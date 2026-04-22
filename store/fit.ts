@@ -5,6 +5,7 @@ import type { Category, Product } from '@/lib/types';
 interface FitState {
   items: Partial<Record<Category, Product>>;
   setItem: (cat: Category, product: Product) => void;
+  replaceItems: (items: Partial<Record<Category, Product>>) => void;
   removeItem: (cat: Category) => void;
   clear: () => void;
   totalCents: () => number;
@@ -16,6 +17,7 @@ export const useFit = create<FitState>()(
     (set, get) => ({
       items: {},
       setItem: (cat, product) => set((s) => ({ items: { ...s.items, [cat]: product } })),
+      replaceItems: (items) => set({ items }),
       removeItem: (cat) =>
         set((s) => {
           const { [cat]: _, ...rest } = s.items;

@@ -1,41 +1,95 @@
-import { Bookmark, Cloud, Database } from 'lucide-react';
+'use client';
+import { Bookmark, RotateCcw, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { useFit } from '@/store/fit';
+import { useSavedFits } from '@/store/saved-fits';
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(value));
+}
 
 export default function SavedPage() {
+  const fits = useSavedFits((state) => state.fits);
+  const removeFit = useSavedFits((state) => state.removeFit);
+  const replaceItems = useFit((state) => state.replaceItems);
+  const router = useRouter();
+
   return (
     <PlaceholderScreen
       eyebrow="Saved"
       title="Fits"
       accent="saved"
-      description="The route works now. Saving is still waiting on the full Supabase wiring, so this screen sets expectations instead of failing silently."
+      description="Saved looks now persist on this MacBook, even before cloud sync is fully wired."
     >
-      <section className="rounded-3xl border border-hairline bg-surface-1 p-5">
-        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-accent/10 text-accent">
-          <Bookmark size={18} />
-        </div>
-        <h2 className="mt-4 font-serif text-[20px] font-semibold text-ink">Saved looks are almost ready</h2>
-        <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
-          Search, build, and shop are the live focus right now. Persistent saved fits will unlock once the database and auth env vars are fully connected.
-        </p>
+      {fits.length ? (
+        <div className="grid gap-3">
+          {fits.map((fit) => (
+            <section key={fit.id} className="rounded-3xl border border-hairline bg-surface-1 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[.18em] text-muted">Saved locally</div>
+                  <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{fit.title}</h2>
+                  <p className="mt-2 text-[12px] text-muted-2">
+                    {fit.itemCount} piece{fit.itemCount !== 1 ? 's' : ''} · ${(fit.totalCents / 100).toLocaleString()} · {formatDate(fit.createdAt)}
+                  </p>
+                </div>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-accent/10 text-accent">
+                  <Bookmark size={18} />
+                </div>
+              </div>
 
-        <div className="mt-5 grid gap-3">
-          <div className="rounded-2xl border border-hairline bg-surface-2 p-3">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[.18em] text-muted">
-              <Cloud size={14} />
-              Missing piece
-            </div>
-            <div className="mt-2 text-[13px] text-ink">Supabase auth and storage need to be live for real saved fits.</div>
-          </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {Object.entries(fit.items).map(([category, product]) => (
+                  <span
+                    key={`${fit.id}-${category}`}
+                    className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[11px] text-muted-2"
+                  >
+                    {category}: {product?.brand}
+                  </span>
+                ))}
+              </div>
 
-          <div className="rounded-2xl border border-hairline bg-surface-2 p-3">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[.18em] text-muted">
-              <Database size={14} />
-              Right now
-            </div>
-            <div className="mt-2 text-[13px] text-ink">Use the builder to test search quality and product selection without dropping into a broken page.</div>
-          </div>
+              <div className="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    replaceItems(fit.items);
+                    router.push('/');
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+                >
+                  <RotateCcw size={13} />
+                  Load in builder
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeFit(fit.id)}
+                  className="inline-flex items-center gap-2 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+                >
+                  <Trash2 size={13} />
+                  Remove
+                </button>
+              </div>
+            </section>
+          ))}
         </div>
-      </section>
+      ) : (
+        <section className="rounded-3xl border border-hairline bg-surface-1 p-5">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-accent/10 text-accent">
+            <Bookmark size={18} />
+          </div>
+          <h2 className="mt-4 font-serif text-[20px] font-semibold text-ink">No saved fits yet</h2>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
+            Save a look from the builder and it will show up here instantly on this MacBook, even before cloud storage is turned on.
+          </p>
+        </section>
+      )}
     </PlaceholderScreen>
   );
 }

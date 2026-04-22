@@ -1,12 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Bookmark, ExternalLink, X } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { useFit } from '@/store/fit';
-import type { Category, Product } from '@/lib/types';
+import { useProfile } from '@/store/profile';
+import { useSavedFits } from '@/store/saved-fits';
+import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 
 interface ShopLink {
   id: string;
@@ -16,16 +19,42 @@ interface ShopLink {
   url: string;
 }
 
-export default function BuilderPage() {
+function BuilderPageContent({
+  quickSlot,
+  quickQuery,
+}: {
+  quickSlot: string | null;
+  quickQuery: string | null;
+}) {
   const { items, totalCents, count, clear } = useFit();
+  const skinTone = useProfile((state) => state.profile.skinTone);
+  const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [shopLinks, setShopLinks] = useState<ShopLink[] | null>(null);
+  const router = useRouter();
   const total = totalCents();
   const n = count();
 
+  useEffect(() => {
+    if (!statusMessage) return;
+    const timeout = window.setTimeout(() => setStatusMessage(null), 4500);
+    return () => window.clearTimeout(timeout);
+  }, [statusMessage]);
+
+  useEffect(() => {
+    if (!quickSlot || !CATEGORY_ORDER.includes(quickSlot as Category)) return;
+    setSearchFor(quickSlot as Category);
+  }, [quickSlot]);
+
+  function closeSearchSheet() {
+    setSearchFor(null);
+    if (quickSlot || quickQuery) router.replace('/');
+  }
+
   async function saveFit() {
     if (!n) return;
+    const localFit = saveLocalFit(items);
     const ids = Object.fromEntries(
       Object.entries(items).map(([k, v]) => [k, v?.id]).filter(([, id]) => id),
     );
@@ -37,12 +66,26 @@ export default function BuilderPage() {
       });
       const d = await res.json();
       if (!res.ok) {
-        setStatusMessage('Save is not wired all the way yet. Finish Supabase setup to store fits.');
+        setStatusMessage(
+          localFit
+            ? `Saved locally as "${localFit.title}". Cloud sync can turn on once Supabase is wired.`
+            : 'Save is not wired all the way yet. Finish Supabase setup to store fits.',
+        );
         return;
       }
-      if (d.id) setStatusMessage(`Saved fit ${d.id.slice(0, 8)}.`);
+      if (d.id) {
+        setStatusMessage(
+          localFit
+            ? `Saved "${localFit.title}" locally and synced fit ${d.id.slice(0, 8)}.`
+            : `Saved fit ${d.id.slice(0, 8)}.`,
+        );
+      }
     } catch {
-      setStatusMessage('Could not save this fit right now.');
+      setStatusMessage(
+        localFit
+          ? `Saved locally as "${localFit.title}". Cloud save is unavailable right now.`
+          : 'Could not save this fit right now.',
+      );
     }
   }
 
@@ -83,6 +126,7 @@ export default function BuilderPage() {
         </div>
         <button
           onClick={saveFit}
+          disabled={n === 0}
           className={`px-3.5 py-2 rounded-full border text-xs font-medium flex items-center gap-1.5 ${
             n > 0 ? 'text-accent border-accent' : 'text-muted-2 border-hairline-2'
           }`}
@@ -95,7 +139,10 @@ export default function BuilderPage() {
         <div className="grid grid-cols-[162px_1fr] gap-3 px-4 pt-3.5">
           <div className="flex flex-col items-center gap-2.5">
             <div className="text-[9px] tracking-[.18em] text-muted uppercase">Your Fit</div>
-            <Mannequin items={items} />
+            <Mannequin items={items} skinTone={skinTone} />
+            <div className="rounded-full border border-hairline bg-surface-2 px-2.5 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
+              Skin tone synced from profile
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-baseline px-0.5 pb-0.5">
@@ -103,7 +150,7 @@ export default function BuilderPage() {
               <div className="text-[10px] text-muted">{n} piece{n !== 1 ? 's' : ''}</div>
             </div>
             <div className="px-0.5 text-[11px] leading-relaxed text-muted-2">
-              Tap any slot to search live products. The fastest clean retailer links now float to the top.
+              Tap any slot to search live products. Saved fits now stay on this device, and Discover can jump you straight into a slot search.
             </div>
             <SlotList onOpenSearch={setSearchFor} />
           </div>
@@ -131,7 +178,12 @@ export default function BuilderPage() {
 
       <BottomNav />
 
-      <SearchSheet open={!!searchFor} category={searchFor} onClose={() => setSearchFor(null)} />
+      <SearchSheet
+        open={!!searchFor}
+        category={searchFor}
+        initialQuery={searchFor ? quickQuery : null}
+        onClose={closeSearchSheet}
+      />
 
       {shopLinks ? (
         <>
@@ -174,5 +226,23 @@ export default function BuilderPage() {
         </>
       ) : null}
     </main>
+  );
+}
+
+function BuilderPageWithSearchParams() {
+  const searchParams = useSearchParams();
+  return (
+    <BuilderPageContent
+      quickSlot={searchParams.get('slot')}
+      quickQuery={searchParams.get('query')}
+    />
+  );
+}
+
+export default function BuilderPage() {
+  return (
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} />}>
+      <BuilderPageWithSearchParams />
+    </Suspense>
   );
 }

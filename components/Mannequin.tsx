@@ -1,18 +1,24 @@
 'use client';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import type { Product } from '@/lib/types';
 
 interface Props {
   items: Partial<Record<string, Product>>;
+  skinTone?: string;
 }
 
 /**
  * CSS-div standing character + image overlays.
  * Phase 1 visualization. Replaceable with SVG / 3D later — API stays identical.
  */
-export function Mannequin({ items }: Props) {
+export function Mannequin({ items, skinTone }: Props) {
+  const mannequinStyle = skinTone
+    ? ({ '--skin': skinTone } as CSSProperties)
+    : undefined;
+
   return (
-    <div className="relative w-[150px] h-[360px] flex justify-center items-start">
+    <div className="relative flex h-[360px] w-[150px] items-start justify-center" style={mannequinStyle}>
       {/* ground shadow */}
       <div className="absolute bottom-0 w-[70%] h-[16px] rounded-full bg-black/50 blur-md" />
       <div className="absolute bottom-0 w-[60%] h-[10px] rounded-full bg-accent/20 blur" />

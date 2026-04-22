@@ -20,10 +20,11 @@ const TRENDING: Record<Category, string[]> = {
 interface Props {
   open: boolean;
   category: Category | null;
+  initialQuery?: string | null;
   onClose: () => void;
 }
 
-export function SearchSheet({ open, category, onClose }: Props) {
+export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Product[] | null>(null);
@@ -36,12 +37,19 @@ export function SearchSheet({ open, category, onClose }: Props) {
 
   useEffect(() => {
     if (!open || !category) return;
-    setQuery('');
+    setQuery(initialQuery?.trim() || '');
     setResults(null);
     setError(null);
     setIsDemoResults(false);
     setCanUseDemo(false);
-  }, [open, category]);
+  }, [open, category, initialQuery]);
+
+  useEffect(() => {
+    if (!open || !category || !initialQuery?.trim()) return;
+    void runSearch(initialQuery, category);
+  }, [open, category, initialQuery]);
+
+  useEffect(() => () => activeRequest.current?.abort(), []);
 
   async function runSearch(q: string, cat: Category, mode: 'live' | 'demo' = 'live') {
     const trimmed = q.trim();
