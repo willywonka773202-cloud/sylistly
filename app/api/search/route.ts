@@ -18,6 +18,7 @@ interface SearchBody {
 }
 
 type SearchSource = 'catalog' | 'live';
+type SearchMode = 'catalog-only' | 'hybrid';
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
 const searchResponseCache = new Map<
@@ -140,6 +141,10 @@ function demoSearchResponse(category: Category | undefined, query: string, reaso
   });
 }
 
+function getSearchMode(): SearchMode {
+  return process.env.SEARCH_MODE === 'hybrid' ? 'hybrid' : 'catalog-only';
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as SearchBody;
   const query = (body.query || '').slice(0, 200);
@@ -148,26 +153,26 @@ export async function POST(req: NextRequest) {
   const cacheKey = `${category || 'any'}::${query.trim().toLowerCase()}`;
   const isDev = process.env.NODE_ENV === 'development';
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
+  const searchMode = getSearchMode();
+  const catalogOnlyMode = searchMode === 'catalog-only';
   const shouldUseDevMocks = isDev && !liveSearchKey;
 
   if (isDev && mode === 'demo') {
     return demoSearchResponse(category, query, 'manual_demo');
   }
 
-  if (shouldUseDevMocks) {
+  if (shouldUseDevMocks && !catalogOnlyMode) {
     return demoSearchResponse(category, query, 'missing_searchapi_key');
-  }
-
-  if (!liveSearchKey) {
-    return NextResponse.json(
-      { error: 'SEARCHAPI_KEY is required for live product search.' },
-      { status: 500 },
-    );
   }
 
   const cached = searchResponseCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json({ products: cached.products, cached: true, source: cached.source });
+    return NextResponse.json({
+      products: cached.products,
+      cached: true,
+      source: cached.source,
+      searchMode,
+    });
   }
   if (cached) searchResponseCache.delete(cacheKey);
 
@@ -197,11 +202,11 @@ export async function POST(req: NextRequest) {
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: photoCatalogProducts, source: 'catalog' });
+      return NextResponse.json({ products: photoCatalogProducts, source: 'catalog', searchMode });
     }
 
     // 2. Fall back to the built-in starter catalog for common brand searches.
-    const useCatalogFirst = shouldUseCatalogFirst(query, category, fastIntent.brand);
+    const useCatalogFirst = shouldUseCatalogFirst(query, category, fastIntent.brand) || catalogOnlyMode;
     const seededCatalogProducts = useCatalogFirst
       ? searchBrandCatalog(fastIntent, query)
       : [];
@@ -209,7 +214,7 @@ export async function POST(req: NextRequest) {
     if (seededCatalogProducts.length) {
       let catalogProducts = seededCatalogProducts;
 
-      if (liveSearchKey && query.trim()) {
+      if (!catalogOnlyMode && liveSearchKey && query.trim()) {
         try {
           const liveCandidates = await searchShopping(fastIntent, query);
           catalogProducts = enrichCatalogProductPhotos(catalogProducts, liveCandidates);
@@ -238,10 +243,29 @@ export async function POST(req: NextRequest) {
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: affiliateWrappedProducts, source: 'catalog' });
+      return NextResponse.json({ products: affiliateWrappedProducts, source: 'catalog', searchMode });
+    }
+
+    if (catalogOnlyMode) {
+      return NextResponse.json(
+        {
+          products: [],
+          source: 'catalog',
+          searchMode,
+          error: 'No catalog matches yet for that search. Try a brand or a simpler clothing term while we keep expanding Sylistly inventory.',
+        },
+        { status: 404 },
+      );
     }
 
     // 3. Parse intent for live search fallback
+    if (!liveSearchKey) {
+      return NextResponse.json(
+        { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode },
+        { status: 500 },
+      );
+    }
+
     const intent = await parseSearchIntent(query, category);
 
     // 4. Search real inventory
@@ -301,7 +325,7 @@ export async function POST(req: NextRequest) {
       source: 'live',
     });
 
-    return NextResponse.json({ products, source: 'live' });
+    return NextResponse.json({ products, source: 'live', searchMode });
   } catch (err) {
     console.error('[api/search]', err);
     const message =
@@ -311,18 +335,22 @@ export async function POST(req: NextRequest) {
         {
           error: 'Live search is temporarily rate-limited. Please wait a moment and try again.',
           demoAvailable: isDev,
+          searchMode,
         },
         { status: 429 },
       );
     }
     if (/searchapi 401|serpapi 401/i.test(message)) {
       return NextResponse.json(
-        { error: 'The SearchAPI key was rejected. Double-check that SEARCHAPI_KEY is your regular API key, not an MCP URL or token.' },
+        {
+          error: 'The SearchAPI key was rejected. Double-check that SEARCHAPI_KEY is your regular API key, not an MCP URL or token.',
+          searchMode,
+        },
         { status: 401 },
       );
     }
     return NextResponse.json(
-      { error: message },
+      { error: message, searchMode },
       { status: 500 },
     );
   }

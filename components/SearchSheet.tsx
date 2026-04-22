@@ -30,6 +30,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isDemoResults, setIsDemoResults] = useState(false);
   const [resultSource, setResultSource] = useState<'catalog' | 'live' | null>(null);
+  const [searchMode, setSearchMode] = useState<'catalog-only' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
@@ -42,6 +43,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     setError(null);
     setIsDemoResults(false);
     setResultSource(null);
+    setSearchMode(null);
     setCanUseDemo(false);
   }, [open, category, initialQuery]);
 
@@ -81,6 +83,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
         setResults([]);
         setIsDemoResults(false);
         setResultSource(null);
+        setSearchMode(data.searchMode === 'hybrid' ? 'hybrid' : data.searchMode === 'catalog-only' ? 'catalog-only' : null);
         setCanUseDemo(Boolean(data.demoAvailable));
         setError(typeof data.error === 'string' ? data.error : 'Search failed.');
         return;
@@ -88,6 +91,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
 
       setIsDemoResults(Boolean(data.mock));
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
+      setSearchMode(data.searchMode === 'hybrid' ? 'hybrid' : data.searchMode === 'catalog-only' ? 'catalog-only' : null);
       setResults(Array.isArray(data.products) ? data.products : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
@@ -96,6 +100,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
       setResults([]);
       setIsDemoResults(false);
       setResultSource(null);
+      setSearchMode(null);
       setCanUseDemo(false);
       setError(
         error instanceof Error && error.name === 'AbortError'
@@ -110,10 +115,12 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   }
 
   const resultLabel = loading
-    ? `Finding ${isDemoResults ? 'demo' : 'live'} products...`
+    ? `Finding ${isDemoResults ? 'demo' : resultSource === 'catalog' || searchMode === 'catalog-only' ? 'catalog' : 'live'} products...`
     : results?.length
     ? `${results.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
-    : 'Search the Sylistly catalog first, then live web results';
+    : searchMode === 'catalog-only'
+    ? 'Search the Sylistly catalog'
+    : 'Search the Sylistly catalog';
 
   if (!open || !category) return null;
 
@@ -139,6 +146,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                 <span>
                   {isDemoResults
                     ? 'Demo mode is on. These are local sample products for UI testing.'
+                    : searchMode === 'catalog-only'
+                    ? 'Search Sylistly inventory by brand, color, or vibe. Results come from the stored catalog so the site can run without live API costs.'
                     : 'Search by brand, color, or vibe. Use Add to fit on a card to place it on the mannequin, or View item to open the retailer.'}
                 </span>
                 {demoSupported ? (
@@ -201,7 +210,9 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                   {isDemoResults
                     ? 'Local sample data'
                     : resultSource === 'catalog'
-                    ? 'Starter brand catalog'
+                    ? searchMode === 'catalog-only'
+                      ? 'Sylistly catalog'
+                      : 'Starter brand catalog'
                     : 'Fastest clean links first'}
                 </span>
               ) : null}
