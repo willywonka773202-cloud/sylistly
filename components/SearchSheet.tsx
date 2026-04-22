@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { X, Search as SearchIcon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { useFit } from '@/store/fit';
 import type { Category, Product } from '@/lib/types';
@@ -30,6 +29,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [results, setResults] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDemoResults, setIsDemoResults] = useState(false);
+  const [resultSource, setResultSource] = useState<'catalog' | 'live' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
@@ -41,6 +41,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     setResults(null);
     setError(null);
     setIsDemoResults(false);
+    setResultSource(null);
     setCanUseDemo(false);
   }, [open, category, initialQuery]);
 
@@ -79,12 +80,14 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
       if (!response.ok) {
         setResults([]);
         setIsDemoResults(false);
+        setResultSource(null);
         setCanUseDemo(Boolean(data.demoAvailable));
         setError(typeof data.error === 'string' ? data.error : 'Search failed.');
         return;
       }
 
       setIsDemoResults(Boolean(data.mock));
+      setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
       setResults(Array.isArray(data.products) ? data.products : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
@@ -92,6 +95,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
       }
       setResults([]);
       setIsDemoResults(false);
+      setResultSource(null);
       setCanUseDemo(false);
       setError(
         error instanceof Error && error.name === 'AbortError'
@@ -108,27 +112,18 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const resultLabel = loading
     ? `Finding ${isDemoResults ? 'demo' : 'live'} products...`
     : results?.length
-    ? `${results.length} ${isDemoResults ? 'demo' : 'live'} picks`
-    : 'Search live products across the web';
+    ? `${results.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
+    : 'Search the Sylistly catalog first, then live web results';
+
+  if (!open || !category) return null;
 
   return (
-    <AnimatePresence>
-      {open && category && (
-        <>
-          <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          <motion.div
-            className="absolute inset-x-0 bottom-0 bg-surface-1 rounded-t-3xl z-50 max-h-[92%] flex flex-col border-t border-hairline-2"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          >
+    <>
+      <div
+        className="absolute inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="absolute inset-x-0 bottom-0 z-50 max-h-[92%] translate-y-0 rounded-t-3xl border-t border-hairline-2 bg-surface-1 flex flex-col shadow-[0_-18px_60px_rgba(0,0,0,.45)]">
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
             <div className="flex items-center justify-between px-5 pt-1.5 pb-2.5">
               <div className="font-serif font-semibold text-lg">
@@ -144,7 +139,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                 <span>
                   {isDemoResults
                     ? 'Demo mode is on. These are local sample products for UI testing.'
-                    : 'Search by brand, color, or vibe. Tap a card to add it to your fit.'}
+                    : 'Search by brand, color, or vibe. Use Add to fit on a card to place it on the mannequin, or View item to open the retailer.'}
                 </span>
                 {demoSupported ? (
                   <button
@@ -202,7 +197,13 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
             <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-muted">
               <span>{resultLabel}</span>
               {results?.length ? (
-                <span>{isDemoResults ? 'Local sample data' : 'Fastest clean links first'}</span>
+                <span>
+                  {isDemoResults
+                    ? 'Local sample data'
+                    : resultSource === 'catalog'
+                    ? 'Starter brand catalog'
+                    : 'Fastest clean links first'}
+                </span>
               ) : null}
             </div>
 
@@ -249,9 +250,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     />
                   ))}
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      </div>
+    </>
   );
 }

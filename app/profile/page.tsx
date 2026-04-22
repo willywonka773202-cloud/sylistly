@@ -6,6 +6,12 @@ import { useProfile } from '@/store/profile';
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
 const BUDGETS = ['low', 'mid', 'high', 'luxury'] as const;
+const BODY_TYPE_LABELS: Record<(typeof BODY_TYPES)[number], string> = {
+  masc: 'Male',
+  fem: 'Female',
+  androgynous: 'Neutral',
+  custom: 'Custom',
+};
 
 export default function ProfilePage() {
   const profile = useProfile((state) => state.profile);
@@ -64,7 +70,7 @@ export default function ProfilePage() {
                     : 'border-hairline bg-surface-2 text-muted-2'
                 }`}
               >
-                {bodyType}
+                {BODY_TYPE_LABELS[bodyType]}
               </button>
             ))}
           </div>

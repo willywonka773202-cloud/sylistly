@@ -1,5 +1,5 @@
 'use client';
-import { useState, type MouseEvent } from 'react';
+import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import type { Product } from '@/lib/types';
 
 interface Props {
@@ -36,9 +36,21 @@ export function ProductCard({ product: p, onClick }: Props) {
     window.location.assign(buyUrl);
   }
 
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onClick();
+  }
+
   return (
     <article className="overflow-hidden rounded-2xl border border-hairline bg-surface-2 transition hover:-translate-y-0.5 hover:border-hairline-2">
-      <button onClick={onClick} className="flex w-full items-stretch gap-3 p-3 text-left">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        className="flex w-full cursor-pointer items-stretch gap-3 p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      >
         <div className="flex h-[112px] w-[96px] flex-none items-center justify-center rounded-2xl bg-black ring-1 ring-hairline">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -77,9 +89,16 @@ export function ProductCard({ product: p, onClick }: Props) {
             </div>
           </div>
         </div>
-      </button>
+      </div>
 
-      <div className="px-3 pb-3">
+      <div className="flex items-center gap-2 px-3 pb-3">
+        <button
+          type="button"
+          className="inline-flex rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-accent-hot"
+          onClick={onClick}
+        >
+          Add to fit
+        </button>
         <button
           type="button"
           className="inline-flex rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"

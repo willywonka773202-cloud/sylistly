@@ -10,7 +10,13 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
-import { VIBES, type GeneratorBudget, type VibeId, vibeSearchQuery } from '@/lib/vibes';
+import {
+  VIBES,
+  type GeneratorBudget,
+  type GeneratorFrame,
+  type VibeId,
+  vibeSearchQuery,
+} from '@/lib/vibes';
 
 interface ShopLink {
   id: string;
@@ -29,6 +35,8 @@ function BuilderPageContent({
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
+  const bodyType = useProfile((state) => state.profile.bodyType);
+  const setBodyType = useProfile((state) => state.setBodyType);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -40,6 +48,8 @@ function BuilderPageContent({
   const total = totalCents();
   const n = count();
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
+  const generatorFrame: GeneratorFrame =
+    bodyType === 'custom' ? 'androgynous' : bodyType;
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -87,7 +97,10 @@ function BuilderPageContent({
       const results = await Promise.allSettled(
         targetSlots.map(async (slot) => ({
           slot,
-          product: await runCategorySearch(slot, vibeSearchQuery(selectedVibe, slot, generatorBudget)),
+          product: await runCategorySearch(
+            slot,
+            vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame),
+          ),
         })),
       );
 
@@ -205,9 +218,9 @@ function BuilderPageContent({
         <div className="grid grid-cols-[162px_1fr] gap-3 px-4 pt-3.5">
           <div className="flex flex-col items-center gap-2.5">
             <div className="text-[9px] tracking-[.18em] text-muted uppercase">Your Fit</div>
-            <Mannequin items={items} skinTone={skinTone} />
+            <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
             <div className="rounded-full border border-hairline bg-surface-2 px-2.5 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
-              Skin tone synced from profile
+              {generatorFrame === 'masc' ? 'Male' : generatorFrame === 'fem' ? 'Female' : 'Androgynous'} frame synced from profile
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -266,6 +279,30 @@ function BuilderPageContent({
                       onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
                       className={`rounded-full px-3 py-1 text-[10px] font-medium transition ${
                         generatorBudget === option.value
+                          ? 'bg-white text-black'
+                          : 'border border-hairline bg-surface-2 text-muted'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
+                <div className="flex flex-wrap justify-end gap-2">
+                  {[
+                    { value: 'masc', label: 'Male' },
+                    { value: 'fem', label: 'Female' },
+                    { value: 'androgynous', label: 'Neutral' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
+                      className={`rounded-full px-3 py-1 text-[10px] font-medium transition ${
+                        generatorFrame === option.value
                           ? 'bg-white text-black'
                           : 'border border-hairline bg-surface-2 text-muted'
                       }`}

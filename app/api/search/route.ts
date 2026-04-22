@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseSearchIntent, rerankProducts } from '@/lib/claude';
+import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
 import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
+import { searchBrandCatalog } from '@/lib/brand-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import type { Category, Product } from '@/lib/types';
 
@@ -15,8 +16,13 @@ interface SearchBody {
   mode?: 'live' | 'demo';
 }
 
+type SearchSource = 'catalog' | 'live';
+
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
-const searchResponseCache = new Map<string, { expiresAt: number; products: Product[] }>();
+const searchResponseCache = new Map<
+  string,
+  { expiresAt: number; products: Product[]; source: SearchSource }
+>();
 const EXPANDED_MARKETPLACE_HOSTS = new Set([
   'ebay.com',
   'etsy.com',
@@ -83,26 +89,52 @@ export async function POST(req: NextRequest) {
 
   const cached = searchResponseCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json({ products: cached.products, cached: true });
+    return NextResponse.json({ products: cached.products, cached: true, source: cached.source });
   }
   if (cached) searchResponseCache.delete(cacheKey);
 
   const startedAt = Date.now();
 
   try {
-    // 1. Parse intent
+    // 1. Try the built-in Sylistly catalog first for common brand searches.
+    const fastIntent = parseSearchIntentHeuristic(query, category);
+    const catalogProducts = searchBrandCatalog(fastIntent, query).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
+
+    if (catalogProducts.length) {
+      cacheProducts(catalogProducts).catch(() => {});
+      searchResponseCache.set(cacheKey, {
+        expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+        products: catalogProducts,
+        source: 'catalog',
+      });
+
+      console.info(
+        '[api/search] query=%s category=%s source=catalog results=%d durationMs=%d',
+        query || '(blank)',
+        category || fastIntent.category,
+        catalogProducts.length,
+        Date.now() - startedAt,
+      );
+
+      return NextResponse.json({ products: catalogProducts, source: 'catalog' });
+    }
+
+    // 2. Parse intent for live search fallback
     const intent = await parseSearchIntent(query, category);
 
-    // 2. Search real inventory
+    // 3. Search real inventory
     const candidates = await searchShopping(intent, query);
 
-    // 3. Re-rank with Claude
+    // 4. Re-rank with Claude
     const rerankLimit = Math.min(6, candidates.length);
     const ranked = candidates.length > rerankLimit
       ? await rerankProducts(query, intent, candidates, rerankLimit)
       : candidates.slice(0, rerankLimit);
 
-    // 4. Resolve direct retailer links for the strongest results only.
+    // 5. Resolve direct retailer links for the strongest results only.
     // This keeps the picker responsive on mobile while still upgrading the
     // top cards with clean retailer destinations.
     const hydrationTargets = ranked.slice(0, 3);
@@ -120,7 +152,7 @@ export async function POST(req: NextRequest) {
       : combined
     ).slice(0, 6);
 
-    // 5. Affiliate-wrap
+    // 6. Affiliate-wrap
     const products: Product[] = selected.map((p) => ({
       ...p,
       affiliateUrl: wrapAffiliate(p.retailerUrl),
@@ -142,14 +174,15 @@ export async function POST(req: NextRequest) {
       Date.now() - startedAt,
     );
 
-    // 6. Fire-and-forget cache write
+    // 7. Fire-and-forget cache write
     cacheProducts(products).catch(() => {});
     searchResponseCache.set(cacheKey, {
       expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
       products,
+      source: 'live',
     });
 
-    return NextResponse.json({ products });
+    return NextResponse.json({ products, source: 'live' });
   } catch (err) {
     console.error('[api/search]', err);
     const message =

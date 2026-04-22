@@ -2,20 +2,84 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import type { Product } from '@/lib/types';
+import type { GeneratorFrame } from '@/lib/vibes';
 
 interface Props {
   items: Partial<Record<string, Product>>;
   skinTone?: string;
+  bodyType?: GeneratorFrame;
 }
 
 /**
  * CSS-div standing character + image overlays.
  * Phase 1 visualization. Replaceable with SVG / 3D later — API stays identical.
  */
-export function Mannequin({ items, skinTone }: Props) {
+const BODY_LAYOUT: Record<
+  GeneratorFrame,
+  {
+    headLeft: number;
+    headWidth: number;
+    torsoLeft: number;
+    torsoWidth: number;
+    torsoHeight: number;
+    armLeft: number;
+    armRight: number;
+    armHeight: number;
+    legLeft: number;
+    legRight: number;
+    legWidth: number;
+    hipTop: number;
+  }
+> = {
+  masc: {
+    headLeft: 35,
+    headWidth: 50,
+    torsoLeft: 24,
+    torsoWidth: 72,
+    torsoHeight: 70,
+    armLeft: 10,
+    armRight: 93,
+    armHeight: 66,
+    legLeft: 30,
+    legRight: 64,
+    legWidth: 28,
+    hipTop: 124,
+  },
+  fem: {
+    headLeft: 39,
+    headWidth: 42,
+    torsoLeft: 31,
+    torsoWidth: 58,
+    torsoHeight: 68,
+    armLeft: 15,
+    armRight: 88,
+    armHeight: 64,
+    legLeft: 34,
+    legRight: 60,
+    legWidth: 24,
+    hipTop: 122,
+  },
+  androgynous: {
+    headLeft: 37,
+    headWidth: 46,
+    torsoLeft: 30,
+    torsoWidth: 60,
+    torsoHeight: 66,
+    armLeft: 14,
+    armRight: 89,
+    armHeight: 62,
+    legLeft: 32,
+    legRight: 62,
+    legWidth: 26,
+    hipTop: 120,
+  },
+};
+
+export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
   const mannequinStyle = skinTone
     ? ({ '--skin': skinTone } as CSSProperties)
     : undefined;
+  const layout = BODY_LAYOUT[bodyType];
 
   return (
     <div className="relative flex h-[360px] w-[150px] items-start justify-center" style={mannequinStyle}>
@@ -24,17 +88,38 @@ export function Mannequin({ items, skinTone }: Props) {
       <div className="absolute bottom-0 w-[60%] h-[10px] rounded-full bg-accent/20 blur" />
 
       <div className="relative w-[120px] h-[360px]">
-        <div className="absolute top-0 left-[37px] w-[46px] h-[48px] rounded-[22px_22px_12px_12px] skin shadow-[inset_-3px_-4px_10px_rgba(0,0,0,.22)]" />
-        <div className="absolute top-[46px] left-[53px] w-[14px] h-[10px] rounded skin" />
-        <div className="absolute top-[56px] left-[30px] w-[60px] h-[66px] rounded-[9px_9px_14px_14px] skin shadow-[inset_-3px_-4px_10px_rgba(0,0,0,.22)]" />
-        <div className="absolute top-[58px] left-[14px] w-[17px] h-[62px] rounded-[8px_6px_10px_10px] skin rotate-[4deg]" />
-        <div className="absolute top-[58px] left-[89px] w-[17px] h-[62px] rounded-[6px_8px_10px_10px] skin -rotate-[4deg]" />
-        <div className="absolute top-[118px] left-[12px] w-[17px] h-[15px] rounded-[8px] skin" />
-        <div className="absolute top-[118px] left-[91px] w-[17px] h-[15px] rounded-[8px] skin" />
-        <div className="absolute top-[120px] left-[32px] w-[26px] h-[100px] rounded-[6px_6px_10px_10px] skin" />
-        <div className="absolute top-[120px] left-[62px] w-[26px] h-[100px] rounded-[6px_6px_10px_10px] skin" />
-        <div className="absolute top-[218px] left-[28px] w-[34px] h-[14px] rounded-[4px_4px_10px_10px] skin" />
-        <div className="absolute top-[218px] left-[58px] w-[34px] h-[14px] rounded-[4px_4px_10px_10px] skin" />
+        <div
+          className="absolute top-0 rounded-[24px_24px_14px_14px] skin shadow-[inset_-3px_-4px_10px_rgba(0,0,0,.22)]"
+          style={{ left: layout.headLeft, width: layout.headWidth, height: 50 }}
+        />
+        <div
+          className="absolute top-[46px] rounded skin"
+          style={{ left: layout.headLeft + layout.headWidth / 2 - 7, width: 14, height: 10 }}
+        />
+        <div
+          className="absolute top-[56px] rounded-[10px_10px_16px_16px] skin shadow-[inset_-3px_-4px_10px_rgba(0,0,0,.22)]"
+          style={{ left: layout.torsoLeft, width: layout.torsoWidth, height: layout.torsoHeight }}
+        />
+        <div
+          className="absolute top-[58px] rounded-[8px_6px_10px_10px] skin rotate-[4deg]"
+          style={{ left: layout.armLeft, width: 17, height: layout.armHeight }}
+        />
+        <div
+          className="absolute top-[58px] rounded-[6px_8px_10px_10px] skin -rotate-[4deg]"
+          style={{ left: layout.armRight, width: 17, height: layout.armHeight }}
+        />
+        <div className="absolute rounded-[8px] skin" style={{ top: layout.hipTop - 2, left: layout.armLeft - 2, width: 17, height: 15 }} />
+        <div className="absolute rounded-[8px] skin" style={{ top: layout.hipTop - 2, left: layout.armRight + 2, width: 17, height: 15 }} />
+        <div
+          className="absolute rounded-[6px_6px_10px_10px] skin"
+          style={{ top: layout.hipTop, left: layout.legLeft, width: layout.legWidth, height: 100 }}
+        />
+        <div
+          className="absolute rounded-[6px_6px_10px_10px] skin"
+          style={{ top: layout.hipTop, left: layout.legRight, width: layout.legWidth, height: 100 }}
+        />
+        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: 218, left: layout.legLeft - 4, width: 34, height: 14 }} />
+        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: 218, left: layout.legRight - 4, width: 34, height: 14 }} />
 
         {/* Styled garment zones work better with normal shopping thumbnails than raw full-body cutouts. */}
         {items.outer && (
@@ -112,7 +197,7 @@ function Overlay({
   }[variant];
 
   return (
-    <div className={`absolute pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass}`} style={style}>
+    <div className={`absolute z-10 pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass}`} style={style}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}

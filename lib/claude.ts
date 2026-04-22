@@ -114,7 +114,7 @@ function parseBudget(query: string): Pick<SearchIntent, 'priceMin' | 'priceMax'>
   return { priceMin: null, priceMax: null };
 }
 
-function heuristicParseSearchIntent(query: string, forcedCategory?: Category): SearchIntent {
+export function parseSearchIntentHeuristic(query: string, forcedCategory?: Category): SearchIntent {
   const normalized = normalizeText(query);
   const keywords = normalized.split(/\s+/).filter(Boolean);
   const { priceMin, priceMax } = parseBudget(query);
@@ -205,7 +205,7 @@ export async function parseSearchIntent(
   query: string,
   forcedCategory?: Category,
 ): Promise<SearchIntent> {
-  const fallback = heuristicParseSearchIntent(query, forcedCategory);
+  const fallback = parseSearchIntentHeuristic(query, forcedCategory);
   const client = getClient();
 
   if (!client) return fallback;
