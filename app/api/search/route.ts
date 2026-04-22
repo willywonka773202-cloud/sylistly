@@ -205,8 +205,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ products: photoCatalogProducts, source: 'catalog', searchMode });
     }
 
-    // 2. Fall back to the built-in starter catalog for common brand searches.
-    const useCatalogFirst = shouldUseCatalogFirst(query, category, fastIntent.brand) || catalogOnlyMode;
+    // 2. Fall back to the built-in starter catalog only in hybrid mode.
+    // In catalog-only launch mode we avoid placeholder SVG products so the
+    // public site only shows real-photo inventory.
+    const useCatalogFirst = !catalogOnlyMode && shouldUseCatalogFirst(query, category, fastIntent.brand);
     const seededCatalogProducts = useCatalogFirst
       ? searchBrandCatalog(fastIntent, query)
       : [];
