@@ -36,6 +36,24 @@ pnpm dev
 
 Needed for full functionality. Without them, `/api/search` falls back to the mock product database (see `lib/mock-products.ts`), so you can still build and test UX.
 
+## Build a Real Photo Catalog
+
+To replace placeholder catalog art with real retailer thumbnails, build the local photo-backed catalog:
+
+```bash
+npm run catalog:build
+```
+
+Useful filters:
+
+```bash
+CATALOG_BRAND_FILTER=nike npm run catalog:build
+CATALOG_CATEGORY_FILTER=shoes npm run catalog:build
+CATALOG_MAX_SEEDS=10 npm run catalog:build
+```
+
+This writes real product records into [`data/photo-catalog.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/photo-catalog.json). Once populated, `/api/search` prefers that photo-backed catalog before the starter placeholder catalog.
+
 ```
 # Required
 NEXT_PUBLIC_SUPABASE_URL=

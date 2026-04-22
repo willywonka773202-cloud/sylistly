@@ -4,6 +4,7 @@ import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '@/lib
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
 import { searchBrandCatalog } from '@/lib/brand-catalog';
+import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import type { Category, Product } from '@/lib/types';
 
@@ -32,6 +33,19 @@ const EXPANDED_MARKETPLACE_HOSTS = new Set([
   'whatnot.com',
 ]);
 
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function tokenize(value: string): string[] {
+  return normalizeText(value)
+    .split(/\s+/)
+    .filter((token) => token.length > 1);
+}
+
 function safeHostname(url: string): string | null {
   try {
     return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
@@ -50,6 +64,70 @@ function productSortScore(product: Product): number {
   if (host && !EXPANDED_MARKETPLACE_HOSTS.has(host)) score += 25;
 
   return score;
+}
+
+function shouldUseCatalogFirst(query: string, category: Category | undefined, detectedBrands: string[] | undefined): boolean {
+  if (!query.trim()) return true;
+  if ((detectedBrands || []).length > 0) return true;
+
+  const normalized = normalizeText(query);
+  if (category && normalized === category) return true;
+
+  return false;
+}
+
+function imageLooksLikePlaceholder(imageUrl: string | undefined): boolean {
+  return typeof imageUrl === 'string' && imageUrl.startsWith('data:image/svg+xml');
+}
+
+function nameOverlapScore(left: string, right: string): number {
+  const leftTokens = new Set(tokenize(left));
+  const rightTokens = new Set(tokenize(right));
+  let score = 0;
+
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) score += 1;
+  }
+
+  return score;
+}
+
+function enrichCatalogProductPhotos(catalogProducts: Product[], liveProducts: Product[]): Product[] {
+  const usedLiveIds = new Set<string>();
+
+  return catalogProducts.map((catalogProduct) => {
+    if (!imageLooksLikePlaceholder(catalogProduct.imageUrl)) return catalogProduct;
+
+    const normalizedBrand = normalizeText(catalogProduct.brand);
+    const bestMatch = liveProducts
+      .filter((liveProduct) => !usedLiveIds.has(liveProduct.id))
+      .map((liveProduct) => {
+        const sameBrand = normalizeText(liveProduct.brand) === normalizedBrand;
+        const overlap = nameOverlapScore(catalogProduct.name, liveProduct.name);
+        return {
+          liveProduct,
+          score: (sameBrand ? 10 : 0) + overlap + (liveProduct.trusted !== false ? 1 : 0),
+        };
+      })
+      .sort((left, right) => right.score - left.score)[0];
+
+    if (!bestMatch || bestMatch.score < 2) return catalogProduct;
+
+    usedLiveIds.add(bestMatch.liveProduct.id);
+    return {
+      ...catalogProduct,
+      imageUrl: bestMatch.liveProduct.imageUrl || catalogProduct.imageUrl,
+      imageOriginalUrl:
+        bestMatch.liveProduct.imageOriginalUrl
+        || bestMatch.liveProduct.imageUrl
+        || catalogProduct.imageOriginalUrl,
+      metadata: {
+        ...(catalogProduct.metadata || {}),
+        photoSource: 'live_match',
+        matchedLiveProductId: bestMatch.liveProduct.id,
+      },
+    };
+  });
 }
 
 function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
@@ -96,18 +174,59 @@ export async function POST(req: NextRequest) {
   const startedAt = Date.now();
 
   try {
-    // 1. Try the built-in Sylistly catalog first for common brand searches.
+    // 1. Prefer the real photo-backed catalog whenever we have a match.
     const fastIntent = parseSearchIntentHeuristic(query, category);
-    const catalogProducts = searchBrandCatalog(fastIntent, query).map((product) => ({
+    const photoCatalogProducts = searchPhotoCatalog(fastIntent, query).map((product) => ({
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
 
-    if (catalogProducts.length) {
-      cacheProducts(catalogProducts).catch(() => {});
+    if (photoCatalogProducts.length) {
+      cacheProducts(photoCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
         expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-        products: catalogProducts,
+        products: photoCatalogProducts,
+        source: 'catalog',
+      });
+
+      console.info(
+        '[api/search] query=%s category=%s source=photo_catalog results=%d durationMs=%d',
+        query || '(blank)',
+        category || fastIntent.category,
+        photoCatalogProducts.length,
+        Date.now() - startedAt,
+      );
+
+      return NextResponse.json({ products: photoCatalogProducts, source: 'catalog' });
+    }
+
+    // 2. Fall back to the built-in starter catalog for common brand searches.
+    const useCatalogFirst = shouldUseCatalogFirst(query, category, fastIntent.brand);
+    const seededCatalogProducts = useCatalogFirst
+      ? searchBrandCatalog(fastIntent, query)
+      : [];
+
+    if (seededCatalogProducts.length) {
+      let catalogProducts = seededCatalogProducts;
+
+      if (liveSearchKey && query.trim()) {
+        try {
+          const liveCandidates = await searchShopping(fastIntent, query);
+          catalogProducts = enrichCatalogProductPhotos(catalogProducts, liveCandidates);
+        } catch (error) {
+          console.warn('[api/search] catalog photo enrichment failed for "%s": %s', query, String(error));
+        }
+      }
+
+      const affiliateWrappedProducts = catalogProducts.map((product) => ({
+        ...product,
+        affiliateUrl: wrapAffiliate(product.retailerUrl),
+      }));
+
+      cacheProducts(affiliateWrappedProducts).catch(() => {});
+      searchResponseCache.set(cacheKey, {
+        expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+        products: affiliateWrappedProducts,
         source: 'catalog',
       });
 
@@ -115,26 +234,26 @@ export async function POST(req: NextRequest) {
         '[api/search] query=%s category=%s source=catalog results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
-        catalogProducts.length,
+        affiliateWrappedProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: catalogProducts, source: 'catalog' });
+      return NextResponse.json({ products: affiliateWrappedProducts, source: 'catalog' });
     }
 
-    // 2. Parse intent for live search fallback
+    // 3. Parse intent for live search fallback
     const intent = await parseSearchIntent(query, category);
 
-    // 3. Search real inventory
+    // 4. Search real inventory
     const candidates = await searchShopping(intent, query);
 
-    // 4. Re-rank with Claude
+    // 5. Re-rank with Claude
     const rerankLimit = Math.min(6, candidates.length);
     const ranked = candidates.length > rerankLimit
       ? await rerankProducts(query, intent, candidates, rerankLimit)
       : candidates.slice(0, rerankLimit);
 
-    // 5. Resolve direct retailer links for the strongest results only.
+    // 6. Resolve direct retailer links for the strongest results only.
     // This keeps the picker responsive on mobile while still upgrading the
     // top cards with clean retailer destinations.
     const hydrationTargets = ranked.slice(0, 3);
@@ -152,7 +271,7 @@ export async function POST(req: NextRequest) {
       : combined
     ).slice(0, 6);
 
-    // 6. Affiliate-wrap
+    // 7. Affiliate-wrap
     const products: Product[] = selected.map((p) => ({
       ...p,
       affiliateUrl: wrapAffiliate(p.retailerUrl),
@@ -174,7 +293,7 @@ export async function POST(req: NextRequest) {
       Date.now() - startedAt,
     );
 
-    // 7. Fire-and-forget cache write
+    // 8. Fire-and-forget cache write
     cacheProducts(products).catch(() => {});
     searchResponseCache.set(cacheKey, {
       expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
