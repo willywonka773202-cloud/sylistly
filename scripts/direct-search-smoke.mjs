@@ -1,0 +1,114 @@
+import { performance } from 'node:perf_hooks';
+import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '../lib/serpapi.ts';
+
+const queries = [
+  ['top', 'white nike crop top'],
+  ['top', 'essentials hoodie'],
+  ['top', 'prada tee'],
+  ['bottom', 'baggy jeans'],
+  ['bottom', 'black cargo pants'],
+  ['shoes', 'air force 1 white'],
+  ['shoes', 'samba'],
+  ['outer', 'north face puffer'],
+  ['outer', 'trench coat'],
+  ['hat', 'supreme cap'],
+  ['bag', 'gucci bag'],
+  ['eyewear', 'ray ban wayfarer'],
+];
+
+function percentile(values, p) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(
+    sorted.length - 1,
+    Math.max(0, Math.ceil((p / 100) * sorted.length) - 1),
+  );
+  return sorted[index];
+}
+
+function buildIntent(category, query) {
+  const normalized = query.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return {
+    category,
+    color: [],
+    brand: [],
+    style: [],
+    priceMin: null,
+    priceMax: null,
+    gender: null,
+    keywords: normalized ? normalized.split(/\s+/) : [],
+  };
+}
+
+async function logRawSerpResponse(query) {
+  if (!process.env.SERPAPI_KEY) {
+    console.log('SERPAPI_KEY is missing, skipping raw SerpAPI shape dump.');
+    return;
+  }
+
+  const params = new URLSearchParams({
+    engine: 'google_shopping',
+    q: query,
+    api_key: process.env.SERPAPI_KEY,
+    hl: 'en',
+    gl: 'us',
+    google_domain: 'google.com',
+    device: 'desktop',
+    num: '3',
+  });
+
+  const response = await fetch(`https://serpapi.com/search.json?${params.toString()}`);
+  const data = await response.json();
+  const sample = Array.isArray(data.shopping_results) ? data.shopping_results[0] : null;
+
+  console.log('\nRaw SerpAPI sample for sanity-check:');
+  console.log(JSON.stringify(sample, null, 2));
+}
+
+async function main() {
+  if (!process.env.SERPAPI_KEY) {
+    console.error('SERPAPI_KEY is missing in .env.local');
+    process.exitCode = 1;
+    return;
+  }
+
+  const durations = [];
+
+  for (const [category, query] of queries) {
+    const startedAt = performance.now();
+
+    try {
+      const intent = buildIntent(category, query);
+      const candidates = await searchShopping(intent, query);
+      const hydrated = await hydrateRetailerUrls(candidates.slice(0, 8));
+      const selected = hydrated.filter((product) => hasDirectRetailerUrl(product.retailerUrl)).slice(0, 6);
+      const results = selected.length >= 4 ? selected : hydrated.slice(0, 6);
+      const elapsedMs = Math.round(performance.now() - startedAt);
+      durations.push(elapsedMs);
+
+      console.log(
+        `OK  ${elapsedMs}ms [${category}] ${query} -> ${results.length} products`,
+      );
+
+      results.forEach((product, index) => {
+        console.log(
+          `  ${index + 1}. ${product.brand} | ${product.name} | ${product.retailer} | $${(product.priceCents / 100).toFixed(2)} | trusted=${product.trusted !== false} | ${product.retailerUrl}`,
+        );
+      });
+    } catch (error) {
+      const elapsedMs = Math.round(performance.now() - startedAt);
+      durations.push(elapsedMs);
+      console.log(`ERR ${elapsedMs}ms [${category}] ${query} -> ${String(error)}`);
+    }
+  }
+
+  console.log(`\np50 latency: ${percentile(durations, 50)}ms`);
+  console.log(`p95 latency: ${percentile(durations, 95)}ms`);
+
+  await logRawSerpResponse(queries[0][1]);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
