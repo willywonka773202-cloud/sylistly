@@ -9,7 +9,7 @@ Production starter for the Sylistly app (AI-powered outfit builder). Pairs with 
 - Tailwind CSS
 - Supabase (auth + Postgres)
 - Anthropic Claude (query parsing + re-ranking)
-- SerpAPI Google Shopping (real product search)
+- SearchAPI Google Shopping (real product search)
 - Skimlinks (auto-affiliate wrapping)
 - PostHog (analytics)
 
@@ -42,7 +42,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ANTHROPIC_API_KEY=
-SERPAPI_KEY=
+SEARCHAPI_KEY=
 
 # Recommended
 SKIMLINKS_PUBLISHER_ID=
@@ -60,7 +60,7 @@ CLOUDFLARE_R2_BUCKET=
 Get keys:
 
 - **Anthropic:** https://console.anthropic.com
-- **SerpAPI:** https://serpapi.com (100 free searches/mo)
+- **SearchAPI:** https://www.searchapi.io
 - **Supabase:** https://supabase.com (free tier)
 - **Skimlinks:** https://skimlinks.com (auto-affiliates any outbound link)
 - **Rakuten:** https://rakutenadvertising.com
@@ -74,7 +74,7 @@ Get keys:
              Claude (parse intent)
                  │
                  ▼
-             SerpAPI Google Shopping
+             SearchAPI Google Shopping
                  │
                  ▼
              dedupe + trust-filter
@@ -100,7 +100,7 @@ app/
   profile/page.tsx       style profile
   fit/[id]/page.tsx      public shareable fit
   api/
-    search/route.ts      Claude + SerpAPI
+    search/route.ts      Claude + SearchAPI
     fit/route.ts         create fit
     fit/[id]/route.ts    read / share fit
     shop-all/route.ts    wrap + return all buy links
@@ -129,7 +129,7 @@ supabase/
 
 ## Deploy
 
-- **Vercel** (recommended): `vercel` in the project root. Set env vars in project settings. The Claude + SerpAPI routes run on Node runtime (not Edge — AWS SDK compatibility).
+- **Vercel** (recommended): `vercel` in the project root. Set env vars in project settings. The Claude + SearchAPI routes run on Node runtime (not Edge — AWS SDK compatibility).
 - **Netlify**: works with `@netlify/plugin-nextjs`.
 
 ## Phase plan

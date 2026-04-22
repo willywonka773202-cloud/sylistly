@@ -63,19 +63,20 @@ export async function POST(req: NextRequest) {
   const mode = body.mode || 'live';
   const cacheKey = `${category || 'any'}::${query.trim().toLowerCase()}`;
   const isDev = process.env.NODE_ENV === 'development';
-  const shouldUseDevMocks = isDev && !process.env.SERPAPI_KEY;
+  const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
+  const shouldUseDevMocks = isDev && !liveSearchKey;
 
   if (isDev && mode === 'demo') {
     return demoSearchResponse(category, query, 'manual_demo');
   }
 
   if (shouldUseDevMocks) {
-    return demoSearchResponse(category, query, 'missing_serpapi_key');
+    return demoSearchResponse(category, query, 'missing_searchapi_key');
   }
 
-  if (!process.env.SERPAPI_KEY) {
+  if (!liveSearchKey) {
     return NextResponse.json(
-      { error: 'SERPAPI_KEY is required for live product search.' },
+      { error: 'SEARCHAPI_KEY is required for live product search.' },
       { status: 500 },
     );
   }
@@ -153,13 +154,19 @@ export async function POST(req: NextRequest) {
     console.error('[api/search]', err);
     const message =
       err instanceof Error ? err.message : 'Live search failed. Please try again.';
-    if (/serpapi 429/i.test(message)) {
+    if (/searchapi 429|serpapi 429/i.test(message)) {
       return NextResponse.json(
         {
           error: 'Live search is temporarily rate-limited. Please wait a moment and try again.',
           demoAvailable: isDev,
         },
         { status: 429 },
+      );
+    }
+    if (/searchapi 401|serpapi 401/i.test(message)) {
+      return NextResponse.json(
+        { error: 'The SearchAPI key was rejected. Double-check that SEARCHAPI_KEY is your regular API key, not an MCP URL or token.' },
+        { status: 401 },
       );
     }
     return NextResponse.json(

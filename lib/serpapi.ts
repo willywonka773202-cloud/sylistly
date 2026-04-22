@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import type { Category, Product, SearchIntent } from './types';
 
-const SERP_ENDPOINT = 'https://serpapi.com/search.json';
+const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
 const SEARCH_TIMEOUT_MS = 12_000;
 const PRODUCT_TIMEOUT_MS = 2_500;
 const MIN_TRUSTED_RESULTS = 3;
@@ -110,55 +110,67 @@ const BRAND_ALIASES: Array<{ alias: string; brand: string }> = [
   { alias: 'oakley', brand: 'Oakley' },
 ];
 
+interface SearchApiShoppingResult {
+  product_id?: string;
+  title?: string;
+  product_link?: string;
+  seller?: string;
+  offers?: string;
+  extracted_offers?: number;
+  offers_link?: string;
+  price?: string;
+  extracted_price?: number;
+  rating?: number;
+  reviews?: number;
+  delivery?: string;
+  thumbnail?: string;
+  product_token?: string;
+}
+
+interface SearchApiOffer {
+  title?: string;
+  link?: string;
+  price?: string;
+  extracted_price?: number;
+  total_price?: string;
+  extracted_total_price?: number;
+  delivery_price?: string;
+  extracted_delivery_price?: number;
+  rating?: number;
+  reviews?: number;
+  details?: string[];
+  merchant?: {
+    name?: string;
+  };
+}
+
+interface SearchApiProductOffersResponse {
+  offers?: SearchApiOffer[];
+}
+
+function getSearchApiKey(): string | null {
+  return process.env.SEARCHAPI_KEY?.trim() || process.env.SERPAPI_KEY?.trim() || null;
+}
+
+function searchApiHeaders(): Record<string, string> {
+  const apiKey = getSearchApiKey();
+  if (!apiKey) return {};
+  return { Authorization: `Bearer ${apiKey}` };
+}
+
 function buildQueryString(intent: SearchIntent, rawQuery: string): string {
   const parts: string[] = [];
   if (rawQuery.trim()) parts.push(rawQuery.trim());
   if (intent.brand?.length) parts.push(intent.brand.join(' '));
   if (intent.color?.length) parts.push(intent.color.join(' '));
   if (intent.style?.length) parts.push(intent.style.join(' '));
+  if (intent.priceMin && intent.priceMax) parts.push(`between $${intent.priceMin} and $${intent.priceMax}`);
+  else if (intent.priceMax) parts.push(`under $${intent.priceMax}`);
+  else if (intent.priceMin) parts.push(`over $${intent.priceMin}`);
   parts.push(CATEGORY_KEYWORDS[intent.category]);
   parts.push(...(intent.keywords || []));
   const merged = Array.from(new Set(parts.filter(Boolean))).join(' ');
   return merged || rawQuery || CATEGORY_KEYWORDS[intent.category];
-}
-
-interface SerpShoppingResult {
-  title?: string;
-  source?: string;
-  link?: string;
-  product_link?: string;
-  serpapi_product_api?: string;
-  immersive_product_page_token?: string;
-  serpapi_immersive_product_api?: string;
-  price?: string;
-  extracted_price?: number;
-  thumbnail?: string;
-  serpapi_thumbnail?: string;
-  thumbnails?: Array<{ link?: string }>;
-  product_id?: string;
-  multiple_sources?: boolean;
-}
-
-interface SerpImmersiveStore {
-  name?: string;
-  link?: string;
-  title?: string;
-  tag?: string;
-  price?: string;
-  extracted_price?: number;
-  total?: string;
-  extracted_total?: number;
-  shipping?: string;
-  shipping_extracted?: number;
-  rating?: number;
-  reviews?: number;
-  details_and_offers?: string[];
-}
-
-interface SerpImmersiveProductResponse {
-  product_results?: {
-    stores?: SerpImmersiveStore[];
-  };
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -218,19 +230,12 @@ function isTrustedRetailer(retailer: string, host: string | null): boolean {
     .some((alias) => normalizedRetailer.includes(normalizeText(alias)));
 }
 
-function firstImage(result: SerpShoppingResult): string | null {
-  return (
-    result.thumbnail ||
-    result.serpapi_thumbnail ||
-    result.thumbnails?.find((image) => image.link)?.link ||
-    null
-  );
+function firstImage(result: SearchApiShoppingResult): string | null {
+  return result.thumbnail || null;
 }
 
-function bestKnownUrl(result: SerpShoppingResult): string | null {
-  const direct = result.link?.trim();
-  if (direct && !isGoogleRetailerUrl(direct)) return direct;
-  return result.product_link?.trim() || direct || null;
+function bestKnownUrl(result: SearchApiShoppingResult): string | null {
+  return result.product_link?.trim() || null;
 }
 
 function parsePrice(value: string): number {
@@ -243,18 +248,18 @@ function parsePrice(value: string): number {
   return Math.min(...prices);
 }
 
-function inferBrand(title: string, source: string): string {
+function inferBrand(title: string, seller: string): string {
   const normalizedTitle = normalizeText(title);
   for (const { alias, brand } of BRAND_ALIASES) {
     if (normalizedTitle.includes(alias)) return brand;
   }
 
-  const normalizedSource = normalizeText(source);
+  const normalizedSeller = normalizeText(seller);
   for (const { alias, brand } of BRAND_ALIASES) {
-    if (normalizedSource.includes(alias)) return brand;
+    if (normalizedSeller.includes(alias)) return brand;
   }
 
-  return source.trim() || 'Unknown';
+  return seller.trim() || 'Unknown';
 }
 
 function cleanName(title: string, brand: string): string {
@@ -288,14 +293,15 @@ function dedupeByIdentity(items: Product[]): Product[] {
   return out;
 }
 
-function toProduct(result: SerpShoppingResult, category: Category): Product {
+function toProduct(result: SearchApiShoppingResult, category: Category): Product {
   const retailerUrl = bestKnownUrl(result) || 'https://google.com';
   const retailerHost = safeHostname(retailerUrl);
   const imageUrl = firstImage(result);
   const price = result.extracted_price ?? parsePrice(result.price || '0');
-  const brand = inferBrand(result.title || '', result.source || '');
+  const seller = result.seller || '';
+  const brand = inferBrand(result.title || '', seller);
   const name = cleanName(result.title || '', brand);
-  const trusted = isTrustedRetailer(result.source || '', retailerHost);
+  const trusted = isTrustedRetailer(seller, retailerHost);
   const idSeed = result.product_id || retailerUrl || `${brand}:${name}:${result.price || ''}`;
 
   return {
@@ -305,61 +311,59 @@ function toProduct(result: SerpShoppingResult, category: Category): Product {
     category,
     priceCents: Math.round(price * 100),
     currency: 'USD',
-    retailer: result.source || retailerHost || 'Unknown retailer',
+    retailer: seller || retailerHost || 'Unknown retailer',
     retailerUrl,
-    // TODO: swap this thumbnail for the bg-removed CDN asset once the image worker exists.
     imageUrl: imageUrl!,
     imageOriginalUrl: imageUrl || undefined,
     trusted,
     metadata: {
       trusted,
       retailerHost,
-      serpapiProductId: result.product_id,
-      serpapiProductApi: result.serpapi_product_api,
-      immersiveProductPageToken: result.immersive_product_page_token,
-      serpapiImmersiveProductApi: result.serpapi_immersive_product_api,
-      shoppingLink: result.product_link,
-      rawSource: result.source,
+      searchapiProductId: result.product_id,
+      searchapiProductToken: result.product_token,
+      searchapiOffersLink: result.offers_link,
+      rawSeller: seller,
       rawPrice: result.price,
-      multipleSources: result.multiple_sources ?? false,
+      extractedOffers: result.extracted_offers,
     },
   };
 }
 
 export async function searchShopping(intent: SearchIntent, rawQuery: string): Promise<Product[]> {
   const query = buildQueryString(intent, rawQuery);
-  const apiKey = process.env.SERPAPI_KEY?.trim();
-  if (!apiKey) throw new Error('SERPAPI_KEY is not configured');
+  const apiKey = getSearchApiKey();
+  if (!apiKey) throw new Error('SEARCHAPI_KEY is not configured');
 
   const params = new URLSearchParams({
     engine: 'google_shopping',
     q: query,
-    api_key: apiKey,
     hl: 'en',
     gl: 'us',
-    google_domain: 'google.com',
-    device: 'desktop',
-    num: '16',
+    location: 'United States',
   });
-  if (intent.priceMax) params.set('max_price', `${intent.priceMax}`);
-  if (intent.priceMin) params.set('min_price', `${intent.priceMin}`);
 
   const response = await withTimeout(
-    fetch(`${SERP_ENDPOINT}?${params}`, { cache: 'no-store' }),
+    fetch(`${SEARCHAPI_ENDPOINT}?${params.toString()}`, {
+      cache: 'no-store',
+      headers: searchApiHeaders(),
+    }),
     SEARCH_TIMEOUT_MS,
-    `SerpAPI search timed out for "${rawQuery || query}"`,
+    `SearchAPI search timed out for "${rawQuery || query}"`,
   );
 
-  if (!response.ok) throw new Error(`serpapi ${response.status}`);
+  if (!response.ok) throw new Error(`searchapi ${response.status}`);
 
   const data = await response.json();
-  const raw: SerpShoppingResult[] = data.shopping_results || [];
+  const raw: SearchApiShoppingResult[] = [
+    ...(Array.isArray(data.shopping_results) ? data.shopping_results : []),
+    ...(Array.isArray(data.popular_products) ? data.popular_products : []),
+  ];
   const rawHosts = raw
     .map((result) => safeHostname(bestKnownUrl(result)))
     .filter((host): host is string => Boolean(host));
 
   console.info(
-    '[serpapi] query=%s built=%s results=%d hosts=%o',
+    '[searchapi] query=%s built=%s results=%d hosts=%o',
     rawQuery || '(blank)',
     query,
     raw.length,
@@ -377,7 +381,7 @@ export async function searchShopping(intent: SearchIntent, rawQuery: string): Pr
 
   if (trusted.length < MIN_TRUSTED_RESULTS) {
     console.warn(
-      '[serpapi] trusted results below threshold for "%s": %d trusted of %d total',
+      '[searchapi] trusted results below threshold for "%s": %d trusted of %d total',
       rawQuery || query,
       trusted.length,
       products.length,
@@ -388,52 +392,47 @@ export async function searchShopping(intent: SearchIntent, rawQuery: string): Pr
   return trusted.length >= 6 ? trusted : [...trusted, ...untrusted];
 }
 
-async function fetchProductStores(product: Product): Promise<SerpImmersiveStore[]> {
-  const apiKey = process.env.SERPAPI_KEY?.trim();
+async function fetchProductOffers(product: Product): Promise<SearchApiOffer[]> {
+  const apiKey = getSearchApiKey();
   if (!apiKey) return [];
 
-  const immersiveUrl = typeof product.metadata?.serpapiImmersiveProductApi === 'string'
-    ? product.metadata.serpapiImmersiveProductApi
+  const productToken = typeof product.metadata?.searchapiProductToken === 'string'
+    ? product.metadata.searchapiProductToken
     : null;
-  const pageToken = typeof product.metadata?.immersiveProductPageToken === 'string'
-    ? product.metadata.immersiveProductPageToken
-    : null;
+  if (!productToken) return [];
 
-  const url = new URL(immersiveUrl || SERP_ENDPOINT);
-  if (!immersiveUrl) {
-    if (!pageToken) return [];
-    url.searchParams.set('engine', 'google_immersive_product');
-    url.searchParams.set('page_token', pageToken);
-  }
-  url.searchParams.set('api_key', apiKey);
-  url.searchParams.set('more_stores', 'true');
-  url.searchParams.set('hl', 'en');
-  url.searchParams.set('gl', 'us');
-  url.searchParams.set('google_domain', 'google.com');
-  url.searchParams.set('device', 'desktop');
+  const params = new URLSearchParams({
+    engine: 'google_product_offers',
+    product_token: productToken,
+    hl: 'en',
+    gl: 'us',
+    page: '1',
+  });
 
   const response = await withTimeout(
-    fetch(url.toString(), { cache: 'no-store' }),
+    fetch(`${SEARCHAPI_ENDPOINT}?${params.toString()}`, {
+      cache: 'no-store',
+      headers: searchApiHeaders(),
+    }),
     PRODUCT_TIMEOUT_MS,
-    `SerpAPI immersive product lookup timed out for ${product.id}`,
+    `SearchAPI product offers lookup timed out for ${product.id}`,
   );
 
-  if (!response.ok) throw new Error(`serpapi immersive product ${response.status}`);
+  if (!response.ok) throw new Error(`searchapi product offers ${response.status}`);
 
-  const data = (await response.json()) as SerpImmersiveProductResponse;
-  return data.product_results?.stores || [];
+  const data = (await response.json()) as SearchApiProductOffersResponse;
+  return data.offers || [];
 }
 
-function storeSortKey(store: SerpImmersiveStore): number {
-  const host = safeHostname(store.link || '');
-  const trusted = isTrustedRetailer(store.name || '', host);
-  const price = store.extracted_total ?? store.extracted_price ?? parsePrice(store.total || store.price || '0');
-  const bestPrice = /best price/i.test(store.tag || '') ? 1 : 0;
-  const reviews = store.reviews ?? 0;
+function offerSortKey(offer: SearchApiOffer): number {
+  const host = safeHostname(offer.link || '');
+  const merchantName = offer.merchant?.name || '';
+  const trusted = isTrustedRetailer(merchantName, host);
+  const price = offer.extracted_total_price ?? offer.extracted_price ?? parsePrice(offer.total_price || offer.price || '0');
+  const reviews = offer.reviews ?? 0;
 
   return (
     (trusted ? 100_000 : 0) +
-    (bestPrice ? 20_000 : 0) +
     reviews -
     Math.round(price * 100)
   );
@@ -450,37 +449,34 @@ export async function hydrateRetailerUrls(products: Product[]): Promise<Product[
         };
       }
 
-      const immersiveApi = typeof product.metadata?.serpapiImmersiveProductApi === 'string'
-        ? product.metadata.serpapiImmersiveProductApi
+      const productToken = typeof product.metadata?.searchapiProductToken === 'string'
+        ? product.metadata.searchapiProductToken
         : null;
-      const pageToken = typeof product.metadata?.immersiveProductPageToken === 'string'
-        ? product.metadata.immersiveProductPageToken
-        : null;
-
-      if (!immersiveApi && !pageToken) return product;
+      if (!productToken) return product;
 
       try {
-        const stores = await fetchProductStores(product);
-        const storeHosts = stores
-          .map((store) => safeHostname(store.link || ''))
+        const offers = await fetchProductOffers(product);
+        const offerHosts = offers
+          .map((offer) => safeHostname(offer.link || ''))
           .filter((host): host is string => Boolean(host));
-        console.info('[serpapi] product=%s storeHosts=%o', product.id, storeHosts);
+        console.info('[searchapi] product=%s offerHosts=%o', product.id, offerHosts);
 
-        const bestStore = [...stores]
-          .filter((store) => store.link)
-          .sort((a, b) => storeSortKey(b) - storeSortKey(a))[0];
+        const bestOffer = [...offers]
+          .filter((offer) => offer.link)
+          .sort((a, b) => offerSortKey(b) - offerSortKey(a))[0];
 
-        if (!bestStore) return product;
+        if (!bestOffer) return product;
 
-        const retailerUrl = bestStore.link || product.retailerUrl;
+        const retailerUrl = bestOffer.link || product.retailerUrl;
         const host = safeHostname(retailerUrl);
-        const trusted = isTrustedRetailer(bestStore.name || product.retailer, host);
-        const price = bestStore.extracted_total ?? bestStore.extracted_price ?? parsePrice(bestStore.total || bestStore.price || '');
+        const retailer = bestOffer.merchant?.name || product.retailer;
+        const trusted = isTrustedRetailer(retailer, host);
+        const price = bestOffer.extracted_total_price ?? bestOffer.extracted_price ?? parsePrice(bestOffer.total_price || bestOffer.price || '');
 
         return {
           ...product,
           id: crypto.createHash('sha1').update(retailerUrl).digest('hex').slice(0, 16),
-          retailer: bestStore.name || product.retailer,
+          retailer,
           retailerUrl,
           trusted,
           priceCents: price > 0 ? Math.round(price * 100) : product.priceCents,
@@ -488,12 +484,11 @@ export async function hydrateRetailerUrls(products: Product[]): Promise<Product[
             ...(product.metadata || {}),
             trusted,
             retailerHost: host,
-            resolvedBy: 'google_immersive_product',
-            storeTag: bestStore.tag,
+            resolvedBy: 'google_product_offers',
           },
         };
       } catch (error) {
-        console.warn('[serpapi] store lookup failed for %s: %s', product.id, String(error));
+        console.warn('[searchapi] offer lookup failed for %s: %s', product.id, String(error));
         return product;
       }
     }),

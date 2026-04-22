@@ -40,34 +40,36 @@ function buildIntent(category, query) {
   };
 }
 
-async function logRawSerpResponse(query) {
-  if (!process.env.SERPAPI_KEY) {
-    console.log('SERPAPI_KEY is missing, skipping raw SerpAPI shape dump.');
+async function logRawSearchApiResponse(query) {
+  const searchApiKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
+  if (!searchApiKey) {
+    console.log('SEARCHAPI_KEY is missing, skipping raw SearchAPI shape dump.');
     return;
   }
 
   const params = new URLSearchParams({
     engine: 'google_shopping',
     q: query,
-    api_key: process.env.SERPAPI_KEY,
     hl: 'en',
     gl: 'us',
-    google_domain: 'google.com',
-    device: 'desktop',
-    num: '3',
+    location: 'United States',
   });
 
-  const response = await fetch(`https://serpapi.com/search.json?${params.toString()}`);
+  const response = await fetch(`https://www.searchapi.io/api/v1/search?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${searchApiKey}`,
+    },
+  });
   const data = await response.json();
   const sample = Array.isArray(data.shopping_results) ? data.shopping_results[0] : null;
 
-  console.log('\nRaw SerpAPI sample for sanity-check:');
+  console.log('\nRaw SearchAPI sample for sanity-check:');
   console.log(JSON.stringify(sample, null, 2));
 }
 
 async function main() {
-  if (!process.env.SERPAPI_KEY) {
-    console.error('SERPAPI_KEY is missing in .env.local');
+  if (!process.env.SEARCHAPI_KEY && !process.env.SERPAPI_KEY) {
+    console.error('SEARCHAPI_KEY is missing in .env.local');
     process.exitCode = 1;
     return;
   }
@@ -105,7 +107,7 @@ async function main() {
   console.log(`\np50 latency: ${percentile(durations, 50)}ms`);
   console.log(`p95 latency: ${percentile(durations, 95)}ms`);
 
-  await logRawSerpResponse(queries[0][1]);
+  await logRawSearchApiResponse(queries[0][1]);
 }
 
 main().catch((error) => {
