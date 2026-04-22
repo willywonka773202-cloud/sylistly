@@ -18,7 +18,7 @@ interface SearchBody {
 }
 
 type SearchSource = 'catalog' | 'live';
-type SearchMode = 'catalog-only' | 'hybrid';
+type SearchMode = 'catalog-only' | 'catalog-preview' | 'hybrid';
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
 const searchResponseCache = new Map<
@@ -142,6 +142,7 @@ function demoSearchResponse(category: Category | undefined, query: string, reaso
 }
 
 function getSearchMode(): SearchMode {
+  if (process.env.SEARCH_MODE === 'catalog-preview') return 'catalog-preview';
   return process.env.SEARCH_MODE === 'hybrid' ? 'hybrid' : 'catalog-only';
 }
 
@@ -155,13 +156,14 @@ export async function POST(req: NextRequest) {
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
   const searchMode = getSearchMode();
   const catalogOnlyMode = searchMode === 'catalog-only';
+  const catalogPreviewMode = searchMode === 'catalog-preview';
   const shouldUseDevMocks = isDev && !liveSearchKey;
 
   if (isDev && mode === 'demo') {
     return demoSearchResponse(category, query, 'manual_demo');
   }
 
-  if (shouldUseDevMocks && !catalogOnlyMode) {
+  if (shouldUseDevMocks && !catalogOnlyMode && !catalogPreviewMode) {
     return demoSearchResponse(category, query, 'missing_searchapi_key');
   }
 
@@ -208,7 +210,9 @@ export async function POST(req: NextRequest) {
     // 2. Fall back to the built-in starter catalog only in hybrid mode.
     // In catalog-only launch mode we avoid placeholder SVG products so the
     // public site only shows real-photo inventory.
-    const useCatalogFirst = !catalogOnlyMode && shouldUseCatalogFirst(query, category, fastIntent.brand);
+    const useCatalogFirst =
+      catalogPreviewMode ||
+      (!catalogOnlyMode && shouldUseCatalogFirst(query, category, fastIntent.brand));
     const seededCatalogProducts = useCatalogFirst
       ? searchBrandCatalog(fastIntent, query)
       : [];

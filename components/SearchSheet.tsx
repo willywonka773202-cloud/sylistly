@@ -30,7 +30,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isDemoResults, setIsDemoResults] = useState(false);
   const [resultSource, setResultSource] = useState<'catalog' | 'live' | null>(null);
-  const [searchMode, setSearchMode] = useState<'catalog-only' | 'hybrid' | null>(null);
+  const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
@@ -83,7 +83,15 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
         setResults([]);
         setIsDemoResults(false);
         setResultSource(null);
-        setSearchMode(data.searchMode === 'hybrid' ? 'hybrid' : data.searchMode === 'catalog-only' ? 'catalog-only' : null);
+        setSearchMode(
+          data.searchMode === 'hybrid'
+            ? 'hybrid'
+            : data.searchMode === 'catalog-only'
+            ? 'catalog-only'
+            : data.searchMode === 'catalog-preview'
+            ? 'catalog-preview'
+            : null,
+        );
         setCanUseDemo(Boolean(data.demoAvailable));
         setError(typeof data.error === 'string' ? data.error : 'Search failed.');
         return;
@@ -91,7 +99,15 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
 
       setIsDemoResults(Boolean(data.mock));
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
-      setSearchMode(data.searchMode === 'hybrid' ? 'hybrid' : data.searchMode === 'catalog-only' ? 'catalog-only' : null);
+      setSearchMode(
+        data.searchMode === 'hybrid'
+          ? 'hybrid'
+          : data.searchMode === 'catalog-only'
+          ? 'catalog-only'
+          : data.searchMode === 'catalog-preview'
+          ? 'catalog-preview'
+          : null,
+      );
       setResults(Array.isArray(data.products) ? data.products : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
@@ -120,6 +136,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     ? `${results.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
     : searchMode === 'catalog-only'
     ? 'Search the Sylistly catalog'
+    : searchMode === 'catalog-preview'
+    ? 'Search the Sylistly preview catalog'
     : 'Search the Sylistly catalog';
 
   if (!open || !category) return null;
@@ -148,6 +166,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     ? 'Demo mode is on. These are local sample products for UI testing.'
                     : searchMode === 'catalog-only'
                     ? 'Search Sylistly inventory by brand, color, or vibe. Results come from the stored catalog so the site can run without live API costs.'
+                    : searchMode === 'catalog-preview'
+                    ? 'Preview mode is on for local testing. Sylistly will show starter catalog items while the real photo catalog is still being built.'
                     : 'Search by brand, color, or vibe. Use Add to fit on a card to place it on the mannequin, or View item to open the retailer.'}
                 </span>
                 {demoSupported ? (
@@ -212,6 +232,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     : resultSource === 'catalog'
                     ? searchMode === 'catalog-only'
                       ? 'Sylistly catalog'
+                      : searchMode === 'catalog-preview'
+                      ? 'Preview starter catalog'
                       : 'Starter brand catalog'
                     : 'Fastest clean links first'}
                 </span>
