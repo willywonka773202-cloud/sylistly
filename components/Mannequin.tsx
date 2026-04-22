@@ -36,24 +36,30 @@ export function Mannequin({ items, skinTone }: Props) {
         <div className="absolute top-[218px] left-[28px] w-[34px] h-[14px] rounded-[4px_4px_10px_10px] skin" />
         <div className="absolute top-[218px] left-[58px] w-[34px] h-[14px] rounded-[4px_4px_10px_10px] skin" />
 
-        {/* Overlays — product images with bg removed. Placeholder gradients until images load. */}
+        {/* Styled garment zones work better with normal shopping thumbnails than raw full-body cutouts. */}
         {items.outer && (
-          <Overlay style={{ top: 52, left: 6, width: 108, height: 98 }} src={items.outer.imageUrl} />
+          <Overlay style={{ top: 48, left: 2, width: 116, height: 104 }} src={items.outer.imageUrl} variant="outer" />
         )}
         {items.top && !items.outer && (
-          <Overlay style={{ top: 55, left: 12, width: 96, height: 74 }} src={items.top.imageUrl} />
+          <Overlay style={{ top: 56, left: 12, width: 96, height: 82 }} src={items.top.imageUrl} variant="top" />
         )}
         {items.bottom && (
-          <Overlay style={{ top: 120, left: 30, width: 60, height: 100 }} src={items.bottom.imageUrl} />
+          <Overlay style={{ top: 118, left: 18, width: 84, height: 116 }} src={items.bottom.imageUrl} variant="bottom" />
         )}
         {items.hat && (
-          <Overlay style={{ top: -6, left: 32, width: 56, height: 30 }} src={items.hat.imageUrl} />
+          <Overlay style={{ top: -8, left: 28, width: 64, height: 34 }} src={items.hat.imageUrl} variant="hat" />
         )}
         {items.shoes && (
-          <Overlay style={{ top: 210, left: 25, width: 72, height: 26 }} src={items.shoes.imageUrl} />
+          <Overlay style={{ top: 226, left: 20, width: 82, height: 34 }} src={items.shoes.imageUrl} variant="shoes" />
         )}
         {items.bag && (
-          <Overlay style={{ top: 134, left: 96, width: 30, height: 38 }} src={items.bag.imageUrl} />
+          <Overlay style={{ top: 132, left: 92, width: 36, height: 52 }} src={items.bag.imageUrl} variant="bag" />
+        )}
+        {items.eyewear && (
+          <Overlay style={{ top: 14, left: 31, width: 58, height: 24 }} src={items.eyewear.imageUrl} variant="eyewear" />
+        )}
+        {items.jewelry && (
+          <Overlay style={{ top: 52, left: 43, width: 36, height: 26 }} src={items.jewelry.imageUrl} variant="jewelry" />
         )}
       </div>
     </div>
@@ -77,17 +83,41 @@ function overlayFallback(): string {
 function Overlay({
   style,
   src,
+  variant,
 }: {
   style: React.CSSProperties;
   src: string;
+  variant: 'outer' | 'top' | 'bottom' | 'hat' | 'shoes' | 'bag' | 'eyewear' | 'jewelry';
 }) {
+  const frameClass = {
+    outer: 'rounded-[20px] bg-black/18 ring-1 ring-white/10 backdrop-blur-[2px]',
+    top: 'rounded-[18px_18px_26px_26px] bg-black/12 ring-1 ring-white/10 backdrop-blur-[2px]',
+    bottom: 'rounded-[18px_18px_24px_24px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
+    hat: 'rounded-[18px] bg-black/10 ring-1 ring-white/10 backdrop-blur-[2px]',
+    shoes: 'rounded-[18px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
+    bag: 'rounded-[16px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
+    eyewear: 'rounded-[999px] bg-black/10 ring-1 ring-white/10 backdrop-blur-[2px]',
+    jewelry: 'rounded-[999px] bg-black/8 ring-1 ring-white/10 backdrop-blur-[2px]',
+  }[variant];
+
+  const imageClass = {
+    outer: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_14px_rgba(0,0,0,.35)]',
+    top: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_14px_rgba(0,0,0,.3)]',
+    bottom: 'h-full w-full object-contain p-1 drop-shadow-[0_8px_14px_rgba(0,0,0,.32)]',
+    hat: 'h-full w-full object-contain p-0.5 drop-shadow-[0_4px_10px_rgba(0,0,0,.3)]',
+    shoes: 'h-full w-full object-contain p-0.5 drop-shadow-[0_4px_10px_rgba(0,0,0,.3)]',
+    bag: 'h-full w-full object-contain p-1 drop-shadow-[0_6px_12px_rgba(0,0,0,.3)]',
+    eyewear: 'h-full w-full object-contain p-0.5 opacity-95',
+    jewelry: 'h-full w-full object-contain p-0.5 opacity-90',
+  }[variant];
+
   return (
-    <div className="absolute pointer-events-none animate-in fade-in" style={style}>
+    <div className={`absolute pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass}`} style={style}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt=""
-        className="w-full h-full object-cover"
+        className={imageClass}
         style={{ mixBlendMode: 'normal' }}
         loading="lazy"
         referrerPolicy="no-referrer"

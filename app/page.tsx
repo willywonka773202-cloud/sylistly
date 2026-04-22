@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useState } from 'react';
-import { Bookmark, ExternalLink, X } from 'lucide-react';
+import { Bookmark, ExternalLink, LoaderCircle, Sparkles, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
@@ -10,6 +10,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
+import { VIBES, type GeneratorBudget, type VibeId, vibeSearchQuery } from '@/lib/vibes';
 
 interface ShopLink {
   id: string;
@@ -26,15 +27,19 @@ function BuilderPageContent({
   quickSlot: string | null;
   quickQuery: string | null;
 }) {
-  const { items, totalCents, count, clear } = useFit();
+  const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [shopLinks, setShopLinks] = useState<ShopLink[] | null>(null);
+  const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
+  const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
+  const [generatorLoading, setGeneratorLoading] = useState(false);
   const router = useRouter();
   const total = totalCents();
   const n = count();
+  const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -50,6 +55,67 @@ function BuilderPageContent({
   function closeSearchSheet() {
     setSearchFor(null);
     if (quickSlot || quickQuery) router.replace('/');
+  }
+
+  async function runCategorySearch(category: Category, query: string): Promise<Product | null> {
+    const response = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ query, category }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Search failed.');
+    }
+    const [firstProduct] = Array.isArray(data.products) ? data.products : [];
+    return firstProduct || null;
+  }
+
+  async function generateLook(mode: 'starter' | 'missing') {
+    if (generatorLoading) return;
+
+    const targetSlots = activeVibe.slots.filter((slot) => mode === 'starter' || !items[slot]);
+    if (!targetSlots.length) {
+      setStatusMessage('That vibe already filled all of its starter pieces. Try regenerate or switch vibes.');
+      return;
+    }
+
+    setGeneratorLoading(true);
+    setStatusMessage(null);
+
+    try {
+      const results = await Promise.allSettled(
+        targetSlots.map(async (slot) => ({
+          slot,
+          product: await runCategorySearch(slot, vibeSearchQuery(selectedVibe, slot, generatorBudget)),
+        })),
+      );
+
+      const nextItems = { ...items };
+      let addedCount = 0;
+
+      for (const result of results) {
+        if (result.status !== 'fulfilled' || !result.value.product) continue;
+        nextItems[result.value.slot] = result.value.product;
+        addedCount += 1;
+      }
+
+      if (!addedCount) {
+        setStatusMessage('No strong starter pieces came back for that vibe. Try another vibe or search a slot manually.');
+        return;
+      }
+
+      replaceItems(nextItems);
+      setStatusMessage(
+        mode === 'starter'
+          ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}.`
+          : `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}.`,
+      );
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : 'Could not generate a look right now.');
+    } finally {
+      setGeneratorLoading(false);
+    }
   }
 
   async function saveFit() {
@@ -150,7 +216,96 @@ function BuilderPageContent({
               <div className="text-[10px] text-muted">{n} piece{n !== 1 ? 's' : ''}</div>
             </div>
             <div className="px-0.5 text-[11px] leading-relaxed text-muted-2">
-              Tap any slot to search live products. Saved fits now stay on this device, and Discover can jump you straight into a slot search.
+              Pick a vibe to generate a starter fit, or tap any slot to search it manually. Saved fits still stay on this device.
+            </div>
+            <div className="rounded-[22px] border border-hairline bg-surface-1 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
+                    <Sparkles size={12} className="text-accent" />
+                    Outfit generator
+                  </div>
+                  <div className="mt-1 font-serif text-[18px] font-semibold text-ink">
+                    {activeVibe.label} <em className="italic text-accent">starter look</em>
+                  </div>
+                  <div className="mt-1 text-[11px] leading-relaxed text-muted-2">
+                    {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {VIBES.map((vibe) => (
+                  <button
+                    key={vibe.id}
+                    type="button"
+                    onClick={() => setSelectedVibe(vibe.id)}
+                    className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                      selectedVibe === vibe.id
+                        ? 'bg-accent text-white shadow-pink-glow'
+                        : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
+                    }`}
+                  >
+                    {vibe.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
+                <div className="flex flex-wrap justify-end gap-2">
+                  {[
+                    { value: 'any', label: 'Any' },
+                    { value: 'under100', label: '< $100' },
+                    { value: 'under250', label: '< $250' },
+                    { value: 'under500', label: '< $500' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
+                      className={`rounded-full px-3 py-1 text-[10px] font-medium transition ${
+                        generatorBudget === option.value
+                          ? 'bg-white text-black'
+                          : 'border border-hairline bg-surface-2 text-muted'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => void generateLook('starter')}
+                  disabled={generatorLoading}
+                  className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white disabled:opacity-60"
+                >
+                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                  Generate starter look
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('missing')}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                >
+                  Fill missing pieces
+                </button>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {activeVibe.slots.map((slot) => (
+                  <span
+                    key={slot}
+                    className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[10px] uppercase tracking-[.12em] text-muted"
+                  >
+                    {slot}
+                  </span>
+                ))}
+              </div>
             </div>
             <SlotList onOpenSearch={setSearchFor} />
           </div>
