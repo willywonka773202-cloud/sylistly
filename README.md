@@ -49,10 +49,12 @@ Useful filters:
 ```bash
 CATALOG_BRAND_FILTER=nike npm run catalog:build
 CATALOG_CATEGORY_FILTER=shoes npm run catalog:build
-CATALOG_MAX_SEEDS=10 npm run catalog:build
+CATALOG_MAX_TASKS=10 npm run catalog:build
 ```
 
 This writes real product records into [`data/photo-catalog.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/photo-catalog.json). Once populated, `/api/search` prefers that photo-backed catalog before the starter placeholder catalog.
+
+The importer now rotates through a saved queue cursor in [`data/catalog-build-state.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/catalog-build-state.json), so repeated runs keep working through different brand/category queries instead of starting from the top every time.
 
 ```
 # Required
