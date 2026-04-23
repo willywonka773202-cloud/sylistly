@@ -225,39 +225,40 @@ function PaperDollLayer({
 
   return (
     <div className={`pointer-events-none absolute ${className}`}>
-      <div className="absolute inset-[7%] rounded-[26px] bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.12),transparent_38%),linear-gradient(180deg,rgba(255,255,255,.05),transparent_55%)] opacity-60" />
-      <svg viewBox="0 0 100 100" className="relative z-10 h-full w-full overflow-visible drop-shadow-[0_14px_22px_rgba(0,0,0,.28)]">
+      <GarmentImage product={product} category={category} variant={variant} />
+      <svg viewBox="0 0 100 100" className="relative z-10 h-full w-full overflow-visible opacity-45 drop-shadow-[0_14px_22px_rgba(0,0,0,.22)]">
         {renderGarmentSvg(category, variant, tone)}
       </svg>
-      <GarmentPreviewBadge product={product} category={category} />
-      <div className="absolute bottom-1 left-1/2 z-20 max-w-[76%] -translate-x-1/2 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-center text-[7px] uppercase tracking-[.16em] text-white/70 backdrop-blur">
-        {product.brand}
+      <div className="absolute bottom-1 left-1/2 z-20 max-w-[76%] -translate-x-1/2 rounded-full border border-white/10 bg-black/30 px-2 py-0.5 text-center text-[7px] uppercase tracking-[.16em] text-white/65 backdrop-blur">
+        {category}
       </div>
     </div>
   );
 }
 
-function GarmentPreviewBadge({
+function GarmentImage({
   product,
   category,
+  variant,
 }: {
   product: Product;
   category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes';
+  variant: string;
 }) {
   return (
-    <div className={`absolute z-20 overflow-hidden border border-white/10 bg-transparent shadow-[0_10px_22px_rgba(0,0,0,.22)] ${SWATCH_POSITIONS[category]}`}>
+    <div className="absolute inset-[3%] z-[5] overflow-hidden">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={proxiedImageUrl(product.imageUrl)}
         alt=""
-        className={`h-full w-full ${category === 'shoes' || category === 'hat' ? 'object-contain p-1' : 'object-cover'} bg-transparent`}
+        className={`h-full w-full bg-transparent ${category === 'shoes' || category === 'hat' ? 'object-contain' : 'object-cover'}`}
+        style={garmentImageStyle(category, variant)}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {
           event.currentTarget.src = overlayFallback(product.brand);
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.18))]" />
     </div>
   );
 }
@@ -277,15 +278,19 @@ function AccessoryOverlay({
 
   return (
     <div className={`pointer-events-none absolute z-20 ${className}`}>
-      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible drop-shadow-[0_12px_18px_rgba(0,0,0,.24)]">
+      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible opacity-40 drop-shadow-[0_12px_18px_rgba(0,0,0,.18)]">
         {renderAccessorySvg(category, tone)}
       </svg>
-      <div className={`absolute overflow-hidden border border-white/10 bg-transparent shadow-[0_10px_20px_rgba(0,0,0,.2)] ${category === 'bag' ? 'bottom-[6px] right-[2px] h-[38px] w-[32px] rounded-2xl' : category === 'eyewear' ? 'left-1/2 top-[8px] h-[22px] w-[34px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[12px] h-[18px] w-[18px] -translate-x-1/2 rounded-full'}`}>
+      <div className={`absolute overflow-hidden bg-transparent ${category === 'bag' ? 'bottom-[4px] right-[0px] h-[44px] w-[38px] rounded-2xl' : category === 'eyewear' ? 'left-1/2 top-[8px] h-[24px] w-[40px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[10px] h-[20px] w-[20px] -translate-x-1/2 rounded-full'}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={proxiedImageUrl(product.imageUrl)}
           alt=""
-          className="h-full w-full object-cover bg-transparent"
+          className="h-full w-full bg-transparent object-cover"
+          style={{
+            mixBlendMode: 'multiply',
+            filter: 'contrast(1.06) saturate(1.04)',
+          }}
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={(event) => {
@@ -295,6 +300,82 @@ function AccessoryOverlay({
       </div>
     </div>
   );
+}
+
+function garmentImageStyle(
+  category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes',
+  variant: string,
+): CSSProperties {
+  const common: CSSProperties = {
+    mixBlendMode: 'multiply',
+    filter: 'contrast(1.06) saturate(1.04)',
+  };
+
+  if (category === 'hat') {
+    if (variant === 'beanie') {
+      return { ...common, clipPath: 'path("M 24 58 C 24 28 76 28 76 58 L 76 70 L 24 70 Z")' };
+    }
+    if (variant === 'bucket') {
+      return { ...common, clipPath: 'polygon(34% 18%,66% 18%,72% 54%,28% 54%,20% 64%,80% 64%,76% 74%,24% 74%)' };
+    }
+    return { ...common, clipPath: 'polygon(28% 34%,72% 34%,72% 52%,84% 60%,72% 70%,28% 70%,16% 60%,28% 52%)' };
+  }
+
+  if (category === 'top') {
+    if (variant === 'tank') {
+      return { ...common, clipPath: 'polygon(34% 10%,42% 10%,42% 24%,58% 24%,58% 10%,66% 10%,72% 22%,68% 84%,32% 84%,28% 22%)' };
+    }
+    if (variant === 'shirt') {
+      return { ...common, clipPath: 'polygon(18% 28%,34% 12%,66% 12%,82% 28%,72% 44%,68% 88%,32% 88%,28% 44%)' };
+    }
+    if (variant === 'hoodie') {
+      return { ...common, clipPath: 'polygon(22% 28%,34% 18%,66% 18%,78% 28%,70% 42%,68% 84%,32% 84%,30% 42%)' };
+    }
+    if (variant === 'bodysuit') {
+      return { ...common, clipPath: 'polygon(35% 10%,42% 10%,42% 22%,58% 22%,58% 10%,65% 10%,70% 20%,64% 82%,56% 96%,44% 96%,36% 82%,30% 20%)' };
+    }
+    return { ...common, clipPath: 'polygon(14% 30%,30% 16%,70% 16%,86% 30%,76% 44%,72% 82%,28% 82%,24% 44%)' };
+  }
+
+  if (category === 'outer') {
+    if (variant === 'puffer') {
+      return { ...common, clipPath: 'polygon(10% 26%,28% 12%,72% 12%,90% 26%,78% 42%,74% 94%,26% 94%,22% 42%)' };
+    }
+    if (variant === 'trench') {
+      return { ...common, clipPath: 'polygon(18% 20%,34% 10%,66% 10%,82% 20%,74% 34%,68% 98%,32% 98%,26% 34%)' };
+    }
+    if (variant === 'blazer') {
+      return { ...common, clipPath: 'polygon(16% 24%,32% 12%,68% 12%,84% 24%,74% 40%,70% 90%,30% 90%,26% 40%)' };
+    }
+    if (variant === 'bomber') {
+      return { ...common, clipPath: 'polygon(12% 28%,28% 16%,72% 16%,88% 28%,78% 42%,72% 80%,28% 80%,22% 42%)' };
+    }
+    return { ...common, clipPath: 'polygon(12% 26%,30% 12%,70% 12%,88% 26%,78% 42%,72% 92%,28% 92%,22% 42%)' };
+  }
+
+  if (category === 'bottom') {
+    if (variant === 'skirt') {
+      return { ...common, clipPath: 'polygon(28% 8%,72% 8%,82% 76%,18% 76%)' };
+    }
+    if (variant === 'shorts') {
+      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,78% 26%,70% 54%,54% 54%,54% 72%,46% 72%,46% 54%,30% 54%,22% 26%)' };
+    }
+    if (variant === 'leggings') {
+      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,70% 22%,70% 92%,56% 92%,56% 22%,44% 22%,44% 92%,30% 92%,30% 22%)' };
+    }
+    return { ...common, clipPath: 'polygon(22% 8%,78% 8%,72% 22%,74% 96%,56% 96%,52% 22%,48% 22%,44% 96%,26% 96%,28% 22%)' };
+  }
+
+  if (variant === 'heels') {
+    return { ...common, clipPath: 'polygon(18% 62%,48% 52%,46% 78%,38% 78%,40% 92%,34% 92%,32% 78%,18% 78%,52% 52%,82% 62%,68% 78%,60% 78%,60% 92%,54% 92%,56% 78%,52% 78%)' };
+  }
+  if (variant === 'boots') {
+    return { ...common, clipPath: 'polygon(18% 22%,38% 22%,38% 54%,44% 54%,44% 74%,12% 74%,12% 54%,18% 54%,62% 22%,82% 22%,82% 54%,88% 54%,88% 74%,56% 74%,56% 54%,62% 54%)' };
+  }
+  if (variant === 'clogs') {
+    return { ...common, clipPath: 'polygon(12% 56%,46% 52%,46% 72%,12% 72%,54% 52%,88% 56%,88% 72%,54% 72%)' };
+  }
+  return { ...common, clipPath: 'polygon(10% 58%,48% 52%,46% 72%,10% 72%,54% 52%,90% 58%,90% 72%,54% 72%)' };
 }
 
 function renderGarmentSvg(category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes', variant: string, tone: Tone) {
