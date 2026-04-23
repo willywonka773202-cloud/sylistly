@@ -6,16 +6,30 @@
   --skin: #c9a98a;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  background: #000;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232,54,93,.12), transparent 28%),
+    linear-gradient(180deg, #11110f 0%, #080807 32%, #030303 100%);
   color: #fffefb;
   font-family: var(--font-dm-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: #e8365d; color: #fff; }
+::selection {
+  background: #e8365d;
+  color: #fff;
+}
 
-/* Mannequin skin colour — set from Profile */
-.skin { background: var(--skin); }
+.skin {
+  background:
+    radial-gradient(circle at 35% 18%, rgba(255,255,255,.22), transparent 28%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--skin) 118%, white),
+      var(--skin) 58%,
+      color-mix(in srgb, var(--skin) 80%, black)
+    );
+}

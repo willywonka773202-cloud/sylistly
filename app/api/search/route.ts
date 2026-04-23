@@ -8,6 +8,12 @@ import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import type { Category, Product } from '@/lib/types';
+import {
+  applyFrameToIntent,
+  normalizeSearchFrame,
+  withFrameBias,
+} from '@/lib/search-frame';
+import type { GeneratorFrame } from '@/lib/vibes';
 
 export const runtime = 'nodejs';
 export const maxDuration = 20;
@@ -16,6 +22,7 @@ interface SearchBody {
   query: string;
   category?: Category;
   mode?: 'live' | 'demo';
+  frame?: GeneratorFrame;
 }
 
 type SearchSource = 'catalog' | 'live';
@@ -152,7 +159,9 @@ export async function POST(req: NextRequest) {
   const query = (body.query || '').slice(0, 200);
   const category = body.category;
   const mode = body.mode || 'live';
-  const cacheKey = `${category || 'any'}::${query.trim().toLowerCase()}`;
+  const frame = normalizeSearchFrame(body.frame);
+  const effectiveQuery = withFrameBias(query, category, frame);
+  const cacheKey = `${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
   const isDev = process.env.NODE_ENV === 'development';
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
   const searchMode = getSearchMode();
@@ -175,6 +184,7 @@ export async function POST(req: NextRequest) {
       cached: true,
       source: cached.source,
       searchMode,
+      frame,
     });
   }
   if (cached) searchResponseCache.delete(cacheKey);
@@ -191,20 +201,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         products: featuredCatalogProducts,
         source: 'catalog',
+        catalogKind: 'featured',
         searchMode,
+        frame,
       });
     }
 
-    // 1. Prefer the real photo-backed catalog whenever we have a match.
-    const fastIntent = parseSearchIntentHeuristic(query, category);
-    const photoCatalogProducts = searchPhotoCatalog(fastIntent, query).map((product) => ({
+    const fastIntent = applyFrameToIntent(
+      parseSearchIntentHeuristic(effectiveQuery, category),
+      frame,
+    );
+    const photoCatalogProducts = searchPhotoCatalog(fastIntent, effectiveQuery).map((product) => ({
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
 
     if (photoCatalogProducts.length) {
       const rankedPhotoCatalogProducts = await rerankProducts(
-        query || fastIntent.category,
+        effectiveQuery || fastIntent.category,
         fastIntent,
         photoCatalogProducts,
         Math.min(6, photoCatalogProducts.length),
@@ -217,32 +231,36 @@ export async function POST(req: NextRequest) {
       });
 
       console.info(
-        '[api/search] query=%s category=%s source=photo_catalog results=%d durationMs=%d',
+        '[api/search] query=%s category=%s frame=%s source=photo_catalog results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
+        frame,
         rankedPhotoCatalogProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: rankedPhotoCatalogProducts, source: 'catalog', searchMode });
+      return NextResponse.json({
+        products: rankedPhotoCatalogProducts,
+        source: 'catalog',
+        catalogKind: 'photo',
+        searchMode,
+        frame,
+      });
     }
 
-    // 2. In hybrid mode, we can use the starter catalog early for common
-    // branded searches. In preview mode we try live/photo results first and
-    // only fall back to starter placeholders if nothing better is available.
     const useCatalogFirst =
-      searchMode === 'hybrid' &&
-      shouldUseCatalogFirst(query, category, fastIntent.brand);
+      catalogOnlyMode ||
+      (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
     const seededCatalogProducts = useCatalogFirst
-      ? searchBrandCatalog(fastIntent, query)
+      ? searchBrandCatalog(fastIntent, effectiveQuery)
       : [];
 
     if (seededCatalogProducts.length) {
       let catalogProducts = seededCatalogProducts;
 
-      if (!catalogOnlyMode && liveSearchKey && query.trim()) {
+      if (!catalogOnlyMode && liveSearchKey && effectiveQuery.trim()) {
         try {
-          const liveCandidates = await searchShopping(fastIntent, query);
+          const liveCandidates = await searchShopping(fastIntent, effectiveQuery);
           catalogProducts = enrichCatalogProductPhotos(catalogProducts, liveCandidates);
         } catch (error) {
           console.warn('[api/search] catalog photo enrichment failed for "%s": %s', query, String(error));
@@ -254,7 +272,7 @@ export async function POST(req: NextRequest) {
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
       const rankedCatalogProducts = await rerankProducts(
-        query || fastIntent.category,
+        effectiveQuery || fastIntent.category,
         fastIntent,
         affiliateWrappedProducts,
         Math.min(6, affiliateWrappedProducts.length),
@@ -268,14 +286,21 @@ export async function POST(req: NextRequest) {
       });
 
       console.info(
-        '[api/search] query=%s category=%s source=catalog results=%d durationMs=%d',
+        '[api/search] query=%s category=%s frame=%s source=catalog results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
+        frame,
         rankedCatalogProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: rankedCatalogProducts, source: 'catalog', searchMode });
+      return NextResponse.json({
+        products: rankedCatalogProducts,
+        source: 'catalog',
+        catalogKind: 'starter',
+        searchMode,
+        frame,
+      });
     }
 
     if (catalogOnlyMode) {
@@ -284,29 +309,28 @@ export async function POST(req: NextRequest) {
           products: [],
           source: 'catalog',
           searchMode,
-          error: 'No catalog matches yet for that search. Try a brand or a simpler clothing term while we keep expanding Sylistly inventory.',
+          frame,
+          error: 'No catalog matches yet for that search. Try Browse, a brand, or a simpler clothing term while we keep expanding Sylistly inventory.',
         },
         { status: 404 },
       );
     }
 
-    // 3. Try live photo search in preview/hybrid modes.
     let liveSearchError: unknown = null;
 
     if (liveSearchKey) {
       try {
-        const intent = await parseSearchIntent(query, category);
+        const intent = applyFrameToIntent(
+          await parseSearchIntent(effectiveQuery, category),
+          frame,
+        );
 
-        // 4. Search real inventory
-        const candidates = await searchShopping(intent, query);
-
-        // 5. Re-rank with Claude
+        const candidates = await searchShopping(intent, effectiveQuery);
         const rerankLimit = Math.min(6, candidates.length);
         const ranked = candidates.length > rerankLimit
-          ? await rerankProducts(query, intent, candidates, rerankLimit)
+          ? await rerankProducts(effectiveQuery, intent, candidates, rerankLimit)
           : candidates.slice(0, rerankLimit);
 
-        // 6. Resolve direct retailer links for the strongest results only.
         const hydrationTargets = ranked.slice(0, 3);
         const untouched = ranked.slice(3);
         const hydratedTop = await hydrateRetailerUrls(hydrationTargets);
@@ -322,7 +346,6 @@ export async function POST(req: NextRequest) {
           : combined
         ).slice(0, 6);
 
-        // 7. Affiliate-wrap
         const products: Product[] = selected.map((p) => ({
           ...p,
           affiliateUrl: wrapAffiliate(p.retailerUrl),
@@ -330,15 +353,15 @@ export async function POST(req: NextRequest) {
 
         if (products.length) {
           console.info(
-            '[api/search] query=%s category=%s candidates=%d results=%d durationMs=%d',
+            '[api/search] query=%s category=%s frame=%s candidates=%d results=%d durationMs=%d',
             query || '(blank)',
             category || intent.category,
+            frame,
             candidates.length,
             products.length,
             Date.now() - startedAt,
           );
 
-          // 8. Fire-and-forget cache write
           cacheProducts(products).catch(() => {});
           searchResponseCache.set(cacheKey, {
             expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
@@ -346,7 +369,7 @@ export async function POST(req: NextRequest) {
             source: 'live',
           });
 
-          return NextResponse.json({ products, source: 'live', searchMode });
+          return NextResponse.json({ products, source: 'live', searchMode, frame });
         }
       } catch (error) {
         liveSearchError = error;
@@ -354,21 +377,20 @@ export async function POST(req: NextRequest) {
       }
     } else if (searchMode === 'hybrid') {
       return NextResponse.json(
-        { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode },
+        { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode, frame },
         { status: 500 },
       );
     }
 
-    // 4. Preview mode can still fall back to starter placeholders locally.
     if (catalogPreviewMode) {
-      const previewSeededCatalogProducts = searchBrandCatalog(fastIntent, query);
+      const previewSeededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery);
       if (previewSeededCatalogProducts.length) {
         const affiliateWrappedProducts = previewSeededCatalogProducts.map((product) => ({
           ...product,
           affiliateUrl: wrapAffiliate(product.retailerUrl),
         }));
         const rankedPreviewProducts = await rerankProducts(
-          query || fastIntent.category,
+          effectiveQuery || fastIntent.category,
           fastIntent,
           affiliateWrappedProducts,
           Math.min(6, affiliateWrappedProducts.length),
@@ -382,14 +404,21 @@ export async function POST(req: NextRequest) {
         });
 
         console.info(
-          '[api/search] query=%s category=%s source=preview_catalog results=%d durationMs=%d',
+          '[api/search] query=%s category=%s frame=%s source=preview_catalog results=%d durationMs=%d',
           query || '(blank)',
           category || fastIntent.category,
+          frame,
           rankedPreviewProducts.length,
           Date.now() - startedAt,
         );
 
-        return NextResponse.json({ products: rankedPreviewProducts, source: 'catalog', searchMode });
+        return NextResponse.json({
+          products: rankedPreviewProducts,
+          source: 'catalog',
+          catalogKind: 'starter',
+          searchMode,
+          frame,
+        });
       }
     }
 
@@ -398,7 +427,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'No products found for that query yet.', searchMode },
+      { error: 'No products found for that query yet.', searchMode, frame },
       { status: 404 },
     );
   } catch (err) {
@@ -411,6 +440,7 @@ export async function POST(req: NextRequest) {
           error: 'Live search is temporarily rate-limited. Please wait a moment and try again.',
           demoAvailable: isDev,
           searchMode,
+          frame,
         },
         { status: 429 },
       );
@@ -420,12 +450,13 @@ export async function POST(req: NextRequest) {
         {
           error: 'The SearchAPI key was rejected. Double-check that SEARCHAPI_KEY is your regular API key, not an MCP URL or token.',
           searchMode,
+          frame,
         },
         { status: 401 },
       );
     }
     return NextResponse.json(
-      { error: message, searchMode },
+      { error: message, searchMode, frame },
       { status: 500 },
     );
   }

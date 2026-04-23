@@ -4,26 +4,60 @@ import { X, Search as SearchIcon } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import { useFit } from '@/store/fit';
 import type { Category, Product } from '@/lib/types';
+import {
+  frameBiasDescription,
+  frameDisplayLabel,
+} from '@/lib/search-frame';
+import type { GeneratorFrame } from '@/lib/vibes';
 
-const TRENDING: Record<Category, string[]> = {
-  hat: ['baseball cap', 'beanie', 'supreme', 'nike', 'prada'],
-  outer: ['puffer', 'denim jacket', 'trench', 'arcteryx', 'carhartt'],
-  top: ['white crop top', 'nike tee', 'hoodie', 'basic tank', 'essentials'],
-  bottom: ['baggy jeans', 'cargo pants', 'black skirt', 'dickies', 'denim'],
-  shoes: ['air force 1', 'samba', 'dr martens', 'new balance', 'heels'],
-  bag: ['gucci bag', 'tote', 'telfar', 'bottega', 'mini bag'],
-  eyewear: ['rayban', 'oakley', 'prada shield', 'aviator', 'black sunglass'],
-  jewelry: ['gold chain', 'silver ring', 'mejuri', 'hoop', 'pearl'],
+const TRENDING: Record<GeneratorFrame, Record<Category, string[]>> = {
+  masc: {
+    hat: ['fitted cap', 'beanie', 'dad hat', 'nike cap', 'carhartt beanie'],
+    outer: ['bomber jacket', 'puffer jacket', 'carhartt jacket', 'overcoat', 'track jacket'],
+    top: ['boxy tee', 'knit polo', 'hoodie', 'camp collar shirt', 'oversized tee'],
+    bottom: ['relaxed trousers', 'cargo pants', 'baggy jeans', 'dickies pants', 'tailored shorts'],
+    shoes: ['loafers', 'samba', 'new balance', 'boots', 'air force 1'],
+    bag: ['crossbody bag', 'tote bag', 'sling bag', 'backpack', 'belt bag'],
+    eyewear: ['wayfarer sunglasses', 'oakley shield', 'aviator', 'black sunglasses', 'warby parker'],
+    jewelry: ['silver chain', 'watch', 'signet ring', 'bracelet', 'gold chain'],
+  },
+  fem: {
+    hat: ['baseball cap', 'beanie', 'prada bucket', 'nike cap', 'trucker hat'],
+    outer: ['puffer', 'denim jacket', 'trench', 'leather jacket', 'cardigan'],
+    top: ['white crop top', 'fitted tank', 'corset top', 'basic tank', 'bodysuit'],
+    bottom: ['baggy jeans', 'cargo pants', 'black skirt', 'wide leg trousers', 'leggings'],
+    shoes: ['air force 1', 'samba', 'dr martens', 'new balance', 'heels'],
+    bag: ['gucci bag', 'tote', 'telfar', 'bottega bag', 'mini bag'],
+    eyewear: ['rayban', 'prada shield', 'oval sunglasses', 'aviator', 'black sunglasses'],
+    jewelry: ['gold hoops', 'silver ring', 'mejuri', 'pearl necklace', 'tennis bracelet'],
+  },
+  androgynous: {
+    hat: ['baseball cap', 'beanie', 'bucket hat', 'nike cap', 'new era'],
+    outer: ['puffer jacket', 'denim jacket', 'trench', 'arcteryx', 'carhartt'],
+    top: ['white tee', 'hoodie', 'tank top', 'button down', 'essentials'],
+    bottom: ['baggy jeans', 'cargo pants', 'straight jeans', 'dickies', 'trousers'],
+    shoes: ['air force 1', 'samba', 'dr martens', 'new balance', 'loafers'],
+    bag: ['tote bag', 'crossbody bag', 'telfar', 'bottega bag', 'belt bag'],
+    eyewear: ['rayban', 'oakley', 'prada shield', 'aviator', 'black sunglasses'],
+    jewelry: ['gold chain', 'silver ring', 'watch', 'bracelet', 'pearl'],
+  },
 };
 
 interface Props {
   open: boolean;
   category: Category | null;
   initialQuery?: string | null;
+  frame?: GeneratorFrame;
   onClose: () => void;
 }
 
-export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
+export function SearchSheet({
+  open,
+  category,
+  initialQuery,
+  frame = 'androgynous',
+  onClose,
+}: Props) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Product[] | null>(null);
@@ -34,7 +68,9 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [canUseDemo, setCanUseDemo] = useState(false);
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
+  const selectedItem = useFit((s) => (category ? s.items[category] : null));
   const demoSupported = process.env.NODE_ENV === 'development';
+  const suggestions = category ? TRENDING[frame][category] : [];
 
   useEffect(() => {
     if (!open || !category) return;
@@ -45,12 +81,12 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     setResultSource(null);
     setSearchMode(null);
     setCanUseDemo(false);
-  }, [open, category, initialQuery]);
+  }, [open, category, initialQuery, frame]);
 
   useEffect(() => {
     if (!open || !category || !initialQuery?.trim()) return;
     void runSearch(initialQuery, category);
-  }, [open, category, initialQuery]);
+  }, [open, category, initialQuery, frame]);
 
   useEffect(() => () => activeRequest.current?.abort(), []);
 
@@ -69,7 +105,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, category: cat, mode }),
+        body: JSON.stringify({ query: trimmed, category: cat, mode, frame }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -156,15 +192,20 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
 
             <div className="px-4 pb-2">
               <div className="flex items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
-                <span>
-                  {isDemoResults
-                    ? 'Demo mode is on. These are local sample products for UI testing.'
-                    : searchMode === 'catalog-only'
-                    ? 'Search Sylistly inventory by brand, color, or vibe. Results come from the stored catalog so the site can run without live API costs.'
-                    : searchMode === 'catalog-preview'
-                    ? 'Preview mode is on for local testing. Sylistly will show starter catalog items while the real photo catalog is still being built.'
-                    : 'Search by brand, color, or vibe, or just browse featured inventory for this slot.'}
-                </span>
+                <div>
+                  <div className="font-semibold text-ink">
+                    {frameDisplayLabel(frame)} search bias
+                  </div>
+                  <div className="mt-0.5">
+                    {isDemoResults
+                      ? 'Demo mode is on. These are local sample products for UI testing.'
+                      : searchMode === 'catalog-only'
+                      ? `${frameBiasDescription(frame)} Results come from the stored catalog so the site can run without live API costs.`
+                      : searchMode === 'catalog-preview'
+                      ? `${frameBiasDescription(frame)} Preview mode can use starter catalog items while the real photo catalog is built.`
+                      : `${frameBiasDescription(frame)} Search by brand, color, or vibe, or browse featured inventory for this slot.`}
+                  </div>
+                </div>
                 <div className="flex flex-none items-center gap-2">
                   <button
                     type="button"
@@ -200,7 +241,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                   setQuery(e.target.value);
                   setError(null);
                 }}
-                placeholder={`try: ${TRENDING[category][0]} or browse`}
+                placeholder={`try: ${suggestions[0]} or browse`}
                 className="w-full rounded-2xl border border-hairline bg-surface-3 py-3 pl-10 pr-24 text-sm text-ink outline-none focus:border-accent"
               />
               <button
@@ -213,7 +254,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
             </form>
 
             <div className="flex gap-2 px-4 pb-2.5 overflow-x-auto scrollbar-hide">
-              {TRENDING[category].map((c) => (
+              {suggestions.map((c) => (
                 <button
                   key={c}
                   onClick={() => {
@@ -280,6 +321,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     <ProductCard
                       key={p.id}
                       product={p}
+                      selected={selectedItem?.id === p.id}
                       onClick={() => {
                         setItem(category, p);
                         onClose();

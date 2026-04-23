@@ -34,7 +34,18 @@ pnpm dev
 
 ## Environment
 
-Needed for full functionality. Without them, `/api/search` falls back to the mock product database (see `lib/mock-products.ts`), so you can still build and test UX.
+Needed for full live functionality. Without paid search keys, `/api/search` still works from the local Sylistly catalog, so the core builder can run without API cost.
+
+## Free Catalog Mode
+
+The app now defaults to a database-first search path so it can run without paid search calls:
+
+- `data/photo-catalog.json` is checked first when you have real product photos imported.
+- If that file is empty, `/api/search` falls back to the starter brand catalog in `lib/brand-catalog.ts`.
+- The selected style frame is sent with every search, so menswear, womenswear, and neutral searches return different query bias.
+- Product buttons open the clean retailer URL directly. Affiliate wrapping can still be layered back in later, but the UI no longer prefers confusing wrapper links.
+
+Set `SEARCH_MODE=hybrid` only when you intentionally want live SearchAPI fallback. Leave it unset or set `SEARCH_MODE=catalog-only` for the low-cost public version.
 
 ## Build a Real Photo Catalog
 

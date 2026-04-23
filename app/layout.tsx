@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Sylistly — style anything, wear anything',
+  title: 'Sylistly - style anything, wear anything',
   description: 'AI-powered outfit builder. Search any brand across the web, build a look, buy it in one flow.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   openGraph: {

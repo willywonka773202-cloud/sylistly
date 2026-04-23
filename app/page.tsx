@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useState } from 'react';
-import { Bookmark, ExternalLink, LoaderCircle, Sparkles, X } from 'lucide-react';
+import { Bookmark, ExternalLink, LoaderCircle, Sparkles } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
@@ -90,7 +90,7 @@ function BuilderPageContent({
     const response = await fetch('/api/search', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ query, category }),
+      body: JSON.stringify({ query, category, frame: generatorFrame }),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -229,7 +229,7 @@ function BuilderPageContent({
         brand: product.brand,
         name: product.name,
         retailer: product.retailer,
-        url: product.affiliateUrl || product.retailerUrl,
+        url: product.retailerUrl || product.affiliateUrl || '',
         priceCents: product.priceCents,
       }))
       .filter((product) => Boolean(product.url));
@@ -244,7 +244,7 @@ function BuilderPageContent({
   }
 
   return (
-    <main className="flex flex-col h-[100dvh] max-w-[440px] mx-auto bg-bg">
+    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
       <header className="flex items-center justify-between pt-11 pb-2.5 px-4 border-b border-hairline">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-accent grid place-items-center text-white font-black text-lg shadow-pink-glow" style={{ fontFamily: 'Impact, sans-serif' }}>S</div>
@@ -268,23 +268,46 @@ function BuilderPageContent({
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-[162px_1fr] gap-3 px-4 pt-3.5">
-          <div className="flex flex-col items-center gap-2.5">
-            <div className="text-[9px] tracking-[.18em] text-muted uppercase">Your Fit</div>
-            <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-            <div className="rounded-full border border-hairline bg-surface-2 px-2.5 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
-              {generatorFrame === 'masc' ? 'Male' : generatorFrame === 'fem' ? 'Female' : 'Androgynous'} frame synced from profile
+        <div className="flex flex-col gap-3 px-4 pb-4 pt-3.5">
+          <section className="rounded-[30px] border border-hairline bg-surface-1 p-3 shadow-[0_24px_60px_rgba(0,0,0,.28)]">
+            <div className="mb-3 flex items-start justify-between gap-3 px-1">
+              <div>
+                <div className="text-[9px] tracking-[.18em] text-muted uppercase">Studio avatar</div>
+                <div className="mt-1 font-serif text-[22px] font-semibold text-ink">
+                  Live outfit <em className="italic text-accent">preview</em>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-right">
+                <div className="font-serif text-[22px] font-semibold leading-none text-ink">
+                  {Math.round((n / CATEGORY_ORDER.length) * 100)}%
+                </div>
+                <div className="mt-1 text-[9px] uppercase tracking-[.14em] text-muted">
+                  {n} styled
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
+            <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
+            <div className="mt-3 flex flex-wrap gap-2 px-1">
+              <span className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
+                {generatorFrame === 'masc' ? 'Menswear' : generatorFrame === 'fem' ? 'Womenswear' : 'Neutral'} bias
+              </span>
+              <span className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
+                {activeVibe.label}
+              </span>
+              <span className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
+                {n ? `${n} item${n !== 1 ? 's' : ''} placed` : 'No items placed'}
+              </span>
+            </div>
+          </section>
+          <section className="flex flex-col gap-3">
             <div className="flex justify-between items-baseline px-0.5 pb-0.5">
-              <div className="font-serif font-semibold text-[17px]">Outfit <em className="italic text-accent">Builder</em></div>
+              <div className="font-serif font-semibold text-[20px]">Outfit <em className="italic text-accent">Builder</em></div>
               <div className="text-[10px] text-muted">{n} piece{n !== 1 ? 's' : ''}</div>
             </div>
-            <div className="px-0.5 text-[11px] leading-relaxed text-muted-2">
-              Pick a vibe to generate a starter fit, or tap any slot to search it manually. Saved fits still stay on this device.
+            <div className="px-0.5 text-[12px] leading-relaxed text-muted-2">
+              Generate a starter fit from the free Sylistly catalog, then tap any slot to swap pieces manually.
             </div>
-            <div className="rounded-[22px] border border-hairline bg-surface-1 p-3">
+            <div className="rounded-[24px] border border-hairline bg-surface-1 p-3.5">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
@@ -398,7 +421,7 @@ function BuilderPageContent({
               </div>
             </div>
             <SlotList onOpenSearch={setSearchFor} />
-          </div>
+          </section>
         </div>
       </div>
 
@@ -413,7 +436,7 @@ function BuilderPageContent({
           disabled={n === 0}
           className="w-full py-3.5 rounded-2xl bg-accent text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-pink-glow disabled:bg-surface-2 disabled:text-muted disabled:shadow-none disabled:cursor-not-allowed hover:bg-accent-hot transition"
         >
-          Shop full look {n > 0 && <span className="opacity-75 font-medium">· {n}</span>}
+          Shop full look {n > 0 && <span className="opacity-75 font-medium">- {n}</span>}
           <ExternalLink size={14} />
         </button>
         <button onClick={clear} className="w-full py-2.5 rounded-xl text-xs text-muted hover:text-ink transition">
@@ -427,6 +450,7 @@ function BuilderPageContent({
         open={!!searchFor}
         category={searchFor}
         initialQuery={searchFor ? quickQuery : null}
+        frame={generatorFrame}
         onClose={closeSearchSheet}
       />
 

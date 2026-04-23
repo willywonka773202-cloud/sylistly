@@ -40,7 +40,7 @@ export default function SavedPage() {
                   <div className="text-[11px] uppercase tracking-[.18em] text-muted">Saved locally</div>
                   <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{fit.title}</h2>
                   <p className="mt-2 text-[12px] text-muted-2">
-                    {fit.itemCount} piece{fit.itemCount !== 1 ? 's' : ''} · ${(fit.totalCents / 100).toLocaleString()} · {formatDate(fit.createdAt)}
+                    {fit.itemCount} piece{fit.itemCount !== 1 ? 's' : ''} - ${(fit.totalCents / 100).toLocaleString()} - {formatDate(fit.createdAt)}
                   </p>
                 </div>
                 <div className="grid h-12 w-12 place-items-center rounded-2xl bg-accent/10 text-accent">

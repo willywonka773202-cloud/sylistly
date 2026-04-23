@@ -89,7 +89,7 @@ export function SlotList({ onOpenSearch }: Props) {
                   onClick={(e) => { e.stopPropagation(); removeItem(cat); }}
                   className="w-5 h-5 rounded-full bg-surface-3 grid place-items-center text-[11px] text-muted-2 hover:bg-accent hover:text-white flex-none cursor-pointer"
                 >
-                  ✕
+                  x
                 </span>
               </>
             ) : (
