@@ -1,5 +1,47 @@
 [
   {
+    "id": "catalog-top-uniqlo-airism",
+    "brand": "Uniqlo",
+    "name": "AIRism Cotton Oversized Tee",
+    "category": "top",
+    "priceCents": 2490,
+    "currency": "USD",
+    "retailer": "Uniqlo",
+    "retailerUrl": "https://www.uniqlo.com/us/en/products/E465185-001/00",
+    "imageUrl": "https://image.uniqlo.com/UQ/ST3/us/imagesgoods/465185/feature/usgoods_465185_feature1.jpg",
+    "imageOriginalUrl": "https://image.uniqlo.com/UQ/ST3/us/imagesgoods/465185/feature/usgoods_465185_feature1.jpg",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "uniqlo airism oversized tee",
+      "colors": ["white", "black", "grey"],
+      "styles": ["tee", "oversized"],
+      "vibes": ["clean", "minimal"],
+      "keywords": ["basic", "airism"]
+    }
+  },
+  {
+    "id": "catalog-bottom-aritzia-effortless",
+    "brand": "Aritzia",
+    "name": "The Effortless Pant",
+    "category": "bottom",
+    "priceCents": 14800,
+    "currency": "USD",
+    "retailer": "Aritzia",
+    "retailerUrl": "https://www.aritzia.com/us/en/product/effortless-pant/91837.html",
+    "imageUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
+    "imageOriginalUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "aritzia effortless pant",
+      "colors": ["black", "brown", "beige"],
+      "styles": ["trouser"],
+      "vibes": ["clean", "office"],
+      "keywords": ["wide leg", "tailored"]
+    }
+  },
+  {
     "id": "f2e4852913aacbdf",
     "brand": "Nike",
     "name": "Men's Oversized Cargo Shorts",
@@ -69,6 +111,48 @@
       "source": "photo_catalog",
       "catalogQuery": "nike vomero",
       "style": "BV1358-001"
+    }
+  },
+  {
+    "id": "catalog-shoes-stevemadden-heel",
+    "brand": "Steve Madden",
+    "name": "Madden pointed slingback heel",
+    "category": "shoes",
+    "priceCents": 11000,
+    "currency": "USD",
+    "retailer": "Steve Madden",
+    "retailerUrl": "https://www.stevemadden.com/products/cary-black-leather",
+    "imageUrl": "https://www.stevemadden.com/cdn/shop/files/STEVEMADDEN_SHOES_CARY_BLACK-LEATHER_01.jpg?v=1729613675",
+    "imageOriginalUrl": "https://www.stevemadden.com/cdn/shop/files/STEVEMADDEN_SHOES_CARY_BLACK-LEATHER_01.jpg?v=1729613675",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "steve madden slingback heel",
+      "colors": ["black", "silver"],
+      "styles": ["heels"],
+      "vibes": ["night out", "dressy"],
+      "keywords": ["pump", "pointed toe"]
+    }
+  },
+  {
+    "id": "catalog-bag-longchamp-lepliage",
+    "brand": "Longchamp",
+    "name": "Le Pliage Original Tote",
+    "category": "bag",
+    "priceCents": 15500,
+    "currency": "USD",
+    "retailer": "Longchamp",
+    "retailerUrl": "https://www.longchamp.com/us/en/products/tote-bag-l-L1899089001.html",
+    "imageUrl": "https://www.longchamp.com/dw/image/v2/BCVX_PRD/on/demandware.static/-/Sites-LC-master-catalog/default/dw159f0d70/images/DIS/L1899089001_0.png?q=100&sh=2000&sm=fit&sw=2000",
+    "imageOriginalUrl": "https://www.longchamp.com/dw/image/v2/BCVX_PRD/on/demandware.static/-/Sites-LC-master-catalog/default/dw159f0d70/images/DIS/L1899089001_0.png?q=100&sh=2000&sm=fit&sw=2000",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "longchamp le pliage tote",
+      "colors": ["black", "navy", "green"],
+      "styles": ["tote"],
+      "vibes": ["clean", "travel"],
+      "keywords": ["foldable tote", "nylon tote"]
     }
   }
 ]

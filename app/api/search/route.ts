@@ -29,6 +29,7 @@ type SearchSource = 'catalog' | 'live';
 type SearchMode = 'catalog-only' | 'catalog-preview' | 'hybrid';
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
+const SEARCH_RESULT_LIMIT = 10;
 const searchResponseCache = new Map<
   string,
   { expiresAt: number; products: Product[]; source: SearchSource }
@@ -216,7 +217,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (!query.trim() && category) {
-      const featuredCatalogProducts = getFeaturedCatalogProducts(6, category).map((product) => ({
+      const featuredCatalogProducts = getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT, category).map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
@@ -263,7 +264,7 @@ export async function POST(req: NextRequest) {
         effectiveQuery || fastIntent.category,
         fastIntent,
         catalogProducts,
-        Math.min(6, catalogProducts.length),
+        Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
       );
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
@@ -315,7 +316,7 @@ export async function POST(req: NextRequest) {
         );
 
         const candidates = await searchShopping(intent, effectiveQuery);
-        const rerankLimit = Math.min(6, candidates.length);
+        const rerankLimit = Math.min(SEARCH_RESULT_LIMIT, candidates.length);
         const ranked = candidates.length > rerankLimit
           ? await rerankProducts(effectiveQuery, intent, candidates, rerankLimit)
           : candidates.slice(0, rerankLimit);
@@ -333,7 +334,7 @@ export async function POST(req: NextRequest) {
               ...combined.filter((product) => !hasDirectRetailerUrl(product.retailerUrl)),
             ]
           : combined
-        ).slice(0, 6);
+        ).slice(0, SEARCH_RESULT_LIMIT);
 
         const products: Product[] = selected.map((p) => ({
           ...p,
@@ -378,7 +379,7 @@ export async function POST(req: NextRequest) {
           effectiveQuery || fastIntent.category,
           fastIntent,
           previewCatalogProducts,
-          Math.min(6, previewCatalogProducts.length),
+          Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
         );
 
         cacheProducts(rankedPreviewProducts).catch(() => {});

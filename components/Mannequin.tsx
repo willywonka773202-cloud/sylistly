@@ -179,8 +179,8 @@ function GarmentShape({
   if (!product) return <ShapePlaceholder category={category} className={className} />;
 
   const accent = pickAccentColor(product, category);
-  const textureSrc = proxiedImageUrl(product.imageUrl);
   const shapeClass = SHAPE_CLASSES[category];
+  const variant = detectGarmentVariant(product, category);
   const label = category === 'outer' ? 'Layer' : category;
 
   return (
@@ -189,19 +189,15 @@ function GarmentShape({
         className={`relative h-full w-full overflow-hidden border border-white/12 shadow-[0_18px_42px_rgba(0,0,0,.38)] ${shapeClass}`}
         style={{ background: `linear-gradient(180deg, ${withAlpha(accent, 0.94)} 0%, ${withAlpha(accent, 0.72)} 100%)` }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.26),transparent_34%),linear-gradient(180deg,rgba(255,255,255,.12),transparent_44%),linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.36))]" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={textureSrc}
-          alt=""
-          className={`absolute inset-0 h-full w-full mix-blend-luminosity object-cover opacity-45 saturate-0 contrast-125 ${TEXTURE_CLASSES[category]}`}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onError={(event) => {
-            event.currentTarget.src = overlayFallback(product.brand);
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.26),transparent_34%),linear-gradient(180deg,rgba(255,255,255,.12),transparent_44%),linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.22))]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, ${withAlpha('#ffffff', 0.06)} 50%, transparent 100%)`,
+            maskImage: 'linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,1))',
           }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.22))]" />
+        {renderGarmentDetails(category, variant, accent)}
         <div className="absolute inset-x-[14%] bottom-[8%] rounded-full border border-white/12 bg-black/28 px-2 py-1 text-center text-[8px] uppercase tracking-[.18em] text-white/70 backdrop-blur-sm">
           {label}
         </div>
@@ -301,20 +297,212 @@ function SelectedLookStrip({
   );
 }
 
+function detectGarmentVariant(
+  product: Product,
+  category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes',
+): string {
+  const text = [
+    product.brand,
+    product.name,
+    ...(Array.isArray(product.metadata?.styles) ? (product.metadata.styles as string[]) : []),
+    ...(Array.isArray(product.metadata?.keywords) ? (product.metadata.keywords as string[]) : []),
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  if (category === 'hat') {
+    if (text.includes('beanie')) return 'beanie';
+    if (text.includes('bucket')) return 'bucket';
+    return 'cap';
+  }
+
+  if (category === 'top') {
+    if (text.includes('hoodie')) return 'hoodie';
+    if (text.includes('bodysuit') || text.includes('square neck')) return 'bodysuit';
+    if (text.includes('oxford') || text.includes('button') || text.includes('shirt')) return 'shirt';
+    if (text.includes('tank') || text.includes('rib')) return 'tank';
+    return 'tee';
+  }
+
+  if (category === 'outer') {
+    if (text.includes('puffer') || text.includes('nuptse')) return 'puffer';
+    if (text.includes('trench') || text.includes('coat')) return 'trench';
+    if (text.includes('blazer')) return 'blazer';
+    if (text.includes('bomber')) return 'bomber';
+    return 'jacket';
+  }
+
+  if (category === 'bottom') {
+    if (text.includes('skirt')) return 'skirt';
+    if (text.includes('short')) return 'shorts';
+    if (text.includes('legging') || text.includes('align')) return 'leggings';
+    return 'pants';
+  }
+
+  if (text.includes('heel') || text.includes('pump') || text.includes('slingback')) return 'heels';
+  if (text.includes('boot') || text.includes('ugg') || text.includes('martens')) return 'boots';
+  if (text.includes('clog') || text.includes('birkenstock') || text.includes('boston')) return 'clogs';
+  return 'sneakers';
+}
+
+function renderGarmentDetails(
+  category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes',
+  variant: string,
+  accent: string,
+) {
+  const line = withAlpha('#ffffff', 0.12);
+  const shade = withAlpha('#000000', 0.14);
+
+  if (category === 'hat') {
+    if (variant === 'beanie') {
+      return <div className="absolute inset-x-[18%] top-[58%] h-[10%] rounded-full bg-black/18" />;
+    }
+    if (variant === 'bucket') {
+      return <div className="absolute inset-x-[8%] top-[54%] h-[12%] rounded-full bg-black/18" />;
+    }
+    return <div className="absolute left-[18%] right-[10%] top-[48%] h-[12%] rounded-full bg-black/18 [clip-path:polygon(0_0,100%_0,78%_100%,20%_100%)]" />;
+  }
+
+  if (category === 'top') {
+    if (variant === 'tank') {
+      return (
+        <>
+          <div className="absolute left-[28%] top-[8%] h-[22%] w-[8%] rounded-full bg-black/14" />
+          <div className="absolute right-[28%] top-[8%] h-[22%] w-[8%] rounded-full bg-black/14" />
+          <div className="absolute left-1/2 top-[16%] h-[16%] w-[20%] -translate-x-1/2 rounded-b-full border-x border-b" style={{ borderColor: line }} />
+        </>
+      );
+    }
+    if (variant === 'shirt') {
+      return (
+        <>
+          <div className="absolute left-[36%] top-[6%] h-[20%] w-[12%] rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,100%_100%,38%_100%)]" />
+          <div className="absolute right-[36%] top-[6%] h-[20%] w-[12%] -rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,62%_100%,0_100%)]" />
+          <div className="absolute left-1/2 top-[22%] h-[56%] w-px -translate-x-1/2" style={{ backgroundColor: line }} />
+        </>
+      );
+    }
+    if (variant === 'hoodie') {
+      return (
+        <>
+          <div className="absolute left-1/2 top-[6%] h-[22%] w-[28%] -translate-x-1/2 rounded-[999px_999px_18px_18px] border" style={{ borderColor: line, backgroundColor: withAlpha(accent, 0.38) }} />
+          <div className="absolute left-1/2 top-[56%] h-[14%] w-[20%] -translate-x-1/2 rounded-[8px]" style={{ backgroundColor: shade, border: `1px solid ${line}` }} />
+        </>
+      );
+    }
+    if (variant === 'bodysuit') {
+      return (
+        <>
+          <div className="absolute left-1/2 top-[14%] h-[16%] w-[20%] -translate-x-1/2 rounded-b-full border-x border-b" style={{ borderColor: line }} />
+          <div className="absolute left-1/2 bottom-[4%] h-[18%] w-[18%] -translate-x-1/2 [clip-path:polygon(0_0,100%_0,62%_100%,38%_100%)]" style={{ backgroundColor: shade }} />
+        </>
+      );
+    }
+    return (
+      <>
+        <div className="absolute left-1/2 top-[14%] h-[14%] w-[20%] -translate-x-1/2 rounded-b-full border-x border-b" style={{ borderColor: line }} />
+        <div className="absolute left-[14%] top-[22%] h-[18%] w-[18%] rounded-full border-t" style={{ borderColor: line }} />
+        <div className="absolute right-[14%] top-[22%] h-[18%] w-[18%] rounded-full border-t" style={{ borderColor: line }} />
+      </>
+    );
+  }
+
+  if (category === 'outer') {
+    if (variant === 'puffer') {
+      return (
+        <>
+          {['24%', '40%', '56%', '72%'].map((top) => (
+            <div key={top} className="absolute left-[10%] right-[10%] h-px" style={{ top, backgroundColor: line }} />
+          ))}
+        </>
+      );
+    }
+    if (variant === 'trench') {
+      return (
+        <>
+          <div className="absolute left-[34%] top-[10%] h-[24%] w-[12%] rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,100%_100%,38%_100%)]" />
+          <div className="absolute right-[34%] top-[10%] h-[24%] w-[12%] -rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,62%_100%,0_100%)]" />
+          <div className="absolute left-[28%] right-[28%] top-[48%] h-[6%] rounded-full" style={{ backgroundColor: shade }} />
+        </>
+      );
+    }
+    if (variant === 'blazer') {
+      return (
+        <>
+          <div className="absolute left-[34%] top-[10%] h-[20%] w-[12%] rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,100%_100%,38%_100%)]" />
+          <div className="absolute right-[34%] top-[10%] h-[20%] w-[12%] -rotate-[14deg] bg-black/16 [clip-path:polygon(0_0,100%_0,62%_100%,0_100%)]" />
+          <div className="absolute left-1/2 top-[28%] h-[48%] w-px -translate-x-1/2" style={{ backgroundColor: line }} />
+        </>
+      );
+    }
+    if (variant === 'bomber') {
+      return <div className="absolute left-[22%] right-[22%] bottom-[18%] h-[7%] rounded-full" style={{ backgroundColor: shade }} />;
+    }
+    return <div className="absolute left-1/2 top-[10%] h-[18%] w-[18%] -translate-x-1/2 rounded-b-full border-x border-b" style={{ borderColor: line }} />;
+  }
+
+  if (category === 'bottom') {
+    if (variant === 'skirt') {
+      return <div className="absolute left-[12%] right-[12%] top-[18%] h-px" style={{ backgroundColor: line }} />;
+    }
+    if (variant === 'shorts') {
+      return (
+        <>
+          <div className="absolute left-1/2 top-[22%] bottom-[48%] w-px -translate-x-1/2" style={{ backgroundColor: line }} />
+          <div className="absolute left-[18%] right-[18%] top-[16%] h-px" style={{ backgroundColor: line }} />
+        </>
+      );
+    }
+    return (
+      <>
+        <div className="absolute left-1/2 top-[10%] bottom-[12%] w-px -translate-x-1/2" style={{ backgroundColor: line }} />
+        <div className="absolute left-[18%] top-[12%] bottom-[14%] w-px" style={{ backgroundColor: withAlpha('#ffffff', 0.06) }} />
+        <div className="absolute right-[18%] top-[12%] bottom-[14%] w-px" style={{ backgroundColor: withAlpha('#ffffff', 0.06) }} />
+      </>
+    );
+  }
+
+  if (variant === 'heels') {
+    return (
+      <>
+        <div className="absolute left-[34%] top-[66%] h-[16%] w-[2px]" style={{ backgroundColor: shade }} />
+        <div className="absolute right-[34%] top-[66%] h-[16%] w-[2px]" style={{ backgroundColor: shade }} />
+      </>
+    );
+  }
+
+  if (variant === 'boots') {
+    return (
+      <>
+        <div className="absolute left-[14%] top-[8%] bottom-[10%] w-px" style={{ backgroundColor: line }} />
+        <div className="absolute right-[14%] top-[8%] bottom-[10%] w-px" style={{ backgroundColor: line }} />
+      </>
+    );
+  }
+
+  if (variant === 'clogs') {
+    return (
+      <>
+        <div className="absolute left-[12%] top-[38%] h-px w-[28%]" style={{ backgroundColor: line }} />
+        <div className="absolute right-[12%] top-[38%] h-px w-[28%]" style={{ backgroundColor: line }} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="absolute left-[12%] top-[46%] h-px w-[30%]" style={{ backgroundColor: line }} />
+      <div className="absolute right-[12%] top-[46%] h-px w-[30%]" style={{ backgroundColor: line }} />
+    </>
+  );
+}
+
 const SHAPE_CLASSES: Record<'hat' | 'top' | 'outer' | 'bottom' | 'shoes', string> = {
   hat: 'rounded-[52%_52%_32%_32%/70%_70%_30%_30%] [clip-path:polygon(8%_52%,18%_18%,82%_18%,92%_52%,84%_70%,16%_70%)]',
   top: 'rounded-[24px_24px_28px_28px] [clip-path:polygon(20%_12%,34%_4%,66%_4%,80%_12%,92%_26%,78%_36%,72%_95%,28%_95%,22%_36%,8%_26%)]',
   outer: 'rounded-[30px_30px_24px_24px] [clip-path:polygon(15%_8%,34%_2%,66%_2%,85%_8%,96%_24%,84%_36%,79%_100%,21%_100%,16%_36%,4%_24%)]',
   bottom: 'rounded-[18px_18px_28px_28px] [clip-path:polygon(18%_0,82%_0,74%_14%,72%_100%,54%_100%,50%_28%,46%_100%,28%_100%,26%_14%)]',
   shoes: '[clip-path:polygon(6%_62%,18%_34%,42%_34%,48%_60%,48%_82%,6%_82%,52%_62%,64%_34%,88%_34%,94%_60%,94%_82%,52%_82%)]',
-};
-
-const TEXTURE_CLASSES: Record<'hat' | 'top' | 'outer' | 'bottom' | 'shoes', string> = {
-  hat: 'scale-[1.15]',
-  top: 'scale-[1.08]',
-  outer: 'scale-[1.06]',
-  bottom: 'scale-[1.12] object-top',
-  shoes: 'scale-[1.08]',
 };
 
 function pickAccentColor(product: Product, fallbackCategory: Category): string {

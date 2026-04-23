@@ -85,7 +85,7 @@ function photoCatalogScore(product: Product, intent: SearchIntent, rawQuery: str
 export function searchPhotoCatalog(
   intent: SearchIntent,
   rawQuery: string,
-  limit = 6,
+  limit = 10,
 ): Product[] {
   const pool = PHOTO_CATALOG_PRODUCTS.filter((product) => product.category === intent.category);
   if (!pool.length) return [];

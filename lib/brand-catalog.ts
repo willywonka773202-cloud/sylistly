@@ -955,7 +955,7 @@ function scoreCatalogProduct(product: Product, intent: SearchIntent, rawQuery: s
 export function searchBrandCatalog(
   intent: SearchIntent,
   rawQuery: string,
-  limit = 6,
+  limit = 10,
 ): Product[] {
   const pool = BRAND_CATALOG_PRODUCTS.filter((product) => product.category === intent.category);
   if (!pool.length) return [];
