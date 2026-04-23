@@ -24,18 +24,18 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
 };
 
 const BOARD_LAYOUT: BoardLayout = {
-  className: 'left-1/2 top-[58px] h-[338px] w-[248px] -translate-x-1/2',
-  imageClassName: 'drop-shadow-[0_14px_24px_rgba(0,0,0,.14)]',
+  className: 'left-1/2 top-[42px] h-[362px] w-[274px] -translate-x-1/2',
+  imageClassName: 'drop-shadow-[0_12px_22px_rgba(0,0,0,.12)]',
   order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
   placements: {
-    eyewear: 'left-[40px] top-[14px] h-[30px] w-[72px] -rotate-[2deg]',
-    hat: 'right-[30px] top-[16px] h-[28px] w-[74px] rotate-[3deg]',
-    outer: 'left-[24px] top-[54px] h-[142px] w-[126px] -rotate-[2deg]',
-    top: 'right-[22px] top-[42px] h-[112px] w-[96px] rotate-[2deg]',
-    bottom: 'left-1/2 top-[146px] h-[146px] w-[112px] -translate-x-1/2',
-    bag: 'right-[30px] top-[178px] h-[78px] w-[64px] rotate-[4deg]',
-    jewelry: 'right-[28px] top-[244px] h-[28px] w-[28px]',
-    shoes: 'left-1/2 bottom-[18px] h-[50px] w-[132px] -translate-x-1/2 -rotate-[3deg]',
+    eyewear: 'left-[44px] top-[16px] h-[34px] w-[82px] -rotate-[2deg]',
+    hat: 'right-[34px] top-[18px] h-[30px] w-[82px] rotate-[3deg]',
+    outer: 'left-[18px] top-[58px] h-[156px] w-[136px] -rotate-[2deg]',
+    top: 'right-[18px] top-[46px] h-[122px] w-[106px] rotate-[2deg]',
+    bottom: 'left-1/2 top-[156px] h-[164px] w-[124px] -translate-x-1/2',
+    bag: 'right-[22px] top-[192px] h-[86px] w-[72px] rotate-[4deg]',
+    jewelry: 'right-[26px] top-[258px] h-[32px] w-[32px]',
+    shoes: 'left-1/2 bottom-[16px] h-[56px] w-[146px] -translate-x-1/2 -rotate-[3deg]',
   },
 };
 
@@ -53,19 +53,19 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
 
   return (
     <div
-      className="relative h-[432px] w-full overflow-hidden rounded-[30px] border border-[#e9d8ce] bg-[#f2e8e2]"
+      className="relative h-[432px] w-full overflow-hidden rounded-[30px] border border-[#ebe0d8] bg-[#f7f2ee]"
       style={{
-        backgroundImage: `radial-gradient(circle at 50% 12%, rgba(255,255,255,.82), transparent 30%), radial-gradient(circle at 50% 56%, ${hexToRgba(warmGlow, 0.24)}, transparent 34%), linear-gradient(180deg, #f8f1ec 0%, #efe3dc 44%, #e7d9d0 100%)`,
+        backgroundImage: `radial-gradient(circle at 50% 14%, rgba(255,255,255,.9), transparent 32%), radial-gradient(circle at 50% 58%, ${hexToRgba(warmGlow, 0.14)}, transparent 36%), linear-gradient(180deg, #faf7f4 0%, #f4ece6 50%, #eee4dd 100%)`,
       }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,.55),transparent_56%)]" />
-      <div className="absolute -left-8 top-28 h-40 w-40 rounded-full bg-white/55 blur-3xl" />
-      <div className="absolute -right-8 top-20 h-44 w-44 rounded-full bg-[#f1d9d7]/60 blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,.62),transparent_58%)]" />
+      <div className="absolute -left-10 top-32 h-40 w-40 rounded-full bg-white/45 blur-3xl" />
+      <div className="absolute -right-10 top-24 h-44 w-44 rounded-full bg-[#f3e2da]/52 blur-3xl" />
 
       <div className="absolute left-4 top-4 z-20">
         <div className="text-[10px] uppercase tracking-[.22em] text-[#7e6f67]">Fit board</div>
         <div className="mt-1 font-serif text-[24px] font-semibold leading-none text-[#2f2723]">
-          Editorial <em className="italic text-accent">preview</em>
+          Outfit <em className="italic text-accent">preview</em>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
       <FitBoard layout={BOARD_LAYOUT} items={items} hasItems={hasItems} />
 
       {!hasItems ? (
-        <div className="absolute left-1/2 top-[160px] z-30 w-[164px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/86 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.12)] backdrop-blur">
+        <div className="absolute left-1/2 top-[156px] z-30 w-[174px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/88 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.1)] backdrop-blur">
           <div className="font-serif text-[18px] font-semibold text-[#2f2723]">Start styling</div>
           <div className="mt-1 text-[11px] leading-relaxed text-[#7f6f66]">
             Add pieces below and Sylistly will lay them out as a clean shopping board.
@@ -87,7 +87,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         </div>
       ) : null}
 
-      <div className="absolute bottom-4 left-4 z-20 rounded-full border border-black/5 bg-white/74 px-3 py-1.5 text-[10px] uppercase tracking-[.18em] text-[#7f6d64] shadow-[0_8px_20px_rgba(84,54,43,.08)] backdrop-blur">
+      <div className="absolute bottom-4 left-4 z-20 rounded-full border border-black/5 bg-white/78 px-3 py-1.5 text-[10px] uppercase tracking-[.18em] text-[#7f6d64] shadow-[0_8px_20px_rgba(84,54,43,.08)] backdrop-blur">
         {count ? `${count} product${count !== 1 ? 's' : ''} in look` : 'Waiting for pieces'}
       </div>
     </div>
@@ -97,10 +97,10 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
 function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Partial<Record<Category, Product>>; hasItems: boolean }) {
   return (
     <div
-      className={`absolute overflow-hidden rounded-[34px] border border-black/5 bg-white/94 shadow-[0_22px_46px_rgba(84,54,43,.12)] ${layout.className}`}
+      className={`absolute overflow-hidden rounded-[34px] border border-[#ebe1da] bg-white shadow-[0_22px_46px_rgba(84,54,43,.12)] ${layout.className}`}
     >
-      <div className="absolute inset-[10px] rounded-[26px] bg-[radial-gradient(circle_at_50%_14%,rgba(255,255,255,.95),rgba(255,255,255,.72)_34%,rgba(244,238,234,.98)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.35),transparent_24%,transparent_78%,rgba(231,220,214,.4))]" />
+      <div className="absolute inset-[10px] rounded-[26px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.28),transparent_18%,transparent_82%,rgba(237,228,221,.28))]" />
 
       {layout.order.map((category, index) => {
         const product = items[category];
@@ -122,7 +122,7 @@ function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Par
         ? EMPTY_HINTS.map((hint) => (
             <div
               key={hint.label}
-              className={`absolute rounded-[24px] border border-dashed border-[#d9cac1] bg-[#faf6f2]/82 ${hint.className}`}
+              className={`absolute rounded-[24px] border border-dashed border-[#d9cac1] bg-[#fcfaf8]/92 ${hint.className}`}
             >
               <div className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-[.18em] text-[#b39d92]">
                 {hint.label}
@@ -151,9 +151,10 @@ function BoardProduct({
     <div className={`absolute ${className}`} style={{ zIndex }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={proxiedImageUrl(product.imageUrl)}
+        src={proxiedImageUrl(product.imageUrl, { cutout: true })}
         alt={`${product.brand} ${product.name}`}
         className={`h-full w-full object-contain ${imageClassName}`}
+        style={{ mixBlendMode: 'multiply' }}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {

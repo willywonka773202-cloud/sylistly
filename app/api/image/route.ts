@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import sharp from 'sharp';
 
 export const runtime = 'nodejs';
 
@@ -6,6 +7,7 @@ const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
 
 export async function GET(req: NextRequest) {
   const rawUrl = req.nextUrl.searchParams.get('url');
+  const cutout = req.nextUrl.searchParams.get('cutout') === '1';
   if (!rawUrl) {
     return new NextResponse('Missing url', { status: 400 });
   }
@@ -37,11 +39,24 @@ export async function GET(req: NextRequest) {
 
     const contentType = upstream.headers.get('content-type') || 'image/jpeg';
     const arrayBuffer = await upstream.arrayBuffer();
+    const source = Buffer.from(arrayBuffer);
 
-    return new NextResponse(arrayBuffer, {
+    if (!cutout || contentType.includes('svg')) {
+      return new NextResponse(new Uint8Array(source), {
+        status: 200,
+        headers: {
+          'content-type': contentType,
+          'cache-control': 'public, max-age=86400, s-maxage=86400',
+        },
+      });
+    }
+
+    const transformed = await makeTransparentCutout(source);
+
+    return new NextResponse(new Uint8Array(transformed), {
       status: 200,
       headers: {
-        'content-type': contentType,
+        'content-type': 'image/png',
         'cache-control': 'public, max-age=86400, s-maxage=86400',
       },
     });
@@ -51,4 +66,39 @@ export async function GET(req: NextRequest) {
       { status: 502 },
     );
   }
+}
+
+async function makeTransparentCutout(source: Buffer): Promise<Buffer> {
+  const pipeline = sharp(source, { failOn: 'none' }).rotate().ensureAlpha();
+  const { data, info } = await pipeline.raw().toBuffer({ resolveWithObject: true });
+
+  for (let index = 0; index < data.length; index += info.channels) {
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    const alpha = data[index + 3];
+    const brightness = (red + green + blue) / 3;
+    const chroma = Math.max(red, green, blue) - Math.min(red, green, blue);
+
+    if (brightness >= 248 && chroma <= 26) {
+      data[index + 3] = 0;
+      continue;
+    }
+
+    if (brightness >= 232 && chroma <= 34) {
+      const fade = Math.max(0, Math.min(1, (248 - brightness) / 16));
+      data[index + 3] = Math.round(alpha * fade);
+    }
+  }
+
+  return sharp(data, {
+    raw: {
+      width: info.width,
+      height: info.height,
+      channels: info.channels,
+    },
+  })
+    .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 }, threshold: 10 })
+    .png()
+    .toBuffer();
 }
