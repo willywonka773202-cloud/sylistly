@@ -11,30 +11,49 @@ interface Props {
   bodyType?: GeneratorFrame;
 }
 
-const FRAME_COPY: Record<GeneratorFrame, { label: string; shoulder: string; waist: string }> = {
+const FRAME_COPY: Record<
+  GeneratorFrame,
+  {
+    label: string;
+    shoulderWidth: string;
+    torsoWidth: string;
+    hipWidth: string;
+    legLeft: string;
+    legRight: string;
+  }
+> = {
   masc: {
     label: 'Menswear frame',
-    shoulder: 'w-[138px]',
-    waist: 'w-[88px]',
+    shoulderWidth: 'w-[142px]',
+    torsoWidth: 'w-[92px]',
+    hipWidth: 'w-[94px]',
+    legLeft: 'left-[70px]',
+    legRight: 'right-[70px]',
   },
   fem: {
     label: 'Womenswear frame',
-    shoulder: 'w-[116px]',
-    waist: 'w-[74px]',
+    shoulderWidth: 'w-[118px]',
+    torsoWidth: 'w-[76px]',
+    hipWidth: 'w-[88px]',
+    legLeft: 'left-[76px]',
+    legRight: 'right-[76px]',
   },
   androgynous: {
     label: 'Neutral frame',
-    shoulder: 'w-[124px]',
-    waist: 'w-[80px]',
+    shoulderWidth: 'w-[128px]',
+    torsoWidth: 'w-[84px]',
+    hipWidth: 'w-[92px]',
+    legLeft: 'left-[73px]',
+    legRight: 'right-[73px]',
   },
 };
 
 const BODY_MARKERS: Array<{ category: Category; label: string; className: string }> = [
-  { category: 'hat', label: 'Hat', className: 'left-[50%] top-[18px] -translate-x-1/2' },
-  { category: 'outer', label: 'Outer', className: 'left-6 top-[150px]' },
-  { category: 'top', label: 'Top', className: 'right-6 top-[168px]' },
-  { category: 'bottom', label: 'Bottom', className: 'left-7 top-[284px]' },
-  { category: 'shoes', label: 'Shoes', className: 'right-8 bottom-[44px]' },
+  { category: 'hat', label: 'Hat', className: 'left-1/2 top-[22px] -translate-x-1/2' },
+  { category: 'outer', label: 'Outer', className: 'left-6 top-[158px]' },
+  { category: 'top', label: 'Top', className: 'right-6 top-[178px]' },
+  { category: 'bottom', label: 'Bottom', className: 'left-7 top-[295px]' },
+  { category: 'shoes', label: 'Shoes', className: 'right-8 bottom-[50px]' },
 ];
 
 const ACCESSORY_CATEGORIES: Array<{ category: Category; label: string }> = [
@@ -42,6 +61,25 @@ const ACCESSORY_CATEGORIES: Array<{ category: Category; label: string }> = [
   { category: 'eyewear', label: 'Eyewear' },
   { category: 'jewelry', label: 'Jewelry' },
 ];
+
+const COLOR_SWATCHES: Record<string, string> = {
+  black: '#191817',
+  white: '#f2eee8',
+  cream: '#d8cbb6',
+  beige: '#b89d7a',
+  tan: '#a57f5f',
+  brown: '#6f4d3a',
+  grey: '#6e7177',
+  gray: '#6e7177',
+  silver: '#878e99',
+  gold: '#b49345',
+  navy: '#283750',
+  blue: '#3b5d88',
+  red: '#7b2d35',
+  pink: '#b76a7d',
+  green: '#55634d',
+  olive: '#58604f',
+};
 
 export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
   const mannequinStyle = skinTone ? ({ '--skin': skinTone } as CSSProperties) : undefined;
@@ -55,7 +93,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
       style={mannequinStyle}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_4%,rgba(255,255,255,.14),transparent_24%),radial-gradient(circle_at_50%_54%,rgba(232,54,93,.18),transparent_44%),linear-gradient(180deg,#171612,#090908_70%,#040404)]" />
-      <div className="absolute inset-0 opacity-[.17] [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.04)_1px,transparent_1px)] [background-size:64px_64px]" />
+      <div className="absolute inset-0 opacity-[.14] [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.04)_1px,transparent_1px)] [background-size:64px_64px]" />
       <div className="absolute left-1/2 top-16 h-[314px] w-[242px] -translate-x-1/2 rounded-full border border-white/10" />
       <div className="absolute left-1/2 top-24 h-[292px] w-[188px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
 
@@ -72,57 +110,42 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="mt-1 text-[9px] uppercase tracking-[.14em] text-muted">slots</div>
       </div>
 
-      <div className="absolute left-1/2 top-[58px] z-10 h-[330px] w-[210px] -translate-x-1/2">
-        <div className="absolute left-1/2 top-[286px] h-10 w-[164px] -translate-x-1/2 rounded-full bg-black/60 blur-md" />
-        <div className="absolute left-1/2 top-[298px] h-5 w-[120px] -translate-x-1/2 rounded-full border border-white/10 bg-white/10" />
+      <div className="absolute left-1/2 top-[52px] z-10 h-[334px] w-[216px] -translate-x-1/2">
+        <div className="absolute left-1/2 top-[290px] h-10 w-[172px] -translate-x-1/2 rounded-full bg-black/60 blur-md" />
+        <div className="absolute left-1/2 top-[302px] h-5 w-[128px] -translate-x-1/2 rounded-full border border-white/10 bg-white/10" />
 
-        <div className="absolute left-1/2 top-0 z-20 h-[58px] w-[52px] -translate-x-1/2 rounded-[24px_24px_18px_18px] skin shadow-[inset_-4px_-5px_12px_rgba(0,0,0,.22),0_14px_24px_rgba(0,0,0,.28)]" />
+        <div className="absolute left-1/2 top-0 z-20 h-[58px] w-[54px] -translate-x-1/2 rounded-[24px_24px_18px_18px] skin shadow-[inset_-4px_-5px_12px_rgba(0,0,0,.22),0_14px_24px_rgba(0,0,0,.28)]" />
         <div className="absolute left-1/2 top-[53px] z-10 h-[18px] w-[18px] -translate-x-1/2 rounded skin" />
-        <div className={`absolute left-1/2 top-[70px] z-10 h-[28px] -translate-x-1/2 rounded-[999px] skin ${frame.shoulder}`} />
-        <div className={`absolute left-1/2 top-[88px] z-10 h-[98px] -translate-x-1/2 rounded-[24px_24px_18px_18px] skin shadow-[inset_-5px_-6px_14px_rgba(0,0,0,.2)] ${frame.waist}`} />
-        <div className="absolute left-[43px] top-[88px] z-10 h-[118px] w-[24px] rotate-[7deg] rounded-[14px] skin" />
-        <div className="absolute right-[43px] top-[88px] z-10 h-[118px] w-[24px] -rotate-[7deg] rounded-[14px] skin" />
-        <div className="absolute left-[39px] top-[198px] z-20 h-[20px] w-[20px] rounded-full skin" />
-        <div className="absolute right-[39px] top-[198px] z-20 h-[20px] w-[20px] rounded-full skin" />
-        <div className="absolute left-1/2 top-[178px] z-10 h-[42px] w-[92px] -translate-x-1/2 rounded-[18px_18px_26px_26px] skin" />
-        <div className="absolute left-[72px] top-[212px] z-10 h-[112px] w-[32px] rounded-[13px_13px_18px_18px] skin" />
-        <div className="absolute right-[72px] top-[212px] z-10 h-[112px] w-[32px] rounded-[13px_13px_18px_18px] skin" />
-        <div className="absolute left-[58px] top-[318px] z-20 h-[17px] w-[54px] rounded-[10px_6px_14px_14px] skin" />
-        <div className="absolute right-[58px] top-[318px] z-20 h-[17px] w-[54px] rounded-[6px_10px_14px_14px] skin" />
+        <div className={`absolute left-1/2 top-[72px] z-10 h-[28px] -translate-x-1/2 rounded-[999px] skin ${frame.shoulderWidth}`} />
+        <div className={`absolute left-1/2 top-[90px] z-10 h-[102px] -translate-x-1/2 rounded-[26px_26px_18px_18px] skin shadow-[inset_-5px_-6px_14px_rgba(0,0,0,.2)] ${frame.torsoWidth}`} />
+        <div className="absolute left-[41px] top-[90px] z-10 h-[120px] w-[24px] rotate-[7deg] rounded-[14px] skin" />
+        <div className="absolute right-[41px] top-[90px] z-10 h-[120px] w-[24px] -rotate-[7deg] rounded-[14px] skin" />
+        <div className="absolute left-[37px] top-[202px] z-20 h-[20px] w-[20px] rounded-full skin" />
+        <div className="absolute right-[37px] top-[202px] z-20 h-[20px] w-[20px] rounded-full skin" />
+        <div className={`absolute left-1/2 top-[184px] z-10 h-[44px] -translate-x-1/2 rounded-[18px_18px_28px_28px] skin ${frame.hipWidth}`} />
+        <div className={`absolute top-[220px] z-10 h-[112px] w-[32px] rounded-[13px_13px_18px_18px] skin ${frame.legLeft}`} />
+        <div className={`absolute top-[220px] z-10 h-[112px] w-[32px] rounded-[13px_13px_18px_18px] skin ${frame.legRight}`} />
+        <div className="absolute left-[56px] top-[320px] z-20 h-[17px] w-[56px] rounded-[10px_6px_14px_14px] skin" />
+        <div className="absolute right-[56px] top-[320px] z-20 h-[17px] w-[56px] rounded-[6px_10px_14px_14px] skin" />
 
-        <GarmentZone
-          product={items.hat}
-          label="Hat"
-          className="left-1/2 top-[-10px] z-40 h-[42px] w-[86px] -translate-x-1/2 rounded-[18px]"
-          imageClassName="p-1"
-        />
-        <GarmentZone
-          product={items.top}
-          label="Top"
-          className="left-1/2 top-[76px] z-30 h-[114px] w-[112px] -translate-x-1/2 rounded-[24px_24px_28px_28px]"
-        />
-        <GarmentZone
-          product={items.outer}
-          label="Outer"
-          className="left-1/2 top-[66px] z-40 h-[140px] w-[146px] -translate-x-1/2 rounded-[30px_30px_24px_24px]"
-        />
-        <GarmentZone
-          product={items.bottom}
-          label="Bottom"
-          className="left-1/2 top-[176px] z-30 h-[146px] w-[104px] -translate-x-1/2 rounded-[22px_22px_30px_30px]"
-        />
-        <GarmentZone
-          product={items.shoes}
-          label="Shoes"
-          className="left-1/2 top-[309px] z-40 h-[38px] w-[126px] -translate-x-1/2 rounded-[18px]"
-          imageClassName="p-1"
-        />
+        <GarmentShape product={items.hat} category="hat" className="left-1/2 top-[8px] z-40 h-[34px] w-[92px] -translate-x-1/2" />
+        <GarmentShape product={items.top} category="top" className="left-1/2 top-[74px] z-30 h-[132px] w-[142px] -translate-x-1/2" />
+        <GarmentShape product={items.outer} category="outer" className="left-1/2 top-[70px] z-40 h-[150px] w-[168px] -translate-x-1/2" />
+        <GarmentShape product={items.bottom} category="bottom" className="left-1/2 top-[186px] z-30 h-[152px] w-[112px] -translate-x-1/2" />
+        <GarmentShape product={items.shoes} category="shoes" className="left-1/2 top-[308px] z-40 h-[40px] w-[130px] -translate-x-1/2" />
+
+        <div className="pointer-events-none absolute left-1/2 top-[332px] z-40 -translate-x-1/2 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-[9px] uppercase tracking-[.18em] text-white/60 backdrop-blur">
+          Studio fit preview
+        </div>
       </div>
 
-      <div className="absolute bottom-4 left-4 z-30 flex max-w-[170px] gap-2">
-        {ACCESSORY_CATEGORIES.map((entry) => (
-          <AccessoryTile key={entry.category} label={entry.label} product={items[entry.category]} />
-        ))}
+      <div className="absolute bottom-4 left-4 right-4 z-30 flex items-end justify-between gap-3">
+        <div className="flex max-w-[170px] gap-2">
+          {ACCESSORY_CATEGORIES.map((entry) => (
+            <AccessoryTile key={entry.category} label={entry.label} product={items[entry.category]} />
+          ))}
+        </div>
+        <SelectedLookStrip items={items} />
       </div>
 
       {BODY_MARKERS.map((marker) => {
@@ -144,56 +167,79 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   );
 }
 
-function GarmentZone({
+function GarmentShape({
   product,
-  label,
+  category,
   className,
-  imageClassName = 'p-2',
 }: {
   product?: Product;
-  label: string;
+  category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes';
   className: string;
-  imageClassName?: string;
 }) {
+  if (!product) return <ShapePlaceholder category={category} className={className} />;
+
+  const accent = pickAccentColor(product, category);
+  const textureSrc = proxiedImageUrl(product.imageUrl);
+  const shapeClass = SHAPE_CLASSES[category];
+  const label = category === 'outer' ? 'Layer' : category;
+
   return (
-    <div
-      className={`absolute overflow-hidden border shadow-[0_18px_42px_rgba(0,0,0,.38)] backdrop-blur-[2px] ${
-        product ? 'border-white/18 bg-black/72' : 'border-dashed border-white/14 bg-black/20'
-      } ${className}`}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,.1),transparent_48%)]" />
-      {product ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={proxiedImageUrl(product.imageUrl)}
-            alt=""
-            className={`relative h-full w-full object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,.42)] ${imageClassName}`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={(event) => {
-              event.currentTarget.src = overlayFallback(product.brand);
-            }}
-          />
-          <div className="absolute bottom-1 left-1 right-1 truncate rounded-full bg-black/70 px-2 py-0.5 text-center text-[8px] uppercase tracking-[.12em] text-white/70">
-            {label}
-          </div>
-        </>
-      ) : (
-        <div className="absolute inset-0 grid place-items-center text-[9px] uppercase tracking-[.14em] text-white/28">
+    <div className={`pointer-events-none absolute ${className}`}>
+      <div
+        className={`relative h-full w-full overflow-hidden border border-white/12 shadow-[0_18px_42px_rgba(0,0,0,.38)] ${shapeClass}`}
+        style={{ background: `linear-gradient(180deg, ${withAlpha(accent, 0.94)} 0%, ${withAlpha(accent, 0.72)} 100%)` }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.26),transparent_34%),linear-gradient(180deg,rgba(255,255,255,.12),transparent_44%),linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.36))]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={textureSrc}
+          alt=""
+          className={`absolute inset-0 h-full w-full mix-blend-luminosity object-cover opacity-45 saturate-0 contrast-125 ${TEXTURE_CLASSES[category]}`}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={(event) => {
+            event.currentTarget.src = overlayFallback(product.brand);
+          }}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.22))]" />
+        <div className="absolute inset-x-[14%] bottom-[8%] rounded-full border border-white/12 bg-black/28 px-2 py-1 text-center text-[8px] uppercase tracking-[.18em] text-white/70 backdrop-blur-sm">
           {label}
         </div>
-      )}
+      </div>
+    </div>
+  );
+}
+
+function ShapePlaceholder({
+  category,
+  className,
+}: {
+  category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes';
+  className: string;
+}) {
+  return (
+    <div className={`pointer-events-none absolute ${className}`}>
+      <div
+        className={`relative h-full w-full overflow-hidden border border-dashed border-white/12 bg-black/12 shadow-[0_10px_24px_rgba(0,0,0,.2)] ${SHAPE_CLASSES[category]}`}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_14%,rgba(255,255,255,.08),transparent_38%)]" />
+        <div className="absolute inset-0 grid place-items-center text-[9px] uppercase tracking-[.18em] text-white/26">
+          {category}
+        </div>
+      </div>
     </div>
   );
 }
 
 function AccessoryTile({ label, product }: { label: string; product?: Product }) {
+  const accent = product ? pickAccentColor(product, 'bag') : '#252321';
+
   return (
     <div
-      className={`h-[56px] w-[48px] overflow-hidden rounded-2xl border ${
-        product ? 'border-accent/35 bg-black/70 shadow-pink-glow' : 'border-dashed border-white/14 bg-black/25'
+      className={`h-[58px] w-[50px] overflow-hidden rounded-2xl border ${
+        product ? 'border-white/12 shadow-pink-glow' : 'border-dashed border-white/14 bg-black/25'
       }`}
+      style={product ? { background: `linear-gradient(180deg, ${withAlpha(accent, 0.84)} 0%, rgba(0,0,0,.78) 100%)` } : undefined}
       title={product ? `${product.brand} ${product.name}` : label}
     >
       {product ? (
@@ -202,14 +248,14 @@ function AccessoryTile({ label, product }: { label: string; product?: Product })
           <img
             src={proxiedImageUrl(product.imageUrl)}
             alt=""
-            className="h-[38px] w-full object-contain p-1.5"
+            className="h-[40px] w-full object-cover p-1.5 opacity-70 saturate-0 mix-blend-luminosity"
             loading="lazy"
             referrerPolicy="no-referrer"
             onError={(event) => {
               event.currentTarget.src = overlayFallback(product.brand);
             }}
           />
-          <div className="truncate px-1 text-center text-[7px] uppercase tracking-[.1em] text-white/60">{label}</div>
+          <div className="truncate px-1 text-center text-[7px] uppercase tracking-[.1em] text-white/65">{label}</div>
         </>
       ) : (
         <div className="flex h-full items-center justify-center px-1 text-center text-[7px] uppercase tracking-[.12em] text-white/30">
@@ -218,6 +264,95 @@ function AccessoryTile({ label, product }: { label: string; product?: Product })
       )}
     </div>
   );
+}
+
+function SelectedLookStrip({
+  items,
+}: {
+  items: Partial<Record<Category, Product>>;
+}) {
+  const displayProducts = [items.top, items.outer, items.bottom, items.shoes].filter(
+    (product): product is Product => Boolean(product),
+  ).slice(0, 4);
+
+  if (!displayProducts.length) return null;
+
+  return (
+    <div className="rounded-2xl border border-hairline bg-black/45 px-2 py-2 backdrop-blur-md">
+      <div className="mb-1 text-[8px] uppercase tracking-[.18em] text-white/42">Placed</div>
+      <div className="flex gap-1.5">
+        {displayProducts.map((product) => (
+          <div key={product.id} className="h-[44px] w-[36px] overflow-hidden rounded-xl border border-white/10 bg-black/35">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={proxiedImageUrl(product.imageUrl)}
+              alt=""
+              className="h-full w-full object-cover opacity-70 saturate-0 mix-blend-luminosity"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onError={(event) => {
+                event.currentTarget.src = overlayFallback(product.brand);
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const SHAPE_CLASSES: Record<'hat' | 'top' | 'outer' | 'bottom' | 'shoes', string> = {
+  hat: 'rounded-[52%_52%_32%_32%/70%_70%_30%_30%] [clip-path:polygon(8%_52%,18%_18%,82%_18%,92%_52%,84%_70%,16%_70%)]',
+  top: 'rounded-[24px_24px_28px_28px] [clip-path:polygon(20%_12%,34%_4%,66%_4%,80%_12%,92%_26%,78%_36%,72%_95%,28%_95%,22%_36%,8%_26%)]',
+  outer: 'rounded-[30px_30px_24px_24px] [clip-path:polygon(15%_8%,34%_2%,66%_2%,85%_8%,96%_24%,84%_36%,79%_100%,21%_100%,16%_36%,4%_24%)]',
+  bottom: 'rounded-[18px_18px_28px_28px] [clip-path:polygon(18%_0,82%_0,74%_14%,72%_100%,54%_100%,50%_28%,46%_100%,28%_100%,26%_14%)]',
+  shoes: '[clip-path:polygon(6%_62%,18%_34%,42%_34%,48%_60%,48%_82%,6%_82%,52%_62%,64%_34%,88%_34%,94%_60%,94%_82%,52%_82%)]',
+};
+
+const TEXTURE_CLASSES: Record<'hat' | 'top' | 'outer' | 'bottom' | 'shoes', string> = {
+  hat: 'scale-[1.15]',
+  top: 'scale-[1.08]',
+  outer: 'scale-[1.06]',
+  bottom: 'scale-[1.12] object-top',
+  shoes: 'scale-[1.08]',
+};
+
+function pickAccentColor(product: Product, fallbackCategory: Category): string {
+  const metadataColors = Array.isArray(product.metadata?.colors)
+    ? (product.metadata?.colors as string[])
+    : [];
+
+  for (const color of metadataColors) {
+    const normalized = String(color).toLowerCase();
+    if (COLOR_SWATCHES[normalized]) return COLOR_SWATCHES[normalized];
+  }
+
+  const brand = product.brand.toLowerCase();
+  if (brand.includes('nike') || brand.includes('jordan')) return '#6f5140';
+  if (brand.includes('zara') || brand.includes('aritzia')) return '#7c6a5a';
+  if (brand.includes('stussy') || brand.includes('carhartt')) return '#54463a';
+  if (brand.includes('prada') || brand.includes('saint laurent')) return '#1b1b1d';
+  if (brand.includes('lululemon') || brand.includes('alo')) return '#8d6c68';
+
+  const categoryFallback: Record<Category, string> = {
+    hat: '#2a2a2e',
+    outer: '#3b352f',
+    top: '#4a433d',
+    bottom: '#34363d',
+    shoes: '#2f2b2b',
+    bag: '#4b3f35',
+    eyewear: '#2a292c',
+    jewelry: '#7a6940',
+  };
+
+  return categoryFallback[fallbackCategory];
+}
+
+function withAlpha(hex: string, alpha: number): string {
+  const normalized = hex.replace('#', '');
+  if (normalized.length !== 6) return hex;
+  const value = Math.max(0, Math.min(255, Math.round(alpha * 255))).toString(16).padStart(2, '0');
+  return `#${normalized}${value}`;
 }
 
 function overlayFallback(label: string): string {
