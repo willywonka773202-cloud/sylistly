@@ -7,6 +7,7 @@ const OUTPUT_PATH = path.resolve(process.cwd(), 'data/photo-catalog.json');
 const LIMIT = Number.parseInt(process.env.CATALOG_HYDRATE_LIMIT || '32', 10);
 const PER_CATEGORY_LIMIT = Number.parseInt(process.env.CATALOG_HYDRATE_PER_CATEGORY || '6', 10);
 const CATEGORY_FILTER = process.env.CATALOG_HYDRATE_CATEGORY?.trim().toLowerCase() || '';
+const DELAY_MS = Number.parseInt(process.env.CATALOG_HYDRATE_DELAY_MS || '300', 10);
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 
 function normalize(value: string): string {
@@ -43,6 +44,7 @@ function hydrateScore(product: Product): number {
   const haystack = searchText(product);
   let score = 0;
 
+  if (product.metadata?.featured) score += 30;
   if (product.trusted) score += 12;
   if (haystack.includes('women') || haystack.includes('womens') || haystack.includes('fem')) score += 4;
   if (haystack.includes('men') || haystack.includes('mens') || haystack.includes('masc')) score += 4;
@@ -75,22 +77,26 @@ function pickProducts(products: Product[]): Product[] {
     .slice(0, LIMIT);
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function replaceProducts(existing: Product[], resolved: Product[]): Product[] {
-  const replacementByRetailerHost = new Map<string, Product>();
+  const replacementByToken = new Map<string, Product>();
 
   for (const product of resolved) {
     const token = typeof product.metadata?.searchapiProductToken === 'string'
       ? product.metadata.searchapiProductToken
       : '';
     if (!token) continue;
-    replacementByRetailerHost.set(token, product);
+    replacementByToken.set(token, product);
   }
 
   return existing.map((product) => {
     const token = typeof product.metadata?.searchapiProductToken === 'string'
       ? product.metadata.searchapiProductToken
       : '';
-    return replacementByRetailerHost.get(token) || product;
+    return replacementByToken.get(token) || product;
   });
 }
 
@@ -103,7 +109,20 @@ if (!targets.length) {
 }
 
 console.log(`Hydrating ${targets.length} products from wrapper URLs to direct retailer pages...`);
-const resolved = await hydrateRetailerUrls(targets);
+const resolved: Product[] = [];
+
+for (const [index, product] of targets.entries()) {
+  const [nextProduct] = await hydrateRetailerUrls([product]);
+  resolved.push(nextProduct || product);
+  console.log(
+    `OK   [${product.category}] ${product.brand} :: ${product.name} -> ${hasDirectRetailerUrl((nextProduct || product).retailerUrl) ? 'direct' : 'wrapper'}`,
+  );
+
+  if (index < targets.length - 1 && DELAY_MS > 0) {
+    await sleep(DELAY_MS);
+  }
+}
+
 const merged = replaceProducts(catalog, resolved);
 
 let directCount = 0;

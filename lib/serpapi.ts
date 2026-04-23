@@ -1,12 +1,11 @@
 import crypto from 'node:crypto';
+import { GOOGLE_HOSTS, hasDirectRetailerUrl, safeHostname } from './retailer-url';
 import type { Category, Product, SearchIntent } from './types';
 
 const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
 const SEARCH_TIMEOUT_MS = 12_000;
 const PRODUCT_TIMEOUT_MS = Number.parseInt(process.env.SEARCHAPI_PRODUCT_TIMEOUT_MS || '2500', 10);
 const MIN_TRUSTED_RESULTS = 3;
-const GOOGLE_HOSTS = new Set(['google.com', 'www.google.com']);
-
 const CATEGORY_KEYWORDS: Record<Category, string> = {
   hat: 'hat cap beanie',
   outer: 'jacket coat outerwear',
@@ -37,7 +36,11 @@ export const TRUSTED_RETAILERS = new Set([
   'michaelkors.com', 'gentlemonster.com', 'mejuri.com', 'pandora.net',
   'swarovski.com', 'tiffany.com', 'missoma.com', 'abercrombie.com',
   'drmartens.com', 'newbalance.com', 'converse.com', 'birkenstock.com',
-  'ugg.com', 'jordan.com', 'neweracap.com',
+  'ugg.com', 'jordan.com', 'neweracap.com', 'bloomingdales.com',
+  'macys.com', 'dillards.com', 'zappos.com', 'dsw.com', 'journeys.com',
+  'footlocker.com', 'champssports.com', 'finishline.com', 'jdsports.com',
+  'dickssportinggoods.com', 'hibbett.com', 'mytheresa.com', 'luisaviaroma.com',
+  'zumiez.com', 'slamjam.com', 'scheels.com', 'gemplers.com',
 ]);
 
 const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
@@ -106,7 +109,37 @@ const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
   'ugg.com': ['ugg'],
   'jordan.com': ['jordan'],
   'neweracap.com': ['new era'],
+  'bloomingdales.com': ['bloomingdale', 'bloomingdales'],
+  'macys.com': ['macys', 'macy s'],
+  'dillards.com': ['dillards', 'dillard s'],
+  'zappos.com': ['zappos'],
+  'dsw.com': ['dsw'],
+  'journeys.com': ['journeys'],
+  'footlocker.com': ['foot locker', 'footlocker'],
+  'champssports.com': ['champs sports', 'champssports'],
+  'finishline.com': ['finish line', 'finishline'],
+  'jdsports.com': ['jd sports', 'jdsports'],
+  'dickssportinggoods.com': ["dick's sporting goods", 'dicks sporting goods'],
+  'hibbett.com': ['hibbett'],
+  'mytheresa.com': ['mytheresa'],
+  'luisaviaroma.com': ['luisaviaroma'],
+  'zumiez.com': ['zumiez'],
+  'slamjam.com': ['slam jam', 'slamjam'],
+  'scheels.com': ['scheels'],
+  'gemplers.com': ['gemplers'],
 };
+
+const MARKETPLACE_RETAILERS = new Set([
+  'amazon.com',
+  'ebay.com',
+  'etsy.com',
+  'mercari.com',
+  'poshmark.com',
+  'vestiairecollective.com',
+  'whatnot.com',
+  'goat.com',
+  'stockx.com',
+]);
 
 const BRAND_ALIASES: Array<{ alias: string; brand: string }> = [
   { alias: 'fear of god essentials', brand: 'Essentials' },
@@ -220,23 +253,9 @@ function normalizeText(value: string): string {
     .trim();
 }
 
-function safeHostname(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  } catch {
-    return null;
-  }
-}
-
 function isGoogleRetailerUrl(url: string): boolean {
   const host = safeHostname(url);
   return host ? GOOGLE_HOSTS.has(host) : false;
-}
-
-export function hasDirectRetailerUrl(url: string): boolean {
-  const host = safeHostname(url);
-  return Boolean(host) && !GOOGLE_HOSTS.has(host as string);
 }
 
 function isTrustedRetailer(retailer: string, host: string | null): boolean {
@@ -452,13 +471,15 @@ function offerSortKey(offer: SearchApiOffer): number {
   const host = safeHostname(offer.link || '');
   const merchantName = offer.merchant?.name || '';
   const trusted = isTrustedRetailer(merchantName, host);
+  const marketplace = host ? MARKETPLACE_RETAILERS.has(host) : false;
   const price = offer.extracted_total_price ?? offer.extracted_price ?? parsePrice(offer.total_price || offer.price || '0');
   const reviews = offer.reviews ?? 0;
 
   return (
-    (trusted ? 100_000 : 0) +
-    reviews -
-    Math.round(price * 100)
+    (trusted ? 1_000_000 : 0) +
+    (marketplace ? -250_000 : 0) +
+    reviews * 25 -
+    Math.round(price * 10)
   );
 }
 

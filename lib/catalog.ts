@@ -2,6 +2,7 @@ import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
 import { parseSearchIntentHeuristic, rerankProducts } from './claude';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
 import { presentationScore } from './presentation-score';
+import { hasDirectRetailerUrl } from './retailer-url';
 import type { Category, Product, SearchIntent } from './types';
 import { VIBES, vibeSearchQuery, type GeneratorBudget, type GeneratorFrame, type VibeId } from './vibes';
 
@@ -52,6 +53,14 @@ function normalize(value: string): string {
 
 function hasRealPhoto(product: Product): boolean {
   return Boolean(product.imageUrl) && !String(product.imageUrl).startsWith('data:image/svg+xml');
+}
+
+function productCommerceScore(product: Product): number {
+  let score = 0;
+  if (product.trusted !== false) score += 18;
+  if (hasDirectRetailerUrl(product.retailerUrl)) score += 22;
+  if (hasRealPhoto(product)) score += 16;
+  return score;
 }
 
 function searchHaystack(product: Product): string {
@@ -442,6 +451,7 @@ function findRealPhotoReplacement(
       let score = 100;
       if (candidate.metadata?.featured) score += 20;
       if (normalize(candidate.brand) === normalize(product.brand)) score += 30;
+      score += productCommerceScore(candidate);
 
       const candidateHaystack = searchHaystack(candidate);
       const originalTerms = new Set(originalHaystack.split(' ').filter(Boolean));
@@ -522,7 +532,7 @@ function scoreFallbackProduct(
   frame: GeneratorFrame,
 ): number {
   let score = product.metadata?.featured ? 16 : 8;
-  if (hasRealPhoto(product)) score += 40;
+  score += productCommerceScore(product);
   const haystack = searchHaystack(product);
   score += presentationScore(product, buildFrameIntent(product.category, frame));
 

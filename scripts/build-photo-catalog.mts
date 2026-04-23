@@ -204,7 +204,7 @@ for (const { index, item } of batch) {
       .map((product) => enrichForCatalog(product, item.query));
 
     collected.push(...accepted);
-    nextTaskIndex = (index + 1) % tasks.length;
+    nextTaskIndex = (index + 1) % rankedTasks.length;
     console.log(`OK   [${item.category}] ${item.brand} :: ${item.query} -> ${accepted.length} saved`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -216,7 +216,7 @@ for (const { index, item } of batch) {
       break;
     }
 
-    nextTaskIndex = (index + 1) % tasks.length;
+      nextTaskIndex = (index + 1) % rankedTasks.length;
   }
 }
 

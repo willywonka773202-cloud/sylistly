@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
-import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
+import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
 import { searchBrandCatalog } from '@/lib/brand-catalog';
 import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
+import { hasDirectRetailerUrl } from '@/lib/retailer-url';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,

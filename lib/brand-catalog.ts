@@ -1,5 +1,6 @@
 import type { Category, Product, SearchIntent } from './types';
 import { presentationScore } from './presentation-score';
+import { hasDirectRetailerUrl } from './retailer-url';
 
 type CatalogSeed = Omit<Product, 'affiliateUrl'> & {
   metadata?: Product['metadata'] & {
@@ -926,6 +927,8 @@ function scoreCatalogProduct(product: Product, intent: SearchIntent, rawQuery: s
 
   let score = product.metadata?.featured ? 12 : 0;
   score += presentationScore(product, intent);
+  if (product.trusted !== false) score += 8;
+  if (hasDirectRetailerUrl(product.retailerUrl)) score += 10;
 
   if (intent.priceMax && product.priceCents > intent.priceMax * 100) score -= 18;
   if (intent.priceMin && product.priceCents < intent.priceMin * 100) score -= 10;
