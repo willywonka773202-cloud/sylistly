@@ -9,6 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "catalog:build": "node --experimental-strip-types --env-file=.env.local scripts/build-photo-catalog.mts",
+    "catalog:hydrate-links": "node --experimental-strip-types --env-file=.env.local scripts/hydrate-photo-catalog-urls.mts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
     "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"

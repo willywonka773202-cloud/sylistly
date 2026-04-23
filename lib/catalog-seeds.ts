@@ -13,6 +13,7 @@ export const PHOTO_CATALOG_SEEDS: CatalogSeedQuery[] = [
   { brand: 'Nike', category: 'shoes', queries: ['nike air force 1', 'nike vomero', 'nike dunk low'] },
   { brand: 'Nike', category: 'hat', queries: ['nike club cap', 'nike beanie'] },
   { brand: 'Nike', category: 'bag', queries: ['nike crossbody bag', 'nike backpack'] },
+  { brand: 'New Era', category: 'hat', queries: ['new era yankees cap'] },
 
   { brand: 'Adidas', category: 'top', queries: ['adidas baby tee', 'adidas track top', 'adidas tank top'] },
   { brand: 'Adidas', category: 'bottom', queries: ['adidas track pants', 'adidas cargo pants'] },
@@ -37,9 +38,11 @@ export const PHOTO_CATALOG_SEEDS: CatalogSeedQuery[] = [
   { brand: 'Lululemon', category: 'top', queries: ['lululemon swiftly tech short sleeve', 'lululemon align tank', 'lululemon define jacket'] },
   { brand: 'Lululemon', category: 'bottom', queries: ['lululemon align high rise pant', 'lululemon dance studio pant'] },
   { brand: 'Lululemon', category: 'bag', queries: ['lululemon everywhere belt bag'] },
+  { brand: 'Lululemon', category: 'hat', queries: ['lululemon baseball cap'] },
 
   { brand: 'Alo', category: 'top', queries: ['alo cropped tee', 'alo airbrush bra', 'alo hoodie'] },
   { brand: 'Alo', category: 'bottom', queries: ['alo leggings', 'alo sweatpants'] },
+  { brand: 'Alo', category: 'hat', queries: ['alo off duty cap'] },
 
   { brand: 'Skims', category: 'top', queries: ['skims cotton jersey tank', 'skims bodysuit', 'skims tee'] },
   { brand: 'Skims', category: 'bottom', queries: ['skims cotton fleece jogger', 'skims leggings'] },
@@ -47,6 +50,7 @@ export const PHOTO_CATALOG_SEEDS: CatalogSeedQuery[] = [
   { brand: 'Aritzia', category: 'top', queries: ['aritzia contour bodysuit', 'aritzia babaton top'] },
   { brand: 'Aritzia', category: 'bottom', queries: ['aritzia effortless pant', 'aritzia denim forum jeans'] },
   { brand: 'Aritzia', category: 'outer', queries: ['aritzia super puff', 'aritzia blazer'] },
+  { brand: 'Aritzia', category: 'bag', queries: ['aritzia slouch bag'] },
 
   { brand: 'Abercrombie', category: 'top', queries: ['abercrombie essential tee', 'abercrombie sweater vest', 'abercrombie oxford shirt'] },
   { brand: 'Abercrombie', category: 'bottom', queries: ['abercrombie sloane pant', 'abercrombie 90s straight jeans'] },
@@ -62,8 +66,11 @@ export const PHOTO_CATALOG_SEEDS: CatalogSeedQuery[] = [
   { brand: 'Dickies', category: 'bottom', queries: ['dickies 874 work pants', 'dickies cargo pants'] },
   { brand: 'Carhartt WIP', category: 'outer', queries: ['carhartt wip detroit jacket', 'carhartt active jacket'] },
   { brand: 'Carhartt WIP', category: 'bottom', queries: ['carhartt wip double knee pant'] },
+  { brand: 'Carhartt WIP', category: 'hat', queries: ['carhartt wip beanie'] },
+  { brand: 'Carhartt WIP', category: 'bag', queries: ['carhartt wip crossbody bag'] },
   { brand: 'Stussy', category: 'top', queries: ['stussy basic tee', 'stussy hoodie'] },
   { brand: 'Stussy', category: 'hat', queries: ['stussy cap', 'stussy beanie'] },
+  { brand: 'Stussy', category: 'bag', queries: ['stussy shoulder bag'] },
 
   { brand: 'The North Face', category: 'outer', queries: ['north face nuptse jacket', 'north face shell jacket'] },
   { brand: "Arc'teryx", category: 'outer', queries: ["arc'teryx beta lt jacket", "arc'teryx atom hoody"] },
@@ -95,4 +102,6 @@ export const PHOTO_CATALOG_SEEDS: CatalogSeedQuery[] = [
   { brand: 'Swarovski', category: 'jewelry', queries: ['swarovski tennis bracelet'] },
   { brand: 'Tiffany & Co.', category: 'jewelry', queries: ['tiffany heart tag pendant'] },
   { brand: 'Missoma', category: 'jewelry', queries: ['missoma pearl hoop earrings'] },
+  { brand: 'Miansai', category: 'jewelry', queries: ['miansai chain necklace'] },
+  { brand: 'Vitaly', category: 'jewelry', queries: ['vitaly chain bracelet'] },
 ];

@@ -3,7 +3,7 @@ import type { Category, Product, SearchIntent } from './types';
 
 const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
 const SEARCH_TIMEOUT_MS = 12_000;
-const PRODUCT_TIMEOUT_MS = 2_500;
+const PRODUCT_TIMEOUT_MS = Number.parseInt(process.env.SEARCHAPI_PRODUCT_TIMEOUT_MS || '2500', 10);
 const MIN_TRUSTED_RESULTS = 3;
 const GOOGLE_HOSTS = new Set(['google.com', 'www.google.com']);
 
@@ -33,6 +33,11 @@ export const TRUSTED_RETAILERS = new Set([
   'levi.com', 'levis.com', 'stussy.com', 'dickies.com', 'carhartt.com',
   'carhartt-wip.com', 'thenorthface.com', 'burberry.com', 'maxmara.com',
   'acnestudios.com', 'supremenewyork.com', 'ray-ban.com', 'oakley.com',
+  'stevemadden.com', 'coach.com', 'longchamp.com', 'bottegaveneta.com',
+  'michaelkors.com', 'gentlemonster.com', 'mejuri.com', 'pandora.net',
+  'swarovski.com', 'tiffany.com', 'missoma.com', 'abercrombie.com',
+  'drmartens.com', 'newbalance.com', 'converse.com', 'birkenstock.com',
+  'ugg.com', 'jordan.com', 'neweracap.com',
 ]);
 
 const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
@@ -82,6 +87,25 @@ const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
   'supremenewyork.com': ['supreme'],
   'ray-ban.com': ['ray ban', 'ray-ban'],
   'oakley.com': ['oakley'],
+  'stevemadden.com': ['steve madden'],
+  'coach.com': ['coach'],
+  'longchamp.com': ['longchamp'],
+  'bottegaveneta.com': ['bottega veneta'],
+  'michaelkors.com': ['michael kors'],
+  'gentlemonster.com': ['gentle monster'],
+  'mejuri.com': ['mejuri'],
+  'pandora.net': ['pandora'],
+  'swarovski.com': ['swarovski'],
+  'tiffany.com': ['tiffany', 'tiffany co'],
+  'missoma.com': ['missoma'],
+  'abercrombie.com': ['abercrombie'],
+  'drmartens.com': ['dr martens', 'drmartens'],
+  'newbalance.com': ['new balance'],
+  'converse.com': ['converse'],
+  'birkenstock.com': ['birkenstock'],
+  'ugg.com': ['ugg'],
+  'jordan.com': ['jordan'],
+  'neweracap.com': ['new era'],
 };
 
 const BRAND_ALIASES: Array<{ alias: string; brand: string }> = [
