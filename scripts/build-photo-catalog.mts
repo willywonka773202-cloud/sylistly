@@ -12,6 +12,8 @@ const BRAND_FILTER = process.env.CATALOG_BRAND_FILTER?.trim().toLowerCase() || '
 const CATEGORY_FILTER = process.env.CATALOG_CATEGORY_FILTER?.trim().toLowerCase() || '';
 const MAX_TASKS_PER_RUN = Number.parseInt(process.env.CATALOG_MAX_TASKS || '8', 10);
 const RESET_CURSOR = process.env.CATALOG_RESET_CURSOR === '1';
+const MAX_ITEMS_PER_QUERY = Number.parseInt(process.env.CATALOG_MAX_ITEMS_PER_QUERY || '2', 10);
+const TARGET_ITEMS_PER_CATEGORY = Number.parseInt(process.env.CATALOG_TARGET_ITEMS_PER_CATEGORY || '8', 10);
 
 interface BuildTask {
   brand: string;
@@ -24,6 +26,12 @@ interface CatalogBuildState {
   lastRunAt?: string;
   lastTask?: string;
   totalCatalogItems?: number;
+}
+
+interface CatalogStats {
+  categoryCounts: Map<string, number>;
+  queryCounts: Map<string, number>;
+  brandCategoryCounts: Map<string, number>;
 }
 
 function isRealImage(url: string | undefined): boolean {
@@ -83,6 +91,71 @@ function buildTasks(): BuildTask[] {
     );
 }
 
+function catalogQueryKey(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function readCatalogStats(products: Product[]): CatalogStats {
+  const categoryCounts = new Map<string, number>();
+  const queryCounts = new Map<string, number>();
+  const brandCategoryCounts = new Map<string, number>();
+
+  for (const product of products) {
+    categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
+
+    const query = typeof product.metadata?.catalogQuery === 'string' ? product.metadata.catalogQuery : '';
+    if (query) {
+      const key = catalogQueryKey(query);
+      queryCounts.set(key, (queryCounts.get(key) || 0) + 1);
+    }
+
+    const brandCategoryKey = `${product.category}::${product.brand.trim().toLowerCase()}`;
+    brandCategoryCounts.set(brandCategoryKey, (brandCategoryCounts.get(brandCategoryKey) || 0) + 1);
+  }
+
+  return {
+    categoryCounts,
+    queryCounts,
+    brandCategoryCounts,
+  };
+}
+
+function taskScore(task: BuildTask, stats: CatalogStats): number {
+  const categoryCount = stats.categoryCounts.get(task.category) || 0;
+  const queryCount = stats.queryCounts.get(catalogQueryKey(task.query)) || 0;
+  const brandCategoryCount = stats.brandCategoryCounts.get(`${task.category}::${task.brand.toLowerCase()}`) || 0;
+  const categoryGap = Math.max(TARGET_ITEMS_PER_CATEGORY - categoryCount, 0);
+  const unseenCategoryBonus = categoryCount === 0 ? 2_000 : 0;
+  const unseenQueryBonus = queryCount === 0 ? 350 : 0;
+  const brandGapBonus = brandCategoryCount === 0 ? 120 : Math.max(40 - brandCategoryCount * 10, 0);
+
+  return (
+    unseenCategoryBonus +
+    categoryGap * 100 +
+    unseenQueryBonus +
+    brandGapBonus -
+    queryCount * 180 -
+    categoryCount * 8
+  );
+}
+
+function rankTasks(tasks: BuildTask[], stats: CatalogStats): BuildTask[] {
+  return tasks
+    .filter((task) => {
+      const categoryCount = stats.categoryCounts.get(task.category) || 0;
+      const queryCount = stats.queryCounts.get(catalogQueryKey(task.query)) || 0;
+      if (queryCount === 0) return true;
+      return categoryCount < TARGET_ITEMS_PER_CATEGORY && queryCount < MAX_ITEMS_PER_QUERY;
+    })
+    .sort((left, right) => {
+      const scoreDelta = taskScore(right, stats) - taskScore(left, stats);
+      if (scoreDelta !== 0) return scoreDelta;
+      if (left.category !== right.category) return left.category.localeCompare(right.category);
+      if (left.brand !== right.brand) return left.brand.localeCompare(right.brand);
+      return left.query.localeCompare(right.query);
+    });
+}
+
 function pickBatch<T>(items: T[], startIndex: number, count: number): Array<{ index: number; item: T }> {
   if (!items.length || count <= 0) return [];
 
@@ -103,8 +176,16 @@ if (!tasks.length) {
 
 const existingCatalog = await readJsonFile<Product[]>(OUTPUT_PATH, []);
 const existingState = await readJsonFile<CatalogBuildState>(STATE_PATH, { nextTaskIndex: 0 });
-const startIndex = RESET_CURSOR ? 0 : existingState.nextTaskIndex % tasks.length;
-const batch = pickBatch(tasks, startIndex, MAX_TASKS_PER_RUN);
+const stats = readCatalogStats(existingCatalog);
+const rankedTasks = rankTasks(tasks, stats);
+
+if (!rankedTasks.length) {
+  console.error('No remaining catalog tasks need more coverage with the current filters.');
+  process.exit(0);
+}
+
+const startIndex = RESET_CURSOR ? 0 : existingState.nextTaskIndex % rankedTasks.length;
+const batch = pickBatch(rankedTasks, startIndex, MAX_TASKS_PER_RUN);
 
 const collected: Product[] = [];
 let nextTaskIndex = startIndex;
@@ -158,5 +239,5 @@ await writeFile(STATE_PATH, `${JSON.stringify(nextState, null, 2)}\n`, 'utf8');
 
 console.log(
   `Saved ${mergedCatalog.length} photo-backed products to ${OUTPUT_PATH} ` +
-  `(added ${collected.length}, next task ${nextTaskIndex}/${tasks.length}${rateLimited ? ', rate-limited' : ''})`,
+  `(added ${collected.length}, next task ${nextTaskIndex}/${rankedTasks.length}${rateLimited ? ', rate-limited' : ''})`,
 );
