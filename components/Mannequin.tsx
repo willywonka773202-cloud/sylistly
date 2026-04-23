@@ -66,6 +66,12 @@ const FRAME_COPY: Record<
   },
 };
 
+const STAGE_TRANSFORM: Record<GeneratorFrame, string> = {
+  masc: 'scale(1.18) translateY(-8px)',
+  fem: 'scale(1.22) translateY(-12px)',
+  androgynous: 'scale(1.2) translateY(-10px)',
+};
+
 const BODY_MARKERS: Array<{ category: Category; label: string; className: string }> = [
   { category: 'hat', label: 'Hat', className: 'left-1/2 top-[18px] -translate-x-1/2' },
   { category: 'eyewear', label: 'Eyewear', className: 'left-[24px] top-[52px]' },
@@ -113,6 +119,7 @@ const COLOR_SWATCHES: Record<string, string> = {
 export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
   const mannequinStyle = skinTone ? ({ '--skin': skinTone } as CSSProperties) : undefined;
   const frame = FRAME_COPY[bodyType];
+  const stageTransform = STAGE_TRANSFORM[bodyType];
   const filled = Object.values(items).filter(Boolean).length;
   const heroItem = items.outer || items.top || items.bottom || items.shoes || items.bag || null;
 
@@ -136,22 +143,20 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="mt-1 text-[9px] uppercase tracking-[.14em] text-muted">styled</div>
       </div>
 
-      <div className="absolute left-1/2 top-[42px] z-10 h-[346px] w-[230px] -translate-x-1/2">
-        <div className="absolute left-1/2 top-[300px] h-10 w-[182px] -translate-x-1/2 rounded-full bg-black/60 blur-md" />
-        <div className="absolute left-1/2 top-[314px] h-5 w-[132px] -translate-x-1/2 rounded-full border border-white/10 bg-white/10" />
-        <GhostOutline frame={frame} />
+      <div className="absolute left-1/2 top-[18px] z-10 h-[390px] w-[276px] -translate-x-1/2 overflow-visible">
+        <div className="absolute inset-x-0 top-0 h-[356px]" style={{ transform: stageTransform, transformOrigin: 'center top' }}>
+          <div className="absolute left-1/2 top-[300px] h-10 w-[182px] -translate-x-1/2 rounded-full bg-black/60 blur-md" />
+          <div className="absolute left-1/2 top-[314px] h-5 w-[132px] -translate-x-1/2 rounded-full border border-white/10 bg-white/10" />
+          <GhostOutline frame={frame} />
 
-        <PaperDollLayer product={items.hat} category="hat" className="left-1/2 top-[10px] h-[34px] w-[94px] -translate-x-1/2" />
-        <AccessoryOverlay product={items.eyewear} category="eyewear" className="left-1/2 top-[22px] h-[38px] w-[86px] -translate-x-1/2" />
-        <AccessoryOverlay product={items.jewelry} category="jewelry" className="left-1/2 top-[72px] h-[34px] w-[74px] -translate-x-1/2" />
-        <PaperDollLayer product={items.top} category="top" className={`left-1/2 top-[78px] h-[132px] -translate-x-1/2 ${frame.topWidth}`} />
-        <PaperDollLayer product={items.outer} category="outer" className={`left-1/2 top-[68px] h-[160px] -translate-x-1/2 ${frame.outerWidth}`} />
-        <PaperDollLayer product={items.bottom} category="bottom" className={`left-1/2 top-[190px] h-[150px] -translate-x-1/2 ${frame.bottomWidth}`} />
-        <PaperDollLayer product={items.shoes} category="shoes" className="left-1/2 top-[312px] h-[38px] w-[132px] -translate-x-1/2" />
-        <AccessoryOverlay product={items.bag} category="bag" className={`${frame.bagAnchor} top-[164px] h-[108px] w-[82px]`} />
-
-        <div className="pointer-events-none absolute left-1/2 top-[334px] z-40 -translate-x-1/2 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-[9px] uppercase tracking-[.18em] text-white/60 backdrop-blur">
-          Floating outfit preview
+          <PaperDollLayer product={items.hat} category="hat" className="left-1/2 top-[10px] h-[34px] w-[94px] -translate-x-1/2" />
+          <AccessoryOverlay product={items.eyewear} category="eyewear" className="left-1/2 top-[22px] h-[38px] w-[86px] -translate-x-1/2" />
+          <AccessoryOverlay product={items.jewelry} category="jewelry" className="left-1/2 top-[74px] h-[36px] w-[80px] -translate-x-1/2" />
+          <PaperDollLayer product={items.top} category="top" className={`left-1/2 top-[74px] h-[142px] -translate-x-1/2 ${frame.topWidth}`} />
+          <PaperDollLayer product={items.outer} category="outer" className={`left-1/2 top-[60px] h-[174px] -translate-x-1/2 ${frame.outerWidth}`} />
+          <PaperDollLayer product={items.bottom} category="bottom" className={`left-1/2 top-[198px] h-[154px] -translate-x-1/2 ${frame.bottomWidth}`} />
+          <PaperDollLayer product={items.shoes} category="shoes" className="left-1/2 top-[320px] h-[42px] w-[146px] -translate-x-1/2" />
+          <AccessoryOverlay product={items.bag} category="bag" className={`${frame.bagAnchor} top-[154px] h-[120px] w-[90px]`} />
         </div>
       </div>
 
@@ -164,19 +169,14 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <Lookboard items={items} />
       </div>
 
-      {BODY_MARKERS.map((marker) => {
-        const hasItem = Boolean(items[marker.category]);
-        return (
-          <div
-            key={marker.category}
-            className={`absolute z-30 rounded-full border px-2.5 py-1 text-[9px] uppercase tracking-[.12em] backdrop-blur-md ${marker.className} ${
-              hasItem ? 'border-accent/70 bg-accent/20 text-ink shadow-pink-glow' : 'border-hairline bg-black/35 text-muted-2'
-            }`}
-          >
-            {marker.label}
-          </div>
-        );
-      })}
+      {BODY_MARKERS.filter((marker) => items[marker.category]).map((marker) => (
+        <div
+          key={marker.category}
+          className={`absolute z-30 rounded-full border border-accent/70 bg-accent/20 px-2.5 py-1 text-[9px] uppercase tracking-[.12em] text-ink shadow-pink-glow backdrop-blur-md ${marker.className}`}
+        >
+          {marker.label}
+        </div>
+      ))}
     </div>
   );
 }
@@ -194,17 +194,17 @@ function GhostOutline({
 }) {
   return (
     <>
-      <div className="absolute left-1/2 top-[2px] z-[1] h-[56px] w-[52px] -translate-x-1/2 rounded-[24px_24px_18px_18px] border border-dashed border-white/12 bg-white/[0.015]" />
-      <div className="absolute left-1/2 top-[58px] z-[1] h-[16px] w-[16px] -translate-x-1/2 rounded-full border border-dashed border-white/10" />
-      <div className={`absolute left-1/2 top-[74px] z-[1] h-[24px] -translate-x-1/2 rounded-full border border-dashed border-white/10 ${frame.shoulder}`} />
-      <div className={`absolute left-1/2 top-[90px] z-[1] h-[104px] -translate-x-1/2 rounded-[28px_28px_20px_20px] border border-dashed border-white/10 ${frame.torso}`} />
-      <div className="absolute left-[39px] top-[90px] z-[1] h-[124px] w-[24px] rotate-[6deg] rounded-[14px] border border-dashed border-white/10" />
-      <div className="absolute right-[39px] top-[90px] z-[1] h-[124px] w-[24px] -rotate-[6deg] rounded-[14px] border border-dashed border-white/10" />
-      <div className={`absolute left-1/2 top-[188px] z-[1] h-[44px] -translate-x-1/2 rounded-[18px_18px_28px_28px] border border-dashed border-white/10 ${frame.hips}`} />
-      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/10 ${frame.leftLeg}`} />
-      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/10 ${frame.rightLeg}`} />
-      <div className="absolute left-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[10px_6px_14px_14px] border border-dashed border-white/10" />
-      <div className="absolute right-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[6px_10px_14px_14px] border border-dashed border-white/10" />
+      <div className="absolute left-1/2 top-[2px] z-[1] h-[56px] w-[52px] -translate-x-1/2 rounded-[24px_24px_18px_18px] border border-dashed border-white/8 bg-white/[0.012]" />
+      <div className="absolute left-1/2 top-[58px] z-[1] h-[16px] w-[16px] -translate-x-1/2 rounded-full border border-dashed border-white/7" />
+      <div className={`absolute left-1/2 top-[74px] z-[1] h-[24px] -translate-x-1/2 rounded-full border border-dashed border-white/7 ${frame.shoulder}`} />
+      <div className={`absolute left-1/2 top-[90px] z-[1] h-[104px] -translate-x-1/2 rounded-[28px_28px_20px_20px] border border-dashed border-white/7 ${frame.torso}`} />
+      <div className="absolute left-[39px] top-[90px] z-[1] h-[124px] w-[24px] rotate-[6deg] rounded-[14px] border border-dashed border-white/7" />
+      <div className="absolute right-[39px] top-[90px] z-[1] h-[124px] w-[24px] -rotate-[6deg] rounded-[14px] border border-dashed border-white/7" />
+      <div className={`absolute left-1/2 top-[188px] z-[1] h-[44px] -translate-x-1/2 rounded-[18px_18px_28px_28px] border border-dashed border-white/7 ${frame.hips}`} />
+      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/7 ${frame.leftLeg}`} />
+      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/7 ${frame.rightLeg}`} />
+      <div className="absolute left-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[10px_6px_14px_14px] border border-dashed border-white/7" />
+      <div className="absolute right-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[6px_10px_14px_14px] border border-dashed border-white/7" />
     </>
   );
 }
@@ -226,12 +226,9 @@ function PaperDollLayer({
   return (
     <div className={`pointer-events-none absolute ${className}`}>
       <GarmentImage product={product} category={category} variant={variant} />
-      <svg viewBox="0 0 100 100" className="relative z-10 h-full w-full overflow-visible opacity-45 drop-shadow-[0_14px_22px_rgba(0,0,0,.22)]">
+      <svg viewBox="0 0 100 100" className="relative z-10 h-full w-full overflow-visible opacity-[0.18] drop-shadow-[0_14px_22px_rgba(0,0,0,.22)]">
         {renderGarmentSvg(category, variant, tone)}
       </svg>
-      <div className="absolute bottom-1 left-1/2 z-20 max-w-[76%] -translate-x-1/2 rounded-full border border-white/10 bg-black/30 px-2 py-0.5 text-center text-[7px] uppercase tracking-[.16em] text-white/65 backdrop-blur">
-        {category}
-      </div>
     </div>
   );
 }
@@ -251,7 +248,7 @@ function GarmentImage({
       <img
         src={proxiedImageUrl(product.imageUrl)}
         alt=""
-        className={`h-full w-full bg-transparent ${category === 'shoes' || category === 'hat' ? 'object-contain' : 'object-cover'}`}
+        className="h-full w-full bg-transparent object-contain"
         style={garmentImageStyle(category, variant)}
         loading="lazy"
         referrerPolicy="no-referrer"
@@ -281,7 +278,7 @@ function AccessoryOverlay({
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible opacity-40 drop-shadow-[0_12px_18px_rgba(0,0,0,.18)]">
         {renderAccessorySvg(category, tone)}
       </svg>
-      <div className={`absolute overflow-hidden bg-transparent ${category === 'bag' ? 'bottom-[4px] right-[0px] h-[44px] w-[38px] rounded-2xl' : category === 'eyewear' ? 'left-1/2 top-[8px] h-[24px] w-[40px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[10px] h-[20px] w-[20px] -translate-x-1/2 rounded-full'}`}>
+      <div className={`absolute overflow-hidden bg-transparent ${category === 'bag' ? 'bottom-[0px] right-[0px] h-[56px] w-[48px] rounded-[22px]' : category === 'eyewear' ? 'left-1/2 top-[6px] h-[26px] w-[46px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[8px] h-[22px] w-[22px] -translate-x-1/2 rounded-full'}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={proxiedImageUrl(product.imageUrl)}
@@ -308,74 +305,74 @@ function garmentImageStyle(
 ): CSSProperties {
   const common: CSSProperties = {
     mixBlendMode: 'multiply',
-    filter: 'contrast(1.06) saturate(1.04)',
+    filter: 'contrast(1.08) saturate(1.06)',
   };
 
   if (category === 'hat') {
     if (variant === 'beanie') {
-      return { ...common, clipPath: 'path("M 24 58 C 24 28 76 28 76 58 L 76 70 L 24 70 Z")' };
+      return { ...common, clipPath: 'path("M 24 58 C 24 28 76 28 76 58 L 76 70 L 24 70 Z")', transform: 'scale(1.18) translateY(3%)' };
     }
     if (variant === 'bucket') {
-      return { ...common, clipPath: 'polygon(34% 18%,66% 18%,72% 54%,28% 54%,20% 64%,80% 64%,76% 74%,24% 74%)' };
+      return { ...common, clipPath: 'polygon(34% 18%,66% 18%,72% 54%,28% 54%,20% 64%,80% 64%,76% 74%,24% 74%)', transform: 'scale(1.14) translateY(3%)' };
     }
-    return { ...common, clipPath: 'polygon(28% 34%,72% 34%,72% 52%,84% 60%,72% 70%,28% 70%,16% 60%,28% 52%)' };
+    return { ...common, clipPath: 'polygon(28% 34%,72% 34%,72% 52%,84% 60%,72% 70%,28% 70%,16% 60%,28% 52%)', transform: 'scale(1.14) translateY(4%)' };
   }
 
   if (category === 'top') {
     if (variant === 'tank') {
-      return { ...common, clipPath: 'polygon(34% 10%,42% 10%,42% 24%,58% 24%,58% 10%,66% 10%,72% 22%,68% 84%,32% 84%,28% 22%)' };
+      return { ...common, clipPath: 'polygon(34% 10%,42% 10%,42% 24%,58% 24%,58% 10%,66% 10%,72% 22%,68% 84%,32% 84%,28% 22%)', transform: 'scale(1.16) translateY(1%)' };
     }
     if (variant === 'shirt') {
-      return { ...common, clipPath: 'polygon(18% 28%,34% 12%,66% 12%,82% 28%,72% 44%,68% 88%,32% 88%,28% 44%)' };
+      return { ...common, clipPath: 'polygon(18% 28%,34% 12%,66% 12%,82% 28%,72% 44%,68% 88%,32% 88%,28% 44%)', transform: 'scale(1.18) translateY(1%)' };
     }
     if (variant === 'hoodie') {
-      return { ...common, clipPath: 'polygon(22% 28%,34% 18%,66% 18%,78% 28%,70% 42%,68% 84%,32% 84%,30% 42%)' };
+      return { ...common, clipPath: 'polygon(22% 28%,34% 18%,66% 18%,78% 28%,70% 42%,68% 84%,32% 84%,30% 42%)', transform: 'scale(1.2) translateY(2%)' };
     }
     if (variant === 'bodysuit') {
-      return { ...common, clipPath: 'polygon(35% 10%,42% 10%,42% 22%,58% 22%,58% 10%,65% 10%,70% 20%,64% 82%,56% 96%,44% 96%,36% 82%,30% 20%)' };
+      return { ...common, clipPath: 'polygon(35% 10%,42% 10%,42% 22%,58% 22%,58% 10%,65% 10%,70% 20%,64% 82%,56% 96%,44% 96%,36% 82%,30% 20%)', transform: 'scale(1.14) translateY(1%)' };
     }
-    return { ...common, clipPath: 'polygon(14% 30%,30% 16%,70% 16%,86% 30%,76% 44%,72% 82%,28% 82%,24% 44%)' };
+    return { ...common, clipPath: 'polygon(14% 30%,30% 16%,70% 16%,86% 30%,76% 44%,72% 82%,28% 82%,24% 44%)', transform: 'scale(1.18) translateY(1%)' };
   }
 
   if (category === 'outer') {
     if (variant === 'puffer') {
-      return { ...common, clipPath: 'polygon(10% 26%,28% 12%,72% 12%,90% 26%,78% 42%,74% 94%,26% 94%,22% 42%)' };
+      return { ...common, clipPath: 'polygon(10% 26%,28% 12%,72% 12%,90% 26%,78% 42%,74% 94%,26% 94%,22% 42%)', transform: 'scale(1.22) translateY(1%)' };
     }
     if (variant === 'trench') {
-      return { ...common, clipPath: 'polygon(18% 20%,34% 10%,66% 10%,82% 20%,74% 34%,68% 98%,32% 98%,26% 34%)' };
+      return { ...common, clipPath: 'polygon(18% 20%,34% 10%,66% 10%,82% 20%,74% 34%,68% 98%,32% 98%,26% 34%)', transform: 'scale(1.2) translateY(0%)' };
     }
     if (variant === 'blazer') {
-      return { ...common, clipPath: 'polygon(16% 24%,32% 12%,68% 12%,84% 24%,74% 40%,70% 90%,30% 90%,26% 40%)' };
+      return { ...common, clipPath: 'polygon(16% 24%,32% 12%,68% 12%,84% 24%,74% 40%,70% 90%,30% 90%,26% 40%)', transform: 'scale(1.2) translateY(1%)' };
     }
     if (variant === 'bomber') {
-      return { ...common, clipPath: 'polygon(12% 28%,28% 16%,72% 16%,88% 28%,78% 42%,72% 80%,28% 80%,22% 42%)' };
+      return { ...common, clipPath: 'polygon(12% 28%,28% 16%,72% 16%,88% 28%,78% 42%,72% 80%,28% 80%,22% 42%)', transform: 'scale(1.18) translateY(1%)' };
     }
-    return { ...common, clipPath: 'polygon(12% 26%,30% 12%,70% 12%,88% 26%,78% 42%,72% 92%,28% 92%,22% 42%)' };
+    return { ...common, clipPath: 'polygon(12% 26%,30% 12%,70% 12%,88% 26%,78% 42%,72% 92%,28% 92%,22% 42%)', transform: 'scale(1.2) translateY(1%)' };
   }
 
   if (category === 'bottom') {
     if (variant === 'skirt') {
-      return { ...common, clipPath: 'polygon(28% 8%,72% 8%,82% 76%,18% 76%)' };
+      return { ...common, clipPath: 'polygon(28% 8%,72% 8%,82% 76%,18% 76%)', transform: 'scale(1.18) translateY(-2%)' };
     }
     if (variant === 'shorts') {
-      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,78% 26%,70% 54%,54% 54%,54% 72%,46% 72%,46% 54%,30% 54%,22% 26%)' };
+      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,78% 26%,70% 54%,54% 54%,54% 72%,46% 72%,46% 54%,30% 54%,22% 26%)', transform: 'scale(1.16) translateY(-1%)' };
     }
     if (variant === 'leggings') {
-      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,70% 22%,70% 92%,56% 92%,56% 22%,44% 22%,44% 92%,30% 92%,30% 22%)' };
+      return { ...common, clipPath: 'polygon(24% 8%,76% 8%,70% 22%,70% 92%,56% 92%,56% 22%,44% 22%,44% 92%,30% 92%,30% 22%)', transform: 'scale(1.12) translateY(-1%)' };
     }
-    return { ...common, clipPath: 'polygon(22% 8%,78% 8%,72% 22%,74% 96%,56% 96%,52% 22%,48% 22%,44% 96%,26% 96%,28% 22%)' };
+    return { ...common, clipPath: 'polygon(22% 8%,78% 8%,72% 22%,74% 96%,56% 96%,52% 22%,48% 22%,44% 96%,26% 96%,28% 22%)', transform: 'scale(1.12) translateY(-1%)' };
   }
 
   if (variant === 'heels') {
-    return { ...common, clipPath: 'polygon(18% 62%,48% 52%,46% 78%,38% 78%,40% 92%,34% 92%,32% 78%,18% 78%,52% 52%,82% 62%,68% 78%,60% 78%,60% 92%,54% 92%,56% 78%,52% 78%)' };
+    return { ...common, clipPath: 'polygon(18% 62%,48% 52%,46% 78%,38% 78%,40% 92%,34% 92%,32% 78%,18% 78%,52% 52%,82% 62%,68% 78%,60% 78%,60% 92%,54% 92%,56% 78%,52% 78%)', transform: 'scale(1.16) translateY(4%)' };
   }
   if (variant === 'boots') {
-    return { ...common, clipPath: 'polygon(18% 22%,38% 22%,38% 54%,44% 54%,44% 74%,12% 74%,12% 54%,18% 54%,62% 22%,82% 22%,82% 54%,88% 54%,88% 74%,56% 74%,56% 54%,62% 54%)' };
+    return { ...common, clipPath: 'polygon(18% 22%,38% 22%,38% 54%,44% 54%,44% 74%,12% 74%,12% 54%,18% 54%,62% 22%,82% 22%,82% 54%,88% 54%,88% 74%,56% 74%,56% 54%,62% 54%)', transform: 'scale(1.12) translateY(5%)' };
   }
   if (variant === 'clogs') {
-    return { ...common, clipPath: 'polygon(12% 56%,46% 52%,46% 72%,12% 72%,54% 52%,88% 56%,88% 72%,54% 72%)' };
+    return { ...common, clipPath: 'polygon(12% 56%,46% 52%,46% 72%,12% 72%,54% 52%,88% 56%,88% 72%,54% 72%)', transform: 'scale(1.14) translateY(5%)' };
   }
-  return { ...common, clipPath: 'polygon(10% 58%,48% 52%,46% 72%,10% 72%,54% 52%,90% 58%,90% 72%,54% 72%)' };
+  return { ...common, clipPath: 'polygon(10% 58%,48% 52%,46% 72%,10% 72%,54% 52%,90% 58%,90% 72%,54% 72%)', transform: 'scale(1.14) translateY(5%)' };
 }
 
 function renderGarmentSvg(category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes', variant: string, tone: Tone) {
