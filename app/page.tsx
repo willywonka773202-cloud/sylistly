@@ -273,9 +273,9 @@ function BuilderPageContent({
           <section className="rounded-[30px] border border-hairline bg-surface-1 p-3 shadow-[0_24px_60px_rgba(0,0,0,.28)]">
             <div className="mb-3 flex items-start justify-between gap-3 px-1">
               <div>
-                <div className="text-[9px] tracking-[.18em] text-muted uppercase">Studio avatar</div>
+                <div className="text-[9px] tracking-[.18em] text-muted uppercase">Styling board</div>
                 <div className="mt-1 font-serif text-[22px] font-semibold text-ink">
-                  Live outfit <em className="italic text-accent">preview</em>
+                  Live fit <em className="italic text-accent">layout</em>
                 </div>
               </div>
               <div className="rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-right">
