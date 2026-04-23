@@ -26,10 +26,6 @@ body {
 .skin {
   background:
     radial-gradient(circle at 35% 18%, rgba(255,255,255,.22), transparent 28%),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--skin) 118%, white),
-      var(--skin) 58%,
-      color-mix(in srgb, var(--skin) 80%, black)
-    );
+    linear-gradient(180deg, rgba(255,255,255,.18), transparent 44%),
+    var(--skin);
 }
