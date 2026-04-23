@@ -4,10 +4,13 @@ import sharp from 'sharp';
 export const runtime = 'nodejs';
 
 const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
+const SUPPORTED_CATEGORIES = new Set(['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry']);
 
 export async function GET(req: NextRequest) {
   const rawUrl = req.nextUrl.searchParams.get('url');
   const cutout = req.nextUrl.searchParams.get('cutout') === '1';
+  const categoryParam = req.nextUrl.searchParams.get('category');
+  const category = categoryParam && SUPPORTED_CATEGORIES.has(categoryParam) ? categoryParam : null;
   if (!rawUrl) {
     return new NextResponse('Missing url', { status: 400 });
   }
@@ -51,7 +54,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const transformed = await makeTransparentCutout(source);
+    const transformed = await makeTransparentCutout(source, category);
 
     return new NextResponse(new Uint8Array(transformed), {
       status: 200,
@@ -68,7 +71,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function makeTransparentCutout(source: Buffer): Promise<Buffer> {
+async function makeTransparentCutout(source: Buffer, category: string | null): Promise<Buffer> {
   const pipeline = sharp(source, { failOn: 'none' }).rotate().ensureAlpha();
   const { data, info } = await pipeline.raw().toBuffer({ resolveWithObject: true });
 
@@ -91,7 +94,7 @@ async function makeTransparentCutout(source: Buffer): Promise<Buffer> {
     }
   }
 
-  return sharp(data, {
+  const trimmed = sharp(data, {
     raw: {
       width: info.width,
       height: info.height,
@@ -99,6 +102,85 @@ async function makeTransparentCutout(source: Buffer): Promise<Buffer> {
     },
   })
     .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 }, threshold: 10 })
+    .png();
+
+  const trimmedBuffer = await trimmed.toBuffer();
+  if (!category) {
+    return trimmedBuffer;
+  }
+
+  return cropForCategory(trimmedBuffer, category);
+}
+
+async function cropForCategory(source: Buffer, category: string): Promise<Buffer> {
+  const image = sharp(source, { failOn: 'none' });
+  const metadata = await image.metadata();
+  const width = metadata.width || 0;
+  const height = metadata.height || 0;
+
+  if (!width || !height) {
+    return source;
+  }
+
+  const box = categoryCropBox(category, width, height);
+
+  return image
+    .extract(box)
+    .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 }, threshold: 8 })
     .png()
     .toBuffer();
+}
+
+function categoryCropBox(category: string, width: number, height: number) {
+  const clamped = (value: number, max: number) => Math.max(0, Math.min(max, Math.round(value)));
+
+  if (category === 'top' || category === 'outer') {
+    const left = clamped(width * 0.06, width - 1);
+    const top = clamped(height * 0.02, height - 1);
+    const cropWidth = clamped(width * 0.88, width - left);
+    const cropHeight = clamped(height * 0.64, height - top);
+    return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
+  }
+
+  if (category === 'bottom') {
+    const left = clamped(width * 0.1, width - 1);
+    const top = clamped(height * 0.34, height - 1);
+    const cropWidth = clamped(width * 0.8, width - left);
+    const cropHeight = clamped(height * 0.62, height - top);
+    return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
+  }
+
+  if (category === 'shoes') {
+    const left = clamped(width * 0.04, width - 1);
+    const top = clamped(height * 0.68, height - 1);
+    const cropWidth = clamped(width * 0.92, width - left);
+    const cropHeight = clamped(height * 0.3, height - top);
+    return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
+  }
+
+  if (category === 'hat' || category === 'eyewear') {
+    const left = clamped(width * 0.14, width - 1);
+    const top = clamped(height * 0.02, height - 1);
+    const cropWidth = clamped(width * 0.72, width - left);
+    const cropHeight = clamped(height * 0.36, height - top);
+    return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
+  }
+
+  if (category === 'bag') {
+    const left = clamped(width * 0.14, width - 1);
+    const top = clamped(height * 0.18, height - 1);
+    const cropWidth = clamped(width * 0.72, width - left);
+    const cropHeight = clamped(height * 0.54, height - top);
+    return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
+  }
+
+  if (category === 'jewelry') {
+    const side = Math.min(width, height);
+    const cropSize = clamped(side * 0.48, side);
+    const left = clamped((width - cropSize) / 2, width - cropSize);
+    const top = clamped(height * 0.18, height - cropSize);
+    return { left, top, width: Math.max(1, cropSize), height: Math.max(1, cropSize) };
+  }
+
+  return { left: 0, top: 0, width, height };
 }

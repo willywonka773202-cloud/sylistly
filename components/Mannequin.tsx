@@ -17,6 +17,17 @@ type BoardLayout = {
   order: Category[];
 };
 
+const PRODUCT_SCALE: Partial<Record<Category, string>> = {
+  eyewear: 'scale(1.16)',
+  hat: 'scale(1.18)',
+  outer: 'scale(1.2)',
+  top: 'scale(1.22)',
+  bottom: 'scale(1.2)',
+  bag: 'scale(1.18)',
+  jewelry: 'scale(1.22)',
+  shoes: 'scale(1.18)',
+};
+
 const FRAME_LABELS: Record<GeneratorFrame, string> = {
   masc: 'Menswear edit',
   fem: 'Womenswear edit',
@@ -24,18 +35,18 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
 };
 
 const BOARD_LAYOUT: BoardLayout = {
-  className: 'left-1/2 top-[42px] h-[362px] w-[274px] -translate-x-1/2',
+  className: 'left-1/2 top-[28px] h-[386px] w-[314px] -translate-x-1/2',
   imageClassName: 'drop-shadow-[0_12px_22px_rgba(0,0,0,.12)]',
   order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
   placements: {
-    eyewear: 'left-[44px] top-[16px] h-[34px] w-[82px] -rotate-[2deg]',
-    hat: 'right-[34px] top-[18px] h-[30px] w-[82px] rotate-[3deg]',
-    outer: 'left-[18px] top-[58px] h-[156px] w-[136px] -rotate-[2deg]',
-    top: 'right-[18px] top-[46px] h-[122px] w-[106px] rotate-[2deg]',
-    bottom: 'left-1/2 top-[156px] h-[164px] w-[124px] -translate-x-1/2',
-    bag: 'right-[22px] top-[192px] h-[86px] w-[72px] rotate-[4deg]',
-    jewelry: 'right-[26px] top-[258px] h-[32px] w-[32px]',
-    shoes: 'left-1/2 bottom-[16px] h-[56px] w-[146px] -translate-x-1/2 -rotate-[3deg]',
+    eyewear: 'left-[54px] top-[16px] h-[36px] w-[90px] -rotate-[2deg]',
+    hat: 'right-[40px] top-[18px] h-[34px] w-[92px] rotate-[3deg]',
+    outer: 'left-[22px] top-[58px] h-[168px] w-[148px] -rotate-[2deg]',
+    top: 'right-[20px] top-[46px] h-[132px] w-[116px] rotate-[2deg]',
+    bottom: 'left-1/2 top-[164px] h-[176px] w-[138px] -translate-x-1/2',
+    bag: 'right-[24px] top-[202px] h-[96px] w-[80px] rotate-[4deg]',
+    jewelry: 'right-[30px] top-[272px] h-[34px] w-[34px]',
+    shoes: 'left-1/2 bottom-[14px] h-[62px] w-[168px] -translate-x-1/2 -rotate-[3deg]',
   },
 };
 
@@ -79,7 +90,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
       <FitBoard layout={BOARD_LAYOUT} items={items} hasItems={hasItems} />
 
       {!hasItems ? (
-        <div className="absolute left-1/2 top-[156px] z-30 w-[174px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/88 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.1)] backdrop-blur">
+        <div className="absolute left-1/2 top-[150px] z-30 w-[174px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/88 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.1)] backdrop-blur">
           <div className="font-serif text-[18px] font-semibold text-[#2f2723]">Start styling</div>
           <div className="mt-1 text-[11px] leading-relaxed text-[#7f6f66]">
             Add pieces below and Sylistly will lay them out as a clean shopping board.
@@ -151,10 +162,10 @@ function BoardProduct({
     <div className={`absolute ${className}`} style={{ zIndex }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={proxiedImageUrl(product.imageUrl, { cutout: true })}
+        src={proxiedImageUrl(product.imageUrl, { cutout: true, category })}
         alt={`${product.brand} ${product.name}`}
         className={`h-full w-full object-contain ${imageClassName}`}
-        style={{ mixBlendMode: 'multiply' }}
+        style={{ mixBlendMode: 'multiply', transform: PRODUCT_SCALE[category] || 'scale(1.14)' }}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {
