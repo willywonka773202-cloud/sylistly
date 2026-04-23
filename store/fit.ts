@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import type { Category, Product } from '@/lib/types';
 
 interface FitState {
@@ -28,6 +29,18 @@ export const useFit = create<FitState>()(
         Object.values(get().items).reduce((sum, p) => sum + (p?.priceCents || 0), 0),
       count: () => Object.values(get().items).filter(Boolean).length,
     }),
-    { name: 'sylistly.fit.v1' },
+    {
+      name: 'sylistly.fit.v1',
+      version: 2,
+      migrate: (persistedState) => {
+        const state = persistedState as FitState | undefined;
+        if (!state?.items) return state as FitState;
+
+        return {
+          ...state,
+          items: hydrateItemsFromCatalog(state.items),
+        };
+      },
+    },
   ),
 );

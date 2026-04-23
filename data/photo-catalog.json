@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": "f2e4852913aacbdf",
+    "brand": "Nike",
+    "name": "Men's Oversized Cargo Shorts",
+    "category": "bottom",
+    "priceCents": 7000,
+    "currency": "USD",
+    "retailer": "Nike",
+    "retailerUrl": "https://www.nike.com/t/sportswear-club-mens-oversized-cargo-shorts-dXe3NhuA",
+    "imageUrl": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/9d4aefe3-43f4-4289-aaa1-066a4ddf1e50/M%2BNK%2BCLUB%2BOS%2BCARGO%2BSHORT.png",
+    "imageOriginalUrl": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/9d4aefe3-43f4-4289-aaa1-066a4ddf1e50/M%2BNK%2BCLUB%2BOS%2BCARGO%2BSHORT.png",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "nike shorts",
+      "style": "dXe3NhuA"
+    }
+  },
+  {
+    "id": "85f6cb6cd1ec6df2",
+    "brand": "Nike",
+    "name": "Men's Woven Cargo Pants",
+    "category": "bottom",
+    "priceCents": 10500,
+    "currency": "USD",
+    "retailer": "Nike",
+    "retailerUrl": "https://www.nike.com/t/sportswear-club-mens-woven-cargo-pants-2XCkbz/HV1433-222",
+    "imageUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
+    "imageOriginalUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "nike cargo pants",
+      "style": "HV1433-222"
+    }
+  },
+  {
+    "id": "9ca13381388dbe1e",
+    "brand": "Nike",
+    "name": "Air Force 1 '07",
+    "category": "shoes",
+    "priceCents": 11500,
+    "currency": "USD",
+    "retailer": "Nike",
+    "retailerUrl": "https://www.nike.com/t/air-force-1-07-mens-shoes-jBrhbr",
+    "imageUrl": "https://content.stylitics.com/images/items/4337101",
+    "imageOriginalUrl": "https://content.stylitics.com/images/items/4337101",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "nike air force 1",
+      "style": "jBrhbr"
+    }
+  },
+  {
+    "id": "a679953574189c64",
+    "brand": "Nike",
+    "name": "Zoom Vomero 5",
+    "category": "shoes",
+    "priceCents": 17000,
+    "currency": "USD",
+    "retailer": "Nike",
+    "retailerUrl": "https://www.nike.com/t/zoom-vomero-5-mens-shoes-MgsTqZ/BV1358-001",
+    "imageUrl": "https://content.stylitics.com/images/items/9790704",
+    "imageOriginalUrl": "https://content.stylitics.com/images/items/9790704",
+    "trusted": true,
+    "metadata": {
+      "source": "photo_catalog",
+      "catalogQuery": "nike vomero",
+      "style": "BV1358-001"
+    }
+  }
+]

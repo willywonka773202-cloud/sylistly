@@ -6,10 +6,12 @@ import { Mannequin } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
+import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
+import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import {
   VIBES,
   type GeneratorBudget,
@@ -18,20 +20,16 @@ import {
   vibeSearchQuery,
 } from '@/lib/vibes';
 
-interface ShopLink {
-  id: string;
-  brand: string;
-  name: string;
-  retailer: string;
-  url: string;
-}
-
 function BuilderPageContent({
   quickSlot,
   quickQuery,
+  quickVibe,
+  quickFrame,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
+  quickVibe: string | null;
+  quickFrame: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -40,7 +38,7 @@ function BuilderPageContent({
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [shopLinks, setShopLinks] = useState<ShopLink[] | null>(null);
+  const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [generatorLoading, setGeneratorLoading] = useState(false);
@@ -58,9 +56,30 @@ function BuilderPageContent({
   }, [statusMessage]);
 
   useEffect(() => {
+    const hydrated = hydrateItemsFromCatalog(items);
+    const changed = Object.entries(hydrated).some(([slot, product]) => product !== items[slot as Category]);
+    if (changed) {
+      replaceItems(hydrated);
+    }
+  }, [items, replaceItems]);
+
+  useEffect(() => {
     if (!quickSlot || !CATEGORY_ORDER.includes(quickSlot as Category)) return;
     setSearchFor(quickSlot as Category);
   }, [quickSlot]);
+
+  useEffect(() => {
+    if (!quickVibe) return;
+    if (VIBES.some((vibe) => vibe.id === quickVibe)) {
+      setSelectedVibe(quickVibe as VibeId);
+    }
+  }, [quickVibe]);
+
+  useEffect(() => {
+    if (quickFrame === 'masc' || quickFrame === 'fem' || quickFrame === 'androgynous') {
+      setBodyType(quickFrame);
+    }
+  }, [quickFrame, setBodyType]);
 
   function closeSearchSheet() {
     setSearchFor(null);
@@ -94,23 +113,56 @@ function BuilderPageContent({
     setStatusMessage(null);
 
     try {
-      const results = await Promise.allSettled(
-        targetSlots.map(async (slot) => ({
-          slot,
-          product: await runCategorySearch(
-            slot,
-            vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame),
-          ),
-        })),
-      );
-
       const nextItems = { ...items };
       let addedCount = 0;
+      let collectionLabel: string | null = null;
+      let assistantLabel: string | null = null;
 
-      for (const result of results) {
-        if (result.status !== 'fulfilled' || !result.value.product) continue;
-        nextItems[result.value.slot] = result.value.product;
-        addedCount += 1;
+      const lookResponse = await fetch('/api/look', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          vibe: selectedVibe,
+          frame: generatorFrame,
+          budget: generatorBudget,
+          mode,
+          currentItems: items,
+        }),
+      });
+      const lookData = await lookResponse.json();
+
+      if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
+        for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
+          if (!product) continue;
+          nextItems[slot] = product;
+          addedCount += 1;
+        }
+
+        if (lookData.collection?.label) {
+          collectionLabel = lookData.collection.label as string;
+        }
+        if (lookData.assistantMode === 'ai-assisted') {
+          assistantLabel = ' with AI stylist assist';
+        }
+      }
+
+      const unresolvedSlots = targetSlots.filter((slot) => !nextItems[slot]);
+      if (unresolvedSlots.length) {
+        const results = await Promise.allSettled(
+          unresolvedSlots.map(async (slot) => ({
+            slot,
+            product: await runCategorySearch(
+              slot,
+              vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame),
+            ),
+          })),
+        );
+
+        for (const result of results) {
+          if (result.status !== 'fulfilled' || !result.value.product) continue;
+          nextItems[result.value.slot] = result.value.product;
+          addedCount += 1;
+        }
       }
 
       if (!addedCount) {
@@ -121,8 +173,8 @@ function BuilderPageContent({
       replaceItems(nextItems);
       setStatusMessage(
         mode === 'starter'
-          ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}.`
-          : `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}.`,
+          ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          : `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`,
       );
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Could not generate a look right now.');
@@ -178,6 +230,7 @@ function BuilderPageContent({
         name: product.name,
         retailer: product.retailer,
         url: product.affiliateUrl || product.retailerUrl,
+        priceCents: product.priceCents,
       }))
       .filter((product) => Boolean(product.url));
 
@@ -187,7 +240,7 @@ function BuilderPageContent({
     }
 
     setStatusMessage(null);
-    setShopLinks(links);
+    setCheckoutProducts(links);
   }
 
   return (
@@ -377,46 +430,12 @@ function BuilderPageContent({
         onClose={closeSearchSheet}
       />
 
-      {shopLinks ? (
-        <>
-          <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setShopLinks(null)} />
-          <div className="absolute inset-x-0 bottom-0 z-50 mx-auto max-w-[440px] rounded-t-3xl border-t border-hairline-2 bg-surface-1 px-4 pb-6 pt-3">
-            <div className="mx-auto h-1 w-10 rounded-full bg-white/20" />
-            <div className="flex items-center justify-between pb-3 pt-2">
-              <div>
-                <div className="text-[9px] uppercase tracking-[.18em] text-muted">Shop links</div>
-                <div className="mt-1 font-serif text-lg font-semibold text-ink">
-                  Open each <em className="italic text-accent">item</em>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShopLinks(null)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-surface-3 text-muted-2"
-              >
-                <X size={14} />
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              {shopLinks.map((link) => (
-                <div key={link.id} className="rounded-2xl border border-hairline bg-surface-2 p-3">
-                  <div className="text-[10px] font-medium uppercase tracking-[.14em] text-muted-2">{link.brand}</div>
-                  <div className="mt-1 text-[13px] leading-tight text-ink">{link.name}</div>
-                  <div className="mt-2 text-[10px] uppercase tracking-[.12em] text-muted">{link.retailer}</div>
-                  <button
-                    type="button"
-                    onClick={() => window.location.assign(link.url)}
-                    className="mt-3 inline-flex rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"
-                  >
-                    Open item
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      ) : null}
+      <CheckoutSheet
+        open={Boolean(checkoutProducts)}
+        title="Your fit"
+        products={checkoutProducts || []}
+        onClose={() => setCheckoutProducts(null)}
+      />
     </main>
   );
 }
@@ -427,13 +446,15 @@ function BuilderPageWithSearchParams() {
     <BuilderPageContent
       quickSlot={searchParams.get('slot')}
       quickQuery={searchParams.get('query')}
+      quickVibe={searchParams.get('vibe')}
+      quickFrame={searchParams.get('frame')}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

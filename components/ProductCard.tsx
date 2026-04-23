@@ -1,6 +1,7 @@
 'use client';
 import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import type { Product } from '@/lib/types';
+import { proxiedImageUrl } from '@/lib/image-url';
 
 interface Props {
   product: Product;
@@ -29,7 +30,7 @@ function fallbackImage(product: Product): string {
 export function ProductCard({ product: p, onClick }: Props) {
   const buyUrl = p.affiliateUrl || p.retailerUrl;
   const [imgFailed, setImgFailed] = useState(false);
-  const imageSrc = imgFailed || !p.imageUrl ? fallbackImage(p) : p.imageUrl;
+  const imageSrc = imgFailed || !p.imageUrl ? fallbackImage(p) : proxiedImageUrl(p.imageUrl);
 
   function openItem(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();

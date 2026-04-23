@@ -4,6 +4,7 @@ import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '@/lib
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
 import { searchBrandCatalog } from '@/lib/brand-catalog';
+import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import type { Category, Product } from '@/lib/types';
@@ -181,6 +182,19 @@ export async function POST(req: NextRequest) {
   const startedAt = Date.now();
 
   try {
+    if (!query.trim() && category) {
+      const featuredCatalogProducts = getFeaturedCatalogProducts(6, category).map((product) => ({
+        ...product,
+        affiliateUrl: wrapAffiliate(product.retailerUrl),
+      }));
+
+      return NextResponse.json({
+        products: featuredCatalogProducts,
+        source: 'catalog',
+        searchMode,
+      });
+    }
+
     // 1. Prefer the real photo-backed catalog whenever we have a match.
     const fastIntent = parseSearchIntentHeuristic(query, category);
     const photoCatalogProducts = searchPhotoCatalog(fastIntent, query).map((product) => ({
@@ -189,10 +203,16 @@ export async function POST(req: NextRequest) {
     }));
 
     if (photoCatalogProducts.length) {
-      cacheProducts(photoCatalogProducts).catch(() => {});
+      const rankedPhotoCatalogProducts = await rerankProducts(
+        query || fastIntent.category,
+        fastIntent,
+        photoCatalogProducts,
+        Math.min(6, photoCatalogProducts.length),
+      );
+      cacheProducts(rankedPhotoCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
         expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-        products: photoCatalogProducts,
+        products: rankedPhotoCatalogProducts,
         source: 'catalog',
       });
 
@@ -200,19 +220,19 @@ export async function POST(req: NextRequest) {
         '[api/search] query=%s category=%s source=photo_catalog results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
-        photoCatalogProducts.length,
+        rankedPhotoCatalogProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: photoCatalogProducts, source: 'catalog', searchMode });
+      return NextResponse.json({ products: rankedPhotoCatalogProducts, source: 'catalog', searchMode });
     }
 
-    // 2. Fall back to the built-in starter catalog only in hybrid mode.
-    // In catalog-only launch mode we avoid placeholder SVG products so the
-    // public site only shows real-photo inventory.
+    // 2. In hybrid mode, we can use the starter catalog early for common
+    // branded searches. In preview mode we try live/photo results first and
+    // only fall back to starter placeholders if nothing better is available.
     const useCatalogFirst =
-      catalogPreviewMode ||
-      (!catalogOnlyMode && shouldUseCatalogFirst(query, category, fastIntent.brand));
+      searchMode === 'hybrid' &&
+      shouldUseCatalogFirst(query, category, fastIntent.brand);
     const seededCatalogProducts = useCatalogFirst
       ? searchBrandCatalog(fastIntent, query)
       : [];
@@ -233,11 +253,17 @@ export async function POST(req: NextRequest) {
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
+      const rankedCatalogProducts = await rerankProducts(
+        query || fastIntent.category,
+        fastIntent,
+        affiliateWrappedProducts,
+        Math.min(6, affiliateWrappedProducts.length),
+      );
 
-      cacheProducts(affiliateWrappedProducts).catch(() => {});
+      cacheProducts(rankedCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
         expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-        products: affiliateWrappedProducts,
+        products: rankedCatalogProducts,
         source: 'catalog',
       });
 
@@ -245,11 +271,11 @@ export async function POST(req: NextRequest) {
         '[api/search] query=%s category=%s source=catalog results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
-        affiliateWrappedProducts.length,
+        rankedCatalogProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: affiliateWrappedProducts, source: 'catalog', searchMode });
+      return NextResponse.json({ products: rankedCatalogProducts, source: 'catalog', searchMode });
     }
 
     if (catalogOnlyMode) {
@@ -264,74 +290,117 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Parse intent for live search fallback
-    if (!liveSearchKey) {
+    // 3. Try live photo search in preview/hybrid modes.
+    let liveSearchError: unknown = null;
+
+    if (liveSearchKey) {
+      try {
+        const intent = await parseSearchIntent(query, category);
+
+        // 4. Search real inventory
+        const candidates = await searchShopping(intent, query);
+
+        // 5. Re-rank with Claude
+        const rerankLimit = Math.min(6, candidates.length);
+        const ranked = candidates.length > rerankLimit
+          ? await rerankProducts(query, intent, candidates, rerankLimit)
+          : candidates.slice(0, rerankLimit);
+
+        // 6. Resolve direct retailer links for the strongest results only.
+        const hydrationTargets = ranked.slice(0, 3);
+        const untouched = ranked.slice(3);
+        const hydratedTop = await hydrateRetailerUrls(hydrationTargets);
+        const combined = [...hydratedTop, ...untouched].sort(
+          (left, right) => productSortScore(right) - productSortScore(left),
+        );
+        const directFirst = combined.filter((product) => hasDirectRetailerUrl(product.retailerUrl));
+        const selected = (directFirst.length >= 4
+          ? [
+              ...directFirst,
+              ...combined.filter((product) => !hasDirectRetailerUrl(product.retailerUrl)),
+            ]
+          : combined
+        ).slice(0, 6);
+
+        // 7. Affiliate-wrap
+        const products: Product[] = selected.map((p) => ({
+          ...p,
+          affiliateUrl: wrapAffiliate(p.retailerUrl),
+        }));
+
+        if (products.length) {
+          console.info(
+            '[api/search] query=%s category=%s candidates=%d results=%d durationMs=%d',
+            query || '(blank)',
+            category || intent.category,
+            candidates.length,
+            products.length,
+            Date.now() - startedAt,
+          );
+
+          // 8. Fire-and-forget cache write
+          cacheProducts(products).catch(() => {});
+          searchResponseCache.set(cacheKey, {
+            expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+            products,
+            source: 'live',
+          });
+
+          return NextResponse.json({ products, source: 'live', searchMode });
+        }
+      } catch (error) {
+        liveSearchError = error;
+        if (searchMode === 'hybrid') throw error;
+      }
+    } else if (searchMode === 'hybrid') {
       return NextResponse.json(
         { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode },
         { status: 500 },
       );
     }
 
-    const intent = await parseSearchIntent(query, category);
+    // 4. Preview mode can still fall back to starter placeholders locally.
+    if (catalogPreviewMode) {
+      const previewSeededCatalogProducts = searchBrandCatalog(fastIntent, query);
+      if (previewSeededCatalogProducts.length) {
+        const affiliateWrappedProducts = previewSeededCatalogProducts.map((product) => ({
+          ...product,
+          affiliateUrl: wrapAffiliate(product.retailerUrl),
+        }));
+        const rankedPreviewProducts = await rerankProducts(
+          query || fastIntent.category,
+          fastIntent,
+          affiliateWrappedProducts,
+          Math.min(6, affiliateWrappedProducts.length),
+        );
 
-    // 4. Search real inventory
-    const candidates = await searchShopping(intent, query);
+        cacheProducts(rankedPreviewProducts).catch(() => {});
+        searchResponseCache.set(cacheKey, {
+          expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+          products: rankedPreviewProducts,
+          source: 'catalog',
+        });
 
-    // 5. Re-rank with Claude
-    const rerankLimit = Math.min(6, candidates.length);
-    const ranked = candidates.length > rerankLimit
-      ? await rerankProducts(query, intent, candidates, rerankLimit)
-      : candidates.slice(0, rerankLimit);
+        console.info(
+          '[api/search] query=%s category=%s source=preview_catalog results=%d durationMs=%d',
+          query || '(blank)',
+          category || fastIntent.category,
+          rankedPreviewProducts.length,
+          Date.now() - startedAt,
+        );
 
-    // 6. Resolve direct retailer links for the strongest results only.
-    // This keeps the picker responsive on mobile while still upgrading the
-    // top cards with clean retailer destinations.
-    const hydrationTargets = ranked.slice(0, 3);
-    const untouched = ranked.slice(3);
-    const hydratedTop = await hydrateRetailerUrls(hydrationTargets);
-    const combined = [...hydratedTop, ...untouched].sort(
-      (left, right) => productSortScore(right) - productSortScore(left),
-    );
-    const directFirst = combined.filter((product) => hasDirectRetailerUrl(product.retailerUrl));
-    const selected = (directFirst.length >= 4
-      ? [
-          ...directFirst,
-          ...combined.filter((product) => !hasDirectRetailerUrl(product.retailerUrl)),
-        ]
-      : combined
-    ).slice(0, 6);
-
-    // 7. Affiliate-wrap
-    const products: Product[] = selected.map((p) => ({
-      ...p,
-      affiliateUrl: wrapAffiliate(p.retailerUrl),
-    }));
-
-    if (!products.length) {
-      return NextResponse.json(
-        { error: 'No live products found for that query.' },
-        { status: 404 },
-      );
+        return NextResponse.json({ products: rankedPreviewProducts, source: 'catalog', searchMode });
+      }
     }
 
-    console.info(
-      '[api/search] query=%s category=%s candidates=%d results=%d durationMs=%d',
-      query || '(blank)',
-      category || intent.category,
-      candidates.length,
-      products.length,
-      Date.now() - startedAt,
+    if (liveSearchError) {
+      throw liveSearchError;
+    }
+
+    return NextResponse.json(
+      { error: 'No products found for that query yet.', searchMode },
+      { status: 404 },
     );
-
-    // 8. Fire-and-forget cache write
-    cacheProducts(products).catch(() => {});
-    searchResponseCache.set(cacheKey, {
-      expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-      products,
-      source: 'live',
-    });
-
-    return NextResponse.json({ products, source: 'live', searchMode });
   } catch (err) {
     console.error('[api/search]', err);
     const message =

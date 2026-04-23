@@ -1,6 +1,8 @@
 'use client';
-import { Bookmark, RotateCcw, Trash2 } from 'lucide-react';
+import { Bookmark, RotateCcw, ShoppingBag, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
@@ -18,6 +20,8 @@ export default function SavedPage() {
   const fits = useSavedFits((state) => state.fits);
   const removeFit = useSavedFits((state) => state.removeFit);
   const replaceItems = useFit((state) => state.replaceItems);
+  const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
+  const [checkoutTitle, setCheckoutTitle] = useState<string>('Saved fit');
   const router = useRouter();
 
   return (
@@ -69,6 +73,28 @@ export default function SavedPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => {
+                    const products = Object.values(fit.items)
+                      .filter((product): product is NonNullable<typeof product> => Boolean(product))
+                      .map((product) => ({
+                        id: product.id,
+                        brand: product.brand,
+                        name: product.name,
+                        retailer: product.retailer,
+                        url: product.affiliateUrl || product.retailerUrl,
+                        priceCents: product.priceCents,
+                      }))
+                      .filter((product) => Boolean(product.url));
+                    setCheckoutTitle(fit.title);
+                    setCheckoutProducts(products);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+                >
+                  <ShoppingBag size={13} />
+                  Shop fit
+                </button>
+                <button
+                  type="button"
                   onClick={() => removeFit(fit.id)}
                   className="inline-flex items-center gap-2 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
                 >
@@ -90,6 +116,12 @@ export default function SavedPage() {
           </p>
         </section>
       )}
+      <CheckoutSheet
+        open={Boolean(checkoutProducts)}
+        title={checkoutTitle}
+        products={checkoutProducts || []}
+        onClose={() => setCheckoutProducts(null)}
+      />
     </PlaceholderScreen>
   );
 }

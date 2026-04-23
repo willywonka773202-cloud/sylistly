@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import type { Category, Product } from '@/lib/types';
 
 export interface SavedFitRecord {
@@ -62,6 +63,21 @@ export const useSavedFits = create<SavedFitsState>()(
       removeFit: (id) =>
         set((state) => ({ fits: state.fits.filter((fit) => fit.id !== id) })),
     }),
-    { name: 'sylistly.saved-fits.v1' },
+    {
+      name: 'sylistly.saved-fits.v1',
+      version: 2,
+      migrate: (persistedState) => {
+        const state = persistedState as SavedFitsState | undefined;
+        if (!state?.fits) return state as SavedFitsState;
+
+        return {
+          ...state,
+          fits: state.fits.map((fit) => ({
+            ...fit,
+            items: hydrateItemsFromCatalog(fit.items),
+          })),
+        };
+      },
+    },
   ),
 );

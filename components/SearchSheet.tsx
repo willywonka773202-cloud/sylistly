@@ -56,11 +56,6 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
 
   async function runSearch(q: string, cat: Category, mode: 'live' | 'demo' = 'live') {
     const trimmed = q.trim();
-    if (!trimmed && mode === 'live') {
-      setResults(null);
-      setError('Type a brand, color, or vibe to search.');
-      return;
-    }
 
     activeRequest.current?.abort();
     const controller = new AbortController();
@@ -168,17 +163,26 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     ? 'Search Sylistly inventory by brand, color, or vibe. Results come from the stored catalog so the site can run without live API costs.'
                     : searchMode === 'catalog-preview'
                     ? 'Preview mode is on for local testing. Sylistly will show starter catalog items while the real photo catalog is still being built.'
-                    : 'Search by brand, color, or vibe. Use Add to fit on a card to place it on the mannequin, or View item to open the retailer.'}
+                    : 'Search by brand, color, or vibe, or just browse featured inventory for this slot.'}
                 </span>
-                {demoSupported ? (
+                <div className="flex flex-none items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => void runSearch(query, category, 'demo')}
-                    className="flex-none rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
+                    onClick={() => void runSearch('', category)}
+                    className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
                   >
-                    Demo
+                    Browse
                   </button>
-                ) : null}
+                  {demoSupported ? (
+                    <button
+                      type="button"
+                      onClick={() => void runSearch(query, category, 'demo')}
+                      className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
+                    >
+                      Demo
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
 
@@ -196,7 +200,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                   setQuery(e.target.value);
                   setError(null);
                 }}
-                placeholder={`try: ${TRENDING[category][0]}`}
+                placeholder={`try: ${TRENDING[category][0]} or browse`}
                 className="w-full rounded-2xl border border-hairline bg-surface-3 py-3 pl-10 pr-24 text-sm text-ink outline-none focus:border-accent"
               />
               <button
@@ -269,7 +273,7 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                     </div>
                   )
                 : results === null
-                ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready. Try a brand, color, or vibe.</div>
+                ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
                 : results.length === 0
                 ? <div className="col-span-2 py-10 text-center text-muted text-sm">No matches. Try a brand, color, or vibe.</div>
                 : results.map((p) => (

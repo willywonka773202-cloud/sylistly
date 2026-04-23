@@ -3,6 +3,7 @@ import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import type { Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
+import { proxiedImageUrl } from '@/lib/image-url';
 
 interface Props {
   items: Partial<Record<string, Product>>;
@@ -123,28 +124,28 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
 
         {/* Styled garment zones work better with normal shopping thumbnails than raw full-body cutouts. */}
         {items.outer && (
-          <Overlay style={{ top: 48, left: 2, width: 116, height: 104 }} src={items.outer.imageUrl} variant="outer" />
+          <Overlay style={{ top: 48, left: 2, width: 116, height: 104 }} src={proxiedImageUrl(items.outer.imageUrl)} variant="outer" />
         )}
         {items.top && !items.outer && (
-          <Overlay style={{ top: 56, left: 12, width: 96, height: 82 }} src={items.top.imageUrl} variant="top" />
+          <Overlay style={{ top: 56, left: 12, width: 96, height: 82 }} src={proxiedImageUrl(items.top.imageUrl)} variant="top" />
         )}
         {items.bottom && (
-          <Overlay style={{ top: 118, left: 18, width: 84, height: 116 }} src={items.bottom.imageUrl} variant="bottom" />
+          <Overlay style={{ top: 118, left: 18, width: 84, height: 116 }} src={proxiedImageUrl(items.bottom.imageUrl)} variant="bottom" />
         )}
         {items.hat && (
-          <Overlay style={{ top: -8, left: 28, width: 64, height: 34 }} src={items.hat.imageUrl} variant="hat" />
+          <Overlay style={{ top: -8, left: 28, width: 64, height: 34 }} src={proxiedImageUrl(items.hat.imageUrl)} variant="hat" />
         )}
         {items.shoes && (
-          <Overlay style={{ top: 226, left: 20, width: 82, height: 34 }} src={items.shoes.imageUrl} variant="shoes" />
+          <Overlay style={{ top: 226, left: 20, width: 82, height: 34 }} src={proxiedImageUrl(items.shoes.imageUrl)} variant="shoes" />
         )}
         {items.bag && (
-          <Overlay style={{ top: 132, left: 92, width: 36, height: 52 }} src={items.bag.imageUrl} variant="bag" />
+          <Overlay style={{ top: 132, left: 92, width: 36, height: 52 }} src={proxiedImageUrl(items.bag.imageUrl)} variant="bag" />
         )}
         {items.eyewear && (
-          <Overlay style={{ top: 14, left: 31, width: 58, height: 24 }} src={items.eyewear.imageUrl} variant="eyewear" />
+          <Overlay style={{ top: 14, left: 31, width: 58, height: 24 }} src={proxiedImageUrl(items.eyewear.imageUrl)} variant="eyewear" />
         )}
         {items.jewelry && (
-          <Overlay style={{ top: 52, left: 43, width: 36, height: 26 }} src={items.jewelry.imageUrl} variant="jewelry" />
+          <Overlay style={{ top: 52, left: 43, width: 36, height: 26 }} src={proxiedImageUrl(items.jewelry.imageUrl)} variant="jewelry" />
         )}
       </div>
     </div>

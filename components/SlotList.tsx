@@ -2,6 +2,7 @@
 import { useFit } from '@/store/fit';
 import { CATEGORY_ORDER, type Category } from '@/lib/types';
 import { Shirt, Footprints, ShoppingBag, Watch, Glasses, PackageSearch, Hand } from 'lucide-react';
+import { proxiedImageUrl } from '@/lib/image-url';
 
 const ICONS: Record<Category, React.ComponentType<{ size?: number }>> = {
   hat: PackageSearch,
@@ -57,7 +58,7 @@ export function SlotList({ onOpenSearch }: Props) {
               {p ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={p.imageUrl}
+                  src={proxiedImageUrl(p.imageUrl)}
                   alt=""
                   className="w-6 h-6 object-contain"
                   loading="lazy"
