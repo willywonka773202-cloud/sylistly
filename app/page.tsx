@@ -125,6 +125,7 @@ function BuilderPageContent({
           vibe: selectedVibe,
           frame: generatorFrame,
           budget: generatorBudget,
+          seed: Date.now(),
           mode,
           currentItems: items,
         }),

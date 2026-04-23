@@ -1,7 +1,8 @@
 import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
 import { parseSearchIntentHeuristic, rerankProducts } from './claude';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
-import type { Category, Product } from './types';
+import { presentationScore } from './presentation-score';
+import type { Category, Product, SearchIntent } from './types';
 import { VIBES, vibeSearchQuery, type GeneratorBudget, type GeneratorFrame, type VibeId } from './vibes';
 
 type CollectionFrame = GeneratorFrame | 'all';
@@ -83,6 +84,29 @@ function dedupeProducts(products: Product[]): Product[] {
   }
 
   return output;
+}
+
+function buildFrameIntent(category: Category, frame: GeneratorFrame): SearchIntent {
+  return {
+    category,
+    keywords: [],
+    gender: frame,
+  };
+}
+
+function stableHash(value: string): number {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+}
+
+function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | null {
+  if (!items.length) return null;
+  const pool = items.slice(0, Math.min(4, items.length));
+  const index = (stableHash(key) + Math.abs(seed || 0)) % pool.length;
+  return pool[index] || pool[0] || null;
 }
 
 export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
@@ -321,6 +345,7 @@ function scoreFallbackProduct(
   let score = product.metadata?.featured ? 16 : 8;
   if (hasRealPhoto(product)) score += 40;
   const haystack = searchHaystack(product);
+  score += presentationScore(product, buildFrameIntent(product.category, frame));
 
   for (const term of VIBE_TERMS[vibe]) {
     if (haystack.includes(normalize(term))) score += 10;
@@ -348,25 +373,28 @@ function getSlotCandidates({
   usedIds: Set<string>;
   collectionCandidates: Product[];
 }): Product[] {
-  const fromCollections = collectionCandidates.filter(
-    (product) => product.category === slot && isUnderBudget(product, budget) && !usedIds.has(product.id),
+  const collectionIds = new Set(
+    collectionCandidates
+      .filter((product) => product.category === slot)
+      .map((product) => product.id),
   );
 
-  const fallback = ALL_CATALOG_PRODUCTS
+  return ALL_CATALOG_PRODUCTS
     .filter((product) => product.category === slot)
     .filter((product) => isUnderBudget(product, budget))
     .filter((product) => !usedIds.has(product.id))
     .map((product) => ({
       product,
-      score: scoreFallbackProduct(product, vibe, frame),
+      score:
+        scoreFallbackProduct(product, vibe, frame)
+        + (collectionIds.has(product.id) ? 28 : 0),
     }))
     .filter((entry) => entry.score > 0)
     .sort((left, right) => right.score - left.score)
-    .map((entry) => entry.product);
-
-  return dedupeProducts([...fromCollections, ...fallback])
+    .map((entry) => entry.product)
+    .filter((product, index, list) => list.findIndex((entry) => entry.id === product.id) === index)
     .sort((left, right) => Number(hasRealPhoto(right)) - Number(hasRealPhoto(left)))
-    .slice(0, 8);
+    .slice(0, 12);
 }
 
 export function buildCatalogLook({
@@ -375,12 +403,14 @@ export function buildCatalogLook({
   budget,
   currentItems,
   mode,
+  seed = 0,
 }: {
   vibe: VibeId;
   frame: GeneratorFrame;
   budget: GeneratorBudget;
   currentItems?: Partial<Record<Category, Product>>;
   mode: 'starter' | 'missing';
+  seed?: number;
 }): {
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
@@ -404,32 +434,19 @@ export function buildCatalogLook({
 
   for (const slot of targetSlots) {
     if (mode === 'missing' && existingItems[slot]) continue;
+    const candidatePool = getSlotCandidates({
+      slot,
+      vibe,
+      frame,
+      budget,
+      usedIds,
+      collectionCandidates,
+    });
+    const chosen = chooseVariedCandidate(candidatePool, seed, `${vibe}:${frame}:${slot}:catalog`);
+    if (!chosen) continue;
 
-    const fromCollection = collectionCandidates.find(
-      (product) => product.category === slot && isUnderBudget(product, budget) && !usedIds.has(product.id),
-    );
-
-    if (fromCollection) {
-      picked[slot] = fromCollection;
-      usedIds.add(fromCollection.id);
-      continue;
-    }
-
-    const fallback = ALL_CATALOG_PRODUCTS
-      .filter((product) => product.category === slot)
-      .filter((product) => isUnderBudget(product, budget))
-      .filter((product) => !usedIds.has(product.id))
-      .map((product) => ({
-        product,
-        score: scoreFallbackProduct(product, vibe, frame),
-      }))
-      .filter((entry) => entry.score > 0)
-      .sort((left, right) => right.score - left.score)[0]?.product;
-
-    if (!fallback) continue;
-
-    picked[slot] = fallback;
-    usedIds.add(fallback.id);
+    picked[slot] = chosen;
+    usedIds.add(chosen.id);
   }
 
   const missingSlots = targetSlots.filter((slot) => !picked[slot] && !(mode === 'missing' && existingItems[slot]));
@@ -447,19 +464,21 @@ export async function buildAiCatalogLook({
   budget,
   currentItems,
   mode,
+  seed = 0,
 }: {
   vibe: VibeId;
   frame: GeneratorFrame;
   budget: GeneratorBudget;
   currentItems?: Partial<Record<Category, Product>>;
   mode: 'starter' | 'missing';
+  seed?: number;
 }): Promise<{
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
   missingSlots: Category[];
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
-  const base = buildCatalogLook({ vibe, frame, budget, currentItems, mode });
+  const base = buildCatalogLook({ vibe, frame, budget, currentItems, mode, seed });
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
   const usedIds = new Set(
@@ -493,7 +512,11 @@ export async function buildAiCatalogLook({
     const query = vibeSearchQuery(vibe, slot, budget, frame);
     const intent = parseSearchIntentHeuristic(query, slot);
     const ranked = await rerankProducts(query, intent, rankingPool, Math.min(3, rankingPool.length));
-    const chosen = ranked.find((product) => !usedIds.has(product.id)) || rankingPool[0];
+    const variedRanked = ranked.filter((product) => !usedIds.has(product.id));
+    const chosen =
+      chooseVariedCandidate(variedRanked, seed, `${vibe}:${frame}:${slot}:ai`)
+      || variedRanked[0]
+      || rankingPool[0];
 
     if (!chosen) continue;
     picked[slot] = chosen;

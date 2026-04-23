@@ -8,6 +8,7 @@ interface LookBody {
   frame?: GeneratorFrame;
   budget?: GeneratorBudget;
   mode?: 'starter' | 'missing';
+  seed?: number;
   currentItems?: Partial<Record<Category, Product>>;
 }
 
@@ -19,11 +20,13 @@ export async function POST(req: NextRequest) {
   const frame = body.frame || 'androgynous';
   const budget = body.budget || 'under250';
   const mode = body.mode || 'starter';
+  const seed = Number.isFinite(body.seed) ? Number(body.seed) : 0;
 
   const result = await buildAiCatalogLook({
     vibe,
     frame,
     budget,
+    seed,
     currentItems: body.currentItems || {},
     mode,
   });

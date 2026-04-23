@@ -1,7 +1,8 @@
 'use client';
 import { Copy, ExternalLink, X } from 'lucide-react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl } from '@/lib/checkout';
+import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
 
 export interface CheckoutProduct {
@@ -23,6 +24,7 @@ interface Props {
 export function CheckoutSheet({ open, title = 'Checkout helper', products, onClose }: Props) {
   const router = useRouter();
   const setCheckout = useCheckout((state) => state.setCheckout);
+  const [batchMessage, setBatchMessage] = useState<string | null>(null);
   const validProducts = products.filter((product) => Boolean(product.url));
   const retailerGroups = buildRetailerGroups(validProducts);
   const totalCents = validProducts.reduce((sum, product) => sum + (product.priceCents || 0), 0);
@@ -41,6 +43,28 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
     }
   }
 
+  function openAllTabs() {
+    const result = openCheckoutUrls(validProducts.map((product) => product.url));
+    if (!result.requestedCount) {
+      setBatchMessage('No retailer links are ready yet.');
+      return;
+    }
+
+    if (result.openedCount === result.requestedCount) {
+      setBatchMessage(`Opened ${result.openedCount} retailer tab${result.openedCount !== 1 ? 's' : ''}.`);
+      return;
+    }
+
+    if (result.openedCount > 0) {
+      setBatchMessage(
+        `Opened ${result.openedCount} of ${result.requestedCount} tabs. If your browser blocks the rest, use Copy links or Review checkout.`,
+      );
+      return;
+    }
+
+    setBatchMessage('Your browser blocked the batch open. Use Copy links or Review checkout.');
+  }
+
   return (
     <>
       <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -57,7 +81,7 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
               {(totalCents / 100).toLocaleString()}
             </div>
             <div className="mt-2 max-w-[300px] text-[11px] leading-relaxed text-muted">
-              Browsers block several retailer tabs at once, so Sylistly gives you clean links to open one at a time.
+              Sylistly can try opening every retailer tab at once again, with checkout review as the fallback when the browser blocks popups.
             </div>
           </div>
           <button
@@ -70,6 +94,13 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
         </div>
 
         <div className="flex flex-wrap gap-2 pb-4">
+          <button
+            type="button"
+            onClick={openAllTabs}
+            className="inline-flex rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+          >
+            Open all tabs
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -90,6 +121,12 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
             Copy links
           </button>
         </div>
+
+        {batchMessage ? (
+          <div className="mb-4 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-muted-2">
+            {batchMessage}
+          </div>
+        ) : null}
 
         <div className="max-h-[56vh] space-y-3 overflow-y-auto pr-1">
           {retailerGroups.map((group) => (

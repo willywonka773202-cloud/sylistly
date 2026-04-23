@@ -44,3 +44,37 @@ export function isExactProductUrl(url: string): boolean {
     return false;
   }
 }
+
+export function openCheckoutUrls(urls: string[]): {
+  openedCount: number;
+  requestedCount: number;
+} {
+  if (typeof window === 'undefined') {
+    return { openedCount: 0, requestedCount: 0 };
+  }
+
+  const uniqueUrls = Array.from(
+    new Set(urls.filter((url) => typeof url === 'string' && url.trim())),
+  );
+  const openedWindows: Window[] = [];
+
+  for (let index = 0; index < uniqueUrls.length; index += 1) {
+    const popup = window.open('about:blank', `sylistly_checkout_${Date.now()}_${index}`);
+    if (!popup) break;
+    openedWindows.push(popup);
+  }
+
+  openedWindows.forEach((popup, index) => {
+    try {
+      popup.opener = null;
+      popup.location.replace(uniqueUrls[index]);
+    } catch {
+      popup.close();
+    }
+  });
+
+  return {
+    openedCount: openedWindows.length,
+    requestedCount: uniqueUrls.length,
+  };
+}

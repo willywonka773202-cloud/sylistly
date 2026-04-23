@@ -64,6 +64,7 @@ export function SearchSheet({
   const [error, setError] = useState<string | null>(null);
   const [isDemoResults, setIsDemoResults] = useState(false);
   const [resultSource, setResultSource] = useState<'catalog' | 'live' | null>(null);
+  const [catalogKind, setCatalogKind] = useState<'photo' | 'starter' | 'blend' | null>(null);
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
   const activeRequest = useRef<AbortController | null>(null);
@@ -79,6 +80,7 @@ export function SearchSheet({
     setError(null);
     setIsDemoResults(false);
     setResultSource(null);
+    setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
   }, [open, category, initialQuery, frame]);
@@ -114,6 +116,7 @@ export function SearchSheet({
         setResults([]);
         setIsDemoResults(false);
         setResultSource(null);
+        setCatalogKind(null);
         setSearchMode(
           data.searchMode === 'hybrid'
             ? 'hybrid'
@@ -130,6 +133,15 @@ export function SearchSheet({
 
       setIsDemoResults(Boolean(data.mock));
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
+      setCatalogKind(
+        data.catalogKind === 'blend'
+          ? 'blend'
+          : data.catalogKind === 'photo'
+          ? 'photo'
+          : data.catalogKind === 'starter'
+          ? 'starter'
+          : null,
+      );
       setSearchMode(
         data.searchMode === 'hybrid'
           ? 'hybrid'
@@ -147,6 +159,7 @@ export function SearchSheet({
       setResults([]);
       setIsDemoResults(false);
       setResultSource(null);
+      setCatalogKind(null);
       setSearchMode(null);
       setCanUseDemo(false);
       setError(
@@ -275,7 +288,11 @@ export function SearchSheet({
                   {isDemoResults
                     ? 'Local sample data'
                     : resultSource === 'catalog'
-                    ? searchMode === 'catalog-only'
+                    ? catalogKind === 'blend'
+                      ? 'Photo catalog + starter catalog'
+                      : catalogKind === 'photo'
+                      ? 'Real-photo catalog'
+                      : searchMode === 'catalog-only'
                       ? 'Sylistly catalog'
                       : searchMode === 'catalog-preview'
                       ? 'Preview starter catalog'

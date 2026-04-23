@@ -139,6 +139,29 @@ function enrichCatalogProductPhotos(catalogProducts: Product[], liveProducts: Pr
   });
 }
 
+function mergeCatalogCandidates(...groups: Product[][]): Product[] {
+  const merged = new Map<string, Product>();
+
+  for (const group of groups) {
+    for (const product of group) {
+      if (!merged.has(product.id)) {
+        merged.set(product.id, product);
+        continue;
+      }
+
+      const existing = merged.get(product.id)!;
+      const existingLooksPlaceholder = imageLooksLikePlaceholder(existing.imageUrl);
+      const nextLooksReal = !imageLooksLikePlaceholder(product.imageUrl);
+
+      if (existingLooksPlaceholder && nextLooksReal) {
+        merged.set(product.id, product);
+      }
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
 function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
   const products = mockSearch(category || 'top', query);
   return NextResponse.json({
@@ -215,48 +238,17 @@ export async function POST(req: NextRequest) {
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
-
-    if (photoCatalogProducts.length) {
-      const rankedPhotoCatalogProducts = await rerankProducts(
-        effectiveQuery || fastIntent.category,
-        fastIntent,
-        photoCatalogProducts,
-        Math.min(6, photoCatalogProducts.length),
-      );
-      cacheProducts(rankedPhotoCatalogProducts).catch(() => {});
-      searchResponseCache.set(cacheKey, {
-        expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-        products: rankedPhotoCatalogProducts,
-        source: 'catalog',
-      });
-
-      console.info(
-        '[api/search] query=%s category=%s frame=%s source=photo_catalog results=%d durationMs=%d',
-        query || '(blank)',
-        category || fastIntent.category,
-        frame,
-        rankedPhotoCatalogProducts.length,
-        Date.now() - startedAt,
-      );
-
-      return NextResponse.json({
-        products: rankedPhotoCatalogProducts,
-        source: 'catalog',
-        catalogKind: 'photo',
-        searchMode,
-        frame,
-      });
-    }
-
     const useCatalogFirst =
       catalogOnlyMode ||
       (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
-    const seededCatalogProducts = useCatalogFirst
-      ? searchBrandCatalog(fastIntent, effectiveQuery)
-      : [];
+    const seededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
+    const mergedCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
 
-    if (seededCatalogProducts.length) {
-      let catalogProducts = seededCatalogProducts;
+    if (mergedCatalogProducts.length && (useCatalogFirst || photoCatalogProducts.length > 0 || catalogOnlyMode)) {
+      let catalogProducts = mergedCatalogProducts;
 
       if (!catalogOnlyMode && liveSearchKey && effectiveQuery.trim()) {
         try {
@@ -267,15 +259,11 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const affiliateWrappedProducts = catalogProducts.map((product) => ({
-        ...product,
-        affiliateUrl: wrapAffiliate(product.retailerUrl),
-      }));
       const rankedCatalogProducts = await rerankProducts(
         effectiveQuery || fastIntent.category,
         fastIntent,
-        affiliateWrappedProducts,
-        Math.min(6, affiliateWrappedProducts.length),
+        catalogProducts,
+        Math.min(6, catalogProducts.length),
       );
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
@@ -286,10 +274,11 @@ export async function POST(req: NextRequest) {
       });
 
       console.info(
-        '[api/search] query=%s category=%s frame=%s source=catalog results=%d durationMs=%d',
+        '[api/search] query=%s category=%s frame=%s source=%s results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
         frame,
+        photoCatalogProducts.length ? 'catalog_blend' : 'catalog',
         rankedCatalogProducts.length,
         Date.now() - startedAt,
       );
@@ -297,7 +286,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         products: rankedCatalogProducts,
         source: 'catalog',
-        catalogKind: 'starter',
+        catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
         searchMode,
         frame,
       });
@@ -383,17 +372,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (catalogPreviewMode) {
-      const previewSeededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery);
-      if (previewSeededCatalogProducts.length) {
-        const affiliateWrappedProducts = previewSeededCatalogProducts.map((product) => ({
-          ...product,
-          affiliateUrl: wrapAffiliate(product.retailerUrl),
-        }));
+      const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
+      if (previewCatalogProducts.length) {
         const rankedPreviewProducts = await rerankProducts(
           effectiveQuery || fastIntent.category,
           fastIntent,
-          affiliateWrappedProducts,
-          Math.min(6, affiliateWrappedProducts.length),
+          previewCatalogProducts,
+          Math.min(6, previewCatalogProducts.length),
         );
 
         cacheProducts(rankedPreviewProducts).catch(() => {});
@@ -415,7 +400,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           products: rankedPreviewProducts,
           source: 'catalog',
-          catalogKind: 'starter',
+          catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
           searchMode,
           frame,
         });

@@ -1,8 +1,9 @@
 'use client';
 import Link from 'next/link';
+import { useState } from 'react';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
-import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl } from '@/lib/checkout';
+import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
 
 export default function CheckoutPage() {
@@ -10,6 +11,7 @@ export default function CheckoutPage() {
   const title = useCheckout((state) => state.title);
   const retailerGroups = buildRetailerGroups(products);
   const totalCents = products.reduce((sum, product) => sum + (product.priceCents || 0), 0);
+  const [batchMessage, setBatchMessage] = useState<string | null>(null);
 
   async function copyLinks() {
     const text = products
@@ -23,12 +25,34 @@ export default function CheckoutPage() {
     }
   }
 
+  function openAllTabs() {
+    const result = openCheckoutUrls(products.map((product) => product.url));
+    if (!result.requestedCount) {
+      setBatchMessage('No retailer links are ready yet.');
+      return;
+    }
+
+    if (result.openedCount === result.requestedCount) {
+      setBatchMessage(`Opened ${result.openedCount} retailer tab${result.openedCount !== 1 ? 's' : ''}.`);
+      return;
+    }
+
+    if (result.openedCount > 0) {
+      setBatchMessage(
+        `Opened ${result.openedCount} of ${result.requestedCount} tabs. If your browser blocks the rest, use Copy all below.`,
+      );
+      return;
+    }
+
+    setBatchMessage('Your browser blocked the batch open. Use Copy all and open the retailer pages manually.');
+  }
+
   return (
     <PlaceholderScreen
       eyebrow="Checkout"
       title="Retailer"
       accent="links"
-      description="Use this page as a safe multi-store checkout helper. Open each clean retailer link manually so pop-up blockers do not interrupt shopping."
+      description="Use this page as a multi-store checkout helper. Sylistly can batch-open retailer tabs again, with manual links as the fallback."
     >
       {products.length ? (
         <div className="grid gap-3">
@@ -50,6 +74,20 @@ export default function CheckoutPage() {
                 Copy all
               </button>
             </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={openAllTabs}
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+              >
+                Open all tabs
+              </button>
+            </div>
+            {batchMessage ? (
+              <div className="mt-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
+                {batchMessage}
+              </div>
+            ) : null}
           </section>
 
           {retailerGroups.map((group) => (
