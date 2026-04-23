@@ -18,14 +18,14 @@ type BoardLayout = {
 };
 
 const PRODUCT_SCALE: Partial<Record<Category, string>> = {
-  eyewear: 'scale(1.16)',
-  hat: 'scale(1.18)',
-  outer: 'scale(1.2)',
-  top: 'scale(1.22)',
-  bottom: 'scale(1.2)',
-  bag: 'scale(1.18)',
-  jewelry: 'scale(1.22)',
-  shoes: 'scale(1.18)',
+  eyewear: 'scale(1.1)',
+  hat: 'scale(1.12)',
+  outer: 'scale(1.1)',
+  top: 'scale(1.14)',
+  bottom: 'scale(1.12)',
+  bag: 'scale(1.1)',
+  jewelry: 'scale(1.08)',
+  shoes: 'scale(1.1)',
 };
 
 const FRAME_LABELS: Record<GeneratorFrame, string> = {
@@ -35,18 +35,18 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
 };
 
 const BOARD_LAYOUT: BoardLayout = {
-  className: 'left-1/2 top-[28px] h-[386px] w-[314px] -translate-x-1/2',
+  className: 'left-1/2 top-[34px] h-[382px] w-[326px] -translate-x-1/2',
   imageClassName: 'drop-shadow-[0_12px_22px_rgba(0,0,0,.12)]',
   order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
   placements: {
-    eyewear: 'left-[54px] top-[16px] h-[36px] w-[90px] -rotate-[2deg]',
-    hat: 'right-[40px] top-[18px] h-[34px] w-[92px] rotate-[3deg]',
-    outer: 'left-[22px] top-[58px] h-[168px] w-[148px] -rotate-[2deg]',
-    top: 'right-[20px] top-[46px] h-[132px] w-[116px] rotate-[2deg]',
-    bottom: 'left-1/2 top-[164px] h-[176px] w-[138px] -translate-x-1/2',
-    bag: 'right-[24px] top-[202px] h-[96px] w-[80px] rotate-[4deg]',
-    jewelry: 'right-[30px] top-[272px] h-[34px] w-[34px]',
-    shoes: 'left-1/2 bottom-[14px] h-[62px] w-[168px] -translate-x-1/2 -rotate-[3deg]',
+    eyewear: 'left-[34px] top-[18px] h-[34px] w-[84px] -rotate-[2deg]',
+    hat: 'right-[34px] top-[18px] h-[32px] w-[88px] rotate-[2deg]',
+    outer: 'left-[16px] top-[60px] h-[156px] w-[142px] -rotate-[2deg]',
+    top: 'right-[18px] top-[56px] h-[120px] w-[108px] rotate-[1deg]',
+    bottom: 'left-1/2 top-[172px] h-[164px] w-[128px] -translate-x-1/2',
+    bag: 'left-[20px] top-[234px] h-[84px] w-[76px] -rotate-[2deg]',
+    jewelry: 'right-[34px] top-[226px] h-[30px] w-[30px]',
+    shoes: 'left-1/2 bottom-[12px] h-[56px] w-[154px] -translate-x-1/2 -rotate-[2deg]',
   },
 };
 
