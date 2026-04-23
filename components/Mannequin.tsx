@@ -118,7 +118,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
 
   return (
     <div className="relative h-[430px] w-full overflow-hidden rounded-[30px] border border-hairline bg-black" style={mannequinStyle}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.14),transparent_24%),radial-gradient(circle_at_50%_56%,rgba(232,54,93,.18),transparent_42%),linear-gradient(180deg,#181613,#080808_74%,#030303)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.12),transparent_22%),radial-gradient(circle_at_50%_56%,rgba(232,54,93,.14),transparent_42%),linear-gradient(180deg,#161412,#080808_74%,#030303)]" />
       <div className="absolute inset-0 opacity-[.1] [background-image:linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] [background-size:56px_56px]" />
       <div className="absolute left-1/2 top-14 h-[324px] w-[250px] -translate-x-1/2 rounded-full border border-white/10" />
       <div className="absolute left-1/2 top-24 h-[304px] w-[200px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
@@ -139,20 +139,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
       <div className="absolute left-1/2 top-[42px] z-10 h-[346px] w-[230px] -translate-x-1/2">
         <div className="absolute left-1/2 top-[300px] h-10 w-[182px] -translate-x-1/2 rounded-full bg-black/60 blur-md" />
         <div className="absolute left-1/2 top-[314px] h-5 w-[132px] -translate-x-1/2 rounded-full border border-white/10 bg-white/10" />
-
-        <div className="absolute left-1/2 top-0 z-20 h-[60px] w-[56px] -translate-x-1/2 rounded-[24px_24px_18px_18px] skin shadow-[inset_-4px_-5px_12px_rgba(0,0,0,.22),0_14px_24px_rgba(0,0,0,.28)]" />
-        <div className="absolute left-1/2 top-[54px] z-10 h-[18px] w-[18px] -translate-x-1/2 rounded skin" />
-        <div className={`absolute left-1/2 top-[72px] z-10 h-[28px] -translate-x-1/2 rounded-[999px] skin ${frame.shoulder}`} />
-        <div className={`absolute left-1/2 top-[90px] z-10 h-[106px] -translate-x-1/2 rounded-[28px_28px_20px_20px] skin shadow-[inset_-5px_-6px_14px_rgba(0,0,0,.2)] ${frame.torso}`} />
-        <div className="absolute left-[39px] top-[90px] z-10 h-[124px] w-[24px] rotate-[6deg] rounded-[14px] skin" />
-        <div className="absolute right-[39px] top-[90px] z-10 h-[124px] w-[24px] -rotate-[6deg] rounded-[14px] skin" />
-        <div className="absolute left-[35px] top-[204px] z-20 h-[20px] w-[20px] rounded-full skin" />
-        <div className="absolute right-[35px] top-[204px] z-20 h-[20px] w-[20px] rounded-full skin" />
-        <div className={`absolute left-1/2 top-[188px] z-10 h-[44px] -translate-x-1/2 rounded-[18px_18px_28px_28px] skin ${frame.hips}`} />
-        <div className={`absolute top-[224px] z-10 h-[114px] w-[32px] rounded-[13px_13px_18px_18px] skin ${frame.leftLeg}`} />
-        <div className={`absolute top-[224px] z-10 h-[114px] w-[32px] rounded-[13px_13px_18px_18px] skin ${frame.rightLeg}`} />
-        <div className="absolute left-[54px] top-[324px] z-20 h-[17px] w-[58px] rounded-[10px_6px_14px_14px] skin" />
-        <div className="absolute right-[54px] top-[324px] z-20 h-[17px] w-[58px] rounded-[6px_10px_14px_14px] skin" />
+        <GhostOutline frame={frame} />
 
         <PaperDollLayer product={items.hat} category="hat" className="left-1/2 top-[10px] h-[34px] w-[94px] -translate-x-1/2" />
         <AccessoryOverlay product={items.eyewear} category="eyewear" className="left-1/2 top-[22px] h-[38px] w-[86px] -translate-x-1/2" />
@@ -164,7 +151,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <AccessoryOverlay product={items.bag} category="bag" className={`${frame.bagAnchor} top-[164px] h-[108px] w-[82px]`} />
 
         <div className="pointer-events-none absolute left-1/2 top-[334px] z-40 -translate-x-1/2 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-[9px] uppercase tracking-[.18em] text-white/60 backdrop-blur">
-          Paper-doll fit preview
+          Floating outfit preview
         </div>
       </div>
 
@@ -194,6 +181,34 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   );
 }
 
+function GhostOutline({
+  frame,
+}: {
+  frame: {
+    shoulder: string;
+    torso: string;
+    hips: string;
+    leftLeg: string;
+    rightLeg: string;
+  };
+}) {
+  return (
+    <>
+      <div className="absolute left-1/2 top-[2px] z-[1] h-[56px] w-[52px] -translate-x-1/2 rounded-[24px_24px_18px_18px] border border-dashed border-white/12 bg-white/[0.015]" />
+      <div className="absolute left-1/2 top-[58px] z-[1] h-[16px] w-[16px] -translate-x-1/2 rounded-full border border-dashed border-white/10" />
+      <div className={`absolute left-1/2 top-[74px] z-[1] h-[24px] -translate-x-1/2 rounded-full border border-dashed border-white/10 ${frame.shoulder}`} />
+      <div className={`absolute left-1/2 top-[90px] z-[1] h-[104px] -translate-x-1/2 rounded-[28px_28px_20px_20px] border border-dashed border-white/10 ${frame.torso}`} />
+      <div className="absolute left-[39px] top-[90px] z-[1] h-[124px] w-[24px] rotate-[6deg] rounded-[14px] border border-dashed border-white/10" />
+      <div className="absolute right-[39px] top-[90px] z-[1] h-[124px] w-[24px] -rotate-[6deg] rounded-[14px] border border-dashed border-white/10" />
+      <div className={`absolute left-1/2 top-[188px] z-[1] h-[44px] -translate-x-1/2 rounded-[18px_18px_28px_28px] border border-dashed border-white/10 ${frame.hips}`} />
+      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/10 ${frame.leftLeg}`} />
+      <div className={`absolute top-[224px] z-[1] h-[114px] w-[32px] rounded-[13px_13px_18px_18px] border border-dashed border-white/10 ${frame.rightLeg}`} />
+      <div className="absolute left-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[10px_6px_14px_14px] border border-dashed border-white/10" />
+      <div className="absolute right-[54px] top-[324px] z-[1] h-[17px] w-[58px] rounded-[6px_10px_14px_14px] border border-dashed border-white/10" />
+    </>
+  );
+}
+
 function PaperDollLayer({
   product,
   category,
@@ -210,7 +225,7 @@ function PaperDollLayer({
 
   return (
     <div className={`pointer-events-none absolute ${className}`}>
-      <div className="absolute inset-[7%] rounded-[26px] bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.18),transparent_38%),linear-gradient(180deg,rgba(255,255,255,.08),transparent_55%)] opacity-80" />
+      <div className="absolute inset-[7%] rounded-[26px] bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.12),transparent_38%),linear-gradient(180deg,rgba(255,255,255,.05),transparent_55%)] opacity-60" />
       <svg viewBox="0 0 100 100" className="relative z-10 h-full w-full overflow-visible drop-shadow-[0_14px_22px_rgba(0,0,0,.28)]">
         {renderGarmentSvg(category, variant, tone)}
       </svg>
@@ -230,12 +245,12 @@ function GarmentPreviewBadge({
   category: 'hat' | 'top' | 'outer' | 'bottom' | 'shoes';
 }) {
   return (
-    <div className={`absolute z-20 overflow-hidden border border-white/12 bg-black/55 shadow-[0_10px_22px_rgba(0,0,0,.28)] backdrop-blur-sm ${SWATCH_POSITIONS[category]}`}>
+    <div className={`absolute z-20 overflow-hidden border border-white/10 bg-transparent shadow-[0_10px_22px_rgba(0,0,0,.22)] ${SWATCH_POSITIONS[category]}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={proxiedImageUrl(product.imageUrl)}
         alt=""
-        className={`h-full w-full ${category === 'shoes' || category === 'hat' ? 'object-contain p-1' : 'object-cover'}`}
+        className={`h-full w-full ${category === 'shoes' || category === 'hat' ? 'object-contain p-1' : 'object-cover'} bg-transparent`}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {
@@ -265,12 +280,12 @@ function AccessoryOverlay({
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible drop-shadow-[0_12px_18px_rgba(0,0,0,.24)]">
         {renderAccessorySvg(category, tone)}
       </svg>
-      <div className={`absolute overflow-hidden border border-white/12 bg-black/50 shadow-[0_10px_20px_rgba(0,0,0,.24)] ${category === 'bag' ? 'bottom-[6px] right-[2px] h-[38px] w-[32px] rounded-2xl' : category === 'eyewear' ? 'left-1/2 top-[8px] h-[22px] w-[34px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[12px] h-[18px] w-[18px] -translate-x-1/2 rounded-full'}`}>
+      <div className={`absolute overflow-hidden border border-white/10 bg-transparent shadow-[0_10px_20px_rgba(0,0,0,.2)] ${category === 'bag' ? 'bottom-[6px] right-[2px] h-[38px] w-[32px] rounded-2xl' : category === 'eyewear' ? 'left-1/2 top-[8px] h-[22px] w-[34px] -translate-x-1/2 rounded-full' : 'left-1/2 top-[12px] h-[18px] w-[18px] -translate-x-1/2 rounded-full'}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={proxiedImageUrl(product.imageUrl)}
           alt=""
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover bg-transparent"
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={(event) => {
