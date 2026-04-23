@@ -10,10 +10,7 @@ interface Props {
   bodyType?: GeneratorFrame;
 }
 
-type BoardId = 'left' | 'center' | 'right';
-
 type BoardLayout = {
-  id: BoardId;
   className: string;
   imageClassName: string;
   placements: Partial<Record<Category, string>>;
@@ -26,54 +23,21 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
   androgynous: 'Neutral edit',
 };
 
-const BOARD_LAYOUTS: BoardLayout[] = [
-  {
-    id: 'left',
-    className: 'left-[8px] top-[98px] h-[286px] w-[128px] -rotate-[8deg]',
-    imageClassName: 'drop-shadow-[0_10px_18px_rgba(0,0,0,.16)]',
-    order: ['hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
-    placements: {
-      hat: 'left-[18px] top-[16px] h-[24px] w-[54px]',
-      outer: 'left-[10px] top-[44px] h-[126px] w-[82px]',
-      top: 'left-[44px] top-[58px] h-[94px] w-[72px]',
-      bottom: 'left-[38px] top-[132px] h-[134px] w-[72px]',
-      bag: 'right-[8px] top-[148px] h-[70px] w-[58px] rotate-[8deg]',
-      jewelry: 'left-[18px] top-[208px] h-[26px] w-[26px]',
-      shoes: 'left-[18px] bottom-[16px] h-[44px] w-[88px] -rotate-[6deg]',
-    },
+const BOARD_LAYOUT: BoardLayout = {
+  className: 'left-1/2 top-[58px] h-[338px] w-[248px] -translate-x-1/2',
+  imageClassName: 'drop-shadow-[0_14px_24px_rgba(0,0,0,.14)]',
+  order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
+  placements: {
+    eyewear: 'left-[40px] top-[14px] h-[30px] w-[72px] -rotate-[2deg]',
+    hat: 'right-[30px] top-[16px] h-[28px] w-[74px] rotate-[3deg]',
+    outer: 'left-[24px] top-[54px] h-[142px] w-[126px] -rotate-[2deg]',
+    top: 'right-[22px] top-[42px] h-[112px] w-[96px] rotate-[2deg]',
+    bottom: 'left-1/2 top-[146px] h-[146px] w-[112px] -translate-x-1/2',
+    bag: 'right-[30px] top-[178px] h-[78px] w-[64px] rotate-[4deg]',
+    jewelry: 'right-[28px] top-[244px] h-[28px] w-[28px]',
+    shoes: 'left-1/2 bottom-[18px] h-[50px] w-[132px] -translate-x-1/2 -rotate-[3deg]',
   },
-  {
-    id: 'center',
-    className: 'left-1/2 top-[24px] h-[380px] w-[192px] -translate-x-1/2',
-    imageClassName: 'drop-shadow-[0_16px_24px_rgba(0,0,0,.18)]',
-    order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
-    placements: {
-      eyewear: 'left-[30px] top-[18px] h-[28px] w-[62px] -rotate-[3deg]',
-      hat: 'right-[26px] top-[22px] h-[26px] w-[62px] rotate-[4deg]',
-      outer: 'left-[16px] top-[54px] h-[156px] w-[110px] -rotate-[2deg]',
-      top: 'right-[18px] top-[34px] h-[116px] w-[92px] rotate-[2deg]',
-      bottom: 'left-1/2 top-[154px] h-[164px] w-[100px] -translate-x-1/2',
-      bag: 'right-[18px] top-[180px] h-[84px] w-[68px] rotate-[6deg]',
-      jewelry: 'right-[18px] top-[224px] h-[30px] w-[30px]',
-      shoes: 'left-1/2 bottom-[18px] h-[54px] w-[110px] -translate-x-1/2 -rotate-[4deg]',
-    },
-  },
-  {
-    id: 'right',
-    className: 'right-[8px] top-[92px] h-[292px] w-[128px] rotate-[8deg]',
-    imageClassName: 'drop-shadow-[0_10px_18px_rgba(0,0,0,.16)]',
-    order: ['hat', 'top', 'outer', 'bottom', 'bag', 'jewelry', 'shoes'],
-    placements: {
-      hat: 'right-[18px] top-[16px] h-[24px] w-[56px]',
-      top: 'left-[12px] top-[34px] h-[92px] w-[74px] -rotate-[2deg]',
-      outer: 'right-[12px] top-[48px] h-[122px] w-[80px] rotate-[2deg]',
-      bottom: 'left-[30px] top-[132px] h-[136px] w-[72px]',
-      bag: 'left-[12px] top-[156px] h-[68px] w-[54px] -rotate-[8deg]',
-      jewelry: 'right-[18px] top-[206px] h-[26px] w-[26px]',
-      shoes: 'left-[12px] bottom-[18px] h-[44px] w-[92px] rotate-[5deg]',
-    },
-  },
-];
+};
 
 const EMPTY_HINTS = [
   { className: 'left-[34px] top-[54px] h-[88px] w-[74px] rotate-[-6deg]', label: 'Top' },
@@ -112,9 +76,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         </div>
       </div>
 
-      {BOARD_LAYOUTS.map((layout) => (
-        <FitBoard key={layout.id} layout={layout} items={items} hasItems={hasItems} />
-      ))}
+      <FitBoard layout={BOARD_LAYOUT} items={items} hasItems={hasItems} />
 
       {!hasItems ? (
         <div className="absolute left-1/2 top-[160px] z-30 w-[164px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/86 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.12)] backdrop-blur">
@@ -132,15 +94,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   );
 }
 
-function FitBoard({
-  layout,
-  items,
-  hasItems,
-}: {
-  layout: BoardLayout;
-  items: Partial<Record<Category, Product>>;
-  hasItems: boolean;
-}) {
+function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Partial<Record<Category, Product>>; hasItems: boolean }) {
   return (
     <div
       className={`absolute overflow-hidden rounded-[34px] border border-black/5 bg-white/94 shadow-[0_22px_46px_rgba(84,54,43,.12)] ${layout.className}`}
@@ -154,7 +108,7 @@ function FitBoard({
         if (!product || !placement) return null;
         return (
           <BoardProduct
-            key={`${layout.id}-${category}-${product.id}`}
+            key={`${category}-${product.id}`}
             product={product}
             category={category}
             className={placement}
@@ -164,7 +118,7 @@ function FitBoard({
         );
       })}
 
-      {!hasItems && layout.id === 'center'
+      {!hasItems
         ? EMPTY_HINTS.map((hint) => (
             <div
               key={hint.label}
