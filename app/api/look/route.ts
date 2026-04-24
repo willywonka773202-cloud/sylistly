@@ -9,6 +9,7 @@ interface LookBody {
   budget?: GeneratorBudget;
   mode?: 'starter' | 'missing';
   seed?: number;
+  avoidProductIds?: string[];
   currentItems?: Partial<Record<Category, Product>>;
 }
 
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
     frame,
     budget,
     seed,
+    avoidProductIds: Array.isArray(body.avoidProductIds) ? body.avoidProductIds : [],
     currentItems: body.currentItems || {},
     mode,
   });

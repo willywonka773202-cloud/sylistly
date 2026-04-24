@@ -122,6 +122,13 @@ async function cropForCategory(source: Buffer, category: string): Promise<Buffer
     return source;
   }
 
+  const aspectRatio = height / Math.max(1, width);
+  const isLikelyModelShot = aspectRatio > 1.18;
+
+  if (!isLikelyModelShot && (category === 'top' || category === 'outer' || category === 'bottom' || category === 'shoes')) {
+    return source;
+  }
+
   const box = categoryCropBox(category, width, height);
 
   return image
@@ -136,41 +143,41 @@ function categoryCropBox(category: string, width: number, height: number) {
 
   if (category === 'top' || category === 'outer') {
     const left = clamped(width * 0.06, width - 1);
-    const top = clamped(height * 0.02, height - 1);
+    const top = clamped(height * 0.12, height - 1);
     const cropWidth = clamped(width * 0.88, width - left);
-    const cropHeight = clamped(height * 0.64, height - top);
+    const cropHeight = clamped(height * 0.54, height - top);
     return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
   }
 
   if (category === 'bottom') {
     const left = clamped(width * 0.1, width - 1);
-    const top = clamped(height * 0.34, height - 1);
+    const top = clamped(height * 0.42, height - 1);
     const cropWidth = clamped(width * 0.8, width - left);
-    const cropHeight = clamped(height * 0.62, height - top);
+    const cropHeight = clamped(height * 0.48, height - top);
     return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
   }
 
   if (category === 'shoes') {
-    const left = clamped(width * 0.04, width - 1);
-    const top = clamped(height * 0.68, height - 1);
-    const cropWidth = clamped(width * 0.92, width - left);
-    const cropHeight = clamped(height * 0.3, height - top);
+    const left = clamped(width * 0.08, width - 1);
+    const top = clamped(height * 0.82, height - 1);
+    const cropWidth = clamped(width * 0.84, width - left);
+    const cropHeight = clamped(height * 0.14, height - top);
     return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
   }
 
   if (category === 'hat' || category === 'eyewear') {
-    const left = clamped(width * 0.14, width - 1);
-    const top = clamped(height * 0.02, height - 1);
-    const cropWidth = clamped(width * 0.72, width - left);
-    const cropHeight = clamped(height * 0.36, height - top);
+    const left = clamped(width * 0.12, width - 1);
+    const top = clamped(height * 0.04, height - 1);
+    const cropWidth = clamped(width * 0.76, width - left);
+    const cropHeight = clamped(height * 0.28, height - top);
     return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
   }
 
   if (category === 'bag') {
     const left = clamped(width * 0.14, width - 1);
-    const top = clamped(height * 0.18, height - 1);
+    const top = clamped(height * 0.24, height - 1);
     const cropWidth = clamped(width * 0.72, width - left);
-    const cropHeight = clamped(height * 0.54, height - top);
+    const cropHeight = clamped(height * 0.4, height - top);
     return { left, top, width: Math.max(1, cropWidth), height: Math.max(1, cropHeight) };
   }
 

@@ -42,6 +42,7 @@ function BuilderPageContent({
   const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [generatorLoading, setGeneratorLoading] = useState(false);
+  const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
   const router = useRouter();
   const total = totalCents();
   const n = count();
@@ -126,6 +127,7 @@ function BuilderPageContent({
           frame: generatorFrame,
           budget: generatorBudget,
           seed: Date.now(),
+          avoidProductIds: recentGeneratedIds,
           mode,
           currentItems: items,
         }),
@@ -172,6 +174,12 @@ function BuilderPageContent({
       }
 
       replaceItems(nextItems);
+      setRecentGeneratedIds((current) => {
+        const freshIds = Object.values(nextItems)
+          .filter((product): product is Product => Boolean(product))
+          .map((product) => product.id);
+        return Array.from(new Set([...freshIds, ...current])).slice(0, 72);
+      });
       setStatusMessage(
         mode === 'starter'
           ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`

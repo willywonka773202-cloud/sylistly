@@ -18,14 +18,25 @@ type BoardLayout = {
 };
 
 const PRODUCT_SCALE: Partial<Record<Category, string>> = {
-  eyewear: 'scale(1.1)',
-  hat: 'scale(1.12)',
-  outer: 'scale(1.1)',
-  top: 'scale(1.14)',
-  bottom: 'scale(1.12)',
-  bag: 'scale(1.1)',
-  jewelry: 'scale(1.08)',
-  shoes: 'scale(1.1)',
+  eyewear: 'scale(1.08)',
+  hat: 'scale(1.1)',
+  outer: 'scale(1.08)',
+  top: 'scale(1.12)',
+  bottom: 'scale(1.08)',
+  bag: 'scale(1.08)',
+  jewelry: 'scale(1.1)',
+  shoes: 'scale(0.96)',
+};
+
+const PRODUCT_POSITION: Partial<Record<Category, string>> = {
+  eyewear: 'center center',
+  hat: 'center center',
+  outer: 'center top',
+  top: 'center top',
+  bottom: 'center top',
+  bag: 'center center',
+  jewelry: 'center center',
+  shoes: 'center bottom',
 };
 
 const FRAME_LABELS: Record<GeneratorFrame, string> = {
@@ -35,19 +46,10 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
 };
 
 const BOARD_LAYOUT: BoardLayout = {
-  className: 'left-1/2 top-[78px] h-[344px] w-[326px] -translate-x-1/2',
+  className: 'left-1/2 top-[88px] h-[354px] w-[340px] -translate-x-1/2',
   imageClassName: 'drop-shadow-[0_12px_22px_rgba(0,0,0,.12)]',
   order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
-  placements: {
-    eyewear: 'left-[34px] top-[22px] h-[30px] w-[80px] -rotate-[2deg]',
-    hat: 'right-[34px] top-[24px] h-[30px] w-[84px] rotate-[2deg]',
-    outer: 'left-[18px] top-[62px] h-[142px] w-[138px] -rotate-[2deg]',
-    top: 'right-[18px] top-[60px] h-[112px] w-[104px] rotate-[1deg]',
-    bottom: 'left-1/2 top-[166px] h-[148px] w-[122px] -translate-x-1/2',
-    bag: 'left-[20px] top-[222px] h-[76px] w-[70px] -rotate-[2deg]',
-    jewelry: 'right-[34px] top-[214px] h-[28px] w-[28px]',
-    shoes: 'left-1/2 bottom-[18px] h-[48px] w-[146px] -translate-x-1/2 -rotate-[2deg]',
-  },
+  placements: {},
 };
 
 const EMPTY_HINTS = [
@@ -106,6 +108,8 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
 }
 
 function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Partial<Record<Category, Product>>; hasItems: boolean }) {
+  const placements = resolveBoardPlacements(items);
+
   return (
     <div
       className={`absolute overflow-hidden rounded-[34px] border border-[#ebe1da] bg-white shadow-[0_22px_46px_rgba(84,54,43,.12)] ${layout.className}`}
@@ -115,7 +119,7 @@ function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Par
 
       {layout.order.map((category, index) => {
         const product = items[category];
-        const placement = layout.placements[category];
+        const placement = placements[category];
         if (!product || !placement) return null;
         return (
           <BoardProduct
@@ -165,7 +169,11 @@ function BoardProduct({
         src={proxiedImageUrl(product.imageUrl, { cutout: true, category })}
         alt={`${product.brand} ${product.name}`}
         className={`h-full w-full object-contain ${imageClassName}`}
-        style={{ mixBlendMode: 'multiply', transform: PRODUCT_SCALE[category] || 'scale(1.14)' }}
+        style={{
+          mixBlendMode: 'multiply',
+          transform: PRODUCT_SCALE[category] || 'scale(1.14)',
+          objectPosition: PRODUCT_POSITION[category] || 'center center',
+        }}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {
@@ -175,6 +183,47 @@ function BoardProduct({
       {category === 'jewelry' ? <div className="absolute inset-0 rounded-full bg-white/8 blur-[2px]" /> : null}
     </div>
   );
+}
+
+function resolveBoardPlacements(items: Partial<Record<Category, Product>>): Partial<Record<Category, string>> {
+  const hasTop = Boolean(items.top);
+  const hasOuter = Boolean(items.outer);
+  const hasBottom = Boolean(items.bottom);
+  const hasBag = Boolean(items.bag);
+  const hasJewelry = Boolean(items.jewelry);
+  const hasUpperPair = hasTop && hasOuter;
+  const hasAccessoryRow = Boolean(items.eyewear || items.hat);
+
+  return {
+    eyewear: items.eyewear ? 'left-[28px] top-[20px] h-[34px] w-[82px] -rotate-[3deg]' : undefined,
+    hat: items.hat ? 'right-[28px] top-[18px] h-[42px] w-[94px] rotate-[2deg]' : undefined,
+    outer: items.outer
+      ? hasTop
+        ? 'left-[18px] top-[76px] h-[126px] w-[132px] -rotate-[2deg]'
+        : `left-1/2 ${hasAccessoryRow ? 'top-[72px]' : 'top-[62px]'} h-[146px] w-[156px] -translate-x-1/2 -rotate-[1deg]`
+      : undefined,
+    top: items.top
+      ? hasOuter
+        ? 'right-[18px] top-[82px] h-[98px] w-[108px] rotate-[1deg]'
+        : `left-1/2 ${hasAccessoryRow ? 'top-[74px]' : 'top-[64px]'} h-[124px] w-[122px] -translate-x-1/2`
+      : undefined,
+    bottom: hasBottom ? 'left-1/2 top-[166px] h-[136px] w-[116px] -translate-x-1/2' : undefined,
+    bag: hasBag
+      ? hasBottom
+        ? `left-[22px] ${hasUpperPair ? 'top-[232px]' : 'top-[220px]'} h-[74px] w-[74px] -rotate-[2deg]`
+        : 'left-[26px] top-[206px] h-[76px] w-[74px] -rotate-[2deg]'
+      : undefined,
+    jewelry: hasJewelry
+      ? hasBag
+        ? 'right-[34px] top-[228px] h-[28px] w-[28px]'
+        : 'right-[30px] top-[208px] h-[30px] w-[30px]'
+      : undefined,
+    shoes: items.shoes
+      ? hasBottom
+        ? 'left-1/2 bottom-[18px] h-[48px] w-[152px] -translate-x-1/2 -rotate-[1deg]'
+        : 'left-1/2 bottom-[26px] h-[50px] w-[156px] -translate-x-1/2 -rotate-[1deg]'
+      : undefined,
+  };
 }
 
 function hexToRgba(hex: string, alpha: number): string {
