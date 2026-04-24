@@ -80,16 +80,17 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        className="flex w-full cursor-pointer items-stretch gap-3 p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="flex w-full cursor-pointer items-stretch gap-4 p-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       >
-        <div className="relative flex h-[112px] w-[96px] flex-none items-center justify-center overflow-hidden rounded-2xl bg-black ring-1 ring-hairline">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,.08),transparent_45%)]" />
+        <div className="relative flex h-[124px] w-[116px] flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
+          <div className="absolute inset-x-4 bottom-3 h-4 rounded-full bg-[#d8cdc4]/35 blur-[6px]" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
             alt={`${p.brand} ${p.name}`}
             className={`relative h-full w-full drop-shadow-[0_12px_18px_rgba(0,0,0,.35)] ${
-              imageMode === 'plain' ? 'object-cover' : 'object-contain p-1.5'
+              imageMode === 'plain' ? 'object-cover' : 'object-contain p-2.5'
             }`}
             loading="lazy"
             referrerPolicy="no-referrer"
@@ -109,7 +110,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="text-[10px] font-medium uppercase tracking-[.14em] text-muted-2">{p.brand}</div>
-              <div className="mt-1 line-clamp-3 text-[13px] leading-[1.25] text-ink">
+              <div className="mt-1 line-clamp-3 text-[14px] leading-[1.28] text-ink">
                 {p.name}
               </div>
             </div>
@@ -134,7 +135,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-3 pb-3">
+      <div className="flex items-center gap-2 px-3.5 pb-3.5">
         <button
           type="button"
           className="inline-flex rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-accent-hot"

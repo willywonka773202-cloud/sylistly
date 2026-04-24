@@ -363,8 +363,8 @@ export function SearchSheet({
             <div className="grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-4 pb-6">
               {loading
                 ? Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="flex h-[136px] items-center gap-3 rounded-2xl border border-hairline bg-surface-2 px-3 animate-pulse">
-                      <div className="h-[104px] w-[92px] rounded-2xl bg-surface-3" />
+                    <div key={i} className="flex h-[152px] items-center gap-4 rounded-2xl border border-hairline bg-surface-2 px-3.5 animate-pulse">
+                      <div className="h-[124px] w-[116px] rounded-[22px] bg-surface-3" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 w-20 rounded-full bg-surface-3" />
                         <div className="h-4 w-full rounded-full bg-surface-3" />
