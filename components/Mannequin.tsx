@@ -29,6 +29,7 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   const centerPlacements = resolveCenterPlacements(items);
   const leftRail = LEFT_RAIL_ORDER.filter((category) => items[category]);
   const rightRail = RIGHT_RAIL_ORDER.filter((category) => items[category]);
+  const denseRail = leftRail.length >= 4 || rightRail.length >= 4;
 
   return (
     <div
@@ -59,19 +60,19 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="absolute inset-[12px] rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.3),transparent_18%,transparent_82%,rgba(237,228,221,.22))]" />
 
-        <div className="absolute left-[16px] top-[46px] z-10 flex w-[92px] flex-col gap-4">
+        <div className={`absolute left-[16px] z-10 flex w-[92px] flex-col ${denseRail ? 'top-[40px] gap-2.5' : 'top-[46px] gap-4'}`}>
           {leftRail.map((category) => (
-            <SideCard key={category} category={category} product={items[category]!} />
+            <SideCard key={category} category={category} product={items[category]!} dense={denseRail} />
           ))}
         </div>
 
-        <div className="absolute right-[16px] top-[46px] z-10 flex w-[92px] flex-col gap-4">
+        <div className={`absolute right-[16px] z-10 flex w-[92px] flex-col ${denseRail ? 'top-[40px] gap-2.5' : 'top-[46px] gap-4'}`}>
           {rightRail.map((category) => (
-            <SideCard key={category} category={category} product={items[category]!} />
+            <SideCard key={category} category={category} product={items[category]!} dense={denseRail} />
           ))}
         </div>
 
-        <div className="absolute left-1/2 top-[20px] z-0 h-[326px] w-[188px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+        <div className={`absolute left-1/2 z-0 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)] -translate-x-1/2 ${denseRail ? 'top-[18px] h-[330px] w-[182px]' : 'top-[20px] h-[326px] w-[188px]'}`}>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.82),transparent_32%)]" />
           <div className="absolute left-1/2 top-[26px] h-[64px] w-[60px] -translate-x-1/2 rounded-[24px] bg-[#e9e5e2]/85 blur-[2px]" />
           <div className="absolute left-1/2 top-[72px] h-[138px] w-[96px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
@@ -117,25 +118,35 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   );
 }
 
-function SideCard({ category, product }: { category: Category; product: Product }) {
+function SideCard({ category, product, dense = false }: { category: Category; product: Product; dense?: boolean }) {
   const cardHeight =
-    category === 'bag' ? 'h-[116px]'
-    : category === 'shoes' ? 'h-[100px]'
-    : category === 'eyewear' || category === 'jewelry' ? 'h-[78px]'
-    : 'h-[92px]';
+    dense
+      ? category === 'bag' ? 'h-[84px]'
+        : category === 'shoes' ? 'h-[72px]'
+        : category === 'eyewear' || category === 'jewelry' ? 'h-[58px]'
+        : 'h-[66px]'
+      : category === 'bag' ? 'h-[116px]'
+      : category === 'shoes' ? 'h-[100px]'
+      : category === 'eyewear' || category === 'jewelry' ? 'h-[78px]'
+      : 'h-[92px]';
 
   const imageClass =
-    category === 'bag' ? 'h-full w-full object-contain p-0.5'
-    : category === 'shoes' ? 'h-full w-full object-contain object-bottom p-1.5'
-    : category === 'eyewear' ? 'h-full w-full object-contain p-2'
-    : 'h-full w-full object-contain p-1.5';
+    dense
+      ? category === 'bag' ? 'h-full w-full object-contain p-0.5'
+        : category === 'shoes' ? 'h-full w-full object-contain object-bottom p-1'
+        : category === 'eyewear' ? 'h-full w-full object-contain p-1.5'
+        : 'h-full w-full object-contain p-1'
+      : category === 'bag' ? 'h-full w-full object-contain p-0.5'
+      : category === 'shoes' ? 'h-full w-full object-contain object-bottom p-1.5'
+      : category === 'eyewear' ? 'h-full w-full object-contain p-2'
+      : 'h-full w-full object-contain p-1.5';
 
   return (
-    <div className="rounded-[18px] border border-[#eee7e0] bg-[#fbfaf8]/96 p-3 shadow-[0_10px_18px_rgba(84,54,43,.06)]">
-      <div className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#b09d93]">
+    <div className={`rounded-[18px] border border-[#eee7e0] bg-[#fbfaf8]/96 shadow-[0_10px_18px_rgba(84,54,43,.06)] ${dense ? 'p-2.5' : 'p-3'}`}>
+      <div className={`${dense ? 'text-[9px]' : 'text-[10px]'} font-semibold uppercase tracking-[.18em] text-[#b09d93]`}>
         {category === 'bag' ? 'Bag' : category}
       </div>
-      <div className={`mt-2 flex items-center justify-center overflow-hidden rounded-[14px] bg-white ${cardHeight}`}>
+      <div className={`${dense ? 'mt-1.5' : 'mt-2'} flex items-center justify-center overflow-hidden rounded-[14px] bg-white ${cardHeight}`}>
         <PreviewImage
           product={product}
           category={category}
@@ -201,12 +212,12 @@ function resolveCenterPlacements(items: Partial<Record<Category, Product>>): Par
 
   return {
     top: hasTop
-      ? { className: 'left-1/2 h-[164px] w-[182px] -translate-x-1/2', style: { top: topBase } }
+      ? { className: 'left-1/2 h-[156px] w-[176px] -translate-x-1/2', style: { top: topBase } }
       : undefined,
     bottom: hasBottom
-      ? { className: 'left-1/2 h-[174px] w-[146px] -translate-x-1/2', style: { top: bottomTop } }
+      ? { className: 'left-1/2 h-[166px] w-[140px] -translate-x-1/2', style: { top: bottomTop } }
       : undefined,
-    shoes: hasShoes ? { className: 'left-1/2 bottom-[-2px] h-[60px] w-[152px] -translate-x-1/2' } : undefined,
+    shoes: hasShoes ? { className: 'left-1/2 bottom-[2px] h-[52px] w-[148px] -translate-x-1/2' } : undefined,
   };
 }
 

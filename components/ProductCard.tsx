@@ -47,8 +47,9 @@ function isSearchLikeUrl(url: string): boolean {
 
 export function ProductCard({ product: p, selected = false, onClick }: Props) {
   const buyUrl = p.retailerUrl || p.affiliateUrl || '#';
+  const shouldUseCutout = p.category === 'top' || p.category === 'bottom' || p.category === 'outer' || p.category === 'shoes';
   const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
-    p.imageUrl ? 'cutout' : 'fallback',
+    p.imageUrl ? (shouldUseCutout ? 'cutout' : 'plain') : 'fallback',
   );
   const imageSrc =
     imageMode === 'fallback' || !p.imageUrl
@@ -90,7 +91,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
             src={imageSrc}
             alt={`${p.brand} ${p.name}`}
             className={`relative h-full w-full drop-shadow-[0_12px_18px_rgba(0,0,0,.35)] ${
-              imageMode === 'plain' ? 'object-cover' : 'object-contain p-2.5'
+              imageMode === 'cutout' ? 'object-contain p-2.5' : 'object-contain p-1.5'
             }`}
             loading="lazy"
             referrerPolicy="no-referrer"
