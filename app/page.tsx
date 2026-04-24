@@ -1,13 +1,12 @@
 'use client';
-import { Suspense, useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bookmark, ExternalLink, LoaderCircle, Sparkles, X, 
-  Flame, Zap, Shield, Crown, Heart, Share2, RefreshCw, ChevronDown, TrendingUp
+  Bookmark, ExternalLink, LoaderCircle, Sparkles, 
+  RefreshCw, ChevronDown, Plus, X
 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
-import { SlotList } from '@/components/SlotList';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
@@ -17,70 +16,26 @@ import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import { 
-  OCCASIONS, STYLE_SCORES,
-  type OccasionId, type StyleScoreType,
+  OCCASIONS,
+  type OccasionId, 
   type GeneratorBudget, type GeneratorFrame,
 } from '@/lib/occasions';
 
-const GENERATOR_BUDGETS: { value: GeneratorBudget; label: string }[] = [
-  { value: 'any', label: 'Any' },
-  { value: 'under100', label: 'Under $100' },
-  { value: 'under250', label: 'Under $250' },
-  { value: 'under500', label: 'Under $500' },
+const BUDGETS: { value: GeneratorBudget; label: string; max: number }[] = [
+  { value: 'any', label: 'Any', max: 0 },
+  { value: 'under100', label: '$100', max: 100 },
+  { value: 'under250', label: '$250', max: 250 },
+  { value: 'under500', label: '$500', max: 500 },
 ];
-
-const STYLE_FRAMES: { value: GeneratorFrame; label: string; icon: React.ElementType }[] = [
-  { value: 'masc', label: 'Masculine', icon: Shield },
-  { value: 'fem', label: 'Feminine', icon: Heart },
-  { value: 'androgynous', label: 'Neutral', icon: Zap },
-];
-
-function calculateStyleScore(items: Partial<Record<Category, Product>>): Record<StyleScoreType, number> {
-  const count = Object.keys(items).filter(Boolean).length;
-  if (count === 0) return { ...STYLE_SCORES, ...{ confidence: 0, trendiness: 0, balance: 0 }};
-
-  const hasOuter = Boolean(items.outer);
-  const hasTop = Boolean(items.top);
-  const hasBottom = Boolean(items.bottom);
-  const hasShoes = Boolean(items.shoes);
-  const total = Object.values(items).filter(Boolean).length;
-
-  const completeness = Math.min(100, Math.round((total / 4) * 100));
-  const hasAccessories = Boolean(items.bag || items.jewelry || items.hat || items.eyewear);
-  
-  return {
-    completeness,
-    confidence: completeness > 50 && hasTop && hasBottom ? 85 + Math.random() * 15 : Math.round(completeness * 0.8),
-    trendiness: 70 + Math.random() * 30,
-    balance: hasOuter ? 80 : hasTop && hasBottom ? 75 : 50,
-    attractiveness: hasAccessories ? 85 + Math.random() * 15 : 60 + Math.random() * 25,
-    rarity: 60 + Math.random() * 30,
-  };
-}
-
-function getScoreLabel(score: number): { label: string; color: string } {
-  if (score >= 90) return { label: 'Exceptional', color: 'text-crown' };
-  if (score >= 75) return { label: 'Strong', color: 'text-emerald' };
-  if (score >= 60) return { label: 'Solid', color: 'text-blue-400' };
-  if (score >= 40) return { label: 'Developing', color: 'text-amber-400' };
-  return { label: 'Starting', color: 'text-muted' };
-}
 
 function BuilderPageContent({
-  quickSlot,
-  quickQuery,
   quickOccasion,
-  quickFrame,
 }: {
-  quickSlot: string | null;
-  quickQuery: string | null;
   quickOccasion: string | null;
-  quickFrame: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
   const bodyType = useProfile((state) => state.profile.bodyType);
-  const setBodyType = useProfile((state) => state.setBodyType);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -94,11 +49,10 @@ function BuilderPageContent({
   const n = count();
   const activeOccasion = OCCASIONS.find((o) => o.id === selectedOccasion) || OCCASIONS[0];
   const generatorFrame: GeneratorFrame = bodyType === 'custom' ? 'androgynous' : bodyType;
-  const styleScores = calculateStyleScore(items);
 
   useEffect(() => {
     if (!statusMessage) return;
-    const timeout = window.setTimeout(() => setStatusMessage(null), 4500);
+    const timeout = window.setTimeout(() => setStatusMessage(null), 3500);
     return () => window.clearTimeout(timeout);
   }, [statusMessage]);
 
@@ -109,27 +63,11 @@ function BuilderPageContent({
   }, [items, replaceItems]);
 
   useEffect(() => {
-    if (!quickSlot || !CATEGORY_ORDER.includes(quickSlot as Category)) return;
-    setSearchFor(quickSlot as Category);
-  }, [quickSlot]);
-
-  useEffect(() => {
     if (!quickOccasion) return;
     if (OCCASIONS.some((o) => o.id === quickOccasion)) {
       setSelectedOccasion(quickOccasion as OccasionId);
     }
   }, [quickOccasion]);
-
-  useEffect(() => {
-    if (quickFrame === 'masc' || quickFrame === 'fem' || quickFrame === 'androgynous') {
-      setBodyType(quickFrame);
-    }
-  }, [quickFrame, setBodyType]);
-
-  function closeSearchSheet() {
-    setSearchFor(null);
-    if (quickSlot || quickQuery) router.replace('/');
-  }
 
   async function runCategorySearch(category: Category, query: string): Promise<Product | null> {
     const response = await fetch('/api/search', {
@@ -143,13 +81,10 @@ function BuilderPageContent({
     return firstProduct || null;
   }
 
-  async function generateLook(mode: 'starter' | 'missing') {
+  async function generateLook() {
     if (generatorLoading) return;
-    const targetSlots = activeOccasion.slots.filter((slot) => mode === 'starter' || !items[slot]);
-    if (!targetSlots.length) {
-      setStatusMessage('All slots filled for this vibe. Switch occasions or generate fresh.');
-      return;
-    }
+    const targetSlots = activeOccasion.slots;
+    if (!targetSlots.length) return;
 
     setGeneratorLoading(true);
     setStatusMessage(null);
@@ -165,7 +100,7 @@ function BuilderPageContent({
           vibe: selectedOccasion,
           frame: generatorFrame,
           budget: generatorBudget,
-          mode,
+          mode: 'starter',
           currentItems: items,
         }),
       });
@@ -179,34 +114,15 @@ function BuilderPageContent({
         }
       }
 
-      const unresolvedSlots = targetSlots.filter((slot) => !nextItems[slot]);
-      if (unresolvedSlots.length) {
-        const results = await Promise.allSettled(
-          unresolvedSlots.map(async (slot) => ({
-            slot,
-            product: await runCategorySearch(slot, `${activeOccasion.label} ${slot}`),
-          })),
-        );
-        for (const result of results) {
-          if (result.status !== 'fulfilled' || !result.value.product) continue;
-          nextItems[result.value.slot] = result.value.product;
-          addedCount += 1;
-        }
-      }
-
-      if (!addedCount) {
-        setStatusMessage('No pieces generated. Try another occasion or search manually.');
+      if (addedCount === 0) {
+        setStatusMessage('No pieces generated. Try another occasion.');
         return;
       }
 
       replaceItems(nextItems);
-      setStatusMessage(
-        mode === 'starter'
-          ? `Generated ${addedCount} piece${addedCount !== 1 ? 's' : ''} for ${activeOccasion.label.toLowerCase()} vibes.`
-          : `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''}.`
-      );
+      setStatusMessage(`Generated ${addedCount} pieces for ${activeOccasion.label.toLowerCase()}`);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Could not generate look right now.');
+      setStatusMessage(error instanceof Error ? error.message : 'Error generating');
     } finally {
       setGeneratorLoading(false);
     }
@@ -226,18 +142,14 @@ function BuilderPageContent({
       });
       const d = await res.json();
       if (!res.ok) {
-        setStatusMessage(
-          localFit
-            ? `Saved locally as "${localFit.title}". Cloud sync can turn on once Supabase is wired.`
-            : 'Save is not wired all the way yet.'
-        );
+        setStatusMessage(localFit ? `Saved locally` : 'Save unavailable');
         return;
       }
       if (d.id) {
-        setStatusMessage(localFit ? `Saved "${localFit.title}" and synced.` : `Saved fit ${d.id.slice(0, 8)}.`);
+        setStatusMessage(localFit ? `Saved locally & synced` : 'Fit saved');
       }
     } catch {
-      setStatusMessage(localFit ? `Saved locally as "${localFit.title}".` : 'Could not save right now.');
+      setStatusMessage(localFit ? 'Saved locally' : 'Save failed');
     }
   }
 
@@ -256,349 +168,219 @@ function BuilderPageContent({
       .filter((product) => Boolean(product.url));
 
     if (!links.length) {
-      setStatusMessage('Pick products first, then shop the look.');
+      setStatusMessage('Add pieces first');
       return;
     }
-
-    setStatusMessage(null);
     setCheckoutProducts(links);
+  }
+
+  function handleSlotClick(slot: Category) {
+    setSearchFor(slot);
+  }
+
+  function handleRemoveSlot(slot: Category) {
+    replaceItems({ ...items, [slot]: undefined });
   }
 
   return (
     <main className="flex flex-col h-[100dvh] max-w-[440px] mx-auto bg-bg overflow-hidden">
-      <motion.header 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between px-5 py-4 pb-3"
-      >
-        <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent-hot grid place-items-center shadow-pink-glow"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Sparkles className="text-white w-5 h-5" />
-          </motion.div>
-          <div>
-            <div className="font-serif font-bold text-lg tracking-tight">sylistly</div>
-            <div className="text-[9px] tracking-widest text-muted uppercase">Build Your Vibe</div>
+      <header className="flex items-center justify-between px-4 py-3 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
+          <span className="font-serif font-bold text-lg">sylistly</span>
         </div>
-
-        <AnimatePresence mode="wait">
-          {n > 0 ? (
-            <motion.div 
-              key="has-items"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-3"
-            >
-              <div className="text-right">
-                <div className="text-[9px] tracking-[.1em] text-muted uppercase">Total</div>
-                <div className="font-serif italic font-semibold text-xl text-emerald">
-                  ${(total / 100).toLocaleString()}
-                </div>
-              </div>
-              <motion.button
-                onClick={saveFit}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-2.5 rounded-full bg-surface-2 border border-hairline"
-              >
-                <Bookmark size={16} className="text-accent" />
-              </motion.button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="no-items"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-right"
-            >
-              <div className="text-[9px] tracking-[.1em] text-muted uppercase">Create</div>
-              <div className="font-serif italic font-semibold text-xl text-muted">Start below</div>
-            </motion.div>
+        <div className="flex items-center gap-3">
+          {n > 0 && (
+            <span className="font-serif text-lg text-emerald">${(total / 100).toFixed(0)}</span>
           )}
-        </AnimatePresence>
-      </motion.header>
+          <button
+            onClick={saveFit}
+            disabled={n === 0}
+            className={`p-2 rounded-full border ${n > 0 ? 'border-accent text-accent' : 'border-hairline text-muted'}`}
+          >
+            <Bookmark size={16} />
+          </button>
+        </div>
+      </header>
 
       <div className="flex-1 overflow-y-auto px-4 pb-32">
         <AnimatePresence mode="wait">
           {n === 0 ? (
             <motion.div
-              key="empty-state"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               className="py-8"
             >
-              <div className="rounded-3xl bg-gradient-to-b from-surface-1 to-surface-2 border border-hairline p-6 text-center">
-                <motion.div 
-                  className="w-20 h-20 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center"
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                >
-                  <Sparkles className="w-10 h-10 text-accent" />
-                </motion.div>
-                <div className="font-serif text-2xl font-semibold mb-2">
-                  Ready to <span className="text-accent italic">slay</span>?
+              <div className="rounded-2xl bg-surface-2 border border-hairline p-6 text-center">
+                <Sparkles className="w-10 h-10 text-accent mx-auto mb-3" />
+                <div className="font-serif text-xl font-semibold">
+                  Build Your <span className="text-accent italic">Vibe</span>
                 </div>
-                <div className="text-muted text-sm leading-relaxed mb-5">
-                  Generate looks built for compliments.<br />
-                  Pick an occasion below and let AI style you.
-                </div>
+                <p className="text-sm text-muted mt-2">Select occasion & generate</p>
               </div>
             </motion.div>
           ) : (
             <motion.div
-              key="mannequin-view"
+              key="filled"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="py-4"
             >
-              <div className="flex items-start gap-4">
+              <div className="flex gap-3">
                 <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-                <div className="flex-1 space-y-3">
-                  <div className="rounded-2xl bg-surface-1 border border-hairline p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-[10px] uppercase tracking-widest text-muted">Style Score</div>
-                      <div className="text-[10px] text-muted">{n} pieces</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(['confidence', 'attractiveness', 'trendiness', 'balance'] as StyleScoreType[]).map((metric) => (
-                        <div key={metric} className="flex items-center justify-between">
-                          <span className="text-[9px] text-muted capitalize">{metric}</span>
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-12 h-1.5 rounded-full bg-surface-3 overflow-hidden">
-                              <motion.div 
-                                className={`h-full rounded-full ${getScoreLabel(styleScores[metric]).color.replace('text-', 'bg-')}`}
-                                initial={{ width: 0 }}
-                                animate={{ width: `${styleScores[metric]}%` }}
-                                transition={{ duration: 0.5, delay: 0.1 }}
-                              />
-                            </div>
-                            <span className={`text-[10px] font-semibold ${getScoreLabel(styleScores[metric]).color}`}>
-                              {Math.round(styleScores[metric])}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {STYLE_FRAMES.map(({ value, label, icon: Icon }) => (
+                <div className="flex-1 grid grid-cols-4 gap-2 content-start">
+                  {(activeOccasion.slots as Category[]).map((slot) => {
+                    const product = items[slot];
+                    return (
                       <button
-                        key={value}
-                        onClick={() => setBodyType(value as 'masc' | 'fem' | 'androgynous')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-[10px] font-medium transition ${
-                          generatorFrame === value
-                            ? 'bg-accent text-white border-accent'
-                            : 'bg-surface-1 border-hairline text-muted'
+                        key={slot}
+                        onClick={() => handleSlotClick(slot)}
+                        className={`aspect-square rounded-xl border flex flex-col items-center justify-center p-2 relative ${
+                          product 
+                            ? 'bg-black border-accent/30' 
+                            : 'bg-surface-2 border-hairline'
                         }`}
                       >
-                        <Icon size={12} />
-                        {label}
+                        {product ? (
+                          <>
+                            <img
+                              src={product.imageUrl}
+                              alt=""
+                              className="w-full h-full object-contain p-1"
+                            />
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleRemoveSlot(slot); }}
+                              className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-surface-3 text-[10px] flex items-center justify-center"
+                            >
+                              <X size={10} />
+                            </button>
+                          </>
+                        ) : (
+                          <Plus className="w-5 h-5 text-muted" />
+                        )}
                       </button>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <motion.div layout className="space-y-4">
-          <motion.div 
-            layout
-            className="rounded-2xl bg-surface-1 border border-hairline overflow-hidden"
+        <div className="space-y-3 mt-4">
+          <button
+            onClick={() => setShowOccasionPicker(!showOccasionPicker)}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-hairline"
           >
-            <button
-              onClick={() => setShowOccasionPicker(!showOccasionPicker)}
-              className="w-full flex items-center justify-between p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
-                  <activeOccasion.icon className="w-5 h-5 text-accent" />
-                </div>
-                <div className="text-left">
-                  <div className="text-[9px] uppercase tracking-widest text-muted">Occasion</div>
-                  <div className="font-semibold text-base">{activeOccasion.label}</div>
-                </div>
-              </div>
-              <ChevronDown className={`w-5 h-5 text-muted transition-transform ${showOccasionPicker ? 'rotate-180' : ''}`} />
-            </button>
-
-            <AnimatePresence>
-              {showOccasionPicker && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="px-4 pb-4 grid grid-cols-2 gap-2">
-                    {OCCASIONS.map((occasion) => (
-                      <button
-                        key={occasion.id}
-                        onClick={() => { setSelectedOccasion(occasion.id); setShowOccasionPicker(false); }}
-                        className={`flex items-center gap-2 p-3 rounded-xl border transition ${
-                          selectedOccasion === occasion.id
-                            ? 'bg-accent/10 border-accent text-ink'
-                            : 'bg-surface-2 border-hairline text-muted hover:border-hairline-2'
-                        }`}
-                      >
-                        <occasion.icon className="w-4 h-4" />
-                        <span className="text-xs font-medium">{occasion.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          <motion.div 
-            layout
-            className="rounded-2xl bg-surface-1 border border-hairline p-4"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-[10px] uppercase tracking-widest text-muted">Generator</span>
-              </div>
-              <div className="text-[11px] text-muted-2">{activeOccasion.slots.length} slots</div>
+            <div className="flex items-center gap-2">
+              <activeOccasion.icon className="w-5 h-5 text-accent" />
+              <span className="font-semibold">{activeOccasion.label}</span>
             </div>
+            <ChevronDown className={`w-4 h-4 text-muted transition ${showOccasionPicker ? 'rotate-180' : ''}`} />
+          </button>
 
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {activeOccasion.slots.map((slot) => (
-                <span
-                  key={slot}
-                  className="px-2.5 py-1 rounded-full bg-surface-2 text-[9px] uppercase tracking-wider text-muted"
-                >
-                  {slot}
-                </span>
-              ))}
-            </div>
-
-            <div className="mb-4">
-              <div className="text-[9px] uppercase tracking-widest text-muted mb-2">Budget</div>
-              <div className="flex gap-1.5 flex-wrap">
-                {GENERATOR_BUDGETS.map((budget) => (
+          <AnimatePresence>
+            {showOccasionPicker && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="grid grid-cols-4 gap-2"
+              >
+                {OCCASIONS.map((occasion) => (
                   <button
-                    key={budget.value}
-                    onClick={() => setGeneratorBudget(budget.value)}
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-medium transition ${
-                      generatorBudget === budget.value
-                        ? 'bg-ink text-bg'
-                        : 'bg-surface-2 text-muted border border-hairline'
+                    key={occasion.id}
+                    onClick={() => { setSelectedOccasion(occasion.id); setShowOccasionPicker(false); }}
+                    className={`p-2 rounded-xl border text-center ${
+                      selectedOccasion === occasion.id
+                        ? 'bg-accent border-accent text-white'
+                        : 'bg-surface-2 border-hairline text-muted'
                     }`}
                   >
-                    {budget.label}
+                    <occasion.icon className="w-5 h-5 mx-auto" />
+                    <span className="text-[10px] block mt-1">{occasion.label}</span>
                   </button>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            <div className="flex gap-2">
-              <motion.button
-                onClick={() => void generateLook('starter')}
-                disabled={generatorLoading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-accent to-accent-hot text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-pink-glow"
-              >
-                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Zap size={14} />}
-                Generate
-              </motion.button>
-              <motion.button
-                onClick={() => void generateLook('missing')}
-                disabled={generatorLoading || n === 0}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 py-3 rounded-xl bg-surface-2 text-muted text-xs font-medium border border-hairline flex items-center gap-2"
-              >
-                <RefreshCw size={14} />
-              </motion.button>
-            </div>
-          </motion.div>
+          <div className="flex gap-2">
+            <button
+              onClick={generateLook}
+              disabled={generatorLoading}
+              className="flex-1 py-3 rounded-xl bg-accent text-white font-semibold text-sm flex items-center justify-center gap-2"
+            >
+              {generatorLoading ? <LoaderCircle size={16} className="animate-spin" /> : <Sparkles size={16} />}
+              Generate
+            </button>
+            <button
+              onClick={clear}
+              disabled={n === 0}
+              className="px-4 py-3 rounded-xl bg-surface-2 border border-hairline text-muted"
+            >
+              <RefreshCw size={16} />
+            </button>
+          </div>
 
-          <SlotList onOpenSearch={setSearchFor} />
-        </motion.div>
+          <div className="grid grid-cols-4 gap-2">
+            {BUDGETS.map((budget) => (
+              <button
+                key={budget.value}
+                onClick={() => setGeneratorBudget(budget.value)}
+                className={`py-2 rounded-lg text-xs font-medium ${
+                  generatorBudget === budget.value
+                    ? 'bg-white text-black'
+                    : 'bg-surface-2 text-muted border border-hairline'
+                }`}
+              >
+                {budget.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-hairline">
+          <div className="text-[10px] uppercase tracking-widest text-muted mb-3">Quick add</div>
+          <div className="grid grid-cols-4 gap-2">
+            {CATEGORY_ORDER.slice(0, 4).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleSlotClick(cat)}
+                className="py-2 rounded-lg bg-surface-2 border border-hairline text-xs text-muted capitalize"
+              >
+                + {cat}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <motion.div 
-        layout
-        className="absolute bottom-[68px] left-0 right-0 p-4 bg-gradient-to-t from-bg via-bg to-transparent"
-      >
+      <div className="absolute bottom-[68px] left-0 right-0 p-4 bg-gradient-to-t from-bg via-bg to-transparent">
         {statusMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mb-3 rounded-xl bg-surface-1 border border-hairline px-4 py-3 text-center text-xs text-muted"
-          >
-            {statusMessage}
-          </motion.div>
+          <div className="mb-2 text-center text-xs text-muted">{statusMessage}</div>
         )}
-        <div className="flex gap-2">
-          <motion.button
-            onClick={shopAll}
-            disabled={n === 0}
-            whileHover={{ scale: n === 0 ? 1 : 1.02 }}
-            whileTap={{ scale: n === 0 ? 1 : 0.98 }}
-            className="flex-1 py-3.5 rounded-xl bg-emerald text-bg font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Shop full look <ExternalLink size={14} />
-          </motion.button>
-          {n > 0 && (
-            <motion.button
-              onClick={clear}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-3.5 rounded-xl bg-surface-2 border border-hairline text-muted text-sm"
-            >
-              Clear
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
+        <button
+          onClick={shopAll}
+          disabled={n === 0}
+          className="w-full py-3.5 rounded-xl bg-emerald text-bg font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+        >
+          Shop full look ({n}) <ExternalLink size={16} />
+        </button>
+      </div>
 
       <BottomNav />
-
-      <SearchSheet
-        open={!!searchFor}
-        category={searchFor}
-        initialQuery={searchFor ? quickQuery : null}
-        onClose={closeSearchSheet}
-      />
-
-      <CheckoutSheet
-        open={Boolean(checkoutProducts)}
-        title="Your fit"
-        products={checkoutProducts || []}
-        onClose={() => setCheckoutProducts(null)}
-      />
+      <SearchSheet open={!!searchFor} category={searchFor} onClose={() => setSearchFor(null)} />
+      <CheckoutSheet open={Boolean(checkoutProducts)} title="Your fit" products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
     </main>
   );
 }
 
-function BuilderPageWithSearchParams() {
-  const searchParams = useSearchParams();
-  return (
-    <BuilderPageContent
-      quickSlot={searchParams.get('slot')}
-      quickQuery={searchParams.get('query')}
-      quickOccasion={searchParams.get('occasion')}
-      quickFrame={searchParams.get('frame')}
-    />
-  );
-}
+export const dynamic = 'force-dynamic';
 
-export default function BuilderPage() {
-  return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickOccasion={null} quickFrame={null} />}>
-      <BuilderPageWithSearchParams />
-    </Suspense>
-  );
+export default function HomePage() {
+  return <BuilderPageContent quickOccasion={null} />;
 }

@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   Bookmark, RotateCcw, ShoppingBag, Trash2, Sparkles, 
   ChevronRight, Share2, Copy, Flame, Calendar 
