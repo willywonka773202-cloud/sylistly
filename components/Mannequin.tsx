@@ -59,23 +59,23 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="absolute inset-[12px] rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.3),transparent_18%,transparent_82%,rgba(237,228,221,.22))]" />
 
-        <div className="absolute left-[18px] top-[56px] z-10 flex w-[82px] flex-col gap-12">
+        <div className="absolute left-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-10">
           {leftRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
         </div>
 
-        <div className="absolute right-[18px] top-[56px] z-10 flex w-[82px] flex-col gap-12">
+        <div className="absolute right-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-10">
           {rightRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
         </div>
 
-        <div className="absolute left-1/2 top-[34px] z-0 h-[300px] w-[152px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+        <div className="absolute left-1/2 top-[34px] z-0 h-[300px] w-[164px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.82),transparent_32%)]" />
           <div className="absolute left-1/2 top-[34px] h-[58px] w-[54px] -translate-x-1/2 rounded-[24px] bg-[#e9e5e2]/85 blur-[2px]" />
-          <div className="absolute left-1/2 top-[78px] h-[120px] w-[82px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
-          <div className="absolute left-1/2 top-[190px] h-[86px] w-[78px] -translate-x-1/2 rounded-[34px] bg-[#f0ece9]/90 blur-[2px]" />
+          <div className="absolute left-1/2 top-[78px] h-[122px] w-[86px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
+          <div className="absolute left-1/2 top-[186px] h-[90px] w-[82px] -translate-x-1/2 rounded-[34px] bg-[#f0ece9]/90 blur-[2px]" />
           <div className="absolute left-1/2 bottom-[18px] h-[12px] w-[94px] -translate-x-1/2 rounded-full bg-[#d9d0ca]/52 blur-[6px]" />
 
           {CENTER_ORDER.map((category, index) => {
@@ -123,7 +123,7 @@ function SideCard({ category, product }: { category: Category; product: Product 
       <div className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#b09d93]">
         {category === 'bag' ? 'Bag' : category}
       </div>
-      <div className="mt-2 flex h-[94px] items-center justify-center overflow-hidden rounded-[14px] bg-white">
+      <div className="mt-2 flex h-[88px] items-center justify-center overflow-hidden rounded-[14px] bg-white">
         <PreviewImage
           product={product}
           category={category}
@@ -187,31 +187,31 @@ function resolveCenterPlacements(items: Partial<Record<Category, Product>>): Par
   const hasBottom = Boolean(items.bottom);
   const hasShoes = Boolean(items.shoes);
 
-  const topBase = hasHat ? 44 : 22;
-  const upperBase = hasEyewear ? 46 : 60;
-  const bottomTop = hasTop || hasOuter ? 150 : hasHat ? 118 : 106;
+  const topBase = hasHat ? 38 : 20;
+  const upperBase = hasEyewear ? 40 : 54;
+  const bottomTop = hasTop || hasOuter ? 144 : hasHat ? 116 : 102;
 
   return {
-    hat: hasHat ? { className: 'left-1/2 top-[4px] h-[58px] w-[114px] -translate-x-1/2' } : undefined,
+    hat: hasHat ? { className: 'left-1/2 top-[2px] h-[54px] w-[112px] -translate-x-1/2' } : undefined,
     eyewear: hasEyewear
-      ? { className: 'left-1/2 h-[34px] w-[92px] -translate-x-1/2', style: { top: hasHat ? 48 : 20 } }
+      ? { className: 'left-1/2 h-[32px] w-[90px] -translate-x-1/2', style: { top: hasHat ? 42 : 16 } }
       : undefined,
     outer: hasOuter
-      ? { className: 'left-1/2 h-[144px] w-[164px] -translate-x-1/2', style: { top: upperBase } }
+      ? { className: 'left-1/2 h-[150px] w-[170px] -translate-x-1/2', style: { top: upperBase } }
       : undefined,
     top: hasTop
-      ? { className: 'left-1/2 h-[138px] w-[148px] -translate-x-1/2', style: { top: topBase } }
+      ? { className: 'left-1/2 h-[132px] w-[156px] -translate-x-1/2', style: { top: topBase } }
       : undefined,
     jewelry: items.jewelry
-      ? { className: 'left-1/2 h-[34px] w-[34px] -translate-x-1/2', style: { top: hasTop || hasOuter ? 102 : 78 } }
+      ? { className: 'left-1/2 h-[30px] w-[30px] -translate-x-1/2', style: { top: hasTop || hasOuter ? 96 : 72 } }
       : undefined,
     bottom: hasBottom
-      ? { className: 'left-1/2 h-[158px] w-[134px] -translate-x-1/2', style: { top: bottomTop } }
+      ? { className: 'left-1/2 h-[150px] w-[122px] -translate-x-1/2', style: { top: bottomTop } }
       : undefined,
     bag: items.bag
-      ? { className: 'left-1/2 h-[96px] w-[96px]', style: { top: hasBottom ? 144 : 128, marginLeft: 44 } }
+      ? { className: 'left-1/2 h-[82px] w-[82px]', style: { top: hasBottom ? 150 : 132, marginLeft: 50 } }
       : undefined,
-    shoes: hasShoes ? { className: 'left-1/2 bottom-[4px] h-[58px] w-[148px] -translate-x-1/2' } : undefined,
+    shoes: hasShoes ? { className: 'left-1/2 bottom-[6px] h-[44px] w-[122px] -translate-x-1/2' } : undefined,
   };
 }
 
