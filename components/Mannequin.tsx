@@ -17,9 +17,8 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
   androgynous: 'Neutral edit',
 };
 
-const CENTER_ORDER: Category[] = ['hat', 'eyewear', 'outer', 'top', 'jewelry', 'bottom', 'bag', 'shoes'];
-const LEFT_RAIL_ORDER: Category[] = ['hat', 'outer', 'top', 'bag'];
-const RIGHT_RAIL_ORDER: Category[] = ['eyewear', 'bottom', 'shoes', 'jewelry'];
+const CENTER_ORDER: Category[] = ['top', 'bottom', 'shoes'];
+const SIDE_ORDER: Category[] = ['outer', 'hat', 'bag', 'eyewear', 'jewelry'];
 type Placement = { className: string; style?: CSSProperties };
 
 export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
@@ -27,8 +26,10 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   const hasItems = count > 0;
   const warmGlow = skinTone || '#edd7cc';
   const centerPlacements = resolveCenterPlacements(items);
-  const leftRail = LEFT_RAIL_ORDER.filter((category) => items[category]).slice(0, 3);
-  const rightRail = RIGHT_RAIL_ORDER.filter((category) => items[category]).slice(0, 3);
+  const sideItems = SIDE_ORDER.filter((category) => items[category]);
+  const splitIndex = Math.ceil(sideItems.length / 2);
+  const leftRail = sideItems.slice(0, splitIndex);
+  const rightRail = sideItems.slice(splitIndex);
 
   return (
     <div
@@ -59,13 +60,13 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="absolute inset-[12px] rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.3),transparent_18%,transparent_82%,rgba(237,228,221,.22))]" />
 
-        <div className="absolute left-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-10">
+        <div className="absolute left-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-8">
           {leftRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
         </div>
 
-        <div className="absolute right-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-10">
+        <div className="absolute right-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-8">
           {rightRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
@@ -180,38 +181,21 @@ function PreviewImage({
 }
 
 function resolveCenterPlacements(items: Partial<Record<Category, Product>>): Partial<Record<Category, Placement>> {
-  const hasHat = Boolean(items.hat);
-  const hasEyewear = Boolean(items.eyewear);
-  const hasOuter = Boolean(items.outer);
   const hasTop = Boolean(items.top);
   const hasBottom = Boolean(items.bottom);
   const hasShoes = Boolean(items.shoes);
 
-  const topBase = hasHat ? 38 : 20;
-  const upperBase = hasEyewear ? 40 : 54;
-  const bottomTop = hasTop || hasOuter ? 144 : hasHat ? 116 : 102;
+  const topBase = 18;
+  const bottomTop = hasTop ? 132 : 96;
 
   return {
-    hat: hasHat ? { className: 'left-1/2 top-[2px] h-[54px] w-[112px] -translate-x-1/2' } : undefined,
-    eyewear: hasEyewear
-      ? { className: 'left-1/2 h-[32px] w-[90px] -translate-x-1/2', style: { top: hasHat ? 42 : 16 } }
-      : undefined,
-    outer: hasOuter
-      ? { className: 'left-1/2 h-[150px] w-[170px] -translate-x-1/2', style: { top: upperBase } }
-      : undefined,
     top: hasTop
-      ? { className: 'left-1/2 h-[132px] w-[156px] -translate-x-1/2', style: { top: topBase } }
-      : undefined,
-    jewelry: items.jewelry
-      ? { className: 'left-1/2 h-[30px] w-[30px] -translate-x-1/2', style: { top: hasTop || hasOuter ? 96 : 72 } }
+      ? { className: 'left-1/2 h-[136px] w-[158px] -translate-x-1/2', style: { top: topBase } }
       : undefined,
     bottom: hasBottom
-      ? { className: 'left-1/2 h-[150px] w-[122px] -translate-x-1/2', style: { top: bottomTop } }
+      ? { className: 'left-1/2 h-[154px] w-[124px] -translate-x-1/2', style: { top: bottomTop } }
       : undefined,
-    bag: items.bag
-      ? { className: 'left-1/2 h-[82px] w-[82px]', style: { top: hasBottom ? 150 : 132, marginLeft: 50 } }
-      : undefined,
-    shoes: hasShoes ? { className: 'left-1/2 bottom-[6px] h-[44px] w-[122px] -translate-x-1/2' } : undefined,
+    shoes: hasShoes ? { className: 'left-1/2 bottom-[8px] h-[42px] w-[118px] -translate-x-1/2' } : undefined,
   };
 }
 
