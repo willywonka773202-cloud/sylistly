@@ -15,14 +15,47 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Sylistly - style anything, wear anything',
-  description: 'AI-powered outfit builder. Search any brand across the web, build a look, buy it in one flow.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  title: {
+    default: 'Sylistly',
+    template: '%s | Sylistly',
+  },
+  description: 'Build polished outfits from real products, save full looks, and shop every piece in one premium flow.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sylistly.com'),
+  applicationName: 'Sylistly',
+  keywords: [
+    'fashion app',
+    'outfit builder',
+    'virtual styling',
+    'closet app',
+    'shop outfits',
+    'lookbook',
+  ],
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'Sylistly',
-    description: 'Style anything. Wear anything. Buy anything.',
-    images: ['/og.png'],
+    description: 'Build and shop complete outfits from real products.',
+    url: '/',
+    siteName: 'Sylistly',
+    images: ['/og.svg'],
+    type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sylistly',
+    description: 'Build and shop complete outfits from real products.',
+    images: ['/og.svg'],
+  },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.svg', type: 'image/svg+xml' },
+    ],
+  },
+  manifest: '/manifest.webmanifest',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
