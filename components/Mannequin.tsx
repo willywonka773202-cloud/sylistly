@@ -199,7 +199,7 @@ function resolveBoardPlacements(items: Partial<Record<Category, Product>>): Part
       ? `left-1/2 ${hasBottom ? 'bottom-[18px]' : 'bottom-[34px]'} h-[50px] w-[156px] -translate-x-1/2`
       : undefined,
     outer: items.outer ? 'left-[10px] top-[86px] h-[128px] w-[110px] -rotate-[4deg]' : undefined,
-    bag: items.bag ? 'left-[20px] bottom-[42px] h-[76px] w-[76px] -rotate-[3deg]' : undefined,
+    bag: items.bag ? 'left-[4px] top-[196px] h-[82px] w-[82px] -rotate-[5deg]' : undefined,
     eyewear: items.eyewear ? 'right-[18px] top-[42px] h-[34px] w-[86px] rotate-[4deg]' : undefined,
     jewelry: items.jewelry ? 'right-[26px] top-[204px] h-[34px] w-[34px] rotate-[4deg]' : undefined,
   };

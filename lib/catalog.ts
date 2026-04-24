@@ -590,6 +590,10 @@ function getSlotCandidates({
 }): Product[] {
   const query = vibeSearchQuery(vibe, slot, budget, frame, customMaxCents);
   const intent = parseSearchIntentHeuristic(query, slot);
+  intent.priceMax = Number.isFinite(getBudgetMaxCents(budget, customMaxCents))
+    ? getBudgetMaxCents(budget, customMaxCents) / 100
+    : null;
+  intent.priceMin = null;
   const collectionIds = new Set(
     collectionCandidates
       .filter((product) => product.category === slot)
@@ -777,6 +781,10 @@ export async function buildAiCatalogLook({
 
     const query = vibeSearchQuery(vibe, slot, budget, frame, customMaxCents);
     const intent = parseSearchIntentHeuristic(query, slot);
+    intent.priceMax = Number.isFinite(getBudgetMaxCents(budget, customMaxCents))
+      ? getBudgetMaxCents(budget, customMaxCents) / 100
+      : null;
+    intent.priceMin = null;
     const ranked = await rerankProducts(query, intent, rankingPool, Math.min(3, rankingPool.length));
     const variedRanked = ranked.filter((product) => !usedIds.has(product.id));
     const chosen =
@@ -794,6 +802,14 @@ export async function buildAiCatalogLook({
     ...base.products,
     ...picked,
   };
+
+  for (const slot of targetSlots) {
+    const current = mergedProducts[slot];
+    if (!current) continue;
+    if (!isUnderBudget(current, budget, customMaxCents)) {
+      delete mergedProducts[slot];
+    }
+  }
 
   for (const slot of targetSlots) {
     const current = mergedProducts[slot];

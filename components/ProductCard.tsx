@@ -51,7 +51,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
   const imageSrc =
     imgFailed || !p.imageUrl
       ? fallbackImage(p)
-      : proxiedImageUrl(p.imageUrl, { cutout: true, category: p.category });
+      : proxiedImageUrl(p.imageUrl);
   const retailHost = getHost(buyUrl);
   const searchLike = isSearchLikeUrl(buyUrl);
 
@@ -84,7 +84,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
           <img
             src={imageSrc}
             alt={`${p.brand} ${p.name}`}
-            className="relative h-[92%] w-[92%] object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
+            className="relative h-full w-full object-cover drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
             loading="lazy"
             referrerPolicy="no-referrer"
             onError={() => setImgFailed(true)}

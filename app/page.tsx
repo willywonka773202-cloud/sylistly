@@ -217,6 +217,11 @@ function BuilderPageContent({
   async function saveFit() {
     if (!n) return;
     const localFit = saveLocalFit(items);
+    setStatusMessage(
+      localFit
+        ? `Saved to your fits as "${localFit.title}".`
+        : 'Saved to your fits.',
+    );
     const ids = Object.fromEntries(
       Object.entries(items).map(([k, v]) => [k, v?.id]).filter(([, id]) => id),
     );
