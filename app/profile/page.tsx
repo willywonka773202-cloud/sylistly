@@ -1,172 +1,209 @@
 'use client';
-import { Palette, Ruler, WandSparkles } from 'lucide-react';
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Palette, Ruler, WandSparkles, Sparkles, ChevronRight, 
+  Check, User, Settings, Bell, Shield, HelpCircle, Trash2, ExternalLink, Flame
+} from 'lucide-react';
 import { useProfile } from '@/store/profile';
 
-const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
-const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
-const BUDGETS = ['low', 'mid', 'high', 'luxury'] as const;
-const BODY_TYPE_LABELS: Record<(typeof BODY_TYPES)[number], string> = {
-  masc: 'Male',
-  fem: 'Female',
-  androgynous: 'Neutral',
-  custom: 'Custom',
-};
+const SKIN_TONES = [
+  { hex: '#f5d0b5', label: 'Light' },
+  { hex: '#ddb192', label: 'Medium-Light' },
+  { hex: '#c9a98a', label: 'Medium' },
+  { hex: '#a47757', label: 'Medium-Dark' },
+  { hex: '#7d553e', label: 'Dark' },
+  { hex: '#4b3025', label: 'Deep' },
+];
+
+const BODY_TYPES = [
+  { id: 'masc', label: 'Masculine', icon: '👨' },
+  { id: 'fem', label: 'Feminine', icon: '👩' },
+  { id: 'androgynous', label: 'Neutral', icon: '🧑' },
+] as const;
+
+const BUDGETS = [
+  { id: 'low', label: 'Budget', range: 'Under $100' },
+  { id: 'mid', label: 'Mid-Range', range: '$100-300' },
+  { id: 'high', label: 'Premium', range: '$300-500' },
+  { id: 'luxury', label: 'Luxury', range: '$500+' },
+] as const;
+
+const STYLE_PERSONAS = [
+  { id: 'minimal', label: 'Minimalist', description: 'Clean lines, neutral colors' },
+  { id: 'street', label: 'Streetwear', description: 'Hype, oversized, urban' },
+  { id: 'classic', label: 'Classic', description: 'Timeless, preppy' },
+  { id: 'edgy', label: 'Edgy', description: 'Dark, bold, statement' },
+] as const;
 
 export default function ProfilePage() {
   const profile = useProfile((state) => state.profile);
   const setSkinTone = useProfile((state) => state.setSkinTone);
   const setBodyType = useProfile((state) => state.setBodyType);
-  const setTopSize = useProfile((state) => state.setTopSize);
-  const setBottomSize = useProfile((state) => state.setBottomSize);
-  const setShoeSize = useProfile((state) => state.setShoeSize);
   const setBudget = useProfile((state) => state.setBudget);
-  const setVibesFromText = useProfile((state) => state.setVibesFromText);
-  const setBrandsFromText = useProfile((state) => state.setBrandsFromText);
 
   return (
-    <PlaceholderScreen
-      eyebrow="Profile"
-      title="Tune"
-      accent="you"
-      description="Your preferences now persist locally and feed the look and feel of the builder."
-    >
-      <div className="grid gap-3">
-        <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-              <Palette size={18} />
-            </div>
-            <div>
-              <h2 className="font-serif text-[18px] font-semibold text-ink">Skin tone and silhouette</h2>
-              <p className="mt-1 text-[12px] text-muted-2">Changes here update the builder mannequin immediately.</p>
-            </div>
+    <main className="flex flex-col min-h-[100dvh] max-w-[440px] mx-auto bg-bg pb-20">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-5 pt-14 pb-6"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent-hot flex items-center justify-center">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl font-semibold">Profile</h1>
+            <p className="text-sm text-muted">Customize your style DNA</p>
+          </div>
+        </div>
+      </motion.header>
+
+      <div className="flex-1 overflow-y-auto px-4 space-y-4">
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-3xl bg-surface-1 border border-hairline p-5"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Palette className="w-5 h-5 text-accent" />
+            <h2 className="font-semibold text-lg">Your Look</h2>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            {SKIN_TONES.map((tone) => (
-              <button
-                key={tone}
-                type="button"
-                aria-label={`Select skin tone ${tone}`}
-                onClick={() => setSkinTone(tone)}
-                className={`h-10 w-10 rounded-full border-2 transition ${
-                  profile.skinTone === tone ? 'border-white scale-105' : 'border-transparent'
-                }`}
-                style={{ backgroundColor: tone }}
-              />
-            ))}
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {BODY_TYPES.map((bodyType) => (
-              <button
-                key={bodyType}
-                type="button"
-                onClick={() => setBodyType(bodyType)}
-                className={`rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[.14em] ${
-                  profile.bodyType === bodyType
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-hairline bg-surface-2 text-muted-2'
-                }`}
-              >
-                {BODY_TYPE_LABELS[bodyType]}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-              <Ruler size={18} />
-            </div>
-            <div>
-              <h2 className="font-serif text-[18px] font-semibold text-ink">Sizing preferences</h2>
-              <p className="mt-1 text-[12px] text-muted-2">Keep a quick reference for the pieces you usually shop for.</p>
+          <div className="mb-5">
+            <div className="text-xs uppercase tracking-widest text-muted mb-3">Skin Tone</div>
+            <div className="flex gap-2">
+              {SKIN_TONES.map((tone) => (
+                <button
+                  key={tone.hex}
+                  onClick={() => setSkinTone(tone.hex)}
+                  className={`flex-1 py-2 rounded-xl border-2 transition ${
+                    profile.skinTone === tone.hex 
+                      ? 'border-accent' : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: tone.hex + '30' }}
+                >
+                  <span className={`text-[10px] ${profile.skinTone === tone.hex ? 'text-accent' : 'text-muted'}`}>
+                    {tone.label}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <label className="text-[11px] text-muted-2">
-              Top
-              <input
-                value={profile.sizes.top || ''}
-                onChange={(event) => setTopSize(event.target.value)}
-                className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-                placeholder="M"
-              />
-            </label>
-            <label className="text-[11px] text-muted-2">
-              Waist
-              <input
-                value={profile.sizes.bottom?.waist?.toString() || ''}
-                onChange={(event) => setBottomSize(event.target.value)}
-                className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-                placeholder="30"
-              />
-            </label>
-            <label className="text-[11px] text-muted-2">
-              Shoe
-              <input
-                value={profile.sizes.shoe || ''}
-                onChange={(event) => setShoeSize(event.target.value)}
-                className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-                placeholder="9"
-              />
-            </label>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-              <WandSparkles size={18} />
-            </div>
-            <div>
-              <h2 className="font-serif text-[18px] font-semibold text-ink">Taste memory</h2>
-              <p className="mt-1 text-[12px] text-muted-2">These preferences are stored locally so future search tuning has something to build from.</p>
+          <div>
+            <div className="text-xs uppercase tracking-widest text-muted mb-3">Body Frame</div>
+            <div className="flex gap-2">
+              {BODY_TYPES.map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => setBodyType(type.id)}
+                  className={`flex-1 py-3 rounded-xl border transition ${
+                    profile.bodyType === type.id
+                      ? 'bg-accent border-accent text-white'
+                      : 'bg-surface-2 border-hairline text-muted-2 hover:border-hairline-2'
+                  }`}
+                >
+                  <span className="text-xl">{type.icon}</span>
+                  <span className="block text-[10px] mt-1">{type.label}</span>
+                </button>
+              ))}
             </div>
           </div>
+        </motion.section>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-3xl bg-surface-1 border border-hairline p-5"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <WandSparkles className="w-5 h-5 text-accent" />
+            <h2 className="font-semibold text-lg">Budget</h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
             {BUDGETS.map((budget) => (
               <button
-                key={budget}
-                type="button"
-                onClick={() => setBudget(budget)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.12em] ${
-                  profile.stylePrefs.budget === budget
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-hairline bg-surface-2 text-muted-2'
+                key={budget.id}
+                onClick={() => setBudget(budget.id)}
+                className={`p-3 rounded-xl border text-left transition ${
+                  profile.stylePrefs.budget === budget.id
+                    ? 'bg-accent/10 border-accent'
+                    : 'bg-surface-2 border-hairline hover:border-hairline-2'
                 }`}
               >
-                {budget}
+                <div className={`font-semibold ${profile.stylePrefs.budget === budget.id ? 'text-accent' : 'text-ink'}`}>
+                  {budget.label}
+                </div>
+                <div className="text-xs text-muted mt-0.5">{budget.range}</div>
               </button>
             ))}
           </div>
+        </motion.section>
 
-          <label className="mt-4 block text-[11px] text-muted-2">
-            Vibes
-            <input
-              value={(profile.stylePrefs.vibes || []).join(', ')}
-              onChange={(event) => setVibesFromText(event.target.value)}
-              className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-              placeholder="clean girl, streetwear, date night"
-            />
-          </label>
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-3xl bg-surface-1 border border-hairline p-5"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Flame className="w-5 h-5 text-accent" />
+            <h2 className="font-semibold text-lg">Style Persona</h2>
+          </div>
 
-          <label className="mt-3 block text-[11px] text-muted-2">
-            Favorite brands
-            <input
-              value={(profile.stylePrefs.brands || []).join(', ')}
-              onChange={(event) => setBrandsFromText(event.target.value)}
-              className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-              placeholder="Skims, Nike, Zara"
-            />
-          </label>
-        </section>
+          <div className="space-y-2">
+            {STYLE_PERSONAS.map((persona) => (
+              <button
+                key={persona.id}
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-hairline hover:border-accent/50 transition"
+              >
+                <div className="text-left">
+                  <div className="font-semibold text-sm">{persona.label}</div>
+                  <div className="text-xs text-muted">{persona.description}</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted" />
+              </button>
+            ))}
+          </div>
+        </motion.section>
+
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="rounded-3xl bg-surface-1 border border-hairline divide-y divide-hairline overflow-hidden"
+        >
+          <button className="w-full flex items-center gap-3 p-4 hover:bg-surface-2 transition">
+            <Settings className="w-5 h-5 text-muted" />
+            <span className="flex-1 text-left text-sm">Settings</span>
+            <ChevronRight className="w-4 h-4 text-muted" />
+          </button>
+          <button className="w-full flex items-center gap-3 p-4 hover:bg-surface-2 transition">
+            <Bell className="w-5 h-5 text-muted" />
+            <span className="flex-1 text-left text-sm">Notifications</span>
+            <ChevronRight className="w-4 h-4 text-muted" />
+          </button>
+          <button className="w-full flex items-center gap-3 p-4 hover:bg-surface-2 transition">
+            <Shield className="w-5 h-5 text-muted" />
+            <span className="flex-1 text-left text-sm">Privacy</span>
+            <ChevronRight className="w-4 h-4 text-muted" />
+          </button>
+          <button className="w-full flex items-center gap-3 p-4 hover:bg-surface-2 transition">
+            <HelpCircle className="w-5 h-5 text-muted" />
+            <span className="flex-1 text-left text-sm">Help & Support</span>
+            <ChevronRight className="w-4 h-4 text-muted" />
+          </button>
+        </motion.section>
+
+        <div className="py-4 text-center">
+          <p className="text-xs text-muted">Sylistly v0.2.0</p>
+          <p className="text-[10px] text-muted/50 mt-1">Build Your Vibe</p>
+        </div>
       </div>
-    </PlaceholderScreen>
+    </main>
   );
 }
