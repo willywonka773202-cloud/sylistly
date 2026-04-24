@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
@@ -14,13 +14,20 @@ const playfair = Playfair_Display({
   weight: ['500', '600', '700'],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#080807',
+};
+
 export const metadata: Metadata = {
-  title: 'Sylistly — style anything, wear anything',
-  description: 'AI-powered outfit builder. Search any brand across the web, build a look, buy it in one flow.',
+  title: 'Sylistly — Build Your Vibe',
+  description: 'AI stylist that builds looks to get compliments. Discover your style identity.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   openGraph: {
-    title: 'Sylistly',
-    description: 'Style anything. Wear anything. Buy anything.',
+    title: 'Sylistly — Build Your Vibe',
+    description: 'AI stylist that builds looks to get compliments',
     images: ['/og.png'],
   },
 };
@@ -28,7 +35,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
-      <body className="bg-bg text-ink">{children}</body>
+      <body className="bg-bg text-ink antialiased">
+        <div className="min-h-screen bg-bg">{children}</div>
+      </body>
     </html>
   );
 }

@@ -18,6 +18,8 @@ export default {
         'hairline-2': 'rgba(255,255,255,.13)',
         skin:      '#c9a98a',
         money:     '#7ccea0',
+        emerald:   '#10b981',
+        crown:     '#fbbf24',
       },
       fontFamily: {
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],
@@ -25,6 +27,9 @@ export default {
       },
       boxShadow: {
         'pink-glow': '0 10px 24px -8px rgba(232,54,93,.6)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
     },
   },

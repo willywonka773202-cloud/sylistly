@@ -2,14 +2,14 @@ import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
 import { parseSearchIntentHeuristic, rerankProducts } from './claude';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
 import type { Category, Product } from './types';
-import { VIBES, vibeSearchQuery, type GeneratorBudget, type GeneratorFrame, type VibeId } from './vibes';
+import { OCCASIONS, occasionSearchQuery, type GeneratorBudget, type GeneratorFrame, type OccasionId } from './occasions';
 
 type CollectionFrame = GeneratorFrame | 'all';
 
 export interface CatalogCollection {
   id: string;
   label: string;
-  vibe: VibeId;
+  vibe: OccasionId;
   frame: CollectionFrame;
   blurb: string;
   queryHint: string;
@@ -23,17 +23,19 @@ const BUDGET_LIMIT_CENTS: Record<GeneratorBudget, number> = {
   under500: 50_000,
 };
 
-const VIBE_TERMS: Record<VibeId, string[]> = {
+const VIBE_TERMS: Record<OccasionId, string[]> = {
   night: ['night out', 'night', 'going out', 'dressy', 'glam'],
   street: ['streetwear', 'workwear', 'retro', 'sporty'],
-  clean: ['clean', 'minimal', 'classic', 'quiet luxury'],
-  gym: ['gym', 'sporty', 'performance', 'wellness'],
-  cozy: ['cozy', 'winter', 'casual', 'soft'],
-  date: ['date', 'night out', 'dressy', 'feminine'],
-  office: ['office', 'work', 'tailored', 'smart'],
+  date: ['date', 'romantic', 'dating', 'attractive'],
+  gym: ['gym', 'sporty', 'performance', 'workout'],
+  cozy: ['cozy', 'winter', 'casual', 'soft', 'warm'],
+  office: ['office', 'work', 'tailored', 'professional'],
   vacation: ['vacation', 'summer', 'resort', 'coastal'],
   edgy: ['edgy', 'dark', 'grunge', 'statement'],
-  preppy: ['preppy', 'classic', 'collegiate', 'smart'],
+  preppy: ['preppy', 'classic', 'collegiate'],
+  formal: ['formal', 'elegant', 'dressy', 'tuxedo'],
+  dateright: ['date', 'first date', 'impressive'],
+  nightlife: ['club', 'party', 'nightlife', 'bold'],
 };
 
 const FRAME_AVOID_TERMS: Record<GeneratorFrame, string[]> = {
@@ -119,7 +121,7 @@ export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
   {
     id: 'clean-all',
     label: 'Clean daily core',
-    vibe: 'clean',
+    vibe: 'date',
     frame: 'all',
     blurb: 'An easy neutral look that works as a clean starting point before you add accessories.',
     queryHint: 'clean minimal',
@@ -294,7 +296,7 @@ export function getCollectionProducts(collection: CatalogCollection): Product[] 
     .filter((product): product is Product => Boolean(product));
 }
 
-export function getCollectionsFor(vibe?: VibeId, frame?: GeneratorFrame): CatalogCollection[] {
+export function getCollectionsFor(vibe?: OccasionId, frame?: GeneratorFrame): CatalogCollection[] {
   return LAUNCH_COLLECTIONS.filter((collection) => {
     if (vibe && collection.vibe !== vibe) return false;
     if (!frame || frame === 'androgynous') return true;
@@ -315,7 +317,7 @@ export function getFeaturedCatalogProducts(limit = 8, category?: Category): Prod
 
 function scoreFallbackProduct(
   product: Product,
-  vibe: VibeId,
+  vibe: OccasionId,
   frame: GeneratorFrame,
 ): number {
   let score = product.metadata?.featured ? 16 : 8;
@@ -342,7 +344,7 @@ function getSlotCandidates({
   collectionCandidates,
 }: {
   slot: Category;
-  vibe: VibeId;
+  vibe: OccasionId;
   frame: GeneratorFrame;
   budget: GeneratorBudget;
   usedIds: Set<string>;
@@ -376,7 +378,7 @@ export function buildCatalogLook({
   currentItems,
   mode,
 }: {
-  vibe: VibeId;
+  vibe: OccasionId;
   frame: GeneratorFrame;
   budget: GeneratorBudget;
   currentItems?: Partial<Record<Category, Product>>;
@@ -386,7 +388,7 @@ export function buildCatalogLook({
   collection: CatalogCollection | null;
   missingSlots: Category[];
 } {
-  const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
+  const vibeConfig = OCCASIONS.find((entry) => entry.id === vibe) || OCCASIONS[0];
   const targetSlots = vibeConfig.slots;
   const existingItems = currentItems || {};
   const picked: Partial<Record<Category, Product>> = {};
@@ -448,7 +450,7 @@ export async function buildAiCatalogLook({
   currentItems,
   mode,
 }: {
-  vibe: VibeId;
+  vibe: OccasionId;
   frame: GeneratorFrame;
   budget: GeneratorBudget;
   currentItems?: Partial<Record<Category, Product>>;
@@ -460,7 +462,7 @@ export async function buildAiCatalogLook({
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
   const base = buildCatalogLook({ vibe, frame, budget, currentItems, mode });
-  const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
+  const vibeConfig = OCCASIONS.find((entry) => entry.id === vibe) || OCCASIONS[0];
   const existingItems = currentItems || {};
   const usedIds = new Set(
     Object.values(existingItems)
@@ -490,7 +492,7 @@ export async function buildAiCatalogLook({
     const photoFirstPool = candidatePool.filter(hasRealPhoto);
     const rankingPool = photoFirstPool.length ? photoFirstPool : candidatePool;
 
-    const query = vibeSearchQuery(vibe, slot, budget, frame);
+    const query = occasionSearchQuery(vibe, slot, budget, frame);
     const intent = parseSearchIntentHeuristic(query, slot);
     const ranked = await rerankProducts(query, intent, rankingPool, Math.min(3, rankingPool.length));
     const chosen = ranked.find((product) => !usedIds.has(product.id)) || rankingPool[0];

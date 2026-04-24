@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildAiCatalogLook } from '@/lib/catalog';
 import type { Category, Product } from '@/lib/types';
-import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
+import { type GeneratorBudget, type GeneratorFrame, type OccasionId, occasionSearchQuery } from '@/lib/occasions';
 
 interface LookBody {
-  vibe?: VibeId;
+  vibe?: OccasionId;
   frame?: GeneratorFrame;
   budget?: GeneratorBudget;
   mode?: 'starter' | 'missing';
@@ -15,7 +15,7 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as LookBody;
-  const vibe = body.vibe || 'clean';
+  const vibe = body.vibe || 'night';
   const frame = body.frame || 'androgynous';
   const budget = body.budget || 'under250';
   const mode = body.mode || 'starter';
