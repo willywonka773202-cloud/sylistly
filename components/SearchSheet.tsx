@@ -100,10 +100,21 @@ export function SearchSheet({
     void runSearch(initialQuery, category);
   }, [open, category, initialQuery, frame]);
 
+  useEffect(() => {
+    if (!open || !category || results === null) return;
+    void runSearch(query, category, 'live', searchPriceMax);
+  }, [searchPriceMax]);
+
   useEffect(() => () => activeRequest.current?.abort(), []);
 
-  async function runSearch(q: string, cat: Category, mode: 'live' | 'demo' = 'live') {
+  async function runSearch(
+    q: string,
+    cat: Category,
+    mode: 'live' | 'demo' = 'live',
+    overridePriceMax?: number | null,
+  ) {
     const trimmed = q.trim();
+    const effectivePriceMax = overridePriceMax === undefined ? searchPriceMax : overridePriceMax;
 
     activeRequest.current?.abort();
     const controller = new AbortController();
@@ -117,7 +128,7 @@ export function SearchSheet({
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, category: cat, mode, frame, priceMax: searchPriceMax }),
+        body: JSON.stringify({ query: trimmed, category: cat, mode, frame, priceMax: effectivePriceMax }),
         signal: controller.signal,
       });
       const data = await response.json();

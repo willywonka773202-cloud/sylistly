@@ -47,10 +47,14 @@ function isSearchLikeUrl(url: string): boolean {
 
 export function ProductCard({ product: p, selected = false, onClick }: Props) {
   const buyUrl = p.retailerUrl || p.affiliateUrl || '#';
-  const [imgFailed, setImgFailed] = useState(false);
+  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
+    p.imageUrl ? 'cutout' : 'fallback',
+  );
   const imageSrc =
-    imgFailed || !p.imageUrl
+    imageMode === 'fallback' || !p.imageUrl
       ? fallbackImage(p)
+      : imageMode === 'cutout'
+      ? proxiedImageUrl(p.imageUrl, { cutout: true, category: p.category })
       : proxiedImageUrl(p.imageUrl);
   const retailHost = getHost(buyUrl);
   const searchLike = isSearchLikeUrl(buyUrl);
@@ -84,10 +88,16 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
           <img
             src={imageSrc}
             alt={`${p.brand} ${p.name}`}
-            className="relative h-full w-full object-cover drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
+            className={`relative h-full w-full drop-shadow-[0_12px_18px_rgba(0,0,0,.35)] ${
+              imageMode === 'plain' ? 'object-cover' : 'object-contain p-1.5'
+            }`}
             loading="lazy"
             referrerPolicy="no-referrer"
-            onError={() => setImgFailed(true)}
+            onError={() =>
+              setImageMode((current) =>
+                current === 'cutout' ? 'plain' : 'fallback',
+              )
+            }
           />
           {selected ? (
             <div className="absolute bottom-2 right-2 grid h-6 w-6 place-items-center rounded-full bg-accent text-[9px] font-bold text-white">

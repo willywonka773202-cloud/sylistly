@@ -114,6 +114,10 @@ function BuilderPageContent({
 
   async function generateLook(mode: 'starter' | 'missing' | 'full' | 'refresh') {
     if (generatorLoading) return;
+    if (generatorBudget === 'custom' && (!customBudgetCents || customBudgetCents <= 0)) {
+      setStatusMessage('Enter a custom max price first.');
+      return;
+    }
 
     const targetSlots = (
       mode === 'full'
@@ -409,12 +413,23 @@ function BuilderPageContent({
                     <span className="text-muted">$</span>
                     <input
                       value={customBudgetInput}
-                      onChange={(event) => setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4))}
+                      onChange={(event) => {
+                        setGeneratorBudget('custom');
+                        setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
+                      }}
                       inputMode="numeric"
                       placeholder="180"
                       className="w-16 bg-transparent text-right outline-none"
                     />
                   </label>
+                </div>
+              ) : null}
+
+              {generatorBudget === 'custom' ? (
+                <div className="mt-2 text-[11px] text-muted-2">
+                  {customBudgetInput
+                    ? `Generating pieces at or below $${customBudgetInput} each.`
+                    : 'Set a per-item max price for generated pieces.'}
                 </div>
               ) : null}
 
