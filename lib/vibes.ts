@@ -11,8 +11,38 @@ export type VibeId =
   | 'vacation'
   | 'edgy'
   | 'preppy';
-export type GeneratorBudget = 'any' | 'under100' | 'under250' | 'under500';
+export type GeneratorBudget = 'any' | 'under100' | 'under250' | 'under500' | 'custom';
 export type GeneratorFrame = 'masc' | 'fem' | 'androgynous';
+
+const BUDGET_HINT: Record<Exclude<GeneratorBudget, 'custom'>, string> = {
+  any: '',
+  under100: ' under $100',
+  under250: ' under $250',
+  under500: ' under $500',
+};
+
+export function getBudgetMaxCents(
+  budget: GeneratorBudget,
+  customMaxCents?: number | null,
+): number {
+  if (budget === 'under100') return 10_000;
+  if (budget === 'under250') return 25_000;
+  if (budget === 'under500') return 50_000;
+  if (budget === 'custom') return Math.max(0, customMaxCents || 0);
+  return Number.POSITIVE_INFINITY;
+}
+
+export function getBudgetHint(
+  budget: GeneratorBudget,
+  customMaxCents?: number | null,
+): string {
+  if (budget === 'custom' && customMaxCents && customMaxCents > 0) {
+    return ` under $${Math.round(customMaxCents / 100)}`;
+  }
+
+  if (budget === 'custom') return '';
+  return BUDGET_HINT[budget];
+}
 
 export const VIBES: Array<{
   id: VibeId;
@@ -93,13 +123,6 @@ const SLOT_PHRASE: Record<Category, string> = {
   jewelry: 'necklace, earrings, or bracelet',
 };
 
-const BUDGET_HINT: Record<GeneratorBudget, string> = {
-  any: '',
-  under100: ' under $100',
-  under250: ' under $250',
-  under500: ' under $500',
-};
-
 function framePrefix(frame: GeneratorFrame): string {
   switch (frame) {
     case 'masc':
@@ -116,9 +139,10 @@ export function vibeSearchQuery(
   slot: Category,
   budget: GeneratorBudget = 'any',
   frame: GeneratorFrame = 'androgynous',
+  customMaxCents?: number | null,
 ): string {
   const piece = SLOT_PHRASE[slot];
-  const budgetHint = BUDGET_HINT[budget];
+  const budgetHint = getBudgetHint(budget, customMaxCents);
   const person = framePrefix(frame);
 
   switch (vibe) {

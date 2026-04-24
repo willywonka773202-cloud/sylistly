@@ -24,6 +24,8 @@ interface SearchBody {
   category?: Category;
   mode?: 'live' | 'demo';
   frame?: GeneratorFrame;
+  priceMax?: number | null;
+  priceMin?: number | null;
 }
 
 type SearchSource = 'catalog' | 'live';
@@ -85,6 +87,19 @@ function shouldUseCatalogFirst(query: string, category: Category | undefined, de
   if (category && normalized === category) return true;
 
   return false;
+}
+
+function applyExplicitPriceBounds(
+  products: Product[],
+  priceMin?: number | null,
+  priceMax?: number | null,
+): Product[] {
+  return products.filter((product) => {
+    const price = product.priceCents || 0;
+    if (priceMin && price < priceMin * 100) return false;
+    if (priceMax && price > priceMax * 100) return false;
+    return true;
+  });
 }
 
 function imageLooksLikePlaceholder(imageUrl: string | undefined): boolean {
@@ -185,6 +200,8 @@ export async function POST(req: NextRequest) {
   const category = body.category;
   const mode = body.mode || 'live';
   const frame = normalizeSearchFrame(body.frame);
+  const explicitPriceMax = typeof body.priceMax === 'number' ? body.priceMax : null;
+  const explicitPriceMin = typeof body.priceMin === 'number' ? body.priceMin : null;
   const effectiveQuery = withFrameBias(query, category, frame);
   const cacheKey = `${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
   const isDev = process.env.NODE_ENV === 'development';
@@ -218,7 +235,11 @@ export async function POST(req: NextRequest) {
 
   try {
     if (!query.trim() && category) {
-      const featuredCatalogProducts = getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT, category).map((product) => ({
+      const featuredCatalogProducts = applyExplicitPriceBounds(
+        getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT * 2, category),
+        explicitPriceMin,
+        explicitPriceMax,
+      ).slice(0, SEARCH_RESULT_LIMIT).map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
@@ -236,6 +257,8 @@ export async function POST(req: NextRequest) {
       parseSearchIntentHeuristic(effectiveQuery, category),
       frame,
     );
+    fastIntent.priceMax = explicitPriceMax ?? fastIntent.priceMax ?? null;
+    fastIntent.priceMin = explicitPriceMin ?? fastIntent.priceMin ?? null;
     const photoCatalogProducts = searchPhotoCatalog(fastIntent, effectiveQuery).map((product) => ({
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
@@ -247,7 +270,11 @@ export async function POST(req: NextRequest) {
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
-    const mergedCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
+    const mergedCatalogProducts = applyExplicitPriceBounds(
+      mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts),
+      explicitPriceMin,
+      explicitPriceMax,
+    );
 
     if (mergedCatalogProducts.length && (useCatalogFirst || photoCatalogProducts.length > 0 || catalogOnlyMode)) {
       let catalogProducts = mergedCatalogProducts;
@@ -315,12 +342,15 @@ export async function POST(req: NextRequest) {
           await parseSearchIntent(effectiveQuery, category),
           frame,
         );
+        intent.priceMax = explicitPriceMax ?? intent.priceMax ?? null;
+        intent.priceMin = explicitPriceMin ?? intent.priceMin ?? null;
 
         const candidates = await searchShopping(intent, effectiveQuery);
-        const rerankLimit = Math.min(SEARCH_RESULT_LIMIT, candidates.length);
-        const ranked = candidates.length > rerankLimit
-          ? await rerankProducts(effectiveQuery, intent, candidates, rerankLimit)
-          : candidates.slice(0, rerankLimit);
+        const filteredCandidates = applyExplicitPriceBounds(candidates, explicitPriceMin, explicitPriceMax);
+        const rerankLimit = Math.min(SEARCH_RESULT_LIMIT, filteredCandidates.length);
+        const ranked = filteredCandidates.length > rerankLimit
+          ? await rerankProducts(effectiveQuery, intent, filteredCandidates, rerankLimit)
+          : filteredCandidates.slice(0, rerankLimit);
 
         const hydrationTargets = ranked.slice(0, 3);
         const untouched = ranked.slice(3);

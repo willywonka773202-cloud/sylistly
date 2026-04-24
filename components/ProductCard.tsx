@@ -48,7 +48,10 @@ function isSearchLikeUrl(url: string): boolean {
 export function ProductCard({ product: p, selected = false, onClick }: Props) {
   const buyUrl = p.retailerUrl || p.affiliateUrl || '#';
   const [imgFailed, setImgFailed] = useState(false);
-  const imageSrc = imgFailed || !p.imageUrl ? fallbackImage(p) : proxiedImageUrl(p.imageUrl);
+  const imageSrc =
+    imgFailed || !p.imageUrl
+      ? fallbackImage(p)
+      : proxiedImageUrl(p.imageUrl, { cutout: true, category: p.category });
   const retailHost = getHost(buyUrl);
   const searchLike = isSearchLikeUrl(buyUrl);
 
@@ -81,7 +84,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
           <img
             src={imageSrc}
             alt={`${p.brand} ${p.name}`}
-            className="relative h-[82%] w-[82%] object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
+            className="relative h-[92%] w-[92%] object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
             loading="lazy"
             referrerPolicy="no-referrer"
             onError={() => setImgFailed(true)}

@@ -14,6 +14,7 @@ import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import {
   VIBES,
+  getBudgetMaxCents,
   type GeneratorBudget,
   type GeneratorFrame,
   type VibeId,
@@ -41,6 +42,7 @@ function BuilderPageContent({
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
+  const [customBudgetInput, setCustomBudgetInput] = useState('');
   const [generatorLoading, setGeneratorLoading] = useState(false);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
   const router = useRouter();
@@ -49,6 +51,15 @@ function BuilderPageContent({
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
   const generatorFrame: GeneratorFrame =
     bodyType === 'custom' ? 'androgynous' : bodyType;
+  const customBudgetCents = customBudgetInput ? Number(customBudgetInput) * 100 : null;
+  const activePriceMax =
+    generatorBudget === 'any'
+      ? null
+      : generatorBudget === 'custom'
+      ? customBudgetInput
+        ? Number(customBudgetInput)
+        : null
+      : getBudgetMaxCents(generatorBudget) / 100;
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -91,7 +102,7 @@ function BuilderPageContent({
     const response = await fetch('/api/search', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ query, category, frame: generatorFrame }),
+      body: JSON.stringify({ query, category, frame: generatorFrame, priceMax: activePriceMax }),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -101,10 +112,16 @@ function BuilderPageContent({
     return firstProduct || null;
   }
 
-  async function generateLook(mode: 'starter' | 'missing') {
+  async function generateLook(mode: 'starter' | 'missing' | 'full' | 'refresh') {
     if (generatorLoading) return;
 
-    const targetSlots = activeVibe.slots.filter((slot) => mode === 'starter' || !items[slot]);
+    const targetSlots = (
+      mode === 'full'
+        ? CATEGORY_ORDER
+        : mode === 'refresh'
+        ? Array.from(new Set([...activeVibe.slots, ...CATEGORY_ORDER.filter((slot) => items[slot])]))
+        : activeVibe.slots
+    ).filter((slot) => mode !== 'missing' || !items[slot]);
     if (!targetSlots.length) {
       setStatusMessage('That vibe already filled all of its starter pieces. Try regenerate or switch vibes.');
       return;
@@ -126,6 +143,7 @@ function BuilderPageContent({
           vibe: selectedVibe,
           frame: generatorFrame,
           budget: generatorBudget,
+          customMaxCents: customBudgetCents,
           seed: Date.now(),
           avoidProductIds: recentGeneratedIds,
           mode,
@@ -153,10 +171,10 @@ function BuilderPageContent({
       if (unresolvedSlots.length) {
         const results = await Promise.allSettled(
           unresolvedSlots.map(async (slot) => ({
-            slot,
-            product: await runCategorySearch(
               slot,
-              vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame),
+              product: await runCategorySearch(
+              slot,
+              vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame, customBudgetCents),
             ),
           })),
         );
@@ -183,7 +201,11 @@ function BuilderPageContent({
       setStatusMessage(
         mode === 'starter'
           ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
-          : `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`,
+          : mode === 'missing'
+          ? `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          : mode === 'full'
+          ? `Built a fuller ${activeVibe.label.toLowerCase()} fit with ${addedCount} refreshed picks${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          : `Refreshed ${addedCount} pieces for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`,
       );
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Could not generate a look right now.');
@@ -352,11 +374,12 @@ function BuilderPageContent({
               <div className="mt-3 flex items-center justify-between gap-2">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
                 <div className="flex flex-wrap justify-end gap-2">
-                  {[
+                  {[ 
                     { value: 'any', label: 'Any' },
                     { value: 'under100', label: '< $100' },
                     { value: 'under250', label: '< $250' },
                     { value: 'under500', label: '< $500' },
+                    { value: 'custom', label: 'Custom' },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -373,6 +396,22 @@ function BuilderPageContent({
                   ))}
                 </div>
               </div>
+
+              {generatorBudget === 'custom' ? (
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Custom max</div>
+                  <label className="flex items-center gap-2 rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink">
+                    <span className="text-muted">$</span>
+                    <input
+                      value={customBudgetInput}
+                      onChange={(event) => setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4))}
+                      inputMode="numeric"
+                      placeholder="180"
+                      className="w-16 bg-transparent text-right outline-none"
+                    />
+                  </label>
+                </div>
+              ) : null}
 
               <div className="mt-3 flex items-center justify-between gap-2">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
@@ -415,6 +454,22 @@ function BuilderPageContent({
                   className="rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
                 >
                   Fill missing pieces
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('refresh')}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                >
+                  Refresh look
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('full')}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                >
+                  Build fuller fit
                 </button>
               </div>
 
@@ -460,6 +515,7 @@ function BuilderPageContent({
         category={searchFor}
         initialQuery={searchFor ? quickQuery : null}
         frame={generatorFrame}
+        priceMax={activePriceMax}
         onClose={closeSearchSheet}
       />
 

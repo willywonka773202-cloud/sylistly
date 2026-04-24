@@ -7,7 +7,8 @@ interface LookBody {
   vibe?: VibeId;
   frame?: GeneratorFrame;
   budget?: GeneratorBudget;
-  mode?: 'starter' | 'missing';
+  customMaxCents?: number | null;
+  mode?: 'starter' | 'missing' | 'full' | 'refresh';
   seed?: number;
   avoidProductIds?: string[];
   currentItems?: Partial<Record<Category, Product>>;
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
     vibe,
     frame,
     budget,
+    customMaxCents: typeof body.customMaxCents === 'number' ? body.customMaxCents : null,
     seed,
     avoidProductIds: Array.isArray(body.avoidProductIds) ? body.avoidProductIds : [],
     currentItems: body.currentItems || {},

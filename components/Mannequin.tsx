@@ -186,43 +186,22 @@ function BoardProduct({
 }
 
 function resolveBoardPlacements(items: Partial<Record<Category, Product>>): Partial<Record<Category, string>> {
+  const hasHat = Boolean(items.hat);
   const hasTop = Boolean(items.top);
-  const hasOuter = Boolean(items.outer);
   const hasBottom = Boolean(items.bottom);
-  const hasBag = Boolean(items.bag);
-  const hasJewelry = Boolean(items.jewelry);
-  const hasUpperPair = hasTop && hasOuter;
-  const hasAccessoryRow = Boolean(items.eyewear || items.hat);
+  const hasShoes = Boolean(items.shoes);
 
   return {
-    eyewear: items.eyewear ? 'left-[28px] top-[20px] h-[34px] w-[82px] -rotate-[3deg]' : undefined,
-    hat: items.hat ? 'right-[28px] top-[18px] h-[42px] w-[94px] rotate-[2deg]' : undefined,
-    outer: items.outer
-      ? hasTop
-        ? 'left-[18px] top-[76px] h-[126px] w-[132px] -rotate-[2deg]'
-        : `left-1/2 ${hasAccessoryRow ? 'top-[72px]' : 'top-[62px]'} h-[146px] w-[156px] -translate-x-1/2 -rotate-[1deg]`
+    hat: hasHat ? 'left-1/2 top-[16px] h-[44px] w-[102px] -translate-x-1/2' : undefined,
+    top: hasTop ? `left-1/2 ${hasHat ? 'top-[66px]' : 'top-[46px]'} h-[118px] w-[136px] -translate-x-1/2` : undefined,
+    bottom: hasBottom ? `left-1/2 ${hasTop ? 'top-[176px]' : hasHat ? 'top-[124px]' : 'top-[102px]'} h-[138px] w-[124px] -translate-x-1/2` : undefined,
+    shoes: hasShoes
+      ? `left-1/2 ${hasBottom ? 'bottom-[18px]' : 'bottom-[34px]'} h-[50px] w-[156px] -translate-x-1/2`
       : undefined,
-    top: items.top
-      ? hasOuter
-        ? 'right-[18px] top-[82px] h-[98px] w-[108px] rotate-[1deg]'
-        : `left-1/2 ${hasAccessoryRow ? 'top-[74px]' : 'top-[64px]'} h-[124px] w-[122px] -translate-x-1/2`
-      : undefined,
-    bottom: hasBottom ? 'left-1/2 top-[166px] h-[136px] w-[116px] -translate-x-1/2' : undefined,
-    bag: hasBag
-      ? hasBottom
-        ? `left-[22px] ${hasUpperPair ? 'top-[232px]' : 'top-[220px]'} h-[74px] w-[74px] -rotate-[2deg]`
-        : 'left-[26px] top-[206px] h-[76px] w-[74px] -rotate-[2deg]'
-      : undefined,
-    jewelry: hasJewelry
-      ? hasBag
-        ? 'right-[34px] top-[228px] h-[28px] w-[28px]'
-        : 'right-[30px] top-[208px] h-[30px] w-[30px]'
-      : undefined,
-    shoes: items.shoes
-      ? hasBottom
-        ? 'left-1/2 bottom-[18px] h-[48px] w-[152px] -translate-x-1/2 -rotate-[1deg]'
-        : 'left-1/2 bottom-[26px] h-[50px] w-[156px] -translate-x-1/2 -rotate-[1deg]'
-      : undefined,
+    outer: items.outer ? 'left-[10px] top-[86px] h-[128px] w-[110px] -rotate-[4deg]' : undefined,
+    bag: items.bag ? 'left-[20px] bottom-[42px] h-[76px] w-[76px] -rotate-[3deg]' : undefined,
+    eyewear: items.eyewear ? 'right-[18px] top-[42px] h-[34px] w-[86px] rotate-[4deg]' : undefined,
+    jewelry: items.jewelry ? 'right-[26px] top-[204px] h-[34px] w-[34px] rotate-[4deg]' : undefined,
   };
 }
 

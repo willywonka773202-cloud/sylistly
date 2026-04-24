@@ -48,6 +48,7 @@ interface Props {
   category: Category | null;
   initialQuery?: string | null;
   frame?: GeneratorFrame;
+  priceMax?: number | null;
   onClose: () => void;
 }
 
@@ -56,6 +57,7 @@ export function SearchSheet({
   category,
   initialQuery,
   frame = 'androgynous',
+  priceMax = null,
   onClose,
 }: Props) {
   const [query, setQuery] = useState('');
@@ -67,6 +69,10 @@ export function SearchSheet({
   const [catalogKind, setCatalogKind] = useState<'photo' | 'starter' | 'blend' | null>(null);
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
+  const [searchPriceMax, setSearchPriceMax] = useState<number | null>(priceMax);
+  const [customPriceInput, setCustomPriceInput] = useState(
+    priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
+  );
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
   const selectedItem = useFit((s) => (category ? s.items[category] : null));
@@ -83,7 +89,11 @@ export function SearchSheet({
     setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
-  }, [open, category, initialQuery, frame]);
+    setSearchPriceMax(priceMax);
+    setCustomPriceInput(
+      priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
+    );
+  }, [open, category, initialQuery, frame, priceMax]);
 
   useEffect(() => {
     if (!open || !category || !initialQuery?.trim()) return;
@@ -107,7 +117,7 @@ export function SearchSheet({
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, category: cat, mode, frame }),
+        body: JSON.stringify({ query: trimmed, category: cat, mode, frame, priceMax: searchPriceMax }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -265,6 +275,43 @@ export function SearchSheet({
                 Search
               </button>
             </form>
+
+            <div className="flex gap-2 px-4 pb-2.5 overflow-x-auto scrollbar-hide">
+              {[
+                { label: 'Any', value: null },
+                { label: '< $100', value: 100 },
+                { label: '< $250', value: 250 },
+                { label: '< $500', value: 500 },
+              ].map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => {
+                    setSearchPriceMax(option.value);
+                    if (option.value !== null) setCustomPriceInput('');
+                  }}
+                  className={`flex-none whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-semibold ${
+                    searchPriceMax === option.value
+                      ? 'bg-accent text-white shadow-pink-glow'
+                      : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+              <input
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={customPriceInput}
+                onChange={(event) => {
+                  const cleaned = event.target.value.replace(/[^\d]/g, '').slice(0, 4);
+                  setCustomPriceInput(cleaned);
+                  setSearchPriceMax(cleaned ? Number(cleaned) : null);
+                }}
+                placeholder="Custom $"
+                className="min-w-[96px] rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
+              />
+            </div>
 
             <div className="flex gap-2 px-4 pb-2.5 overflow-x-auto scrollbar-hide">
               {suggestions.map((c) => (

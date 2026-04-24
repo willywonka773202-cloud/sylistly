@@ -91,6 +91,8 @@ export function searchPhotoCatalog(
   if (!pool.length) return [];
 
   const scored = pool
+    .filter((product) => !intent.priceMax || product.priceCents <= intent.priceMax * 100)
+    .filter((product) => !intent.priceMin || product.priceCents >= intent.priceMin * 100)
     .map((product) => ({
       product,
       score: photoCatalogScore(product, intent, rawQuery),
