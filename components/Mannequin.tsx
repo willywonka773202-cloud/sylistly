@@ -18,7 +18,8 @@ const FRAME_LABELS: Record<GeneratorFrame, string> = {
 };
 
 const CENTER_ORDER: Category[] = ['top', 'bottom', 'shoes'];
-const SIDE_ORDER: Category[] = ['outer', 'hat', 'bag', 'eyewear', 'jewelry'];
+const LEFT_RAIL_ORDER: Category[] = ['hat', 'outer', 'top', 'bag'];
+const RIGHT_RAIL_ORDER: Category[] = ['eyewear', 'jewelry', 'bottom', 'shoes'];
 type Placement = { className: string; style?: CSSProperties };
 
 export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
@@ -26,10 +27,8 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   const hasItems = count > 0;
   const warmGlow = skinTone || '#edd7cc';
   const centerPlacements = resolveCenterPlacements(items);
-  const sideItems = SIDE_ORDER.filter((category) => items[category]);
-  const splitIndex = Math.ceil(sideItems.length / 2);
-  const leftRail = sideItems.slice(0, splitIndex);
-  const rightRail = sideItems.slice(splitIndex);
+  const leftRail = LEFT_RAIL_ORDER.filter((category) => items[category]);
+  const rightRail = RIGHT_RAIL_ORDER.filter((category) => items[category]);
 
   return (
     <div
@@ -60,24 +59,24 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="absolute inset-[12px] rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.3),transparent_18%,transparent_82%,rgba(237,228,221,.22))]" />
 
-        <div className="absolute left-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-8">
+        <div className="absolute left-[16px] top-[48px] z-10 flex w-[88px] flex-col gap-5">
           {leftRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
         </div>
 
-        <div className="absolute right-[18px] top-[54px] z-10 flex w-[80px] flex-col gap-8">
+        <div className="absolute right-[16px] top-[48px] z-10 flex w-[88px] flex-col gap-5">
           {rightRail.map((category) => (
             <SideCard key={category} category={category} product={items[category]!} />
           ))}
         </div>
 
-        <div className="absolute left-1/2 top-[34px] z-0 h-[300px] w-[164px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+        <div className="absolute left-1/2 top-[28px] z-0 h-[314px] w-[176px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.82),transparent_32%)]" />
-          <div className="absolute left-1/2 top-[34px] h-[58px] w-[54px] -translate-x-1/2 rounded-[24px] bg-[#e9e5e2]/85 blur-[2px]" />
-          <div className="absolute left-1/2 top-[78px] h-[122px] w-[86px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
-          <div className="absolute left-1/2 top-[186px] h-[90px] w-[82px] -translate-x-1/2 rounded-[34px] bg-[#f0ece9]/90 blur-[2px]" />
-          <div className="absolute left-1/2 bottom-[18px] h-[12px] w-[94px] -translate-x-1/2 rounded-full bg-[#d9d0ca]/52 blur-[6px]" />
+          <div className="absolute left-1/2 top-[30px] h-[62px] w-[58px] -translate-x-1/2 rounded-[24px] bg-[#e9e5e2]/85 blur-[2px]" />
+          <div className="absolute left-1/2 top-[74px] h-[130px] w-[92px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
+          <div className="absolute left-1/2 top-[194px] h-[92px] w-[84px] -translate-x-1/2 rounded-[34px] bg-[#f0ece9]/90 blur-[2px]" />
+          <div className="absolute left-1/2 bottom-[12px] h-[12px] w-[102px] -translate-x-1/2 rounded-full bg-[#d9d0ca]/52 blur-[6px]" />
 
           {CENTER_ORDER.map((category, index) => {
             const product = items[category];
@@ -124,12 +123,16 @@ function SideCard({ category, product }: { category: Category; product: Product 
       <div className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#b09d93]">
         {category === 'bag' ? 'Bag' : category}
       </div>
-      <div className="mt-2 flex h-[88px] items-center justify-center overflow-hidden rounded-[14px] bg-white">
+      <div className={`mt-2 flex items-center justify-center overflow-hidden rounded-[14px] bg-white ${
+        category === 'bag' ? 'h-[102px]' : category === 'shoes' ? 'h-[94px]' : 'h-[88px]'
+      }`}>
         <PreviewImage
           product={product}
           category={category}
           wrapperClassName="h-full w-full"
-          modeClassName="h-full w-full object-contain p-1.5"
+          modeClassName={`h-full w-full object-contain ${
+            category === 'bag' ? 'p-1' : category === 'shoes' ? 'p-2 object-bottom' : 'p-1.5'
+          }`}
           blend={false}
         />
       </div>
@@ -185,17 +188,17 @@ function resolveCenterPlacements(items: Partial<Record<Category, Product>>): Par
   const hasBottom = Boolean(items.bottom);
   const hasShoes = Boolean(items.shoes);
 
-  const topBase = 18;
-  const bottomTop = hasTop ? 132 : 96;
+  const topBase = 8;
+  const bottomTop = hasTop ? 126 : 88;
 
   return {
     top: hasTop
-      ? { className: 'left-1/2 h-[136px] w-[158px] -translate-x-1/2', style: { top: topBase } }
+      ? { className: 'left-1/2 h-[152px] w-[172px] -translate-x-1/2', style: { top: topBase } }
       : undefined,
     bottom: hasBottom
-      ? { className: 'left-1/2 h-[154px] w-[124px] -translate-x-1/2', style: { top: bottomTop } }
+      ? { className: 'left-1/2 h-[164px] w-[136px] -translate-x-1/2', style: { top: bottomTop } }
       : undefined,
-    shoes: hasShoes ? { className: 'left-1/2 bottom-[8px] h-[42px] w-[118px] -translate-x-1/2' } : undefined,
+    shoes: hasShoes ? { className: 'left-1/2 bottom-[0px] h-[52px] w-[134px] -translate-x-1/2' } : undefined,
   };
 }
 
