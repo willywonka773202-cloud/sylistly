@@ -29,3 +29,12 @@ body {
     linear-gradient(180deg, rgba(255,255,255,.18), transparent 44%),
     var(--skin);
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Bookmark, ExternalLink, LoaderCircle, Sparkles } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mannequin } from '@/components/Mannequin';
+import { Mannequin, type FitVariant } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
@@ -20,6 +20,52 @@ import {
   type VibeId,
   vibeSearchQuery,
 } from '@/lib/vibes';
+
+const EDITORIAL_LOADING_LINES = [
+  'Balancing silhouette...',
+  'Matching tones...',
+  'Placing accessories...',
+  'Polishing the board...',
+];
+
+const FIT_VARIANT_MAP: Record<FitVariant, Partial<Record<VibeId, VibeId>>> = {
+  casual: {
+    night: 'clean',
+    street: 'cozy',
+    clean: 'cozy',
+    gym: 'cozy',
+    cozy: 'cozy',
+    date: 'clean',
+    office: 'clean',
+    vacation: 'cozy',
+    edgy: 'street',
+    preppy: 'clean',
+  },
+  elevated: {
+    night: 'night',
+    street: 'office',
+    clean: 'office',
+    gym: 'clean',
+    cozy: 'office',
+    date: 'night',
+    office: 'office',
+    vacation: 'date',
+    edgy: 'night',
+    preppy: 'office',
+  },
+  bold: {
+    night: 'edgy',
+    street: 'street',
+    clean: 'edgy',
+    gym: 'street',
+    cozy: 'street',
+    date: 'night',
+    office: 'edgy',
+    vacation: 'street',
+    edgy: 'edgy',
+    preppy: 'street',
+  },
+};
 
 function BuilderPageContent({
   quickSlot,
@@ -44,6 +90,7 @@ function BuilderPageContent({
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [customBudgetInput, setCustomBudgetInput] = useState('');
   const [generatorLoading, setGeneratorLoading] = useState(false);
+  const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
   const router = useRouter();
   const total = totalCents();
@@ -66,6 +113,19 @@ function BuilderPageContent({
     const timeout = window.setTimeout(() => setStatusMessage(null), 4500);
     return () => window.clearTimeout(timeout);
   }, [statusMessage]);
+
+  useEffect(() => {
+    if (!generatorLoading) {
+      setLoadingPhraseIndex(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setLoadingPhraseIndex((current) => (current + 1) % EDITORIAL_LOADING_LINES.length);
+    }, 1150);
+
+    return () => window.clearInterval(interval);
+  }, [generatorLoading]);
 
   useEffect(() => {
     const hydrated = hydrateItemsFromCatalog(items);
@@ -112,19 +172,25 @@ function BuilderPageContent({
     return firstProduct || null;
   }
 
-  async function generateLook(mode: 'starter' | 'missing' | 'full' | 'refresh') {
+  async function generateLook(
+    mode: 'starter' | 'missing' | 'full' | 'refresh',
+    options?: { vibeId?: VibeId; sourceLabel?: string },
+  ) {
     if (generatorLoading) return;
     if (generatorBudget === 'custom' && (!customBudgetCents || customBudgetCents <= 0)) {
       setStatusMessage('Enter a custom max price first.');
       return;
     }
 
+    const vibeId = options?.vibeId || selectedVibe;
+    const workingVibe = VIBES.find((vibe) => vibe.id === vibeId) || activeVibe;
+
     const targetSlots = (
       mode === 'full'
         ? CATEGORY_ORDER
         : mode === 'refresh'
-        ? Array.from(new Set([...activeVibe.slots, ...CATEGORY_ORDER.filter((slot) => items[slot])]))
-        : activeVibe.slots
+        ? Array.from(new Set([...workingVibe.slots, ...CATEGORY_ORDER.filter((slot) => items[slot])]))
+        : workingVibe.slots
     ).filter((slot) => mode !== 'missing' || !items[slot]);
     if (!targetSlots.length) {
       setStatusMessage('That vibe already filled all of its starter pieces. Try regenerate or switch vibes.');
@@ -144,7 +210,7 @@ function BuilderPageContent({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          vibe: selectedVibe,
+          vibe: vibeId,
           frame: generatorFrame,
           budget: generatorBudget,
           customMaxCents: customBudgetCents,
@@ -178,7 +244,7 @@ function BuilderPageContent({
               slot,
               product: await runCategorySearch(
               slot,
-              vibeSearchQuery(selectedVibe, slot, generatorBudget, generatorFrame, customBudgetCents),
+              vibeSearchQuery(vibeId, slot, generatorBudget, generatorFrame, customBudgetCents),
             ),
           })),
         );
@@ -202,20 +268,33 @@ function BuilderPageContent({
           .map((product) => product.id);
         return Array.from(new Set([...freshIds, ...current])).slice(0, 72);
       });
+      const sourceLead = options?.sourceLabel ? `${options.sourceLabel} ` : '';
       setStatusMessage(
         mode === 'starter'
-          ? `Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          ? `${sourceLead}Generated ${addedCount} starter piece${addedCount !== 1 ? 's' : ''} for ${workingVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
           : mode === 'missing'
-          ? `Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          ? `${sourceLead}Filled ${addedCount} missing piece${addedCount !== 1 ? 's' : ''} for ${workingVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
           : mode === 'full'
-          ? `Built a fuller ${activeVibe.label.toLowerCase()} fit with ${addedCount} refreshed picks${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
-          : `Refreshed ${addedCount} pieces for ${activeVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`,
+          ? `${sourceLead}Built a fuller ${workingVibe.label.toLowerCase()} fit with ${addedCount} refreshed picks${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`
+          : `${sourceLead}Refreshed ${addedCount} pieces for ${workingVibe.label.toLowerCase()}${collectionLabel ? ` using ${collectionLabel.toLowerCase()}` : ''}${assistantLabel || ''}.`,
       );
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Could not generate a look right now.');
     } finally {
       setGeneratorLoading(false);
     }
+  }
+
+  async function generateVariant(variant: FitVariant) {
+    const mappedVibe = FIT_VARIANT_MAP[variant][selectedVibe] || selectedVibe;
+    if (mappedVibe !== selectedVibe) {
+      setSelectedVibe(mappedVibe);
+    }
+
+    await generateLook('full', {
+      vibeId: mappedVibe,
+      sourceLabel: `${variant.charAt(0).toUpperCase() + variant.slice(1)} pass.`,
+    });
   }
 
   async function saveFit() {
@@ -309,25 +388,28 @@ function BuilderPageContent({
 
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-3 px-4 pb-4 pt-3.5">
-          <section className="rounded-[30px] border border-hairline bg-surface-1 p-3 shadow-[0_24px_60px_rgba(0,0,0,.28)]">
-            <div className="mb-3 flex items-start justify-between gap-3 px-1">
-              <div>
-                <div className="text-[9px] tracking-[.18em] text-muted uppercase">Styling board</div>
-                <div className="mt-1 font-serif text-[22px] font-semibold text-ink">
-                  Live fit <em className="italic text-accent">layout</em>
-                </div>
+          <section className="flex flex-col gap-3">
+            <div className="px-1">
+              <div className="text-[9px] tracking-[.18em] text-muted uppercase">Styling board</div>
+              <div className="mt-1 font-serif text-[22px] font-semibold text-ink">
+                Premium <em className="italic text-accent">AI fit board</em>
               </div>
-              <div className="rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-right">
-                <div className="font-serif text-[22px] font-semibold leading-none text-ink">
-                  {Math.round((n / CATEGORY_ORDER.length) * 100)}%
-                </div>
-                <div className="mt-1 text-[9px] uppercase tracking-[.14em] text-muted">
-                  {n} styled
-                </div>
+              <div className="mt-1 max-w-[340px] text-[11px] leading-relaxed text-muted-2">
+                Anchor every piece to a cleaner body zone, polish the silhouette automatically, and keep product cards separate from the worn look.
               </div>
             </div>
-            <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-            <div className="mt-3 flex flex-wrap gap-2 px-1">
+            <Mannequin
+              items={items}
+              skinTone={skinTone}
+              bodyType={generatorFrame}
+              vibeLabel={activeVibe.label}
+              vibeBlurb={activeVibe.blurb}
+              onOpenSearch={setSearchFor}
+              onGenerateVariant={(variant) => {
+                void generateVariant(variant);
+              }}
+            />
+            <div className="flex flex-wrap gap-2 px-1">
               <span className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[10px] uppercase tracking-[.14em] text-muted">
                 {generatorFrame === 'masc' ? 'Menswear' : generatorFrame === 'fem' ? 'Womenswear' : 'Neutral'} bias
               </span>
@@ -341,13 +423,13 @@ function BuilderPageContent({
           </section>
           <section className="flex flex-col gap-3">
             <div className="flex justify-between items-baseline px-0.5 pb-0.5">
-              <div className="font-serif font-semibold text-[20px]">Outfit <em className="italic text-accent">Builder</em></div>
+              <div className="font-serif font-semibold text-[20px]">AI styling <em className="italic text-accent">controls</em></div>
               <div className="text-[10px] text-muted">{n} piece{n !== 1 ? 's' : ''}</div>
             </div>
             <div className="px-0.5 text-[12px] leading-relaxed text-muted-2">
-              Generate a starter fit from the free Sylistly catalog, then tap any slot to swap pieces manually.
+              Generate a base direction, fill gaps, refresh the board, then use the tray to swap individual slots manually.
             </div>
-            <div className="rounded-[24px] border border-hairline bg-surface-1 p-3.5">
+            <div className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))] p-3.5 shadow-[0_22px_48px_rgba(0,0,0,.18)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
@@ -359,6 +441,12 @@ function BuilderPageContent({
                   </div>
                   <div className="mt-1 text-[11px] leading-relaxed text-muted-2">
                     {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
+                  </div>
+                </div>
+                <div className="rounded-[20px] border border-hairline bg-surface-2 px-3 py-2 text-right">
+                  <div className="text-[10px] uppercase tracking-[.16em] text-muted">AI pass</div>
+                  <div className="mt-1 text-[11px] text-ink">
+                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'Ready to style'}
                   </div>
                 </div>
               </div>
@@ -425,11 +513,17 @@ function BuilderPageContent({
                 </div>
               ) : null}
 
-              {generatorBudget === 'custom' ? (
+                {generatorBudget === 'custom' ? (
                 <div className="mt-2 text-[11px] text-muted-2">
                   {customBudgetInput
                     ? `Generating pieces at or below $${customBudgetInput} each.`
                     : 'Set a per-item max price for generated pieces.'}
+                </div>
+              ) : null}
+
+              {generatorLoading ? (
+                <div className="mt-3 rounded-[18px] border border-accent/20 bg-accent/10 px-3 py-2 text-[11px] text-[#ffe7ee]">
+                  {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
                 </div>
               ) : null}
 
@@ -504,7 +598,20 @@ function BuilderPageContent({
                 ))}
               </div>
             </div>
-            <SlotList onOpenSearch={setSearchFor} />
+            <div className="rounded-[28px] border border-hairline bg-surface-1 p-3.5 shadow-[0_18px_42px_rgba(0,0,0,.16)]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[.18em] text-muted">Item tray</div>
+                  <div className="mt-1 font-serif text-[18px] font-semibold text-ink">
+                    Swap and refine <em className="italic text-accent">slot by slot</em>
+                  </div>
+                </div>
+                <div className="text-[10px] uppercase tracking-[.16em] text-muted">{CATEGORY_ORDER.length} zones</div>
+              </div>
+              <div className="mt-3">
+                <SlotList onOpenSearch={setSearchFor} />
+              </div>
+            </div>
           </section>
         </div>
       </div>
