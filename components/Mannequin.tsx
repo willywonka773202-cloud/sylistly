@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, type CSSProperties } from 'react';
 import { proxiedImageUrl } from '@/lib/image-url';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
@@ -10,68 +11,33 @@ interface Props {
   bodyType?: GeneratorFrame;
 }
 
-type BoardLayout = {
-  className: string;
-  imageClassName: string;
-  placements: Partial<Record<Category, string>>;
-  order: Category[];
-};
-
-const PRODUCT_SCALE: Partial<Record<Category, string>> = {
-  eyewear: 'scale(1.08)',
-  hat: 'scale(1.1)',
-  outer: 'scale(1.08)',
-  top: 'scale(1.12)',
-  bottom: 'scale(1.08)',
-  bag: 'scale(1.08)',
-  jewelry: 'scale(1.1)',
-  shoes: 'scale(0.96)',
-};
-
-const PRODUCT_POSITION: Partial<Record<Category, string>> = {
-  eyewear: 'center center',
-  hat: 'center center',
-  outer: 'center top',
-  top: 'center top',
-  bottom: 'center top',
-  bag: 'center center',
-  jewelry: 'center center',
-  shoes: 'center bottom',
-};
-
 const FRAME_LABELS: Record<GeneratorFrame, string> = {
   masc: 'Menswear edit',
   fem: 'Womenswear edit',
   androgynous: 'Neutral edit',
 };
 
-const BOARD_LAYOUT: BoardLayout = {
-  className: 'left-1/2 top-[88px] h-[354px] w-[340px] -translate-x-1/2',
-  imageClassName: 'drop-shadow-[0_12px_22px_rgba(0,0,0,.12)]',
-  order: ['eyewear', 'hat', 'outer', 'top', 'bottom', 'bag', 'jewelry', 'shoes'],
-  placements: {},
-};
-
-const EMPTY_HINTS = [
-  { className: 'left-[34px] top-[54px] h-[88px] w-[74px] rotate-[-6deg]', label: 'Top' },
-  { className: 'left-[48px] top-[150px] h-[126px] w-[82px] rotate-[2deg]', label: 'Bottom' },
-  { className: 'left-[48px] bottom-[28px] h-[36px] w-[88px] rotate-[-4deg]', label: 'Shoes' },
-];
+const CENTER_ORDER: Category[] = ['hat', 'eyewear', 'outer', 'top', 'jewelry', 'bottom', 'bag', 'shoes'];
+const LEFT_RAIL_ORDER: Category[] = ['hat', 'outer', 'top', 'bag'];
+const RIGHT_RAIL_ORDER: Category[] = ['eyewear', 'bottom', 'shoes', 'jewelry'];
+type Placement = { className: string; style?: CSSProperties };
 
 export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
-  const filledItems = Object.entries(items).filter((entry): entry is [Category, Product] => Boolean(entry[1]));
-  const count = filledItems.length;
+  const count = Object.values(items).filter(Boolean).length;
   const hasItems = count > 0;
   const warmGlow = skinTone || '#edd7cc';
+  const centerPlacements = resolveCenterPlacements(items);
+  const leftRail = LEFT_RAIL_ORDER.filter((category) => items[category]).slice(0, 3);
+  const rightRail = RIGHT_RAIL_ORDER.filter((category) => items[category]).slice(0, 3);
 
   return (
     <div
-      className="relative h-[468px] w-full overflow-hidden rounded-[30px] border border-[#ebe0d8] bg-[#f7f2ee]"
+      className="relative h-[520px] w-full overflow-hidden rounded-[30px] border border-[#ebe0d8] bg-[#f7f2ee]"
       style={{
-        backgroundImage: `radial-gradient(circle at 50% 14%, rgba(255,255,255,.9), transparent 32%), radial-gradient(circle at 50% 58%, ${hexToRgba(warmGlow, 0.14)}, transparent 36%), linear-gradient(180deg, #faf7f4 0%, #f4ece6 50%, #eee4dd 100%)`,
+        backgroundImage: `radial-gradient(circle at 50% 12%, rgba(255,255,255,.94), transparent 28%), radial-gradient(circle at 50% 62%, ${hexToRgba(warmGlow, 0.14)}, transparent 34%), linear-gradient(180deg, #fbf8f5 0%, #f4ece6 56%, #eee3dc 100%)`,
       }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,.62),transparent_58%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,.74),transparent_56%)]" />
       <div className="absolute -left-10 top-36 h-40 w-40 rounded-full bg-white/45 blur-3xl" />
       <div className="absolute -right-10 top-28 h-44 w-44 rounded-full bg-[#f3e2da]/52 blur-3xl" />
 
@@ -89,16 +55,60 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         </div>
       </div>
 
-      <FitBoard layout={BOARD_LAYOUT} items={items} hasItems={hasItems} />
+      <div className="absolute left-1/2 top-[74px] h-[382px] w-[352px] -translate-x-1/2 overflow-hidden rounded-[34px] border border-[#ebe1da] bg-white shadow-[0_22px_46px_rgba(84,54,43,.12)]">
+        <div className="absolute inset-[12px] rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.3),transparent_18%,transparent_82%,rgba(237,228,221,.22))]" />
 
-      {!hasItems ? (
-        <div className="absolute left-1/2 top-[184px] z-30 w-[174px] -translate-x-1/2 rounded-[24px] border border-white/70 bg-white/88 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.1)] backdrop-blur">
-          <div className="font-serif text-[18px] font-semibold text-[#2f2723]">Start styling</div>
-          <div className="mt-1 text-[11px] leading-relaxed text-[#7f6f66]">
-            Add pieces below and Sylistly will lay them out as a clean shopping board.
-          </div>
+        <div className="absolute left-[18px] top-[56px] z-10 flex w-[82px] flex-col gap-12">
+          {leftRail.map((category) => (
+            <SideCard key={category} category={category} product={items[category]!} />
+          ))}
         </div>
-      ) : null}
+
+        <div className="absolute right-[18px] top-[56px] z-10 flex w-[82px] flex-col gap-12">
+          {rightRail.map((category) => (
+            <SideCard key={category} category={category} product={items[category]!} />
+          ))}
+        </div>
+
+        <div className="absolute left-1/2 top-[34px] z-0 h-[300px] w-[152px] -translate-x-1/2 overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#f1f0ef_0%,#ffffff_38%,#f3f1ef_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.82),transparent_32%)]" />
+          <div className="absolute left-1/2 top-[34px] h-[58px] w-[54px] -translate-x-1/2 rounded-[24px] bg-[#e9e5e2]/85 blur-[2px]" />
+          <div className="absolute left-1/2 top-[78px] h-[120px] w-[82px] -translate-x-1/2 rounded-[36px] bg-[#efebe8]/92 blur-[2px]" />
+          <div className="absolute left-1/2 top-[190px] h-[86px] w-[78px] -translate-x-1/2 rounded-[34px] bg-[#f0ece9]/90 blur-[2px]" />
+          <div className="absolute left-1/2 bottom-[18px] h-[12px] w-[94px] -translate-x-1/2 rounded-full bg-[#d9d0ca]/52 blur-[6px]" />
+
+          {CENTER_ORDER.map((category, index) => {
+            const product = items[category];
+            const placement = centerPlacements[category];
+            if (!product || !placement) return null;
+            return (
+              <div
+                key={`${category}-${product.id}`}
+                className={`absolute ${placement.className}`}
+                style={{ zIndex: index + 1, ...(placement.style || {}) }}
+              >
+                <PreviewImage
+                  product={product}
+                  category={category}
+                  modeClassName={centerImageClassName(category)}
+                  wrapperClassName="h-full w-full"
+                  blend={category !== 'bag' && category !== 'jewelry'}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {!hasItems ? (
+          <div className="absolute left-1/2 top-[158px] z-30 w-[178px] -translate-x-1/2 rounded-[22px] border border-white/70 bg-white/88 px-4 py-3 text-center shadow-[0_12px_30px_rgba(84,54,43,.1)] backdrop-blur">
+            <div className="font-serif text-[18px] font-semibold text-[#2f2723]">Start styling</div>
+            <div className="mt-1 text-[11px] leading-relaxed text-[#7f6f66]">
+              Add pieces and Sylistly will compose them into a cleaner fit board.
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       <div className="absolute bottom-5 left-4 z-20 rounded-full border border-black/5 bg-white/78 px-3 py-1.5 text-[10px] uppercase tracking-[.18em] text-[#7f6d64] shadow-[0_8px_20px_rgba(84,54,43,.08)] backdrop-blur">
         {count ? `${count} product${count !== 1 ? 's' : ''} in look` : 'Waiting for pieces'}
@@ -107,102 +117,110 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
   );
 }
 
-function FitBoard({ layout, items, hasItems }: { layout: BoardLayout; items: Partial<Record<Category, Product>>; hasItems: boolean }) {
-  const placements = resolveBoardPlacements(items);
-
+function SideCard({ category, product }: { category: Category; product: Product }) {
   return (
-    <div
-      className={`absolute overflow-hidden rounded-[34px] border border-[#ebe1da] bg-white shadow-[0_22px_46px_rgba(84,54,43,.12)] ${layout.className}`}
-    >
-      <div className="absolute inset-[10px] rounded-[26px] bg-[linear-gradient(180deg,#ffffff_0%,#fdfaf7_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.28),transparent_18%,transparent_82%,rgba(237,228,221,.28))]" />
-
-      {layout.order.map((category, index) => {
-        const product = items[category];
-        const placement = placements[category];
-        if (!product || !placement) return null;
-        return (
-          <BoardProduct
-            key={`${category}-${product.id}`}
-            product={product}
-            category={category}
-            className={placement}
-            imageClassName={layout.imageClassName}
-            zIndex={index + 1}
-          />
-        );
-      })}
-
-      {!hasItems
-        ? EMPTY_HINTS.map((hint) => (
-            <div
-              key={hint.label}
-              className={`absolute rounded-[24px] border border-dashed border-[#d9cac1] bg-[#fcfaf8]/92 ${hint.className}`}
-            >
-              <div className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-[.18em] text-[#b39d92]">
-                {hint.label}
-              </div>
-            </div>
-          ))
-        : null}
+    <div className="rounded-[18px] border border-[#eee7e0] bg-[#fbfaf8]/96 p-3 shadow-[0_10px_18px_rgba(84,54,43,.06)]">
+      <div className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#b09d93]">
+        {category === 'bag' ? 'Bag' : category}
+      </div>
+      <div className="mt-2 flex h-[94px] items-center justify-center overflow-hidden rounded-[14px] bg-white">
+        <PreviewImage
+          product={product}
+          category={category}
+          wrapperClassName="h-full w-full"
+          modeClassName="h-full w-full object-contain p-1.5"
+          blend={false}
+        />
+      </div>
     </div>
   );
 }
 
-function BoardProduct({
+function PreviewImage({
   product,
   category,
-  className,
-  imageClassName,
-  zIndex,
+  wrapperClassName,
+  modeClassName,
+  blend,
 }: {
   product: Product;
   category: Category;
-  className: string;
-  imageClassName: string;
-  zIndex: number;
+  wrapperClassName: string;
+  modeClassName: string;
+  blend: boolean;
 }) {
+  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
+    product.imageUrl ? 'cutout' : 'fallback',
+  );
+
+  const src =
+    imageMode === 'fallback' || !product.imageUrl
+      ? overlayFallback(product.brand)
+      : imageMode === 'cutout'
+      ? proxiedImageUrl(product.imageUrl, { cutout: true, category })
+      : proxiedImageUrl(product.imageUrl);
+
   return (
-    <div className={`absolute ${className}`} style={{ zIndex }}>
+    <div className={wrapperClassName}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={proxiedImageUrl(product.imageUrl, { cutout: true, category })}
+        src={src}
         alt={`${product.brand} ${product.name}`}
-        className={`h-full w-full object-contain ${imageClassName}`}
+        className={modeClassName}
         style={{
-          mixBlendMode: 'multiply',
-          transform: PRODUCT_SCALE[category] || 'scale(1.14)',
-          objectPosition: PRODUCT_POSITION[category] || 'center center',
+          mixBlendMode: blend ? 'multiply' : 'normal',
+          filter: blend ? 'drop-shadow(0 12px 20px rgba(0,0,0,.12))' : 'drop-shadow(0 10px 18px rgba(0,0,0,.08))',
         }}
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={(event) => {
-          event.currentTarget.src = overlayFallback(product.brand);
-        }}
+        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'fallback'))}
       />
-      {category === 'jewelry' ? <div className="absolute inset-0 rounded-full bg-white/8 blur-[2px]" /> : null}
     </div>
   );
 }
 
-function resolveBoardPlacements(items: Partial<Record<Category, Product>>): Partial<Record<Category, string>> {
+function resolveCenterPlacements(items: Partial<Record<Category, Product>>): Partial<Record<Category, Placement>> {
   const hasHat = Boolean(items.hat);
+  const hasEyewear = Boolean(items.eyewear);
+  const hasOuter = Boolean(items.outer);
   const hasTop = Boolean(items.top);
   const hasBottom = Boolean(items.bottom);
   const hasShoes = Boolean(items.shoes);
 
+  const topBase = hasHat ? 44 : 22;
+  const upperBase = hasEyewear ? 46 : 60;
+  const bottomTop = hasTop || hasOuter ? 150 : hasHat ? 118 : 106;
+
   return {
-    hat: hasHat ? 'left-1/2 top-[16px] h-[44px] w-[102px] -translate-x-1/2' : undefined,
-    top: hasTop ? `left-1/2 ${hasHat ? 'top-[66px]' : 'top-[46px]'} h-[118px] w-[136px] -translate-x-1/2` : undefined,
-    bottom: hasBottom ? `left-1/2 ${hasTop ? 'top-[176px]' : hasHat ? 'top-[124px]' : 'top-[102px]'} h-[138px] w-[124px] -translate-x-1/2` : undefined,
-    shoes: hasShoes
-      ? `left-1/2 ${hasBottom ? 'bottom-[18px]' : 'bottom-[34px]'} h-[50px] w-[156px] -translate-x-1/2`
+    hat: hasHat ? { className: 'left-1/2 top-[4px] h-[58px] w-[114px] -translate-x-1/2' } : undefined,
+    eyewear: hasEyewear
+      ? { className: 'left-1/2 h-[34px] w-[92px] -translate-x-1/2', style: { top: hasHat ? 48 : 20 } }
       : undefined,
-    outer: items.outer ? 'left-[10px] top-[86px] h-[128px] w-[110px] -rotate-[4deg]' : undefined,
-    bag: items.bag ? 'left-[4px] top-[196px] h-[82px] w-[82px] -rotate-[5deg]' : undefined,
-    eyewear: items.eyewear ? 'right-[18px] top-[42px] h-[34px] w-[86px] rotate-[4deg]' : undefined,
-    jewelry: items.jewelry ? 'right-[26px] top-[204px] h-[34px] w-[34px] rotate-[4deg]' : undefined,
+    outer: hasOuter
+      ? { className: 'left-1/2 h-[144px] w-[164px] -translate-x-1/2', style: { top: upperBase } }
+      : undefined,
+    top: hasTop
+      ? { className: 'left-1/2 h-[138px] w-[148px] -translate-x-1/2', style: { top: topBase } }
+      : undefined,
+    jewelry: items.jewelry
+      ? { className: 'left-1/2 h-[34px] w-[34px] -translate-x-1/2', style: { top: hasTop || hasOuter ? 102 : 78 } }
+      : undefined,
+    bottom: hasBottom
+      ? { className: 'left-1/2 h-[158px] w-[134px] -translate-x-1/2', style: { top: bottomTop } }
+      : undefined,
+    bag: items.bag
+      ? { className: 'left-1/2 h-[96px] w-[96px]', style: { top: hasBottom ? 144 : 128, marginLeft: 44 } }
+      : undefined,
+    shoes: hasShoes ? { className: 'left-1/2 bottom-[4px] h-[58px] w-[148px] -translate-x-1/2' } : undefined,
   };
+}
+
+function centerImageClassName(category: Category): string {
+  if (category === 'bag') return 'h-full w-full object-contain p-0.5';
+  if (category === 'jewelry') return 'h-full w-full object-contain p-1';
+  if (category === 'eyewear') return 'h-full w-full object-contain';
+  if (category === 'shoes') return 'h-full w-full object-contain object-bottom';
+  return 'h-full w-full object-contain';
 }
 
 function hexToRgba(hex: string, alpha: number): string {
