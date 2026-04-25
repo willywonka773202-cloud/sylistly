@@ -1,13 +1,13 @@
 'use client';
 import { motion } from 'framer-motion';
-import { User, Venus, Mars, Gem } from 'lucide-react';
+import { Gem } from 'lucide-react';
 import { useProfile } from '@/store/profile';
 import type { Gender } from '@/lib/types';
 
-const GENDER_OPTIONS: { value: Gender; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
-  { value: 'masc', label: 'Men', icon: Mars },
-  { value: 'fem', label: 'Women', icon: Venus },
-  { value: 'unisex', label: 'Unisex', icon: Gem },
+const GENDER_OPTIONS: { value: Gender; label: string; emoji: string }[] = [
+  { value: 'masc', label: 'Men', emoji: '♂' },
+  { value: 'fem', label: 'Women', emoji: '♀' },
+  { value: 'unisex', label: 'Unisex', emoji: '⚥' },
 ];
 
 export function GenderSelector() {
@@ -21,7 +21,6 @@ export function GenderSelector() {
       className="flex items-center gap-2 p-1 rounded-xl bg-surface-2 border border-hairline"
     >
       {GENDER_OPTIONS.map((option) => {
-        const Icon = option.icon;
         const isActive = gender === option.value;
         return (
           <button
@@ -33,7 +32,7 @@ export function GenderSelector() {
                 : 'text-muted hover:text-ink'
             }`}
           >
-            <Icon size={14} />
+            <span className="text-sm">{option.emoji}</span>
             <span>{option.label}</span>
           </button>
         );

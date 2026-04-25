@@ -62,7 +62,7 @@ export function ToastContainer() {
 
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-full max-w-[360px] pointer-events-none">
-      <AnimatePresence mode="pop">
+      <AnimatePresence mode="wait">
         {toasts.map((toast) => {
           const Icon = ICONS[toast.type];
           return (

@@ -22,8 +22,6 @@ import {
 } from '@/lib/occasions';
 import { DripMeter } from '@/components/DripMeter';
 import { GenderSelector } from '@/components/GenderSelector';
-import { ShareCard } from '@/components/ShareCard';
-import { OnboardingSheet } from '@/components/OnboardingSheet';
 
 const BUDGETS: { value: GeneratorBudget; label: string; max: number }[] = [
   { value: 'any', label: 'Any', max: 0 },
@@ -48,16 +46,8 @@ function BuilderPageContent({
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [generatorLoading, setGeneratorLoading] = useState(false);
   const [showOccasionPicker, setShowOccasionPicker] = useState(false);
-  const [showShareCard, setShowShareCard] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('sylistly.onboarding.seen');
-    if (!hasSeenOnboarding) {
-      setShowOnboarding(true);
-    }
-  }, []);
   const total = totalCents();
   const n = count();
   const activeOccasion = OCCASIONS.find((o) => o.id === selectedOccasion) || OCCASIONS[0];
@@ -207,14 +197,6 @@ function BuilderPageContent({
         <div className="flex items-center gap-3">
           {n > 0 && (
             <span className="font-serif text-lg text-emerald">${(total / 100).toFixed(0)}</span>
-          )}
-          {n > 0 && (
-            <button
-              onClick={() => setShowShareCard(true)}
-              className="p-2 rounded-full border border-accent text-accent"
-            >
-              <Share2 size={16} />
-            </button>
           )}
           <button
             onClick={saveFit}
@@ -407,11 +389,6 @@ function BuilderPageContent({
       <BottomNav />
       <SearchSheet open={!!searchFor} category={searchFor} onClose={() => setSearchFor(null)} />
       <CheckoutSheet open={Boolean(checkoutProducts)} title="Your fit" products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
-      <ShareCard open={showShareCard} onClose={() => setShowShareCard(false)} />
-      <OnboardingSheet open={showOnboarding} onComplete={() => {
-        localStorage.setItem('sylistly.onboarding.seen', 'true');
-        setShowOnboarding(false);
-      }} />
     </main>
   );
 }

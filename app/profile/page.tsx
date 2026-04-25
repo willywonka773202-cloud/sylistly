@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   Palette, Ruler, WandSparkles, User, Settings, Bell, 
   Shield, HelpCircle, ChevronRight, Check, Moon, Sun, Flame,
-  Mars, Venus, Gem
+  Gem
 } from 'lucide-react';
 import { useProfile } from '@/store/profile';
 import type { Gender } from '@/lib/types';
@@ -47,10 +47,10 @@ export default function ProfilePage() {
   const setGender = useProfile((state) => state.setGender);
   const setBudget = useProfile((state) => state.setBudget);
 
-  const GENDER_OPTIONS: { value: Gender; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
-    { value: 'masc', label: 'Men', icon: Mars },
-    { value: 'fem', label: 'Women', icon: Venus },
-    { value: 'unisex', label: 'Unisex', icon: Gem },
+  const GENDER_OPTIONS: { value: Gender; label: string; emoji: string }[] = [
+    { value: 'masc', label: 'Men', emoji: '♂' },
+    { value: 'fem', label: 'Women', emoji: '♀' },
+    { value: 'unisex', label: 'Unisex', emoji: '⚥' },
   ];
 
   return (
@@ -137,7 +137,6 @@ export default function ProfilePage() {
 
           <div className="flex gap-2">
             {GENDER_OPTIONS.map((option) => {
-              const Icon = option.icon;
               const isActive = profile.gender === option.value;
               return (
                 <button
@@ -149,7 +148,7 @@ export default function ProfilePage() {
                       : 'bg-surface-1 border-hairline text-muted-2'
                   }`}
                 >
-                  <Icon size={18} />
+                  <span className="text-lg">{option.emoji}</span>
                   <span className="text-sm font-medium">{option.label}</span>
                 </button>
               );

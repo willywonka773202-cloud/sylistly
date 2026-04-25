@@ -105,7 +105,7 @@ const BODY_LAYOUT: Record<
 
 function getOverlayStyle(
   category: string,
-  layout: ReturnType<typeof BODY_LAYOUT[string]>
+  layout: { headLeft: number; headWidth: number; headTop: number; torsoLeft: number; torsoWidth: number; torsoHeight: number; torsoTop: number; armLeft: number; armRight: number; armHeight: number; armTop: number; legLeft: number; legRight: number; legWidth: number; legTop: number; hipTop: number; footTop: number; neckTop: number; eyeTop: number; }
 ): React.CSSProperties {
   const styles: Record<string, React.CSSProperties> = {
     hat: {
