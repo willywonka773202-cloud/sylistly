@@ -1,8 +1,19 @@
 import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
-import { parseSearchIntentHeuristic, rerankProducts } from './claude';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
-import type { Category, Product } from './types';
+import type { Category, Product, SearchIntent } from './types';
 import { OCCASIONS, occasionSearchQuery, type GeneratorBudget, type GeneratorFrame, type OccasionId } from './occasions';
+
+export function parseSearchIntentHeuristic(query: string, categoryFallback?: Category): SearchIntent {
+  return {
+    category: categoryFallback || 'top',
+    brand: undefined,
+    color: undefined,
+    gender: 'unisex',
+    budget: undefined,
+    style: undefined,
+    specificName: undefined,
+  };
+}
 
 type CollectionFrame = GeneratorFrame | 'all';
 
@@ -491,11 +502,7 @@ export async function buildAiCatalogLook({
     if (!candidatePool.length) continue;
     const photoFirstPool = candidatePool.filter(hasRealPhoto);
     const rankingPool = photoFirstPool.length ? photoFirstPool : candidatePool;
-
-    const query = occasionSearchQuery(vibe, slot, budget, frame);
-    const intent = parseSearchIntentHeuristic(query, slot);
-    const ranked = await rerankProducts(query, intent, rankingPool, Math.min(3, rankingPool.length));
-    const chosen = ranked.find((product) => !usedIds.has(product.id)) || rankingPool[0];
+    const chosen = rankingPool.find((product) => !usedIds.has(product.id)) || rankingPool[0];
 
     if (!chosen) continue;
     picked[slot] = chosen;

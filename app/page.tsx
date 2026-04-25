@@ -10,6 +10,8 @@ import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import { BuilderHeader } from '@/components/BuilderHeader';
+import { CategoryList } from '@/components/CategoryList';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
@@ -187,26 +189,11 @@ function BuilderPageContent({
 
   return (
     <main className="flex flex-col h-[100dvh] max-w-[440px] mx-auto bg-bg overflow-hidden">
-      <header className="flex items-center justify-between px-4 py-3 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-serif font-bold text-lg">sylistly</span>
-        </div>
-        <div className="flex items-center gap-3">
-          {n > 0 && (
-            <span className="font-serif text-lg text-emerald">${(total / 100).toFixed(0)}</span>
-          )}
-          <button
-            onClick={saveFit}
-            disabled={n === 0}
-            className={`p-2 rounded-full border ${n > 0 ? 'border-accent text-accent' : 'border-hairline text-muted'}`}
-          >
-            <Bookmark size={16} />
-          </button>
-        </div>
-      </header>
+      <BuilderHeader 
+        itemCount={n} 
+        totalAmount={total} 
+        onSave={saveFit} 
+      />
 
       <div className="flex-1 overflow-y-auto px-4 pb-32">
         <AnimatePresence mode="wait">
@@ -234,46 +221,11 @@ function BuilderPageContent({
             >
               <div className="flex gap-4 items-start">
                 <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-                <div className="flex-1 space-y-1.5">
-                  {CATEGORY_ORDER.map((cat) => {
-                    const product = items[cat];
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => handleSlotClick(cat)}
-                        className={`w-full h-9 rounded-lg border flex items-center justify-between px-2 transition-colors ${
-                          product 
-                            ? 'bg-black/40 border-accent/30 hover:border-accent/60' 
-                            : 'bg-surface-2 border-hairline hover:border-hairline-2'
-                        }`}
-                      >
-                        {product ? (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={product.imageUrl}
-                                alt=""
-                                className="w-6 h-6 object-contain"
-                              />
-                              <span className="text-[10px] text-muted uppercase tracking-wide">{cat}</span>
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleRemoveSlot(cat); }}
-                              className="w-5 h-5 rounded-full bg-surface-3 text-[10px] flex items-center justify-center hover:bg-accent hover:text-white"
-                            >
-                              <X size={10} />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-[10px] text-muted/60 capitalize">+ {cat}</span>
-                            <Plus className="w-3 h-3 text-muted/40" />
-                          </>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                <CategoryList 
+                  items={items} 
+                  onSlotClick={handleSlotClick} 
+                  onRemoveSlot={handleRemoveSlot} 
+                />
               </div>
             </motion.div>
           )}

@@ -312,23 +312,23 @@ function Overlay({
   isPreview?: boolean;
 }) {
   const frameClass = {
-    outer: 'rounded-[20px] bg-black/18 ring-1 ring-white/10 backdrop-blur-[2px]',
-    top: 'rounded-[18px_18px_26px_26px] bg-black/12 ring-1 ring-white/10 backdrop-blur-[2px]',
-    bottom: 'rounded-[18px_18px_24px_24px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
-    hat: 'rounded-[18px] bg-black/10 ring-1 ring-white/10 backdrop-blur-[2px]',
-    shoes: 'rounded-[18px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
-    bag: 'rounded-[16px] bg-black/16 ring-1 ring-white/10 backdrop-blur-[2px]',
-    eyewear: 'rounded-[999px] bg-black/10 ring-1 ring-white/10 backdrop-blur-[2px]',
-    jewelry: 'rounded-[999px] bg-black/8 ring-1 ring-white/10 backdrop-blur-[2px]',
+    outer: 'rounded-[20px] mix-blend-multiply',
+    top: 'rounded-[18px_18px_26px_26px] mix-blend-multiply',
+    bottom: 'rounded-[18px_18px_24px_24px] mix-blend-multiply',
+    hat: 'rounded-[18px] mix-blend-multiply',
+    shoes: 'rounded-[18px] mix-blend-multiply',
+    bag: 'rounded-[16px] mix-blend-multiply',
+    eyewear: 'rounded-[999px] mix-blend-multiply',
+    jewelry: 'rounded-[999px] mix-blend-multiply',
   }[variant];
 
   const imageClass = {
-    outer: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_14px_rgba(0,0,0,.35)]',
-    top: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_14px_rgba(0,0,0,.3)]',
-    bottom: 'h-full w-full object-contain p-1 drop-shadow-[0_8px_14px_rgba(0,0,0,.32)]',
-    hat: 'h-full w-full object-contain p-0.5 drop-shadow-[0_4px_10px_rgba(0,0,0,.3)]',
-    shoes: 'h-full w-full object-contain p-0.5 drop-shadow-[0_4px_10px_rgba(0,0,0,.3)]',
-    bag: 'h-full w-full object-contain p-1 drop-shadow-[0_6px_12px_rgba(0,0,0,.3)]',
+    outer: 'h-full w-full object-contain p-1.5',
+    top: 'h-full w-full object-contain p-1.5',
+    bottom: 'h-full w-full object-contain p-1',
+    hat: 'h-full w-full object-contain p-0.5',
+    shoes: 'h-full w-full object-contain p-0.5',
+    bag: 'h-full w-full object-contain p-1',
     eyewear: 'h-full w-full object-contain p-0.5 opacity-95',
     jewelry: 'h-full w-full object-contain p-0.5 opacity-90',
   }[variant];
@@ -338,7 +338,7 @@ function Overlay({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
-      className={`absolute z-10 pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass} ${
+      className={`absolute z-10 pointer-events-none overflow-visible ${frameClass} ${
         isPreview ? 'ring-2 ring-accent animate-pulse-slow' : ''
       }`}
       style={style}
@@ -347,7 +347,7 @@ function Overlay({
         src={src}
         alt=""
         className={imageClass}
-        style={{ mixBlendMode: 'normal' }}
+        style={{ mixBlendMode: 'multiply' }}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={(event) => {
