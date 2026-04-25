@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     title: 'Sylistly — Build Your Vibe',
     description: 'AI stylist that builds looks to get compliments',
     images: ['/og.png'],
+    siteName: 'Sylistly',
   },
 };
 
