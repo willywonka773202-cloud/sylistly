@@ -15,6 +15,7 @@ export const maxDuration = 20;
 interface SearchBody {
   query: string;
   category?: Category;
+  gender?: 'masc' | 'fem' | 'unisex';
   mode?: 'live' | 'demo';
 }
 
@@ -132,8 +133,8 @@ function enrichCatalogProductPhotos(catalogProducts: Product[], liveProducts: Pr
   });
 }
 
-function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
-  const products = mockSearch(category || 'top', query);
+function demoSearchResponse(category: Category | undefined, query: string, gender: string | undefined, reason: string) {
+  const products = mockSearch(category || 'top', query, gender as 'masc' | 'fem' | 'unisex');
   return NextResponse.json({
     products,
     mock: true,
@@ -161,11 +162,11 @@ export async function POST(req: NextRequest) {
   const shouldUseDevMocks = isDev && !liveSearchKey;
 
   if (isDev && mode === 'demo') {
-    return demoSearchResponse(category, query, 'manual_demo');
+    return demoSearchResponse(category, query, body.gender, 'manual_demo');
   }
 
   if (shouldUseDevMocks && !catalogOnlyMode && !catalogPreviewMode) {
-    return demoSearchResponse(category, query, 'missing_searchapi_key');
+    return demoSearchResponse(category, query, body.gender, 'missing_searchapi_key');
   }
 
   const cached = searchResponseCache.get(cacheKey);
@@ -242,7 +243,7 @@ export async function POST(req: NextRequest) {
 
       if (!catalogOnlyMode && liveSearchKey && query.trim()) {
         try {
-          const liveCandidates = await searchShopping(fastIntent, query);
+          const liveCandidates = await searchShopping(fastIntent, query, body.gender);
           catalogProducts = enrichCatalogProductPhotos(catalogProducts, liveCandidates);
         } catch (error) {
           console.warn('[api/search] catalog photo enrichment failed for "%s": %s', query, String(error));
@@ -298,7 +299,7 @@ export async function POST(req: NextRequest) {
         const intent = await parseSearchIntent(query, category);
 
         // 4. Search real inventory
-        const candidates = await searchShopping(intent, query);
+        const candidates = await searchShopping(intent, query, body.gender);
 
         // 5. Re-rank with Claude
         const rerankLimit = Math.min(6, candidates.length);

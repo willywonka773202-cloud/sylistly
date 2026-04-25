@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bookmark, ExternalLink, LoaderCircle, Sparkles, 
-  RefreshCw, ChevronDown, Plus, X
+  RefreshCw, ChevronDown, Plus, X, Share2
 } from 'lucide-react';
 import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
@@ -20,6 +20,10 @@ import {
   type OccasionId, 
   type GeneratorBudget, type GeneratorFrame,
 } from '@/lib/occasions';
+import { DripMeter } from '@/components/DripMeter';
+import { GenderSelector } from '@/components/GenderSelector';
+import { ShareCard } from '@/components/ShareCard';
+import { OnboardingSheet } from '@/components/OnboardingSheet';
 
 const BUDGETS: { value: GeneratorBudget; label: string; max: number }[] = [
   { value: 'any', label: 'Any', max: 0 },
@@ -44,7 +48,16 @@ function BuilderPageContent({
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [generatorLoading, setGeneratorLoading] = useState(false);
   const [showOccasionPicker, setShowOccasionPicker] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('sylistly.onboarding.seen');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
   const total = totalCents();
   const n = count();
   const activeOccasion = OCCASIONS.find((o) => o.id === selectedOccasion) || OCCASIONS[0];
@@ -195,6 +208,14 @@ function BuilderPageContent({
           {n > 0 && (
             <span className="font-serif text-lg text-emerald">${(total / 100).toFixed(0)}</span>
           )}
+          {n > 0 && (
+            <button
+              onClick={() => setShowShareCard(true)}
+              className="p-2 rounded-full border border-accent text-accent"
+            >
+              <Share2 size={16} />
+            </button>
+          )}
           <button
             onClick={saveFit}
             disabled={n === 0}
@@ -229,37 +250,43 @@ function BuilderPageContent({
               animate={{ opacity: 1 }}
               className="py-4"
             >
-              <div className="flex gap-3">
+              <div className="flex gap-4 items-start">
                 <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-                <div className="flex-1 grid grid-cols-4 gap-2 content-start">
-                  {(activeOccasion.slots as Category[]).map((slot) => {
-                    const product = items[slot];
+                <div className="flex-1 space-y-1.5">
+                  {CATEGORY_ORDER.map((cat) => {
+                    const product = items[cat];
                     return (
                       <button
-                        key={slot}
-                        onClick={() => handleSlotClick(slot)}
-                        className={`aspect-square rounded-xl border flex flex-col items-center justify-center p-2 relative ${
+                        key={cat}
+                        onClick={() => handleSlotClick(cat)}
+                        className={`w-full h-9 rounded-lg border flex items-center justify-between px-2 transition-colors ${
                           product 
-                            ? 'bg-black border-accent/30' 
-                            : 'bg-surface-2 border-hairline'
+                            ? 'bg-black/40 border-accent/30 hover:border-accent/60' 
+                            : 'bg-surface-2 border-hairline hover:border-hairline-2'
                         }`}
                       >
                         {product ? (
                           <>
-                            <img
-                              src={product.imageUrl}
-                              alt=""
-                              className="w-full h-full object-contain p-1"
-                            />
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={product.imageUrl}
+                                alt=""
+                                className="w-6 h-6 object-contain"
+                              />
+                              <span className="text-[10px] text-muted uppercase tracking-wide">{cat}</span>
+                            </div>
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleRemoveSlot(slot); }}
-                              className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-surface-3 text-[10px] flex items-center justify-center"
+                              onClick={(e) => { e.stopPropagation(); handleRemoveSlot(cat); }}
+                              className="w-5 h-5 rounded-full bg-surface-3 text-[10px] flex items-center justify-center hover:bg-accent hover:text-white"
                             >
                               <X size={10} />
                             </button>
                           </>
                         ) : (
-                          <Plus className="w-5 h-5 text-muted" />
+                          <>
+                            <span className="text-[10px] text-muted/60 capitalize">+ {cat}</span>
+                            <Plus className="w-3 h-3 text-muted/40" />
+                          </>
                         )}
                       </button>
                     );
@@ -269,6 +296,8 @@ function BuilderPageContent({
             </motion.div>
           )}
         </AnimatePresence>
+
+        <DripMeter items={items} />
 
         <div className="space-y-3 mt-4">
           <button
@@ -341,18 +370,21 @@ function BuilderPageContent({
               </button>
             ))}
           </div>
+
+          <GenderSelector />
         </div>
 
         <div className="mt-4 pt-4 border-t border-hairline">
           <div className="text-[10px] uppercase tracking-widest text-muted mb-3">Quick add</div>
-          <div className="grid grid-cols-4 gap-2">
-            {CATEGORY_ORDER.slice(0, 4).map((cat) => (
+          <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+            {CATEGORY_ORDER.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleSlotClick(cat)}
-                className="py-2 rounded-lg bg-surface-2 border border-hairline text-xs text-muted capitalize"
+                className="shrink-0 w-20 h-20 rounded-xl border border-hairline flex flex-col items-center justify-center gap-1 bg-surface-2 hover:border-accent/50 transition-colors"
               >
-                + {cat}
+                <span className="text-lg text-accent">+</span>
+                <span className="text-[10px] text-muted capitalize">{cat}</span>
               </button>
             ))}
           </div>
@@ -375,6 +407,11 @@ function BuilderPageContent({
       <BottomNav />
       <SearchSheet open={!!searchFor} category={searchFor} onClose={() => setSearchFor(null)} />
       <CheckoutSheet open={Boolean(checkoutProducts)} title="Your fit" products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
+      <ShareCard open={showShareCard} onClose={() => setShowShareCard(false)} />
+      <OnboardingSheet open={showOnboarding} onComplete={() => {
+        localStorage.setItem('sylistly.onboarding.seen', 'true');
+        setShowOnboarding(false);
+      }} />
     </main>
   );
 }

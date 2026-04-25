@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Profile } from '@/lib/types';
+import type { Profile, Gender } from '@/lib/types';
 
 const DEFAULT_PROFILE: Profile = {
   id: 'local-profile',
   skinTone: '#c9a98a',
   bodyType: 'androgynous',
+  gender: 'unisex',
   sizes: {},
   stylePrefs: {
     vibes: ['clean', 'streetwear'],
@@ -19,6 +20,7 @@ interface ProfileState {
   profile: Profile;
   setSkinTone: (skinTone: string) => void;
   setBodyType: (bodyType: Profile['bodyType']) => void;
+  setGender: (gender: Gender) => void;
   setTopSize: (top: string) => void;
   setBottomSize: (bottom: string) => void;
   setShoeSize: (shoe: string) => void;
@@ -42,6 +44,8 @@ export const useProfile = create<ProfileState>()(
         set((state) => ({ profile: { ...state.profile, skinTone } })),
       setBodyType: (bodyType) =>
         set((state) => ({ profile: { ...state.profile, bodyType } })),
+      setGender: (gender) =>
+        set((state) => ({ profile: { ...state.profile, gender } })),
       setTopSize: (top) =>
         set((state) => ({
           profile: {

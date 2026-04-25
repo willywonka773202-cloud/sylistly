@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Palette, Ruler, WandSparkles, User, Settings, Bell, 
-  Shield, HelpCircle, ChevronRight, Check, Moon, Sun, Flame
+  Shield, HelpCircle, ChevronRight, Check, Moon, Sun, Flame,
+  Mars, Venus, Gem
 } from 'lucide-react';
 import { useProfile } from '@/store/profile';
+import type { Gender } from '@/lib/types';
 
 const SKIN_TONES = [
   { hex: '#f5d0b5', label: 'Light' },
@@ -42,7 +44,14 @@ export default function ProfilePage() {
   const profile = useProfile((state) => state.profile);
   const setSkinTone = useProfile((state) => state.setSkinTone);
   const setBodyType = useProfile((state) => state.setBodyType);
+  const setGender = useProfile((state) => state.setGender);
   const setBudget = useProfile((state) => state.setBudget);
+
+  const GENDER_OPTIONS: { value: Gender; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
+    { value: 'masc', label: 'Men', icon: Mars },
+    { value: 'fem', label: 'Women', icon: Venus },
+    { value: 'unisex', label: 'Unisex', icon: Gem },
+  ];
 
   return (
     <main className="flex flex-col min-h-[100dvh] max-w-[440px] mx-auto bg-bg pb-20">
@@ -112,6 +121,39 @@ export default function ProfilePage() {
                 </button>
               ))}
             </div>
+          </div>
+        </motion.section>
+
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="rounded-2xl bg-surface-2 border border-hairline p-4"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <User className="w-5 h-5 text-accent" />
+            <h2 className="font-semibold text-lg">Gender</h2>
+          </div>
+
+          <div className="flex gap-2">
+            {GENDER_OPTIONS.map((option) => {
+              const Icon = option.icon;
+              const isActive = profile.gender === option.value;
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => setGender(option.value)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border transition ${
+                    isActive
+                      ? 'bg-accent border-accent text-white'
+                      : 'bg-surface-1 border-hairline text-muted-2'
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span className="text-sm font-medium">{option.label}</span>
+                </button>
+              );
+            })}
           </div>
         </motion.section>
 

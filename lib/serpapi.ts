@@ -158,7 +158,7 @@ function searchApiHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${apiKey}` };
 }
 
-function buildQueryString(intent: SearchIntent, rawQuery: string): string {
+function buildQueryString(intent: SearchIntent, rawQuery: string, gender?: 'masc' | 'fem' | 'unisex'): string {
   const parts: string[] = [];
   if (rawQuery.trim()) parts.push(rawQuery.trim());
   if (intent.brand?.length) parts.push(intent.brand.join(' '));
@@ -167,6 +167,10 @@ function buildQueryString(intent: SearchIntent, rawQuery: string): string {
   if (intent.priceMin && intent.priceMax) parts.push(`between $${intent.priceMin} and $${intent.priceMax}`);
   else if (intent.priceMax) parts.push(`under $${intent.priceMax}`);
   else if (intent.priceMin) parts.push(`over $${intent.priceMin}`);
+  
+  if (gender === 'masc') parts.push("men's");
+  else if (gender === 'fem') parts.push("women's");
+  
   parts.push(CATEGORY_KEYWORDS[intent.category]);
   parts.push(...(intent.keywords || []));
   const merged = Array.from(new Set(parts.filter(Boolean))).join(' ');
@@ -329,7 +333,7 @@ function toProduct(result: SearchApiShoppingResult, category: Category): Product
   };
 }
 
-export async function searchShopping(intent: SearchIntent, rawQuery: string): Promise<Product[]> {
+export async function searchShopping(intent: SearchIntent, rawQuery: string, gender?: 'masc' | 'fem' | 'unisex'): Promise<Product[]> {
   const query = buildQueryString(intent, rawQuery);
   const apiKey = getSearchApiKey();
   if (!apiKey) throw new Error('SEARCHAPI_KEY is not configured');

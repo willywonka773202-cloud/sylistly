@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import { ToastContainer } from '@/components/Toast';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
       <body className="bg-bg text-ink antialiased">
         <div className="min-h-screen bg-bg">{children}</div>
+        <ToastContainer />
       </body>
     </html>
   );

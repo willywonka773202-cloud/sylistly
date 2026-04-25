@@ -4,92 +4,187 @@ import type { CSSProperties } from 'react';
 import type { Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
 import { proxiedImageUrl } from '@/lib/image-url';
+import { motion } from 'framer-motion';
 
 interface Props {
   items: Partial<Record<string, Product>>;
   skinTone?: string;
   bodyType?: GeneratorFrame;
+  previewItem?: Product | null;
+  previewCategory?: string | null;
 }
 
-/**
- * CSS-div standing character + image overlays.
- * Phase 1 visualization. Replaceable with SVG / 3D later — API stays identical.
- */
 const BODY_LAYOUT: Record<
   GeneratorFrame,
   {
     headLeft: number;
     headWidth: number;
+    headTop: number;
     torsoLeft: number;
     torsoWidth: number;
     torsoHeight: number;
+    torsoTop: number;
     armLeft: number;
     armRight: number;
     armHeight: number;
+    armTop: number;
     legLeft: number;
     legRight: number;
     legWidth: number;
+    legTop: number;
     hipTop: number;
+    footTop: number;
+    neckTop: number;
+    eyeTop: number;
   }
 > = {
   masc: {
     headLeft: 35,
     headWidth: 50,
+    headTop: 0,
     torsoLeft: 24,
     torsoWidth: 72,
     torsoHeight: 70,
+    torsoTop: 46,
     armLeft: 10,
     armRight: 93,
     armHeight: 66,
+    armTop: 48,
     legLeft: 30,
     legRight: 64,
     legWidth: 28,
+    legTop: 124,
     hipTop: 124,
+    footTop: 220,
+    neckTop: 46,
+    eyeTop: 12,
   },
   fem: {
     headLeft: 39,
     headWidth: 42,
+    headTop: 2,
     torsoLeft: 31,
     torsoWidth: 58,
     torsoHeight: 68,
+    torsoTop: 48,
     armLeft: 15,
     armRight: 88,
     armHeight: 64,
+    armTop: 50,
     legLeft: 34,
     legRight: 60,
     legWidth: 24,
+    legTop: 124,
     hipTop: 122,
+    footTop: 218,
+    neckTop: 48,
+    eyeTop: 14,
   },
   androgynous: {
     headLeft: 37,
     headWidth: 46,
+    headTop: 1,
     torsoLeft: 30,
     torsoWidth: 60,
     torsoHeight: 66,
+    torsoTop: 47,
     armLeft: 14,
     armRight: 89,
     armHeight: 62,
+    armTop: 49,
     legLeft: 32,
     legRight: 62,
     legWidth: 26,
-    hipTop: 120,
+    legTop: 123,
+    hipTop: 121,
+    footTop: 219,
+    neckTop: 47,
+    eyeTop: 13,
   },
 };
 
-export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) {
+function getOverlayStyle(
+  category: string,
+  layout: ReturnType<typeof BODY_LAYOUT[string]>
+): React.CSSProperties {
+  const styles: Record<string, React.CSSProperties> = {
+    hat: {
+      top: layout.headTop - 6,
+      left: layout.headLeft - 7,
+      width: layout.headWidth + 14,
+      height: 32,
+    },
+    outer: {
+      top: layout.torsoTop - 4,
+      left: layout.torsoLeft - 6,
+      width: layout.torsoWidth + 12,
+      height: layout.torsoHeight + 16,
+    },
+    top: {
+      top: layout.torsoTop,
+      left: layout.torsoLeft,
+      width: layout.torsoWidth,
+      height: layout.torsoHeight,
+    },
+    bottom: {
+      top: layout.legTop - 4,
+      left: layout.torsoLeft,
+      width: layout.torsoWidth,
+      height: layout.footTop - layout.legTop + 20,
+    },
+    shoes: {
+      top: layout.footTop - 2,
+      left: layout.legLeft - 6,
+      width: layout.torsoWidth + 12,
+      height: 28,
+    },
+    bag: {
+      top: layout.torsoTop + layout.torsoHeight * 0.4,
+      left: layout.armRight - 4,
+      width: 38,
+      height: 54,
+    },
+    eyewear: {
+      top: layout.eyeTop,
+      left: layout.headLeft - 4,
+      width: layout.headWidth + 8,
+      height: 22,
+    },
+    jewelry: {
+      top: layout.neckTop + 4,
+      left: layout.torsoLeft + layout.torsoWidth * 0.2,
+      width: layout.torsoWidth * 0.6,
+      height: 24,
+    },
+  };
+  return styles[category] || styles.top;
+}
+
+export function Mannequin({ items, skinTone, bodyType = 'androgynous', previewItem, previewCategory }: Props) {
   const mannequinStyle = skinTone
     ? ({ '--skin': skinTone } as CSSProperties)
     : undefined;
   const layout = BODY_LAYOUT[bodyType];
 
+  const getDisplayItems = () => {
+    if (previewItem && previewCategory) {
+      return { ...items, [previewCategory]: previewItem };
+    }
+    return items;
+  };
+
+  const displayItems = getDisplayItems();
+
   return (
-    <div className="relative flex h-[360px] w-[150px] items-start justify-center" style={mannequinStyle}>
-      {/* ground shadow */}
+    <div className="relative flex h-[360px] w-[140px] shrink-0 items-start justify-center" style={mannequinStyle}>
       <div className="absolute bottom-0 w-[70%] h-[16px] rounded-full bg-black/50 blur-md" />
       <div className="absolute bottom-0 w-[60%] h-[10px] rounded-full bg-accent/20 blur" />
 
       <div className="relative w-[120px] h-[360px]">
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
           className="absolute top-0 rounded-[24px_24px_14px_14px] skin shadow-[inset_-3px_-4px_10px_rgba(0,0,0,.22)]"
           style={{ left: layout.headLeft, width: layout.headWidth, height: 50 }}
         />
@@ -113,39 +208,78 @@ export function Mannequin({ items, skinTone, bodyType = 'androgynous' }: Props) 
         <div className="absolute rounded-[8px] skin" style={{ top: layout.hipTop - 2, left: layout.armRight + 2, width: 17, height: 15 }} />
         <div
           className="absolute rounded-[6px_6px_10px_10px] skin"
-          style={{ top: layout.hipTop, left: layout.legLeft, width: layout.legWidth, height: 100 }}
+          style={{ top: layout.legTop, left: layout.legLeft, width: layout.legWidth, height: 100 }}
         />
         <div
           className="absolute rounded-[6px_6px_10px_10px] skin"
-          style={{ top: layout.hipTop, left: layout.legRight, width: layout.legWidth, height: 100 }}
+          style={{ top: layout.legTop, left: layout.legRight, width: layout.legWidth, height: 100 }}
         />
-        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: 218, left: layout.legLeft - 4, width: 34, height: 14 }} />
-        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: 218, left: layout.legRight - 4, width: 34, height: 14 }} />
+        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: layout.footTop, left: layout.legLeft - 4, width: 34, height: 14 }} />
+        <div className="absolute rounded-[4px_4px_10px_10px] skin" style={{ top: layout.footTop, left: layout.legRight - 4, width: 34, height: 14 }} />
 
-        {/* Styled garment zones work better with normal shopping thumbnails than raw full-body cutouts. */}
-        {items.outer && (
-          <Overlay style={{ top: 48, left: 2, width: 116, height: 104 }} src={proxiedImageUrl(items.outer.imageUrl)} variant="outer" />
+        {displayItems.outer && (
+          <Overlay 
+            style={getOverlayStyle('outer', layout)} 
+            src={proxiedImageUrl(displayItems.outer.imageUrl)} 
+            variant="outer" 
+            isPreview={previewCategory === 'outer'}
+          />
         )}
-        {items.top && !items.outer && (
-          <Overlay style={{ top: 56, left: 12, width: 96, height: 82 }} src={proxiedImageUrl(items.top.imageUrl)} variant="top" />
+        {displayItems.top && !displayItems.outer && (
+          <Overlay 
+            style={getOverlayStyle('top', layout)} 
+            src={proxiedImageUrl(displayItems.top.imageUrl)} 
+            variant="top" 
+            isPreview={previewCategory === 'top'}
+          />
         )}
-        {items.bottom && (
-          <Overlay style={{ top: 118, left: 18, width: 84, height: 116 }} src={proxiedImageUrl(items.bottom.imageUrl)} variant="bottom" />
+        {displayItems.bottom && (
+          <Overlay 
+            style={getOverlayStyle('bottom', layout)} 
+            src={proxiedImageUrl(displayItems.bottom.imageUrl)} 
+            variant="bottom" 
+            isPreview={previewCategory === 'bottom'}
+          />
         )}
-        {items.hat && (
-          <Overlay style={{ top: -8, left: 28, width: 64, height: 34 }} src={proxiedImageUrl(items.hat.imageUrl)} variant="hat" />
+        {displayItems.hat && (
+          <Overlay 
+            style={getOverlayStyle('hat', layout)} 
+            src={proxiedImageUrl(displayItems.hat.imageUrl)} 
+            variant="hat" 
+            isPreview={previewCategory === 'hat'}
+          />
         )}
-        {items.shoes && (
-          <Overlay style={{ top: 226, left: 20, width: 82, height: 34 }} src={proxiedImageUrl(items.shoes.imageUrl)} variant="shoes" />
+        {displayItems.shoes && (
+          <Overlay 
+            style={getOverlayStyle('shoes', layout)} 
+            src={proxiedImageUrl(displayItems.shoes.imageUrl)} 
+            variant="shoes" 
+            isPreview={previewCategory === 'shoes'}
+          />
         )}
-        {items.bag && (
-          <Overlay style={{ top: 132, left: 92, width: 36, height: 52 }} src={proxiedImageUrl(items.bag.imageUrl)} variant="bag" />
+        {displayItems.bag && (
+          <Overlay 
+            style={getOverlayStyle('bag', layout)} 
+            src={proxiedImageUrl(displayItems.bag.imageUrl)} 
+            variant="bag" 
+            isPreview={previewCategory === 'bag'}
+          />
         )}
-        {items.eyewear && (
-          <Overlay style={{ top: 14, left: 31, width: 58, height: 24 }} src={proxiedImageUrl(items.eyewear.imageUrl)} variant="eyewear" />
+        {displayItems.eyewear && (
+          <Overlay 
+            style={getOverlayStyle('eyewear', layout)} 
+            src={proxiedImageUrl(displayItems.eyewear.imageUrl)} 
+            variant="eyewear" 
+            isPreview={previewCategory === 'eyewear'}
+          />
         )}
-        {items.jewelry && (
-          <Overlay style={{ top: 52, left: 43, width: 36, height: 26 }} src={proxiedImageUrl(items.jewelry.imageUrl)} variant="jewelry" />
+        {displayItems.jewelry && (
+          <Overlay 
+            style={getOverlayStyle('jewelry', layout)} 
+            src={proxiedImageUrl(displayItems.jewelry.imageUrl)} 
+            variant="jewelry" 
+            isPreview={previewCategory === 'jewelry'}
+          />
         )}
       </div>
     </div>
@@ -170,10 +304,12 @@ function Overlay({
   style,
   src,
   variant,
+  isPreview,
 }: {
   style: React.CSSProperties;
   src: string;
   variant: 'outer' | 'top' | 'bottom' | 'hat' | 'shoes' | 'bag' | 'eyewear' | 'jewelry';
+  isPreview?: boolean;
 }) {
   const frameClass = {
     outer: 'rounded-[20px] bg-black/18 ring-1 ring-white/10 backdrop-blur-[2px]',
@@ -198,8 +334,15 @@ function Overlay({
   }[variant];
 
   return (
-    <div className={`absolute z-10 pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass}`} style={style}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
+      className={`absolute z-10 pointer-events-none overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,.22)] ${frameClass} ${
+        isPreview ? 'ring-2 ring-accent animate-pulse-slow' : ''
+      }`}
+      style={style}
+    >
       <img
         src={src}
         alt=""
@@ -211,7 +354,7 @@ function Overlay({
           event.currentTarget.src = overlayFallback();
         }}
       />
-    </div>
+    </motion.div>
   );
 }
 
