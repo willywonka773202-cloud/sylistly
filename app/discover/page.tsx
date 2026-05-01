@@ -12,12 +12,12 @@ export default function DiscoverPage() {
       accent="library"
       description="Browse curated visual outfit boards, then open any direction directly in Builder."
     >
-      <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
+      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4">
         <div className="flex items-center gap-3">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent"><Sparkles size={18} /></div>
           <div>
             <div className="text-[11px] uppercase tracking-[.18em] text-muted">Style library</div>
-            <h2 className="mt-1 font-serif text-[18px] font-semibold text-ink">Curated visual outfit cards</h2>
+            <h2 className="mt-1 font-serif text-[22px] font-semibold text-[#fff5ee]">Curated visual outfit cards</h2>
           </div>
         </div>
 
@@ -26,12 +26,12 @@ export default function DiscoverPage() {
             const products = getCollectionProducts(collection);
             const total = products.reduce((sum, p) => sum + p.priceCents, 0);
             return (
-              <section key={collection.id} className="rounded-3xl border border-hairline bg-surface-2 p-4">
+              <section key={collection.id} className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[.18em] text-muted">{collection.vibe} · {collection.frame}</div>
-                    <h3 className="mt-1 font-serif text-[18px] font-semibold text-ink">{collection.label}</h3>
-                    <p className="mt-2 text-[12px] leading-relaxed text-muted-2">{collection.blurb}</p>
+                    <div className="text-[10px] uppercase tracking-[.18em] text-[#9e8f85]">{collection.vibe} · {collection.frame}</div>
+                    <h3 className="mt-1 font-serif text-[20px] font-semibold text-[#fff5ee]">{collection.label}</h3>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#c7b7ad]">{collection.blurb}</p>
                   </div>
                   <div className="rounded-full bg-surface-3 px-3 py-1 text-[10px] uppercase tracking-[.16em] text-muted">{products.length} pcs</div>
                 </div>

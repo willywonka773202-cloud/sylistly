@@ -213,7 +213,7 @@ export function SearchSheet({
         className="absolute inset-0 z-40 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 z-50 max-h-[92%] translate-y-0 rounded-t-3xl border-t border-hairline-2 bg-surface-1 flex flex-col shadow-[0_-18px_60px_rgba(0,0,0,.45)]">
+      <div className="absolute inset-x-0 bottom-0 z-50 max-h-[94%] translate-y-0 rounded-t-3xl border-t border-white/10 bg-[#11100f] flex flex-col shadow-[0_-22px_70px_rgba(0,0,0,.55)]">
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
             <div className="flex items-center justify-between px-5 pt-1.5 pb-2.5">
               <div className="font-serif font-semibold text-lg">
@@ -225,7 +225,7 @@ export function SearchSheet({
             </div>
 
             <div className="px-4 pb-2">
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[11px] text-muted-2">
                 <div>
                   <div className="font-semibold text-ink">
                     {frameDisplayLabel(frame)} search bias
@@ -276,7 +276,7 @@ export function SearchSheet({
                   setError(null);
                 }}
                 placeholder={`try: ${suggestions[0]} or browse`}
-                className="w-full rounded-2xl border border-hairline bg-surface-3 py-3 pl-10 pr-24 text-sm text-ink outline-none focus:border-accent"
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.04] py-3.5 pl-10 pr-24 text-sm text-ink outline-none focus:border-accent"
               />
               <button
                 type="submit"
@@ -360,7 +360,7 @@ export function SearchSheet({
               ) : null}
             </div>
 
-            <div className="grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-4 pb-6">
+            <div className="grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-4 pb-8">
               {loading
                 ? Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="flex h-[152px] items-center gap-4 rounded-2xl border border-hairline bg-surface-2 px-3.5 animate-pulse">

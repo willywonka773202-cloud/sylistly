@@ -34,14 +34,14 @@ export default function SavedPage() {
       description="Saved looks now persist on this MacBook, even before cloud sync is fully wired."
     >
       {fits.length ? (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {fits.map((fit) => (
-            <section key={fit.id} className="rounded-3xl border border-hairline bg-surface-1 p-4">
+            <section key={fit.id} className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 shadow-[0_14px_32px_rgba(0,0,0,.28)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-[11px] uppercase tracking-[.18em] text-muted">Saved locally</div>
-                  <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{fit.title}</h2>
-                  <p className="mt-2 text-[12px] text-muted-2">
+                  <div className="text-[10px] uppercase tracking-[.18em] text-[#9a8a80]">Saved locally</div>
+                  <h2 className="mt-2 font-serif text-[30px] leading-[1] font-semibold text-[#fff5ee]">{fit.title}</h2>
+                  <p className="mt-2 text-[12px] text-[#c8b8ae]">
                     {fit.itemCount} piece{fit.itemCount !== 1 ? 's' : ''} - ${(fit.totalCents / 100).toLocaleString()} - {formatDate(fit.createdAt)}
                   </p>
                 </div>
@@ -50,16 +50,16 @@ export default function SavedPage() {
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-4 gap-2">
+              <div className="mt-4 grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                 {Object.entries(fit.items).slice(0,4).map(([category, product]) => product ? (
-                  <div key={`${fit.id}-${category}`} className="rounded-2xl border border-hairline bg-surface-2 p-1.5">
+                  <div key={`${fit.id}-${category}`} className="rounded-2xl border border-[#e9ddd3] bg-[#faf6f1] p-1.5">
                     <div className="h-20"><ProductImage product={product} className="h-full w-full object-contain p-1.5"/></div>
                     <div className="truncate text-[9px] uppercase tracking-[.12em] text-muted">{category}</div>
                   </div>
                 ) : null)}
               </div>
 
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => {

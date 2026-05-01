@@ -64,15 +64,15 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
   }
 
   return (
-    <article className={`overflow-hidden rounded-2xl border bg-surface-2 transition hover:-translate-y-0.5 hover:border-hairline-2 ${
-      selected ? 'border-accent shadow-pink-glow' : 'border-hairline'
+    <article className={`overflow-hidden rounded-[22px] border bg-[#f8f4ef] transition hover:-translate-y-0.5 ${
+      selected ? 'border-accent shadow-pink-glow' : 'border-[#ddd2c8]'
     }`}>
       <div
         role="button"
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        className="flex w-full cursor-pointer items-stretch gap-4 p-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="flex w-full cursor-pointer items-stretch gap-4 p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       >
         <div className="relative flex h-[124px] w-[116px] flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
@@ -101,13 +101,13 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
                 {p.name}
               </div>
             </div>
-            <div className="rounded-full bg-surface-3 px-2.5 py-1 text-[13px] font-semibold text-ink">
+            <div className="rounded-full bg-white px-2.5 py-1 text-[13px] font-semibold text-ink shadow-sm">
               {formatPrice(p.priceCents)}
             </div>
           </div>
 
           <div className="mt-auto pt-3">
-            <div className="text-[10px] uppercase tracking-[.12em] text-muted">{p.retailer}</div>
+            <div className="text-[10px] uppercase tracking-[.12em] text-[#7b6d64]">{p.retailer}</div>
             <div className="mt-2 flex items-center gap-2">
               <span className={`rounded-full px-2 py-1 text-[9px] uppercase tracking-[.16em] ${
                 searchLike
@@ -122,7 +122,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-3.5 pb-3.5">
+      <div className="flex items-center gap-2 px-4 pb-4">
         <button
           type="button"
           className="inline-flex rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-accent-hot"
