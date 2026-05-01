@@ -212,7 +212,7 @@ export function Mannequin({
         )}
       </div>
 
-      <div className="relative z-10 mt-4 grid grid-cols-2 gap-3">
+      <div className="relative z-10 mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         <section className="rounded-[26px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -389,14 +389,14 @@ function FrontCanvas({
   const _heatmap = heatmapMode;
   const _magnet = magnetMode;
   const zoneClass: Record<Category, string> = {
-    hat: 'col-span-1 min-h-[90px]',
-    eyewear: 'col-span-1 min-h-[90px]',
-    jewelry: 'col-span-1 min-h-[90px]',
-    outer: 'col-span-2 min-h-[150px]',
-    top: 'col-span-2 min-h-[150px]',
-    bag: 'col-span-1 min-h-[150px]',
-    bottom: 'col-span-2 min-h-[170px]',
-    shoes: 'col-span-3 min-h-[120px]',
+    hat: 'col-span-1 h-[82px]',
+    eyewear: 'col-span-1 h-[82px]',
+    jewelry: 'col-span-1 h-[82px]',
+    outer: 'col-span-1 h-[126px]',
+    top: 'col-span-1 h-[126px]',
+    bag: 'col-span-1 h-[126px]',
+    bottom: 'col-span-2 h-[112px]',
+    shoes: 'col-span-1 h-[112px]',
   };
 
   const renderZone = (category: Category, prominent = false) => {
@@ -425,7 +425,7 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fefdfb_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+    <div className="relative overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fefdfb_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
       <div className="grid h-full grid-cols-3 gap-2.5">
         <div className={zoneClass.hat}>{renderZone('hat')}</div>
         <div className={zoneClass.eyewear}>{renderZone('eyewear')}</div>

@@ -50,8 +50,8 @@ export default function SavedPage() {
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-2.5 sm:grid-cols-4">
-                {Object.entries(fit.items).slice(0,4).map(([category, product]) => product ? (
+              <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {Object.entries(fit.items).slice(0,8).map(([category, product]) => product ? (
                   <div key={`${fit.id}-${category}`} className="rounded-2xl border border-[#e9ddd3] bg-[#faf6f1] p-1.5">
                     <div className="h-20"><ProductImage product={product} className="h-full w-full object-contain p-1.5"/></div>
                     <div className="truncate text-[9px] uppercase tracking-[.12em] text-muted">{category}</div>

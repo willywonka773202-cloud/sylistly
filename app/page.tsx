@@ -388,7 +388,7 @@ function BuilderPageContent({
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-3 px-4 pb-4 pt-3.5">
+        <div className="flex flex-col gap-3 px-4 pb-36 pt-3.5">
           <section className="flex flex-col gap-3">
             <div className="px-1">
               <div className="text-[9px] tracking-[.18em] text-muted uppercase">Styling board</div>

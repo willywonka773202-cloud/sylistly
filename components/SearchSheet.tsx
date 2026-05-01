@@ -287,7 +287,7 @@ export function SearchSheet({
               </button>
             </form>
 
-            <div className="flex gap-2 px-4 pb-2.5 overflow-x-auto scrollbar-hide">
+            <div className="flex flex-wrap gap-2 px-4 pb-2.5">
               {[
                 { label: 'Any', value: null },
                 { label: '< $100', value: 100 },
@@ -324,7 +324,7 @@ export function SearchSheet({
               />
             </div>
 
-            <div className="flex gap-2 px-4 pb-2.5 overflow-x-auto scrollbar-hide">
+            <div className="flex flex-wrap gap-2 px-4 pb-2.5">
               {suggestions.map((c) => (
                 <button
                   key={c}
