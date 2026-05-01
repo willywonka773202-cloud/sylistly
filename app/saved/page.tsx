@@ -6,6 +6,8 @@ import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet'
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
+import { ProductImage } from '@/components/ProductImage';
+import { getProductOutboundUrl } from '@/lib/product-links';
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -48,15 +50,13 @@ export default function SavedPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {Object.entries(fit.items).map(([category, product]) => (
-                  <span
-                    key={`${fit.id}-${category}`}
-                    className="rounded-full border border-hairline bg-surface-2 px-3 py-1 text-[11px] text-muted-2"
-                  >
-                    {category}: {product?.brand}
-                  </span>
-                ))}
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                {Object.entries(fit.items).slice(0,4).map(([category, product]) => product ? (
+                  <div key={`${fit.id}-${category}`} className="rounded-2xl border border-hairline bg-surface-2 p-1.5">
+                    <div className="h-20"><ProductImage product={product} className="h-full w-full object-contain p-1.5"/></div>
+                    <div className="truncate text-[9px] uppercase tracking-[.12em] text-muted">{category}</div>
+                  </div>
+                ) : null)}
               </div>
 
               <div className="mt-4 flex gap-2">
@@ -81,7 +81,7 @@ export default function SavedPage() {
                         brand: product.brand,
                         name: product.name,
                         retailer: product.retailer,
-                        url: product.affiliateUrl || product.retailerUrl,
+                        url: getProductOutboundUrl(product),
                         priceCents: product.priceCents,
                       }))
                       .filter((product) => Boolean(product.url));

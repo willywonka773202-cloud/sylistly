@@ -12,6 +12,7 @@ import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
+import { getProductOutboundUrl } from '@/lib/product-links';
 import {
   VIBES,
   getBudgetMaxCents,
@@ -348,7 +349,7 @@ function BuilderPageContent({
         brand: product.brand,
         name: product.name,
         retailer: product.retailer,
-        url: product.retailerUrl || product.affiliateUrl || '',
+        url: getProductOutboundUrl(product),
         priceCents: product.priceCents,
       }))
       .filter((product) => Boolean(product.url));

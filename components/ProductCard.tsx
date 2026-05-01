@@ -1,7 +1,8 @@
 'use client';
-import { useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { type KeyboardEvent, type MouseEvent } from 'react';
 import type { Product } from '@/lib/types';
-import { proxiedImageUrl } from '@/lib/image-url';
+import { ProductImage } from '@/components/ProductImage';
+import { getProductOutboundUrl } from '@/lib/product-links';
 
 interface Props {
   product: Product;
@@ -46,17 +47,7 @@ function isSearchLikeUrl(url: string): boolean {
 }
 
 export function ProductCard({ product: p, selected = false, onClick }: Props) {
-  const buyUrl = p.retailerUrl || p.affiliateUrl || '#';
-  const shouldUseCutout = p.category === 'top' || p.category === 'bottom' || p.category === 'outer' || p.category === 'shoes';
-  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
-    p.imageUrl ? (shouldUseCutout ? 'cutout' : 'plain') : 'fallback',
-  );
-  const imageSrc =
-    imageMode === 'fallback' || !p.imageUrl
-      ? fallbackImage(p)
-      : imageMode === 'cutout'
-      ? proxiedImageUrl(p.imageUrl, { cutout: true, category: p.category })
-      : proxiedImageUrl(p.imageUrl);
+  const buyUrl = getProductOutboundUrl(p);
   const retailHost = getHost(buyUrl);
   const searchLike = isSearchLikeUrl(buyUrl);
 
@@ -86,21 +77,16 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
         <div className="relative flex h-[124px] w-[116px] flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
           <div className="absolute inset-x-4 bottom-3 h-4 rounded-full bg-[#d8cdc4]/35 blur-[6px]" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={imageSrc}
-            alt={`${p.brand} ${p.name}`}
-            className={`relative h-full w-full drop-shadow-[0_12px_18px_rgba(0,0,0,.35)] ${
-              imageMode === 'cutout' ? 'object-contain p-2.5' : 'object-contain p-1.5'
-            }`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={() =>
-              setImageMode((current) =>
-                current === 'cutout' ? 'plain' : 'fallback',
-              )
-            }
-          />
+          {p.imageUrl ? (
+            <ProductImage
+              product={p}
+              wrapperClassName="relative h-full w-full"
+              className="relative h-full w-full object-contain p-2.5 drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={fallbackImage(p)} alt={`${p.brand} ${p.name}`} className="relative h-full w-full object-contain p-2" loading="lazy" />
+          )}
           {selected ? (
             <div className="absolute bottom-2 right-2 grid h-6 w-6 place-items-center rounded-full bg-accent text-[9px] font-bold text-white">
               OK
