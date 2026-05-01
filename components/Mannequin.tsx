@@ -383,114 +383,100 @@ function FrontCanvas({
   polishMode: boolean;
   skinTone?: string;
 }) {
-  const crowding = getCrowding(items);
-  const placements = buildPlacements(items, bagLayer, polishMode);
+  const _crowding = getCrowding(items);
+  const _placements = buildPlacements(items, bagLayer, polishMode);
+  const _tone = skinTone;
+  const _heatmap = heatmapMode;
+  const _magnet = magnetMode;
+  const zoneClass: Record<Category, string> = {
+    hat: 'col-span-1 min-h-[90px]',
+    eyewear: 'col-span-1 min-h-[90px]',
+    jewelry: 'col-span-1 min-h-[90px]',
+    outer: 'col-span-2 min-h-[150px]',
+    top: 'col-span-2 min-h-[150px]',
+    bag: 'col-span-1 min-h-[150px]',
+    bottom: 'col-span-2 min-h-[170px]',
+    shoes: 'col-span-3 min-h-[120px]',
+  };
+
+  const renderZone = (category: Category, prominent = false) => {
+    const product = items[category];
+    if (!product) {
+      return (
+        <div className="flex h-full w-full items-center justify-center rounded-[18px] border border-dashed border-[#d9ccc2] bg-white/70 px-2 text-center">
+          <span className="text-[10px] uppercase tracking-[.16em] text-[#b39f91]">{CATEGORY_LABELS[category]}</span>
+        </div>
+      );
+    }
+    return (
+      <div className={`h-full w-full overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f4eee8_100%)] p-2 shadow-[0_8px_18px_rgba(0,0,0,.06)] ${highlightCategory === category ? 'ring-1 ring-accent/40' : ''}`}>
+        <div className="mb-1 text-[9px] uppercase tracking-[.16em] text-[#aa9688]">{CATEGORY_LABELS[category]}</div>
+        <div className={`${prominent ? 'h-[calc(100%-18px)]' : 'h-[calc(100%-16px)]'} rounded-[12px] bg-white/75`}>
+          <PreviewImage
+            product={product}
+            category={category}
+            wrapperClassName="h-full w-full"
+            modeClassName="h-full w-full object-contain p-2.5"
+            blend={false}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="relative h-[380px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fefdfb_0%,#f7f2ec_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.94),transparent_28%),radial-gradient(circle_at_50%_68%,rgba(232,54,93,.08),transparent_36%)]" />
-      <AlignmentGuides />
-      {heatmapMode ? <HeatmapOverlay crowding={crowding} /> : null}
-      <Silhouette skinTone={skinTone} />
+    <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fefdfb_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+      <div className="grid h-full grid-cols-3 gap-2.5">
+        <div className={zoneClass.hat}>{renderZone('hat')}</div>
+        <div className={zoneClass.eyewear}>{renderZone('eyewear')}</div>
+        <div className={zoneClass.jewelry}>{renderZone('jewelry')}</div>
 
-      {GHOST_ZONES.map((zone) => {
-        const filled = Boolean(items[zone.category]);
-        const focused = highlightCategory === zone.category;
-        return (
-          <div
-            key={zone.category}
-            className={`absolute rounded-[22px] border border-dashed transition ${
-              filled
-                ? 'border-transparent'
-                : focused || magnetMode
-                ? 'border-accent/40 bg-accent/[0.05]'
-                : 'border-[#ddd2ca] bg-white/[0.18]'
-            }`}
-            style={zone.style}
-          >
-            {!filled ? (
-              <div className="absolute left-3 top-2 text-[9px] uppercase tracking-[.18em] text-[#b9aaa0]">
-                {zone.label}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
+        <div className={zoneClass.outer}>{renderZone('outer', true)}</div>
+        <div className={zoneClass.top}>{renderZone('top', true)}</div>
+        <div className={zoneClass.bag}>{renderZone('bag')}</div>
 
-      {CATEGORY_PRIORITY.map((category) => {
-        const product = items[category];
-        const placement = placements[category];
-        if (!product || !placement) return null;
-
-        if (category === 'shoes') {
-          return (
-            <div key={`${category}-${product.id}`} className="absolute inset-0">
-              {renderShoes(product, placement, highlightCategory === category)}
-            </div>
-          );
-        }
-
-        return (
-          <motion.div
-            key={`${category}-${product.id}`}
-            layout
-            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-            className={`absolute ${placement.frameClassName || ''}`}
-            style={placementStyle(placement)}
-          >
-            <div
-              className={`relative h-full w-full ${
-                highlightCategory === category ? 'drop-shadow-[0_18px_28px_rgba(232,54,93,.22)]' : ''
-              }`}
-            >
-              <PreviewImage
-                product={product}
-                category={category}
-                modeClassName={placement.imageClassName || defaultCanvasImageClass(category)}
-                wrapperClassName="h-full w-full"
-                blend={placement.blend ?? (category !== 'bag' && category !== 'eyewear' && category !== 'jewelry')}
-              />
-            </div>
-          </motion.div>
-        );
-      })}
+        <div className={zoneClass.bottom}>{renderZone('bottom', true)}</div>
+        <div className={zoneClass.shoes}>{renderZone('shoes', true)}</div>
+      </div>
     </div>
   );
 }
 
 function FlatLayCanvas({ items }: { items: Partial<Record<Category, Product>> }) {
-  const entries = CATEGORY_PRIORITY.filter((category) => items[category]);
-
   return (
-    <div className="relative h-[380px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#ffffff_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]">
-      <div className="text-[10px] uppercase tracking-[.18em] text-[#9e8e84]">Mirror mode</div>
-      <div className="mt-1 font-serif text-[17px] font-semibold text-[#342a26]">Flat-lay board</div>
-      <div className="mt-3 grid h-[310px] grid-cols-2 gap-2.5">
-        {entries.length ? (
-          entries.map((category, index) => (
-            <div
-              key={`${category}-${items[category]!.id}`}
-              className={`rounded-[20px] border border-[#eee4dc] bg-white p-2 shadow-[0_10px_18px_rgba(84,54,43,.05)] ${
-                index === 0 ? 'col-span-2' : ''
-              }`}
-            >
-              <div className="text-[9px] uppercase tracking-[.18em] text-[#b29f95]">{CATEGORY_LABELS[category]}</div>
-              <div className="mt-2 flex h-[calc(100%-18px)] items-center justify-center overflow-hidden rounded-[14px] bg-[#faf6f2]">
-                <PreviewImage
-                  product={items[category]!}
-                  category={category}
-                  wrapperClassName="h-full w-full"
-                  modeClassName="h-full w-full object-contain p-2.5"
-                  blend={false}
-                />
+    <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#ffffff_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]">
+      <div className="grid h-full grid-cols-2 gap-2.5">
+        <div className="rounded-[20px] border border-[#ece2d9] bg-white/80 p-3">
+          <div className="text-[10px] uppercase tracking-[.18em] text-[#9e8e84]">Mirror mode</div>
+          <div className="mt-1 font-serif text-[16px] font-semibold text-[#342a26]">Outfit summary</div>
+          <div className="mt-3 space-y-2">
+            {CATEGORY_ORDER.filter((c) => items[c]).map((c) => (
+              <div key={c} className="flex items-center justify-between rounded-full border border-[#ece2d9] bg-[#faf6f2] px-3 py-1.5 text-[10px] uppercase tracking-[.14em] text-[#86756a]">
+                <span>{CATEGORY_LABELS[c]}</span>
+                <span>{items[c]?.brand}</span>
               </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-2 rounded-[24px] border border-dashed border-[#e2d7cf] bg-white/70 p-4 text-center text-[11px] leading-relaxed text-[#8d7c73]">
-            Mirror mode will generate a flat-lay board as soon as pieces are added.
+            ))}
+            {CATEGORY_ORDER.every((c) => !items[c]) ? <div className="text-[11px] text-[#8d7c73]">Add pieces to populate your board.</div> : null}
           </div>
-        )}
+        </div>
+        <div className="rounded-[20px] border border-[#ece2d9] bg-white/80 p-2.5">
+          <div className="grid h-full grid-cols-2 gap-2">
+            {CATEGORY_ORDER.map((category) => (
+              <div key={category} className="overflow-hidden rounded-[14px] border border-[#eee4dc] bg-white p-1.5">
+                {items[category] ? (
+                  <>
+                    <div className="text-[8px] uppercase tracking-[.16em] text-[#a59082]">{CATEGORY_LABELS[category]}</div>
+                    <div className="h-[calc(100%-14px)]">
+                      <PreviewImage product={items[category]!} category={category} wrapperClassName="h-full w-full" modeClassName="h-full w-full object-contain p-1.5" blend={false} />
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-[8px] uppercase tracking-[.14em] text-[#b9a89d]">{CATEGORY_LABELS[category]}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
