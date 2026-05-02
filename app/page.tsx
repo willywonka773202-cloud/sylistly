@@ -14,6 +14,7 @@ import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { proxiedImageUrl } from '@/lib/image-url';
+import { filterRenderableProducts, hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
 import {
   VIBES,
   getBudgetMaxCents,
@@ -145,11 +146,13 @@ function BuilderPageContent({
   quickQuery,
   quickVibe,
   quickFrame,
+  quickSlots,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
   quickVibe: string | null;
   quickFrame: string | null;
+  quickSlots: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -226,14 +229,23 @@ function BuilderPageContent({
   }, [quickVibe]);
 
   useEffect(() => {
+    if (quickSlots) return;
     setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe));
-  }, [selectedVibe]);
+  }, [quickSlots, selectedVibe]);
 
   useEffect(() => {
     if (quickFrame === 'masc' || quickFrame === 'fem' || quickFrame === 'androgynous') {
       setBodyType(quickFrame);
     }
   }, [quickFrame, setBodyType]);
+
+  useEffect(() => {
+    if (!quickSlots) return;
+    const slots = quickSlots
+      .split(',')
+      .filter((slot): slot is Category => CATEGORY_ORDER.includes(slot as Category));
+    if (slots.length) setSelectedGenerationSlots(CATEGORY_ORDER.filter((slot) => slots.includes(slot)));
+  }, [quickSlots]);
 
   function closeSearchSheet() {
     setSearchFor(null);
@@ -250,12 +262,10 @@ function BuilderPageContent({
     if (!response.ok) {
       throw new Error(typeof data.error === 'string' ? data.error : 'Search failed.');
     }
-    const products = Array.isArray(data.products) ? data.products.filter(Boolean) as Product[] : [];
+    const products = Array.isArray(data.products) ? filterRenderableProducts(data.products.filter(Boolean) as Product[]) : [];
     const avoidSet = new Set(avoidIds);
-    const imageBacked = products.filter((product) => Boolean(product.imageUrl));
-    const reliableProducts = imageBacked.length ? imageBacked : products;
-    const preferred = reliableProducts.filter((product) => !avoidSet.has(product.id));
-    const eligible = preferred.length ? preferred : reliableProducts;
+    const preferred = products.filter((product) => !avoidSet.has(product.id));
+    const eligible = preferred.length ? preferred : products;
     const pool = eligible.slice(0, Math.min(12, eligible.length));
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
@@ -333,7 +343,7 @@ function BuilderPageContent({
       if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
         for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
           if (!targetSlots.includes(slot)) continue;
-          if (!product) continue;
+          if (!isRenderableProduct(product)) continue;
           nextItems[slot] = product;
           addedCount += 1;
         }
@@ -366,7 +376,7 @@ function BuilderPageContent({
         );
 
         for (const result of results) {
-          if (result.status !== 'fulfilled' || !result.value.product) continue;
+          if (result.status !== 'fulfilled' || !isRenderableProduct(result.value.product)) continue;
           nextItems[result.value.slot] = result.value.product;
           addedCount += 1;
         }
@@ -517,7 +527,7 @@ function BuilderPageContent({
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-3 px-4 pb-36 pt-2">
+        <div className="flex flex-col gap-4 px-4 pb-56 pt-2">
           <section className="flex flex-col gap-3">
             <Mannequin
               items={items}
@@ -528,25 +538,25 @@ function BuilderPageContent({
               selectedGenerationSlots={selectedGenerationSlots}
               onToggleGenerationSlot={toggleGenerationSlot}
             />
-            <div className="border-t border-hairline px-1 pt-3 text-center">
+            <div className="border-t border-hairline px-1 pt-4 text-center">
               <div className="text-[12px] font-medium text-muted-2">
                 Tap slots to include in next generation
               </div>
               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
-                  className="rounded-full border border-hairline-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
                 >
                   Use vibe defaults
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
-                  className="rounded-full border border-hairline-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
                 >
                   Select all
                 </button>
@@ -555,7 +565,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:opacity-60"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:opacity-60"
               >
                 {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Build selected fit
@@ -563,35 +573,34 @@ function BuilderPageContent({
             </div>
           </section>
           <section className="flex flex-col gap-3">
-            <div className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))] p-3.5 shadow-[0_22px_48px_rgba(0,0,0,.18)]">
+            <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
                     <Sparkles size={12} className="text-accent" />
                     Outfit generator
                   </div>
-                  <div className="mt-1 font-serif text-[18px] font-semibold text-ink">
+                  <div className="mt-2 font-serif text-[25px] font-semibold leading-[1.04] text-ink">
                     {activeVibe.label} <em className="italic text-accent">starter look</em>
                   </div>
-                  <div className="mt-1 text-[11px] leading-relaxed text-muted-2">
+                  <div className="mt-2 text-[13px] leading-relaxed text-muted-2">
                     {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
                   </div>
                 </div>
-                <div className="rounded-[20px] border border-hairline bg-surface-2 px-3 py-2 text-right">
-                  <div className="text-[10px] uppercase tracking-[.16em] text-muted">AI pass</div>
-                  <div className="mt-1 text-[11px] text-ink">
-                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'Ready to style'}
+                <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
+                  <div className="text-[9px] uppercase tracking-[.18em] text-muted">
+                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'AI pass - ready'}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {VIBES.map((vibe) => (
                   <button
                     key={vibe.id}
                     type="button"
                     onClick={() => setSelectedVibe(vibe.id)}
-                    className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition ${
                       selectedVibe === vibe.id
                         ? 'bg-accent text-white shadow-pink-glow'
                         : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
@@ -602,7 +611,7 @@ function BuilderPageContent({
                 ))}
               </div>
 
-              <div className="mt-3 flex items-center justify-between gap-2">
+              <div className="mt-5 flex items-center justify-between gap-2">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
                 <div className="flex flex-wrap justify-end gap-2">
                   {[ 
@@ -616,7 +625,7 @@ function BuilderPageContent({
                       key={option.value}
                       type="button"
                       onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
-                      className={`rounded-full px-3 py-1 text-[10px] font-medium transition ${
+                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
                         generatorBudget === option.value
                           ? 'bg-white text-black'
                           : 'border border-hairline bg-surface-2 text-muted'
@@ -661,7 +670,7 @@ function BuilderPageContent({
                 </div>
               ) : null}
 
-              <div className="mt-3 flex items-center justify-between gap-2">
+              <div className="mt-5 flex items-center justify-between gap-2">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
                 <div className="flex flex-wrap justify-end gap-2">
                   {[
@@ -673,7 +682,7 @@ function BuilderPageContent({
                       key={option.value}
                       type="button"
                       onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
-                      className={`rounded-full px-3 py-1 text-[10px] font-medium transition ${
+                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
                         generatorFrame === option.value
                           ? 'bg-white text-black'
                           : 'border border-hairline bg-surface-2 text-muted'
@@ -685,12 +694,12 @@ function BuilderPageContent({
                 </div>
               </div>
 
-              <div className="mt-3 grid grid-cols-1 gap-2 min-[390px]:grid-cols-2">
+              <div className="mt-6 grid grid-cols-1 gap-3">
                 <button
                   type="button"
                   onClick={() => void generateLook('starter')}
                   disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
                 >
                   {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
                   Generate starter look
@@ -699,18 +708,18 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('missing')}
                   disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
                 >
                   <Sparkles size={13} />
                   Fill missing pieces
                 </button>
               </div>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => void generateLook('refresh')}
                   disabled={generatorLoading}
-                  className="rounded-full border border-hairline-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
                 >
                   Refresh look
                 </button>
@@ -718,13 +727,13 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('full')}
                   disabled={generatorLoading}
-                  className="rounded-full border border-hairline-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
                 >
                   Build fuller fit
                 </button>
               </div>
             </div>
-            <div className="rounded-[28px] border border-hairline bg-surface-1 p-3.5 shadow-[0_18px_42px_rgba(0,0,0,.16)]">
+            <div className="rounded-[30px] border border-hairline bg-surface-1 p-5 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-[10px] uppercase tracking-[.18em] text-muted">Item tray</div>
@@ -749,7 +758,7 @@ function BuilderPageContent({
               onOpenSearch={setSearchFor}
               onToggleBagLayer={() => setBagLayer((value) => (value === 'front' ? 'behind' : 'front'))}
             />
-            <div className="sticky bottom-0 z-20 -mx-4 flex flex-col gap-2 border-t border-hairline bg-bg/95 px-4 py-3 backdrop-blur">
+            <div className="sticky bottom-3 z-20 flex flex-col gap-2 rounded-[24px] border border-white/10 bg-bg/90 p-2 shadow-[0_18px_44px_rgba(0,0,0,.42)] backdrop-blur">
               {statusMessage ? (
                 <div className="rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
                   {statusMessage}
@@ -758,12 +767,12 @@ function BuilderPageContent({
               <button
                 onClick={shopAll}
                 disabled={n === 0}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
+                  className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
               >
                 Shop full look {n > 0 && <span className="opacity-75 font-medium">- {n}</span>}
                 <ExternalLink size={14} />
               </button>
-              <button onClick={clear} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
+              <button onClick={clear} className="w-full rounded-xl py-1.5 text-xs text-muted transition hover:text-ink">
                 Clear fit
               </button>
             </div>
@@ -987,16 +996,22 @@ function PanelPreviewImage({
   wrapperClassName: string;
   modeClassName: string;
 }) {
-  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
-    product.imageUrl ? 'cutout' : 'fallback',
+  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'hidden'>(() =>
+    hasUsableProductImage(product) ? 'cutout' : 'hidden',
   );
 
   const src =
-    imageMode === 'fallback' || !product.imageUrl
-      ? overlayFallback(product.brand)
+    imageMode === 'hidden' || !hasUsableProductImage(product)
+      ? ''
       : imageMode === 'cutout'
       ? proxiedImageUrl(product.imageUrl, { cutout: true, category })
       : proxiedImageUrl(product.imageUrl);
+
+  useEffect(() => {
+    setImageMode(hasUsableProductImage(product) ? 'cutout' : 'hidden');
+  }, [product.id, product.imageUrl]);
+
+  if (!src) return null;
 
   return (
     <div className={wrapperClassName}>
@@ -1008,7 +1023,7 @@ function PanelPreviewImage({
         style={{ filter: 'drop-shadow(0 10px 18px rgba(0,0,0,.08))' }}
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'fallback'))}
+        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'hidden'))}
       />
     </div>
   );
@@ -1216,13 +1231,14 @@ function BuilderPageWithSearchParams() {
       quickQuery={searchParams.get('query')}
       quickVibe={searchParams.get('vibe')}
       quickFrame={searchParams.get('frame')}
+      quickSlots={searchParams.get('slots')}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

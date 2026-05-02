@@ -83,6 +83,7 @@ export function SearchSheet({
   const [catalogKind, setCatalogKind] = useState<'photo' | 'starter' | 'blend' | null>(null);
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
+  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [searchPriceMax, setSearchPriceMax] = useState<number | null>(priceMax);
   const [customPriceInput, setCustomPriceInput] = useState(
     priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
@@ -106,6 +107,7 @@ export function SearchSheet({
     setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
+    setFailedImageIds(new Set());
     setSearchPriceMax(priceMax);
     setCustomPriceInput(
       priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
@@ -170,6 +172,7 @@ export function SearchSheet({
       }
 
       setIsDemoResults(Boolean(data.mock));
+      setFailedImageIds(new Set());
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
       setCatalogKind(
         data.catalogKind === 'blend'
@@ -224,9 +227,12 @@ export function SearchSheet({
     setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
+    setFailedImageIds(new Set());
   }
 
-  const visibleResults = results ? filterRenderableProducts(results) : results;
+  const visibleResults = results
+    ? filterRenderableProducts(results).filter((product) => !failedImageIds.has(product.id))
+    : results;
   const resultLabel = loading
     ? `Finding ${isDemoResults ? 'demo' : resultSource === 'catalog' || searchMode === 'catalog-only' ? 'catalog' : 'live'} products...`
     : visibleResults?.length
@@ -263,7 +269,7 @@ export function SearchSheet({
                   {slotOrder.map((slot) => {
                     const product = fitItems[slot];
                     const active = slot === currentCategory;
-                    const renderableProduct = hasUsableProductImage(product) ? product : null;
+                    const renderableProduct = hasUsableProductImage(product) && !failedImageIds.has(product.id) ? product : null;
 
                     return (
                       <button
@@ -292,6 +298,9 @@ export function SearchSheet({
                               product={renderableProduct}
                               wrapperClassName="h-full w-full"
                               className="h-full w-full object-contain p-2"
+                              onUnavailable={(failedProduct) => {
+                                setFailedImageIds((current) => new Set(current).add(failedProduct.id));
+                              }}
                             />
                           ) : (
                             <span className="text-[22px] leading-none text-[#7d7068]">+</span>
@@ -481,12 +490,15 @@ export function SearchSheet({
                 : visibleResults === null
                 ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
                 : visibleResults.length === 0
-                ? <div className="col-span-2 py-10 text-center text-muted text-sm">No matches. Try a brand, color, or vibe.</div>
+                ? <div className="col-span-2 py-10 text-center text-muted text-sm">No image-backed products found for this search.</div>
                 : visibleResults.map((p) => (
                     <ProductCard
                       key={p.id}
                       product={p}
                       selected={selectedItem?.id === p.id}
+                      onImageUnavailable={() => {
+                        setFailedImageIds((current) => new Set(current).add(p.id));
+                      }}
                       onClick={() => {
                         setItem(currentCategory, p);
                         onClose();

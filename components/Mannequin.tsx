@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Layers3, Radar, Sparkles, Wand2 } from 'lucide-react';
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { Check, Layers3, Radar, Sparkles, Wand2 } from 'lucide-react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { proxiedImageUrl } from '@/lib/image-url';
+import { hasUsableProductImage } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -15,8 +16,8 @@ interface Props {
   bodyType?: GeneratorFrame;
   vibeLabel: string;
   vibeBlurb: string;
-  onOpenSearch?: (category: Category) => void;
-  onGenerateVariant?: (variant: FitVariant) => void;
+  selectedGenerationSlots?: Category[];
+  onToggleGenerationSlot?: (category: Category) => void;
 }
 
 interface Placement {
@@ -69,12 +70,6 @@ const CATEGORY_LABELS: Record<Category, string> = {
   jewelry: 'Jewelry',
 };
 
-const VARIANT_COPY: Record<FitVariant, { title: string; blurb: string }> = {
-  casual: { title: 'Casual', blurb: 'Relax the look' },
-  elevated: { title: 'Elevated', blurb: 'Sharpen the silhouette' },
-  bold: { title: 'Bold', blurb: 'Push contrast and statement' },
-};
-
 const GHOST_ZONES: Array<{ category: Category; label: string; style: CSSProperties }> = [
   { category: 'hat', label: 'Head', style: { left: '50%', top: '8%', width: '26%', height: '12%', transform: 'translateX(-50%)' } },
   { category: 'eyewear', label: 'Eyes', style: { left: '50%', top: '19%', width: '22%', height: '7%', transform: 'translateX(-50%)' } },
@@ -95,8 +90,8 @@ export function Mannequin({
   bodyType = 'androgynous',
   vibeLabel,
   vibeBlurb,
-  onOpenSearch,
-  onGenerateVariant,
+  selectedGenerationSlots = [],
+  onToggleGenerationSlot,
 }: Props) {
   const [mirrorMode, setMirrorMode] = useState(false);
   const [magnetMode, setMagnetMode] = useState(true);
@@ -108,10 +103,6 @@ export function Mannequin({
   const count = Object.values(items).filter(Boolean).length;
   const hasItems = count > 0;
   const analysis = useMemo(() => analyzeOutfit(items, vibeLabel), [items, vibeLabel]);
-  const stackEntries = CATEGORY_ORDER.filter((category) => items[category]).map((category) => ({
-    category,
-    product: items[category]!,
-  }));
   const highlightCategory = activeCategory || analysis.primaryGap;
   const glow = skinTone || '#edd7cc';
 
@@ -125,242 +116,28 @@ export function Mannequin({
 
   return (
     <div
-      className="relative overflow-hidden rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,#1a1714_0%,#11100f_32%,#0e0d0c_100%)] p-3.5 shadow-[0_28px_80px_rgba(0,0,0,.35)]"
+      className="relative overflow-hidden rounded-[30px] border border-[#efe4dc] bg-[#fff7ef] p-2.5 shadow-[0_22px_54px_rgba(0,0,0,.3)]"
       style={{
-        boxShadow: `0 28px 80px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px ${hexToRgba(glow, 0.08)}`,
+        boxShadow: `0 18px 44px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.88), 0 0 0 1px ${hexToRgba(glow, 0.08)}`,
       }}
     >
-      <div className="absolute -right-10 top-10 h-36 w-36 rounded-full blur-3xl" style={{ background: hexToRgba(glow, 0.12) }} />
-      <div className="absolute left-[-30px] top-44 h-32 w-32 rounded-full bg-[#f5e8de]/8 blur-3xl" />
-
-      <div className="relative z-10 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="text-[10px] uppercase tracking-[.22em] text-[#9f9187]">AI fit board</div>
-          <div className="mt-1 font-serif text-[24px] font-semibold leading-none text-[#fff6f0]">
-            Outfit <em className="italic text-accent">canvas</em>
-          </div>
-          <div className="mt-2 max-w-[220px] text-[11px] leading-relaxed text-[#c8b9ae]">
-            {vibeLabel} styling system tuned for anchored placement, color balance, and cleaner product separation.
-          </div>
-          <div className="mt-1 max-w-[240px] text-[10px] uppercase tracking-[.14em] text-[#9d8d84]">
-            {vibeBlurb}
-          </div>
-        </div>
-
-        <div className="rounded-[24px] border border-white/8 bg-white/[0.04] px-4 py-3 text-right shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
-          <div className="text-[10px] uppercase tracking-[.18em] text-[#a7948b]">{FRAME_LABELS[bodyType]}</div>
-          <div className="mt-1 font-serif text-[28px] font-semibold leading-none text-[#fff8f4]">
-            {analysis.score}
-          </div>
-          <div className="mt-1 text-[10px] uppercase tracking-[.16em] text-[#b9aaa1]">
-            {count}/8 placed
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 mt-4 flex flex-wrap gap-2">
-        <ToolChip label="Fit Magnet" active={magnetMode} onClick={() => setMagnetMode((value) => !value)} icon={<Radar size={12} />} />
-        <ToolChip label="Mirror Mode" active={mirrorMode} onClick={() => setMirrorMode((value) => !value)} icon={<Layers3 size={12} />} />
-        <ToolChip label="Heatmap" active={heatmapMode} onClick={() => setHeatmapMode((value) => !value)} icon={<Sparkles size={12} />} />
-        <ToolChip label="Auto Fit" active={false} onClick={autoFit} icon={<Wand2 size={12} />} />
-        <ToolChip label="One Tap Polish" active={polishMode} onClick={() => setPolishMode((value) => !value)} icon={<Sparkles size={12} />} />
-      </div>
-
-      <div className="relative z-10 mt-4 overflow-hidden rounded-[30px] border border-[#ebe0d8] bg-[#f7f2ee] p-3 shadow-[0_18px_46px_rgba(0,0,0,.22)]">
-        <div
-          className="rounded-[26px] border border-[#e9dfd7] bg-[linear-gradient(180deg,#fcfaf8_0%,#f7f1eb_58%,#f0e8e2_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 18% 18%, rgba(255,255,255,.86), transparent 28%), radial-gradient(circle at 82% 12%, rgba(255,255,255,.68), transparent 24%), radial-gradient(circle at 50% 70%, ${hexToRgba(glow, 0.16)}, transparent 36%), linear-gradient(180deg,#fcfaf8 0%,#f7f1eb 58%,#f0e8e2 100%)`,
-          }}
-        >
-          {mirrorMode ? (
-            <div className="grid grid-cols-2 gap-3">
-              <FrontCanvas
-                items={items}
-                bagLayer={bagLayer}
-                heatmapMode={heatmapMode}
-                highlightCategory={highlightCategory}
-                magnetMode={magnetMode}
-                polishMode={polishMode}
-                skinTone={skinTone}
-              />
-              <FlatLayCanvas items={items} />
-            </div>
-          ) : (
-            <FrontCanvas
-              items={items}
-              bagLayer={bagLayer}
-              heatmapMode={heatmapMode}
-              highlightCategory={highlightCategory}
-              magnetMode={magnetMode}
-              polishMode={polishMode}
-              skinTone={skinTone}
-            />
-          )}
-        </div>
-
-        {!hasItems ? (
-          <div className="mt-3 rounded-[22px] border border-[#eadfd7] bg-white/70 px-4 py-3 text-[11px] leading-relaxed text-[#74665f] shadow-[0_10px_24px_rgba(84,54,43,.06)]">
-            Add pieces below and Sylistly will snap them into the head, torso, waist, foot, and side-body zones automatically.
-          </div>
-        ) : (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-[22px] border border-[#eadfd7] bg-white/72 px-4 py-2.5 text-[10px] uppercase tracking-[.18em] text-[#8e7d73] shadow-[0_8px_20px_rgba(84,54,43,.05)]">
-            <span>{analysis.balanceLabel}</span>
-            <span>{analysis.harmonyLabel}</span>
-            <span>{count} products in look</span>
-          </div>
-        )}
-      </div>
-
-      <div className="relative z-10 mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-        <section className="rounded-[26px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-[10px] uppercase tracking-[.18em] text-[#a8968b]">Product stack</div>
-              <div className="mt-1 font-serif text-[18px] font-semibold text-[#fff6f0]">Selected pieces</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => onOpenSearch?.(analysis.primaryGap || 'top')}
-              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[.14em] text-[#d9cbc3] transition hover:border-accent hover:text-white"
-            >
-              Browse
-              <ArrowUpRight size={11} />
-            </button>
-          </div>
-
-          <div className="mt-3 space-y-2.5">
-            {stackEntries.length ? (
-              stackEntries.map(({ category, product }) => (
-                <button
-                  key={product.id}
-                  type="button"
-                  onClick={() => onOpenSearch?.(category)}
-                  onMouseEnter={() => setActiveCategory(category)}
-                  onMouseLeave={() => setActiveCategory(null)}
-                  className="flex w-full items-center gap-3 rounded-[20px] border border-white/7 bg-[#141210] px-2.5 py-2.5 text-left transition hover:border-accent/40 hover:bg-[#191613]"
-                >
-                  <div className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]">
-                    <PreviewImage
-                      product={product}
-                      category={category}
-                      modeClassName="h-full w-full object-contain p-2"
-                      wrapperClassName="h-full w-full"
-                      blend={false}
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[9px] uppercase tracking-[.18em] text-[#a69489]">{CATEGORY_LABELS[category]}</div>
-                    <div className="mt-1 truncate text-[12px] font-medium text-[#fff4ee]">{product.brand}</div>
-                    <div className="truncate text-[11px] text-[#c1b2a8]">{product.name}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-serif text-[14px] font-semibold text-[#fff4ee]">
-                      ${(product.priceCents / 100).toLocaleString()}
-                    </div>
-                  </div>
-                </button>
-              ))
-            ) : (
-              <div className="rounded-[20px] border border-dashed border-white/10 bg-[#141210] px-3 py-5 text-center text-[11px] leading-relaxed text-[#c8b9ae]">
-                Your product stack populates here as you add pieces from the tray.
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="rounded-[26px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
-          <div className="text-[10px] uppercase tracking-[.18em] text-[#a8968b]">Style intelligence</div>
-          <div className="mt-1 font-serif text-[18px] font-semibold text-[#fff6f0]">Fit diagnostics</div>
-
-          <div className="mt-3 rounded-[22px] border border-white/8 bg-[#141210] p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[10px] uppercase tracking-[.18em] text-[#aa968b]">Style DNA</div>
-                <div className="mt-1 text-[13px] font-medium text-[#fff6f0]">{analysis.silhouetteLabel}</div>
-              </div>
-              <div className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] font-semibold text-[#fff6f0]">
-                {analysis.harmonyLabel}
-              </div>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {analysis.styleDna.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-white/8 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[.14em] text-[#d9cac1]"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-3 space-y-2.5">
-            <MetricRow label="Color harmony" value={analysis.colorHarmony} />
-            <MetricRow label="Silhouette" value={analysis.silhouette} />
-            <MetricRow label="Layering" value={analysis.layering} />
-            <MetricRow label="Proportions" value={analysis.proportions} />
-          </div>
-
-          <div className="mt-3 rounded-[22px] border border-white/8 bg-[#141210] p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-[10px] uppercase tracking-[.18em] text-[#aa968b]">Heatmap</div>
-              <button
-                type="button"
-                onClick={() => setBagLayer((value) => (value === 'front' ? 'behind' : 'front'))}
-                className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9px] uppercase tracking-[.16em] text-[#d7c6bc] transition hover:border-accent"
-              >
-                Bag {bagLayer === 'front' ? 'front' : 'behind'}
-              </button>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <HeatChip label="Upper" value={analysis.crowding.upper} />
-              <HeatChip label="Mid" value={analysis.crowding.mid} />
-              <HeatChip label="Lower" value={analysis.crowding.lower} />
-            </div>
-            <div className="mt-3 text-[11px] leading-relaxed text-[#c7b8ae]">{analysis.upgradeNote}</div>
-          </div>
-
-          <div className="mt-3">
-            <div className="text-[10px] uppercase tracking-[.18em] text-[#aa968b]">Shop the gaps</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {analysis.missing.length ? (
-                analysis.missing.slice(0, 3).map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => onOpenSearch?.(category)}
-                    className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[10px] uppercase tracking-[.14em] text-[#f5e8df] transition hover:border-accent"
-                  >
-                    Add {category}
-                  </button>
-                ))
-              ) : (
-                <span className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[.14em] text-[#d8c9c0]">
-                  Fully styled
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <div className="text-[10px] uppercase tracking-[.18em] text-[#aa968b]">3 better versions</div>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {(Object.keys(VARIANT_COPY) as FitVariant[]).map((variant) => (
-                <button
-                  key={variant}
-                  type="button"
-                  onClick={() => onGenerateVariant?.(variant)}
-                  className="rounded-[18px] border border-white/10 bg-[#151311] px-2.5 py-2.5 text-left transition hover:border-accent hover:bg-[#191613]"
-                >
-                  <div className="text-[10px] uppercase tracking-[.16em] text-[#f5e8df]">{VARIANT_COPY[variant].title}</div>
-                  <div className="mt-1 text-[10px] leading-relaxed text-[#bdaea4]">{VARIANT_COPY[variant].blurb}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+      <div
+        className="rounded-[26px] border border-[#eadfd7] bg-[linear-gradient(180deg,#fffdf9_0%,#f8f1ea_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 18% 14%, rgba(255,255,255,.9), transparent 28%), radial-gradient(circle at 86% 18%, rgba(255,255,255,.68), transparent 24%), radial-gradient(circle at 50% 72%, ${hexToRgba(glow, 0.12)}, transparent 38%), linear-gradient(180deg,#fffdf9 0%,#f8f1ea 100%)`,
+        }}
+      >
+        <FrontCanvas
+          items={items}
+          bagLayer={bagLayer}
+          heatmapMode={heatmapMode}
+          highlightCategory={highlightCategory}
+          magnetMode={magnetMode}
+          onToggleGenerationSlot={onToggleGenerationSlot}
+          polishMode={polishMode}
+          selectedGenerationSlots={selectedGenerationSlots}
+          skinTone={skinTone}
+        />
       </div>
     </div>
   );
@@ -372,7 +149,9 @@ function FrontCanvas({
   heatmapMode,
   highlightCategory,
   magnetMode,
+  onToggleGenerationSlot,
   polishMode,
+  selectedGenerationSlots,
   skinTone,
 }: {
   items: Partial<Record<Category, Product>>;
@@ -380,7 +159,9 @@ function FrontCanvas({
   heatmapMode: boolean;
   highlightCategory: Category | null;
   magnetMode: boolean;
+  onToggleGenerationSlot?: (category: Category) => void;
   polishMode: boolean;
+  selectedGenerationSlots: Category[];
   skinTone?: string;
 }) {
   const _crowding = getCrowding(items);
@@ -388,55 +169,109 @@ function FrontCanvas({
   const _tone = skinTone;
   const _heatmap = heatmapMode;
   const _magnet = magnetMode;
-  const zoneClass: Record<Category, string> = {
-    hat: 'col-span-1 h-[82px]',
-    eyewear: 'col-span-1 h-[82px]',
-    jewelry: 'col-span-1 h-[82px]',
-    outer: 'col-span-1 h-[126px]',
-    top: 'col-span-1 h-[126px]',
-    bag: 'col-span-1 h-[126px]',
-    bottom: 'col-span-2 h-[112px]',
-    shoes: 'col-span-1 h-[112px]',
+  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const zoneStyle: Record<Category, CSSProperties> = {
+    hat: { gridColumn: '1', gridRow: '1 / span 2' },
+    outer: { gridColumn: '1', gridRow: '3 / span 6' },
+    top: { gridColumn: '2', gridRow: '1 / span 4' },
+    bottom: { gridColumn: '2', gridRow: '5 / span 4' },
+    eyewear: { gridColumn: '3', gridRow: '1 / span 2' },
+    jewelry: { gridColumn: '3', gridRow: '3 / span 2' },
+    bag: { gridColumn: '3', gridRow: '5 / span 2' },
+    shoes: { gridColumn: '3', gridRow: '7 / span 2' },
   };
 
   const renderZone = (category: Category, prominent = false) => {
-    const product = items[category];
+    const rawProduct = items[category];
+    const product = hasUsableProductImage(rawProduct) && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
+    const selected = selectedGenerationSlots.includes(category);
+    const interactive = Boolean(onToggleGenerationSlot);
+    const selectedClassName = selected
+      ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
+      : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
+    const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1.5 transition ${selectedClassName} ${interactive ? 'cursor-pointer active:scale-[0.985]' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
+    const selectionBadge = selected ? (
+      <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.42)]">
+        <Check size={13} strokeWidth={3} />
+      </span>
+    ) : null;
+
     if (!product) {
       return (
-        <div className="flex h-full w-full items-center justify-center rounded-[18px] border border-dashed border-[#d9ccc2] bg-white/70 px-2 text-center">
-          <span className="text-[10px] uppercase tracking-[.16em] text-[#b39f91]">{CATEGORY_LABELS[category]}</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => onToggleGenerationSlot?.(category)}
+          className={`${wrapperClassName} flex flex-col items-center justify-center border-dashed bg-white/64 px-1.5 text-center`}
+          aria-pressed={selected}
+          aria-label={`${selected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
+        >
+          {selectionBadge}
+          <span className={`text-[8px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
+        </button>
       );
     }
+    const imageClassName =
+      category === 'top' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
+      category === 'bottom' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
+      category === 'shoes' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.04]' :
+      category === 'bag' ? 'h-full w-full object-contain object-center p-2 scale-[1.02]' :
+      category === 'outer' ? 'h-full w-full object-contain object-center p-1.5 scale-[0.99]' :
+      category === 'hat' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
+      category === 'eyewear' ? 'h-full w-full object-contain object-center p-2 scale-[1.08]' :
+      category === 'jewelry' ? 'h-full w-full object-contain object-center p-2.5 scale-[1.12]' :
+      `h-full w-full object-contain ${prominent ? 'p-1' : 'p-1.5'}`;
+    const innerFrameClassName =
+      category === 'jewelry'
+        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,.7)]'
+        : category === 'eyewear'
+        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,.65)]'
+        : 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/64 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]';
+
     return (
-      <div className={`h-full w-full overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f4eee8_100%)] p-2 shadow-[0_8px_18px_rgba(0,0,0,.06)] ${highlightCategory === category ? 'ring-1 ring-accent/40' : ''}`}>
-        <div className="mb-1 text-[9px] uppercase tracking-[.16em] text-[#aa9688]">{CATEGORY_LABELS[category]}</div>
-        <div className={`${prominent ? 'h-[calc(100%-18px)]' : 'h-[calc(100%-16px)]'} rounded-[12px] bg-white/75`}>
+      <button
+        type="button"
+        onClick={() => onToggleGenerationSlot?.(category)}
+        className={wrapperClassName}
+        aria-pressed={selected}
+        aria-label={`${selected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
+      >
+        {selectionBadge}
+        <div className={`mb-0.5 text-left text-[7px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
+        <div className={innerFrameClassName}>
           <PreviewImage
             product={product}
             category={category}
             wrapperClassName="h-full w-full"
-            modeClassName="h-full w-full object-contain p-2.5"
+            modeClassName={imageClassName}
             blend={false}
+            onUnavailable={(failedProduct) => {
+              setFailedImageIds((current) => new Set(current).add(failedProduct.id));
+            }}
           />
         </div>
-      </div>
+      </button>
     );
   };
 
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fefdfb_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
-      <div className="grid h-full grid-cols-3 gap-2.5">
-        <div className={zoneClass.hat}>{renderZone('hat')}</div>
-        <div className={zoneClass.eyewear}>{renderZone('eyewear')}</div>
-        <div className={zoneClass.jewelry}>{renderZone('jewelry')}</div>
+    <div className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]">
+      <div
+        className="grid h-full gap-2.5"
+        style={{
+          gridTemplateColumns: '0.92fr 1.55fr 0.92fr',
+          gridTemplateRows: 'repeat(8, minmax(0, 1fr))',
+        }}
+      >
+        <div style={zoneStyle.hat}>{renderZone('hat')}</div>
+        <div style={zoneStyle.eyewear}>{renderZone('eyewear')}</div>
+        <div style={zoneStyle.jewelry}>{renderZone('jewelry')}</div>
+        <div style={zoneStyle.top}>{renderZone('top', true)}</div>
 
-        <div className={zoneClass.outer}>{renderZone('outer', true)}</div>
-        <div className={zoneClass.top}>{renderZone('top', true)}</div>
-        <div className={zoneClass.bag}>{renderZone('bag')}</div>
-
-        <div className={zoneClass.bottom}>{renderZone('bottom', true)}</div>
-        <div className={zoneClass.shoes}>{renderZone('shoes', true)}</div>
+        <div style={zoneStyle.outer}>{renderZone('outer', true)}</div>
+        <div style={zoneStyle.bottom}>{renderZone('bottom', true)}</div>
+        <div style={zoneStyle.bag}>{renderZone('bag')}</div>
+        <div style={zoneStyle.shoes}>{renderZone('shoes', true)}</div>
       </div>
     </div>
   );
@@ -509,47 +344,6 @@ function ToolChip({
   );
 }
 
-function MetricRow({ label, value }: { label: string; value: number }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[.16em] text-[#a8968b]">
-        <span>{label}</span>
-        <span className="text-[#f5e8df]">{value}</span>
-      </div>
-      <div className="mt-2 h-2 rounded-full bg-white/[0.06]">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${Math.max(8, Math.min(100, value))}%` }}
-          transition={{ type: 'spring', stiffness: 180, damping: 24 }}
-          className="h-full rounded-full bg-[linear-gradient(90deg,#e8365d_0%,#ffc9d4_100%)]"
-        />
-      </div>
-    </div>
-  );
-}
-
-function HeatChip({
-  label,
-  value,
-}: {
-  label: string;
-  value: 'calm' | 'balanced' | 'crowded';
-}) {
-  const styles =
-    value === 'crowded'
-      ? 'border-rose-400/35 bg-rose-500/12 text-rose-100'
-      : value === 'balanced'
-      ? 'border-emerald-400/35 bg-emerald-500/12 text-emerald-100'
-      : 'border-white/10 bg-white/[0.05] text-[#eee2da]';
-
-  return (
-    <div className={`rounded-[18px] border px-2.5 py-2 text-center ${styles}`}>
-      <div className="text-[9px] uppercase tracking-[.18em]">{label}</div>
-      <div className="mt-1 text-[11px] font-semibold capitalize">{value}</div>
-    </div>
-  );
-}
-
 function AlignmentGuides() {
   return (
     <>
@@ -616,23 +410,24 @@ function PreviewImage({
   wrapperClassName,
   modeClassName,
   blend,
+  onUnavailable,
 }: {
   product: Product;
   category: Category;
   wrapperClassName: string;
   modeClassName: string;
   blend: boolean;
+  onUnavailable?: (product: Product) => void;
 }) {
-  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'fallback'>(() =>
-    product.imageUrl ? 'cutout' : 'fallback',
-  );
+  const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
 
-  const src =
-    imageMode === 'fallback' || !product.imageUrl
-      ? overlayFallback(product.brand)
-      : imageMode === 'cutout'
-      ? proxiedImageUrl(product.imageUrl, { cutout: true, category })
-      : proxiedImageUrl(product.imageUrl);
+  const src = imageOk && hasUsableProductImage(product) ? proxiedImageUrl(product.imageUrl) : '';
+
+  useEffect(() => {
+    setImageOk(hasUsableProductImage(product));
+  }, [product.id, product.imageUrl]);
+
+  if (!src) return null;
 
   return (
     <div className={wrapperClassName}>
@@ -647,7 +442,10 @@ function PreviewImage({
         }}
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'fallback'))}
+        onError={() => {
+          setImageOk(false);
+          onUnavailable?.(product);
+        }}
       />
     </div>
   );

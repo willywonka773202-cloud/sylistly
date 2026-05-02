@@ -1,5 +1,6 @@
 'use client';
 import { type KeyboardEvent, type MouseEvent } from 'react';
+import { useState } from 'react';
 import type { Product } from '@/lib/types';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
@@ -9,6 +10,7 @@ interface Props {
   product: Product;
   selected?: boolean;
   onClick: () => void;
+  onImageUnavailable?: () => void;
 }
 
 function formatPrice(priceCents: number): string {
@@ -24,7 +26,10 @@ function getHost(url: string): string {
   }
 }
 
-export function ProductCard({ product: p, selected = false, onClick }: Props) {
+export function ProductCard({ product: p, selected = false, onClick, onImageUnavailable }: Props) {
+  const [imageUnavailable, setImageUnavailable] = useState(false);
+
+  if (imageUnavailable) return null;
   if (!isRenderableProduct(p)) return null;
 
   const buyUrl = getProductOutboundUrl(p);
@@ -43,7 +48,7 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
   }
 
   return (
-    <article className={`overflow-hidden rounded-[20px] border bg-[#f8f3ed] shadow-[0_10px_26px_rgba(0,0,0,.18)] transition hover:-translate-y-0.5 ${
+    <article className={`overflow-hidden rounded-[24px] border bg-[#f8f3ed] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition hover:-translate-y-0.5 ${
       selected ? 'border-accent shadow-pink-glow' : 'border-[#e2d7cd]'
     }`}>
       <div
@@ -51,15 +56,19 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        className="flex min-h-[118px] w-full cursor-pointer items-center gap-3 p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="grid min-h-[206px] w-full cursor-pointer grid-cols-[150px_1fr] gap-3.5 p-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60 min-[390px]:grid-cols-[168px_1fr]"
       >
-        <div className="relative flex h-[96px] w-[112px] flex-none items-center justify-center overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,#fffdfa_0%,#f1e8df_100%)] ring-1 ring-[#efe4da] min-[390px]:h-[108px] min-[390px]:w-[124px]">
+        <div className="relative flex h-[178px] w-full flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fffdfa_0%,#f1e8df_100%)] ring-1 ring-[#efe4da] min-[390px]:h-[190px]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
-          <div className="absolute inset-x-4 bottom-3 h-4 rounded-full bg-[#d8cdc4]/35 blur-[6px]" />
+          <div className="absolute inset-x-5 bottom-4 h-5 rounded-full bg-[#d8cdc4]/38 blur-[7px]" />
           <ProductImage
             product={p}
             wrapperClassName="relative h-full w-full"
-            className="relative h-full w-full object-contain p-2 drop-shadow-[0_12px_18px_rgba(0,0,0,.24)]"
+            className="relative h-full w-full object-contain p-2.5 drop-shadow-[0_16px_22px_rgba(0,0,0,.24)]"
+            onUnavailable={() => {
+              setImageUnavailable(true);
+              onImageUnavailable?.();
+            }}
           />
           {selected ? (
             <div className="absolute bottom-2 right-2 grid h-6 w-6 place-items-center rounded-full bg-accent text-[9px] font-bold text-white">
@@ -67,32 +76,33 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
             </div>
           ) : null}
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-[9px] font-bold uppercase tracking-[.16em] text-[#8a7b72]">{p.brand}</div>
-          <div className="mt-1 line-clamp-2 font-serif text-[15px] font-semibold leading-[1.18] text-[#191513]">
+        <div className="flex min-w-0 flex-col py-0.5">
+          <div className="text-[9px] font-bold uppercase tracking-[.17em] text-[#8a7b72]">{p.brand}</div>
+          <div className="mt-1.5 line-clamp-3 font-serif text-[17px] font-semibold leading-[1.12] text-[#191513]">
             {p.name}
           </div>
-          <div className="mt-1 text-[13px] font-semibold text-[#191513]">{formatPrice(p.priceCents)}</div>
+          <div className="mt-2 text-[15px] font-semibold text-[#191513]">{formatPrice(p.priceCents)}</div>
           <button
             type="button"
             onClick={openItem}
             title={`Open ${retailHost}`}
-            className="mt-2 inline-flex max-w-full rounded-full bg-[#efe5dc] px-2.5 py-1 text-[9px] text-[#8a7b72] transition hover:bg-[#e8d8ca] hover:text-[#191513]"
+            className="mt-2 inline-flex max-w-full rounded-full bg-[#efe5dc] px-2.5 py-1.5 text-[9px] text-[#8a7b72] transition hover:bg-[#e8d8ca] hover:text-[#191513]"
           >
             <span className="truncate">{p.retailer}</span>
           </button>
+
+          <button
+            type="button"
+            aria-label={selected ? 'Added to fit' : 'Swap into fit'}
+            className="mt-auto inline-flex w-full items-center justify-center rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.13em] text-white shadow-pink-glow transition hover:bg-accent-hot"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClick();
+            }}
+          >
+            {selected ? 'Selected' : 'Swap'}
+          </button>
         </div>
-        <button
-          type="button"
-          aria-label={selected ? 'Added to fit' : 'Add to fit'}
-          className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent text-[24px] font-light leading-none text-white shadow-pink-glow transition hover:bg-accent-hot"
-          onClick={(event) => {
-            event.stopPropagation();
-            onClick();
-          }}
-        >
-          {selected ? 'OK' : '+'}
-        </button>
       </div>
     </article>
   );

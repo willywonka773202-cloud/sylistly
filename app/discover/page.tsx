@@ -10,6 +10,22 @@ import {
 import { getDiscoverLookPreview } from '@/lib/discover-previews';
 import { isRenderableProduct } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Product } from '@/lib/types';
+import recipeData from '@/data/discover-look-recipes.json';
+
+interface SlotRecipe {
+  keywords?: string[];
+  colors?: string[];
+  avoidKeywords?: string[];
+}
+
+interface DiscoverLookRecipe {
+  id: string;
+  slotRecipes: Partial<Record<Product['category'], SlotRecipe>>;
+}
+
+const DISCOVER_RECIPES = new Map(
+  (recipeData as DiscoverLookRecipe[]).map((recipe) => [recipe.id, recipe]),
+);
 
 function productText(product: Product): string {
   return [
@@ -39,7 +55,71 @@ function productMatchesCollection(product: Product, collection: CatalogCollectio
   );
 }
 
+function hasTerm(text: string, term: string): boolean {
+  return text.includes(term.toLowerCase());
+}
+
+function recipeScore(product: Product, collection: CatalogCollection, recipe: SlotRecipe): number {
+  const text = productText(product);
+  let score = 0;
+
+  for (const keyword of recipe.keywords || []) {
+    if (hasTerm(text, keyword)) score += keyword.length > 5 ? 16 : 10;
+  }
+
+  for (const color of recipe.colors || []) {
+    if (product.colors?.some((entry) => entry.toLowerCase() === color.toLowerCase()) || hasTerm(text, color)) {
+      score += 22;
+    }
+  }
+
+  for (const avoid of recipe.avoidKeywords || []) {
+    if (hasTerm(text, avoid)) score -= 60;
+  }
+
+  if (product.vibes?.includes(collection.vibe) || product.occasions?.includes(collection.vibe)) score += 12;
+  if (collection.frame === 'all') score += 5;
+  else if (product.gender?.includes(collection.frame)) score += 18;
+  else if (product.gender?.includes('androgynous') || !product.gender?.length) score += 8;
+  else score -= 40;
+
+  if (product.imageQuality === 'good') score += 12;
+  if (product.metadata?.featured) score += 6;
+  if (product.priceCents > 0) score += 3;
+
+  return score;
+}
+
+function recipeProductsFor(collection: CatalogCollection): Product[] {
+  const recipe = DISCOVER_RECIPES.get(collection.id);
+  if (!recipe) return [];
+
+  const usedIds = new Set<string>();
+  const selected: Product[] = [];
+
+  for (const category of CATEGORY_ORDER) {
+    const slotRecipe = recipe.slotRecipes[category];
+    if (!slotRecipe) continue;
+    const match = ALL_CATALOG_PRODUCTS
+      .filter((product) => product.category === category)
+      .filter(isRenderableProduct)
+      .filter((product) => !usedIds.has(product.id))
+      .map((product) => ({ product, score: recipeScore(product, collection, slotRecipe) }))
+      .filter((entry) => entry.score > 0)
+      .sort((left, right) => right.score - left.score)[0]?.product;
+
+    if (!match) continue;
+    usedIds.add(match.id);
+    selected.push(match);
+  }
+
+  return selected;
+}
+
 function curatedProductsFor(collection: CatalogCollection): Product[] {
+  const recipeProducts = recipeProductsFor(collection);
+  if (recipeProducts.length >= 3) return recipeProducts.slice(0, 8);
+
   const seen = new Set<string>();
   const selected: Product[] = [];
   const addProduct = (product: Product) => {
@@ -102,7 +182,7 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
     })
     .filter((look): look is DiscoverLookCardData => look !== null);
 
-  return looks.slice(0, 12);
+  return looks.slice(0, 20);
 }
 
 export default function DiscoverPage() {
@@ -114,8 +194,9 @@ export default function DiscoverPage() {
       title="Style"
       accent="library"
       description="Editorial outfit directions built from renderable Sylistly catalog products."
+      maxWidthClassName="max-w-[680px]"
     >
-      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4">
+      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
             <Sparkles size={18} />
@@ -126,7 +207,7 @@ export default function DiscoverPage() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-4">
+        <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-8">
           {looks.map((look) => (
             <DiscoverLookCard key={look.id} look={look} />
           ))}

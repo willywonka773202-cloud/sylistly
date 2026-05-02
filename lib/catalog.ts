@@ -8,6 +8,7 @@ import { searchBrandCatalog } from './brand-catalog';
 import { searchPhotoCatalog } from './photo-catalog';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
 import { frameCompatibilityScore, hasFrameMismatch } from './frame-inference';
+import { hasUsableProductImage, isRenderableProduct } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
 import {
   VIBES,
@@ -433,7 +434,7 @@ function matchedTerms(text: string, terms: string[] = []): string[] {
 }
 
 function hasRealPhoto(product: Product): boolean {
-  return Boolean(product.imageUrl) && !String(product.imageUrl).startsWith('data:image/svg+xml');
+  return hasUsableProductImage(product);
 }
 
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
@@ -1355,6 +1356,7 @@ function getSlotCandidates({
 
   const categoryProducts = ALL_CATALOG_PRODUCTS
     .filter((product) => product.category === slot)
+    .filter(isRenderableProduct)
     .filter(isAdultCatalogCandidate)
     .filter((product) => !hasCategoryMismatch(product))
     .filter((product) => isUnderBudget(product, budget, customMaxCents))

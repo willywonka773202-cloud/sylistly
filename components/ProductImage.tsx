@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { proxiedImageUrl } from '@/lib/image-url';
 import { hasUsableProductImage } from '@/lib/product-image-quality';
 import type { Product } from '@/lib/types';
@@ -12,10 +12,25 @@ export function getCleanProductImageUrl(product: Product, cutout = false): strin
     : proxiedImageUrl(product.imageUrl);
 }
 
-export function ProductImage({ product, className, wrapperClassName }: { product: Product; className?: string; wrapperClassName?: string }) {
+export function ProductImage({
+  product,
+  className,
+  wrapperClassName,
+  onUnavailable,
+}: {
+  product: Product;
+  className?: string;
+  wrapperClassName?: string;
+  onUnavailable?: (product: Product) => void;
+}) {
   const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
   const [cutout, setCutout] = useState(false);
   const src = getCleanProductImageUrl(product, cutout);
+
+  useEffect(() => {
+    setImageOk(hasUsableProductImage(product));
+    setCutout(false);
+  }, [product.id, product.imageUrl]);
 
   if (!imageOk || !src) {
     return null;
@@ -36,6 +51,7 @@ export function ProductImage({ product, className, wrapperClassName }: { product
             return;
           }
           setImageOk(false);
+          onUnavailable?.(product);
         }}
       />
     </div>

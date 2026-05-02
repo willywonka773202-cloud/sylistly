@@ -10,6 +10,11 @@
     "typecheck": "tsc --noEmit",
     "catalog:build": "node --experimental-strip-types --env-file=.env.local scripts/build-photo-catalog.mts",
     "catalog:hydrate-links": "node --experimental-strip-types --env-file=.env.local scripts/hydrate-photo-catalog-urls.mts",
+    "catalog:expand": "node --experimental-strip-types --env-file-if-exists=.env.local scripts/expand-catalog.ts",
+    "catalog:enrich": "jiti scripts/enrich-catalog-tags.ts",
+    "catalog:validate": "jiti scripts/validate-catalog.ts",
+    "catalog:audit-images": "jiti scripts/audit-product-images.ts",
+    "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
     "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"
