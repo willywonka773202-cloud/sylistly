@@ -8,6 +8,7 @@ import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
+import { filterRenderableProducts, hasUsableImageUrl, hasUsableProductImage } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,
@@ -103,7 +104,7 @@ function applyExplicitPriceBounds(
 }
 
 function imageLooksLikePlaceholder(imageUrl: string | undefined): boolean {
-  return typeof imageUrl === 'string' && imageUrl.startsWith('data:image/svg+xml');
+  return !hasUsableImageUrl(imageUrl);
 }
 
 function nameOverlapScore(left: string, right: string): number {
@@ -180,7 +181,7 @@ function mergeCatalogCandidates(...groups: Product[][]): Product[] {
 }
 
 function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
-  const products = mockSearch(category || 'top', query);
+  const products = filterRenderableProducts(mockSearch(category || 'top', query));
   return NextResponse.json({
     products,
     mock: true,
@@ -239,7 +240,7 @@ export async function POST(req: NextRequest) {
         getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT * 2, category),
         explicitPriceMin,
         explicitPriceMax,
-      ).slice(0, SEARCH_RESULT_LIMIT).map((product) => ({
+      ).filter(hasUsableProductImage).slice(0, SEARCH_RESULT_LIMIT).map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
@@ -288,12 +289,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const rankedCatalogProducts = await rerankProducts(
+      const rankedCatalogProducts = filterRenderableProducts(await rerankProducts(
         effectiveQuery || fastIntent.category,
         fastIntent,
-        catalogProducts,
+        filterRenderableProducts(catalogProducts),
         Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
-      );
+      ));
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
@@ -367,10 +368,10 @@ export async function POST(req: NextRequest) {
           : combined
         ).slice(0, SEARCH_RESULT_LIMIT);
 
-        const products: Product[] = selected.map((p) => ({
+        const products: Product[] = filterRenderableProducts(selected.map((p) => ({
           ...p,
           affiliateUrl: wrapAffiliate(p.retailerUrl),
-        }));
+        })));
 
         if (products.length) {
           console.info(
@@ -406,12 +407,12 @@ export async function POST(req: NextRequest) {
     if (catalogPreviewMode) {
       const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
       if (previewCatalogProducts.length) {
-        const rankedPreviewProducts = await rerankProducts(
+        const rankedPreviewProducts = filterRenderableProducts(await rerankProducts(
           effectiveQuery || fastIntent.category,
           fastIntent,
-          previewCatalogProducts,
+          filterRenderableProducts(previewCatalogProducts),
           Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
-        );
+        ));
 
         cacheProducts(rankedPreviewProducts).catch(() => {});
         searchResponseCache.set(cacheKey, {

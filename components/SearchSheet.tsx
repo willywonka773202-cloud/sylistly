@@ -2,12 +2,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, Search as SearchIcon } from 'lucide-react';
 import { ProductCard } from './ProductCard';
+import { ProductImage } from './ProductImage';
 import { useFit } from '@/store/fit';
-import type { Category, Product } from '@/lib/types';
+import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
   frameBiasDescription,
   frameDisplayLabel,
 } from '@/lib/search-frame';
+import { filterRenderableProducts, hasUsableProductImage } from '@/lib/product-image-quality';
 import type { GeneratorFrame } from '@/lib/vibes';
 
 const TRENDING: Record<GeneratorFrame, Record<Category, string[]>> = {
@@ -43,6 +45,17 @@ const TRENDING: Record<GeneratorFrame, Record<Category, string[]>> = {
   },
 };
 
+const CATEGORY_LABELS: Record<Category, string> = {
+  hat: 'Hat',
+  outer: 'Outer',
+  top: 'Top',
+  bottom: 'Bottom',
+  shoes: 'Shoes',
+  bag: 'Bag',
+  eyewear: 'Eyewear',
+  jewelry: 'Jewelry',
+};
+
 interface Props {
   open: boolean;
   category: Category | null;
@@ -60,6 +73,7 @@ export function SearchSheet({
   priceMax = null,
   onClose,
 }: Props) {
+  const [activeCategory, setActiveCategory] = useState<Category | null>(category);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Product[] | null>(null);
@@ -75,12 +89,15 @@ export function SearchSheet({
   );
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
-  const selectedItem = useFit((s) => (category ? s.items[category] : null));
+  const fitItems = useFit((s) => s.items);
+  const selectedItem = activeCategory ? fitItems[activeCategory] : null;
   const demoSupported = process.env.NODE_ENV === 'development';
-  const suggestions = category ? TRENDING[frame][category] : [];
+  const currentCategory = activeCategory || category;
+  const suggestions = currentCategory ? TRENDING[frame][currentCategory] : [];
 
   useEffect(() => {
     if (!open || !category) return;
+    setActiveCategory(category);
     setQuery(initialQuery?.trim() || '');
     setResults(null);
     setError(null);
@@ -101,8 +118,8 @@ export function SearchSheet({
   }, [open, category, initialQuery, frame]);
 
   useEffect(() => {
-    if (!open || !category || results === null) return;
-    void runSearch(query, category, 'live', searchPriceMax);
+    if (!open || !currentCategory || results === null) return;
+    void runSearch(query, currentCategory, 'live', searchPriceMax);
   }, [searchPriceMax]);
 
   useEffect(() => () => activeRequest.current?.abort(), []);
@@ -172,7 +189,7 @@ export function SearchSheet({
           ? 'catalog-preview'
           : null,
       );
-      setResults(Array.isArray(data.products) ? data.products : []);
+      setResults(Array.isArray(data.products) ? filterRenderableProducts(data.products) : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
         return;
@@ -195,17 +212,33 @@ export function SearchSheet({
     }
   }
 
+  function chooseCategory(nextCategory: Category) {
+    if (nextCategory === currentCategory) return;
+    activeRequest.current?.abort();
+    setActiveCategory(nextCategory);
+    setQuery('');
+    setResults(null);
+    setError(null);
+    setIsDemoResults(false);
+    setResultSource(null);
+    setCatalogKind(null);
+    setSearchMode(null);
+    setCanUseDemo(false);
+  }
+
+  const visibleResults = results ? filterRenderableProducts(results) : results;
   const resultLabel = loading
     ? `Finding ${isDemoResults ? 'demo' : resultSource === 'catalog' || searchMode === 'catalog-only' ? 'catalog' : 'live'} products...`
-    : results?.length
-    ? `${results.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
+    : visibleResults?.length
+    ? `${visibleResults.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
     : searchMode === 'catalog-only'
     ? 'Search the Sylistly catalog'
     : searchMode === 'catalog-preview'
     ? 'Search the Sylistly preview catalog'
     : 'Search the Sylistly catalog';
 
-  if (!open || !category) return null;
+  if (!open || !category || !currentCategory) return null;
+  const slotOrder = [currentCategory, ...CATEGORY_ORDER.filter((slot) => slot !== currentCategory)];
 
   return (
     <>
@@ -217,11 +250,68 @@ export function SearchSheet({
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
             <div className="flex items-center justify-between px-5 pt-1.5 pb-2.5">
               <div className="font-serif font-semibold text-lg">
-                Add <em className="italic text-accent">{category}</em>
+                Add <em className="italic text-accent">{CATEGORY_LABELS[currentCategory]}</em>
               </div>
               <button onClick={onClose} className="w-7 h-7 rounded-full bg-surface-3 grid place-items-center">
                 <X size={14} className="text-muted-2" />
               </button>
+            </div>
+
+            <div className="px-4 pb-3">
+              <div className="overflow-x-auto pb-1 scrollbar-hide">
+                <div className="flex min-w-max gap-3">
+                  {slotOrder.map((slot) => {
+                    const product = fitItems[slot];
+                    const active = slot === currentCategory;
+                    const renderableProduct = hasUsableProductImage(product) ? product : null;
+
+                    return (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => chooseCategory(slot)}
+                        className={`relative flex w-[132px] flex-none flex-col rounded-[22px] border p-2.5 text-left transition ${
+                          active
+                            ? 'border-accent/65 bg-[linear-gradient(180deg,rgba(232,54,93,.12),rgba(255,255,255,.04))] shadow-pink-glow'
+                            : product
+                            ? 'border-white/10 bg-white/[0.05]'
+                            : 'border-white/8 bg-[#151311]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-[9px] uppercase tracking-[.18em] text-[#a9998f]">{CATEGORY_LABELS[slot]}</div>
+                          <span className="rounded-full border border-white/10 px-2 py-0.5 text-[8px] uppercase tracking-[.14em] text-[#d7c8bf]">
+                            {product ? 'Swap' : 'Browse'}
+                          </span>
+                        </div>
+                        <div className={`mt-2 flex h-[78px] items-center justify-center overflow-hidden rounded-[17px] ${
+                          renderableProduct ? 'bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]' : 'bg-white/[0.04]'
+                        }`}>
+                          {renderableProduct ? (
+                            <ProductImage
+                              product={renderableProduct}
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-contain p-2"
+                            />
+                          ) : (
+                            <span className="text-[22px] leading-none text-[#7d7068]">+</span>
+                          )}
+                        </div>
+                        <div className="mt-2 min-h-[30px]">
+                          {renderableProduct ? (
+                            <>
+                              <div className="truncate text-[9px] uppercase tracking-[.12em] text-[#a9998f]">{renderableProduct.brand}</div>
+                              <div className="mt-0.5 truncate text-[11px] text-[#fff6f0]">{renderableProduct.name}</div>
+                            </>
+                          ) : (
+                            <div className="text-[11px] leading-snug text-[#c8b9ae]">Search this slot</div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             <div className="px-4 pb-2">
@@ -243,7 +333,7 @@ export function SearchSheet({
                 <div className="flex flex-none items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => void runSearch('', category)}
+                    onClick={() => void runSearch('', currentCategory)}
                     className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
                   >
                     Browse
@@ -251,7 +341,7 @@ export function SearchSheet({
                   {demoSupported ? (
                     <button
                       type="button"
-                      onClick={() => void runSearch(query, category, 'demo')}
+                      onClick={() => void runSearch(query, currentCategory, 'demo')}
                       className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
                     >
                       Demo
@@ -265,7 +355,7 @@ export function SearchSheet({
               className="relative px-4 pb-2"
               onSubmit={(event) => {
                 event.preventDefault();
-                void runSearch(query, category);
+                void runSearch(query, currentCategory);
               }}
             >
               <SearchIcon size={16} className="absolute left-7 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
@@ -330,7 +420,7 @@ export function SearchSheet({
                   key={c}
                   onClick={() => {
                     setQuery(c);
-                    void runSearch(c, category);
+                    void runSearch(c, currentCategory);
                   }}
                   className="flex-none whitespace-nowrap rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11.5px] text-muted-2 hover:text-ink"
                 >
@@ -341,7 +431,7 @@ export function SearchSheet({
 
             <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-muted">
               <span>{resultLabel}</span>
-              {results?.length ? (
+              {visibleResults?.length ? (
                 <span>
                   {isDemoResults
                     ? 'Local sample data'
@@ -380,7 +470,7 @@ export function SearchSheet({
                       {canUseDemo ? (
                         <button
                           type="button"
-                          onClick={() => void runSearch(query, category, 'demo')}
+                          onClick={() => void runSearch(query, currentCategory, 'demo')}
                           className="mt-4 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
                         >
                           Use demo results
@@ -388,17 +478,17 @@ export function SearchSheet({
                       ) : null}
                     </div>
                   )
-                : results === null
+                : visibleResults === null
                 ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
-                : results.length === 0
+                : visibleResults.length === 0
                 ? <div className="col-span-2 py-10 text-center text-muted text-sm">No matches. Try a brand, color, or vibe.</div>
-                : results.map((p) => (
+                : visibleResults.map((p) => (
                     <ProductCard
                       key={p.id}
                       product={p}
                       selected={selectedItem?.id === p.id}
                       onClick={() => {
-                        setItem(category, p);
+                        setItem(currentCategory, p);
                         onClose();
                       }}
                     />

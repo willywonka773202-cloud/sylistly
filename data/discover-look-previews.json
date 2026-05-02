@@ -1,0 +1,62 @@
+[
+  {
+    "id": "night-femme",
+    "previewImageUrl": "/discover-previews/night-femme.webp",
+    "previewImageStatus": "pending",
+    "tags": ["night out", "date", "jewelry"]
+  },
+  {
+    "id": "street-masc",
+    "previewImageUrl": "/discover-previews/street-masc.webp",
+    "previewImageStatus": "pending",
+    "tags": ["streetwear", "layers", "sneakers"]
+  },
+  {
+    "id": "clean-all",
+    "previewImageUrl": "/discover-previews/clean-all.webp",
+    "previewImageStatus": "pending",
+    "tags": ["clean", "minimal", "daily"]
+  },
+  {
+    "id": "gym-all",
+    "previewImageUrl": "/discover-previews/gym-all.webp",
+    "previewImageStatus": "pending",
+    "tags": ["gym", "athletic", "studio"]
+  },
+  {
+    "id": "office-femme",
+    "previewImageUrl": "/discover-previews/office-femme.webp",
+    "previewImageStatus": "pending",
+    "tags": ["office", "tailored", "workwear"]
+  },
+  {
+    "id": "vacation-femme",
+    "previewImageUrl": "/discover-previews/vacation-femme.webp",
+    "previewImageStatus": "pending",
+    "tags": ["vacation", "summer", "resort"]
+  },
+  {
+    "id": "preppy-masc",
+    "previewImageUrl": "/discover-previews/preppy-masc.webp",
+    "previewImageStatus": "pending",
+    "tags": ["preppy", "old money", "city"]
+  },
+  {
+    "id": "date-femme-afterdark",
+    "previewImageUrl": "/discover-previews/date-femme-afterdark.webp",
+    "previewImageStatus": "pending",
+    "tags": ["date", "after dark", "polished"]
+  },
+  {
+    "id": "edgy-femme-night",
+    "previewImageUrl": "/discover-previews/edgy-femme-night.webp",
+    "previewImageStatus": "pending",
+    "tags": ["edgy", "gallery", "black"]
+  },
+  {
+    "id": "vacation-masc-resort",
+    "previewImageUrl": "/discover-previews/vacation-masc-resort.webp",
+    "previewImageStatus": "pending",
+    "tags": ["vacation", "menswear", "off duty"]
+  }
+]

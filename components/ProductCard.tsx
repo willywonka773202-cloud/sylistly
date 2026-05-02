@@ -3,6 +3,7 @@ import { type KeyboardEvent, type MouseEvent } from 'react';
 import type { Product } from '@/lib/types';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
+import { isRenderableProduct } from '@/lib/product-image-quality';
 
 interface Props {
   product: Product;
@@ -15,20 +16,6 @@ function formatPrice(priceCents: number): string {
   return `$${(priceCents / 100).toLocaleString()}`;
 }
 
-function fallbackImage(product: Product): string {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
-      <rect width="320" height="320" rx="36" fill="#0f0f0e" />
-      <rect x="18" y="18" width="284" height="284" rx="28" fill="#e8365d" opacity="0.14" />
-      <rect x="92" y="76" width="136" height="112" rx="28" fill="#fffefb" opacity="0.9" />
-      <rect x="108" y="206" width="104" height="14" rx="7" fill="#fffefb" opacity="0.85" />
-      <text x="28" y="276" fill="#fffefb" font-family="Arial, sans-serif" font-size="22" font-weight="700">${product.brand.replace(/&/g, '&amp;')}</text>
-    </svg>
-  `.trim();
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function getHost(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www\./, '');
@@ -37,19 +24,11 @@ function getHost(url: string): string {
   }
 }
 
-function isSearchLikeUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return /search|query|q=|searchTerm|Ntt/i.test(`${parsed.pathname} ${parsed.search}`);
-  } catch {
-    return false;
-  }
-}
-
 export function ProductCard({ product: p, selected = false, onClick }: Props) {
+  if (!isRenderableProduct(p)) return null;
+
   const buyUrl = getProductOutboundUrl(p);
   const retailHost = getHost(buyUrl);
-  const searchLike = isSearchLikeUrl(buyUrl);
 
   function openItem(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
@@ -64,78 +43,55 @@ export function ProductCard({ product: p, selected = false, onClick }: Props) {
   }
 
   return (
-    <article className={`overflow-hidden rounded-[22px] border bg-[#f8f4ef] transition hover:-translate-y-0.5 ${
-      selected ? 'border-accent shadow-pink-glow' : 'border-[#ddd2c8]'
+    <article className={`overflow-hidden rounded-[20px] border bg-[#f8f3ed] shadow-[0_10px_26px_rgba(0,0,0,.18)] transition hover:-translate-y-0.5 ${
+      selected ? 'border-accent shadow-pink-glow' : 'border-[#e2d7cd]'
     }`}>
       <div
         role="button"
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        className="flex w-full cursor-pointer items-stretch gap-4 p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="flex min-h-[118px] w-full cursor-pointer items-center gap-3 p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       >
-        <div className="relative flex h-[132px] w-[118px] flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]">
+        <div className="relative flex h-[96px] w-[112px] flex-none items-center justify-center overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,#fffdfa_0%,#f1e8df_100%)] ring-1 ring-[#efe4da] min-[390px]:h-[108px] min-[390px]:w-[124px]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
           <div className="absolute inset-x-4 bottom-3 h-4 rounded-full bg-[#d8cdc4]/35 blur-[6px]" />
-          {p.imageUrl ? (
-            <ProductImage
-              product={p}
-              wrapperClassName="relative h-full w-full"
-              className="relative h-full w-full object-contain p-2.5 drop-shadow-[0_12px_18px_rgba(0,0,0,.35)]"
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={fallbackImage(p)} alt={`${p.brand} ${p.name}`} className="relative h-full w-full object-contain p-2" loading="lazy" />
-          )}
+          <ProductImage
+            product={p}
+            wrapperClassName="relative h-full w-full"
+            className="relative h-full w-full object-contain p-2 drop-shadow-[0_12px_18px_rgba(0,0,0,.24)]"
+          />
           {selected ? (
             <div className="absolute bottom-2 right-2 grid h-6 w-6 place-items-center rounded-full bg-accent text-[9px] font-bold text-white">
               OK
             </div>
           ) : null}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-[10px] font-medium uppercase tracking-[.14em] text-muted-2">{p.brand}</div>
-              <div className="mt-1 line-clamp-2 text-[14px] leading-[1.3] text-ink">
-                {p.name}
-              </div>
-            </div>
-            <div className="rounded-full bg-white px-2.5 py-1 text-[13px] font-semibold text-ink shadow-sm">
-              {formatPrice(p.priceCents)}
-            </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[9px] font-bold uppercase tracking-[.16em] text-[#8a7b72]">{p.brand}</div>
+          <div className="mt-1 line-clamp-2 font-serif text-[15px] font-semibold leading-[1.18] text-[#191513]">
+            {p.name}
           </div>
-
-          <div className="mt-auto pt-3">
-            <div className="text-[10px] uppercase tracking-[.12em] text-[#7b6d64]">{p.retailer}</div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`rounded-full px-2 py-1 text-[9px] uppercase tracking-[.16em] ${
-                searchLike
-                  ? 'bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/20'
-                  : 'bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20'
-              }`}>
-                {searchLike ? 'Retailer search' : 'Direct retailer'}
-              </span>
-              <span className="text-[10px] text-muted-2">Tap to add to your fit</span>
-            </div>
-          </div>
+          <div className="mt-1 text-[13px] font-semibold text-[#191513]">{formatPrice(p.priceCents)}</div>
+          <button
+            type="button"
+            onClick={openItem}
+            title={`Open ${retailHost}`}
+            className="mt-2 inline-flex max-w-full rounded-full bg-[#efe5dc] px-2.5 py-1 text-[9px] text-[#8a7b72] transition hover:bg-[#e8d8ca] hover:text-[#191513]"
+          >
+            <span className="truncate">{p.retailer}</span>
+          </button>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 px-4 pb-4">
         <button
           type="button"
-          className="inline-flex rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-accent-hot"
-          onClick={onClick}
+          aria-label={selected ? 'Added to fit' : 'Add to fit'}
+          className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent text-[24px] font-light leading-none text-white shadow-pink-glow transition hover:bg-accent-hot"
+          onClick={(event) => {
+            event.stopPropagation();
+            onClick();
+          }}
         >
-          {selected ? 'Added' : 'Add to fit'}
-        </button>
-        <button
-          type="button"
-          className="inline-flex rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"
-          onClick={openItem}
-        >
-          Open {retailHost}
+          {selected ? 'OK' : '+'}
         </button>
       </div>
     </article>
