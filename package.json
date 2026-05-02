@@ -14,6 +14,7 @@
     "catalog:enrich": "jiti scripts/enrich-catalog-tags.ts",
     "catalog:validate": "jiti scripts/validate-catalog.ts",
     "catalog:audit-images": "jiti scripts/audit-product-images.ts",
+    "catalog:test-search": "jiti scripts/test-catalog-search.ts",
     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",

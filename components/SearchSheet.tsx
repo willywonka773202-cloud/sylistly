@@ -83,6 +83,7 @@ export function SearchSheet({
   const [catalogKind, setCatalogKind] = useState<'photo' | 'starter' | 'blend' | null>(null);
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
+  const [readyImageIds, setReadyImageIds] = useState<Set<string>>(new Set());
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [searchPriceMax, setSearchPriceMax] = useState<number | null>(priceMax);
   const [customPriceInput, setCustomPriceInput] = useState(
@@ -107,6 +108,7 @@ export function SearchSheet({
     setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
+    setReadyImageIds(new Set());
     setFailedImageIds(new Set());
     setSearchPriceMax(priceMax);
     setCustomPriceInput(
@@ -155,6 +157,8 @@ export function SearchSheet({
       if (!response.ok) {
         setResults([]);
         setIsDemoResults(false);
+        setReadyImageIds(new Set());
+        setFailedImageIds(new Set());
         setResultSource(null);
         setCatalogKind(null);
         setSearchMode(
@@ -172,6 +176,7 @@ export function SearchSheet({
       }
 
       setIsDemoResults(Boolean(data.mock));
+      setReadyImageIds(new Set());
       setFailedImageIds(new Set());
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
       setCatalogKind(
@@ -199,6 +204,8 @@ export function SearchSheet({
       }
       setResults([]);
       setIsDemoResults(false);
+      setReadyImageIds(new Set());
+      setFailedImageIds(new Set());
       setResultSource(null);
       setCatalogKind(null);
       setSearchMode(null);
@@ -227,14 +234,24 @@ export function SearchSheet({
     setCatalogKind(null);
     setSearchMode(null);
     setCanUseDemo(false);
+    setReadyImageIds(new Set());
     setFailedImageIds(new Set());
   }
 
-  const visibleResults = results
+  const staticRenderableResults = results
     ? filterRenderableProducts(results).filter((product) => !failedImageIds.has(product.id))
     : results;
+  const visibleResults = staticRenderableResults
+    ? staticRenderableResults.filter((product) => readyImageIds.has(product.id))
+    : staticRenderableResults;
+  const pendingImageCount = staticRenderableResults
+    ? staticRenderableResults.filter((product) => !readyImageIds.has(product.id) && !failedImageIds.has(product.id)).length
+    : 0;
+  const renderProbeResults = staticRenderableResults || [];
   const resultLabel = loading
     ? `Finding ${isDemoResults ? 'demo' : resultSource === 'catalog' || searchMode === 'catalog-only' ? 'catalog' : 'live'} products...`
+    : staticRenderableResults?.length && pendingImageCount
+    ? 'Checking image-backed products...'
     : visibleResults?.length
     ? `${visibleResults.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
     : searchMode === 'catalog-only'
@@ -489,22 +506,50 @@ export function SearchSheet({
                   )
                 : visibleResults === null
                 ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
-                : visibleResults.length === 0
-                ? <div className="col-span-2 py-10 text-center text-muted text-sm">No image-backed products found for this search.</div>
-                : visibleResults.map((p) => (
-                    <ProductCard
-                      key={p.id}
-                      product={p}
-                      selected={selectedItem?.id === p.id}
-                      onImageUnavailable={() => {
-                        setFailedImageIds((current) => new Set(current).add(p.id));
-                      }}
-                      onClick={() => {
-                        setItem(currentCategory, p);
-                        onClose();
-                      }}
-                    />
-                  ))}
+                : renderProbeResults.length === 0
+                ? (
+                    <div className="col-span-2 py-10 text-center text-sm">
+                      <div className="text-ink">No image-backed products found for this search.</div>
+                      <div className="mt-1 text-muted">Try a broader term or browse another slot.</div>
+                    </div>
+                  )
+                : (
+                    <>
+                      {pendingImageCount > 0 && visibleResults.length === 0 ? (
+                        <div className="col-span-2 py-8 text-center text-sm text-muted">
+                          Checking image-backed products...
+                        </div>
+                      ) : null}
+                      {renderProbeResults.map((p) => (
+                        <ProductCard
+                          key={p.id}
+                          product={p}
+                          selected={selectedItem?.id === p.id}
+                          onImageAvailable={() => {
+                            setReadyImageIds((current) => new Set(current).add(p.id));
+                          }}
+                          onImageUnavailable={() => {
+                            setReadyImageIds((current) => {
+                              const next = new Set(current);
+                              next.delete(p.id);
+                              return next;
+                            });
+                            setFailedImageIds((current) => new Set(current).add(p.id));
+                          }}
+                          onClick={() => {
+                            setItem(currentCategory, p);
+                            onClose();
+                          }}
+                        />
+                      ))}
+                      {pendingImageCount === 0 && visibleResults.length === 0 ? (
+                        <div className="col-span-2 py-10 text-center text-sm">
+                          <div className="text-ink">No image-backed products found for this search.</div>
+                          <div className="mt-1 text-muted">Try a broader term or browse another slot.</div>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
             </div>
       </div>
     </>

@@ -16,11 +16,15 @@ export function ProductImage({
   product,
   className,
   wrapperClassName,
+  loading = 'lazy',
+  onAvailable,
   onUnavailable,
 }: {
   product: Product;
   className?: string;
   wrapperClassName?: string;
+  loading?: 'lazy' | 'eager';
+  onAvailable?: (product: Product) => void;
   onUnavailable?: (product: Product) => void;
 }) {
   const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
@@ -42,9 +46,18 @@ export function ProductImage({
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
-        loading="lazy"
+        loading={loading}
         referrerPolicy="no-referrer"
         className={className || 'h-full w-full object-contain p-2.5'}
+        onLoad={(event) => {
+          const image = event.currentTarget;
+          if (image.naturalWidth < 32 || image.naturalHeight < 32) {
+            setImageOk(false);
+            onUnavailable?.(product);
+            return;
+          }
+          onAvailable?.(product);
+        }}
         onError={() => {
           if (cutout) {
             setCutout(false);

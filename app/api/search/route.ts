@@ -8,7 +8,7 @@ import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
-import { filterRenderableProducts, hasUsableImageUrl, hasUsableProductImage } from '@/lib/product-image-quality';
+import { filterRenderableProducts, hasUsableImageUrl } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,
@@ -240,13 +240,16 @@ export async function POST(req: NextRequest) {
         getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT * 2, category),
         explicitPriceMin,
         explicitPriceMax,
-      ).filter(hasUsableProductImage).slice(0, SEARCH_RESULT_LIMIT).map((product) => ({
+      );
+      const renderableFeaturedProducts = filterRenderableProducts(featuredCatalogProducts)
+        .slice(0, SEARCH_RESULT_LIMIT)
+        .map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
 
       return NextResponse.json({
-        products: featuredCatalogProducts,
+        products: renderableFeaturedProducts,
         source: 'catalog',
         catalogKind: 'featured',
         searchMode,
