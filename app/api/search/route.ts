@@ -8,7 +8,7 @@ import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
-import { filterRenderableProducts, hasUsableImageUrl } from '@/lib/product-image-quality';
+import { filterRenderableProducts, hasUsableImageUrl, sortSearchResultProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,
@@ -78,6 +78,10 @@ function productSortScore(product: Product): number {
   if (host && !EXPANDED_MARKETPLACE_HOSTS.has(host)) score += 25;
 
   return score;
+}
+
+function selectQualityResults(products: Product[], query = '', category?: Category, limit = SEARCH_RESULT_LIMIT): Product[] {
+  return sortSearchResultProducts(products, query, category).slice(0, limit);
 }
 
 function shouldUseCatalogFirst(query: string, category: Category | undefined, detectedBrands: string[] | undefined): boolean {
@@ -181,7 +185,7 @@ function mergeCatalogCandidates(...groups: Product[][]): Product[] {
 }
 
 function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
-  const products = filterRenderableProducts(mockSearch(category || 'top', query));
+  const products = selectQualityResults(mockSearch(category || 'top', query), query, category || 'top');
   return NextResponse.json({
     products,
     mock: true,
@@ -241,8 +245,7 @@ export async function POST(req: NextRequest) {
         explicitPriceMin,
         explicitPriceMax,
       );
-      const renderableFeaturedProducts = filterRenderableProducts(featuredCatalogProducts)
-        .slice(0, SEARCH_RESULT_LIMIT)
+      const renderableFeaturedProducts = selectQualityResults(featuredCatalogProducts, query, category)
         .map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
@@ -292,12 +295,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const rankedCatalogProducts = filterRenderableProducts(await rerankProducts(
+      const rankedCatalogProducts = selectQualityResults(await rerankProducts(
         effectiveQuery || fastIntent.category,
         fastIntent,
         filterRenderableProducts(catalogProducts),
         Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
-      ));
+      ), effectiveQuery, fastIntent.category);
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
@@ -371,10 +374,10 @@ export async function POST(req: NextRequest) {
           : combined
         ).slice(0, SEARCH_RESULT_LIMIT);
 
-        const products: Product[] = filterRenderableProducts(selected.map((p) => ({
+        const products: Product[] = selectQualityResults(selected.map((p) => ({
           ...p,
           affiliateUrl: wrapAffiliate(p.retailerUrl),
-        })));
+        })), effectiveQuery, intent.category);
 
         if (products.length) {
           console.info(
@@ -410,12 +413,12 @@ export async function POST(req: NextRequest) {
     if (catalogPreviewMode) {
       const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
       if (previewCatalogProducts.length) {
-        const rankedPreviewProducts = filterRenderableProducts(await rerankProducts(
+        const rankedPreviewProducts = selectQualityResults(await rerankProducts(
           effectiveQuery || fastIntent.category,
           fastIntent,
           filterRenderableProducts(previewCatalogProducts),
           Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
-        ));
+        ), effectiveQuery, fastIntent.category);
 
         cacheProducts(rankedPreviewProducts).catch(() => {});
         searchResponseCache.set(cacheKey, {

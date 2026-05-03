@@ -19,14 +19,29 @@ const OVERRIDES_PATH = path.resolve(process.cwd(), 'data/catalog-tag-overrides.j
 const TARGET_VIBES = [
   'clean',
   'minimal',
+  'streetwear',
   'night',
   'date',
   'gym',
   'athletic',
+  'office',
+  'business casual',
   'old money',
+  'vacation',
+  'beach',
+  'summer',
+  'winter',
+  'cozy',
+  'edgy',
+  'techwear',
   'y2k',
+  'western',
   'college',
+  'casual',
   'luxury',
+  'preppy',
+  'coffee',
+  'airport',
 ];
 
 const OCCASION_BY_VIBE: Record<string, string[]> = {
@@ -44,6 +59,17 @@ const OCCASION_BY_VIBE: Record<string, string[]> = {
   casual: ['everyday'],
   preppy: ['office', 'everyday'],
   'business casual': ['office'],
+  office: ['office'],
+  vacation: ['vacation'],
+  beach: ['vacation'],
+  summer: ['vacation', 'everyday'],
+  winter: ['winter', 'everyday'],
+  cozy: ['winter', 'everyday'],
+  edgy: ['night out', 'everyday'],
+  techwear: ['everyday'],
+  western: ['everyday'],
+  coffee: ['everyday'],
+  airport: ['travel'],
 };
 
 async function readJson<T>(filePath: string, fallback: T): Promise<T> {
@@ -147,6 +173,50 @@ function inferTags(product: Product): CatalogTagOverride {
     'shoulder bag', 'y2k', 'cargo skirt', 'crop top', 'cropped', 'parachute',
   ])) {
     add(['y2k'], ['y2k', 'retro', '2000s']);
+  }
+
+  if (hasAny(haystack, [
+    'blazer', 'trouser', 'button down', 'button-down', 'oxford shirt', 'dress shirt',
+    'work bag', 'briefcase', 'satchel', 'tote', 'loafer', 'flat', 'cardigan', 'chino',
+    'tailored', 'office', 'business casual', 'workwear',
+  ])) {
+    add(['office', 'business casual'], ['office', 'work', 'tailored', 'business casual']);
+  }
+
+  if (hasAny(haystack, [
+    'linen', 'resort', 'vacation', 'beach', 'summer', 'sandals', 'sandal', 'slide',
+    'straw', 'raffia', 'swim', 'bikini', 'tank', 'shorts', 'camp collar', 'espadrille',
+  ])) {
+    add(['vacation', 'beach', 'summer'], ['vacation', 'beach', 'summer', 'resort']);
+  }
+
+  if (hasAny(haystack, [
+    'puffer', 'beanie', 'fleece', 'wool', 'winter', 'cozy', 'sweatpants', 'sweatshirt',
+    'knit', 'sweater', 'boot', 'boots', 'thermal', 'quarter zip', 'hoodie',
+  ])) {
+    add(['winter', 'cozy'], ['winter', 'cozy', 'warm']);
+  }
+
+  if (hasAny(haystack, [
+    'black', 'leather', 'cargo', 'shell', 'utility', 'tactical', 'techwear', 'crossbody',
+    'silver', 'chain', 'boot', 'boots', 'edgy', 'grunge', 'parachute',
+  ])) {
+    add(['edgy', 'techwear'], ['edgy', 'techwear', 'utility']);
+  }
+
+  if (hasAny(haystack, [
+    'cowboy', 'western', 'suede', 'rugged', 'denim jacket', 'bootcut', 'belt', 'turquoise',
+    'ranch', 'rodeo',
+  ])) {
+    add(['western'], ['western', 'rugged']);
+  }
+
+  if (hasAny(haystack, ['coffee', 'coffee run', 'cafe', 'easy pant', 'everyday tote'])) {
+    add(['coffee', 'casual', 'clean'], ['coffee run', 'everyday']);
+  }
+
+  if (hasAny(haystack, ['airport', 'travel', 'carry on', 'carry-on', 'travel tote', 'weekender', 'jogger'])) {
+    add(['airport', 'clean', 'casual'], ['airport', 'travel']);
   }
 
   if (product.category === 'eyewear' && hasAny(haystack, ['black', 'cat eye', 'rectangle', 'prada', 'gucci', 'ray ban'])) {

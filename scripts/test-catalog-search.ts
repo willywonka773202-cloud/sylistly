@@ -4,7 +4,12 @@ import { parseSearchIntentHeuristic } from '../lib/claude';
 import { searchPhotoCatalog } from '../lib/photo-catalog';
 import {
   filterRenderableProducts,
+  hasCategoryTitleMismatch,
   hasUsableImageUrl,
+  isBlockedProductImage,
+  productImageQualityScore,
+  searchResultQualityScore,
+  sortSearchResultProducts,
 } from '../lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 
@@ -68,8 +73,20 @@ const fallbackCategoryPool = ALL_CATALOG_PRODUCTS.filter((product) => product.ca
 const rawCandidates = searchedCandidates.length ? searchedCandidates : fallbackCategoryPool;
 const categoryFiltered = rawCandidates.filter((product) => product.category === category);
 const staticImageFiltered = filterRenderableProducts(categoryFiltered);
+const rankedImageFiltered = sortSearchResultProducts(categoryFiltered, query, category);
 const badStatic = categoryFiltered.filter((product) => !hasUsableImageUrl(product.imageUrl));
 const suspicious = categoryFiltered.filter((product) => isSuspiciousImageUrl(product.imageUrl));
+const blocked = categoryFiltered.filter(isBlockedProductImage);
+const categoryMismatches = categoryFiltered.filter(hasCategoryTitleMismatch);
+const marketplaceResults = categoryFiltered.filter((product) => /poshmark|ebay|etsy|depop|mercari|grailed|thredup|vestiaire/i.test([
+  product.brand,
+  product.retailer,
+  product.name,
+  product.productUrl,
+  product.retailerUrl,
+  product.googleShoppingUrl,
+  product.fallbackUrl,
+].filter(Boolean).join(' ')));
 const badBySource = new Map<string, number>();
 
 for (const product of badStatic) {
@@ -83,7 +100,11 @@ console.log(`Category: ${category}`);
 console.log(`Raw candidates count: ${rawCandidates.length}`);
 console.log(`After category filter count: ${categoryFiltered.length}`);
 console.log(`After static image filter count: ${staticImageFiltered.length}`);
+console.log(`After quality-ranked image filter count: ${rankedImageFiltered.length}`);
 console.log(`Suspicious/bad image count: ${suspicious.length}/${categoryFiltered.length}`);
+console.log(`Blocked image/product count: ${blocked.length}/${categoryFiltered.length}`);
+console.log(`Category mismatch warnings: ${categoryMismatches.length}/${categoryFiltered.length}`);
+console.log(`Marketplace/reseller candidates: ${marketplaceResults.length}/${categoryFiltered.length}`);
 
 if (badBySource.size) {
   console.log('\nBad static image URLs by source');
@@ -93,10 +114,20 @@ if (badBySource.size) {
 }
 
 console.log('\nTop image-backed candidates');
-for (const product of staticImageFiltered.slice(0, 10)) {
-  console.log(`- ${product.brand} | ${product.name} | ${product.category} | ${product.imageUrl}`);
+for (const product of rankedImageFiltered.slice(0, 10)) {
+  const score = productImageQualityScore(product);
+  const searchScore = searchResultQualityScore(product, query, category);
+  const marketplace = marketplaceResults.some((entry) => entry.id === product.id) ? ' marketplace-penalty' : '';
+  console.log(`- score=${score} searchScore=${searchScore}${marketplace} | ${product.brand} | ${product.name} | ${product.category} | ${product.imageUrl}`);
 }
 
-if (!staticImageFiltered.length) {
+if (categoryMismatches.length) {
+  console.log('\nCategory/title mismatch samples');
+  for (const product of categoryMismatches.slice(0, 8)) {
+    console.log(`- ${product.category} | ${product.brand} | ${product.name}`);
+  }
+}
+
+if (!rankedImageFiltered.length) {
   console.log('\nNo static image-backed candidates found. The UI should show the clean empty state.');
 }

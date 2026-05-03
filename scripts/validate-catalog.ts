@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { genderMismatchReasons, productGenderTags } from '../lib/frame-inference';
+import { hasCategoryTitleMismatch, isBlockedProductImage, productImageQualityScore } from '../lib/product-image-quality';
 import type { Category, Product } from '../lib/types';
 
 const GENERATED_PATH = path.resolve(process.cwd(), 'data/generated-catalog.json');
@@ -167,6 +168,14 @@ function genderWarnings(product: Product): string[] {
   return warnings;
 }
 
+function productQualityWarnings(product: Product): string[] {
+  const warnings: string[] = [];
+  if (isBlockedProductImage(product)) warnings.push(`${product.id} blocked bad/placeholder image pattern`);
+  if (hasCategoryTitleMismatch(product)) warnings.push(`${product.id} category/title mismatch: ${product.category} | ${product.brand} | ${product.name}`);
+  if (productImageQualityScore(product) < -25) warnings.push(`${product.id} low product quality score (${productImageQualityScore(product)}): ${product.brand} | ${product.name}`);
+  return warnings;
+}
+
 async function main(): Promise<void> {
   const generated = await readJson<Product[]>(GENERATED_PATH, []);
   const photo = await readJson<Product[]>(PHOTO_PATH, []);
@@ -202,6 +211,7 @@ async function main(): Promise<void> {
     }
 
     warnings.push(...genderWarnings(product));
+    warnings.push(...productQualityWarnings(product));
   }
 
   console.log(`Generated products: ${generated.length}`);
