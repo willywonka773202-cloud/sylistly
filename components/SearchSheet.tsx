@@ -56,6 +56,35 @@ const CATEGORY_LABELS: Record<Category, string> = {
   jewelry: 'Jewelry',
 };
 
+function useBodyScrollLock(locked: boolean) {
+  useEffect(() => {
+    if (!locked) return;
+    const scrollY = window.scrollY;
+    const previous = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overscrollBehavior: document.body.style.overscrollBehavior,
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = previous.overflow;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overscrollBehavior = previous.overscrollBehavior;
+      window.scrollTo(0, scrollY);
+    };
+  }, [locked]);
+}
+
 function formatPrice(priceCents: number): string {
   if (!priceCents) return 'Price pending';
   return `$${(priceCents / 100).toLocaleString()}`;
@@ -90,6 +119,7 @@ export function SearchSheet({
   onSelectProduct,
   onClose,
 }: Props) {
+  useBodyScrollLock(open);
   const [activeCategory, setActiveCategory] = useState<Category | null>(category);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -329,12 +359,12 @@ export function SearchSheet({
   return (
     <>
       <div
-        className="absolute inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 z-50 max-h-[92%] translate-y-0 rounded-t-3xl border-t border-white/10 bg-[#11100f] flex flex-col shadow-[0_-22px_70px_rgba(0,0,0,.55)]">
+      <div className="fixed inset-x-0 bottom-0 z-[80] mx-auto flex max-h-[calc(100dvh-8px)] min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_70px_rgba(0,0,0,.55)]">
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
-            <div className="flex items-center justify-between px-5 pt-1.5 pb-2.5">
+            <div className="flex items-center justify-between px-5 pb-1.5 pt-1">
               <div className="font-serif font-semibold text-lg">
                 Add <em className="italic text-accent">{CATEGORY_LABELS[currentCategory]}</em>
               </div>
@@ -356,7 +386,7 @@ export function SearchSheet({
                         key={slot}
                         type="button"
                         onClick={() => chooseCategory(slot)}
-                        className={`relative flex w-[112px] flex-none flex-col rounded-[18px] border p-2 text-left transition ${
+                        className={`relative flex w-[96px] flex-none flex-col rounded-[16px] border p-1.5 text-left transition ${
                           active
                             ? 'border-accent/65 bg-[linear-gradient(180deg,rgba(232,54,93,.12),rgba(255,255,255,.04))] shadow-pink-glow'
                             : product
@@ -370,7 +400,7 @@ export function SearchSheet({
                             {product ? 'Swap' : 'Browse'}
                           </span>
                         </div>
-                        <div className={`mt-1.5 flex h-[56px] items-center justify-center overflow-hidden rounded-[14px] ${
+                        <div className={`mt-1 flex h-[42px] items-center justify-center overflow-hidden rounded-[12px] ${
                           renderableProduct ? 'bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da]' : 'bg-white/[0.04]'
                         }`}>
                           {renderableProduct ? (
@@ -386,11 +416,11 @@ export function SearchSheet({
                             <span className="text-[22px] leading-none text-[#7d7068]">+</span>
                           )}
                         </div>
-                        <div className="mt-1.5 min-h-[24px]">
+                        <div className="mt-1 min-h-[20px]">
                           {renderableProduct ? (
                             <>
-                              <div className="truncate text-[9px] uppercase tracking-[.12em] text-[#a9998f]">{renderableProduct.brand}</div>
-                              <div className="mt-0.5 truncate text-[10px] text-[#fff6f0]">{renderableProduct.name}</div>
+                              <div className="truncate text-[8px] uppercase tracking-[.12em] text-[#a9998f]">{renderableProduct.brand}</div>
+                              <div className="truncate text-[9px] text-[#fff6f0]">{renderableProduct.name}</div>
                             </>
                           ) : (
                             <div className="text-[11px] leading-snug text-[#c8b9ae]">Search this slot</div>
@@ -409,7 +439,7 @@ export function SearchSheet({
                   <div className="font-semibold text-ink">
                     {frameDisplayLabel(frame)} search bias
                   </div>
-                  <div className="mt-0.5 line-clamp-2">
+                  <div className="mt-0.5 line-clamp-1">
                     {isDemoResults
                       ? 'Demo mode is on. These are local sample products for UI testing.'
                       : searchMode === 'catalog-only'
@@ -539,7 +569,7 @@ export function SearchSheet({
               ) : null}
             </div>
 
-            <div className="flex-1 overflow-hidden px-4 pb-4">
+            <div className="min-h-0 flex-1 overflow-hidden px-4 pb-3">
               {loading
                 ? (
                     <div className="grid min-h-[260px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
@@ -651,7 +681,7 @@ export function SearchSheet({
                             <div className="absolute inset-x-12 bottom-5 h-6 rounded-full bg-[#c7b8aa]/42 blur-[11px]" />
                             <ProductImage
                               product={activeCandidate}
-                              wrapperClassName="relative h-[180px] min-[390px]:h-[210px] w-full"
+                              wrapperClassName="relative h-[min(160px,23dvh)] min-[390px]:h-[min(180px,24dvh)] w-full"
                               className="relative h-full w-full object-contain p-4 drop-shadow-[0_15px_20px_rgba(0,0,0,.22)]"
                               onAvailable={(product) => {
                                 setReadyImageIds((current) => new Set(current).add(product.id));
@@ -671,7 +701,7 @@ export function SearchSheet({
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeCandidate.brand}</div>
-                                <div className="mt-1 line-clamp-2 font-serif text-[20px] font-semibold leading-[1.08] text-ink">
+                                <div className="mt-1 line-clamp-2 font-serif text-[18px] font-semibold leading-[1.08] text-ink">
                                   {activeCandidate.name}
                                 </div>
                                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted">

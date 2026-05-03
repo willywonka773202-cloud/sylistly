@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Layers3, Radar, Sparkles, Wand2 } from 'lucide-react';
+import { Check, Layers3, Lock, Radar, Sparkles, Wand2 } from 'lucide-react';
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { proxiedImageUrl } from '@/lib/image-url';
 import { hasUsableProductImage } from '@/lib/product-image-quality';
@@ -17,7 +17,9 @@ interface Props {
   vibeLabel: string;
   vibeBlurb: string;
   selectedGenerationSlots?: Category[];
+  lockedSlots?: Category[];
   onToggleGenerationSlot?: (category: Category) => void;
+  onToggleSlotLock?: (category: Category) => void;
   onOpenSlot?: (category: Category) => void;
   slotInteractionDisabled?: boolean;
   activeEditSlot?: Category | null;
@@ -94,7 +96,9 @@ export function Mannequin({
   vibeLabel,
   vibeBlurb,
   selectedGenerationSlots = [],
+  lockedSlots = [],
   onToggleGenerationSlot,
+  onToggleSlotLock,
   onOpenSlot,
   slotInteractionDisabled = false,
   activeEditSlot = null,
@@ -141,9 +145,11 @@ export function Mannequin({
           magnetMode={magnetMode}
           activeEditSlot={activeEditSlot}
           onOpenSlot={onOpenSlot}
+          onToggleSlotLock={onToggleSlotLock}
           onToggleGenerationSlot={onToggleGenerationSlot}
           polishMode={polishMode}
           selectedGenerationSlots={selectedGenerationSlots}
+          lockedSlots={lockedSlots}
           skinTone={skinTone}
           slotInteractionDisabled={slotInteractionDisabled}
         />
@@ -160,9 +166,11 @@ function FrontCanvas({
   magnetMode,
   activeEditSlot,
   onOpenSlot,
+  onToggleSlotLock,
   onToggleGenerationSlot,
   polishMode,
   selectedGenerationSlots,
+  lockedSlots,
   skinTone,
   slotInteractionDisabled,
 }: {
@@ -173,9 +181,11 @@ function FrontCanvas({
   magnetMode: boolean;
   activeEditSlot?: Category | null;
   onOpenSlot?: (category: Category) => void;
+  onToggleSlotLock?: (category: Category) => void;
   onToggleGenerationSlot?: (category: Category) => void;
   polishMode: boolean;
   selectedGenerationSlots: Category[];
+  lockedSlots: Category[];
   skinTone?: string;
   slotInteractionDisabled?: boolean;
 }) {
@@ -200,6 +210,7 @@ function FrontCanvas({
     const rawProduct = items[category];
     const product = hasUsableProductImage(rawProduct) && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
     const generationSelected = selectedGenerationSlots.includes(category);
+    const locked = Boolean(product && lockedSlots.includes(category));
     const selected = generationSelected || activeEditSlot === category;
     const interactive = Boolean(onToggleGenerationSlot || onOpenSlot) && !slotInteractionDisabled;
     const handleSlotClick = () => {
@@ -210,13 +221,15 @@ function FrontCanvas({
       }
       onToggleGenerationSlot?.(category);
     };
-    const selectedClassName = selected
+    const selectedClassName = locked
+      ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.74),0_0_30px_rgba(232,54,93,.36),0_14px_28px_rgba(40,18,22,.14)]'
+      : selected
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
       : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
     const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1.5 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
       <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.42)]">
-        <Check size={13} strokeWidth={3} />
+        {locked ? <Lock size={12} strokeWidth={3} /> : <Check size={13} strokeWidth={3} />}
       </span>
     ) : null;
 
@@ -263,6 +276,30 @@ function FrontCanvas({
         aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
       >
         {selectionBadge}
+        {product && onToggleSlotLock ? (
+          <span
+            role="button"
+            tabIndex={0}
+            aria-label={`${locked ? 'Unlock' : 'Lock'} ${CATEGORY_LABELS[category]}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (!slotInteractionDisabled) onToggleSlotLock(category);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              event.stopPropagation();
+              if (!slotInteractionDisabled) onToggleSlotLock(category);
+            }}
+            className={`absolute bottom-1.5 right-1.5 z-10 grid h-6 w-6 place-items-center rounded-full border text-[10px] transition ${
+              locked
+                ? 'border-accent bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.36)]'
+                : 'border-[#d9c9bb] bg-white/82 text-[#6c5c52] hover:border-accent hover:text-accent'
+            }`}
+          >
+            <Lock size={12} strokeWidth={2.6} />
+          </span>
+        ) : null}
         <div className={`mb-0.5 text-left text-[7px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
         <div className={innerFrameClassName}>
           <PreviewImage

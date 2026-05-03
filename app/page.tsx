@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -125,6 +125,35 @@ const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
 
 const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
 
+function useBodyScrollLock(locked: boolean) {
+  useEffect(() => {
+    if (!locked) return;
+    const scrollY = window.scrollY;
+    const previous = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overscrollBehavior: document.body.style.overscrollBehavior,
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = previous.overflow;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overscrollBehavior = previous.overscrollBehavior;
+      window.scrollTo(0, scrollY);
+    };
+  }, [locked]);
+}
+
 const VARIANT_COPY: Record<FitVariant, { title: string; blurb: string }> = {
   casual: { title: 'Casual', blurb: 'Relax the look' },
   elevated: { title: 'Elevated', blurb: 'Sharpen the silhouette' },
@@ -192,6 +221,7 @@ function BuilderPageContent({
   const [saveBurst, setSaveBurst] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
+  const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
@@ -218,6 +248,9 @@ function BuilderPageContent({
     CATEGORY_ORDER.find((category) => renderItems[category]) ||
     analysis.primaryGap ||
     'top';
+  const lockedSlotSet = useMemo(() => new Set(lockedSlots), [lockedSlots]);
+
+  useBodyScrollLock(Boolean(activeBuildOverlay || checkoutProducts));
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -263,6 +296,13 @@ function BuilderPageContent({
       replaceItems(hydrated);
     }
   }, [items, replaceItems]);
+
+  useEffect(() => {
+    setLockedSlots((current) => {
+      const next = current.filter((category) => Boolean(items[category]));
+      return next.length === current.length ? current : next;
+    });
+  }, [items]);
 
   useEffect(() => {
     if (!quickSlot || !CATEGORY_ORDER.includes(quickSlot as Category)) return;
@@ -335,6 +375,11 @@ function BuilderPageContent({
       vibeId === selectedVibe
         ? selectedGenerationSlots
         : defaultGenerationSlotsForVibe(vibeId);
+    const lockedItems = Object.fromEntries(
+      CATEGORY_ORDER
+        .filter((slot) => lockedSlotSet.has(slot) && items[slot])
+        .map((slot) => [slot, items[slot]]),
+    ) as Partial<Record<Category, Product>>;
 
     if (!generationSlots.length) {
       setStatusMessage('Select at least one preview slot before generating.');
@@ -351,9 +396,13 @@ function BuilderPageContent({
             ...workingVibe.slots.filter((slot) => generationSlots.includes(slot)),
           ]))
         : generationSlots
-    ).filter((slot) => mode !== 'missing' || !items[slot]);
+    ).filter((slot) => !lockedSlotSet.has(slot) && (mode !== 'missing' || !items[slot]));
     if (!targetSlots.length) {
-      setStatusMessage('That vibe already filled all of its starter pieces. Try regenerate or switch vibes.');
+      setStatusMessage(
+        Object.keys(lockedItems).length
+          ? 'Unlock at least one selected item to generate a new variation.'
+          : 'That vibe already filled all of its starter pieces. Try regenerate or switch vibes.',
+      );
       return;
     }
 
@@ -361,7 +410,7 @@ function BuilderPageContent({
     setStatusMessage(null);
 
     try {
-      const nextItems: Partial<Record<Category, Product>> = mode === 'missing' ? { ...items } : {};
+      const nextItems: Partial<Record<Category, Product>> = mode === 'missing' ? { ...items } : { ...lockedItems };
       let addedCount = 0;
       let collectionLabel: string | null = null;
       let assistantLabel: string | null = null;
@@ -478,6 +527,21 @@ function BuilderPageContent({
         ? current.filter((slot) => slot !== category)
         : CATEGORY_ORDER.filter((slot) => [...current, category].includes(slot)),
     );
+  }
+
+  function toggleLockedSlot(category: Category) {
+    if (!items[category]) return;
+    setLockedSlots((current) =>
+      current.includes(category)
+        ? current.filter((slot) => slot !== category)
+        : CATEGORY_ORDER.filter((slot) => slot === category || current.includes(slot)),
+    );
+  }
+
+  function clearFit() {
+    clear();
+    setLockedSlots([]);
+    setActiveEditSlot(null);
   }
 
   function openBoardSlot(category: Category) {
@@ -782,6 +846,8 @@ function BuilderPageContent({
                   vibeLabel={activeVibe.label}
                   vibeBlurb={activeVibe.blurb}
                   selectedGenerationSlots={selectedGenerationSlots}
+                  lockedSlots={lockedSlots}
+                  onToggleSlotLock={toggleLockedSlot}
                   onOpenSlot={openBoardSlot}
                   slotInteractionDisabled={boardDragging || generatorLoading}
                   activeEditSlot={activeEditSlot}
@@ -797,6 +863,7 @@ function BuilderPageContent({
               </div>
               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
+                {lockedSlots.length ? ` / Locked ${lockedSlots.length}` : ''}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
@@ -1071,7 +1138,9 @@ function BuilderPageContent({
               <FocusedRefinePanel
                 items={renderItems}
                 activeCategory={refineFocusCategory}
+                lockedSlots={lockedSlots}
                 onFocusCategory={focusRefineCategory}
+                onToggleLock={toggleLockedSlot}
                 onOpenSearch={openFocusedSearch}
               />
             </div>
@@ -1105,7 +1174,7 @@ function BuilderPageContent({
                     Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
-                  <button onClick={clear} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
+                  <button onClick={clearFit} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
                     Clear fit
                   </button>
                 </div>
@@ -1139,15 +1208,20 @@ function BuilderPageContent({
 function FocusedRefinePanel({
   items,
   activeCategory,
+  lockedSlots,
   onFocusCategory,
+  onToggleLock,
   onOpenSearch,
 }: {
   items: Partial<Record<Category, Product>>;
   activeCategory: Category;
+  lockedSlots: Category[];
   onFocusCategory: (category: Category) => void;
+  onToggleLock: (category: Category) => void;
   onOpenSearch: (category: Category) => void;
 }) {
   const activeProduct = items[activeCategory];
+  const activeLocked = Boolean(activeProduct && lockedSlots.includes(activeCategory));
   const activeIndex = CATEGORY_ORDER.indexOf(activeCategory);
   const previousCategory = CATEGORY_ORDER[(activeIndex - 1 + CATEGORY_ORDER.length) % CATEGORY_ORDER.length];
   const nextCategory = CATEGORY_ORDER[(activeIndex + 1) % CATEGORY_ORDER.length];
@@ -1182,12 +1256,17 @@ function FocusedRefinePanel({
                 key={category}
                 type="button"
                 onClick={() => onFocusCategory(category)}
-                className={`w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition ${
-                  active
+                className={`relative w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition ${
+                  active || lockedSlots.includes(category)
                     ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
                     : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
                 }`}
               >
+                {lockedSlots.includes(category) ? (
+                  <span className="absolute right-1 top-1 z-10 grid h-4 w-4 place-items-center rounded-full bg-accent text-white">
+                    <Lock size={9} strokeWidth={3} />
+                  </span>
+                ) : null}
                 <div className={`grid aspect-square place-items-center overflow-hidden rounded-[12px] ${
                   product ? 'bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)]' : 'bg-white/[0.05]'
                 }`}>
@@ -1231,6 +1310,20 @@ function FocusedRefinePanel({
               <div className="mt-1 text-[11px] leading-relaxed text-[#8b7c72]">Browse image-backed pieces for this slot.</div>
             </div>
           )}
+          {activeProduct ? (
+            <button
+              type="button"
+              onClick={() => onToggleLock(activeCategory)}
+              className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] transition ${
+                activeLocked
+                  ? 'border-accent bg-accent text-white shadow-[0_8px_18px_rgba(232,54,93,.34)]'
+                  : 'border-[#d8c7b8] bg-white/85 text-[#6c5c52] hover:border-accent hover:text-accent'
+              }`}
+            >
+              <Lock size={11} strokeWidth={2.7} />
+              {activeLocked ? 'Locked' : 'Lock'}
+            </button>
+          ) : null}
         </div>
 
         <div className="px-4 pb-4 pt-1">
@@ -1296,7 +1389,7 @@ function BuildOverlay({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-40 mx-auto flex max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-50 mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
       <button
         type="button"
         aria-label="Close build panel"
@@ -1308,7 +1401,7 @@ function BuildOverlay({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 38, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className="relative z-10 max-h-[78dvh] w-full overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
+        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
       >
         <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))] px-4 pb-3 pt-3">
           <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/18" />
@@ -1345,7 +1438,7 @@ function BuildOverlay({
             ))}
           </div>
         </div>
-        <div className="max-h-[calc(78dvh-118px)] overflow-y-auto px-4 pb-8 pt-4">
+        <div className="min-h-0 flex-1 overscroll-contain overflow-y-auto px-4 pb-6 pt-4">
           {children}
         </div>
       </motion.section>
