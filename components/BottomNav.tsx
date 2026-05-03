@@ -1,9 +1,10 @@
 'use client';
-import { Grid, Star, Bookmark, User } from 'lucide-react';
+import { Grid, Star, Bookmark, User, Flame } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const tabs = [
-  { href: '/',          label: 'Build',    icon: Grid },
+  { href: '/feed',      label: 'Feed',     icon: Flame },
+  { href: '/build',     label: 'Build',    icon: Grid },
   { href: '/discover',  label: 'Discover', icon: Star },
   { href: '/saved',     label: 'Saved',    icon: Bookmark },
   { href: '/profile',   label: 'Profile',  icon: User },
@@ -13,7 +14,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <nav className="h-[68px] pt-1.5 pb-3.5 bg-bg border-t border-hairline grid grid-cols-4">
+    <nav className="h-[68px] pt-1.5 pb-3.5 bg-bg border-t border-hairline grid grid-cols-5">
       {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (

@@ -1,14 +1,15 @@
 'use client';
-import { Bookmark, RotateCcw, ShoppingBag, Trash2 } from 'lucide-react';
+import { Bookmark, RotateCcw, Send, ShoppingBag, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
+import { useSocialFeed } from '@/store/social-feed';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { isRenderableProduct } from '@/lib/product-image-quality';
+import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
 function formatDate(value: string): string {
@@ -23,6 +24,7 @@ function formatDate(value: string): string {
 export default function SavedPage() {
   const fits = useSavedFits((state) => state.fits);
   const removeFit = useSavedFits((state) => state.removeFit);
+  const postFit = useSocialFeed((state) => state.postFit);
   const replaceItems = useFit((state) => state.replaceItems);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState<string>('Saved fit');
@@ -31,7 +33,7 @@ export default function SavedPage() {
   const displayFits = fits
     .map((fit) => {
       const visualEntries = Object.entries(fit.items)
-        .filter((entry): entry is [Category, Product] => isRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id));
+        .filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id));
       const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
       const visualProducts = visualEntries.map(([, product]) => product);
 
@@ -87,7 +89,7 @@ export default function SavedPage() {
                   type="button"
                   onClick={() => {
                     replaceItems(visualItems);
-                    router.push('/');
+                    router.push('/build');
                   }}
                   className="inline-flex flex-[1.25] items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow"
                 >
@@ -114,6 +116,14 @@ export default function SavedPage() {
                 >
                   <ShoppingBag size={13} />
                   Shop fit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => postFit(visualItems, { title: fit.title, vibe: 'Saved', visibility: 'public' })}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-4 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#d7c8bf] transition hover:border-accent hover:text-ink"
+                >
+                  <Send size={13} />
+                  Post
                 </button>
                 <button
                   type="button"

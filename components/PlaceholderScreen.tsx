@@ -34,7 +34,7 @@ export function PlaceholderScreen({
             </p>
           </div>
           <Link
-            href="/"
+            href="/build"
             className="inline-flex items-center gap-1 rounded-full border border-hairline-2 px-3 py-2 text-[11px] font-medium text-muted-2 transition hover:border-accent hover:text-ink"
           >
             <ArrowLeft size={12} />

@@ -8,7 +8,7 @@ import {
   frameBiasDescription,
   frameDisplayLabel,
 } from '@/lib/search-frame';
-import { filterRenderableProducts, hasUsableProductImage } from '@/lib/product-image-quality';
+import { hasUsableProductImage, sortImageBackedProducts } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -98,6 +98,25 @@ function getHost(url: string): string {
   }
 }
 
+function buildSimilarQuery(product: Product | null | undefined, category: Category, fallback: string): string {
+  if (!product) return fallback;
+  const words = [
+    product.brand,
+    product.name,
+    ...(product.colors || []),
+    ...(product.searchTerms || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, ' ')
+    .split(/\s+/)
+    .filter((word) => word.length > 2 && !['the', 'and', 'for', 'with', 'new', 'women', 'mens', 'men', 'size'].includes(word));
+
+  const unique = Array.from(new Set(words)).slice(0, 5);
+  return unique.length ? `${unique.join(' ')} ${category}` : fallback;
+}
+
 interface Props {
   open: boolean;
   category: Category | null;
@@ -148,8 +167,10 @@ export function SearchSheet({
 
   useEffect(() => {
     if (!open || !category) return;
+    const product = displayItems[category];
+    const autoQuery = initialQuery?.trim() || buildSimilarQuery(product, category, TRENDING[frame][category][0] || '');
     setActiveCategory(category);
-    setQuery(initialQuery?.trim() || '');
+    setQuery(autoQuery);
     setResults(null);
     setError(null);
     setIsDemoResults(false);
@@ -164,12 +185,8 @@ export function SearchSheet({
     setCustomPriceInput(
       priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
     );
+    void runSearch(autoQuery, category, 'live', priceMax);
   }, [open, category, initialQuery, frame, priceMax]);
-
-  useEffect(() => {
-    if (!open || !category || !initialQuery?.trim()) return;
-    void runSearch(initialQuery, category);
-  }, [open, category, initialQuery, frame]);
 
   useEffect(() => {
     if (!open || !currentCategory || results === null) return;
@@ -249,7 +266,7 @@ export function SearchSheet({
           ? 'catalog-preview'
           : null,
       );
-      setResults(Array.isArray(data.products) ? filterRenderableProducts(data.products) : []);
+      setResults(Array.isArray(data.products) ? sortImageBackedProducts(data.products) : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
         return;
@@ -293,7 +310,7 @@ export function SearchSheet({
   }
 
   const candidateResults = results
-    ? filterRenderableProducts(results).filter((product) => !failedImageIds.has(product.id))
+    ? sortImageBackedProducts(results).filter((product) => !failedImageIds.has(product.id))
     : results;
   const activeCandidate = candidateResults?.[activeResultIndex] || null;
   const activeImageReady = activeCandidate ? readyImageIds.has(activeCandidate.id) : false;
@@ -362,7 +379,13 @@ export function SearchSheet({
         className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="fixed inset-x-0 bottom-0 z-[80] mx-auto flex max-h-[calc(100dvh-8px)] min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_70px_rgba(0,0,0,.55)]">
+      <div
+        className="fixed inset-x-0 z-[80] mx-auto flex min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-1 shadow-[0_-22px_70px_rgba(0,0,0,.55)]"
+        style={{
+          bottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+          maxHeight: 'calc(100dvh - env(safe-area-inset-bottom) - 16px)',
+        }}
+      >
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
             <div className="flex items-center justify-between px-5 pb-1.5 pt-1">
               <div className="font-serif font-semibold text-lg">

@@ -104,7 +104,7 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
     const renderableProducts = look.products.filter(isRenderableProduct);
     const slots = renderableProducts.map((product) => product.category).join(',');
     replaceItems(productsToItems(renderableProducts));
-    router.push(`/?vibe=${look.vibe}&frame=${look.frameBias === 'all' ? 'androgynous' : look.frameBias}&slots=${encodeURIComponent(slots)}`);
+    router.push(`/build?vibe=${look.vibe}&frame=${look.frameBias === 'all' ? 'androgynous' : look.frameBias}&slots=${encodeURIComponent(slots)}`);
   }
 
   return (
