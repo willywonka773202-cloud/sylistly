@@ -1,62 +1,122 @@
 [
   {
     "id": "night-femme",
-    "previewImageUrl": "/discover-previews/night-femme.webp",
-    "previewImageStatus": "pending",
-    "tags": ["night out", "date", "jewelry"]
+    "previewImageUrl": "/discover-previews/midnight-polish.webp",
+    "previewImageStatus": "ready",
+    "tags": ["night", "polished", "jewelry"]
   },
   {
     "id": "street-masc",
-    "previewImageUrl": "/discover-previews/street-masc.webp",
-    "previewImageStatus": "pending",
+    "previewImageUrl": "/discover-previews/downtown-layers.webp",
+    "previewImageStatus": "ready",
     "tags": ["streetwear", "layers", "sneakers"]
   },
   {
     "id": "clean-all",
-    "previewImageUrl": "/discover-previews/clean-all.webp",
-    "previewImageStatus": "pending",
-    "tags": ["clean", "minimal", "daily"]
+    "previewImageUrl": "/discover-previews/clean-airport-fit.webp",
+    "previewImageStatus": "ready",
+    "tags": ["clean", "airport", "minimal"]
   },
   {
     "id": "gym-all",
-    "previewImageUrl": "/discover-previews/gym-all.webp",
-    "previewImageStatus": "pending",
-    "tags": ["gym", "athletic", "studio"]
+    "previewImageUrl": "/discover-previews/gym-off-duty.webp",
+    "previewImageStatus": "ready",
+    "tags": ["gym", "athletic", "off duty"]
+  },
+  {
+    "id": "cozy-all",
+    "previewImageUrl": "/discover-previews/cozy-winter-layers.webp",
+    "previewImageStatus": "ready",
+    "tags": ["cozy", "winter", "layers"]
   },
   {
     "id": "office-femme",
-    "previewImageUrl": "/discover-previews/office-femme.webp",
-    "previewImageStatus": "pending",
-    "tags": ["office", "tailored", "workwear"]
+    "previewImageUrl": "/discover-previews/minimal-office-uniform.webp",
+    "previewImageStatus": "ready",
+    "tags": ["office", "tailored", "minimal"]
   },
   {
     "id": "vacation-femme",
-    "previewImageUrl": "/discover-previews/vacation-femme.webp",
-    "previewImageStatus": "pending",
-    "tags": ["vacation", "summer", "resort"]
+    "previewImageUrl": "/discover-previews/summer-off-duty.webp",
+    "previewImageStatus": "ready",
+    "tags": ["summer", "vacation", "resort"]
   },
   {
     "id": "preppy-masc",
-    "previewImageUrl": "/discover-previews/preppy-masc.webp",
-    "previewImageStatus": "pending",
-    "tags": ["preppy", "old money", "city"]
+    "previewImageUrl": "/discover-previews/preppy-city-look.webp",
+    "previewImageStatus": "ready",
+    "tags": ["preppy", "city", "old money"]
+  },
+  {
+    "id": "clean-femme-soft",
+    "previewImageUrl": "/discover-previews/coffee-run-clean-fit.webp",
+    "previewImageStatus": "ready",
+    "tags": ["clean", "coffee run", "soft tailoring"]
+  },
+  {
+    "id": "clean-masc-smart",
+    "previewImageUrl": "/discover-previews/luxe-monochrome.webp",
+    "previewImageStatus": "ready",
+    "tags": ["clean", "luxe", "monochrome"]
   },
   {
     "id": "date-femme-afterdark",
-    "previewImageUrl": "/discover-previews/date-femme-afterdark.webp",
-    "previewImageStatus": "pending",
-    "tags": ["date", "after dark", "polished"]
+    "previewImageUrl": "/discover-previews/date-night-black.webp",
+    "previewImageStatus": "ready",
+    "tags": ["date", "night", "black"]
+  },
+  {
+    "id": "date-masc-polished",
+    "previewImageUrl": "/discover-previews/night-out-masculine.webp",
+    "previewImageStatus": "ready",
+    "tags": ["date", "night", "masculine"]
   },
   {
     "id": "edgy-femme-night",
-    "previewImageUrl": "/discover-previews/edgy-femme-night.webp",
-    "previewImageStatus": "pending",
-    "tags": ["edgy", "gallery", "black"]
+    "previewImageUrl": "/discover-previews/edgy-downtown.webp",
+    "previewImageStatus": "ready",
+    "tags": ["edgy", "downtown", "leather"]
+  },
+  {
+    "id": "edgy-masc-core",
+    "previewImageUrl": "/discover-previews/techwear-utility.webp",
+    "previewImageStatus": "ready",
+    "tags": ["techwear", "utility", "black"]
+  },
+  {
+    "id": "office-masc-refined",
+    "previewImageUrl": "/discover-previews/old-money-weekend.webp",
+    "previewImageStatus": "ready",
+    "tags": ["old money", "office", "refined"]
   },
   {
     "id": "vacation-masc-resort",
-    "previewImageUrl": "/discover-previews/vacation-masc-resort.webp",
-    "previewImageStatus": "pending",
-    "tags": ["vacation", "menswear", "off duty"]
+    "previewImageUrl": "/discover-previews/vacation-linen.webp",
+    "previewImageStatus": "ready",
+    "tags": ["vacation", "linen", "resort"]
+  },
+  {
+    "id": "gym-femme-studio",
+    "previewImageUrl": "/discover-previews/beach-club-neutral.webp",
+    "previewImageStatus": "ready",
+    "tags": ["athletic", "summer", "neutral"]
+  },
+  {
+    "id": "gym-masc-training",
+    "previewImageUrl": "/discover-previews/streetwear-uniform.webp",
+    "previewImageStatus": "ready",
+    "tags": ["training", "streetwear", "uniform"]
+  },
+  {
+    "id": "cozy-femme-weekend",
+    "previewImageUrl": "/discover-previews/night-out-feminine.webp",
+    "previewImageStatus": "ready",
+    "tags": ["cozy", "polished", "feminine"]
+  },
+  {
+    "id": "street-femme-downtown",
+    "previewImageUrl": "/discover-previews/y2k-going-out.webp",
+    "previewImageStatus": "ready",
+    "tags": ["streetwear", "y2k", "downtown"]
   }
 ]

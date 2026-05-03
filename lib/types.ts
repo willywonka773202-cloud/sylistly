@@ -30,6 +30,17 @@ export interface Product {
   imageOriginalUrl?: string;   // debug
   inStock?: boolean;
   trusted?: boolean;
+  vibes?: string[];
+  occasions?: string[];
+  colors?: string[];
+  gender?: Array<'masc' | 'fem' | 'androgynous'>;
+  searchTerms?: string[];
+  sourceQuery?: string;
+  productUrl?: string;
+  googleShoppingUrl?: string;
+  fallbackUrl?: string;
+  imageQuality?: 'good' | 'ok' | 'missing';
+  popularityScore?: number;
   metadata?: Record<string, unknown>;
 }
 

@@ -1,4 +1,4 @@
-import photoCatalogData from '@/data/photo-catalog.json';
+import photoCatalogData from '../data/photo-catalog.json';
 import type { Category, Product, SearchIntent } from './types';
 import { presentationScore } from './presentation-score';
 

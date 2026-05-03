@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { X, Search as SearchIcon } from 'lucide-react';
-import { ProductCard } from './ProductCard';
+import { ChevronLeft, ChevronRight, ExternalLink, RotateCcw, X, Search as SearchIcon } from 'lucide-react';
 import { ProductImage } from './ProductImage';
 import { useFit } from '@/store/fit';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
@@ -10,6 +9,7 @@ import {
   frameDisplayLabel,
 } from '@/lib/search-frame';
 import { filterRenderableProducts, hasUsableProductImage } from '@/lib/product-image-quality';
+import { getProductOutboundUrl } from '@/lib/product-links';
 import type { GeneratorFrame } from '@/lib/vibes';
 
 const TRENDING: Record<GeneratorFrame, Record<Category, string[]>> = {
@@ -56,12 +56,27 @@ const CATEGORY_LABELS: Record<Category, string> = {
   jewelry: 'Jewelry',
 };
 
+function formatPrice(priceCents: number): string {
+  if (!priceCents) return 'Price pending';
+  return `$${(priceCents / 100).toLocaleString()}`;
+}
+
+function getHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'retailer';
+  }
+}
+
 interface Props {
   open: boolean;
   category: Category | null;
   initialQuery?: string | null;
   frame?: GeneratorFrame;
   priceMax?: number | null;
+  itemsOverride?: Partial<Record<Category, Product>>;
+  onSelectProduct?: (category: Category, product: Product) => void;
   onClose: () => void;
 }
 
@@ -71,6 +86,8 @@ export function SearchSheet({
   initialQuery,
   frame = 'androgynous',
   priceMax = null,
+  itemsOverride,
+  onSelectProduct,
   onClose,
 }: Props) {
   const [activeCategory, setActiveCategory] = useState<Category | null>(category);
@@ -85,6 +102,7 @@ export function SearchSheet({
   const [canUseDemo, setCanUseDemo] = useState(false);
   const [readyImageIds, setReadyImageIds] = useState<Set<string>>(new Set());
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const [activeResultIndex, setActiveResultIndex] = useState(0);
   const [searchPriceMax, setSearchPriceMax] = useState<number | null>(priceMax);
   const [customPriceInput, setCustomPriceInput] = useState(
     priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
@@ -92,7 +110,8 @@ export function SearchSheet({
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
   const fitItems = useFit((s) => s.items);
-  const selectedItem = activeCategory ? fitItems[activeCategory] : null;
+  const displayItems = itemsOverride || fitItems;
+  const selectedItem = activeCategory ? displayItems[activeCategory] : null;
   const demoSupported = process.env.NODE_ENV === 'development';
   const currentCategory = activeCategory || category;
   const suggestions = currentCategory ? TRENDING[frame][currentCategory] : [];
@@ -110,6 +129,7 @@ export function SearchSheet({
     setCanUseDemo(false);
     setReadyImageIds(new Set());
     setFailedImageIds(new Set());
+    setActiveResultIndex(0);
     setSearchPriceMax(priceMax);
     setCustomPriceInput(
       priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
@@ -159,6 +179,7 @@ export function SearchSheet({
         setIsDemoResults(false);
         setReadyImageIds(new Set());
         setFailedImageIds(new Set());
+        setActiveResultIndex(0);
         setResultSource(null);
         setCatalogKind(null);
         setSearchMode(
@@ -178,6 +199,7 @@ export function SearchSheet({
       setIsDemoResults(Boolean(data.mock));
       setReadyImageIds(new Set());
       setFailedImageIds(new Set());
+      setActiveResultIndex(0);
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
       setCatalogKind(
         data.catalogKind === 'blend'
@@ -206,6 +228,7 @@ export function SearchSheet({
       setIsDemoResults(false);
       setReadyImageIds(new Set());
       setFailedImageIds(new Set());
+      setActiveResultIndex(0);
       setResultSource(null);
       setCatalogKind(null);
       setSearchMode(null);
@@ -236,29 +259,69 @@ export function SearchSheet({
     setCanUseDemo(false);
     setReadyImageIds(new Set());
     setFailedImageIds(new Set());
+    setActiveResultIndex(0);
   }
 
-  const staticRenderableResults = results
+  const candidateResults = results
     ? filterRenderableProducts(results).filter((product) => !failedImageIds.has(product.id))
     : results;
-  const visibleResults = staticRenderableResults
-    ? staticRenderableResults.filter((product) => readyImageIds.has(product.id))
-    : staticRenderableResults;
-  const pendingImageCount = staticRenderableResults
-    ? staticRenderableResults.filter((product) => !readyImageIds.has(product.id) && !failedImageIds.has(product.id)).length
-    : 0;
-  const renderProbeResults = staticRenderableResults || [];
+  const activeCandidate = candidateResults?.[activeResultIndex] || null;
+  const activeImageReady = activeCandidate ? readyImageIds.has(activeCandidate.id) : false;
+  const activePosition = activeCandidate ? activeResultIndex + 1 : 0;
   const resultLabel = loading
-    ? `Finding ${isDemoResults ? 'demo' : resultSource === 'catalog' || searchMode === 'catalog-only' ? 'catalog' : 'live'} products...`
-    : staticRenderableResults?.length && pendingImageCount
-    ? 'Checking image-backed products...'
-    : visibleResults?.length
-    ? `${visibleResults.length} ${isDemoResults ? 'demo' : resultSource === 'catalog' ? 'catalog' : 'live'} picks`
+    ? 'Finding image-backed pieces...'
+    : candidateResults?.length && activeCandidate
+    ? `Option ${activePosition} of ${candidateResults.length}`
+    : candidateResults?.length && activeResultIndex >= candidateResults.length
+    ? 'You reviewed all options'
     : searchMode === 'catalog-only'
     ? 'Search the Sylistly catalog'
     : searchMode === 'catalog-preview'
     ? 'Search the Sylistly preview catalog'
     : 'Search the Sylistly catalog';
+
+  useEffect(() => {
+    if (!candidateResults?.length) return;
+    if (activeResultIndex > candidateResults.length) {
+      setActiveResultIndex(candidateResults.length);
+    }
+  }, [candidateResults?.length, activeResultIndex]);
+
+  useEffect(() => {
+    if (!activeCandidate || activeImageReady) return;
+    const timer = window.setTimeout(() => {
+      setFailedImageIds((current) => new Set(current).add(activeCandidate.id));
+    }, 8_000);
+    return () => window.clearTimeout(timer);
+  }, [activeCandidate?.id, activeImageReady]);
+
+  function goToPreviousResult() {
+    setActiveResultIndex((current) => Math.max(0, current - 1));
+  }
+
+  function goToNextResult() {
+    setActiveResultIndex((current) => {
+      const total = candidateResults?.length || 0;
+      return Math.min(total, current + 1);
+    });
+  }
+
+  function chooseActiveCandidate() {
+    if (!activeCandidate || !currentCategory || !activeImageReady) return;
+    if (onSelectProduct) {
+      onSelectProduct(currentCategory, activeCandidate);
+    } else {
+      setItem(currentCategory, activeCandidate);
+    }
+    onClose();
+  }
+
+  function shopActiveCandidate() {
+    if (!activeCandidate) return;
+    const url = getProductOutboundUrl(activeCandidate);
+    if (!url || url === '#') return;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 
   if (!open || !category || !currentCategory) return null;
   const slotOrder = [currentCategory, ...CATEGORY_ORDER.filter((slot) => slot !== currentCategory)];
@@ -284,7 +347,7 @@ export function SearchSheet({
               <div className="overflow-x-auto pb-1 scrollbar-hide">
                 <div className="flex min-w-max gap-3">
                   {slotOrder.map((slot) => {
-                    const product = fitItems[slot];
+                    const product = displayItems[slot];
                     const active = slot === currentCategory;
                     const renderableProduct = hasUsableProductImage(product) && !failedImageIds.has(product.id) ? product : null;
 
@@ -457,7 +520,7 @@ export function SearchSheet({
 
             <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-muted">
               <span>{resultLabel}</span>
-              {visibleResults?.length ? (
+              {activeCandidate ? (
                 <span>
                   {isDemoResults
                     ? 'Local sample data'
@@ -476,22 +539,20 @@ export function SearchSheet({
               ) : null}
             </div>
 
-            <div className="grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-4 pb-8">
+            <div className="flex-1 overflow-y-auto px-4 pb-8">
               {loading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="flex h-[152px] items-center gap-4 rounded-2xl border border-hairline bg-surface-2 px-3.5 animate-pulse">
-                      <div className="h-[124px] w-[116px] rounded-[22px] bg-surface-3" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 w-20 rounded-full bg-surface-3" />
-                        <div className="h-4 w-full rounded-full bg-surface-3" />
-                        <div className="h-4 w-3/4 rounded-full bg-surface-3" />
-                        <div className="h-3 w-24 rounded-full bg-surface-3" />
+                ? (
+                    <div className="grid min-h-[360px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
+                      <div>
+                        <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+                        <div className="mt-4 font-serif text-lg text-ink">Finding image-backed pieces...</div>
+                        <div className="mt-1 text-sm text-muted">Only real product photos will be shown.</div>
                       </div>
                     </div>
-                  ))
+                  )
                 : error
                 ? (
-                    <div className="col-span-2 py-10 text-center text-sm">
+                    <div className="py-10 text-center text-sm">
                       <div className="text-rose-300">{error}</div>
                       {canUseDemo ? (
                         <button
@@ -504,51 +565,174 @@ export function SearchSheet({
                       ) : null}
                     </div>
                   )
-                : visibleResults === null
-                ? <div className="col-span-2 py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
-                : renderProbeResults.length === 0
+                : candidateResults === null
+                ? <div className="py-10 text-center text-muted text-sm">Search when you are ready, or tap Browse to open featured Sylistly inventory for this slot.</div>
+                : candidateResults.length === 0
                 ? (
-                    <div className="col-span-2 py-10 text-center text-sm">
+                    <div className="py-10 text-center text-sm">
                       <div className="text-ink">No image-backed products found for this search.</div>
                       <div className="mt-1 text-muted">Try a broader term or browse another slot.</div>
                     </div>
                   )
+                : activeResultIndex >= candidateResults.length
+                ? (
+                    <div className="grid min-h-[360px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] p-6 text-center">
+                      <div>
+                        <div className="font-serif text-2xl text-ink">You reviewed all options.</div>
+                        <div className="mt-2 text-sm text-muted">Search again, reset the stack, or browse another slot.</div>
+                        <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveResultIndex(0);
+                              setFailedImageIds(new Set());
+                              setReadyImageIds(new Set());
+                            }}
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
+                          >
+                            <RotateCcw size={14} />
+                            Reset options
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void runSearch(query, currentCategory)}
+                            className="rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-white shadow-pink-glow"
+                          >
+                            Search again
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
                 : (
-                    <>
-                      {pendingImageCount > 0 && visibleResults.length === 0 ? (
-                        <div className="col-span-2 py-8 text-center text-sm text-muted">
-                          Checking image-backed products...
+                    <div className="relative">
+                      {activeCandidate && !activeImageReady ? (
+                        <div className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+                          <ProductImage
+                            product={activeCandidate}
+                            loading="eager"
+                            wrapperClassName="h-px w-px overflow-hidden"
+                            className="h-px w-px object-contain"
+                            onAvailable={(product) => {
+                              setReadyImageIds((current) => new Set(current).add(product.id));
+                            }}
+                            onUnavailable={(product) => {
+                              setReadyImageIds((current) => {
+                                const next = new Set(current);
+                                next.delete(product.id);
+                                return next;
+                              });
+                              setFailedImageIds((current) => new Set(current).add(product.id));
+                            }}
+                          />
                         </div>
                       ) : null}
-                      {renderProbeResults.map((p) => (
-                        <ProductCard
-                          key={p.id}
-                          product={p}
-                          selected={selectedItem?.id === p.id}
-                          onImageAvailable={() => {
-                            setReadyImageIds((current) => new Set(current).add(p.id));
-                          }}
-                          onImageUnavailable={() => {
-                            setReadyImageIds((current) => {
-                              const next = new Set(current);
-                              next.delete(p.id);
-                              return next;
-                            });
-                            setFailedImageIds((current) => new Set(current).add(p.id));
-                          }}
-                          onClick={() => {
-                            setItem(currentCategory, p);
-                            onClose();
-                          }}
-                        />
-                      ))}
-                      {pendingImageCount === 0 && visibleResults.length === 0 ? (
-                        <div className="col-span-2 py-10 text-center text-sm">
-                          <div className="text-ink">No image-backed products found for this search.</div>
-                          <div className="mt-1 text-muted">Try a broader term or browse another slot.</div>
+
+                      {!activeCandidate || !activeImageReady ? (
+                        <div className="grid min-h-[360px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
+                          <div>
+                            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+                            <div className="mt-4 font-serif text-lg text-ink">Preparing option...</div>
+                            <div className="mt-1 text-sm text-muted">Checking the product photo before it appears.</div>
+                          </div>
                         </div>
-                      ) : null}
-                    </>
+                      ) : (
+                        <article className="overflow-hidden rounded-[30px] border border-white/10 bg-[#171514] shadow-[0_24px_70px_rgba(0,0,0,.34)]">
+                          <div className="relative m-3 overflow-hidden rounded-[26px] bg-[linear-gradient(180deg,#fffaf0_0%,#f0e4d6_100%)] ring-1 ring-[#efe4da]">
+                            <div className="absolute left-3 top-3 z-10 rounded-full bg-[#181513]/80 px-3 py-1 text-[9px] font-bold uppercase tracking-[.16em] text-white">
+                              {CATEGORY_LABELS[activeCandidate.category]}
+                            </div>
+                            {selectedItem?.id === activeCandidate.id ? (
+                              <div className="absolute right-3 top-3 z-10 rounded-full bg-accent px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-white">
+                                Selected
+                              </div>
+                            ) : null}
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
+                            <div className="absolute inset-x-12 bottom-8 h-7 rounded-full bg-[#c7b8aa]/45 blur-[12px]" />
+                            <ProductImage
+                              product={activeCandidate}
+                              wrapperClassName="relative h-[300px] min-[390px]:h-[340px] w-full"
+                              className="relative h-full w-full object-contain p-6 drop-shadow-[0_22px_28px_rgba(0,0,0,.26)]"
+                              onAvailable={(product) => {
+                                setReadyImageIds((current) => new Set(current).add(product.id));
+                              }}
+                              onUnavailable={(product) => {
+                                setReadyImageIds((current) => {
+                                  const next = new Set(current);
+                                  next.delete(product.id);
+                                  return next;
+                                });
+                                setFailedImageIds((current) => new Set(current).add(product.id));
+                              }}
+                            />
+                          </div>
+
+                          <div className="px-5 pb-5 pt-1">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0">
+                                <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeCandidate.brand}</div>
+                                <div className="mt-1.5 font-serif text-[24px] font-semibold leading-[1.05] text-ink">
+                                  {activeCandidate.name}
+                                </div>
+                                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-muted">
+                                  <span className="rounded-full border border-white/10 px-2.5 py-1">{formatPrice(activeCandidate.priceCents)}</span>
+                                  <span className="rounded-full border border-white/10 px-2.5 py-1">{getHost(getProductOutboundUrl(activeCandidate))}</span>
+                                </div>
+                              </div>
+                              <div className="flex flex-none items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[10px] text-muted">
+                                {activePosition}/{candidateResults.length}
+                              </div>
+                            </div>
+
+                            <div className="mt-5 grid grid-cols-[1fr_1.25fr] gap-2">
+                              <button
+                                type="button"
+                                onClick={goToNextResult}
+                                className="rounded-full border border-white/15 px-4 py-3 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
+                              >
+                                Skip
+                              </button>
+                              <button
+                                type="button"
+                                onClick={chooseActiveCandidate}
+                                className="rounded-full bg-accent px-4 py-3 text-[11px] font-semibold uppercase tracking-[.14em] text-white shadow-pink-glow"
+                              >
+                                {selectedItem ? 'Swap' : 'Use this'}
+                              </button>
+                            </div>
+
+                            <div className="mt-2 grid grid-cols-3 gap-2">
+                              <button
+                                type="button"
+                                onClick={goToPreviousResult}
+                                disabled={activeResultIndex <= 0}
+                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
+                              >
+                                <ChevronLeft size={14} />
+                                Prev
+                              </button>
+                              <button
+                                type="button"
+                                onClick={shopActiveCandidate}
+                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2"
+                              >
+                                Shop
+                                <ExternalLink size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={goToNextResult}
+                                disabled={activeResultIndex >= candidateResults.length}
+                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
+                              >
+                                Next
+                                <ChevronRight size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      )}
+                    </div>
                   )}
             </div>
       </div>

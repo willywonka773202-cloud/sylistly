@@ -8,6 +8,8 @@ export interface DiscoverLookPreview {
   previewImageUrl?: string;
   previewImageStatus: DiscoverPreviewStatus;
   tags?: string[];
+  prompt?: string;
+  notes?: string;
 }
 
 const PREVIEW_MAP = new Map(

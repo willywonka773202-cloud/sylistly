@@ -1,6 +1,7 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Sparkles } from 'lucide-react';
+import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
 import { SlotList } from '@/components/SlotList';
@@ -113,6 +114,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
+const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
 
 const VARIANT_COPY: Record<FitVariant, { title: string; blurb: string }> = {
   casual: { title: 'Casual', blurb: 'Relax the look' },
@@ -171,13 +173,25 @@ function BuilderPageContent({
   const [generatorLoading, setGeneratorLoading] = useState(false);
   const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
+  const [boardDragging, setBoardDragging] = useState(false);
+  const [activeEditSlot, setActiveEditSlot] = useState<Category | null>(null);
+  const [swipeFeedback, setSwipeFeedback] = useState<'save' | 'pass' | null>(null);
+  const [dragIntent, setDragIntent] = useState<'save' | 'pass' | null>(null);
+  const [swipeCoachLabel, setSwipeCoachLabel] = useState<'save' | 'pass' | null>(null);
+  const [swipeHintDismissed, setSwipeHintDismissed] = useState(true);
+  const [swipeHintRunCount, setSwipeHintRunCount] = useState(0);
+  const [saveBurst, setSaveBurst] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
   const n = count();
+  const renderItems = hasMounted ? items : {};
+  const renderN = hasMounted ? n : 0;
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
   const generatorFrame: GeneratorFrame =
     bodyType === 'custom' ? 'androgynous' : bodyType;
-  const analysis = useMemo(() => analyzeOutfit(items, activeVibe.label), [items, activeVibe.label]);
+  const analysis = useMemo(() => analyzeOutfit(renderItems, activeVibe.label), [renderItems, activeVibe.label]);
   const [bagLayer, setBagLayer] = useState<'front' | 'behind'>('front');
   const customBudgetCents = customBudgetInput ? Number(customBudgetInput) * 100 : null;
   const activePriceMax =
@@ -194,6 +208,24 @@ function BuilderPageContent({
     const timeout = window.setTimeout(() => setStatusMessage(null), 4500);
     return () => window.clearTimeout(timeout);
   }, [statusMessage]);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const seen = window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1';
+    setSwipeHintDismissed(seen);
+    if (seen) return;
+    const timeout = window.setTimeout(() => void playSwipeHint(), 850);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (swipeHintDismissed || swipeHintRunCount >= 2 || boardDragging || generatorLoading || searchFor) return;
+    const timeout = window.setTimeout(() => void playSwipeHint(), 6500);
+    return () => window.clearTimeout(timeout);
+  }, [boardDragging, generatorLoading, searchFor, swipeHintDismissed, swipeHintRunCount]);
 
   useEffect(() => {
     if (!generatorLoading) {
@@ -249,6 +281,7 @@ function BuilderPageContent({
 
   function closeSearchSheet() {
     setSearchFor(null);
+    setActiveEditSlot(null);
     if (quickSlot || quickQuery) router.replace('/');
   }
 
@@ -431,6 +464,13 @@ function BuilderPageContent({
     );
   }
 
+  function openBoardSlot(category: Category) {
+    if (boardDragging) return;
+    dismissSwipeHint();
+    setActiveEditSlot(category);
+    setSearchFor(category);
+  }
+
   async function saveFit() {
     if (!n) return;
     const localFit = saveLocalFit(items);
@@ -496,6 +536,128 @@ function BuilderPageContent({
     setCheckoutProducts(links);
   }
 
+  async function generateNextSwipeFit(direction: 'left' | 'right') {
+    if (generatorLoading) return;
+    const hasCurrentFit = n > 0;
+    if (direction === 'right' && hasCurrentFit) {
+      const saved = saveLocalFit(items);
+      setSaveBurst(true);
+      window.setTimeout(() => setSaveBurst(false), 850);
+      setStatusMessage(saved ? `Saved "${saved.title}". Loading the next ${activeVibe.label.toLowerCase()} look.` : 'Saved this look. Loading the next variation.');
+    } else if (direction === 'left') {
+      setStatusMessage(`Passed. Loading another ${activeVibe.label.toLowerCase()} look.`);
+    }
+
+    await generateLook(hasCurrentFit ? 'refresh' : 'full', {
+      sourceLabel: direction === 'right' ? 'Saved swipe.' : 'Pass swipe.',
+    });
+  }
+
+  function dismissSwipeHint(persist = false) {
+    if (persist) {
+      window.localStorage.setItem(SWIPE_HINT_STORAGE_KEY, '1');
+    }
+    setSwipeHintDismissed(true);
+    setSwipeCoachLabel(null);
+  }
+
+  async function playSwipeHint() {
+    if (generatorLoading || boardDragging || searchFor) return;
+    if (window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1') {
+      setSwipeHintDismissed(true);
+      return;
+    }
+
+    setSwipeHintRunCount((current) => current + 1);
+    setSwipeCoachLabel('pass');
+    await boardControls.start({
+      x: -30,
+      rotate: -1.6,
+      transition: { type: 'spring', stiffness: 170, damping: 18 },
+    });
+    setSwipeCoachLabel('save');
+    await boardControls.start({
+      x: 34,
+      rotate: 1.8,
+      transition: { type: 'spring', stiffness: 170, damping: 18 },
+    });
+    await boardControls.start({
+      x: 0,
+      rotate: 0,
+      transition: { type: 'spring', stiffness: 220, damping: 20 },
+    });
+    setSwipeCoachLabel(null);
+  }
+
+  async function performBoardSwipe(direction: 'left' | 'right') {
+    if (generatorLoading) return;
+    dismissSwipeHint(true);
+    setBoardDragging(true);
+    setActiveEditSlot(null);
+    setDragIntent(null);
+    setSwipeFeedback(direction === 'right' ? 'save' : 'pass');
+    await boardControls.start({
+      x: direction === 'right' ? 520 : -520,
+      rotate: direction === 'right' ? 12 : -12,
+      opacity: 0,
+      scale: 0.97,
+      transition: { type: 'spring', stiffness: 240, damping: 24 },
+    });
+    await generateNextSwipeFit(direction);
+    boardControls.set({
+      x: direction === 'right' ? -56 : 56,
+      rotate: direction === 'right' ? -4 : 4,
+      opacity: 0,
+      scale: 0.98,
+    });
+    await boardControls.start({
+      x: 0,
+      rotate: 0,
+      opacity: 1,
+      scale: 1,
+      transition: { type: 'spring', stiffness: 230, damping: 24 },
+    });
+    setSwipeFeedback(null);
+    setBoardDragging(false);
+  }
+
+  async function handleBoardDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
+    if (generatorLoading) {
+      await boardControls.start({ x: 0, rotate: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 320, damping: 26 } });
+      setDragIntent(null);
+      setBoardDragging(false);
+      return;
+    }
+
+    const saveSwipe = info.offset.x > 105 || info.velocity.x > 650;
+    const passSwipe = info.offset.x < -105 || info.velocity.x < -650;
+
+    if (saveSwipe) {
+      await performBoardSwipe('right');
+      return;
+    }
+
+    if (passSwipe) {
+      await performBoardSwipe('left');
+      return;
+    }
+
+    await boardControls.start({ x: 0, rotate: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 320, damping: 26 } });
+    setDragIntent(null);
+    window.setTimeout(() => setBoardDragging(false), 80);
+  }
+
+  function handleBoardDoubleTap() {
+    if (boardDragging || n === 0) return;
+    dismissSwipeHint(true);
+    const saved = saveLocalFit(items);
+    setSaveBurst(true);
+    window.setTimeout(() => setSaveBurst(false), 850);
+    setStatusMessage(saved ? `Saved "${saved.title}".` : 'Saved this fit.');
+  }
+
+  const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
+
   return (
     <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
       <header className="flex items-center justify-between px-4 pb-2.5 pt-10">
@@ -517,9 +679,9 @@ function BuilderPageContent({
         </div>
         <button
           onClick={saveFit}
-          disabled={n === 0}
+          disabled={renderN === 0}
           className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold ${
-            n > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
+            renderN > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
           }`}
         >
           <Bookmark size={12} /> Save fit
@@ -529,21 +691,122 @@ function BuilderPageContent({
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-4 px-4 pb-56 pt-2">
           <section className="flex flex-col gap-3">
-            <Mannequin
-              items={items}
-              skinTone={skinTone}
-              bodyType={generatorFrame}
-              vibeLabel={activeVibe.label}
-              vibeBlurb={activeVibe.blurb}
-              selectedGenerationSlots={selectedGenerationSlots}
-              onToggleGenerationSlot={toggleGenerationSlot}
-            />
+            <div className="relative">
+              {saveBurst ? (
+                <div className="pointer-events-none absolute -inset-4 z-0 rounded-[38px] bg-accent/25 blur-2xl" />
+              ) : null}
+              <div
+                className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                  activeSwipeCue === 'pass'
+                    ? 'border-white/25 bg-black/78 text-white shadow-[0_12px_30px_rgba(0,0,0,.32)]'
+                    : 'border-white/10 bg-black/28 text-white/42'
+                }`}
+              >
+                Pass
+              </div>
+              <div
+                className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                  activeSwipeCue === 'save'
+                    ? 'border-accent bg-accent text-white shadow-pink-glow'
+                    : 'border-accent/20 bg-accent/10 text-white/48'
+                }`}
+              >
+                Save
+              </div>
+              <motion.div
+                animate={boardControls}
+                className="relative z-10 touch-pan-y"
+                drag="x"
+                dragConstraints={{ left: -220, right: 220 }}
+                dragElastic={0.12}
+                dragTransition={{ bounceStiffness: 260, bounceDamping: 22 }}
+                onDragStart={() => {
+                  dismissSwipeHint();
+                  setBoardDragging(true);
+                  setActiveEditSlot(null);
+                }}
+                onDrag={(_, info) => {
+                  setDragIntent(info.offset.x > 22 ? 'save' : info.offset.x < -22 ? 'pass' : null);
+                }}
+                onDragEnd={(event, info) => void handleBoardDragEnd(event, info)}
+                onDoubleClick={handleBoardDoubleTap}
+                whileDrag={{ rotate: 2, scale: 0.985 }}
+              >
+                {swipeFeedback ? (
+                  <div
+                    className={`pointer-events-none absolute left-5 top-5 z-30 rounded-full border px-4 py-2 text-[11px] font-black uppercase tracking-[.18em] shadow-[0_14px_34px_rgba(0,0,0,.28)] ${
+                      swipeFeedback === 'save'
+                        ? 'rotate-[-8deg] border-accent bg-accent text-white shadow-pink-glow'
+                        : 'rotate-[8deg] border-white/18 bg-black/72 text-white'
+                    }`}
+                  >
+                    {swipeFeedback === 'save' ? 'Saved' : 'Pass'}
+                  </div>
+                ) : null}
+                {saveBurst ? (
+                  <div className="pointer-events-none absolute right-5 top-5 z-30 grid h-11 w-11 animate-pulse place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                    <Bookmark size={17} fill="currentColor" />
+                  </div>
+                ) : null}
+                <Mannequin
+                  items={renderItems}
+                  skinTone={skinTone}
+                  bodyType={generatorFrame}
+                  vibeLabel={activeVibe.label}
+                  vibeBlurb={activeVibe.blurb}
+                  selectedGenerationSlots={selectedGenerationSlots}
+                  onOpenSlot={openBoardSlot}
+                  slotInteractionDisabled={boardDragging || generatorLoading}
+                  activeEditSlot={activeEditSlot}
+                />
+              </motion.div>
+            </div>
             <div className="border-t border-hairline px-1 pt-4 text-center">
-              <div className="text-[12px] font-medium text-muted-2">
-                Tap slots to include in next generation
+              <div className="text-[12px] font-medium leading-relaxed text-muted-2">
+                <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
+              </div>
+              <div className="mt-1 text-[11px] text-muted">
+                Pink-lit slots are editable pieces. The chips below choose what generates next.
               </div>
               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => void performBoardSwipe('left')}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-white/25 hover:text-ink disabled:opacity-50"
+                >
+                  Pass
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void performBoardSwipe('right')}
+                  disabled={generatorLoading || renderN === 0}
+                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                {CATEGORY_ORDER.map((category) => {
+                  const selected = selectedGenerationSlots.includes(category);
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => toggleGenerationSlot(category)}
+                      className={`rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] transition ${
+                        selected
+                          ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
+                          : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
+                      }`}
+                    >
+                      {CATEGORY_LABELS[category]}
+                    </button>
+                  );
+                })}
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <button
@@ -749,7 +1012,7 @@ function BuilderPageContent({
             </div>
             <SelectedPiecesPanel
               analysis={analysis}
-              items={items}
+              items={renderItems}
               onOpenSearch={setSearchFor}
             />
             <FitDiagnosticsPanel
@@ -766,10 +1029,10 @@ function BuilderPageContent({
               ) : null}
               <button
                 onClick={shopAll}
-                disabled={n === 0}
+                disabled={renderN === 0}
                   className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
               >
-                Shop full look {n > 0 && <span className="opacity-75 font-medium">- {n}</span>}
+                Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                 <ExternalLink size={14} />
               </button>
               <button onClick={clear} className="w-full rounded-xl py-1.5 text-xs text-muted transition hover:text-ink">
