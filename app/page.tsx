@@ -1,10 +1,9 @@
 'use client';
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
-import { SlotList } from '@/components/SlotList';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
@@ -115,6 +114,16 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
+const BUILD_SECTION_TABS = ['build', 'refine', 'details'] as const;
+type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
+
+const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
+  build: 'Build',
+  refine: 'Refine',
+  details: 'Details',
+};
+
+const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
 
 const VARIANT_COPY: Record<FitVariant, { title: string; blurb: string }> = {
   casual: { title: 'Casual', blurb: 'Relax the look' },
@@ -182,12 +191,14 @@ function BuilderPageContent({
   const [swipeHintRunCount, setSwipeHintRunCount] = useState(0);
   const [saveBurst, setSaveBurst] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
   const n = count();
   const renderItems = hasMounted ? items : {};
   const renderN = hasMounted ? n : 0;
+  const totalDisplay = `$${(total / 100).toFixed(2)}`;
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
   const generatorFrame: GeneratorFrame =
     bodyType === 'custom' ? 'androgynous' : bodyType;
@@ -202,6 +213,11 @@ function BuilderPageContent({
         ? Number(customBudgetInput)
         : null
       : getBudgetMaxCents(generatorBudget) / 100;
+  const refineFocusCategory =
+    activeEditSlot ||
+    CATEGORY_ORDER.find((category) => renderItems[category]) ||
+    analysis.primaryGap ||
+    'top';
 
   useEffect(() => {
     if (!statusMessage) return;
@@ -468,6 +484,7 @@ function BuilderPageContent({
     if (boardDragging) return;
     dismissSwipeHint();
     setActiveEditSlot(category);
+    setActiveBuildOverlay('refine');
     setSearchFor(category);
   }
 
@@ -534,6 +551,16 @@ function BuilderPageContent({
 
     setStatusMessage(null);
     setCheckoutProducts(links);
+  }
+
+  function focusRefineCategory(category: Category) {
+    setActiveEditSlot(category);
+    setActiveBuildOverlay('refine');
+  }
+
+  function openFocusedSearch(category: Category) {
+    setActiveEditSlot(category);
+    setSearchFor(category);
   }
 
   async function generateNextSwipeFit(direction: 'left' | 'right') {
@@ -996,52 +1023,97 @@ function BuilderPageContent({
                 </button>
               </div>
             </div>
-            <div className="rounded-[30px] border border-hairline bg-surface-1 p-5 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[.18em] text-muted">Item tray</div>
-                  <div className="mt-1 font-serif text-[18px] font-semibold text-ink">
-                    Swap and refine <em className="italic text-accent">slot by slot</em>
-                  </div>
-                </div>
-                <div className="text-[10px] uppercase tracking-[.16em] text-muted">{CATEGORY_ORDER.length} zones</div>
-              </div>
-              <div className="mt-3">
-                <SlotList onOpenSearch={setSearchFor} />
-              </div>
-            </div>
-            <SelectedPiecesPanel
-              analysis={analysis}
-              items={renderItems}
-              onOpenSearch={setSearchFor}
-            />
-            <FitDiagnosticsPanel
-              analysis={analysis}
-              bagLayer={bagLayer}
-              onOpenSearch={setSearchFor}
-              onToggleBagLayer={() => setBagLayer((value) => (value === 'front' ? 'behind' : 'front'))}
-            />
-            <div className="sticky bottom-3 z-20 flex flex-col gap-2 rounded-[24px] border border-white/10 bg-bg/90 p-2 shadow-[0_18px_44px_rgba(0,0,0,.42)] backdrop-blur">
-              {statusMessage ? (
-                <div className="rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
-                  {statusMessage}
-                </div>
-              ) : null}
+          </section>
+
+          <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
+            <div className="grid grid-cols-3 gap-2">
               <button
+                type="button"
+                onClick={() => setActiveBuildOverlay('refine')}
+                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+              >
+                Refine
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveBuildOverlay('details')}
+                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+              >
+                Details
+              </button>
+              <button
+                type="button"
                 onClick={shopAll}
                 disabled={renderN === 0}
-                  className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
+                className="rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
               >
-                Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
-                <ExternalLink size={14} />
-              </button>
-              <button onClick={clear} className="w-full rounded-xl py-1.5 text-xs text-muted transition hover:text-ink">
-                Clear fit
+                Shop
               </button>
             </div>
           </section>
+
+          {statusMessage ? (
+            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[11px] leading-relaxed text-muted-2">
+              {statusMessage}
+            </div>
+          ) : null}
         </div>
       </div>
+
+      {activeBuildOverlay ? (
+        <BuildOverlay
+          activeTab={activeBuildOverlay}
+          onChangeTab={setActiveBuildOverlay}
+          onClose={() => setActiveBuildOverlay(null)}
+        >
+          {activeBuildOverlay === 'refine' ? (
+            <div className="flex flex-col gap-3">
+              <FocusedRefinePanel
+                items={renderItems}
+                activeCategory={refineFocusCategory}
+                onFocusCategory={focusRefineCategory}
+                onOpenSearch={openFocusedSearch}
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <FitDiagnosticsPanel
+                analysis={analysis}
+                bagLayer={bagLayer}
+                onOpenSearch={setSearchFor}
+                onToggleBagLayer={() => setBagLayer((value) => (value === 'front' ? 'behind' : 'front'))}
+              />
+              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-4 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[.18em] text-muted">Shopping summary</div>
+                    <div className="mt-1 font-serif text-[21px] font-semibold text-ink">{totalDisplay}</div>
+                    <div className="mt-1 text-[11px] leading-relaxed text-muted-2">
+                      {renderN > 0 ? `${renderN} image-backed piece${renderN !== 1 ? 's' : ''} ready to shop.` : 'Build a fit first, then shop the full look.'}
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
+                    {renderN}/8
+                  </div>
+                </div>
+                <div className="mt-4 grid grid-cols-1 gap-2">
+                  <button
+                    onClick={shopAll}
+                    disabled={renderN === 0}
+                    className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
+                  >
+                    Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
+                    <ExternalLink size={14} />
+                  </button>
+                  <button onClick={clear} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
+                    Clear fit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </BuildOverlay>
+      ) : null}
 
       <BottomNav />
 
@@ -1061,6 +1133,223 @@ function BuilderPageContent({
         onClose={() => setCheckoutProducts(null)}
       />
     </main>
+  );
+}
+
+function FocusedRefinePanel({
+  items,
+  activeCategory,
+  onFocusCategory,
+  onOpenSearch,
+}: {
+  items: Partial<Record<Category, Product>>;
+  activeCategory: Category;
+  onFocusCategory: (category: Category) => void;
+  onOpenSearch: (category: Category) => void;
+}) {
+  const activeProduct = items[activeCategory];
+  const activeIndex = CATEGORY_ORDER.indexOf(activeCategory);
+  const previousCategory = CATEGORY_ORDER[(activeIndex - 1 + CATEGORY_ORDER.length) % CATEGORY_ORDER.length];
+  const nextCategory = CATEGORY_ORDER[(activeIndex + 1) % CATEGORY_ORDER.length];
+  const shopUrl = activeProduct ? getProductOutboundUrl(activeProduct) : '';
+
+  function openShop() {
+    if (!shopUrl || shopUrl === '#') return;
+    window.open(shopUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  return (
+    <section className="rounded-[30px] border border-hairline bg-surface-1 p-4 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] uppercase tracking-[.18em] text-muted">Focused refine</div>
+          <div className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">
+            Editing <em className="italic text-accent">{CATEGORY_LABELS[activeCategory]}</em>
+          </div>
+        </div>
+        <div className="rounded-full border border-accent/35 bg-accent/12 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
+          {Object.values(items).filter(Boolean).length}/8
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex w-max gap-2 pr-2">
+          {CATEGORY_ORDER.map((category) => {
+            const product = items[category];
+            const active = category === activeCategory;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => onFocusCategory(category)}
+                className={`w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition ${
+                  active
+                    ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
+                    : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
+                }`}
+              >
+                <div className={`grid aspect-square place-items-center overflow-hidden rounded-[12px] ${
+                  product ? 'bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)]' : 'bg-white/[0.05]'
+                }`}>
+                  {product ? (
+                    <PanelPreviewImage
+                      product={product}
+                      category={category}
+                      wrapperClassName="h-full w-full"
+                      modeClassName="h-full w-full object-contain p-1.5"
+                    />
+                  ) : (
+                    <span className="text-lg text-muted">+</span>
+                  )}
+                </div>
+                <div className={`mt-1 truncate text-[8px] font-bold uppercase tracking-[.1em] ${
+                  active ? 'text-accent' : 'text-muted'
+                }`}>
+                  {CATEGORY_LABELS[category]}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-[24px] border border-white/10 bg-[#171412]">
+        <div className="relative m-2.5 grid h-[190px] place-items-center overflow-hidden rounded-[20px] bg-[linear-gradient(180deg,#fffaf0_0%,#f0e4d6_100%)] ring-1 ring-[#efe4da]">
+          <div className="absolute left-3 top-3 z-10 rounded-full bg-[#181513]/78 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-white">
+            {CATEGORY_LABELS[activeCategory]}
+          </div>
+          {activeProduct ? (
+            <PanelPreviewImage
+              product={activeProduct}
+              category={activeCategory}
+              wrapperClassName="relative h-full w-full"
+              modeClassName="h-full w-full object-contain p-5 drop-shadow-[0_18px_24px_rgba(0,0,0,.18)]"
+            />
+          ) : (
+            <div className="px-6 text-center">
+              <div className="font-serif text-[20px] font-semibold text-[#201915]">No {CATEGORY_LABELS[activeCategory].toLowerCase()} yet</div>
+              <div className="mt-1 text-[11px] leading-relaxed text-[#8b7c72]">Browse image-backed pieces for this slot.</div>
+            </div>
+          )}
+        </div>
+
+        <div className="px-4 pb-4 pt-1">
+          {activeProduct ? (
+            <>
+              <div className="truncate text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeProduct.brand}</div>
+              <div className="mt-1 line-clamp-2 font-serif text-[21px] font-semibold leading-tight text-ink">{activeProduct.name}</div>
+              <div className="mt-1 text-[12px] text-muted">
+                {activeProduct.priceCents ? `$${(activeProduct.priceCents / 100).toLocaleString()}` : 'Price pending'}
+              </div>
+            </>
+          ) : null}
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => onFocusCategory(previousCategory)}
+              className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={() => onFocusCategory(nextCategory)}
+              className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+            >
+              Next
+            </button>
+          </div>
+          <div className="mt-2 grid grid-cols-[1.2fr_1fr] gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenSearch(activeCategory)}
+              className="rounded-full bg-accent px-3 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot"
+            >
+              {activeProduct ? 'Swap' : 'Browse'}
+            </button>
+            <button
+              type="button"
+              onClick={openShop}
+              disabled={!activeProduct || !shopUrl || shopUrl === '#'}
+              className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.06] px-3 py-3 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:bg-white/[0.1] disabled:opacity-35"
+            >
+              Shop
+              <ExternalLink size={12} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BuildOverlay({
+  activeTab,
+  children,
+  onChangeTab,
+  onClose,
+}: {
+  activeTab: Exclude<BuildSectionTab, 'build'>;
+  children: ReactNode;
+  onChangeTab: (tab: Exclude<BuildSectionTab, 'build'>) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-40 mx-auto flex max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
+      <button
+        type="button"
+        aria-label="Close build panel"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
+      <motion.section
+        initial={{ y: 38, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 38, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+        className="relative z-10 max-h-[78dvh] w-full overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
+      >
+        <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))] px-4 pb-3 pt-3">
+          <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/18" />
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[10px] uppercase tracking-[.18em] text-muted">Build panel</div>
+              <div className="mt-1 font-serif text-[21px] font-semibold text-ink">
+                {BUILD_SECTION_LABELS[activeTab]}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-2 transition hover:border-accent hover:text-ink"
+              aria-label="Close"
+            >
+              x
+            </button>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {BUILD_OVERLAY_TABS.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => onChangeTab(tab)}
+                className={`rounded-full px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] transition ${
+                  activeTab === tab
+                    ? 'bg-accent text-white shadow-pink-glow'
+                    : 'border border-white/10 bg-white/[0.04] text-muted-2 hover:border-accent/50 hover:text-ink'
+                }`}
+              >
+                {BUILD_SECTION_LABELS[tab]}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="max-h-[calc(78dvh-118px)] overflow-y-auto px-4 pb-8 pt-4">
+          {children}
+        </div>
+      </motion.section>
+    </div>
   );
 }
 
