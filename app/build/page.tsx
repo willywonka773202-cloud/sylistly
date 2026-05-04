@@ -263,6 +263,7 @@ function BuilderPageContent({
   const skinTone = useProfile((state) => state.profile.skinTone);
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
+  const profileBudget = useProfile((state) => state.profile.stylePrefs.budget);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const postFitToFeed = useSocialFeed((state) => state.postFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
@@ -412,6 +413,17 @@ function BuilderPageContent({
       .filter((c): c is Category => CATEGORY_ORDER.includes(c as Category));
     if (cats.length) setLockedSlots(cats);
   }, [quickLock]);
+
+  useEffect(() => {
+    if (!profileBudget) return;
+    const map: Record<string, GeneratorBudget> = {
+      low: 'under100',
+      mid: 'under250',
+      high: 'under500',
+      luxury: 'any',
+    };
+    setGeneratorBudget(map[profileBudget] ?? 'under250');
+  }, [profileBudget]);
 
   function closeSearchSheet() {
     setSearchFor(null);

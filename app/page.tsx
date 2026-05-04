@@ -56,7 +56,11 @@ export default function HomePage() {
             <div className="font-serif text-[32px] font-semibold leading-none text-ink">
               Sylistly
             </div>
-            <p className="mt-1 text-[11px] text-muted">Build. Discover. Wear.</p>
+            <p className="mt-1 text-[11px] text-muted">
+              {profileVibes.length > 0
+                ? `Your ${profileVibes[0]} feed`
+                : 'Build. Discover. Wear.'}
+            </p>
           </div>
           <button
             onClick={() => router.push('/build')}

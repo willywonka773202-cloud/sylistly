@@ -84,6 +84,7 @@ export default function FitFeedPage() {
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const profileVibes = profile.stylePrefs.vibes || [];
   const profileFrame = profile.bodyType === 'custom' ? 'androgynous' : profile.bodyType;
   const profileBudget = profile.stylePrefs.budget;
@@ -94,6 +95,10 @@ export default function FitFeedPage() {
       (a, b) => forYouScore(b, profileVibes, profileFrame, profileBudget) - forYouScore(a, profileVibes, profileFrame, profileBudget),
     );
   }, [posts, activeFilter, profileVibes, profileFrame, profileBudget]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeFilter]);
 
   useEffect(() => {
     if (posts.length < 24) generateMorePosts(18);
@@ -194,7 +199,7 @@ export default function FitFeedPage() {
           </div>
         </header>
 
-        <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
+        <div ref={scrollRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
           {filteredPosts.map((post) => {
             const products = visibleProducts(post, failedImageIds);
             return (
@@ -231,15 +236,32 @@ export default function FitFeedPage() {
                   <button onClick={() => remix(post)} className="grid h-12 w-12 place-items-center rounded-full border border-accent/45 bg-accent text-white shadow-pink-glow" aria-label="Remix in Builder">
                     <RotateCcw size={20} />
                   </button>
+                  <button
+                    onClick={() => {
+                      replaceItems(itemsFromProducts(visibleProducts(post, failedImageIds)));
+                      router.push('/try-on');
+                    }}
+                    className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md"
+                    aria-label="Try on"
+                  >
+                    <Sparkles size={20} />
+                  </button>
                   <button onClick={() => shop(post)} className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md" aria-label="Shop fit">
                     <ShoppingBag size={20} />
                   </button>
                 </div>
 
                 <div className="relative z-10 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+18px)] pr-[76px]">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/34 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
-                    <Sparkles size={12} className="text-accent" />
-                    {post.sourceType || 'catalog'} fit
+                  <div className="flex flex-wrap gap-2">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/34 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
+                      <Sparkles size={12} className="text-accent" />
+                      {post.sourceType || 'catalog'} fit
+                    </div>
+                    {post.isOOTD && (
+                      <div className="inline-flex items-center rounded-full border border-accent/50 bg-accent/18 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.16em] text-accent backdrop-blur-md">
+                        OOTD
+                      </div>
+                    )}
                   </div>
                   <h1 className="mt-3 font-serif text-[35px] font-semibold leading-[.94] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,.42)]">
                     {post.title}
