@@ -1,6 +1,9 @@
-import { Sparkles } from 'lucide-react';
+'use client';
+
+import { Compass } from 'lucide-react';
+import { useState } from 'react';
+import { BottomNav } from '@/components/BottomNav';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import {
   ALL_CATALOG_PRODUCTS,
   getCollectionProducts,
@@ -26,6 +29,8 @@ interface DiscoverLookRecipe {
 const DISCOVER_RECIPES = new Map(
   (recipeData as DiscoverLookRecipe[]).map((recipe) => [recipe.id, recipe]),
 );
+
+const VIBE_FILTERS = ['All', 'Night', 'Street', 'Clean', 'Date', 'Office', 'Gym', 'Cozy', 'Vacation', 'Edgy', 'Preppy'];
 
 function productText(product: Product): string {
   return [
@@ -185,34 +190,80 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
   return looks.slice(0, 20);
 }
 
+const ALL_LOOKS = buildDiscoverLooks();
+
 export default function DiscoverPage() {
-  const looks = buildDiscoverLooks();
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  const filteredLooks = activeFilter === 'All'
+    ? ALL_LOOKS
+    : ALL_LOOKS.filter((look) =>
+        look.vibe.toLowerCase().includes(activeFilter.toLowerCase()) ||
+        look.title.toLowerCase().includes(activeFilter.toLowerCase()) ||
+        look.tags.some((tag) => tag.toLowerCase().includes(activeFilter.toLowerCase())),
+      );
 
   return (
-    <PlaceholderScreen
-      eyebrow="Discover"
-      title="Style"
-      accent="library"
-      description="Editorial outfit directions built from renderable Sylistly catalog products."
-      maxWidthClassName="max-w-[680px]"
-    >
-      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
-        <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-            <Sparkles size={18} />
-          </div>
+    <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
+      <div className="flex-1 overflow-y-auto pb-6 pt-[calc(env(safe-area-inset-top)+16px)]">
+
+        {/* Page header */}
+        <div className="flex items-center justify-between px-4 pb-4">
           <div>
-            <div className="text-[11px] uppercase tracking-[.18em] text-muted">Style library</div>
-            <h2 className="mt-1 font-serif text-[22px] font-semibold text-[#fff5ee]">Editorial outfit previews</h2>
+            <div className="text-[9px] uppercase tracking-[.2em] text-accent">Discover</div>
+            <h1 className="mt-0.5 font-serif text-[30px] font-semibold leading-none text-ink">
+              Style <em className="italic text-accent">library</em>
+            </h1>
+            <p className="mt-1 text-[11px] text-muted">{filteredLooks.length} editorial look{filteredLooks.length !== 1 ? 's' : ''}</p>
+          </div>
+          <div className="grid h-12 w-12 place-items-center rounded-[18px] bg-accent/10 text-accent">
+            <Compass size={20} />
           </div>
         </div>
 
-        <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-8">
-          {looks.map((look) => (
-            <DiscoverLookCard key={look.id} look={look} />
+        {/* Vibe filter chips */}
+        <div className="flex gap-2 overflow-x-auto px-4 pb-4 scrollbar-hide">
+          {VIBE_FILTERS.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setActiveFilter(filter)}
+              className={`flex-none rounded-full px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.1em] transition ${
+                activeFilter === filter
+                  ? 'bg-accent text-white shadow-pink-glow'
+                  : 'border border-white/10 bg-white/[0.04] text-muted-2 hover:border-accent/50 hover:text-ink'
+              }`}
+            >
+              {filter}
+            </button>
           ))}
         </div>
-      </section>
-    </PlaceholderScreen>
+
+        {/* Looks list */}
+        {filteredLooks.length > 0 ? (
+          <div className="flex flex-col gap-6 px-4">
+            {filteredLooks.map((look) => (
+              <DiscoverLookCard key={look.id} look={look} />
+            ))}
+          </div>
+        ) : (
+          <div className="mx-4 mt-6 rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#161412_0%,#0d0c0b_100%)] p-7 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-[20px] bg-accent/12 text-accent">
+              <Compass size={22} />
+            </div>
+            <h2 className="mt-4 font-serif text-[22px] font-semibold text-ink">No looks for this vibe</h2>
+            <p className="mt-2 text-[13px] leading-relaxed text-muted-2">Try another filter or browse all looks.</p>
+            <button
+              onClick={() => setActiveFilter('All')}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow"
+            >
+              Show all
+            </button>
+          </div>
+        )}
+      </div>
+
+      <BottomNav />
+    </main>
   );
 }

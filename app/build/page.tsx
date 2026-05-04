@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -131,16 +131,17 @@ const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag',
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
 const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
-const BUILD_SECTION_TABS = ['build', 'refine', 'details'] as const;
+const BUILD_SECTION_TABS = ['build', 'generate', 'refine', 'details'] as const;
 type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
 
 const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
   build: 'Build',
+  generate: 'Generate',
   refine: 'Refine',
   details: 'Details',
 };
 
-const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
+const BUILD_OVERLAY_TABS = ['generate', 'refine', 'details'] as const;
 
 function recordBuilderPreferenceEvent(
   kind: BuilderPreferenceKind,
@@ -1208,13 +1209,159 @@ function BuilderPageContent({
         </div>
       </div>
 
+      {/* Sticky generate bar */}
+      <div className="flex items-center gap-2.5 border-t border-white/8 bg-[#0c0b0a]/92 px-4 py-3 backdrop-blur-sm">
+        <button
+          type="button"
+          onClick={() => setActiveBuildOverlay('generate')}
+          aria-label="Generator settings"
+          className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border transition ${
+            activeBuildOverlay === 'generate'
+              ? 'border-accent bg-accent/15 text-accent'
+              : 'border-white/15 bg-white/[0.05] text-muted-2 hover:border-accent hover:text-ink'
+          }`}
+        >
+          <SlidersHorizontal size={15} />
+        </button>
+        <button
+          type="button"
+          onClick={() => void generateLook('starter')}
+          disabled={generatorLoading}
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-3 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+        >
+          {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+          {generatorLoading ? 'Generating...' : `Generate ${activeVibe.label}`}
+        </button>
+      </div>
+
       {activeBuildOverlay ? (
         <BuildOverlay
           activeTab={activeBuildOverlay}
           onChangeTab={setActiveBuildOverlay}
           onClose={() => setActiveBuildOverlay(null)}
         >
-          {activeBuildOverlay === 'refine' ? (
+          {activeBuildOverlay === 'generate' ? (
+            <div className="flex flex-col gap-3">
+              {/* Vibe selection */}
+              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-4">
+                <div className="text-[10px] uppercase tracking-[.18em] text-muted">Vibe</div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {VIBES.map((vibe) => (
+                    <button
+                      key={vibe.id}
+                      type="button"
+                      onClick={() => setSelectedVibe(vibe.id)}
+                      className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition ${
+                        selectedVibe === vibe.id
+                          ? 'bg-accent text-white shadow-pink-glow'
+                          : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
+                      }`}
+                    >
+                      {vibe.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {[
+                      { value: 'any', label: 'Any' },
+                      { value: 'under100', label: '< $100' },
+                      { value: 'under250', label: '< $250' },
+                      { value: 'under500', label: '< $500' },
+                      { value: 'custom', label: 'Custom' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+                          generatorBudget === option.value
+                            ? 'bg-white text-black'
+                            : 'border border-hairline bg-surface-2 text-muted'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {generatorBudget === 'custom' && (
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="text-[10px] uppercase tracking-[.14em] text-muted">Max price</div>
+                    <label className="flex items-center gap-2 rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink">
+                      <span className="text-muted">$</span>
+                      <input
+                        value={customBudgetInput}
+                        onChange={(event) => {
+                          setGeneratorBudget('custom');
+                          setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
+                        }}
+                        inputMode="numeric"
+                        placeholder="180"
+                        className="w-16 bg-transparent text-right outline-none"
+                      />
+                    </label>
+                  </div>
+                )}
+
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
+                  <div className="flex gap-2">
+                    {[
+                      { value: 'masc', label: 'Male' },
+                      { value: 'fem', label: 'Female' },
+                      { value: 'androgynous', label: 'Neutral' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+                          generatorFrame === option.value
+                            ? 'bg-white text-black'
+                            : 'border border-hairline bg-surface-2 text-muted'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Generate CTAs */}
+              <button
+                type="button"
+                onClick={() => { void generateLook('starter'); setActiveBuildOverlay(null); }}
+                disabled={generatorLoading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+              >
+                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                Generate {activeVibe.label} look
+              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => { void generateLook('missing'); setActiveBuildOverlay(null); }}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-accent/70 px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
+                >
+                  Fill missing
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { void generateLook('refresh'); setActiveBuildOverlay(null); }}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                >
+                  Refresh look
+                </button>
+              </div>
+            </div>
+          ) : activeBuildOverlay === 'refine' ? (
             <div className="flex flex-col gap-3">
               <FocusedRefinePanel
                 items={renderItems}
@@ -1527,7 +1674,7 @@ function BuildOverlay({
               x
             </button>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {BUILD_OVERLAY_TABS.map((tab) => (
               <button
                 key={tab}

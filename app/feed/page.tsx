@@ -60,8 +60,8 @@ export default function FitFeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 3),
-    [posts, activeFilter, failedImageIds],
+    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 3),
+    [posts, activeFilter],
   );
 
   useEffect(() => {

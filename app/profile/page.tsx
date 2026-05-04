@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, UserPlus, WandSparkles, X } from 'lucide-react';
+import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, Shirt, Trash2, UserPlus, WandSparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -13,6 +13,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
@@ -23,6 +24,8 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPES)[number], string> = {
   androgynous: 'Neutral',
   custom: 'Custom',
 };
+
+type ProfileTab = 'outfits' | 'wardrobe' | 'style';
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
@@ -50,7 +53,10 @@ export default function ProfilePage() {
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
   const replaceItems = useFit((state) => state.replaceItems);
+  const ownedItems = useWardrobe((state) => state.ownedItems);
+  const removeWardrobeItem = useWardrobe((state) => state.removeItem);
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<ProfileTab>('outfits');
   const [activePost, setActivePost] = useState<FeedPost | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Style profile');
@@ -87,10 +93,18 @@ export default function ProfilePage() {
     setCheckoutProducts(products);
   }
 
+  const tabs: { id: ProfileTab; label: string }[] = [
+    { id: 'outfits', label: 'Outfits' },
+    { id: 'wardrobe', label: 'Wardrobe' },
+    { id: 'style', label: 'Style DNA' },
+  ];
+
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
-      <div className="flex-1 overflow-y-auto px-4 pb-7 pt-10">
-        <section className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.16),transparent_32%),linear-gradient(180deg,#191513_0%,#0f0e0d_100%)] p-4 shadow-[0_28px_64px_rgba(0,0,0,.42)]">
+      <div className="flex-1 overflow-y-auto pb-7 pt-[calc(env(safe-area-inset-top)+16px)]">
+
+        {/* Profile header card */}
+        <section className="mx-4 rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.16),transparent_32%),linear-gradient(180deg,#191513_0%,#0f0e0d_100%)] p-4 shadow-[0_28px_64px_rgba(0,0,0,.42)]">
           <div className="flex items-start gap-4">
             <div className="grid h-[82px] w-[82px] shrink-0 place-items-center rounded-[28px] border border-accent/35 bg-accent text-[32px] font-black text-white shadow-pink-glow">
               S
@@ -117,7 +131,7 @@ export default function ProfilePage() {
               ['Posts', userPosts.length],
               ['Saved', savedCount],
               ['Likes', likedCount],
-              ['Remixes', remixCount],
+              ['Wardrobe', ownedItems.length],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
                 <div className="font-serif text-[20px] font-semibold text-ink">{value}</div>
@@ -147,138 +161,226 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="mt-5">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="text-[9px] uppercase tracking-[.18em] text-accent">Posted fits</div>
-              <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Outfit grid</h2>
-            </div>
-            {!userPosts.length ? (
-              <p className="max-w-[18ch] text-right text-[10px] leading-snug text-muted">Post from Builder to replace this inspo grid.</p>
-            ) : null}
-          </div>
+        {/* Tab bar */}
+        <div className="mt-5 flex gap-1 px-4">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 rounded-full py-2.5 text-[11px] font-semibold uppercase tracking-[.1em] transition ${
+                activeTab === tab.id
+                  ? 'bg-accent text-white shadow-pink-glow'
+                  : 'border border-white/10 bg-white/[0.04] text-muted-2'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {gridPosts.map((post) => {
-              const products = postProducts(post, failedImageIds);
-              return (
-                <button
-                  key={post.id}
-                  type="button"
-                  onClick={() => setActivePost(post)}
-                  className="group overflow-hidden rounded-[24px] border border-white/10 bg-[#151311] text-left shadow-[0_18px_38px_rgba(0,0,0,.32)]"
-                >
-                  <div className="m-2 grid h-[190px] grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
-                    {products.slice(0, 5).map((product, index) => (
-                      <div key={`${post.id}-${product.id}`} className={`overflow-hidden rounded-[12px] bg-white/80 ${index === 0 ? 'row-span-2' : ''}`}>
-                        <ProductImage
-                          product={product}
-                          wrapperClassName="h-full w-full"
-                          className="h-full w-full object-contain p-1.5"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="px-3 pb-3">
-                    <h3 className="line-clamp-1 font-serif text-[18px] font-semibold text-ink">{post.title}</h3>
-                    <div className="mt-1 flex items-center gap-2 text-[10px] text-muted">
-                      <span>{post.vibe}</span>
-                      <span>{formatPrice(post.totalCents)}</span>
+        {/* Tab: Outfits */}
+        {activeTab === 'outfits' && (
+          <section className="mt-5 px-4">
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <div className="text-[9px] uppercase tracking-[.18em] text-accent">Posted fits</div>
+                <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Outfit grid</h2>
+              </div>
+              {!userPosts.length ? (
+                <p className="max-w-[18ch] text-right text-[10px] leading-snug text-muted">Post from Builder to replace this inspo grid.</p>
+              ) : null}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {gridPosts.map((post) => {
+                const products = postProducts(post, failedImageIds);
+                return (
+                  <button
+                    key={post.id}
+                    type="button"
+                    onClick={() => setActivePost(post)}
+                    className="group overflow-hidden rounded-[24px] border border-white/10 bg-[#151311] text-left shadow-[0_18px_38px_rgba(0,0,0,.32)]"
+                  >
+                    <div className="m-2 grid h-[190px] grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
+                      {products.slice(0, 5).map((product, index) => (
+                        <div key={`${post.id}-${product.id}`} className={`overflow-hidden rounded-[12px] bg-white/80 ${index === 0 ? 'row-span-2' : ''}`}>
+                          <ProductImage
+                            product={product}
+                            wrapperClassName="h-full w-full"
+                            className="h-full w-full object-contain p-1.5"
+                            onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                    <div className="px-3 pb-3">
+                      <h3 className="line-clamp-1 font-serif text-[18px] font-semibold text-ink">{post.title}</h3>
+                      <div className="mt-1 flex items-center gap-2 text-[10px] text-muted">
+                        <span>{post.vibe}</span>
+                        <span>{formatPrice(post.totalCents)}</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Tab: Wardrobe */}
+        {activeTab === 'wardrobe' && (
+          <section className="mt-5 px-4">
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <div className="text-[9px] uppercase tracking-[.18em] text-accent">Your clothes</div>
+                <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Wardrobe</h2>
+              </div>
+              {ownedItems.length > 0 && (
+                <p className="text-[10px] text-muted">{ownedItems.length} piece{ownedItems.length !== 1 ? 's' : ''}</p>
+              )}
+            </div>
+
+            {ownedItems.length === 0 ? (
+              <div className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(232,54,93,.1),transparent_38%),linear-gradient(180deg,#161412_0%,#0d0c0b_100%)] p-7 text-center shadow-[0_24px_60px_rgba(0,0,0,.35)]">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-[20px] bg-accent/12 text-accent">
+                  <Shirt size={22} />
+                </div>
+                <h2 className="mt-4 font-serif text-[22px] font-semibold text-ink">No pieces yet</h2>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
+                  Mark items as owned in the Builder or Discover to track your wardrobe.
+                </p>
+                <button
+                  onClick={() => router.push('/discover')}
+                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow"
+                >
+                  Browse Discover
                 </button>
-              );
-            })}
-          </div>
-        </section>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2.5">
+                {ownedItems.map((item) => (
+                  <div
+                    key={item.productId}
+                    className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[#151311]"
+                  >
+                    <div className="aspect-square overflow-hidden rounded-[16px] m-1.5 border border-[#eadfd5] bg-[#fff8f2]">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="h-full w-full object-contain p-2"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    </div>
+                    <div className="px-2 pb-2.5">
+                      <p className="line-clamp-1 text-[10px] font-semibold text-ink">{item.brand}</p>
+                      <p className="line-clamp-1 text-[9px] text-muted">{item.name}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeWardrobeItem(item.productId)}
+                      aria-label="Remove from wardrobe"
+                      className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-rose-400/70 opacity-0 transition group-hover:opacity-100 group-active:opacity-100"
+                    >
+                      <Trash2 size={10} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
-        <section className="mt-5 rounded-[28px] border border-white/10 bg-surface-1 p-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-accent/10 text-accent">
-              <WandSparkles size={17} />
+        {/* Tab: Style DNA */}
+        {activeTab === 'style' && (
+          <section className="mt-5 mx-4 rounded-[28px] border border-white/10 bg-surface-1 p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-accent/10 text-accent">
+                <WandSparkles size={17} />
+              </div>
+              <div>
+                <h2 className="font-serif text-[20px] font-semibold text-ink">Style DNA</h2>
+                <p className="mt-1 text-[12px] text-muted-2">Tunes Builder generation.</p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-serif text-[20px] font-semibold text-ink">Style DNA</h2>
-              <p className="mt-1 text-[12px] text-muted-2">Preferences still tune Builder generation locally.</p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {BUDGETS.map((budget) => (
+                <button
+                  key={budget}
+                  type="button"
+                  onClick={() => setBudget(budget)}
+                  className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.12em] ${
+                    profile.stylePrefs.budget === budget
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-hairline bg-surface-2 text-muted-2'
+                  }`}
+                >
+                  {budget}
+                </button>
+              ))}
             </div>
-          </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {BUDGETS.map((budget) => (
-              <button
-                key={budget}
-                type="button"
-                onClick={() => setBudget(budget)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.12em] ${
-                  profile.stylePrefs.budget === budget
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-hairline bg-surface-2 text-muted-2'
-                }`}
-              >
-                {budget}
-              </button>
-            ))}
-          </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {BODY_TYPES.map((bodyType) => (
+                <button
+                  key={bodyType}
+                  type="button"
+                  onClick={() => setBodyType(bodyType)}
+                  className={`rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[.14em] ${
+                    profile.bodyType === bodyType
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-hairline bg-surface-2 text-muted-2'
+                  }`}
+                >
+                  {BODY_TYPE_LABELS[bodyType]}
+                </button>
+              ))}
+            </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {BODY_TYPES.map((bodyType) => (
-              <button
-                key={bodyType}
-                type="button"
-                onClick={() => setBodyType(bodyType)}
-                className={`rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[.14em] ${
-                  profile.bodyType === bodyType
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-hairline bg-surface-2 text-muted-2'
-                }`}
-              >
-                {BODY_TYPE_LABELS[bodyType]}
-              </button>
-            ))}
-          </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {SKIN_TONES.map((tone) => (
+                <button
+                  key={tone}
+                  type="button"
+                  aria-label={`Select skin tone ${tone}`}
+                  onClick={() => setSkinTone(tone)}
+                  className={`h-9 w-9 rounded-full border-2 transition ${profile.skinTone === tone ? 'scale-105 border-white' : 'border-transparent'}`}
+                  style={{ backgroundColor: tone }}
+                />
+              ))}
+            </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            {SKIN_TONES.map((tone) => (
-              <button
-                key={tone}
-                type="button"
-                aria-label={`Select skin tone ${tone}`}
-                onClick={() => setSkinTone(tone)}
-                className={`h-9 w-9 rounded-full border-2 transition ${profile.skinTone === tone ? 'scale-105 border-white' : 'border-transparent'}`}
-                style={{ backgroundColor: tone }}
-              />
-            ))}
-          </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <label className="text-[11px] text-muted-2">
+                Top
+                <input value={profile.sizes.top || ''} onChange={(event) => setTopSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="M" />
+              </label>
+              <label className="text-[11px] text-muted-2">
+                Waist
+                <input value={profile.sizes.bottom?.waist?.toString() || ''} onChange={(event) => setBottomSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="30" />
+              </label>
+              <label className="text-[11px] text-muted-2">
+                Shoe
+                <input value={profile.sizes.shoe || ''} onChange={(event) => setShoeSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="9" />
+              </label>
+            </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <label className="text-[11px] text-muted-2">
-              Top
-              <input value={profile.sizes.top || ''} onChange={(event) => setTopSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="M" />
+            <label className="mt-4 block text-[11px] text-muted-2">
+              Vibes
+              <input value={(profile.stylePrefs.vibes || []).join(', ')} onChange={(event) => setVibesFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="clean girl, streetwear, date night" />
             </label>
-            <label className="text-[11px] text-muted-2">
-              Waist
-              <input value={profile.sizes.bottom?.waist?.toString() || ''} onChange={(event) => setBottomSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="30" />
+            <label className="mt-3 block text-[11px] text-muted-2">
+              Favorite brands
+              <input value={(profile.stylePrefs.brands || []).join(', ')} onChange={(event) => setBrandsFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="Skims, Nike, Zara" />
             </label>
-            <label className="text-[11px] text-muted-2">
-              Shoe
-              <input value={profile.sizes.shoe || ''} onChange={(event) => setShoeSize(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="9" />
-            </label>
-          </div>
-
-          <label className="mt-4 block text-[11px] text-muted-2">
-            Vibes
-            <input value={(profile.stylePrefs.vibes || []).join(', ')} onChange={(event) => setVibesFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="clean girl, streetwear, date night" />
-          </label>
-          <label className="mt-3 block text-[11px] text-muted-2">
-            Favorite brands
-            <input value={(profile.stylePrefs.brands || []).join(', ')} onChange={(event) => setBrandsFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="Skims, Nike, Zara" />
-          </label>
-        </section>
+          </section>
+        )}
       </div>
 
       <BottomNav />
 
+      {/* Post detail modal */}
       {activePost ? (
         <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/70 backdrop-blur-sm">
           <button className="absolute inset-0" aria-label="Close post" onClick={() => setActivePost(null)} />
