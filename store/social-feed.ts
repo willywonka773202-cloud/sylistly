@@ -5,6 +5,8 @@ import { sortFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 
+const FEED_POST_LIMIT = 360;
+
 export interface FeedComment {
   id: string;
   user: string;
@@ -207,9 +209,14 @@ function postSignature(items: Partial<Record<Category, Product>>): string {
 function recentProductIds(posts: FeedPost[]): string[] {
   return Array.from(new Set(
     posts
-      .slice(0, 20)
+      .slice(-28)
       .flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product)).map((product) => product.id)),
   )).slice(0, 90);
+}
+
+function capFeedPosts(posts: FeedPost[], limit = FEED_POST_LIMIT): FeedPost[] {
+  if (posts.length <= limit) return posts;
+  return posts.slice(posts.length - limit);
 }
 
 function normalizeFeedPost(post: FeedPost): FeedPost | null {
@@ -278,7 +285,7 @@ export const useSocialFeed = create<SocialFeedState>()(
             .filter((post): post is FeedPost => Boolean(post));
           const generated = generateFeedBatch(cleanExisting, state.generationCursor || 0, count);
           return {
-            posts: [...cleanExisting, ...generated.posts].slice(0, 140),
+            posts: capFeedPosts([...cleanExisting, ...generated.posts]),
             generationCursor: generated.cursor,
           };
         }),
@@ -306,7 +313,7 @@ export const useSocialFeed = create<SocialFeedState>()(
           saved: false,
           comments: [],
         };
-        set((state) => ({ posts: [post, ...state.posts].slice(0, 140) }));
+        set((state) => ({ posts: [post, ...state.posts].slice(0, FEED_POST_LIMIT) }));
         return post;
       },
       toggleLike: (id) =>
