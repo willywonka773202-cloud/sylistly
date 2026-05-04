@@ -1,5 +1,5 @@
 'use client';
-import { Bookmark, Plus, RotateCcw, Send, ShoppingBag, Trash2, X } from 'lucide-react';
+import { Bookmark, Plus, RotateCcw, Send, ShoppingBag, Sparkles, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
@@ -153,6 +153,11 @@ export default function SavedPage() {
             setSelectedFit(null);
             router.push('/build');
           }}
+          onTryOn={() => {
+            replaceItems(selectedFit.items);
+            setSelectedFit(null);
+            router.push('/try-on');
+          }}
           onShop={() => openShop(selectedFit)}
           onPost={() => {
             postFit(selectedFit.items, { title: selectedFit.title, vibe: 'Saved' });
@@ -181,6 +186,7 @@ function FitDetailModal({
   onImageUnavailable,
   onClose,
   onLoadInBuilder,
+  onTryOn,
   onShop,
   onPost,
   onDelete,
@@ -190,6 +196,7 @@ function FitDetailModal({
   onImageUnavailable: (id: string) => void;
   onClose: () => void;
   onLoadInBuilder: () => void;
+  onTryOn: () => void;
   onShop: () => void;
   onPost: () => void;
   onDelete: () => void;
@@ -263,17 +270,24 @@ function FitDetailModal({
         </div>
 
         {/* Secondary actions */}
-        <div className="mt-2 grid grid-cols-[1fr_.55fr] gap-2">
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          <button
+            onClick={onTryOn}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+          >
+            <Sparkles size={12} />
+            Try on
+          </button>
           <button
             onClick={onPost}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
           >
             <Send size={12} />
-            Post to feed
+            Post
           </button>
           <button
             onClick={onDelete}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-rose-400/65 transition hover:border-rose-400/45 hover:text-rose-300"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[.12em] text-rose-400/65 transition hover:border-rose-400/45 hover:text-rose-300"
           >
             <Trash2 size={12} />
             Delete

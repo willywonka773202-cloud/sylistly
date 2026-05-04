@@ -5,6 +5,7 @@ import { ArrowRight, Bookmark, Check, Plus, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductImage } from '@/components/ProductImage';
 import { useFit } from '@/store/fit';
+import { useSavedFits } from '@/store/saved-fits';
 import { useWardrobe } from '@/store/wardrobe';
 import { isRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -93,11 +94,13 @@ function ProductFallbackHero({ products }: { products: Product[] }) {
 export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
   const router = useRouter();
   const replaceItems = useFit((state) => state.replaceItems);
+  const saveFit = useSavedFits((state) => state.saveFit);
   const addToWardrobe = useWardrobe((state) => state.addItem);
   const removeFromWardrobe = useWardrobe((state) => state.removeItem);
   const isOwned = useWardrobe((state) => state.hasItem);
   const [heroFailed, setHeroFailed] = useState(false);
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const [bookmarked, setBookmarked] = useState(false);
   const showHeroImage = Boolean(
     look.previewImageStatus === 'ready'
     && look.previewImageUrl
@@ -194,9 +197,17 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
           <button
             type="button"
             aria-label={`Bookmark ${look.title}`}
-            className="grid h-12 w-12 flex-none place-items-center rounded-full border border-white/10 bg-white/[0.03] text-[#eadbd2] transition hover:border-accent hover:text-accent"
+            onClick={() => {
+              saveFit(productsToItems(look.products));
+              setBookmarked(true);
+            }}
+            className={`grid h-12 w-12 flex-none place-items-center rounded-full border transition ${
+              bookmarked
+                ? 'border-accent bg-accent/15 text-accent'
+                : 'border-white/10 bg-white/[0.03] text-[#eadbd2] hover:border-accent hover:text-accent'
+            }`}
           >
-            <Bookmark size={17} />
+            <Bookmark size={17} fill={bookmarked ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>

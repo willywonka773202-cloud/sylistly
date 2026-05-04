@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bookmark, Check, Heart, MessageCircle, Plus, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -11,8 +11,10 @@ import { getProductOutboundUrl } from '@/lib/product-links';
 import { filterFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
+import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 
 const FILTERS = ['For You', 'Trending', 'Following', 'Under $100', 'Night Out', 'Streetwear', 'Clean', 'Gym'];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
@@ -41,6 +43,25 @@ function postMatches(post: FeedPost, filter: string): boolean {
   return [post.vibe, ...post.tags].some((tag) => tag.toLowerCase().includes(needle));
 }
 
+function forYouScore(
+  post: FeedPost,
+  vibes: string[],
+  frame: string,
+  budget: string | undefined,
+): number {
+  let score = post.likeCount / 100;
+  const postText = [post.vibe, post.title, ...post.tags].join(' ').toLowerCase();
+  for (const vibe of vibes) {
+    if (postText.includes(vibe.toLowerCase())) score += 8;
+  }
+  if (post.frameBias && post.frameBias !== 'any' && post.frameBias === frame) score += 5;
+  if (post.frameBias === 'any' || !post.frameBias) score += 2;
+  if (budget === 'low' && post.totalCents / Math.max(1, post.itemCount) <= 8000) score += 4;
+  if (budget === 'mid' && post.totalCents / Math.max(1, post.itemCount) <= 25000) score += 3;
+  if (budget === 'luxury' && post.totalCents / Math.max(1, post.itemCount) > 30000) score += 4;
+  return score;
+}
+
 export default function FitFeedPage() {
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
@@ -50,6 +71,10 @@ export default function FitFeedPage() {
   const replaceItems = useFit((state) => state.replaceItems);
   const saveFit = useSavedFits((state) => state.saveFit);
   const router = useRouter();
+  const profile = useProfile((state) => state.profile);
+  const addToWardrobe = useWardrobe((state) => state.addItem);
+  const removeFromWardrobe = useWardrobe((state) => state.removeItem);
+  const isItemOwned = useWardrobe((state) => state.hasItem);
   const [activeFilter, setActiveFilter] = useState('For You');
   const [commentPost, setCommentPost] = useState<FeedPost | null>(null);
   const [commentText, setCommentText] = useState('');
@@ -59,10 +84,16 @@ export default function FitFeedPage() {
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const filteredPosts = useMemo(
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 3),
-    [posts, activeFilter],
-  );
+  const profileVibes = profile.stylePrefs.vibes || [];
+  const profileFrame = profile.bodyType === 'custom' ? 'androgynous' : profile.bodyType;
+  const profileBudget = profile.stylePrefs.budget;
+  const filteredPosts = useMemo(() => {
+    const matching = posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 3);
+    if (activeFilter !== 'For You') return matching;
+    return [...matching].sort(
+      (a, b) => forYouScore(b, profileVibes, profileFrame, profileBudget) - forYouScore(a, profileVibes, profileFrame, profileBudget),
+    );
+  }, [posts, activeFilter, profileVibes, profileFrame, profileBudget]);
 
   useEffect(() => {
     if (posts.length < 24) generateMorePosts(18);
@@ -232,25 +263,41 @@ export default function FitFeedPage() {
                   </div>
 
                   <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                    {products.slice(0, 6).map((product) => (
-                      <button
-                        key={`${post.id}-tray-${product.id}`}
-                        type="button"
-                        onClick={() => shop(post)}
-                        className="group relative h-[72px] w-[62px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)]"
-                        aria-label={`Shop ${product.brand} ${product.name}`}
-                      >
-                        <ProductImage
-                          product={product}
-                          wrapperClassName="h-full w-full"
-                          className="h-full w-full object-contain p-1.5 transition group-active:scale-95"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
-                        />
-                        <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
-                          {product.category}
+                    {products.slice(0, 6).map((product) => {
+                      const owned = isItemOwned(product.id);
+                      return (
+                        <div key={`${post.id}-tray-${product.id}`} className="relative flex-none">
+                          <button
+                            type="button"
+                            onClick={() => shop(post)}
+                            className="group h-[72px] w-[62px] overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)]"
+                            aria-label={`Shop ${product.brand} ${product.name}`}
+                          >
+                            <ProductImage
+                              product={product}
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-contain p-1.5 transition group-active:scale-95"
+                              onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
+                            />
+                            <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
+                              {product.category}
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => owned ? removeFromWardrobe(product.id) : addToWardrobe(product)}
+                            aria-label={owned ? 'Remove from wardrobe' : 'Add to wardrobe'}
+                            className={`absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full border text-[8px] transition ${
+                              owned
+                                ? 'border-emerald-400/50 bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,.4)]'
+                                : 'border-white/20 bg-[#1a1614] text-muted-2 hover:border-accent hover:text-accent'
+                            }`}
+                          >
+                            {owned ? <Check size={9} strokeWidth={3} /> : <Plus size={9} strokeWidth={3} />}
+                          </button>
                         </div>
-                      </button>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="mt-4 grid grid-cols-[1fr_.78fr] gap-2">

@@ -1,9 +1,10 @@
 'use client';
 
 import { Compass } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
+import { useProfile } from '@/store/profile';
 import {
   ALL_CATALOG_PRODUCTS,
   getCollectionProducts,
@@ -193,15 +194,28 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
 const ALL_LOOKS = buildDiscoverLooks();
 
 export default function DiscoverPage() {
+  const profile = useProfile((state) => state.profile);
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filteredLooks = activeFilter === 'All'
-    ? ALL_LOOKS
-    : ALL_LOOKS.filter((look) =>
-        look.vibe.toLowerCase().includes(activeFilter.toLowerCase()) ||
-        look.title.toLowerCase().includes(activeFilter.toLowerCase()) ||
-        look.tags.some((tag) => tag.toLowerCase().includes(activeFilter.toLowerCase())),
-      );
+  const profileFrame = profile.bodyType === 'custom' ? 'androgynous' : profile.bodyType;
+  const profileVibes = profile.stylePrefs.vibes || [];
+
+  const filteredLooks = useMemo(() => {
+    const base = activeFilter === 'All'
+      ? ALL_LOOKS
+      : ALL_LOOKS.filter((look) =>
+          look.vibe.toLowerCase().includes(activeFilter.toLowerCase()) ||
+          look.title.toLowerCase().includes(activeFilter.toLowerCase()) ||
+          look.tags.some((tag) => tag.toLowerCase().includes(activeFilter.toLowerCase())),
+        );
+    return [...base].sort((a, b) => {
+      const aVibeMatch = profileVibes.some((v) => a.vibe.toLowerCase().includes(v.toLowerCase()) || a.tags.some((t) => t.toLowerCase().includes(v.toLowerCase()))) ? 10 : 0;
+      const bVibeMatch = profileVibes.some((v) => b.vibe.toLowerCase().includes(v.toLowerCase()) || b.tags.some((t) => t.toLowerCase().includes(v.toLowerCase()))) ? 10 : 0;
+      const aFrameMatch = a.frameBias === 'all' || a.frameBias === profileFrame ? 5 : 0;
+      const bFrameMatch = b.frameBias === 'all' || b.frameBias === profileFrame ? 5 : 0;
+      return (bVibeMatch + bFrameMatch) - (aVibeMatch + aFrameMatch);
+    });
+  }, [activeFilter, profileFrame, profileVibes]);
 
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">

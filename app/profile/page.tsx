@@ -305,8 +305,8 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="px-2 pb-2.5">
+                      <div className="text-[8px] uppercase tracking-[.1em] text-accent mb-0.5">{item.category}</div>
                       <p className="line-clamp-1 text-[10px] font-semibold text-ink">{item.brand}</p>
-                      <p className="line-clamp-1 text-[9px] text-muted">{item.name}</p>
                     </div>
                     <button
                       type="button"

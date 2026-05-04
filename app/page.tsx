@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
 import { useFit } from '@/store/fit';
+import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { useWardrobe } from '@/store/wardrobe';
@@ -17,10 +18,14 @@ function formatPrice(cents: number): string {
 
 export default function HomePage() {
   const router = useRouter();
+  const profile = useProfile((state) => state.profile);
   const savedFits = useSavedFits((state) => state.fits);
   const posts = useSocialFeed((state) => state.posts);
   const ownedItems = useWardrobe((state) => state.ownedItems);
   const replaceItems = useFit((state) => state.replaceItems);
+
+  const profileFrame = profile.bodyType === 'custom' ? 'androgynous' : profile.bodyType;
+  const profileVibes = profile.stylePrefs.vibes || [];
 
   const recentFits = savedFits.slice(0, 6);
   const recentWardrobe = ownedItems.slice(0, 8);
@@ -28,7 +33,15 @@ export default function HomePage() {
     .filter((post) => filterFeedRenderableProducts(
       Object.values(post.items).filter((p): p is Product => Boolean(p)),
     ).length >= 3)
-    .sort((a, b) => b.likeCount - a.likeCount)
+    .sort((a, b) => {
+      const aText = [a.vibe, a.title, ...a.tags].join(' ').toLowerCase();
+      const bText = [b.vibe, b.title, ...b.tags].join(' ').toLowerCase();
+      const aVibeMatch = profileVibes.some((v) => aText.includes(v.toLowerCase())) ? 12 : 0;
+      const bVibeMatch = profileVibes.some((v) => bText.includes(v.toLowerCase())) ? 12 : 0;
+      const aFrameMatch = !a.frameBias || a.frameBias === 'any' || a.frameBias === profileFrame ? 6 : 0;
+      const bFrameMatch = !b.frameBias || b.frameBias === 'any' || b.frameBias === profileFrame ? 6 : 0;
+      return (b.likeCount + bVibeMatch + bFrameMatch) - (a.likeCount + aVibeMatch + aFrameMatch);
+    })
     .slice(0, 4);
 
   const hasContent = recentFits.length > 0 || recentWardrobe.length > 0;
@@ -60,6 +73,7 @@ export default function HomePage() {
             { label: 'Fit Feed', sub: 'Swipe looks', icon: Flame, href: '/feed', accent: true },
             { label: 'Builder', sub: 'Create outfit', icon: Sparkles, href: '/build', accent: false },
             { label: 'Discover', sub: 'Style library', icon: Bookmark, href: '/discover', accent: false },
+            { label: 'Try On', sub: 'Preview fit', icon: Shirt, href: '/try-on', accent: false },
           ].map(({ label, sub, icon: Icon, href, accent }) => (
             <button
               key={href}

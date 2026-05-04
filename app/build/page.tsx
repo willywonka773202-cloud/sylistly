@@ -855,32 +855,53 @@ function BuilderPageContent({
 
   return (
     <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
-      <header className="flex items-center justify-between px-4 pb-2.5 pt-10">
+      <header className="flex items-center justify-between gap-2 px-4 pb-2 pt-10">
         <button
           type="button"
           onClick={() => router.back()}
-          className="grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
           aria-label="Back"
         >
           <ArrowUpRight size={15} className="rotate-[225deg]" />
         </button>
-        <div className="text-center">
+        <div className="min-w-0 flex-1 text-center">
           <div className="font-serif text-[18px] font-semibold leading-none text-ink">
             Sylistly <em className="italic text-accent">Builder</em>
           </div>
-          <div className="mt-1 text-[9px] font-semibold uppercase tracking-[.16em] text-muted">
-            Build. Refine. Wear.
-          </div>
+          {renderN > 0 ? (
+            <div className="mt-1 flex items-center justify-center gap-2 text-[10px] text-muted-2">
+              <span className="font-semibold text-ink">{totalDisplay}</span>
+              <span className="opacity-40">·</span>
+              <span>{renderN} piece{renderN !== 1 ? 's' : ''}</span>
+              <span className="opacity-40">·</span>
+              <span className="font-semibold text-accent">{analysis.score} fit</span>
+            </div>
+          ) : (
+            <div className="mt-1 text-[9px] font-semibold uppercase tracking-[.16em] text-muted">
+              Build. Refine. Wear.
+            </div>
+          )}
         </div>
-        <button
-          onClick={saveFit}
-          disabled={renderN === 0}
-          className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold ${
-            renderN > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
-          }`}
-        >
-          <Bookmark size={12} /> Save fit
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => router.push('/try-on')}
+            disabled={renderN === 0}
+            className="grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-40"
+            aria-label="Try on"
+          >
+            <Sparkles size={14} />
+          </button>
+          <button
+            onClick={saveFit}
+            disabled={renderN === 0}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold ${
+              renderN > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
+            }`}
+          >
+            <Bookmark size={12} /> Save
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
@@ -1193,6 +1214,25 @@ function BuilderPageContent({
                   Build fuller fit
                 </button>
               </div>
+              {renderN > 0 && (
+                <div className="mt-1 rounded-[20px] border border-white/10 bg-white/[0.03] p-3">
+                  <div className="text-[9px] uppercase tracking-[.16em] text-muted mb-2">Remix this fit</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['casual', 'elevated', 'bold'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        type="button"
+                        onClick={() => void generateVariant(variant)}
+                        disabled={generatorLoading}
+                        className="flex flex-col items-center gap-1 rounded-[16px] border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center transition hover:border-accent/50 hover:bg-accent/8 disabled:opacity-40"
+                      >
+                        <span className="text-[11px] font-semibold text-ink">{VARIANT_COPY[variant].title}</span>
+                        <span className="text-[9px] text-muted-2 leading-tight">{VARIANT_COPY[variant].blurb}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
@@ -1232,28 +1272,41 @@ function BuilderPageContent({
       </div>
 
       {/* Sticky generate bar */}
-      <div className="flex items-center gap-2.5 border-t border-white/8 bg-[#0c0b0a]/92 px-4 py-3 backdrop-blur-sm">
+      <div className="flex items-center gap-2 border-t border-white/8 bg-[#0c0b0a]/92 px-3 py-2.5 backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setActiveBuildOverlay('generate')}
           aria-label="Generator settings"
-          className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border transition ${
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border transition ${
             activeBuildOverlay === 'generate'
               ? 'border-accent bg-accent/15 text-accent'
               : 'border-white/15 bg-white/[0.05] text-muted-2 hover:border-accent hover:text-ink'
           }`}
         >
-          <SlidersHorizontal size={15} />
+          <SlidersHorizontal size={14} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setBodyType(generatorFrame === 'masc' ? 'fem' : generatorFrame === 'fem' ? 'androgynous' : 'masc')}
+          aria-label={`Style frame: ${generatorFrame}`}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.05] text-[15px] text-muted-2 transition hover:border-accent hover:text-ink"
+        >
+          {generatorFrame === 'masc' ? '♂' : generatorFrame === 'fem' ? '♀' : '✦'}
         </button>
         <button
           type="button"
           onClick={() => void generateLook('starter')}
           disabled={generatorLoading}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-3 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
         >
           {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {generatorLoading ? 'Generating...' : `Generate ${activeVibe.label}`}
         </button>
+        {renderN > 0 && (
+          <div className="shrink-0 rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-2 text-center">
+            <div className="text-[11px] font-semibold text-ink leading-none">{totalDisplay}</div>
+          </div>
+        )}
       </div>
 
       {activeBuildOverlay ? (

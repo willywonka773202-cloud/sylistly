@@ -50,7 +50,7 @@ export default function OnboardingPage() {
   const ownedCount = useWardrobe((state) => state.ownedItems.length);
 
   function finish() {
-    router.replace('/feed');
+    router.replace('/');
   }
 
   const categoryProducts = SUGGESTED[activeCategory] || [];
