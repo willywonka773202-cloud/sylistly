@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '@/lib/catalog';
-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import { sortFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 
@@ -36,6 +36,8 @@ export interface FeedPost {
 
 interface SocialFeedState {
   posts: FeedPost[];
+  generationCursor: number;
+  generateMorePosts: (count?: number) => void;
   postFit: (
     items: Partial<Record<Category, Product>>,
     options?: { title?: string; vibe?: string; visibility?: 'public' | 'private' },
@@ -46,9 +48,10 @@ interface SocialFeedState {
 }
 
 function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
-  return Object.fromEntries(
-    Object.entries(items).filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1])),
-  ) as Partial<Record<Category, Product>>;
+  const products = sortFeedRenderableProducts(
+    Object.values(items).filter((product): product is Product => Boolean(product)),
+  );
+  return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
 
 function fitTotals(items: Partial<Record<Category, Product>>) {
@@ -67,7 +70,7 @@ function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Post
 }
 
 function itemsFromCollection(index: number): Partial<Record<Category, Product>> {
-  const products = getCollectionProducts(LAUNCH_COLLECTIONS[index]).filter(isHighConfidenceRenderableProduct);
+  const products = sortFeedRenderableProducts(getCollectionProducts(LAUNCH_COLLECTIONS[index]));
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
 
@@ -85,7 +88,8 @@ function seedPost(
   frameBias: FeedPost['frameBias'] = 'any',
   sourceType: FeedPost['sourceType'] = 'catalog',
 ): FeedPost {
-  const totals = fitTotals(items);
+  const sanitized = sanitizeItems(items);
+  const totals = fitTotals(sanitized);
   return {
     id,
     username,
@@ -100,7 +104,7 @@ function seedPost(
     createdAt: new Date(Date.now() - (ageIndex + 1) * 18 * 60 * 60 * 1000).toISOString(),
     totalCents: totals.totalCents,
     itemCount: totals.itemCount,
-    items,
+    items: sanitized,
     likeCount,
     liked: false,
     saved: false,
@@ -157,15 +161,20 @@ const GENERATED_POST_PLAN: Array<{
   { id: 'preppy-masc-weekend', title: 'Clubhouse weekend', caption: 'A refined weekend board with loafers, knitwear, and easy polish.', vibe: 'preppy', label: 'Preppy', frame: 'masc', budget: 'under500', seed: 902, tags: ['old money', 'preppy', 'weekend'] },
   { id: 'edgy-femme-downtown', title: 'Edgy downtown', caption: 'Dark pieces, shine, and a little bite in the accessories.', vibe: 'edgy', label: 'Edgy', frame: 'fem', budget: 'under500', seed: 1001, tags: ['edgy', 'black', 'leather'] },
   { id: 'edgy-masc-tech', title: 'Techwear utility', caption: 'Black utility pieces with technical shape and a crossbody finish.', vibe: 'edgy', label: 'Techwear', frame: 'masc', budget: 'under500', seed: 1002, tags: ['techwear', 'utility', 'black'] },
+  { id: 'clean-masc-casual', title: 'Clean casual base', caption: 'A reliable neutral formula for everyday wear with room to remix.', vibe: 'clean', label: 'Clean', frame: 'masc', budget: 'under250', seed: 1101, tags: ['clean', 'casual', 'neutral'] },
+  { id: 'street-any-black', title: 'Black street uniform', caption: 'Dark streetwear pieces with an easy sneaker finish.', vibe: 'street', label: 'Streetwear', frame: 'androgynous', budget: 'under500', seed: 1201, tags: ['streetwear', 'black', 'uniform'] },
+  { id: 'office-any-soft', title: 'Soft workday edit', caption: 'Office pieces with a smoother, less corporate read.', vibe: 'office', label: 'Office', frame: 'androgynous', budget: 'under500', seed: 1301, tags: ['office', 'workwear', 'tailored'] },
+  { id: 'night-any-luxe', title: 'Luxe monochrome', caption: 'A darker outfit board built around sleek shapes and shine.', vibe: 'night', label: 'Night out', frame: 'androgynous', budget: 'under500', seed: 1401, tags: ['luxury', 'night', 'monochrome'] },
 ];
 
-function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number]): Partial<Record<Category, Product>> {
+function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number], cursor = 0, avoidProductIds: string[] = []): Partial<Record<Category, Product>> {
   const generated = buildCatalogLook({
     vibe: plan.vibe,
     frame: plan.frame,
     budget: plan.budget,
     mode: 'full',
-    seed: plan.seed,
+    seed: plan.seed + cursor * 1_019,
+    avoidProductIds,
   }).products;
   return sanitizeItems(generated);
 }
@@ -187,14 +196,96 @@ const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
 
 const SEED_POSTS: FeedPost[] = [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4);
 
+function postSignature(items: Partial<Record<Category, Product>>): string {
+  return Object.values(items)
+    .filter((product): product is Product => Boolean(product))
+    .map((product) => product.id)
+    .sort()
+    .join('|');
+}
+
+function recentProductIds(posts: FeedPost[]): string[] {
+  return Array.from(new Set(
+    posts
+      .slice(0, 20)
+      .flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product)).map((product) => product.id)),
+  )).slice(0, 90);
+}
+
+function normalizeFeedPost(post: FeedPost): FeedPost | null {
+  const items = sanitizeItems(post.items);
+  const totals = fitTotals(items);
+  if (totals.itemCount < 3) return null;
+  return {
+    ...post,
+    items,
+    itemCount: totals.itemCount,
+    totalCents: totals.totalCents,
+  };
+}
+
+function makeGeneratedPost(plan: (typeof GENERATED_POST_PLAN)[number], cursor: number, avoidProductIds: string[]): FeedPost | null {
+  const items = itemsFromGeneratedLook(plan, cursor, avoidProductIds);
+  const totals = fitTotals(items);
+  if (totals.itemCount < 3) return null;
+  return seedPost(
+    items,
+    cursor + COLLECTION_POSTS.length,
+    `feed-${plan.id}-${cursor}`,
+    ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile', '@cityuniform', '@dailyform'][cursor % 7] || '@sylistly',
+    plan.title.slice(0, 1).toUpperCase(),
+    plan.title,
+    plan.label,
+    plan.tags,
+    Math.max(24, 330 - (cursor % 25) * 4),
+    plan.caption,
+    plan.frame,
+    'catalog',
+  );
+}
+
+function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count: number): { posts: FeedPost[]; cursor: number } {
+  const signatures = new Set(existingPosts.map((post) => postSignature(post.items)).filter(Boolean));
+  const batch: FeedPost[] = [];
+  let cursor = startCursor;
+  let attempts = 0;
+
+  while (batch.length < count && attempts < count * 6) {
+    const plan = GENERATED_POST_PLAN[cursor % GENERATED_POST_PLAN.length];
+    const avoidProductIds = recentProductIds([...batch, ...existingPosts]);
+    const post = makeGeneratedPost(plan, cursor, avoidProductIds);
+    cursor += 1;
+    attempts += 1;
+    if (!post) continue;
+    const signature = postSignature(post.items);
+    if (!signature || signatures.has(signature)) continue;
+    signatures.add(signature);
+    batch.push(post);
+  }
+
+  return { posts: batch, cursor };
+}
+
 export const useSocialFeed = create<SocialFeedState>()(
   persist(
     (set) => ({
       posts: SEED_POSTS,
+      generationCursor: GENERATED_POST_PLAN.length,
+      generateMorePosts: (count = 12) =>
+        set((state) => {
+          const cleanExisting = state.posts
+            .map(normalizeFeedPost)
+            .filter((post): post is FeedPost => Boolean(post));
+          const generated = generateFeedBatch(cleanExisting, state.generationCursor || 0, count);
+          return {
+            posts: [...cleanExisting, ...generated.posts].slice(0, 140),
+            generationCursor: generated.cursor,
+          };
+        }),
       postFit: (items, options) => {
         const selected = sanitizeItems(items);
         const totals = fitTotals(selected);
-        if (!totals.itemCount) return null;
+        if (totals.itemCount < 3) return null;
         const post: FeedPost = {
           id: `post-${Date.now()}`,
           username: '@you',
@@ -215,7 +306,7 @@ export const useSocialFeed = create<SocialFeedState>()(
           saved: false,
           comments: [],
         };
-        set((state) => ({ posts: [post, ...state.posts].slice(0, 48) }));
+        set((state) => ({ posts: [post, ...state.posts].slice(0, 140) }));
         return post;
       },
       toggleLike: (id) =>
@@ -247,7 +338,19 @@ export const useSocialFeed = create<SocialFeedState>()(
     }),
     {
       name: 'sylistly.social-feed.v1',
-      version: 2,
+      version: 3,
+      migrate: (persistedState) => {
+        const state = persistedState as Partial<SocialFeedState> | undefined;
+        const posts = (state?.posts?.length ? state.posts : SEED_POSTS)
+          .map(normalizeFeedPost)
+          .filter((post): post is FeedPost => Boolean(post));
+        const generationCursor = Number.isFinite(state?.generationCursor) ? Number(state?.generationCursor) : GENERATED_POST_PLAN.length;
+        return {
+          ...state,
+          posts: posts.length >= 8 ? posts : SEED_POSTS,
+          generationCursor,
+        } as SocialFeedState;
+      },
     },
   ),
 );

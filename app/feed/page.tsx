@@ -1,15 +1,15 @@
 'use client';
 
 import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { OutfitBoard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
-import type { Product } from '@/lib/types';
+import { filterFeedRenderableProducts } from '@/lib/product-image-quality';
+import type { Category, Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
@@ -22,10 +22,14 @@ function formatPrice(cents: number): string {
 }
 
 function visibleProducts(post: FeedPost, failedImageIds?: Set<string>): Product[] {
-  return Object.values(post.items).filter(
+  return filterFeedRenderableProducts(Object.values(post.items).filter(
     (product): product is Product =>
-      isHighConfidenceRenderableProduct(product) && !failedImageIds?.has(product.id),
-  );
+      Boolean(product) && !failedImageIds?.has(product.id),
+  ));
+}
+
+function itemsFromProducts(products: Product[]): Partial<Record<Category, Product>> {
+  return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
 
 function postMatches(post: FeedPost, filter: string): boolean {
@@ -42,6 +46,7 @@ export default function FitFeedPage() {
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
   const addComment = useSocialFeed((state) => state.addComment);
+  const generateMorePosts = useSocialFeed((state) => state.generateMorePosts);
   const replaceItems = useFit((state) => state.replaceItems);
   const saveFit = useSavedFits((state) => state.saveFit);
   const router = useRouter();
@@ -52,15 +57,39 @@ export default function FitFeedPage() {
   const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
     () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 3),
     [posts, activeFilter, failedImageIds],
   );
 
+  useEffect(() => {
+    if (posts.length < 24) generateMorePosts(18);
+  }, [generateMorePosts, posts.length]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setLoadingMore(true);
+        generateMorePosts(14);
+        window.setTimeout(() => setLoadingMore(false), 360);
+      },
+      { root: null, rootMargin: '900px 0px', threshold: 0.01 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [generateMorePosts, filteredPosts.length]);
+
   function remix(post: FeedPost) {
+    const products = visibleProducts(post, failedImageIds);
+    if (products.length < 3) return;
     setBurstPostId(post.id);
     window.setTimeout(() => {
-      replaceItems(post.items);
+      replaceItems(itemsFromProducts(products));
       router.push('/build');
     }, 180);
   }
@@ -73,7 +102,10 @@ export default function FitFeedPage() {
 
   function savePost(post: FeedPost) {
     toggleSave(post.id);
-    if (!post.saved) saveFit(post.items);
+    if (!post.saved) {
+      const products = visibleProducts(post, failedImageIds);
+      if (products.length >= 3) saveFit(itemsFromProducts(products));
+    }
   }
 
   function shop(post: FeedPost) {
@@ -132,7 +164,7 @@ export default function FitFeedPage() {
         </header>
 
         <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
-          {filteredPosts.map((post, postIndex) => {
+          {filteredPosts.map((post) => {
             const products = visibleProducts(post, failedImageIds);
             return (
               <article
@@ -148,7 +180,7 @@ export default function FitFeedPage() {
 
                 <div className="absolute inset-x-0 top-[78px] z-0 px-4">
                   <OutfitBoard
-                    items={post.items}
+                    items={itemsFromProducts(products)}
                     className="h-[min(58dvh,520px)] min-h-[390px]"
                     onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                   />
@@ -235,6 +267,12 @@ export default function FitFeedPage() {
               </article>
             );
           })}
+          <div ref={sentinelRef} className="grid min-h-[40dvh] snap-start place-items-center bg-bg px-6 pb-28 text-center">
+            <div>
+              <div className="font-serif text-[24px] text-ink">{loadingMore ? 'Loading more fits' : 'More fits are coming'}</div>
+              <p className="mt-2 text-sm text-muted-2">Keep scrolling for fresh catalog-backed outfits.</p>
+            </div>
+          </div>
         </div>
       </div>
 
