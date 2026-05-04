@@ -13,6 +13,7 @@ interface LookBody {
   seed?: number;
   avoidProductIds?: string[];
   currentItems?: Partial<Record<Category, Product>>;
+  lockedItems?: Partial<Record<Category, Product>>;
   targetSlots?: Category[];
 }
 
@@ -30,9 +31,15 @@ export async function POST(req: NextRequest) {
         ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'].includes(slot),
       )
     : undefined;
+  const lockedProductIds = new Set(
+    Object.values(body.lockedItems || {})
+      .filter((product): product is Product => Boolean(product))
+      .map((product) => product.id),
+  );
   const currentProductIds = Object.values(body.currentItems || {})
     .filter((product): product is Product => Boolean(product))
-    .map((product) => product.id);
+    .map((product) => product.id)
+    .filter((id) => !lockedProductIds.has(id));
   const avoidProductIds = Array.from(new Set([
     ...(Array.isArray(body.avoidProductIds) ? body.avoidProductIds : []),
     ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds : []),
@@ -46,6 +53,7 @@ export async function POST(req: NextRequest) {
     seed,
     avoidProductIds,
     currentItems: body.currentItems || {},
+    lockedItems: body.lockedItems || {},
     mode,
     targetSlots,
   });

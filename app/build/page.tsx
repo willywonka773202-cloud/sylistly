@@ -62,6 +62,21 @@ function defaultGenerationSlotsForVibe(vibe: VibeId): Category[] {
   return FULL_GENERATOR_SLOTS[vibe] || STARTER_GENERATOR_SLOTS[vibe] || ['top', 'bottom', 'shoes', 'bag'];
 }
 
+type BuilderPreferenceKind = 'save' | 'pass';
+
+interface BuilderPreferenceHistory {
+  events: Array<{
+    kind: BuilderPreferenceKind;
+    vibe: VibeId;
+    productIds: string[];
+    categories: Category[];
+    createdAt: number;
+  }>;
+  vibes: Partial<Record<VibeId, { saved: number; passed: number }>>;
+  categories: Partial<Record<Category, { saved: number; passed: number }>>;
+  products: Record<string, { saved: number; passed: number }>;
+}
+
 const FIT_VARIANT_MAP: Record<FitVariant, Partial<Record<VibeId, VibeId>>> = {
   casual: {
     night: 'clean',
@@ -115,6 +130,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
+const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
 const BUILD_SECTION_TABS = ['build', 'refine', 'details'] as const;
 type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
 
@@ -125,6 +141,50 @@ const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
 };
 
 const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
+
+function recordBuilderPreferenceEvent(
+  kind: BuilderPreferenceKind,
+  productsBySlot: Partial<Record<Category, Product>>,
+  vibe: VibeId,
+) {
+  if (typeof window === 'undefined') return;
+  const entries = Object.entries(productsBySlot).filter((entry): entry is [Category, Product] => Boolean(entry[1]));
+  if (!entries.length) return;
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(BUILDER_PREFERENCES_STORAGE_KEY) || '{}') as Partial<BuilderPreferenceHistory>;
+    const history: BuilderPreferenceHistory = {
+      events: Array.isArray(parsed.events) ? parsed.events : [],
+      vibes: parsed.vibes || {},
+      categories: parsed.categories || {},
+      products: parsed.products || {},
+    };
+    const counterKey = kind === 'save' ? 'saved' : 'passed';
+
+    history.events.unshift({
+      kind,
+      vibe,
+      productIds: entries.map(([, product]) => product.id),
+      categories: entries.map(([category]) => category),
+      createdAt: Date.now(),
+    });
+    history.events = history.events.slice(0, 120);
+
+    history.vibes[vibe] = history.vibes[vibe] || { saved: 0, passed: 0 };
+    history.vibes[vibe]![counterKey] += 1;
+
+    for (const [category, product] of entries) {
+      history.categories[category] = history.categories[category] || { saved: 0, passed: 0 };
+      history.categories[category]![counterKey] += 1;
+      history.products[product.id] = history.products[product.id] || { saved: 0, passed: 0 };
+      history.products[product.id][counterKey] += 1;
+    }
+
+    window.localStorage.setItem(BUILDER_PREFERENCES_STORAGE_KEY, JSON.stringify(history));
+  } catch {
+    // Local preference tracking should never block save/pass/generation flows.
+  }
+}
 
 function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
@@ -436,6 +496,7 @@ function BuilderPageContent({
           ])),
           mode,
           currentItems: items,
+          lockedItems,
           targetSlots,
         }),
       });
@@ -558,6 +619,7 @@ function BuilderPageContent({
   async function saveFit() {
     if (!n) return;
     const localFit = saveLocalFit(items);
+    recordBuilderPreferenceEvent('save', items, selectedVibe);
     setStatusMessage(
       localFit
         ? `Saved to your fits as "${localFit.title}".`
@@ -648,10 +710,12 @@ function BuilderPageContent({
     const hasCurrentFit = n > 0;
     if (direction === 'right' && hasCurrentFit) {
       const saved = saveLocalFit(items);
+      recordBuilderPreferenceEvent('save', items, selectedVibe);
       setSaveBurst(true);
       window.setTimeout(() => setSaveBurst(false), 850);
       setStatusMessage(saved ? `Saved "${saved.title}". Loading the next ${activeVibe.label.toLowerCase()} look.` : 'Saved this look. Loading the next variation.');
     } else if (direction === 'left') {
+      if (hasCurrentFit) recordBuilderPreferenceEvent('pass', items, selectedVibe);
       setStatusMessage(`Passed. Loading another ${activeVibe.label.toLowerCase()} look.`);
     }
 
@@ -758,6 +822,7 @@ function BuilderPageContent({
     if (boardDragging || n === 0) return;
     dismissSwipeHint(true);
     const saved = saveLocalFit(items);
+    recordBuilderPreferenceEvent('save', items, selectedVibe);
     setSaveBurst(true);
     window.setTimeout(() => setSaveBurst(false), 850);
     setStatusMessage(saved ? `Saved "${saved.title}".` : 'Saved this fit.');

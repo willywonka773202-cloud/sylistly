@@ -1293,9 +1293,13 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
   const hasSelected = (terms: string[]) => terms.some((term) => selectedHaystack.includes(normalize(term)));
   const hasProduct = (terms: string[]) => terms.some((term) => haystack.includes(normalize(term)));
 
-  if (hasSelected(['blazer', 'trouser', 'office', 'tailored']) && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 52;
+  if (hasSelected(['blazer', 'trouser', 'office', 'tailored', 'loafer']) && hasProduct(['running', 'gym', 'workout', 'sweatpants', 'gym shorts'])) score -= 62;
+  if (hasSelected(['blazer', 'tailored', 'loafer', 'dress shirt']) && hasProduct(['hoodie', 'cargo', 'graphic']) && !['street', 'edgy', 'cozy'].includes(vibe)) score -= 34;
+  if (hasSelected(['hoodie', 'cargo', 'sneaker', 'cap', 'denim']) && hasProduct(['heel', 'pumps', 'formal', 'satin']) && ['street', 'gym', 'cozy'].includes(vibe)) score -= 42;
   if (hasSelected(['puffer', 'winter', 'fleece', 'beanie']) && hasProduct(['sandal', 'linen', 'beach'])) score -= 52;
   if (hasSelected(['linen', 'beach', 'vacation', 'resort']) && hasProduct(['puffer', 'winter', 'boot', 'fleece'])) score -= 52;
+  if (hasSelected(['linen', 'straw', 'resort', 'sandal']) && hasProduct(['linen', 'straw', 'resort', 'sandal', 'shorts'])) score += 24;
+  if (hasSelected(['black', 'leather', 'sleek']) && hasProduct(['black', 'leather', 'sleek', 'silver', 'chain'])) score += 18;
   if (vibe === 'clean' && hasProduct(['graphic', 'neon', 'statement', 'western', 'techwear'])) score -= 44;
   if ((vibe === 'gym' || vibe === 'cozy') && hasProduct(['heel', 'pumps', 'satin', 'dressy'])) score -= 44;
   if ((vibe === 'night' || vibe === 'date') && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 44;
@@ -1405,12 +1409,29 @@ function getSlotCandidates({
   return [...preferred, ...avoided].slice(0, 96);
 }
 
+function getGenerationAnchorProducts({
+  lockedItems,
+  existingItems,
+  mode,
+}: {
+  lockedItems?: Partial<Record<Category, Product>>;
+  existingItems: Partial<Record<Category, Product>>;
+  mode: GeneratorMode;
+}): Product[] {
+  const lockedAnchors = Object.values(lockedItems || {}).filter((product): product is Product => isRenderableProduct(product));
+  const existingAnchors = mode === 'missing'
+    ? Object.values(existingItems).filter((product): product is Product => isRenderableProduct(product))
+    : [];
+  return dedupeProducts([...lockedAnchors, ...existingAnchors]);
+}
+
 export function buildCatalogLook({
   vibe,
   frame,
   budget,
   customMaxCents,
   currentItems,
+  lockedItems,
   mode,
   seed = 0,
   avoidProductIds = [],
@@ -1421,6 +1442,7 @@ export function buildCatalogLook({
   budget: GeneratorBudget;
   customMaxCents?: number | null;
   currentItems?: Partial<Record<Category, Product>>;
+  lockedItems?: Partial<Record<Category, Product>>;
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
@@ -1432,6 +1454,7 @@ export function buildCatalogLook({
 } {
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
+  const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
   const picked: Partial<Record<Category, Product>> = {};
   const currentIds = new Set(
@@ -1468,6 +1491,7 @@ export function buildCatalogLook({
     mode,
     targetSlots,
     currentCount: currentIds.size,
+    lockedCount: anchorProducts.length,
     avoidCount: avoidIds.size,
     accessorySlotsIncluded: targetSlots.filter((slot) => REFRESH_ACCESSORY_SLOTS.includes(slot)),
   });
@@ -1485,7 +1509,10 @@ export function buildCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
-      selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
+      selectedProducts: [
+        ...anchorProducts,
+        ...Object.values(picked).filter((product): product is Product => Boolean(product)),
+      ],
       collectionCandidates,
     });
     const chosen = chooseVariedCandidate(candidatePool, seed, `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:catalog`);
@@ -1561,6 +1588,7 @@ export async function buildAiCatalogLook({
   budget,
   customMaxCents,
   currentItems,
+  lockedItems,
   mode,
   seed = 0,
   avoidProductIds = [],
@@ -1571,6 +1599,7 @@ export async function buildAiCatalogLook({
   budget: GeneratorBudget;
   customMaxCents?: number | null;
   currentItems?: Partial<Record<Category, Product>>;
+  lockedItems?: Partial<Record<Category, Product>>;
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
@@ -1581,9 +1610,10 @@ export async function buildAiCatalogLook({
   missingSlots: Category[];
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
-  const base = buildCatalogLook({ vibe, frame, budget, customMaxCents, currentItems, mode, seed, avoidProductIds, targetSlots: selectedTargetSlots });
+  const base = buildCatalogLook({ vibe, frame, budget, customMaxCents, currentItems, lockedItems, mode, seed, avoidProductIds, targetSlots: selectedTargetSlots });
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
+  const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
   const currentIds = new Set(
     Object.values(existingItems)
@@ -1627,7 +1657,10 @@ export async function buildAiCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
-      selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
+      selectedProducts: [
+        ...anchorProducts,
+        ...Object.values(picked).filter((product): product is Product => Boolean(product)),
+      ],
       collectionCandidates,
     });
 

@@ -1,5 +1,6 @@
 import { buildCatalogLook, getVibeQualityWarnings } from '../lib/catalog';
 import { genderMismatchReasons, productGenderTags } from '../lib/frame-inference';
+import { isRenderableProduct } from '../lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 import type { GeneratorFrame, VibeId } from '../lib/vibes';
 
@@ -239,6 +240,99 @@ function formatMissing(missingByCategory: Partial<Record<Category, number>>): st
   return entries.map(([category, count]) => `${category}:${count}`).join(', ');
 }
 
+interface LockScenarioReport {
+  label: string;
+  passed: boolean;
+  lockedSlots: Category[];
+  changedUnlockedSlots: number;
+  badImageCount: number;
+  sample: string;
+  failures: string[];
+}
+
+function simulateLockedGenerationScenario({
+  label,
+  vibe,
+  frame,
+  lockedSlots,
+}: {
+  label: string;
+  vibe: VibeId;
+  frame: GeneratorFrame;
+  lockedSlots: Category[];
+}): LockScenarioReport {
+  const base = buildCatalogLook({
+    vibe,
+    frame,
+    budget: 'any',
+    mode: 'full',
+    seed: 91_000 + label.length * 97,
+  });
+  const lockedItems = Object.fromEntries(
+    lockedSlots
+      .map((slot) => [slot, base.products[slot]] as const)
+      .filter((entry): entry is readonly [Category, Product] => Boolean(entry[1])),
+  ) as Partial<Record<Category, Product>>;
+  const unlockedSlots = CATEGORY_ORDER.filter((slot) => !lockedItems[slot]);
+  const next = buildCatalogLook({
+    vibe,
+    frame,
+    budget: 'any',
+    mode: 'refresh',
+    seed: 94_000 + label.length * 131,
+    currentItems: base.products,
+    lockedItems,
+    targetSlots: unlockedSlots,
+    avoidProductIds: productIds(base.products),
+  });
+  const merged = {
+    ...lockedItems,
+    ...next.products,
+  };
+  const failures: string[] = [];
+
+  for (const slot of Object.keys(lockedItems) as Category[]) {
+    if (merged[slot]?.id !== lockedItems[slot]?.id) {
+      failures.push(`${slot} changed from locked product`);
+    }
+  }
+
+  const changedUnlockedSlots = unlockedSlots.filter((slot) => {
+    const before = base.products[slot]?.id;
+    const after = merged[slot]?.id;
+    return Boolean(before && after && before !== after);
+  }).length;
+  const badImageCount = Object.values(merged)
+    .filter((product): product is Product => Boolean(product))
+    .filter((product) => !isRenderableProduct(product)).length;
+
+  if (Object.keys(lockedItems).length !== lockedSlots.length) {
+    failures.push('base look could not fill every requested locked slot');
+  }
+  if (changedUnlockedSlots < 2) {
+    failures.push('fewer than two unlocked slots changed');
+  }
+  if (badImageCount) {
+    failures.push(`${badImageCount} non-renderable products in merged locked look`);
+  }
+
+  return {
+    label,
+    passed: failures.length === 0,
+    lockedSlots: Object.keys(lockedItems) as Category[],
+    changedUnlockedSlots,
+    badImageCount,
+    sample: slotSummary(merged),
+    failures,
+  };
+}
+
+const lockReports = [
+  simulateLockedGenerationScenario({ label: 'office fem keeps top+shoes', vibe: 'office', frame: 'fem', lockedSlots: ['top', 'shoes'] }),
+  simulateLockedGenerationScenario({ label: 'street masc keeps outer+shoes', vibe: 'street', frame: 'masc', lockedSlots: ['outer', 'shoes'] }),
+  simulateLockedGenerationScenario({ label: 'vacation fem keeps top+bag', vibe: 'vacation', frame: 'fem', lockedSlots: ['top', 'bag'] }),
+];
+
 const reports = SCENARIOS.map(simulateScenario);
 
 console.log(`Generator variety simulation: ${RUNS_PER_SCENARIO} full-look runs per scenario`);
@@ -295,4 +389,24 @@ if (mismatchReports.length) {
   for (const report of mismatchReports) {
     console.log(`  ${report.label}: mismatch=${report.mismatchCount}, categoryMismatch=${report.categoryMismatchCount}, offFrame=${report.offFrameCount}`);
   }
+}
+
+console.log('\nLocked item regeneration:');
+for (const report of lockReports) {
+  console.log(
+    [
+      `  ${report.passed ? 'PASS' : 'FAIL'} ${report.label}`,
+      `locked=${report.lockedSlots.join(',') || 'none'}`,
+      `changedUnlocked=${report.changedUnlockedSlots}`,
+      `badImages=${report.badImageCount}`,
+    ].join('  '),
+  );
+  if (report.failures.length) {
+    report.failures.forEach((failure) => console.log(`    - ${failure}`));
+  }
+  console.log(`    ${report.sample}`);
+}
+
+if (lockReports.some((report) => !report.passed)) {
+  process.exitCode = 1;
 }
