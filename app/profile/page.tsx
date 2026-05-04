@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { ProductImage } from '@/components/ProductImage';
+import { getCatalogProductById } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -78,6 +79,28 @@ export default function ProfilePage() {
   function remix(post: FeedPost) {
     replaceItems(post.items);
     router.push('/build');
+  }
+
+  function buildFromWardrobe() {
+    const productItems: Partial<Record<Category, Product>> = {};
+    for (const item of ownedItems) {
+      if (productItems[item.category]) continue;
+      const catalogProduct = getCatalogProductById(item.productId);
+      productItems[item.category] = catalogProduct ?? {
+        id: item.productId,
+        brand: item.brand,
+        name: item.name,
+        category: item.category,
+        priceCents: item.priceCents,
+        currency: 'USD',
+        retailer: item.brand,
+        retailerUrl: '',
+        imageUrl: item.imageUrl,
+      };
+    }
+    replaceItems(productItems);
+    const lockCats = Object.keys(productItems).join(',');
+    router.push(`/build?lock=${lockCats}`);
   }
 
   function shop(post: FeedPost) {
@@ -239,7 +262,14 @@ export default function ProfilePage() {
                 <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Wardrobe</h2>
               </div>
               {ownedItems.length > 0 && (
-                <p className="text-[10px] text-muted">{ownedItems.length} piece{ownedItems.length !== 1 ? 's' : ''}</p>
+                <button
+                  type="button"
+                  onClick={buildFromWardrobe}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.1em] text-white shadow-pink-glow"
+                >
+                  <Sparkles size={11} />
+                  Build fit
+                </button>
               )}
             </div>
 

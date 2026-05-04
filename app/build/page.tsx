@@ -250,12 +250,14 @@ function BuilderPageContent({
   quickVibe,
   quickFrame,
   quickSlots,
+  quickLock,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
   quickVibe: string | null;
   quickFrame: string | null;
   quickSlots: string | null;
+  quickLock: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -402,6 +404,14 @@ function BuilderPageContent({
       .filter((slot): slot is Category => CATEGORY_ORDER.includes(slot as Category));
     if (slots.length) setSelectedGenerationSlots(CATEGORY_ORDER.filter((slot) => slots.includes(slot)));
   }, [quickSlots]);
+
+  useEffect(() => {
+    if (!quickLock) return;
+    const cats = quickLock
+      .split(',')
+      .filter((c): c is Category => CATEGORY_ORDER.includes(c as Category));
+    if (cats.length) setLockedSlots(cats);
+  }, [quickLock]);
 
   function closeSearchSheet() {
     setSearchFor(null);
@@ -1414,6 +1424,15 @@ function BuilderPageContent({
                     Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => { setActiveBuildOverlay(null); router.push('/try-on'); }}
+                    disabled={renderN === 0}
+                    className="flex w-full items-center justify-center gap-2 rounded-[20px] border border-white/10 bg-white/[0.04] py-3 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink disabled:opacity-40"
+                  >
+                    <Sparkles size={14} />
+                    Try on this fit
+                  </button>
                   {/* OOTD posting form */}
                   <div className="mt-1 rounded-[20px] border border-white/8 bg-white/[0.03] p-3">
                     <div className="text-[9px] uppercase tracking-[.18em] text-accent mb-2">Post to feed</div>
@@ -2199,13 +2218,14 @@ function BuilderPageWithSearchParams() {
       quickVibe={searchParams.get('vibe')}
       quickFrame={searchParams.get('frame')}
       quickSlots={searchParams.get('slots')}
+      quickLock={searchParams.get('lock')}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );
