@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, Bookmark, Sparkles } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, Plus, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductImage } from '@/components/ProductImage';
 import { useFit } from '@/store/fit';
+import { useWardrobe } from '@/store/wardrobe';
 import { isRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { VibeId } from '@/lib/vibes';
@@ -92,6 +93,9 @@ function ProductFallbackHero({ products }: { products: Product[] }) {
 export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
   const router = useRouter();
   const replaceItems = useFit((state) => state.replaceItems);
+  const addToWardrobe = useWardrobe((state) => state.addItem);
+  const removeFromWardrobe = useWardrobe((state) => state.removeItem);
+  const isOwned = useWardrobe((state) => state.hasItem);
   const [heroFailed, setHeroFailed] = useState(false);
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const showHeroImage = Boolean(
@@ -145,19 +149,36 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
           ))}
         </div>
 
-        <div className="mt-5 flex gap-2.5 overflow-hidden opacity-90">
-          {look.products.filter((product) => !failedImageIds.has(product.id)).slice(0, 4).map((product) => (
-            <div key={product.id} className="h-16 w-16 flex-none overflow-hidden rounded-[16px] border border-[#eadfd5] bg-[#fbf4ee] shadow-[0_8px_18px_rgba(0,0,0,.14)] sm:h-[70px] sm:w-[70px]">
-              <ProductImage
-                product={product}
-                wrapperClassName="h-full w-full"
-                className="h-full w-full object-contain p-1.5"
-                onUnavailable={(failedProduct) => {
-                  setFailedImageIds((current) => new Set(current).add(failedProduct.id));
-                }}
-              />
-            </div>
-          ))}
+        <div className="mt-5 flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
+          {look.products.filter((product) => !failedImageIds.has(product.id)).slice(0, 6).map((product) => {
+            const owned = isOwned(product.id);
+            return (
+              <div key={product.id} className="relative flex-none">
+                <div className="h-16 w-16 overflow-hidden rounded-[16px] border border-[#eadfd5] bg-[#fbf4ee] shadow-[0_8px_18px_rgba(0,0,0,.14)] sm:h-[70px] sm:w-[70px]">
+                  <ProductImage
+                    product={product}
+                    wrapperClassName="h-full w-full"
+                    className="h-full w-full object-contain p-1.5"
+                    onUnavailable={(failedProduct) => {
+                      setFailedImageIds((current) => new Set(current).add(failedProduct.id));
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => owned ? removeFromWardrobe(product.id) : addToWardrobe(product)}
+                  aria-label={owned ? 'Remove from wardrobe' : 'Add to wardrobe'}
+                  className={`absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full border text-[8px] transition ${
+                    owned
+                      ? 'border-emerald-400/50 bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,.4)]'
+                      : 'border-white/20 bg-[#1a1614] text-muted-2 hover:border-accent hover:text-accent'
+                  }`}
+                >
+                  {owned ? <Check size={9} strokeWidth={3} /> : <Plus size={9} strokeWidth={3} />}
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         <div className="mt-5 flex items-center gap-3">

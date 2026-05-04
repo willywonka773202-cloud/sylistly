@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, Shirt, Trash2, UserPlus, WandSparkles, X } from 'lucide-react';
+import { Bookmark, Camera, Grid3X3, Heart, MessageCircle, RotateCcw, ShoppingBag, Sparkles, Shirt, Trash2, UserPlus, WandSparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -48,6 +48,8 @@ export default function ProfilePage() {
   const setBudget = useProfile((state) => state.setBudget);
   const setVibesFromText = useProfile((state) => state.setVibesFromText);
   const setBrandsFromText = useProfile((state) => state.setBrandsFromText);
+  const setSelfieUrl = useProfile((state) => state.setSelfieUrl);
+  const setBodyPhotoUrl = useProfile((state) => state.setBodyPhotoUrl);
   const savedCount = useSavedFits((state) => state.fits.length);
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
@@ -374,6 +376,57 @@ export default function ProfilePage() {
               Favorite brands
               <input value={(profile.stylePrefs.brands || []).join(', ')} onChange={(event) => setBrandsFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="Skims, Nike, Zara" />
             </label>
+
+            {/* Try-on setup */}
+            <div className="mt-5 rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-accent/10 text-accent">
+                  <Camera size={14} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold text-ink">Try-on setup</div>
+                  <div className="text-[10px] text-muted-2">Paste photo URLs for AI outfit preview</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[10px] text-muted-2 mb-1.5">Selfie / face photo</div>
+                  {profile.selfieUrl ? (
+                    <div className="relative mb-1.5">
+                      <div className="h-24 overflow-hidden rounded-[14px] border border-[#eadfd5] bg-[#fff8f2]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={profile.selfieUrl} alt="Selfie" className="h-full w-full object-cover" onError={() => setSelfieUrl('')} />
+                      </div>
+                      <button onClick={() => setSelfieUrl('')} className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-white text-[9px]">×</button>
+                    </div>
+                  ) : (
+                    <div className="mb-1.5 flex h-24 flex-col items-center justify-center gap-1 rounded-[14px] border border-dashed border-white/15 bg-white/[0.03] text-[10px] text-muted-2">
+                      <Camera size={16} className="opacity-40" />
+                      Face photo
+                    </div>
+                  )}
+                  <input type="text" value={profile.selfieUrl || ''} onChange={(e) => setSelfieUrl(e.target.value)} placeholder="Paste image URL" className="w-full rounded-xl border border-hairline bg-surface-2 px-2.5 py-1.5 text-[10px] text-ink outline-none focus:border-accent" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-muted-2 mb-1.5">Full-body photo</div>
+                  {profile.bodyPhotoUrl ? (
+                    <div className="relative mb-1.5">
+                      <div className="h-24 overflow-hidden rounded-[14px] border border-[#eadfd5] bg-[#fff8f2]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={profile.bodyPhotoUrl} alt="Body photo" className="h-full w-full object-cover" onError={() => setBodyPhotoUrl('')} />
+                      </div>
+                      <button onClick={() => setBodyPhotoUrl('')} className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-white text-[9px]">×</button>
+                    </div>
+                  ) : (
+                    <div className="mb-1.5 flex h-24 flex-col items-center justify-center gap-1 rounded-[14px] border border-dashed border-white/15 bg-white/[0.03] text-[10px] text-muted-2">
+                      <Camera size={16} className="opacity-40" />
+                      Full-length
+                    </div>
+                  )}
+                  <input type="text" value={profile.bodyPhotoUrl || ''} onChange={(e) => setBodyPhotoUrl(e.target.value)} placeholder="Paste image URL" className="w-full rounded-xl border border-hairline bg-surface-2 px-2.5 py-1.5 text-[10px] text-ink outline-none focus:border-accent" />
+                </div>
+              </div>
+            </div>
           </section>
         )}
       </div>

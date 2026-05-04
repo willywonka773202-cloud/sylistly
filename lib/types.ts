@@ -61,6 +61,8 @@ export interface Profile {
   handle?: string;
   skinTone: string;           // hex
   bodyType: 'masc' | 'fem' | 'androgynous' | 'custom';
+  selfieUrl?: string;
+  bodyPhotoUrl?: string;
   sizes: {
     top?: string;
     bottom?: { waist?: number; inseam?: number };

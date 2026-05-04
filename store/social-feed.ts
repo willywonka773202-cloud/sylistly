@@ -21,6 +21,8 @@ export interface FeedPost {
   title: string;
   caption?: string;
   vibe: string;
+  occasion?: string;
+  isOOTD?: boolean;
   frameBias?: 'masc' | 'fem' | 'androgynous' | 'any';
   heroImageUrl?: string;
   sourceType?: 'editorial' | 'community' | 'discover' | 'catalog';
@@ -42,7 +44,7 @@ interface SocialFeedState {
   generateMorePosts: (count?: number) => void;
   postFit: (
     items: Partial<Record<Category, Product>>,
-    options?: { title?: string; vibe?: string; visibility?: 'public' | 'private' },
+    options?: { title?: string; vibe?: string; visibility?: 'public' | 'private'; caption?: string; occasion?: string; isOOTD?: boolean },
   ) => FeedPost | null;
   toggleLike: (id: string) => void;
   toggleSave: (id: string) => void;
@@ -293,16 +295,19 @@ export const useSocialFeed = create<SocialFeedState>()(
         const selected = sanitizeItems(items);
         const totals = fitTotals(selected);
         if (totals.itemCount < 3) return null;
+        const tags = [options?.vibe || 'builder', options?.occasion, options?.visibility || 'public'].filter(Boolean) as string[];
         const post: FeedPost = {
           id: `post-${Date.now()}`,
           username: '@you',
           avatar: 'Y',
           title: options?.title || createTitle(selected),
-          caption: 'Posted from Builder. Remix it, lock the best pieces, and keep swiping.',
+          caption: options?.caption || 'Posted from Builder. Remix it, lock the best pieces, and keep swiping.',
           vibe: options?.vibe || 'Builder',
+          occasion: options?.occasion,
+          isOOTD: options?.isOOTD || false,
           frameBias: 'any',
           sourceType: 'community',
-          tags: [options?.vibe || 'builder', options?.visibility || 'public'].filter(Boolean),
+          tags,
           visibility: options?.visibility || 'public',
           createdAt: new Date().toISOString(),
           totalCents: totals.totalCents,

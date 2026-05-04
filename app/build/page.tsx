@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, CheckSquare2, ExternalLink, LoaderCircle, Lock, Send, Shirt, SlidersHorizontal, Sparkles, Square } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -11,6 +11,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
@@ -286,6 +287,9 @@ function BuilderPageContent({
   const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
   const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
   const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
+  const [postCaption, setPostCaption] = useState('');
+  const [postOccasion, setPostOccasion] = useState('');
+  const [isOOTD, setIsOOTD] = useState(false);
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
@@ -688,12 +692,20 @@ function BuilderPageContent({
       title: `${activeVibe.label} fit`,
       vibe: activeVibe.label,
       visibility: postVisibility,
+      caption: postCaption.trim() || undefined,
+      occasion: postOccasion || undefined,
+      isOOTD,
     });
     setStatusMessage(
       posted
         ? `Posted "${posted.title}" to Fit Feed as ${postVisibility}.`
         : 'Build a fit before posting to Fit Feed.',
     );
+    if (posted) {
+      setPostCaption('');
+      setPostOccasion('');
+      setIsOOTD(false);
+    }
   }
 
   function focusRefineCategory(category: Category) {
@@ -1402,29 +1414,65 @@ function BuilderPageContent({
                     Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
-                  <div className="grid grid-cols-[1fr_1fr_1.2fr] gap-2">
-                    {(['public', 'private'] as const).map((visibility) => (
+                  {/* OOTD posting form */}
+                  <div className="mt-1 rounded-[20px] border border-white/8 bg-white/[0.03] p-3">
+                    <div className="text-[9px] uppercase tracking-[.18em] text-accent mb-2">Post to feed</div>
+                    <textarea
+                      value={postCaption}
+                      onChange={(e) => setPostCaption(e.target.value)}
+                      placeholder="Add a caption… (optional)"
+                      maxLength={200}
+                      rows={2}
+                      className="w-full resize-none rounded-[14px] border border-white/10 bg-white/[0.04] px-3 py-2 text-[12px] leading-relaxed text-ink placeholder:text-muted-2 outline-none focus:border-accent"
+                    />
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {['Casual', 'Date night', 'Work', 'Night out', 'Vacation', 'Weekend'].map((occ) => (
+                        <button
+                          key={occ}
+                          type="button"
+                          onClick={() => setPostOccasion(postOccasion === occ ? '' : occ)}
+                          className={`rounded-full px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.1em] transition ${
+                            postOccasion === occ
+                              ? 'bg-accent text-white'
+                              : 'border border-white/10 bg-white/[0.03] text-muted-2'
+                          }`}
+                        >
+                          {occ}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-2.5 flex items-center justify-between gap-3">
                       <button
-                        key={visibility}
                         type="button"
-                        onClick={() => setPostVisibility(visibility)}
-                        className={`rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[.12em] transition ${
-                          postVisibility === visibility
-                            ? 'border-accent bg-accent/15 text-accent'
-                            : 'border-white/10 bg-white/[0.04] text-muted-2'
-                        }`}
+                        onClick={() => setIsOOTD((v) => !v)}
+                        className={`flex items-center gap-1.5 text-[10px] font-semibold transition ${isOOTD ? 'text-accent' : 'text-muted-2'}`}
                       >
-                        {visibility}
+                        {isOOTD ? <CheckSquare2 size={14} /> : <Square size={14} />}
+                        OOTD Story
                       </button>
-                    ))}
+                      <div className="flex gap-1.5">
+                        {(['public', 'private'] as const).map((v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => setPostVisibility(v)}
+                            className={`rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.1em] transition ${
+                              postVisibility === v ? 'border-accent bg-accent/15 text-accent' : 'border-white/10 bg-white/[0.04] text-muted-2'
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={postCurrentFit}
                       disabled={renderN === 0}
-                      className="inline-flex items-center justify-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-40"
+                      className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-40"
                     >
                       <Send size={12} />
-                      Post
+                      Post{isOOTD ? ' as OOTD' : ''} to feed
                     </button>
                   </div>
                   <button onClick={clearFit} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
@@ -1473,8 +1521,12 @@ function FocusedRefinePanel({
   onToggleLock: (category: Category) => void;
   onOpenSearch: (category: Category) => void;
 }) {
+  const addToWardrobe = useWardrobe((state) => state.addItem);
+  const removeFromWardrobe = useWardrobe((state) => state.removeItem);
+  const isOwned = useWardrobe((state) => state.hasItem);
   const activeProduct = items[activeCategory];
   const activeLocked = Boolean(activeProduct && lockedSlots.includes(activeCategory));
+  const owned = Boolean(activeProduct && isOwned(activeProduct.id));
   const activeIndex = CATEGORY_ORDER.indexOf(activeCategory);
   const previousCategory = CATEGORY_ORDER[(activeIndex - 1 + CATEGORY_ORDER.length) % CATEGORY_ORDER.length];
   const nextCategory = CATEGORY_ORDER[(activeIndex + 1) % CATEGORY_ORDER.length];
@@ -1606,7 +1658,7 @@ function FocusedRefinePanel({
               Next
             </button>
           </div>
-          <div className="mt-2 grid grid-cols-[1.2fr_1fr] gap-2">
+          <div className="mt-2 grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => onOpenSearch(activeCategory)}
@@ -1622,6 +1674,23 @@ function FocusedRefinePanel({
             >
               Shop
               <ExternalLink size={12} />
+            </button>
+            <button
+              type="button"
+              disabled={!activeProduct}
+              onClick={() => {
+                if (!activeProduct) return;
+                owned ? removeFromWardrobe(activeProduct.id) : addToWardrobe(activeProduct);
+              }}
+              className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-3 text-[10px] font-bold uppercase tracking-[.14em] transition disabled:opacity-35 ${
+                owned
+                  ? 'bg-emerald-500/18 text-emerald-300 ring-1 ring-emerald-400/30'
+                  : 'bg-white/[0.06] text-muted-2 hover:bg-white/[0.1]'
+              }`}
+              aria-label={owned ? 'Remove from wardrobe' : 'Add to wardrobe'}
+            >
+              <Shirt size={12} />
+              {owned ? 'Owned' : 'Own'}
             </button>
           </div>
         </div>

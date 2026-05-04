@@ -1,9 +1,9 @@
 'use client';
-import { Grid, Star, Bookmark, User, Flame } from 'lucide-react';
+import { Grid, Star, Bookmark, User, Home } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const tabs = [
-  { href: '/feed',      label: 'Feed',     icon: Flame },
+  { href: '/',          label: 'Home',     icon: Home },
   { href: '/build',     label: 'Build',    icon: Grid },
   { href: '/discover',  label: 'Discover', icon: Star },
   { href: '/saved',     label: 'Saved',    icon: Bookmark },

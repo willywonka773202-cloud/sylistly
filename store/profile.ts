@@ -25,6 +25,8 @@ interface ProfileState {
   setBudget: (budget: NonNullable<Profile['stylePrefs']['budget']>) => void;
   setVibesFromText: (value: string) => void;
   setBrandsFromText: (value: string) => void;
+  setSelfieUrl: (url: string) => void;
+  setBodyPhotoUrl: (url: string) => void;
 }
 
 function splitCsv(value: string): string[] {
@@ -90,6 +92,10 @@ export const useProfile = create<ProfileState>()(
             },
           },
         })),
+      setSelfieUrl: (selfieUrl) =>
+        set((state) => ({ profile: { ...state.profile, selfieUrl } })),
+      setBodyPhotoUrl: (bodyPhotoUrl) =>
+        set((state) => ({ profile: { ...state.profile, bodyPhotoUrl } })),
     }),
     { name: 'sylistly.profile.v1' },
   ),
