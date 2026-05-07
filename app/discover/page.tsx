@@ -1,12 +1,15 @@
 import { Sparkles } from 'lucide-react';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { ProductImage } from '@/components/ProductImage';
 import {
   ALL_CATALOG_PRODUCTS,
+  filterProductsByGender,
   getCollectionProducts,
   LAUNCH_COLLECTIONS,
   type CatalogCollection,
 } from '@/lib/catalog';
+import { frameCompatibilityScore, hasFrameMismatch } from '@/lib/frame-inference';
 import { getDiscoverLookPreview } from '@/lib/discover-previews';
 import { isRenderableProduct } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Product } from '@/lib/types';
@@ -41,6 +44,11 @@ function productText(product: Product): string {
 
 function productMatchesCollection(product: Product, collection: CatalogCollection): boolean {
   const text = productText(product);
+  if (
+    (collection.frame === 'masc' || collection.frame === 'fem')
+    && hasFrameMismatch(product, collection.frame)
+  ) return false;
+
   const frameMatches =
     collection.frame === 'all'
     || product.gender?.includes(collection.frame)
@@ -61,6 +69,11 @@ function hasTerm(text: string, term: string): boolean {
 
 function recipeScore(product: Product, collection: CatalogCollection, recipe: SlotRecipe): number {
   const text = productText(product);
+  if (
+    (collection.frame === 'masc' || collection.frame === 'fem')
+    && hasFrameMismatch(product, collection.frame)
+  ) return -999;
+
   let score = 0;
 
   for (const keyword of recipe.keywords || []) {
@@ -82,6 +95,7 @@ function recipeScore(product: Product, collection: CatalogCollection, recipe: Sl
   else if (product.gender?.includes(collection.frame)) score += 18;
   else if (product.gender?.includes('androgynous') || !product.gender?.length) score += 8;
   else score -= 40;
+  if (collection.frame !== 'all') score += frameCompatibilityScore(product, collection.frame);
 
   if (product.imageQuality === 'good') score += 12;
   if (product.metadata?.featured) score += 6;
@@ -90,17 +104,24 @@ function recipeScore(product: Product, collection: CatalogCollection, recipe: Sl
   return score;
 }
 
+function frameSafeProductsFor(collection: CatalogCollection): Product[] {
+  return collection.frame === 'all'
+    ? ALL_CATALOG_PRODUCTS
+    : filterProductsByGender(ALL_CATALOG_PRODUCTS, collection.frame);
+}
+
 function recipeProductsFor(collection: CatalogCollection): Product[] {
   const recipe = DISCOVER_RECIPES.get(collection.id);
   if (!recipe) return [];
 
   const usedIds = new Set<string>();
   const selected: Product[] = [];
+  const frameSafeProducts = frameSafeProductsFor(collection);
 
   for (const category of CATEGORY_ORDER) {
     const slotRecipe = recipe.slotRecipes[category];
     if (!slotRecipe) continue;
-    const match = ALL_CATALOG_PRODUCTS
+    const match = frameSafeProducts
       .filter((product) => product.category === category)
       .filter(isRenderableProduct)
       .filter((product) => !usedIds.has(product.id))
@@ -132,7 +153,7 @@ function curatedProductsFor(collection: CatalogCollection): Product[] {
 
   for (const category of CATEGORY_ORDER) {
     if (selected.some((product) => product.category === category)) continue;
-    const replacement = ALL_CATALOG_PRODUCTS
+    const replacement = frameSafeProductsFor(collection)
       .filter((product) => product.category === category)
       .filter((product) => productMatchesCollection(product, collection))
       .filter(isRenderableProduct)
@@ -146,7 +167,7 @@ function curatedProductsFor(collection: CatalogCollection): Product[] {
   }
 
   if (selected.length < 4) {
-    for (const product of ALL_CATALOG_PRODUCTS.filter(isRenderableProduct)) {
+    for (const product of frameSafeProductsFor(collection).filter(isRenderableProduct)) {
       if (!productMatchesCollection(product, collection)) continue;
       addProduct(product);
       if (selected.length >= 6) break;
@@ -187,6 +208,13 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
 
 export default function DiscoverPage() {
   const looks = buildDiscoverLooks();
+  const trendingLooks = looks.slice(0, 4);
+  const budgetLooks = looks
+    .filter((look) => look.estimatedTotal > 0 && look.estimatedTotal <= 35000)
+    .slice(0, 4);
+  const creatorLooks = looks
+    .filter((look) => ['street', 'night', 'date', 'edgy'].includes(look.vibe))
+    .slice(0, 4);
 
   return (
     <PlaceholderScreen
@@ -196,7 +224,38 @@ export default function DiscoverPage() {
       description="Editorial outfit directions built from renderable Sylistly catalog products."
       maxWidthClassName="max-w-[680px]"
     >
-      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
+      <section className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.14),transparent_32%),linear-gradient(180deg,#191513_0%,#0f0f0e_100%)] p-4 shadow-[0_22px_54px_rgba(0,0,0,.28)]">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-accent">Trend radar</div>
+            <h2 className="mt-1 font-serif text-[26px] font-semibold leading-tight text-ink">Find a direction, then build it</h2>
+            <p className="mt-2 max-w-[38ch] text-[12px] leading-relaxed text-muted-2">
+              Every look is assembled from renderable catalog pieces and filtered for frame coherence before it appears here.
+            </p>
+          </div>
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
+            <Sparkles size={20} />
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {[
+            ['Trending', trendingLooks.length],
+            ['Under $350', budgetLooks.length],
+            ['Creator', creatorLooks.length],
+          ].map(([label, value]) => (
+            <div key={label as string} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
+              <div className="font-serif text-[20px] font-semibold text-ink">{value as number}</div>
+              <div className="mt-1 text-[8px] uppercase tracking-[.15em] text-muted">{label as string}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <DiscoverRail title="Trending fits" looks={trendingLooks} />
+      <DiscoverRail title="Budget-friendly finds" looks={budgetLooks} />
+      <DiscoverRail title="Creator-ready looks" looks={creatorLooks} />
+
+      <section className="mt-5 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
             <Sparkles size={18} />
@@ -214,5 +273,42 @@ export default function DiscoverPage() {
         </div>
       </section>
     </PlaceholderScreen>
+  );
+}
+
+function DiscoverRail({ title, looks }: { title: string; looks: DiscoverLookCardData[] }) {
+  if (!looks.length) return null;
+
+  return (
+    <section className="mt-5">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <div className="text-[9px] uppercase tracking-[.18em] text-muted">Curated</div>
+          <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">{title}</h2>
+        </div>
+      </div>
+      <div className="mt-3 flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+        {looks.map((look) => (
+          <div key={`${title}-${look.id}`} className="w-[176px] flex-none rounded-[24px] border border-white/10 bg-[#151311] p-3 shadow-[0_16px_34px_rgba(0,0,0,.24)]">
+            <div className="grid h-[116px] grid-cols-2 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
+              {look.products.slice(0, 4).map((product) => (
+                <div key={`${look.id}-${product.id}`} className="overflow-hidden rounded-xl bg-white/80">
+                  <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1" />
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 line-clamp-1 font-serif text-[17px] font-semibold text-ink">{look.title}</div>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[8px] font-bold uppercase tracking-[.1em] text-muted">
+                {look.vibe}
+              </span>
+              <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[8px] font-bold uppercase tracking-[.1em] text-muted">
+                ${Math.round(look.estimatedTotal / 100)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

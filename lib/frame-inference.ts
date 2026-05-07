@@ -5,9 +5,11 @@ export type FrameTag = 'masc' | 'fem' | 'androgynous';
 
 const FEM_ONLY_TERMS = [
   'women', 'womens', 'woman', 'ladies', 'lady', 'girl', 'girls',
-  'mini dress', 'slip dress', 'bodycon dress', 'mini skirt', 'pleated skirt', 'skirt', 'heels', 'heel', 'pumps', 'pump',
+  'mini dress', 'slip dress', 'bodycon dress', 'maxi dress', 'midi dress',
+  'mini skirt', 'pleated skirt', 'slip skirt', 'skirt',
+  'heels', 'heel', 'pumps', 'pump', 'stiletto', 'kitten heel',
   'sports bra', 'bralette', 'bra ', 'crop top', 'cropped cami', 'cami tank',
-  'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset',
+  'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset', 'ballet flat',
 ];
 
 const MASC_ONLY_TERMS = [
@@ -107,7 +109,7 @@ export function genderMismatchReasons(product: Product, requestedFrame: Generato
 
   if (requestedFrame === 'masc') {
     if (tags.includes('fem') && !tags.includes('androgynous') && !tags.includes('masc')) reasons.push('fem-only tag');
-    if (hasAny(haystack, ['women', 'womens', 'ladies', 'mini dress', 'slip dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'baby tee', 'cami tank', 'align tank', 'cropped cami'])) {
+    if (hasAny(haystack, ['women', 'womens', 'ladies', 'mini dress', 'slip dress', 'midi dress', 'maxi dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'stiletto', 'kitten heel', 'baby tee', 'tube top', 'cami tank', 'align tank', 'cropped cami'])) {
       reasons.push('obvious fem keyword');
     }
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, UserPlus, WandSparkles, X } from 'lucide-react';
+import { Bookmark, Camera, Grid3X3, Heart, MessageCircle, RotateCcw, Share2, ShoppingBag, Sparkles, WandSparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -13,10 +13,12 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
 const BUDGETS = ['low', 'mid', 'high', 'luxury'] as const;
+const PROFILE_FILTERS = ['All', 'Work', 'Casual', 'Date', 'Night', 'Travel'];
 const BODY_TYPE_LABELS: Record<(typeof BODY_TYPES)[number], string> = {
   masc: 'Male',
   fem: 'Female',
@@ -46,6 +48,7 @@ export default function ProfilePage() {
   const setVibesFromText = useProfile((state) => state.setVibesFromText);
   const setBrandsFromText = useProfile((state) => state.setBrandsFromText);
   const savedCount = useSavedFits((state) => state.fits.length);
+  const wardrobeItems = useWardrobe((state) => state.items);
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
@@ -55,6 +58,8 @@ export default function ProfilePage() {
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Style profile');
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const [activeProfileTab, setActiveProfileTab] = useState<'clothes' | 'outfits' | 'collections'>('outfits');
+  const [activeFilter, setActiveFilter] = useState('All');
 
   const userPosts = useMemo(
     () => posts.filter((post) => post.username === '@you' && postProducts(post, failedImageIds).length >= 3),
@@ -63,9 +68,17 @@ export default function ProfilePage() {
   const gridPosts = userPosts.length
     ? userPosts
     : posts.filter((post) => postProducts(post, failedImageIds).length >= 3).slice(0, 8);
+  const filteredGridPosts = activeFilter === 'All'
+    ? gridPosts
+    : gridPosts.filter((post) =>
+        [post.vibe, post.occasion, ...post.tags].some((tag) => tag?.toLowerCase().includes(activeFilter.toLowerCase())),
+      );
+  const wardrobeProducts = Object.values(wardrobeItems)
+    .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))
+    .map((item) => item.product)
+    .filter((product) => isHighConfidenceRenderableProduct(product) && !failedImageIds.has(product.id));
   const likedCount = posts.filter((post) => post.liked).length;
-  const savedSocialCount = posts.filter((post) => post.saved).length;
-  const remixCount = Math.max(12, userPosts.length * 3 + savedSocialCount);
+  const closetCount = Object.keys(wardrobeItems).length;
 
   function remix(post: FeedPost) {
     replaceItems(post.items);
@@ -98,26 +111,57 @@ export default function ProfilePage() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <h1 className="font-serif text-[28px] font-semibold leading-none text-ink">Style profile</h1>
+                  <h1 className="font-serif text-[28px] font-semibold leading-none text-ink">Your style profile</h1>
                   <p className="mt-1 text-[12px] font-semibold text-muted-2">@you</p>
                 </div>
-                <button className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow">
-                  <UserPlus size={12} />
-                  Follow
+                <button
+                  type="button"
+                  onClick={() => router.push('/try-on')}
+                  className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow"
+                >
+                  <Camera size={12} />
+                  Try on
                 </button>
               </div>
               <p className="mt-3 text-[12px] leading-relaxed text-[#cfc0b8]">
                 Building swipeable fits around clean layers, sharp night pieces, and image-backed shopping picks.
               </p>
+              <div className="mt-3 flex gap-4 text-[11px] text-muted-2">
+                <span><strong className="text-ink">0</strong> Followers</span>
+                <span><strong className="text-ink">0</strong> Following</span>
+              </div>
             </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-ink"
+            >
+              Edit profile
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-1 rounded-full border border-white/10 bg-white/[0.05] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-ink"
+            >
+              <Share2 size={12} />
+              Share
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/saved')}
+              className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-ink"
+            >
+              Saved
+            </button>
           </div>
 
           <div className="mt-5 grid grid-cols-4 gap-2">
             {[
               ['Posts', userPosts.length],
+              ['Clothes', closetCount],
               ['Saved', savedCount],
               ['Likes', likedCount],
-              ['Remixes', remixCount],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
                 <div className="font-serif text-[20px] font-semibold text-ink">{value}</div>
@@ -150,16 +194,54 @@ export default function ProfilePage() {
         <section className="mt-5">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[9px] uppercase tracking-[.18em] text-accent">Posted fits</div>
-              <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Outfit grid</h2>
+              <div className="text-[9px] uppercase tracking-[.18em] text-accent">Creator profile</div>
+              <h2 className="mt-1 font-serif text-[24px] font-semibold text-ink">Style library</h2>
             </div>
             {!userPosts.length ? (
               <p className="max-w-[18ch] text-right text-[10px] leading-snug text-muted">Post from Builder to replace this inspo grid.</p>
             ) : null}
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {gridPosts.map((post) => {
+          <div className="mt-4 grid grid-cols-3 border-b border-hairline text-center">
+            {[
+              ['clothes', 'Clothes'],
+              ['outfits', 'Outfits'],
+              ['collections', 'Collections'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setActiveProfileTab(value as 'clothes' | 'outfits' | 'collections')}
+                className={`relative px-2 pb-3 text-[13px] font-bold transition ${
+                  activeProfileTab === value ? 'text-ink' : 'text-muted'
+                }`}
+              >
+                {label}
+                {activeProfileTab === value ? <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-accent" /> : null}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {PROFILE_FILTERS.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setActiveFilter(filter)}
+                className={`flex-none rounded-full px-3 py-2 text-[10px] font-bold uppercase tracking-[.12em] ${
+                  activeFilter === filter
+                    ? 'bg-accent text-white shadow-pink-glow'
+                    : 'border border-hairline bg-surface-2 text-muted-2'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {activeProfileTab === 'outfits' ? (
+            <div className="mt-3 grid grid-cols-2 gap-3">
+            {(filteredGridPosts.length ? filteredGridPosts : gridPosts).map((post) => {
               const products = postProducts(post, failedImageIds);
               return (
                 <button
@@ -190,7 +272,54 @@ export default function ProfilePage() {
                 </button>
               );
             })}
-          </div>
+            </div>
+          ) : activeProfileTab === 'clothes' ? (
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {wardrobeProducts.length ? wardrobeProducts.slice(0, 18).map((product) => (
+                <button
+                  key={`profile-clothes-${product.id}`}
+                  type="button"
+                  onClick={() => router.push('/wardrobe')}
+                  className="overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5 text-left shadow-[0_12px_24px_rgba(0,0,0,.18)]"
+                >
+                  <div className="grid aspect-square place-items-center rounded-[14px] bg-white">
+                    <ProductImage
+                      product={product}
+                      wrapperClassName="h-full w-full"
+                      className="h-full w-full object-contain p-1.5"
+                      onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
+                    />
+                  </div>
+                  <div className="mt-1 truncate text-[9px] font-bold text-[#221d19]">{product.brand}</div>
+                </button>
+              )) : (
+                <div className="col-span-3 rounded-[24px] border border-white/10 bg-white/[0.04] p-4 text-center text-[12px] text-muted-2">
+                  Add owned pieces in Closet to fill this profile grid.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {['Clean rotation', 'Night looks', 'Wardrobe core', 'Wishlist'].map((collection, index) => (
+                <button
+                  key={collection}
+                  type="button"
+                  onClick={() => setActiveProfileTab('outfits')}
+                  className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] p-4 text-left shadow-[0_18px_38px_rgba(0,0,0,.28)]"
+                >
+                  <div className="grid h-20 grid-cols-2 gap-1.5">
+                    {(gridPosts[index]?.items ? postProducts(gridPosts[index], failedImageIds).slice(0, 3) : []).map((product) => (
+                      <div key={`${collection}-${product.id}`} className="overflow-hidden rounded-xl bg-[#fff7ef]">
+                        <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 font-serif text-[18px] font-semibold text-ink">{collection}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[.14em] text-muted">{Math.max(1, index + userPosts.length)} fits</div>
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mt-5 rounded-[28px] border border-white/10 bg-surface-1 p-4">

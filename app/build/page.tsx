@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, Shirt, SlidersHorizontal, Sparkles, WalletCards } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -11,6 +11,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
@@ -60,21 +61,6 @@ const FULL_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
 
 function defaultGenerationSlotsForVibe(vibe: VibeId): Category[] {
   return FULL_GENERATOR_SLOTS[vibe] || STARTER_GENERATOR_SLOTS[vibe] || ['top', 'bottom', 'shoes', 'bag'];
-}
-
-type BuilderPreferenceKind = 'save' | 'pass';
-
-interface BuilderPreferenceHistory {
-  events: Array<{
-    kind: BuilderPreferenceKind;
-    vibe: VibeId;
-    productIds: string[];
-    categories: Category[];
-    createdAt: number;
-  }>;
-  vibes: Partial<Record<VibeId, { saved: number; passed: number }>>;
-  categories: Partial<Record<Category, { saved: number; passed: number }>>;
-  products: Record<string, { saved: number; passed: number }>;
 }
 
 const FIT_VARIANT_MAP: Record<FitVariant, Partial<Record<VibeId, VibeId>>> = {
@@ -130,60 +116,38 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
-const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
-const BUILD_SECTION_TABS = ['build', 'refine', 'details'] as const;
+const BUILD_SECTION_TABS = ['build', 'settings', 'refine', 'details'] as const;
 type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
 
 const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
   build: 'Build',
+  settings: 'Controls',
   refine: 'Refine',
   details: 'Details',
 };
 
-const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
+const BUILD_OVERLAY_TABS = ['settings', 'refine', 'details'] as const;
+type WardrobeGenerationMode = 'catalog' | 'wardrobe' | 'mixed';
 
-function recordBuilderPreferenceEvent(
-  kind: BuilderPreferenceKind,
-  productsBySlot: Partial<Record<Category, Product>>,
-  vibe: VibeId,
-) {
-  if (typeof window === 'undefined') return;
-  const entries = Object.entries(productsBySlot).filter((entry): entry is [Category, Product] => Boolean(entry[1]));
-  if (!entries.length) return;
+const WARDROBE_GENERATION_MODES: Array<{ value: WardrobeGenerationMode; label: string; helper: string }> = [
+  { value: 'catalog', label: 'Catalog', helper: 'Shop-ready picks' },
+  { value: 'wardrobe', label: 'Closet only', helper: 'Use what you own' },
+  { value: 'mixed', label: 'Closet + suggested', helper: 'Fill the gaps' },
+];
 
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(BUILDER_PREFERENCES_STORAGE_KEY) || '{}') as Partial<BuilderPreferenceHistory>;
-    const history: BuilderPreferenceHistory = {
-      events: Array.isArray(parsed.events) ? parsed.events : [],
-      vibes: parsed.vibes || {},
-      categories: parsed.categories || {},
-      products: parsed.products || {},
-    };
-    const counterKey = kind === 'save' ? 'saved' : 'passed';
+function formatMoney(cents: number): string {
+  return `$${Math.round(cents / 100).toLocaleString()}`;
+}
 
-    history.events.unshift({
-      kind,
-      vibe,
-      productIds: entries.map(([, product]) => product.id),
-      categories: entries.map(([category]) => category),
-      createdAt: Date.now(),
-    });
-    history.events = history.events.slice(0, 120);
-
-    history.vibes[vibe] = history.vibes[vibe] || { saved: 0, passed: 0 };
-    history.vibes[vibe]![counterKey] += 1;
-
-    for (const [category, product] of entries) {
-      history.categories[category] = history.categories[category] || { saved: 0, passed: 0 };
-      history.categories[category]![counterKey] += 1;
-      history.products[product.id] = history.products[product.id] || { saved: 0, passed: 0 };
-      history.products[product.id][counterKey] += 1;
-    }
-
-    window.localStorage.setItem(BUILDER_PREFERENCES_STORAGE_KEY, JSON.stringify(history));
-  } catch {
-    // Local preference tracking should never block save/pass/generation flows.
-  }
+function lookAllowanceCents(
+  budget: GeneratorBudget,
+  customBudgetCents: number | null,
+  selectedSlotCount: number,
+): number | null {
+  if (budget === 'any') return null;
+  const perItemMax = budget === 'custom' ? customBudgetCents : getBudgetMaxCents(budget);
+  if (!perItemMax || perItemMax <= 0) return null;
+  return perItemMax * Math.max(1, selectedSlotCount);
 }
 
 function useBodyScrollLock(locked: boolean) {
@@ -261,6 +225,7 @@ function BuilderPageContent({
   const setBodyType = useProfile((state) => state.setBodyType);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const postFitToFeed = useSocialFeed((state) => state.postFit);
+  const wardrobeItems = useWardrobe((state) => state.items);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
@@ -285,6 +250,10 @@ function BuilderPageContent({
   const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
   const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
   const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
+  const [postCaption, setPostCaption] = useState('');
+  const [postOccasion, setPostOccasion] = useState('Casual');
+  const [addToStory, setAddToStory] = useState(true);
+  const [wardrobeMode, setWardrobeMode] = useState<WardrobeGenerationMode>('mixed');
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
@@ -298,6 +267,24 @@ function BuilderPageContent({
   const analysis = useMemo(() => analyzeOutfit(renderItems, activeVibe.label), [renderItems, activeVibe.label]);
   const [bagLayer, setBagLayer] = useState<'front' | 'behind'>('front');
   const customBudgetCents = customBudgetInput ? Number(customBudgetInput) * 100 : null;
+  const allowanceCents = lookAllowanceCents(generatorBudget, customBudgetCents, selectedGenerationSlots.length || renderN || 1);
+  const allowanceDeltaCents = allowanceCents === null ? null : allowanceCents - total;
+  const wardrobeProducts = useMemo(
+    () => Object.values(wardrobeItems)
+      .filter((item) => item.status === 'owned' || item.status === 'similar')
+      .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))
+      .map((item) => item.product),
+    [wardrobeItems],
+  );
+  const wardrobeProductsByCategory = useMemo(() => {
+    const grouped = new Map<Category, Product[]>();
+    for (const product of wardrobeProducts) {
+      const current = grouped.get(product.category) || [];
+      current.push(product);
+      grouped.set(product.category, current);
+    }
+    return grouped;
+  }, [wardrobeProducts]);
   const activePriceMax =
     generatorBudget === 'any'
       ? null
@@ -401,7 +388,7 @@ function BuilderPageContent({
   function closeSearchSheet() {
     setSearchFor(null);
     setActiveEditSlot(null);
-    if (quickSlot || quickQuery) router.replace('/');
+    if (quickSlot || quickQuery) router.replace('/build');
   }
 
   async function runCategorySearch(category: Category, query: string, avoidIds: string[] = []): Promise<Product | null> {
@@ -481,6 +468,44 @@ function BuilderPageContent({
         .filter((product): product is Product => Boolean(product))
         .map((product) => product.id);
 
+      const closetSeedSlots = targetSlots.filter((slot) => !nextItems[slot]);
+      if (wardrobeMode !== 'catalog') {
+        for (const slot of closetSeedSlots) {
+          const match = wardrobeProductsByCategory.get(slot)?.find((product) => !currentProductIds.includes(product.id));
+          if (!match) continue;
+          nextItems[slot] = match;
+          addedCount += 1;
+        }
+      }
+
+      const unresolvedApiTargetSlots = targetSlots.filter((slot) => !nextItems[slot]);
+      if (wardrobeMode === 'wardrobe') {
+        if (!addedCount) {
+          setStatusMessage('Your Closet does not have enough matching pieces for the selected categories yet.');
+          return;
+        }
+
+        replaceItems(nextItems);
+        setRecentGeneratedIds((current) => {
+          const freshIds = Object.values(nextItems)
+            .filter((product): product is Product => Boolean(product))
+            .map((product) => product.id);
+          return Array.from(new Set([...freshIds, ...current])).slice(0, 72);
+        });
+        setStatusMessage(
+          unresolvedApiTargetSlots.length
+            ? `Built from Closet with ${addedCount} piece${addedCount !== 1 ? 's' : ''}. Add ${unresolvedApiTargetSlots.map((slot) => CATEGORY_LABELS[slot]).join(', ')} to your Closet to finish this mode.`
+            : `Built a Closet-only ${workingVibe.label.toLowerCase()} fit with ${addedCount} piece${addedCount !== 1 ? 's' : ''}.`,
+        );
+        return;
+      }
+
+      if (!unresolvedApiTargetSlots.length) {
+        replaceItems(nextItems);
+        setStatusMessage(`Seeded this fit from your Closet. Switch to Catalog if you want more shopping picks.`);
+        return;
+      }
+
       const lookResponse = await fetch('/api/look', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -496,15 +521,14 @@ function BuilderPageContent({
           ])),
           mode,
           currentItems: items,
-          lockedItems,
-          targetSlots,
+          targetSlots: unresolvedApiTargetSlots,
         }),
       });
       const lookData = await lookResponse.json();
 
       if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
         for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
-          if (!targetSlots.includes(slot)) continue;
+          if (!unresolvedApiTargetSlots.includes(slot)) continue;
           if (!isRenderableProduct(product)) continue;
           nextItems[slot] = product;
           addedCount += 1;
@@ -518,7 +542,7 @@ function BuilderPageContent({
         }
       }
 
-      const unresolvedSlots = targetSlots.filter((slot) => !nextItems[slot]);
+      const unresolvedSlots = unresolvedApiTargetSlots.filter((slot) => !nextItems[slot]);
       if (unresolvedSlots.length) {
         const results = await Promise.allSettled(
           unresolvedSlots.map(async (slot) => ({
@@ -608,6 +632,34 @@ function BuilderPageContent({
     setActiveEditSlot(null);
   }
 
+  function seedFromWardrobe() {
+    if (!wardrobeProducts.length) {
+      setStatusMessage('Add owned or similar pieces in Closet first.');
+      setActiveBuildOverlay('settings');
+      return;
+    }
+
+    const targetSlots = selectedGenerationSlots.length ? selectedGenerationSlots : CATEGORY_ORDER;
+    const nextItems: Partial<Record<Category, Product>> = { ...items };
+    let addedCount = 0;
+
+    for (const slot of targetSlots) {
+      if (lockedSlotSet.has(slot) && nextItems[slot]) continue;
+      const match = wardrobeProductsByCategory.get(slot)?.find((product) => product.id !== nextItems[slot]?.id);
+      if (!match) continue;
+      nextItems[slot] = match;
+      addedCount += 1;
+    }
+
+    if (!addedCount) {
+      setStatusMessage('Your Closet has pieces, but none match the selected categories yet.');
+      return;
+    }
+
+    replaceItems(nextItems);
+    setStatusMessage(`Seeded ${addedCount} selected slot${addedCount !== 1 ? 's' : ''} from your Closet.`);
+  }
+
   function openBoardSlot(category: Category) {
     if (boardDragging) return;
     dismissSwipeHint();
@@ -619,7 +671,6 @@ function BuilderPageContent({
   async function saveFit() {
     if (!n) return;
     const localFit = saveLocalFit(items);
-    recordBuilderPreferenceEvent('save', items, selectedVibe);
     setStatusMessage(
       localFit
         ? `Saved to your fits as "${localFit.title}".`
@@ -683,9 +734,13 @@ function BuilderPageContent({
   }
 
   function postCurrentFit() {
+    const caption = postCaption.trim();
     const posted = postFitToFeed(items, {
-      title: `${activeVibe.label} fit`,
+      title: caption || `${postOccasion} ${activeVibe.label} fit`,
+      caption: caption || undefined,
       vibe: activeVibe.label,
+      occasion: postOccasion,
+      story: addToStory,
       visibility: postVisibility,
     });
     setStatusMessage(
@@ -710,12 +765,10 @@ function BuilderPageContent({
     const hasCurrentFit = n > 0;
     if (direction === 'right' && hasCurrentFit) {
       const saved = saveLocalFit(items);
-      recordBuilderPreferenceEvent('save', items, selectedVibe);
       setSaveBurst(true);
       window.setTimeout(() => setSaveBurst(false), 850);
       setStatusMessage(saved ? `Saved "${saved.title}". Loading the next ${activeVibe.label.toLowerCase()} look.` : 'Saved this look. Loading the next variation.');
     } else if (direction === 'left') {
-      if (hasCurrentFit) recordBuilderPreferenceEvent('pass', items, selectedVibe);
       setStatusMessage(`Passed. Loading another ${activeVibe.label.toLowerCase()} look.`);
     }
 
@@ -822,7 +875,6 @@ function BuilderPageContent({
     if (boardDragging || n === 0) return;
     dismissSwipeHint(true);
     const saved = saveLocalFit(items);
-    recordBuilderPreferenceEvent('save', items, selectedVibe);
     setSaveBurst(true);
     window.setTimeout(() => setSaveBurst(false), 850);
     setStatusMessage(saved ? `Saved "${saved.title}".` : 'Saved this fit.');
@@ -934,8 +986,63 @@ function BuilderPageContent({
                   activeEditSlot={activeEditSlot}
                 />
               </motion.div>
+              <div className="absolute inset-x-3 bottom-3 z-30 grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveBuildOverlay('settings')}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
+                >
+                  <SlidersHorizontal size={13} />
+                  Controls
+                </button>
+                <button
+                  type="button"
+                  onClick={seedFromWardrobe}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
+                >
+                  <Shirt size={13} />
+                  Closet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
+                  disabled={generatorLoading || selectedGenerationSlots.length === 0}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
+                >
+                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                  Generate
+                </button>
+              </div>
             </div>
             <div className="border-t border-hairline px-1 pt-4 text-center">
+              <div className="mb-3 grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
+                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Look total</div>
+                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">{totalDisplay}</div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
+                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Allowance</div>
+                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">
+                    {allowanceCents === null ? 'Open' : formatMoney(allowanceCents)}
+                  </div>
+                </div>
+                <div className={`rounded-2xl border px-2 py-2.5 ${
+                  allowanceDeltaCents === null || allowanceDeltaCents >= 0
+                    ? 'border-accent/25 bg-accent/10'
+                    : 'border-[#ffb38a]/30 bg-[#ff8a4a]/10'
+                }`}>
+                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Budget</div>
+                  <div className={`mt-1 font-serif text-[17px] font-semibold ${
+                    allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-[#ffb38a]'
+                  }`}>
+                    {allowanceDeltaCents === null
+                      ? 'Flexible'
+                      : allowanceDeltaCents >= 0
+                      ? `${formatMoney(allowanceDeltaCents)} left`
+                      : `${formatMoney(Math.abs(allowanceDeltaCents))} over`}
+                  </div>
+                </div>
+              </div>
               <div className="text-[12px] font-medium leading-relaxed text-muted-2">
                 <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
               </div>
@@ -945,6 +1052,10 @@ function BuilderPageContent({
               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
                 {lockedSlots.length ? ` / Locked ${lockedSlots.length}` : ''}
+              </div>
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2">
+                <Shirt size={11} className="text-accent" />
+                Source: {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
@@ -1174,18 +1285,25 @@ function BuilderPageContent({
           </section>
 
           <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveBuildOverlay('settings')}
+                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+              >
+                Controls
+              </button>
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
               >
                 Refine
               </button>
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
               >
                 Details
               </button>
@@ -1193,7 +1311,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={shopAll}
                 disabled={renderN === 0}
-                className="rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
+                className="rounded-full bg-accent px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
               >
                 Shop
               </button>
@@ -1214,7 +1332,32 @@ function BuilderPageContent({
           onChangeTab={setActiveBuildOverlay}
           onClose={() => setActiveBuildOverlay(null)}
         >
-          {activeBuildOverlay === 'refine' ? (
+          {activeBuildOverlay === 'settings' ? (
+            <BuildSettingsPanel
+              selectedVibe={selectedVibe}
+              onSelectVibe={setSelectedVibe}
+              generatorBudget={generatorBudget}
+              onSetGeneratorBudget={setGeneratorBudget}
+              customBudgetInput={customBudgetInput}
+              onSetCustomBudgetInput={setCustomBudgetInput}
+              generatorFrame={generatorFrame}
+              onSetFrame={setBodyType}
+              selectedGenerationSlots={selectedGenerationSlots}
+              onToggleGenerationSlot={toggleGenerationSlot}
+              onUseVibeDefaults={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
+              onSelectAll={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
+              allowanceCents={allowanceCents}
+              allowanceDeltaCents={allowanceDeltaCents}
+              totalCents={total}
+              wardrobeCount={wardrobeProducts.length}
+              wardrobeMode={wardrobeMode}
+              onSetWardrobeMode={setWardrobeMode}
+              onSeedFromWardrobe={seedFromWardrobe}
+              onOpenTryOn={() => router.push('/try-on')}
+              onGenerate={() => void generateLook('full', { sourceLabel: 'Control panel.' })}
+              generatorLoading={generatorLoading}
+            />
+          ) : activeBuildOverlay === 'refine' ? (
             <div className="flex flex-col gap-3">
               <FocusedRefinePanel
                 items={renderItems}
@@ -1255,6 +1398,49 @@ function BuilderPageContent({
                     Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
+                  <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-3">
+                    <label className="block text-[10px] font-bold uppercase tracking-[.16em] text-muted">
+                      Caption
+                      <textarea
+                        value={postCaption}
+                        onChange={(event) => setPostCaption(event.target.value.slice(0, 140))}
+                        placeholder="Add a caption..."
+                        className="mt-2 min-h-[72px] w-full resize-none rounded-2xl border border-white/10 bg-black/18 px-3 py-2 text-[13px] font-medium normal-case tracking-normal text-ink outline-none placeholder:text-muted focus:border-accent"
+                      />
+                    </label>
+                    <div className="mt-3">
+                      <div className="text-[10px] font-bold uppercase tracking-[.16em] text-muted">Occasion</div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {['Casual', 'Work', 'Date', 'Night', 'Travel'].map((occasion) => (
+                          <button
+                            key={occasion}
+                            type="button"
+                            onClick={() => setPostOccasion(occasion)}
+                            className={`rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.1em] ${
+                              postOccasion === occasion
+                                ? 'bg-accent text-white shadow-pink-glow'
+                                : 'border border-white/10 bg-white/[0.04] text-muted-2'
+                            }`}
+                          >
+                            {occasion}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAddToStory((value) => !value)}
+                      className="mt-3 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2.5 text-left"
+                    >
+                      <span>
+                        <span className="block text-[11px] font-bold text-ink">Add to style story</span>
+                        <span className="mt-0.5 block text-[10px] text-muted">Show this fit as a temporary creator post.</span>
+                      </span>
+                      <span className={`h-6 w-11 rounded-full p-0.5 transition ${addToStory ? 'bg-accent' : 'bg-white/16'}`}>
+                        <span className={`block h-5 w-5 rounded-full bg-white transition ${addToStory ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </span>
+                    </button>
+                  </div>
                   <div className="grid grid-cols-[1fr_1fr_1.2fr] gap-2">
                     {(['public', 'private'] as const).map((visibility) => (
                       <button
@@ -1308,6 +1494,304 @@ function BuilderPageContent({
         onClose={() => setCheckoutProducts(null)}
       />
     </main>
+  );
+}
+
+function BuildSettingsPanel({
+  selectedVibe,
+  onSelectVibe,
+  generatorBudget,
+  onSetGeneratorBudget,
+  customBudgetInput,
+  onSetCustomBudgetInput,
+  generatorFrame,
+  onSetFrame,
+  selectedGenerationSlots,
+  onToggleGenerationSlot,
+  onUseVibeDefaults,
+  onSelectAll,
+  allowanceCents,
+  allowanceDeltaCents,
+  totalCents,
+  wardrobeCount,
+  wardrobeMode,
+  onSetWardrobeMode,
+  onSeedFromWardrobe,
+  onOpenTryOn,
+  onGenerate,
+  generatorLoading,
+}: {
+  selectedVibe: VibeId;
+  onSelectVibe: (vibe: VibeId) => void;
+  generatorBudget: GeneratorBudget;
+  onSetGeneratorBudget: (budget: GeneratorBudget) => void;
+  customBudgetInput: string;
+  onSetCustomBudgetInput: (value: string) => void;
+  generatorFrame: GeneratorFrame;
+  onSetFrame: (frame: 'masc' | 'fem' | 'androgynous') => void;
+  selectedGenerationSlots: Category[];
+  onToggleGenerationSlot: (category: Category) => void;
+  onUseVibeDefaults: () => void;
+  onSelectAll: () => void;
+  allowanceCents: number | null;
+  allowanceDeltaCents: number | null;
+  totalCents: number;
+  wardrobeCount: number;
+  wardrobeMode: WardrobeGenerationMode;
+  onSetWardrobeMode: (mode: WardrobeGenerationMode) => void;
+  onSeedFromWardrobe: () => void;
+  onOpenTryOn: () => void;
+  onGenerate: () => void;
+  generatorLoading: boolean;
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-4 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-muted">Live controls</div>
+            <div className="mt-1 font-serif text-[24px] font-semibold leading-tight text-ink">
+              Adjust without leaving the preview
+            </div>
+          </div>
+          <div className="grid h-11 w-11 place-items-center rounded-2xl border border-accent/25 bg-accent/10 text-accent">
+            <SlidersHorizontal size={18} />
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center">
+            <div className="text-[8px] uppercase tracking-[.14em] text-muted">Current</div>
+            <div className="mt-1 font-serif text-[18px] font-semibold text-ink">{formatMoney(totalCents)}</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5 text-center">
+            <div className="text-[8px] uppercase tracking-[.14em] text-muted">Allowance</div>
+            <div className="mt-1 font-serif text-[18px] font-semibold text-ink">
+              {allowanceCents === null ? 'Open' : formatMoney(allowanceCents)}
+            </div>
+          </div>
+          <div className={`rounded-2xl border px-2 py-2.5 text-center ${
+            allowanceDeltaCents === null || allowanceDeltaCents >= 0
+              ? 'border-accent/25 bg-accent/10'
+              : 'border-[#ffb38a]/30 bg-[#ff8a4a]/10'
+          }`}>
+            <div className="text-[8px] uppercase tracking-[.14em] text-muted">Status</div>
+            <div className={`mt-1 font-serif text-[18px] font-semibold ${
+              allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-[#ffb38a]'
+            }`}>
+              {allowanceDeltaCents === null
+                ? 'Flexible'
+                : allowanceDeltaCents >= 0
+                ? 'In budget'
+                : 'Over'}
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenTryOn}
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+        >
+          <Sparkles size={13} className="text-accent" />
+          Open Dressing Room
+        </button>
+      </div>
+
+      <div className="rounded-[28px] border border-white/10 bg-surface-1 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-muted">Style frame</div>
+            <div className="mt-1 text-[13px] text-muted-2">This directly filters the generated clothing pool.</div>
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {[
+            { value: 'masc', label: 'Male' },
+            { value: 'fem', label: 'Female' },
+            { value: 'androgynous', label: 'Neutral' },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onSetFrame(option.value as 'masc' | 'fem' | 'androgynous')}
+              className={`rounded-2xl border px-3 py-3 text-[11px] font-bold uppercase tracking-[.12em] transition ${
+                generatorFrame === option.value
+                  ? 'border-accent bg-accent text-white shadow-pink-glow'
+                  : 'border-hairline bg-surface-2 text-muted-2'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-[28px] border border-white/10 bg-surface-1 p-4">
+        <div className="text-[10px] uppercase tracking-[.18em] text-muted">Vibe</div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {VIBES.map((vibe) => (
+            <button
+              key={vibe.id}
+              type="button"
+              onClick={() => onSelectVibe(vibe.id)}
+              className={`rounded-2xl border px-3 py-3 text-left transition ${
+                selectedVibe === vibe.id
+                  ? 'border-accent bg-accent/15 text-ink shadow-[0_0_18px_rgba(232,54,93,.24)]'
+                  : 'border-hairline bg-surface-2 text-muted-2'
+              }`}
+            >
+              <div className="text-[12px] font-bold">{vibe.label}</div>
+              <div className="mt-1 line-clamp-2 text-[10px] leading-snug text-muted">{vibe.blurb}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-[28px] border border-white/10 bg-surface-1 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-muted">Budget allowance</div>
+            <div className="mt-1 text-[13px] text-muted-2">Set a per-piece cap, then Sylistly shows the full look allowance.</div>
+          </div>
+          <WalletCards size={18} className="text-accent" />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[
+            { value: 'any', label: 'Any' },
+            { value: 'under100', label: '< $100' },
+            { value: 'under250', label: '< $250' },
+            { value: 'under500', label: '< $500' },
+            { value: 'custom', label: 'Custom' },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onSetGeneratorBudget(option.value as GeneratorBudget)}
+              className={`rounded-full px-3 py-2 text-[10px] font-bold uppercase tracking-[.1em] transition ${
+                generatorBudget === option.value
+                  ? 'bg-accent text-white shadow-pink-glow'
+                  : 'border border-hairline bg-surface-2 text-muted-2'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        {generatorBudget === 'custom' ? (
+          <label className="mt-3 flex items-center gap-2 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[12px] text-ink">
+            <span className="text-muted">$</span>
+            <input
+              value={customBudgetInput}
+              onChange={(event) => onSetCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4))}
+              inputMode="numeric"
+              placeholder="180"
+              className="w-full bg-transparent outline-none"
+            />
+            <span className="text-[10px] uppercase tracking-[.12em] text-muted">per piece</span>
+          </label>
+        ) : null}
+      </div>
+
+      <div className="rounded-[28px] border border-white/10 bg-surface-1 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-muted">Categories</div>
+            <div className="mt-1 text-[13px] text-muted-2">Choose which slots regenerate next.</div>
+          </div>
+          <div className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
+            {selectedGenerationSlots.length}/8
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {CATEGORY_ORDER.map((category) => {
+            const selected = selectedGenerationSlots.includes(category);
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => onToggleGenerationSlot(category)}
+                className={`rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[.1em] transition ${
+                  selected
+                    ? 'border-accent bg-accent/15 text-ink shadow-[0_0_16px_rgba(232,54,93,.22)]'
+                    : 'border-hairline bg-surface-2 text-muted-2'
+                }`}
+              >
+                {CATEGORY_LABELS[category]}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={onUseVibeDefaults}
+            className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2"
+          >
+            Vibe defaults
+          </button>
+          <button
+            type="button"
+            onClick={onSelectAll}
+            className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2"
+          >
+            Select all
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-[28px] border border-accent/25 bg-accent/10 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[.18em] text-accent">Wardrobe source</div>
+            <div className="mt-1 font-serif text-[21px] font-semibold text-ink">Generate from Closet</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+              {wardrobeCount
+                ? `${wardrobeCount} owned or similar piece${wardrobeCount !== 1 ? 's' : ''} can seed this board.`
+                : 'Add owned or similar pieces in Closet to unlock wardrobe-first looks.'}
+            </p>
+          </div>
+          <Shirt size={19} className="shrink-0 text-accent" />
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {WARDROBE_GENERATION_MODES.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onSetWardrobeMode(option.value)}
+              className={`rounded-2xl border px-2 py-3 text-left transition ${
+                wardrobeMode === option.value
+                  ? 'border-accent bg-accent text-white shadow-pink-glow'
+                  : 'border-white/10 bg-white/[0.04] text-muted-2'
+              }`}
+            >
+              <span className="block text-[9px] font-black uppercase tracking-[.1em]">{option.label}</span>
+              <span className={`mt-1 block text-[9px] leading-snug ${wardrobeMode === option.value ? 'text-white/76' : 'text-muted'}`}>
+                {option.helper}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 grid grid-cols-[.9fr_1.1fr] gap-2">
+          <button
+            type="button"
+            onClick={onSeedFromWardrobe}
+            disabled={!wardrobeCount}
+            className="rounded-full border border-accent/45 bg-accent/12 px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-accent disabled:border-white/10 disabled:bg-white/[0.04] disabled:text-muted"
+          >
+            Seed board
+          </button>
+          <button
+            type="button"
+            onClick={onGenerate}
+            disabled={generatorLoading || !selectedGenerationSlots.length}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-white/[0.06] disabled:text-muted disabled:shadow-none"
+          >
+            {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+            Generate look
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1527,7 +2011,7 @@ function BuildOverlay({
               x
             </button>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {BUILD_OVERLAY_TABS.map((tab) => (
               <button
                 key={tab}

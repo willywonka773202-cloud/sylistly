@@ -168,8 +168,25 @@ const OUTFIT_RECIPES: Record<VibeId, OutfitRecipe> = {
 };
 
 const FRAME_AVOID_TERMS: Record<GeneratorFrame, string[]> = {
-  masc: ['skirt', 'heel', 'bodysuit', 'corset', 'cat eye', 'pearl'],
-  fem: ['work pants'],
+  masc: [
+    'skirt',
+    'dress',
+    'heel',
+    'heels',
+    'pump',
+    'pumps',
+    'stiletto',
+    'bodysuit',
+    'corset',
+    'bralette',
+    'sports bra',
+    'baby tee',
+    'tube top',
+    'cami',
+    'cat eye',
+    'pearl',
+  ],
+  fem: ['work pants', 'mens', "men's"],
   androgynous: [],
 };
 
@@ -492,6 +509,72 @@ function metadataList(
 
 function isUnderBudget(product: Product, budget: GeneratorBudget, customMaxCents?: number | null): boolean {
   return product.priceCents <= getBudgetMaxCents(budget, customMaxCents);
+}
+
+export function filterProductsByGender(products: Product[], frame: GeneratorFrame): Product[] {
+  if (frame === 'androgynous') {
+    return products.filter((product) => !hasFrameMismatch(product, 'masc') || !hasFrameMismatch(product, 'fem'));
+  }
+
+  return products.filter((product) => !hasFrameMismatch(product, frame));
+}
+
+export function filterProductsByBudget(
+  products: Product[],
+  budget: GeneratorBudget,
+  customMaxCents?: number | null,
+): Product[] {
+  if (budget === 'any') return products;
+  return products.filter((product) => isUnderBudget(product, budget, customMaxCents));
+}
+
+export function filterProductsByCategory(products: Product[], category?: Category | null): Product[] {
+  if (!category) return products;
+  return products.filter((product) => product.category === category);
+}
+
+export function filterProductsByVibe(products: Product[], vibe?: VibeId | null): Product[] {
+  if (!vibe) return products;
+  const vibeTerms = VIBE_TERMS[vibe] || [];
+
+  return products.filter((product) => {
+    const haystack = searchHaystack(product);
+    return (
+      product.vibes?.includes(vibe)
+      || product.occasions?.includes(vibe)
+      || vibeTerms.some((term) => textHasTerm(haystack, term))
+    );
+  });
+}
+
+export function rankCatalogItems(
+  products: Product[],
+  options: {
+    frame?: GeneratorFrame;
+    vibe?: VibeId;
+    category?: Category | null;
+    budget?: GeneratorBudget;
+    customMaxCents?: number | null;
+  } = {},
+): Product[] {
+  const frame = options.frame || 'androgynous';
+  let pool = filterProductsByCategory(products, options.category);
+  pool = filterProductsByGender(pool, frame);
+  if (options.budget) pool = filterProductsByBudget(pool, options.budget, options.customMaxCents);
+  if (options.vibe) pool = filterProductsByVibe(pool, options.vibe);
+
+  return dedupeProducts(pool)
+    .map((product) => ({
+      product,
+      score:
+        productCommerceScore(product)
+        + frameCompatibilityScore(product, frame)
+        + (product.imageQuality === 'good' ? 14 : product.imageQuality === 'ok' ? 4 : -20)
+        + (product.metadata?.featured ? 8 : 0)
+        + (options.vibe && (product.vibes?.includes(options.vibe) || product.occasions?.includes(options.vibe)) ? 12 : 0),
+    }))
+    .sort((left, right) => right.score - left.score)
+    .map((entry) => entry.product);
 }
 
 function dedupeProducts(products: Product[]): Product[] {
@@ -1293,13 +1376,9 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
   const hasSelected = (terms: string[]) => terms.some((term) => selectedHaystack.includes(normalize(term)));
   const hasProduct = (terms: string[]) => terms.some((term) => haystack.includes(normalize(term)));
 
-  if (hasSelected(['blazer', 'trouser', 'office', 'tailored', 'loafer']) && hasProduct(['running', 'gym', 'workout', 'sweatpants', 'gym shorts'])) score -= 62;
-  if (hasSelected(['blazer', 'tailored', 'loafer', 'dress shirt']) && hasProduct(['hoodie', 'cargo', 'graphic']) && !['street', 'edgy', 'cozy'].includes(vibe)) score -= 34;
-  if (hasSelected(['hoodie', 'cargo', 'sneaker', 'cap', 'denim']) && hasProduct(['heel', 'pumps', 'formal', 'satin']) && ['street', 'gym', 'cozy'].includes(vibe)) score -= 42;
+  if (hasSelected(['blazer', 'trouser', 'office', 'tailored']) && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 52;
   if (hasSelected(['puffer', 'winter', 'fleece', 'beanie']) && hasProduct(['sandal', 'linen', 'beach'])) score -= 52;
   if (hasSelected(['linen', 'beach', 'vacation', 'resort']) && hasProduct(['puffer', 'winter', 'boot', 'fleece'])) score -= 52;
-  if (hasSelected(['linen', 'straw', 'resort', 'sandal']) && hasProduct(['linen', 'straw', 'resort', 'sandal', 'shorts'])) score += 24;
-  if (hasSelected(['black', 'leather', 'sleek']) && hasProduct(['black', 'leather', 'sleek', 'silver', 'chain'])) score += 18;
   if (vibe === 'clean' && hasProduct(['graphic', 'neon', 'statement', 'western', 'techwear'])) score -= 44;
   if ((vibe === 'gym' || vibe === 'cozy') && hasProduct(['heel', 'pumps', 'satin', 'dressy'])) score -= 44;
   if ((vibe === 'night' || vibe === 'date') && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 44;
@@ -1375,7 +1454,18 @@ function getSlotCandidates({
   const frameMatched = frame === 'androgynous'
     ? qualityPool
     : qualityPool.filter((product) => !hasFrameMismatch(product, frame));
-  const framePool = frame !== 'androgynous' && frameMatched.length >= 2 ? frameMatched : qualityPool;
+  const frameCompatibleFallback = frame === 'androgynous'
+    ? qualityPool
+    : qualityPool.filter((product) => frameCompatibilityScore(product, frame) >= 0);
+  const framePool = frame === 'androgynous'
+    ? qualityPool
+    : frameMatched.length
+    ? frameMatched
+    : frameCompatibleFallback.length
+    ? frameCompatibleFallback
+    : [];
+
+  if (!framePool.length) return [];
 
   const ranked = framePool
     .map((product) => ({
@@ -1409,29 +1499,12 @@ function getSlotCandidates({
   return [...preferred, ...avoided].slice(0, 96);
 }
 
-function getGenerationAnchorProducts({
-  lockedItems,
-  existingItems,
-  mode,
-}: {
-  lockedItems?: Partial<Record<Category, Product>>;
-  existingItems: Partial<Record<Category, Product>>;
-  mode: GeneratorMode;
-}): Product[] {
-  const lockedAnchors = Object.values(lockedItems || {}).filter((product): product is Product => isRenderableProduct(product));
-  const existingAnchors = mode === 'missing'
-    ? Object.values(existingItems).filter((product): product is Product => isRenderableProduct(product))
-    : [];
-  return dedupeProducts([...lockedAnchors, ...existingAnchors]);
-}
-
 export function buildCatalogLook({
   vibe,
   frame,
   budget,
   customMaxCents,
   currentItems,
-  lockedItems,
   mode,
   seed = 0,
   avoidProductIds = [],
@@ -1442,7 +1515,6 @@ export function buildCatalogLook({
   budget: GeneratorBudget;
   customMaxCents?: number | null;
   currentItems?: Partial<Record<Category, Product>>;
-  lockedItems?: Partial<Record<Category, Product>>;
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
@@ -1454,7 +1526,6 @@ export function buildCatalogLook({
 } {
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
-  const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
   const picked: Partial<Record<Category, Product>> = {};
   const currentIds = new Set(
@@ -1491,7 +1562,6 @@ export function buildCatalogLook({
     mode,
     targetSlots,
     currentCount: currentIds.size,
-    lockedCount: anchorProducts.length,
     avoidCount: avoidIds.size,
     accessorySlotsIncluded: targetSlots.filter((slot) => REFRESH_ACCESSORY_SLOTS.includes(slot)),
   });
@@ -1509,10 +1579,7 @@ export function buildCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
-      selectedProducts: [
-        ...anchorProducts,
-        ...Object.values(picked).filter((product): product is Product => Boolean(product)),
-      ],
+      selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
       collectionCandidates,
     });
     const chosen = chooseVariedCandidate(candidatePool, seed, `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:catalog`);
@@ -1588,7 +1655,6 @@ export async function buildAiCatalogLook({
   budget,
   customMaxCents,
   currentItems,
-  lockedItems,
   mode,
   seed = 0,
   avoidProductIds = [],
@@ -1599,7 +1665,6 @@ export async function buildAiCatalogLook({
   budget: GeneratorBudget;
   customMaxCents?: number | null;
   currentItems?: Partial<Record<Category, Product>>;
-  lockedItems?: Partial<Record<Category, Product>>;
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
@@ -1610,10 +1675,9 @@ export async function buildAiCatalogLook({
   missingSlots: Category[];
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
-  const base = buildCatalogLook({ vibe, frame, budget, customMaxCents, currentItems, lockedItems, mode, seed, avoidProductIds, targetSlots: selectedTargetSlots });
+  const base = buildCatalogLook({ vibe, frame, budget, customMaxCents, currentItems, mode, seed, avoidProductIds, targetSlots: selectedTargetSlots });
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
-  const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
   const currentIds = new Set(
     Object.values(existingItems)
@@ -1657,10 +1721,7 @@ export async function buildAiCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
-      selectedProducts: [
-        ...anchorProducts,
-        ...Object.values(picked).filter((product): product is Product => Boolean(product)),
-      ],
+      selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
       collectionCandidates,
     });
 

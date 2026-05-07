@@ -1,18 +1,19 @@
 'use client';
 
 import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { OutfitBoard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { filterFeedRenderableProducts } from '@/lib/product-image-quality';
-import type { Category, Product } from '@/lib/types';
+import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import type { Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { useWardrobe, WARDROBE_STATUS_LABELS } from '@/store/wardrobe';
 
 const FILTERS = ['For You', 'Trending', 'Following', 'Under $100', 'Night Out', 'Streetwear', 'Clean', 'Gym'];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
@@ -22,14 +23,10 @@ function formatPrice(cents: number): string {
 }
 
 function visibleProducts(post: FeedPost, failedImageIds?: Set<string>): Product[] {
-  return filterFeedRenderableProducts(Object.values(post.items).filter(
+  return Object.values(post.items).filter(
     (product): product is Product =>
-      Boolean(product) && !failedImageIds?.has(product.id),
-  ));
-}
-
-function itemsFromProducts(products: Product[]): Partial<Record<Category, Product>> {
-  return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
+      isHighConfidenceRenderableProduct(product) && !failedImageIds?.has(product.id),
+  );
 }
 
 function postMatches(post: FeedPost, filter: string): boolean {
@@ -46,9 +43,9 @@ export default function FitFeedPage() {
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
   const addComment = useSocialFeed((state) => state.addComment);
-  const generateMorePosts = useSocialFeed((state) => state.generateMorePosts);
   const replaceItems = useFit((state) => state.replaceItems);
   const saveFit = useSavedFits((state) => state.saveFit);
+  const wardrobeItems = useWardrobe((state) => state.items);
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState('For You');
   const [commentPost, setCommentPost] = useState<FeedPost | null>(null);
@@ -57,39 +54,15 @@ export default function FitFeedPage() {
   const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
     () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 3),
     [posts, activeFilter, failedImageIds],
   );
 
-  useEffect(() => {
-    if (posts.length < 24) generateMorePosts(18);
-  }, [generateMorePosts, posts.length]);
-
-  useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        setLoadingMore(true);
-        generateMorePosts(14);
-        window.setTimeout(() => setLoadingMore(false), 360);
-      },
-      { root: null, rootMargin: '900px 0px', threshold: 0.01 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [generateMorePosts, filteredPosts.length]);
-
   function remix(post: FeedPost) {
-    const products = visibleProducts(post, failedImageIds);
-    if (products.length < 3) return;
     setBurstPostId(post.id);
     window.setTimeout(() => {
-      replaceItems(itemsFromProducts(products));
+      replaceItems(post.items);
       router.push('/build');
     }, 180);
   }
@@ -102,10 +75,7 @@ export default function FitFeedPage() {
 
   function savePost(post: FeedPost) {
     toggleSave(post.id);
-    if (!post.saved) {
-      const products = visibleProducts(post, failedImageIds);
-      if (products.length >= 3) saveFit(itemsFromProducts(products));
-    }
+    if (!post.saved) saveFit(post.items);
   }
 
   function shop(post: FeedPost) {
@@ -164,12 +134,13 @@ export default function FitFeedPage() {
         </header>
 
         <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
-          {filteredPosts.map((post) => {
+          {filteredPosts.map((post, postIndex) => {
             const products = visibleProducts(post, failedImageIds);
+            const averageCents = Math.round(post.totalCents / Math.max(1, products.length));
             return (
               <article
                 key={post.id}
-                className="relative flex h-full snap-start snap-always flex-col overflow-hidden bg-[radial-gradient(circle_at_50%_10%,rgba(246,48,107,.14),transparent_34%),linear-gradient(180deg,#14110f_0%,#090807_100%)]"
+                className="relative flex h-full snap-start snap-always flex-col overflow-hidden bg-[radial-gradient(circle_at_50%_8%,rgba(246,48,107,.18),transparent_32%),radial-gradient(circle_at_12%_72%,rgba(255,204,153,.12),transparent_30%),linear-gradient(180deg,#171310_0%,#090807_100%)]"
               >
                 {burstPostId === post.id ? (
                   <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-accent/10">
@@ -178,13 +149,20 @@ export default function FitFeedPage() {
                   </div>
                 ) : null}
 
-                <div className="absolute inset-x-0 top-[78px] z-0 px-4">
+                {postIndex === 0 ? (
+                  <div className="pointer-events-none absolute left-4 top-[calc(env(safe-area-inset-top)+76px)] z-20 rounded-full border border-white/14 bg-black/44 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
+                    Swipe up for more fits
+                  </div>
+                ) : null}
+
+                <div className="absolute inset-x-0 top-[92px] z-0 px-4">
                   <OutfitBoard
-                    items={itemsFromProducts(products)}
-                    className="h-[min(58dvh,520px)] min-h-[390px]"
+                    items={post.items}
+                    className="h-[min(54dvh,500px)] min-h-[350px] shadow-[0_26px_72px_rgba(0,0,0,.38)]"
                     onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                   />
                 </div>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[46dvh] bg-[linear-gradient(180deg,transparent_0%,rgba(9,8,7,.68)_38%,#090807_100%)]" />
 
                 <div className="absolute right-3 top-[47%] z-20 flex -translate-y-1/2 flex-col items-center gap-3">
                   <button onClick={() => like(post)} className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition ${post.liked ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-white/18 bg-black/38 text-white'}`} aria-label="Like fit">
@@ -206,9 +184,19 @@ export default function FitFeedPage() {
                 </div>
 
                 <div className="relative z-10 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+18px)] pr-[76px]">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/34 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
-                    <Sparkles size={12} className="text-accent" />
-                    {post.sourceType || 'catalog'} fit
+                  <div className="flex items-center gap-2">
+                    <div className="grid h-8 w-8 place-items-center rounded-full border border-accent/35 bg-accent text-[12px] font-black text-white shadow-pink-glow">
+                      {post.avatar}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate text-[12px] font-semibold text-white">{post.username}</div>
+                      <div className="text-[9px] uppercase tracking-[.16em] text-white/52">{post.sourceType || 'catalog'} fit</div>
+                    </div>
+                    {post.story ? (
+                      <span className="ml-auto rounded-full border border-accent/35 bg-accent/15 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[.14em] text-accent">
+                        Story
+                      </span>
+                    ) : null}
                   </div>
                   <h1 className="mt-3 font-serif text-[35px] font-semibold leading-[.94] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,.42)]">
                     {post.title}
@@ -229,6 +217,12 @@ export default function FitFeedPage() {
                     <span className="rounded-full border border-white/14 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.14em] text-white/78 backdrop-blur-md">
                       {formatPrice(post.totalCents)}
                     </span>
+                    <span className="rounded-full border border-white/14 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.14em] text-white/78 backdrop-blur-md">
+                      Avg {formatPrice(averageCents)}
+                    </span>
+                    <span className="rounded-full border border-white/14 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.14em] text-white/78 backdrop-blur-md">
+                      {products.length} pieces
+                    </span>
                   </div>
 
                   <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -247,18 +241,18 @@ export default function FitFeedPage() {
                           onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                         />
                         <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
-                          {product.category}
+                          {wardrobeItems[product.id] ? WARDROBE_STATUS_LABELS[wardrobeItems[product.id].status] : product.category}
                         </div>
                       </button>
                     ))}
                   </div>
 
                   <div className="mt-4 grid grid-cols-[1fr_.78fr] gap-2">
-                    <button onClick={() => remix(post)} className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow">
+                    <button onClick={() => remix(post)} className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[.98]">
                       <RotateCcw size={14} />
                       Build this
                     </button>
-                    <button onClick={() => shop(post)} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                    <button onClick={() => shop(post)} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white backdrop-blur-md transition active:scale-[.98]">
                       <ShoppingBag size={14} />
                       Shop Fit
                     </button>
@@ -267,12 +261,22 @@ export default function FitFeedPage() {
               </article>
             );
           })}
-          <div ref={sentinelRef} className="grid min-h-[40dvh] snap-start place-items-center bg-bg px-6 pb-28 text-center">
-            <div>
-              <div className="font-serif text-[24px] text-ink">{loadingMore ? 'Loading more fits' : 'More fits are coming'}</div>
-              <p className="mt-2 text-sm text-muted-2">Keep scrolling for fresh catalog-backed outfits.</p>
-            </div>
-          </div>
+          {!filteredPosts.length ? (
+            <section className="flex h-full snap-start snap-always items-center justify-center bg-[linear-gradient(180deg,#171310_0%,#090807_100%)] px-6 text-center">
+              <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_22px_56px_rgba(0,0,0,.34)]">
+                <Sparkles className="mx-auto text-accent" size={22} />
+                <h2 className="mt-3 font-serif text-[25px] font-semibold text-ink">No fits in this lane</h2>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-2">Switch filters or post a look from Builder to refresh the feed.</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('For You')}
+                  className="mt-4 rounded-full bg-accent px-5 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow"
+                >
+                  Back to For You
+                </button>
+              </div>
+            </section>
+          ) : null}
         </div>
       </div>
 
