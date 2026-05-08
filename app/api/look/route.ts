@@ -52,8 +52,7 @@ export async function POST(req: NextRequest) {
     customMaxCents: typeof body.customMaxCents === 'number' ? body.customMaxCents : null,
     seed,
     avoidProductIds,
-    currentItems: body.currentItems || {},
-    lockedItems: body.lockedItems || {},
+    currentItems: body.lockedItems || body.currentItems || {},
     mode,
     targetSlots,
   });
@@ -76,3 +75,5 @@ export async function POST(req: NextRequest) {
     assistantMode: result.assistantMode,
   });
 }
+
+

@@ -1,6 +1,5 @@
 'use client';
-import { type KeyboardEvent, type MouseEvent, useEffect } from 'react';
-import { useState } from 'react';
+import { type KeyboardEvent, type MouseEvent } from 'react';
 import type { Product } from '@/lib/types';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
@@ -28,33 +27,14 @@ function getHost(url: string): string {
 }
 
 export function ProductCard({ product: p, selected = false, onClick, onImageAvailable, onImageUnavailable }: Props) {
-  const [imageReady, setImageReady] = useState(false);
-  const [imageUnavailable, setImageUnavailable] = useState(false);
-
-  useEffect(() => {
-    setImageReady(false);
-    setImageUnavailable(false);
-  }, [p.id, p.imageUrl]);
-
-  useEffect(() => {
-    if (imageReady || imageUnavailable) return;
-    const timer = window.setTimeout(() => {
-      markImageUnavailable();
-    }, 8_000);
-    return () => window.clearTimeout(timer);
-  }, [p.id, p.imageUrl, imageReady, imageUnavailable]);
-
   function markImageAvailable() {
-    setImageReady(true);
     onImageAvailable?.();
   }
 
   function markImageUnavailable() {
-    setImageUnavailable(true);
     onImageUnavailable?.();
   }
 
-  if (imageUnavailable) return null;
   if (!isRenderableProduct(p)) return null;
 
   const buyUrl = getProductOutboundUrl(p);
@@ -70,21 +50,6 @@ export function ProductCard({ product: p, selected = false, onClick, onImageAvai
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     onClick();
-  }
-
-  if (!imageReady) {
-    return (
-      <div className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
-        <ProductImage
-          product={p}
-          loading="eager"
-          wrapperClassName="h-px w-px overflow-hidden"
-          className="h-px w-px object-contain"
-          onAvailable={markImageAvailable}
-          onUnavailable={markImageUnavailable}
-        />
-      </div>
-    );
   }
 
   return (

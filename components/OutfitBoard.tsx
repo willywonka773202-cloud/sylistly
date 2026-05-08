@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { ProductImage } from '@/components/ProductImage';
 import { filterFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -43,17 +42,7 @@ export function OutfitBoard({
   className?: string;
   onImageUnavailable?: (product: Product) => void;
 }) {
-  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
-  const itemKey = useMemo(
-    () => outfitBoardProducts(items).map((product) => `${product.category}:${product.id}`).join('|'),
-    [items],
-  );
-
-  useEffect(() => {
-    setFailedIds(new Set());
-  }, [itemKey]);
-
-  const products = outfitBoardProducts(items).filter((product) => !failedIds.has(product.id));
+  const products = outfitBoardProducts(items);
   const byCategory = new Map(products.map((product) => [product.category, product]));
   const visibleSlots = BOARD_ORDER.filter((category) => byCategory.has(category));
 
@@ -76,7 +65,6 @@ export function OutfitBoard({
               wrapperClassName="h-full w-full"
               className={`h-full w-full object-contain ${IMAGE_PADDING[category]}`}
               onUnavailable={(failedProduct) => {
-                setFailedIds((current) => new Set(current).add(failedProduct.id));
                 onImageUnavailable?.(failedProduct);
               }}
             />

@@ -7,6 +7,7 @@ import { Mannequin, type FitVariant } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import { ProductImage } from '@/components/ProductImage';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
@@ -15,8 +16,7 @@ import { useWardrobe } from '@/store/wardrobe';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { proxiedImageUrl } from '@/lib/image-url';
-import { filterRenderableProducts, hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
+import { filterRenderableProducts, isRenderableProduct } from '@/lib/product-image-quality';
 import {
   VIBES,
   getBudgetMaxCents,
@@ -2231,34 +2231,16 @@ function PanelPreviewImage({
   wrapperClassName: string;
   modeClassName: string;
 }) {
-  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'hidden'>(() =>
-    hasUsableProductImage(product) ? 'cutout' : 'hidden',
-  );
-
-  const src =
-    imageMode === 'hidden' || !hasUsableProductImage(product)
-      ? ''
-      : imageMode === 'cutout'
-      ? proxiedImageUrl(product.imageUrl, { cutout: true, category })
-      : proxiedImageUrl(product.imageUrl);
-
-  useEffect(() => {
-    setImageMode(hasUsableProductImage(product) ? 'cutout' : 'hidden');
-  }, [product.id, product.imageUrl]);
-
-  if (!src) return null;
-
   return (
     <div className={wrapperClassName}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={`${product.brand} ${product.name}`}
+      <ProductImage
+        product={product}
+        category={category}
+        cutout
+        size="lg"
+        wrapperClassName="h-full w-full"
         className={modeClassName}
-        style={{ filter: 'drop-shadow(0 10px 18px rgba(0,0,0,.08))' }}
         loading="lazy"
-        referrerPolicy="no-referrer"
-        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'hidden'))}
       />
     </div>
   );

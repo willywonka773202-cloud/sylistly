@@ -30,7 +30,6 @@ export default function SavedPage() {
   const wardrobeItems = useWardrobe((state) => state.items);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState<string>('Saved fit');
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeFit, setActiveFit] = useState<{
     fit: SavedFitRecord;
     visualItems: Partial<Record<Category, Product>>;
@@ -40,7 +39,7 @@ export default function SavedPage() {
   const displayFits = fits
     .map((fit) => {
       const visualEntries = Object.entries(fit.items)
-        .filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id));
+        .filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1]));
       const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
       const visualProducts = visualEntries.map(([, product]) => product);
 
@@ -87,9 +86,6 @@ export default function SavedPage() {
                         product={product}
                         wrapperClassName="h-full w-full"
                         className="h-full w-full object-contain p-1.5"
-                        onUnavailable={(failedProduct) => {
-                          setFailedImageIds((current) => new Set(current).add(failedProduct.id));
-                        }}
                       />
                     </div>
                   ))}
@@ -196,7 +192,6 @@ export default function SavedPage() {
                       product={product}
                       wrapperClassName="h-full w-full"
                       className="h-full w-full object-contain p-2"
-                      onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                     />
                   </div>
                 ))}

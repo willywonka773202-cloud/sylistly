@@ -8,7 +8,7 @@ import {
   frameBiasDescription,
   frameDisplayLabel,
 } from '@/lib/search-frame';
-import { hasUsableProductImage, sortImageBackedProducts } from '@/lib/product-image-quality';
+import { sortImageBackedProducts } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -150,7 +150,6 @@ export function SearchSheet({
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
   const [canUseDemo, setCanUseDemo] = useState(false);
   const [readyImageIds, setReadyImageIds] = useState<Set<string>>(new Set());
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeResultIndex, setActiveResultIndex] = useState(0);
   const [searchPriceMax, setSearchPriceMax] = useState<number | null>(priceMax);
   const [customPriceInput, setCustomPriceInput] = useState(
@@ -179,7 +178,6 @@ export function SearchSheet({
     setSearchMode(null);
     setCanUseDemo(false);
     setReadyImageIds(new Set());
-    setFailedImageIds(new Set());
     setActiveResultIndex(0);
     setSearchPriceMax(priceMax);
     setCustomPriceInput(
@@ -225,7 +223,6 @@ export function SearchSheet({
         setResults([]);
         setIsDemoResults(false);
         setReadyImageIds(new Set());
-        setFailedImageIds(new Set());
         setActiveResultIndex(0);
         setResultSource(null);
         setCatalogKind(null);
@@ -245,7 +242,6 @@ export function SearchSheet({
 
       setIsDemoResults(Boolean(data.mock));
       setReadyImageIds(new Set());
-      setFailedImageIds(new Set());
       setActiveResultIndex(0);
       setResultSource(data.source === 'catalog' ? 'catalog' : 'live');
       setCatalogKind(
@@ -274,7 +270,6 @@ export function SearchSheet({
       setResults([]);
       setIsDemoResults(false);
       setReadyImageIds(new Set());
-      setFailedImageIds(new Set());
       setActiveResultIndex(0);
       setResultSource(null);
       setCatalogKind(null);
@@ -305,12 +300,11 @@ export function SearchSheet({
     setSearchMode(null);
     setCanUseDemo(false);
     setReadyImageIds(new Set());
-    setFailedImageIds(new Set());
     setActiveResultIndex(0);
   }
 
   const candidateResults = results
-    ? sortImageBackedProducts(results).filter((product) => !failedImageIds.has(product.id))
+    ? sortImageBackedProducts(results)
     : results;
   const activeCandidate = candidateResults?.[activeResultIndex] || null;
   const activeImageReady = activeCandidate ? readyImageIds.has(activeCandidate.id) : false;
@@ -337,7 +331,7 @@ export function SearchSheet({
   useEffect(() => {
     if (!activeCandidate || activeImageReady) return;
     const timer = window.setTimeout(() => {
-      setFailedImageIds((current) => new Set(current).add(activeCandidate.id));
+      setReadyImageIds((current) => new Set(current).add(activeCandidate.id));
     }, 8_000);
     return () => window.clearTimeout(timer);
   }, [activeCandidate?.id, activeImageReady]);
@@ -402,7 +396,7 @@ export function SearchSheet({
                   {slotOrder.map((slot) => {
                     const product = displayItems[slot];
                     const active = slot === currentCategory;
-                    const renderableProduct = hasUsableProductImage(product) && !failedImageIds.has(product.id) ? product : null;
+                    const renderableProduct = product || null;
 
                     return (
                       <button
@@ -431,9 +425,6 @@ export function SearchSheet({
                               product={renderableProduct}
                               wrapperClassName="h-full w-full"
                               className="h-full w-full object-contain p-2"
-                              onUnavailable={(failedProduct) => {
-                                setFailedImageIds((current) => new Set(current).add(failedProduct.id));
-                              }}
                             />
                           ) : (
                             <span className="text-[22px] leading-none text-[#7d7068]">+</span>
@@ -638,7 +629,6 @@ export function SearchSheet({
                             type="button"
                             onClick={() => {
                               setActiveResultIndex(0);
-                              setFailedImageIds(new Set());
                               setReadyImageIds(new Set());
                             }}
                             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
@@ -675,7 +665,6 @@ export function SearchSheet({
                                 next.delete(product.id);
                                 return next;
                               });
-                              setFailedImageIds((current) => new Set(current).add(product.id));
                             }}
                           />
                         </div>
@@ -715,7 +704,6 @@ export function SearchSheet({
                                   next.delete(product.id);
                                   return next;
                                 });
-                                setFailedImageIds((current) => new Set(current).add(product.id));
                               }}
                             />
                           </div>

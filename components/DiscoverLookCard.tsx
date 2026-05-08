@@ -93,7 +93,6 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
   const router = useRouter();
   const replaceItems = useFit((state) => state.replaceItems);
   const [heroFailed, setHeroFailed] = useState(false);
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const showHeroImage = Boolean(
     look.previewImageStatus === 'ready'
     && look.previewImageUrl
@@ -146,15 +145,12 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
         </div>
 
         <div className="mt-5 flex gap-2.5 overflow-hidden opacity-90">
-          {look.products.filter((product) => !failedImageIds.has(product.id)).slice(0, 4).map((product) => (
+          {look.products.slice(0, 4).map((product) => (
             <div key={product.id} className="h-16 w-16 flex-none overflow-hidden rounded-[16px] border border-[#eadfd5] bg-[#fbf4ee] shadow-[0_8px_18px_rgba(0,0,0,.14)] sm:h-[70px] sm:w-[70px]">
               <ProductImage
                 product={product}
                 wrapperClassName="h-full w-full"
                 className="h-full w-full object-contain p-1.5"
-                onUnavailable={(failedProduct) => {
-                  setFailedImageIds((current) => new Set(current).add(failedProduct.id));
-                }}
               />
             </div>
           ))}

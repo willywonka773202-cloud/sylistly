@@ -22,10 +22,9 @@ function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
-function visibleProducts(post: FeedPost, failedImageIds?: Set<string>): Product[] {
+function visibleProducts(post: FeedPost): Product[] {
   return Object.values(post.items).filter(
-    (product): product is Product =>
-      isHighConfidenceRenderableProduct(product) && !failedImageIds?.has(product.id),
+    (product): product is Product => isHighConfidenceRenderableProduct(product),
   );
 }
 
@@ -52,11 +51,10 @@ export default function FitFeedPage() {
   const [commentText, setCommentText] = useState('');
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const filteredPosts = useMemo(
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 3),
-    [posts, activeFilter, failedImageIds],
+    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 3),
+    [posts, activeFilter],
   );
 
   function remix(post: FeedPost) {
@@ -79,7 +77,7 @@ export default function FitFeedPage() {
   }
 
   function shop(post: FeedPost) {
-    const products = visibleProducts(post, failedImageIds)
+    const products = visibleProducts(post)
       .map((product) => ({
         id: product.id,
         brand: product.brand,
@@ -135,7 +133,7 @@ export default function FitFeedPage() {
 
         <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
           {filteredPosts.map((post, postIndex) => {
-            const products = visibleProducts(post, failedImageIds);
+            const products = visibleProducts(post);
             const averageCents = Math.round(post.totalCents / Math.max(1, products.length));
             return (
               <article
@@ -159,7 +157,6 @@ export default function FitFeedPage() {
                   <OutfitBoard
                     items={post.items}
                     className="h-[min(54dvh,500px)] min-h-[350px] shadow-[0_26px_72px_rgba(0,0,0,.38)]"
-                    onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                   />
                 </div>
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[46dvh] bg-[linear-gradient(180deg,transparent_0%,rgba(9,8,7,.68)_38%,#090807_100%)]" />
@@ -238,7 +235,6 @@ export default function FitFeedPage() {
                           product={product}
                           wrapperClassName="h-full w-full"
                           className="h-full w-full object-contain p-1.5 transition group-active:scale-95"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                         />
                         <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
                           {wardrobeItems[product.id] ? WARDROBE_STATUS_LABELS[wardrobeItems[product.id].status] : product.category}

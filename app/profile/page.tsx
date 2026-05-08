@@ -30,10 +30,9 @@ function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
-function postProducts(post: FeedPost, failedImageIds: Set<string>): Product[] {
+function postProducts(post: FeedPost): Product[] {
   return Object.values(post.items).filter(
-    (product): product is Product =>
-      isHighConfidenceRenderableProduct(product) && !failedImageIds.has(product.id),
+    (product): product is Product => isHighConfidenceRenderableProduct(product),
   );
 }
 
@@ -57,17 +56,16 @@ export default function ProfilePage() {
   const [activePost, setActivePost] = useState<FeedPost | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Style profile');
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeProfileTab, setActiveProfileTab] = useState<'clothes' | 'outfits' | 'collections'>('outfits');
   const [activeFilter, setActiveFilter] = useState('All');
 
   const userPosts = useMemo(
-    () => posts.filter((post) => post.username === '@you' && postProducts(post, failedImageIds).length >= 3),
-    [posts, failedImageIds],
+    () => posts.filter((post) => post.username === '@you' && postProducts(post).length >= 3),
+    [posts],
   );
   const gridPosts = userPosts.length
     ? userPosts
-    : posts.filter((post) => postProducts(post, failedImageIds).length >= 3).slice(0, 8);
+    : posts.filter((post) => postProducts(post).length >= 3).slice(0, 8);
   const filteredGridPosts = activeFilter === 'All'
     ? gridPosts
     : gridPosts.filter((post) =>
@@ -76,7 +74,7 @@ export default function ProfilePage() {
   const wardrobeProducts = Object.values(wardrobeItems)
     .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))
     .map((item) => item.product)
-    .filter((product) => isHighConfidenceRenderableProduct(product) && !failedImageIds.has(product.id));
+    .filter(isHighConfidenceRenderableProduct);
   const likedCount = posts.filter((post) => post.liked).length;
   const closetCount = Object.keys(wardrobeItems).length;
 
@@ -86,7 +84,7 @@ export default function ProfilePage() {
   }
 
   function shop(post: FeedPost) {
-    const products = postProducts(post, failedImageIds)
+    const products = postProducts(post)
       .map((product) => ({
         id: product.id,
         brand: product.brand,
@@ -242,7 +240,7 @@ export default function ProfilePage() {
           {activeProfileTab === 'outfits' ? (
             <div className="mt-3 grid grid-cols-2 gap-3">
             {(filteredGridPosts.length ? filteredGridPosts : gridPosts).map((post) => {
-              const products = postProducts(post, failedImageIds);
+              const products = postProducts(post);
               return (
                 <button
                   key={post.id}
@@ -257,7 +255,6 @@ export default function ProfilePage() {
                           product={product}
                           wrapperClassName="h-full w-full"
                           className="h-full w-full object-contain p-1.5"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                         />
                       </div>
                     ))}
@@ -287,7 +284,6 @@ export default function ProfilePage() {
                       product={product}
                       wrapperClassName="h-full w-full"
                       className="h-full w-full object-contain p-1.5"
-                      onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                     />
                   </div>
                   <div className="mt-1 truncate text-[9px] font-bold text-[#221d19]">{product.brand}</div>
@@ -308,7 +304,7 @@ export default function ProfilePage() {
                   className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] p-4 text-left shadow-[0_18px_38px_rgba(0,0,0,.28)]"
                 >
                   <div className="grid h-20 grid-cols-2 gap-1.5">
-                    {(gridPosts[index]?.items ? postProducts(gridPosts[index], failedImageIds).slice(0, 3) : []).map((product) => (
+                    {(gridPosts[index]?.items ? postProducts(gridPosts[index]).slice(0, 3) : []).map((product) => (
                       <div key={`${collection}-${product.id}`} className="overflow-hidden rounded-xl bg-[#fff7ef]">
                         <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1" />
                       </div>
@@ -424,13 +420,12 @@ export default function ProfilePage() {
 
             <div className="mt-4 rounded-[28px] border border-[#eadfd5] bg-[#fff7ef] p-2">
               <div className="grid h-[360px] grid-cols-2 grid-rows-3 gap-2 overflow-hidden rounded-[22px] bg-[#fffaf5] p-2">
-                {postProducts(activePost, failedImageIds).slice(0, 6).map((product, index) => (
+                {postProducts(activePost).slice(0, 6).map((product, index) => (
                   <div key={`${activePost.id}-modal-${product.id}`} className={`overflow-hidden rounded-[16px] bg-white/80 ring-1 ring-[#eadfd5] ${index === 0 ? 'row-span-2' : ''}`}>
                     <ProductImage
                       product={product}
                       wrapperClassName="h-full w-full"
                       className="h-full w-full object-contain p-2"
-                      onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                     />
                   </div>
                 ))}

@@ -280,8 +280,7 @@ function simulateLockedGenerationScenario({
     budget: 'any',
     mode: 'refresh',
     seed: 94_000 + label.length * 131,
-    currentItems: base.products,
-    lockedItems,
+    currentItems: lockedItems,
     targetSlots: unlockedSlots,
     avoidProductIds: productIds(base.products),
   });
@@ -410,3 +409,6 @@ for (const report of lockReports) {
 if (lockReports.some((report) => !report.passed)) {
   process.exitCode = 1;
 }
+
+
+
