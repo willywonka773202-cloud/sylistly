@@ -299,7 +299,9 @@ export async function POST(req: NextRequest) {
         Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
       ));
 
-      cacheProducts(rankedCatalogProducts).catch(() => {});
+      cacheProducts(rankedCatalogProducts).catch((err) =>
+        console.error('[api/search] cacheProducts failed:', err),
+      );
       searchResponseCache.set(cacheKey, {
         expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
         products: rankedCatalogProducts,
@@ -387,7 +389,9 @@ export async function POST(req: NextRequest) {
             Date.now() - startedAt,
           );
 
-          cacheProducts(products).catch(() => {});
+          cacheProducts(products).catch((err) =>
+            console.error('[api/search] cacheProducts failed:', err),
+          );
           searchResponseCache.set(cacheKey, {
             expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
             products,
@@ -417,7 +421,9 @@ export async function POST(req: NextRequest) {
           Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
         ));
 
-        cacheProducts(rankedPreviewProducts).catch(() => {});
+        cacheProducts(rankedPreviewProducts).catch((err) =>
+          console.error('[api/search] cacheProducts failed:', err),
+        );
         searchResponseCache.set(cacheKey, {
           expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
           products: rankedPreviewProducts,
