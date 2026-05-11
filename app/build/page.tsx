@@ -1001,33 +1001,7 @@ function BuilderPageContent({
                   activeEditSlot={activeEditSlot}
                 />
               </motion.div>
-              <div className="absolute inset-x-3 bottom-3 z-30 grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveBuildOverlay('settings')}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
-                >
-                  <SlidersHorizontal size={13} />
-                  Controls
-                </button>
-                <button
-                  type="button"
-                  onClick={seedFromWardrobe}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
-                >
-                  <Shirt size={13} />
-                  Closet
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
-                  disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
-                >
-                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                  Generate
-                </button>
-              </div>
+
             </div>
 
           {/* Main Board Summary & Action Area */}
@@ -1035,16 +1009,14 @@ function BuilderPageContent({
             <div className="mb-4 flex items-center justify-between px-2">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-[.14em] text-muted">Look Total</span>
-                <span className="font-serif text-lg font-semibold text-ink">{totalDisplay}</span>
+                <span className="font-serif text-[18px] font-semibold text-ink">{totalDisplay}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                {outfitScore && (
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-bold uppercase tracking-[.14em] text-accent">Score</span>
-                    <span className="font-serif text-lg font-semibold text-accent">{outfitScore.total}</span>
-                  </div>
-                )}
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-[.14em] text-accent">Score</span>
+                  <span className="font-serif text-[18px] font-semibold text-accent">{outfitScore.total}</span>
+                </div>
               </div>
             </div>
 
