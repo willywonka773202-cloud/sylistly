@@ -1,0 +1,266 @@
+[
+  {
+    "id": "searchapi-classyyettrendy-2f339c6338a4e990",
+    "brand": "ClassyYetTrendy",
+    "name": "Men's Simplified Style - A Year-Round Capsule Wardrobe",
+    "category": "hat",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "priceCents": 3499,
+    "currency": "USD",
+    "budgetTier": "budget",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn%3AANd9GcQL-cZHddg5WuyIkTFTZOwCF6UkELC-V07hboPWs_e8Dsf9RLWPWNOj3U6rMvVIkEBOPUASRoZs-0wyp9LX_SUE_PhdkANxyQ",
+    "productUrl": "https://www.google.com/search?q=men+capsule+wardrobe+basics+products&oq=men+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "retailerUrl": "https://www.google.com/search?q=men+capsule+wardrobe+basics+products&oq=men+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "sourceQuery": "men capsule wardrobe basics products",
+    "sourceResultPosition": 1,
+    "sourceProductId": null,
+    "retailer": "ClassyYetTrendy",
+    "vibes": [
+      "capsule"
+    ],
+    "occasions": [
+      "everyday"
+    ],
+    "searchTerms": [
+      "men",
+      "capsule",
+      "wardrobe",
+      "basics",
+      "simplified",
+      "style",
+      "year",
+      "round",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "importedAt": "2026-05-11T13:24:40.006Z",
+    "metadata": {
+      "source": "searchapi",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate"
+    }
+  },
+  {
+    "id": "searchapi-old-navy-dbc4e7450e591d68",
+    "brand": "Old Navy",
+    "name": "Old Navy Women's Classic Button-Down Shirt",
+    "category": "hat",
+    "gender": [
+      "fem",
+      "androgynous"
+    ],
+    "priceCents": 2999,
+    "currency": "USD",
+    "budgetTier": "budget",
+    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn%3AANd9GcQeqtdymmy4vIqtd7ay_MXuiALbOh800cw-lLqoMBPMcko6g1H1Mc_qC0S_5L8O0OcZcROGzZTR7XTkXbWdpBtx5lRA_7kKoJvhPzKwphTITsohU4hXTXX7cg",
+    "productUrl": "https://www.google.com/search?q=women+capsule+wardrobe+basics+products&oq=women+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "retailerUrl": "https://www.google.com/search?q=women+capsule+wardrobe+basics+products&oq=women+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "sourceQuery": "women capsule wardrobe basics products",
+    "sourceResultPosition": 1,
+    "sourceProductId": "357596861429208920",
+    "retailer": "Old Navy",
+    "vibes": [
+      "capsule"
+    ],
+    "occasions": [
+      "everyday"
+    ],
+    "searchTerms": [
+      "women",
+      "capsule",
+      "wardrobe",
+      "basics",
+      "old",
+      "navy",
+      "classic",
+      "button",
+      "down",
+      "shirt",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "importedAt": "2026-05-11T13:24:40.006Z",
+    "metadata": {
+      "source": "searchapi",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate"
+    }
+  },
+  {
+    "id": "searchapi-boohooman-us-4e766513bd732ec4",
+    "brand": "BOOHOOMAN US",
+    "name": "boohooMAN Men's Regular Fit Cargo Hooded Tracksuit",
+    "category": "shoes",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "priceCents": 2900,
+    "currency": "USD",
+    "budgetTier": "budget",
+    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn%3AANd9GcRmlLUJE6Ezf1BDfp3QGOmAyL_XCS0skEmsKsPfEyGMDGo9y8gteaEk_BL4-RA4XilQMnH-9eE38mYDgDDkVW3XEhctP-kXUt0eKPzlgLMcfdhNoinq9Bx8fA",
+    "productUrl": "https://www.google.com/search?q=men+streetwear+cargos+hoodie+sneakers&oq=men+streetwear+cargos+hoodie+sneakers&gl=us&hl=en&udm=28",
+    "retailerUrl": "https://www.google.com/search?q=men+streetwear+cargos+hoodie+sneakers&oq=men+streetwear+cargos+hoodie+sneakers&gl=us&hl=en&udm=28",
+    "sourceQuery": "men streetwear cargos hoodie sneakers",
+    "sourceResultPosition": 1,
+    "sourceProductId": "7169485167290464204",
+    "retailer": "BOOHOOMAN US",
+    "vibes": [
+      "streetwear",
+      "sneaker rotation"
+    ],
+    "occasions": [
+      "casual"
+    ],
+    "searchTerms": [
+      "men",
+      "streetwear",
+      "cargos",
+      "hoodie",
+      "sneakers",
+      "boohooman",
+      "regular",
+      "fit",
+      "cargo",
+      "hooded",
+      "tracksuit",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "importedAt": "2026-05-11T13:24:40.006Z",
+    "metadata": {
+      "source": "searchapi",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate"
+    }
+  },
+  {
+    "id": "searchapi-walmart-mengtao-f110c22d3258d99e",
+    "brand": "Walmart - MENGtao",
+    "name": "Light Cardigans for Women Summer Casual Loose Fit Solid Color Minimalist Knit Sweater with Pocket Cozy Girls Cardigan, Women's, Size: Medium, Brown",
+    "category": "shoes",
+    "gender": [
+      "fem",
+      "androgynous"
+    ],
+    "priceCents": 2129,
+    "currency": "USD",
+    "budgetTier": "budget",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn%3AANd9GcTjcQ2ZwHF6c9MJweoEQPdAWQwTBaOxW_2vVUHCCAAyhHjbNUH7vRpKjF8ufA_aj5Kb85KjK8NQsTNaV0i9A0BWQzezrJsh4w",
+    "productUrl": "https://www.google.com/search?q=women+clean+girl+cardigan+jeans+sneakers+bag&oq=women+clean+girl+cardigan+jeans+sneakers+bag&gl=us&hl=en&udm=28",
+    "retailerUrl": "https://www.google.com/search?q=women+clean+girl+cardigan+jeans+sneakers+bag&oq=women+clean+girl+cardigan+jeans+sneakers+bag&gl=us&hl=en&udm=28",
+    "sourceQuery": "women clean girl cardigan jeans sneakers bag",
+    "sourceResultPosition": 1,
+    "sourceProductId": null,
+    "retailer": "Walmart - MENGtao",
+    "vibes": [
+      "streetwear",
+      "clean",
+      "sneaker rotation"
+    ],
+    "occasions": [
+      "casual"
+    ],
+    "searchTerms": [
+      "women",
+      "clean",
+      "girl",
+      "cardigan",
+      "jeans",
+      "sneakers",
+      "bag",
+      "light",
+      "cardigans",
+      "summer",
+      "casual",
+      "loose",
+      "fit",
+      "solid",
+      "color",
+      "minimalist",
+      "knit",
+      "sweater",
+      "pocket"
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "importedAt": "2026-05-11T13:24:40.006Z",
+    "metadata": {
+      "source": "searchapi",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate"
+    }
+  },
+  {
+    "id": "searchapi-old-money-worldwide-053c8262faff8cac",
+    "brand": "Old Money WorldWide",
+    "name": "Old Money Suede Loafers Men",
+    "category": "shoes",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "priceCents": 2680,
+    "currency": "USD",
+    "budgetTier": "budget",
+    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn%3AANd9GcTz_QG4DkVBnyE9rvHboJXr0Wm59CFThcgW4ErwBsTEqZ8EKc5soce8H_SYdDGs3GPt-sQ1YZ6r77O0jQvm2T8HOLTqiVeW6XgGG_fUfdx3PcAUx9v2LuKf",
+    "productUrl": "https://www.google.com/search?q=men+old+money+loafers+trousers+polo+blazer&oq=men+old+money+loafers+trousers+polo+blazer&gl=us&hl=en&udm=28",
+    "retailerUrl": "https://www.google.com/search?q=men+old+money+loafers+trousers+polo+blazer&oq=men+old+money+loafers+trousers+polo+blazer&gl=us&hl=en&udm=28",
+    "sourceQuery": "men old money loafers trousers polo blazer",
+    "sourceResultPosition": 1,
+    "sourceProductId": "7515438223102879938",
+    "retailer": "Old Money WorldWide",
+    "vibes": [
+      "old money"
+    ],
+    "occasions": [
+      "smart casual"
+    ],
+    "searchTerms": [
+      "men",
+      "old",
+      "money",
+      "loafers",
+      "trousers",
+      "polo",
+      "blazer",
+      "suede",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "importedAt": "2026-05-11T13:24:40.006Z",
+    "metadata": {
+      "source": "searchapi",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate"
+    }
+  }
+]
