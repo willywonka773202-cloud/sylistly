@@ -161,6 +161,22 @@ export default function SavedPage() {
           <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
             Save a look from the builder and it will show up here instantly on this MacBook, even before cloud storage is turned on.
           </p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => router.push('/feed')}
+              className="rounded-full bg-accent px-4 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow"
+            >
+              Browse feed
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/build')}
+              className="rounded-full border border-hairline bg-surface-2 px-4 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-muted-2"
+            >
+              Build fit
+            </button>
+          </div>
         </section>
       )}
       <CheckoutSheet

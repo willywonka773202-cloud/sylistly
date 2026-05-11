@@ -1,0 +1,246 @@
+[
+  {
+    "id": "searchapi-classyyettrendy-2f339c6338a4e990",
+    "brand": "ClassyYetTrendy",
+    "name": "Men's Simplified Style - A Year-Round Capsule Wardrobe",
+    "category": "hat",
+    "priceCents": 3499,
+    "currency": "USD",
+    "retailer": "ClassyYetTrendy",
+    "retailerUrl": "https://www.google.com/search?q=men+capsule+wardrobe+basics+products&oq=men+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "productUrl": "https://www.google.com/search?q=men+capsule+wardrobe+basics+products&oq=men+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn%3AANd9GcQL-cZHddg5WuyIkTFTZOwCF6UkELC-V07hboPWs_e8Dsf9RLWPWNOj3U6rMvVIkEBOPUASRoZs-0wyp9LX_SUE_PhdkANxyQ",
+    "imageQuality": "ok",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "vibes": [
+      "capsule"
+    ],
+    "occasions": [
+      "everyday"
+    ],
+    "searchTerms": [
+      "men",
+      "capsule",
+      "wardrobe",
+      "basics",
+      "simplified",
+      "style",
+      "year",
+      "round",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "metadata": {
+      "source": "searchapi-reviewed",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate",
+      "needsReview": false,
+      "reviewReasons": []
+    }
+  },
+  {
+    "id": "searchapi-old-navy-dbc4e7450e591d68",
+    "brand": "Old Navy",
+    "name": "Old Navy Women's Classic Button-Down Shirt",
+    "category": "hat",
+    "priceCents": 2999,
+    "currency": "USD",
+    "retailer": "Old Navy",
+    "retailerUrl": "https://www.google.com/search?q=women+capsule+wardrobe+basics+products&oq=women+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "productUrl": "https://www.google.com/search?q=women+capsule+wardrobe+basics+products&oq=women+capsule+wardrobe+basics+products&gl=us&hl=en&udm=28",
+    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn%3AANd9GcQeqtdymmy4vIqtd7ay_MXuiALbOh800cw-lLqoMBPMcko6g1H1Mc_qC0S_5L8O0OcZcROGzZTR7XTkXbWdpBtx5lRA_7kKoJvhPzKwphTITsohU4hXTXX7cg",
+    "imageQuality": "ok",
+    "gender": [
+      "fem",
+      "androgynous"
+    ],
+    "vibes": [
+      "capsule"
+    ],
+    "occasions": [
+      "everyday"
+    ],
+    "searchTerms": [
+      "women",
+      "capsule",
+      "wardrobe",
+      "basics",
+      "old",
+      "navy",
+      "classic",
+      "button",
+      "down",
+      "shirt",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "metadata": {
+      "source": "searchapi-reviewed",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate",
+      "needsReview": false,
+      "reviewReasons": []
+    }
+  },
+  {
+    "id": "searchapi-boohooman-us-4e766513bd732ec4",
+    "brand": "BOOHOOMAN US",
+    "name": "boohooMAN Men's Regular Fit Cargo Hooded Tracksuit",
+    "category": "shoes",
+    "priceCents": 2900,
+    "currency": "USD",
+    "retailer": "BOOHOOMAN US",
+    "retailerUrl": "https://www.google.com/search?q=men+streetwear+cargos+hoodie+sneakers&oq=men+streetwear+cargos+hoodie+sneakers&gl=us&hl=en&udm=28",
+    "productUrl": "https://www.google.com/search?q=men+streetwear+cargos+hoodie+sneakers&oq=men+streetwear+cargos+hoodie+sneakers&gl=us&hl=en&udm=28",
+    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn%3AANd9GcRmlLUJE6Ezf1BDfp3QGOmAyL_XCS0skEmsKsPfEyGMDGo9y8gteaEk_BL4-RA4XilQMnH-9eE38mYDgDDkVW3XEhctP-kXUt0eKPzlgLMcfdhNoinq9Bx8fA",
+    "imageQuality": "ok",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "vibes": [
+      "streetwear",
+      "sneaker rotation"
+    ],
+    "occasions": [
+      "casual"
+    ],
+    "searchTerms": [
+      "men",
+      "streetwear",
+      "cargos",
+      "hoodie",
+      "sneakers",
+      "boohooman",
+      "regular",
+      "fit",
+      "cargo",
+      "hooded",
+      "tracksuit",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "metadata": {
+      "source": "searchapi-reviewed",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate",
+      "needsReview": false,
+      "reviewReasons": []
+    }
+  },
+  {
+    "id": "searchapi-walmart-mengtao-f110c22d3258d99e",
+    "brand": "Walmart - MENGtao",
+    "name": "Light Cardigans for Women Summer Casual Loose Fit Solid Color Minimalist Knit Sweater with Pocket Cozy Girls Cardigan, Women's, Size: Medium, Brown",
+    "category": "shoes",
+    "priceCents": 2129,
+    "currency": "USD",
+    "retailer": "Walmart - MENGtao",
+    "retailerUrl": "https://www.google.com/search?q=women+clean+girl+cardigan+jeans+sneakers+bag&oq=women+clean+girl+cardigan+jeans+sneakers+bag&gl=us&hl=en&udm=28",
+    "productUrl": "https://www.google.com/search?q=women+clean+girl+cardigan+jeans+sneakers+bag&oq=women+clean+girl+cardigan+jeans+sneakers+bag&gl=us&hl=en&udm=28",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn%3AANd9GcTjcQ2ZwHF6c9MJweoEQPdAWQwTBaOxW_2vVUHCCAAyhHjbNUH7vRpKjF8ufA_aj5Kb85KjK8NQsTNaV0i9A0BWQzezrJsh4w",
+    "imageQuality": "ok",
+    "gender": [
+      "fem",
+      "androgynous"
+    ],
+    "vibes": [
+      "streetwear",
+      "clean",
+      "sneaker rotation"
+    ],
+    "occasions": [
+      "casual"
+    ],
+    "searchTerms": [
+      "women",
+      "clean",
+      "girl",
+      "cardigan",
+      "jeans",
+      "sneakers",
+      "bag",
+      "light",
+      "cardigans",
+      "summer",
+      "casual",
+      "loose",
+      "fit",
+      "solid",
+      "color",
+      "minimalist",
+      "knit",
+      "sweater",
+      "pocket"
+    ],
+    "metadata": {
+      "source": "searchapi-reviewed",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate",
+      "needsReview": false,
+      "reviewReasons": []
+    }
+  },
+  {
+    "id": "searchapi-old-money-worldwide-053c8262faff8cac",
+    "brand": "Old Money WorldWide",
+    "name": "Old Money Suede Loafers Men",
+    "category": "shoes",
+    "priceCents": 2680,
+    "currency": "USD",
+    "retailer": "Old Money WorldWide",
+    "retailerUrl": "https://www.google.com/search?q=men+old+money+loafers+trousers+polo+blazer&oq=men+old+money+loafers+trousers+polo+blazer&gl=us&hl=en&udm=28",
+    "productUrl": "https://www.google.com/search?q=men+old+money+loafers+trousers+polo+blazer&oq=men+old+money+loafers+trousers+polo+blazer&gl=us&hl=en&udm=28",
+    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn%3AANd9GcTz_QG4DkVBnyE9rvHboJXr0Wm59CFThcgW4ErwBsTEqZ8EKc5soce8H_SYdDGs3GPt-sQ1YZ6r77O0jQvm2T8HOLTqiVeW6XgGG_fUfdx3PcAUx9v2LuKf",
+    "imageQuality": "ok",
+    "gender": [
+      "masc",
+      "androgynous"
+    ],
+    "vibes": [
+      "old money"
+    ],
+    "occasions": [
+      "smart casual"
+    ],
+    "searchTerms": [
+      "men",
+      "old",
+      "money",
+      "loafers",
+      "trousers",
+      "polo",
+      "blazer",
+      "suede",
+      "https",
+      "www",
+      "google",
+      "com",
+      "search"
+    ],
+    "metadata": {
+      "source": "searchapi-reviewed",
+      "endpoint": "https://www.searchapi.io/api/v1/search",
+      "imageQuality": "ok",
+      "reviewStatus": "candidate",
+      "needsReview": false,
+      "reviewReasons": []
+    }
+  }
+]

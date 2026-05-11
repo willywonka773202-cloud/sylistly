@@ -170,15 +170,30 @@ const GENERATED_POST_PLAN: Array<{
   { id: 'preppy-masc-weekend', title: 'Clubhouse weekend', caption: 'A refined weekend board with loafers, knitwear, and easy polish.', vibe: 'preppy', label: 'Preppy', frame: 'masc', budget: 'under500', seed: 902, tags: ['old money', 'preppy', 'weekend'] },
   { id: 'edgy-femme-downtown', title: 'Edgy downtown', caption: 'Dark pieces, shine, and a little bite in the accessories.', vibe: 'edgy', label: 'Edgy', frame: 'fem', budget: 'under500', seed: 1001, tags: ['edgy', 'black', 'leather'] },
   { id: 'edgy-masc-tech', title: 'Techwear utility', caption: 'Black utility pieces with technical shape and a crossbody finish.', vibe: 'edgy', label: 'Techwear', frame: 'masc', budget: 'under500', seed: 1002, tags: ['techwear', 'utility', 'black'] },
+  { id: 'budget-campus-masc', title: 'Budget campus fit', caption: 'Affordable catalog staples built for class, coffee, and repeat wear.', vibe: 'street', label: 'Budget', frame: 'masc', budget: 'under100', seed: 1101, tags: ['budget', 'campus', 'under 150', 'college'] },
+  { id: 'budget-clean-fem', title: 'Under $150 clean edit', caption: 'A low-cost clean formula with real product anchors and no filler.', vibe: 'clean', label: 'Budget', frame: 'fem', budget: 'under100', seed: 1102, tags: ['budget', 'clean', 'under 150'] },
+  { id: 'work-travel-masc', title: 'Work trip capsule', caption: 'A travel-ready outfit that can land directly in a casual office.', vibe: 'office', label: 'Work', frame: 'masc', budget: 'under500', seed: 1201, tags: ['work', 'travel', 'airport', 'office'] },
+  { id: 'work-travel-fem', title: 'Travel workday set', caption: 'Comfortable enough for transit, polished enough for the first meeting.', vibe: 'office', label: 'Work', frame: 'fem', budget: 'under500', seed: 1202, tags: ['work', 'travel', 'office'] },
+  { id: 'campus-clean-fem', title: 'Campus clean girl', caption: 'Soft campus pieces with a practical bag and sneaker base.', vibe: 'clean', label: 'Campus', frame: 'fem', budget: 'under250', seed: 1301, tags: ['campus', 'clean girl', 'college'] },
+  { id: 'campus-street-masc', title: 'Class to dinner layers', caption: 'Street-leaning campus layers that still feel styled after class.', vibe: 'street', label: 'Campus', frame: 'masc', budget: 'under250', seed: 1302, tags: ['campus', 'streetwear', 'class'] },
+  { id: 'travel-neutral-all', title: 'Neutral airport stack', caption: 'Comfort, carry capacity, and clean layering for a real travel day.', vibe: 'cozy', label: 'Travel', frame: 'androgynous', budget: 'under250', seed: 1401, tags: ['travel', 'airport', 'neutral'] },
+  { id: 'travel-resort-fem', title: 'Vacation dinner pack', caption: 'Warm-weather polish with breathable pieces and vacation accessories.', vibe: 'vacation', label: 'Travel', frame: 'fem', budget: 'under500', seed: 1402, tags: ['travel', 'vacation', 'resort'] },
+  { id: 'old-money-budget-masc', title: 'Old money under budget', caption: 'Classic proportions without relying on luxury-only picks.', vibe: 'preppy', label: 'Old Money', frame: 'masc', budget: 'under250', seed: 1501, tags: ['old money', 'budget', 'preppy'] },
+  { id: 'old-money-soft-fem', title: 'Soft old money edit', caption: 'A polished feminine take on classic layers, refined shoes, and a structured carry.', vibe: 'preppy', label: 'Old Money', frame: 'fem', budget: 'under500', seed: 1502, tags: ['old money', 'quiet luxury', 'preppy'] },
+  { id: 'gym-campus-masc', title: 'Gym to class fit', caption: 'Athletic pieces that stay coherent outside the weight room.', vibe: 'gym', label: 'Gym', frame: 'masc', budget: 'under250', seed: 1601, tags: ['gym', 'campus', 'athletic'] },
+  { id: 'gym-errands-fem', title: 'Pilates errands stack', caption: 'A practical activewear build with enough polish for the rest of the day.', vibe: 'gym', label: 'Gym', frame: 'fem', budget: 'under250', seed: 1602, tags: ['gym', 'errands', 'athletic'] },
+  { id: 'date-budget-fem', title: 'Date night under $250', caption: 'A budget-conscious night-out fit with a strong shoe and accessory finish.', vibe: 'date', label: 'Date night', frame: 'fem', budget: 'under250', seed: 1701, tags: ['date night', 'budget', 'under 250'] },
+  { id: 'date-clean-masc', title: 'Clean reservation fit', caption: 'Simple polished pieces for dinner without looking overworked.', vibe: 'date', label: 'Date night', frame: 'masc', budget: 'under250', seed: 1702, tags: ['date night', 'clean', 'dinner'] },
 ];
 
-function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number]): Partial<Record<Category, Product>> {
+function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number], avoidProductIds: string[]): Partial<Record<Category, Product>> {
   const generated = buildCatalogLook({
     vibe: plan.vibe,
     frame: plan.frame,
     budget: plan.budget,
     mode: 'full',
     seed: plan.seed,
+    avoidProductIds,
   }).products;
   return repairOrRegenerateOutfit({
     items: generated,
@@ -189,20 +204,33 @@ function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number]): Par
   });
 }
 
-const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
-  itemsFromGeneratedLook(plan),
-  index + COLLECTION_POSTS.length,
-  `feed-${plan.id}`,
-  ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
-  plan.title.slice(0, 1).toUpperCase(),
-  plan.title,
-  plan.label,
-  plan.tags,
-  360 - index * 7,
-  plan.caption,
-  plan.frame,
-  'catalog',
-));
+function buildGeneratedPosts(): FeedPost[] {
+  const recentIds: string[] = [];
+
+  return GENERATED_POST_PLAN.map((plan, index) => {
+    const items = itemsFromGeneratedLook(plan, recentIds);
+    const products = getOutfitProducts(items);
+    recentIds.unshift(...products.map((product) => product.id));
+    recentIds.splice(96);
+
+    return seedPost(
+      items,
+      index + COLLECTION_POSTS.length,
+      `feed-${plan.id}`,
+      ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
+      plan.title.slice(0, 1).toUpperCase(),
+      plan.title,
+      plan.label,
+      plan.tags,
+      360 - index * 7,
+      plan.caption,
+      plan.frame,
+      'catalog',
+    );
+  });
+}
+
+const GENERATED_POSTS = buildGeneratedPosts();
 
 const SEED_POSTS: FeedPost[] = [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4);
 const FEED_STORAGE_VERSION = 3;

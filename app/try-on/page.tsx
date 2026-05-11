@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState, type ReactNode } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
+import { buildCatalogLook } from '@/lib/catalog';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
@@ -22,6 +23,7 @@ function fitProducts(items: Partial<Record<Category, Product>>): Product[] {
 export default function TryOnPage() {
   const router = useRouter();
   const items = useFit((state) => state.items);
+  const replaceItems = useFit((state) => state.replaceItems);
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
   const [selfieReady, setSelfieReady] = useState(false);
@@ -29,6 +31,20 @@ export default function TryOnPage() {
   const [previewState, setPreviewState] = useState<'idle' | 'queued'>('idle');
   const products = useMemo(() => fitProducts(items), [items]);
   const totalCents = products.reduce((sum, product) => sum + product.priceCents, 0);
+  const frame = bodyType === 'custom' ? 'androgynous' : bodyType;
+
+  function regeneratePreviewFit() {
+    const next = buildCatalogLook({
+      vibe: 'clean',
+      frame,
+      budget: 'under250',
+      mode: 'full',
+      seed: Date.now(),
+      avoidProductIds: products.map((product) => product.id),
+    });
+    replaceItems(next.products);
+    setPreviewState('queued');
+  }
 
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
@@ -54,10 +70,15 @@ export default function TryOnPage() {
         <section className="mt-5 overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,#f8f3ed_0%,#eee2d7_100%)] p-3 text-[#211b17] shadow-[0_28px_64px_rgba(0,0,0,.34)]">
           <div className="relative grid min-h-[430px] place-items-center overflow-hidden rounded-[28px] bg-[#fffaf5]">
             <div className="absolute right-3 top-3 z-10 flex gap-2">
-              <button className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]" aria-label="Download placeholder">
+              <button className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]" aria-label="Download preview">
                 <Download size={18} />
               </button>
-              <button className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]" aria-label="Generate placeholder">
+              <button
+                type="button"
+                onClick={regeneratePreviewFit}
+                className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]"
+                aria-label="Generate catalog preview"
+              >
                 {previewState === 'queued' ? <LoaderCircle size={18} className="animate-spin" /> : <Sparkles size={18} />}
               </button>
             </div>
@@ -122,14 +143,14 @@ export default function TryOnPage() {
             <SetupRow
               icon={<Camera size={18} />}
               title="Selfie photo"
-              helper="Face photo placeholder. Upload flow will connect when Try-On backend is wired."
+              helper="Local setup card. Real face upload will connect when the Try-On backend is wired."
               ready={selfieReady}
               onClick={() => setSelfieReady((value) => !value)}
             />
             <SetupRow
               icon={<ImageIcon size={18} />}
               title="Body photo"
-              helper="Optional full-body photo placeholder for better future results."
+              helper="Optional local setup card for future full-body try-on results."
               ready={bodyPhotoReady}
               onClick={() => setBodyPhotoReady((value) => !value)}
             />
@@ -163,8 +184,7 @@ export default function TryOnPage() {
           <div className="mt-4 grid grid-cols-[1fr_.9fr] gap-2">
             <button
               type="button"
-              onClick={() => setPreviewState('queued')}
-              disabled={!products.length}
+              onClick={products.length ? () => setPreviewState('queued') : regeneratePreviewFit}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-white/[0.06] disabled:text-muted disabled:shadow-none"
             >
               <Sparkles size={14} />

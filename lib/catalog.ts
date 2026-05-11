@@ -667,13 +667,18 @@ function stableHash(value: string): number {
 
 function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | null {
   if (!items.length) return null;
-  const pool = items.slice(0, Math.min(48, items.length));
+  const pool = items.slice(0, Math.min(96, items.length));
   const random = (stableHash(`${key}:${Math.abs(seed || 0)}`) % 1_000_000) / 1_000_000;
-  const totalWeight = pool.reduce((total, _item, index) => total + Math.pow(pool.length - index, 1.35), 0);
+  const weightFor = (item: T, index: number) => {
+    const id = typeof item === 'object' && item && 'id' in item ? String((item as { id?: unknown }).id || '') : '';
+    const jitter = 0.82 + ((stableHash(`${key}:${seed}:${id || index}`) % 38) / 100);
+    return Math.pow(pool.length - index, 0.9) * jitter;
+  };
+  const totalWeight = pool.reduce((total, item, index) => total + weightFor(item, index), 0);
   let threshold = random * totalWeight;
 
   for (let index = 0; index < pool.length; index += 1) {
-    threshold -= Math.pow(pool.length - index, 1.35);
+    threshold -= weightFor(pool[index] as T, index);
     if (threshold <= 0) return pool[index] || pool[0] || null;
   }
 

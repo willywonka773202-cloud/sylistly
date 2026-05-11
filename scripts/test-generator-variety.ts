@@ -48,6 +48,8 @@ interface ScenarioReport {
   repeatedProducts: Array<{ label: string; count: number }>;
   warningSamples: string[];
   samples: string[];
+  productCounts: Record<string, number>;
+  missingRequiredRuns: number;
 }
 
 function productIds(products: Partial<Record<Category, Product>>): string[] {
@@ -141,6 +143,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
   const recentIds: string[] = [];
   const missingByCategory: Partial<Record<Category, number>> = {};
   const samples: string[] = [];
+  const productCounts: Record<string, number> = {};
   let currentItems: Partial<Record<Category, Product>> = {};
   let totalPicks = 0;
   let repeatedPicks = 0;
@@ -152,6 +155,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
   let vibeContradictions = 0;
   let accessoryOveruseRuns = 0;
   let weakCategoryMatches = 0;
+  let missingRequiredRuns = 0;
   const warningSamples: string[] = [];
 
   for (let run = 0; run < RUNS_PER_SCENARIO; run += 1) {
@@ -177,6 +181,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
         label: productLabel(product),
         count: (counts.get(product.id)?.count || 0) + 1,
       });
+      productCounts[product.id] = (productCounts[product.id] || 0) + 1;
       if (genderMismatchReasons(product, frame).length) mismatchCount += 1;
       if (hasCategoryMismatch(product)) categoryMismatchCount += 1;
       if (isOffFrame(product, frame)) offFrameCount += 1;
@@ -192,6 +197,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
 
     if (products.eyewear) eyewearRuns += 1;
     if (products.jewelry) jewelryRuns += 1;
+    if (!products.top || !products.bottom || !products.shoes) missingRequiredRuns += 1;
     if (isAccessoryOveruse(vibe, products)) accessoryOveruseRuns += 1;
 
     for (const category of CATEGORY_ORDER) {
@@ -228,6 +234,8 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
       .slice(0, 5),
     warningSamples,
     samples,
+    productCounts,
+    missingRequiredRuns,
   };
 }
 
@@ -333,9 +341,41 @@ const lockReports = [
 ];
 
 const reports = SCENARIOS.map(simulateScenario);
+const aggregateProductCounts = new Map<string, number>();
+let aggregatePicks = 0;
+let aggregateUnique = 0;
+let aggregateMissingRequiredRuns = 0;
+let aggregateMismatchCount = 0;
+let aggregateCategoryMismatchCount = 0;
+let aggregateOffFrameCount = 0;
+
+for (const report of reports) {
+  aggregatePicks += report.totalPicks;
+  aggregateUnique += report.uniqueIds;
+  aggregateMissingRequiredRuns += report.missingRequiredRuns;
+  aggregateMismatchCount += report.mismatchCount;
+  aggregateCategoryMismatchCount += report.categoryMismatchCount;
+  aggregateOffFrameCount += report.offFrameCount;
+  for (const [id, count] of Object.entries(report.productCounts)) {
+    aggregateProductCounts.set(id, (aggregateProductCounts.get(id) || 0) + count);
+  }
+}
 
 console.log(`Generator variety simulation: ${RUNS_PER_SCENARIO} full-look runs per scenario`);
 console.log('No SearchAPI calls are made by this script.');
+console.log(
+  [
+    `Aggregate outfits=${reports.length * RUNS_PER_SCENARIO}`,
+    `uniqueProducts=${aggregateProductCounts.size}`,
+    `totalPicks=${aggregatePicks}`,
+    `catalogUseRate=${((aggregateProductCounts.size / aggregatePicks) * 100).toFixed(1)}%`,
+    `scenarioUniqueSum=${aggregateUnique}`,
+    `missingRequiredRuns=${aggregateMissingRequiredRuns}`,
+    `genderMismatches=${aggregateMismatchCount}`,
+    `categoryMismatches=${aggregateCategoryMismatchCount}`,
+    `offFrame=${aggregateOffFrameCount}`,
+  ].join('  '),
+);
 console.log('');
 
 for (const report of reports) {
@@ -353,12 +393,24 @@ for (const report of reports) {
       `vibeContradictions=${report.vibeContradictions}`,
       `accessoryOveruse=${report.accessoryOveruseRuns}/${RUNS_PER_SCENARIO}`,
       `weakCategory=${report.weakCategoryMatches}`,
+      `missingRequired=${report.missingRequiredRuns}`,
       `missing=${formatMissing(report.missingByCategory)}`,
     ].join('  '),
   );
 }
 
 console.log('\nTop repeated products:');
+const globalRepeated = Array.from(aggregateProductCounts.entries())
+  .filter(([, count]) => count > 1)
+  .sort((left, right) => right[1] - left[1])
+  .slice(0, 12);
+console.log(
+  `  global: ${
+    globalRepeated.length
+      ? globalRepeated.map(([id, count]) => `${id} (${count})`).join('; ')
+      : 'none'
+  }`,
+);
 for (const report of reports) {
   const repeated = report.repeatedProducts.length
     ? report.repeatedProducts.map((entry) => `${entry.label} (${entry.count})`).join('; ')

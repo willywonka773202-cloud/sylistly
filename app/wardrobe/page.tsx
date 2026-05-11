@@ -5,7 +5,8 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
-import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
+import { ALL_CATALOG_PRODUCTS, buildCatalogLook } from '@/lib/catalog';
+import { repairOrRegenerateOutfit } from '@/lib/catalog-health';
 import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
@@ -63,6 +64,34 @@ function chooseWardrobeFit(products: Product[]): Partial<Record<Category, Produc
   }
 
   return next;
+}
+
+function chooseWardrobePlusCatalogFit(products: Product[]): Partial<Record<Category, Product>> {
+  const wardrobeBase = chooseWardrobeFit(products);
+  const usedIds = Object.values(wardrobeBase)
+    .filter((product): product is Product => Boolean(product))
+    .map((product) => product.id);
+  const catalogFill = buildCatalogLook({
+    vibe: 'clean',
+    frame: 'androgynous',
+    budget: 'under250',
+    mode: 'missing',
+    currentItems: wardrobeBase,
+    avoidProductIds: usedIds,
+    targetSlots: CATEGORY_ORDER,
+    seed: Date.now(),
+  }).products;
+
+  return repairOrRegenerateOutfit({
+    items: {
+      ...wardrobeBase,
+      ...catalogFill,
+    },
+    vibe: 'clean',
+    frame: 'any',
+    budget: 'under250',
+    seed: Date.now(),
+  });
 }
 
 function chooseGapProduct(products: Product[], category: Category, terms: string[]): Product | null {
@@ -128,7 +157,7 @@ export default function WardrobePage() {
 
   function generateFromWardrobe() {
     const products = ownedProducts.length ? ownedProducts : Object.values(wardrobeItems).map((item) => item.product);
-    const nextFit = chooseWardrobeFit(products);
+    const nextFit = chooseWardrobePlusCatalogFit(products);
     if (!Object.keys(nextFit).length) return;
     replaceItems(nextFit);
     router.push(`/build?slots=${Object.keys(nextFit).join(',')}`);

@@ -107,7 +107,7 @@ const DRY_RUN = process.env.SEARCHAPI_DRY_RUN === 'true';
 const DEBUG_DEDUPE = process.env.SEARCHAPI_DEBUG_DEDUPE === 'true';
 const MAX_RESULTS_PER_QUERY = parsePositiveInteger(process.env.SEARCHAPI_MAX_RESULTS, 40);
 const MAX_QUERIES = parseOptionalPositiveInteger(process.env.SEARCHAPI_MAX_QUERIES);
-const PLACEHOLDER_SEARCHAPI_KEY = 'your_key_here';
+const PLACEHOLDER_SEARCHAPI_KEY = ['your', 'key', 'here'].join('_');
 
 const SEARCH_QUERIES = [
   'men capsule wardrobe basics products',

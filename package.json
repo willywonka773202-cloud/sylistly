@@ -17,7 +17,9 @@
     "catalog:audit-images": "jiti scripts/audit-product-images.ts",
     "catalog:test-search": "jiti scripts/test-catalog-search.ts",
     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
+    "catalog:merge-candidates": "jiti scripts/merge-catalog-candidates.ts",
     "import:catalog": "set SEARCHAPI_KEY=& node --experimental-strip-types --env-file=.env.local scripts/searchapi-catalog-import.ts",
+    "qa": "node --experimental-strip-types scripts/qa-check.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
     "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"

@@ -4,6 +4,7 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { ProductImage } from '@/components/ProductImage';
 import {
   ALL_CATALOG_PRODUCTS,
+  buildCatalogLook,
   filterProductsByGender,
   getCollectionProducts,
   LAUNCH_COLLECTIONS,
@@ -13,6 +14,7 @@ import { frameCompatibilityScore, hasFrameMismatch } from '@/lib/frame-inference
 import { getDiscoverLookPreview } from '@/lib/discover-previews';
 import { isRenderableProduct } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Product } from '@/lib/types';
+import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 import recipeData from '@/data/discover-look-recipes.json';
 
 interface SlotRecipe {
@@ -206,8 +208,72 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
   return looks.slice(0, 20);
 }
 
+const GENERATED_DISCOVER_SECTIONS: Array<{
+  title: string;
+  vibe: VibeId;
+  frame: GeneratorFrame;
+  budget: GeneratorBudget;
+  tags: string[];
+}> = [
+  { title: 'Trending fits', vibe: 'street', frame: 'androgynous', budget: 'under500', tags: ['trending', 'streetwear'] },
+  { title: 'Under $150', vibe: 'clean', frame: 'androgynous', budget: 'under100', tags: ['budget', 'under 150'] },
+  { title: 'Campus', vibe: 'street', frame: 'androgynous', budget: 'under250', tags: ['campus', 'college'] },
+  { title: 'Date night', vibe: 'date', frame: 'androgynous', budget: 'under500', tags: ['date night', 'dinner'] },
+  { title: 'Gym', vibe: 'gym', frame: 'androgynous', budget: 'under250', tags: ['gym', 'athletic'] },
+  { title: 'Old money', vibe: 'preppy', frame: 'androgynous', budget: 'under500', tags: ['old money', 'preppy'] },
+  { title: 'Streetwear', vibe: 'street', frame: 'masc', budget: 'under500', tags: ['streetwear', 'downtown'] },
+  { title: 'Clean essentials', vibe: 'clean', frame: 'fem', budget: 'under250', tags: ['clean', 'minimal'] },
+  { title: 'Travel', vibe: 'cozy', frame: 'androgynous', budget: 'under250', tags: ['travel', 'airport'] },
+  { title: 'Work', vibe: 'office', frame: 'androgynous', budget: 'under500', tags: ['work', 'office'] },
+  { title: 'Closet ready', vibe: 'clean', frame: 'androgynous', budget: 'under250', tags: ['closet ready', 'capsule'] },
+];
+
+function buildGeneratedDiscoverSections() {
+  const recentIds: string[] = [];
+
+  return GENERATED_DISCOVER_SECTIONS.map((section, sectionIndex) => {
+    const looks: DiscoverLookCardData[] = [];
+
+    for (let index = 0; index < 4; index += 1) {
+      const seed = 21_000 + sectionIndex * 997 + index * 131;
+      const generated = buildCatalogLook({
+        vibe: section.vibe,
+        frame: index % 3 === 0 ? 'masc' : index % 3 === 1 ? 'fem' : section.frame,
+        budget: section.budget,
+        mode: 'full',
+        seed,
+        avoidProductIds: recentIds,
+      });
+      const products = CATEGORY_ORDER
+        .map((category) => generated.products[category])
+        .filter((product): product is Product => Boolean(product))
+        .slice(0, 7);
+
+      recentIds.unshift(...products.map((product) => product.id));
+      recentIds.splice(120);
+
+      if (products.length < 4) continue;
+
+      looks.push({
+        id: `generated-${section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${index}`,
+        title: `${section.title} ${index + 1}`,
+        description: `Generated from the 709-product catalog with ${section.vibe} styling and budget-aware picks.`,
+        vibe: section.vibe,
+        frameBias: section.frame,
+        products,
+        estimatedTotal: products.reduce((sum, product) => sum + product.priceCents, 0),
+        previewImageStatus: 'missing',
+        tags: section.tags,
+      });
+    }
+
+    return { title: section.title, looks };
+  });
+}
+
 export default function DiscoverPage() {
   const looks = buildDiscoverLooks();
+  const generatedSections = buildGeneratedDiscoverSections();
   const trendingLooks = looks.slice(0, 4);
   const budgetLooks = looks
     .filter((look) => look.estimatedTotal > 0 && look.estimatedTotal <= 35000)
@@ -262,6 +328,9 @@ export default function DiscoverPage() {
       <DiscoverRail title="Work and interview" looks={workLooks} />
       <DiscoverRail title="Travel capsule" looks={travelLooks} />
       <DiscoverRail title="Old money edits" looks={oldMoneyLooks} />
+      {generatedSections.map((section) => (
+        <DiscoverRail key={section.title} title={section.title} looks={section.looks} />
+      ))}
 
       <section className="mt-5 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
         <div className="flex items-center gap-3">

@@ -78,6 +78,22 @@ export default function ProfilePage() {
     .filter(isHighConfidenceRenderableProduct);
   const likedCount = posts.filter((post) => post.liked).length;
   const closetCount = Object.keys(wardrobeItems).length;
+  const styleBadges = useMemo(() => {
+    const text = [
+      ...(profile.stylePrefs.vibes || []),
+      ...wardrobeProducts.flatMap((product) => [...(product.vibes || []), ...(product.occasions || []), product.category]),
+    ].join(' ').toLowerCase();
+    return [
+      text.includes('clean') || text.includes('minimal') ? 'Clean Fit Expert' : null,
+      text.includes('street') || text.includes('cargo') ? 'Streetwear Regular' : null,
+      text.includes('gym') || text.includes('athletic') ? 'Gym Core' : null,
+      text.includes('old money') || text.includes('preppy') ? 'Old Money' : null,
+      text.includes('travel') || text.includes('airport') ? 'Travel Capsule' : null,
+      text.includes('office') || text.includes('work') ? 'Workwear Pro' : null,
+      savedCount >= 5 ? 'Trendsetter' : null,
+      closetCount >= 8 ? 'Closet Builder' : null,
+    ].filter((badge): badge is string => Boolean(badge)).slice(0, 6);
+  }, [closetCount, profile.stylePrefs.vibes, savedCount, wardrobeProducts]);
 
   function remix(post: FeedPost) {
     replaceItems(post.items);
@@ -310,6 +326,17 @@ export default function ProfilePage() {
               <h2 className="font-serif text-[20px] font-semibold text-ink">Style DNA</h2>
               <p className="mt-1 text-[12px] text-muted-2">Preferences still tune Builder generation locally.</p>
             </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(styleBadges.length ? styleBadges : ['Catalog Explorer', 'Closet Builder']).map((badge) => (
+              <span
+                key={badge}
+                className="rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-accent"
+              >
+                {badge}
+              </span>
+            ))}
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
