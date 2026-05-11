@@ -15,6 +15,7 @@ import { useSocialFeed } from '@/store/social-feed';
 import { useWardrobe } from '@/store/wardrobe';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
+import { calculateBudgetStatus, calculateOutfitScore } from '@/lib/catalog-health';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { filterRenderableProducts, isRenderableProduct } from '@/lib/product-image-quality';
 import {
@@ -137,6 +138,16 @@ const WARDROBE_GENERATION_MODES: Array<{ value: WardrobeGenerationMode; label: s
 
 function formatMoney(cents: number): string {
   return `$${Math.round(cents / 100).toLocaleString()}`;
+}
+
+function BuilderSignal({ label, value, helper, tone = 'default' }: { label: string; value: string; helper?: string; tone?: 'default' | 'accent' | 'warn' }) {
+  return (
+    <div className={`rounded-2xl border px-2 py-2.5 text-left ${tone === 'accent' ? 'border-accent/30 bg-accent/10' : tone === 'warn' ? 'border-[#ffb38a]/30 bg-[#ff8a4a]/10' : 'border-white/10 bg-white/[0.04]'}`}>
+      <div className="text-[8px] uppercase tracking-[.14em] text-muted">{label}</div>
+      <div className={`mt-1 font-serif text-[16px] font-semibold ${tone === 'accent' ? 'text-accent' : tone === 'warn' ? 'text-[#ffb38a]' : 'text-ink'}`}>{value}</div>
+      {helper ? <div className="mt-0.5 truncate text-[9px] text-muted">{helper}</div> : null}
+    </div>
+  );
 }
 
 function lookAllowanceCents(
@@ -299,6 +310,9 @@ function BuilderPageContent({
     analysis.primaryGap ||
     'top';
   const lockedSlotSet = useMemo(() => new Set(lockedSlots), [lockedSlots]);
+  const wardrobeProductIds = useMemo(() => new Set(wardrobeProducts.map((product) => product.id)), [wardrobeProducts]);
+  const outfitScore = useMemo(() => calculateOutfitScore(renderItems, wardrobeProductIds), [renderItems, wardrobeProductIds]);
+  const builderBudgetStatus = useMemo(() => calculateBudgetStatus(total, generatorBudget), [total, generatorBudget]);
 
   useBodyScrollLock(Boolean(activeBuildOverlay || checkoutProducts));
 
@@ -1047,7 +1061,7 @@ function BuilderPageContent({
                 <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
               </div>
               <div className="mt-1 text-[11px] text-muted">
-                Pink-lit slots are editable pieces. The chips below choose what generates next.
+                Pink-lit slots are editable pieces. Open Controls for vibe, budget, frame, and source settings.
               </div>
               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
@@ -1056,6 +1070,23 @@ function BuilderPageContent({
               <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2">
                 <Shirt size={11} className="text-accent" />
                 Source: {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                <BuilderSignal label="Score" value={`${outfitScore.total}`} helper="catalog" tone="accent" />
+                <BuilderSignal label="Complete" value={`${outfitScore.completeness}%`} helper="slots" />
+                <BuilderSignal label="Visual" value={`${outfitScore.renderability}%`} helper="safe" />
+                <BuilderSignal label="Closet" value={`${outfitScore.wardrobeMatch}%`} helper="owned" />
+              </div>
+              <div className={`mt-2 rounded-2xl border px-3 py-2 text-left ${builderBudgetStatus.overBudget ? 'border-[#ffb38a]/30 bg-[#ff8a4a]/10' : 'border-accent/25 bg-accent/10'}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[9px] font-black uppercase tracking-[.16em] text-muted">Budget assistant</span>
+                  <span className={`text-[10px] font-black uppercase tracking-[.14em] ${builderBudgetStatus.overBudget ? 'text-[#ffb38a]' : 'text-accent'}`}>
+                    {builderBudgetStatus.label}
+                  </span>
+                </div>
+                <div className="mt-1 text-[10px] leading-relaxed text-muted-2">
+                  Uses catalog prices and current budget mode; expensive replacements can be handled from Refine.
+                </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
@@ -1073,212 +1104,6 @@ function BuilderPageContent({
                   className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
                 >
                   Save
-                </button>
-              </div>
-              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-                {CATEGORY_ORDER.map((category) => {
-                  const selected = selectedGenerationSlots.includes(category);
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => toggleGenerationSlot(category)}
-                      className={`rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] transition ${
-                        selected
-                          ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
-                          : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
-                      }`}
-                    >
-                      {CATEGORY_LABELS[category]}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
-                >
-                  Use vibe defaults
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
-                >
-                  Select all
-                </button>
-              </div>
-              <button
-                type="button"
-                onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
-                disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:opacity-60"
-              >
-                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                Build selected fit
-              </button>
-            </div>
-          </section>
-          <section className="flex flex-col gap-3">
-            <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
-                    <Sparkles size={12} className="text-accent" />
-                    Outfit generator
-                  </div>
-                  <div className="mt-2 font-serif text-[25px] font-semibold leading-[1.04] text-ink">
-                    {activeVibe.label} <em className="italic text-accent">starter look</em>
-                  </div>
-                  <div className="mt-2 text-[13px] leading-relaxed text-muted-2">
-                    {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
-                  </div>
-                </div>
-                <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
-                  <div className="text-[9px] uppercase tracking-[.18em] text-muted">
-                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'AI pass - ready'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {VIBES.map((vibe) => (
-                  <button
-                    key={vibe.id}
-                    type="button"
-                    onClick={() => setSelectedVibe(vibe.id)}
-                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition ${
-                      selectedVibe === vibe.id
-                        ? 'bg-accent text-white shadow-pink-glow'
-                        : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
-                    }`}
-                  >
-                    {vibe.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-5 flex items-center justify-between gap-2">
-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
-                <div className="flex flex-wrap justify-end gap-2">
-                  {[ 
-                    { value: 'any', label: 'Any' },
-                    { value: 'under100', label: '< $100' },
-                    { value: 'under250', label: '< $250' },
-                    { value: 'under500', label: '< $500' },
-                    { value: 'custom', label: 'Custom' },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
-                        generatorBudget === option.value
-                          ? 'bg-white text-black'
-                          : 'border border-hairline bg-surface-2 text-muted'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {generatorBudget === 'custom' ? (
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Custom max</div>
-                  <label className="flex items-center gap-2 rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink">
-                    <span className="text-muted">$</span>
-                    <input
-                      value={customBudgetInput}
-                      onChange={(event) => {
-                        setGeneratorBudget('custom');
-                        setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
-                      }}
-                      inputMode="numeric"
-                      placeholder="180"
-                      className="w-16 bg-transparent text-right outline-none"
-                    />
-                  </label>
-                </div>
-              ) : null}
-
-                {generatorBudget === 'custom' ? (
-                <div className="mt-2 text-[11px] text-muted-2">
-                  {customBudgetInput
-                    ? `Generating pieces at or below $${customBudgetInput} each.`
-                    : 'Set a per-item max price for generated pieces.'}
-                </div>
-              ) : null}
-
-              {generatorLoading ? (
-                <div className="mt-3 rounded-[18px] border border-accent/20 bg-accent/10 px-3 py-2 text-[11px] text-[#ffe7ee]">
-                  {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
-                </div>
-              ) : null}
-
-              <div className="mt-5 flex items-center justify-between gap-2">
-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
-                <div className="flex flex-wrap justify-end gap-2">
-                  {[
-                    { value: 'masc', label: 'Male' },
-                    { value: 'fem', label: 'Female' },
-                    { value: 'androgynous', label: 'Neutral' },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
-                        generatorFrame === option.value
-                          ? 'bg-white text-black'
-                          : 'border border-hairline bg-surface-2 text-muted'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-1 gap-3">
-                <button
-                  type="button"
-                  onClick={() => void generateLook('starter')}
-                  disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
-                >
-                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                  Generate starter look
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('missing')}
-                  disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
-                >
-                  <Sparkles size={13} />
-                  Fill missing pieces
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => void generateLook('refresh')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
-                >
-                  Refresh look
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
-                >
-                  Build fuller fit
                 </button>
               </div>
             </div>

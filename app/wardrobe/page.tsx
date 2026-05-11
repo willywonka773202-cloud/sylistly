@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Plus, RotateCcw, Shirt, ShoppingBag, Sparkles, X } from 'lucide-react';
+import { AlertCircle, Check, Plus, RotateCcw, Shirt, ShoppingBag, Sparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -65,6 +65,33 @@ function chooseWardrobeFit(products: Product[]): Partial<Record<Category, Produc
   return next;
 }
 
+function chooseGapProduct(products: Product[], category: Category, terms: string[]): Product | null {
+  return products
+    .filter((product) => product.category === category)
+    .map((product) => {
+      const haystack = [product.brand, product.name, ...(product.vibes || []), ...(product.occasions || []), ...(product.searchTerms || [])].join(' ').toLowerCase();
+      const termScore = terms.reduce((score, term) => score + (haystack.includes(term) ? 10 : 0), 0);
+      return { product, score: termScore + (product.imageQuality === 'good' ? 8 : 0) + (product.priceCents ? 2 : 0) };
+    })
+    .sort((left, right) => right.score - left.score)[0]?.product || null;
+}
+
+function buildWardrobeGaps(ownedProducts: Product[], catalogProducts: Product[]) {
+  const ownedCategories = new Set(ownedProducts.map((product) => product.category));
+  const specs: Array<{ category: Category; title: string; helper: string; terms: string[] }> = [
+    { category: 'outer', title: 'Add a neutral outer layer', helper: 'Unlock work, dinner, travel, and rainy day fits.', terms: ['blazer', 'jacket', 'trench', 'neutral', 'clean'] },
+    { category: 'shoes', title: 'Add versatile shoes', helper: 'Your closet needs a repeatable sneaker, boot, or loafer anchor.', terms: ['sneaker', 'loafer', 'boot', 'clean', 'versatile'] },
+    { category: 'bottom', title: 'Add black pants', helper: 'A dark bottom makes night, office, and clean fits easier.', terms: ['black', 'trouser', 'jean', 'pant'] },
+    { category: 'bag', title: 'Add an everyday bag', helper: 'Travel, campus, and errands work better with a real carry piece.', terms: ['bag', 'tote', 'crossbody', 'backpack'] },
+    { category: 'jewelry', title: 'Add a finishing accessory', helper: 'Small details make saved outfits feel styled instead of generated.', terms: ['watch', 'ring', 'chain', 'gold', 'silver'] },
+  ];
+
+  return specs
+    .filter((spec) => !ownedCategories.has(spec.category))
+    .map((spec) => ({ ...spec, product: chooseGapProduct(catalogProducts, spec.category, spec.terms) }))
+    .filter((gap): gap is typeof specs[number] & { product: Product } => Boolean(gap.product))
+    .slice(0, 4);
+}
 export default function WardrobePage() {
   const router = useRouter();
   const replaceItems = useFit((state) => state.replaceItems);
@@ -79,7 +106,7 @@ export default function WardrobePage() {
     [],
   );
   const starterProducts = useMemo(
-    () => renderableProducts.filter(productMatchesStarter).slice(0, 42),
+    () => renderableProducts.filter(productMatchesStarter).slice(0, 64),
     [renderableProducts],
   );
   const ownedProducts = useMemo(
@@ -90,6 +117,7 @@ export default function WardrobePage() {
     [wardrobeItems],
   );
   const recentProducts = ownedProducts.slice(0, 8);
+  const wardrobeGaps = useMemo(() => buildWardrobeGaps(ownedProducts, renderableProducts), [ownedProducts, renderableProducts]);
   const selectedCount = Object.keys(wardrobeItems).length;
   const ownedCount = Object.values(wardrobeItems).filter((item) => item.status === 'owned').length;
   const similarCount = Object.values(wardrobeItems).filter((item) => item.status === 'similar').length;
@@ -210,6 +238,10 @@ export default function WardrobePage() {
             <WardrobeShelf title="Similar items I have" products={similarShelf} onRemove={removeItem} />
             <WardrobeShelf title="Wishlist" products={wishlistShelf} onRemove={removeItem} />
           </section>
+        ) : null}
+
+        {wardrobeGaps.length ? (
+          <WardrobeGapAssistant gaps={wardrobeGaps} onAdd={(product) => setItemStatus(product, 'wishlist')} />
         ) : null}
 
         {recentProducts.length ? (
@@ -406,5 +438,49 @@ function WardrobeShelf({
         </div>
       )}
     </div>
+  );
+}
+
+function WardrobeGapAssistant({
+  gaps,
+  onAdd,
+}: {
+  gaps: Array<{ title: string; helper: string; product: Product }>;
+  onAdd: (product: Product) => void;
+}) {
+  return (
+    <section className="mt-5 rounded-[28px] border border-accent/20 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.16),transparent_34%),linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] p-4">
+      <div className="flex items-start gap-3">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/12 text-accent">
+          <AlertCircle size={18} />
+        </div>
+        <div>
+          <div className="text-[9px] uppercase tracking-[.18em] text-accent">Closet gap assistant</div>
+          <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">Unlock more outfits</h2>
+          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">These are real catalog pieces that fill missing categories in your closet.</p>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        {gaps.map((gap) => (
+          <article key={gap.product.id} className="grid grid-cols-[72px_1fr] gap-3 rounded-[22px] border border-white/10 bg-white/[0.045] p-2.5">
+            <div className="overflow-hidden rounded-2xl bg-[#f7efe5]">
+              <ProductImage product={gap.product} className="aspect-square h-full w-full object-contain p-2" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[9px] font-black uppercase tracking-[.15em] text-accent">{gap.title}</div>
+              <div className="mt-1 truncate font-serif text-[16px] font-semibold text-ink">{gap.product.brand} {gap.product.name}</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-muted-2">{gap.helper}</p>
+              <button
+                type="button"
+                onClick={() => onAdd(gap.product)}
+                className="mt-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-accent"
+              >
+                Add to wishlist
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }

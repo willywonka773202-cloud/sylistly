@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '@/lib/catalog';
-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import { getOutfitProducts, repairOrRegenerateOutfit } from '@/lib/catalog-health';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 
@@ -55,13 +55,11 @@ interface SocialFeedState {
 }
 
 function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
-  return Object.fromEntries(
-    Object.entries(items).filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1])),
-  ) as Partial<Record<Category, Product>>;
+  return repairOrRegenerateOutfit({ items, vibe: 'clean', frame: 'any', budget: 'under250' });
 }
 
 function fitTotals(items: Partial<Record<Category, Product>>) {
-  const products = Object.values(items).filter((product): product is Product => Boolean(product));
+  const products = getOutfitProducts(items);
   return {
     itemCount: products.length,
     totalCents: products.reduce((sum, product) => sum + (product.priceCents || 0), 0),
@@ -69,15 +67,21 @@ function fitTotals(items: Partial<Record<Category, Product>>) {
 }
 
 function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Posted fit'): string {
-  const products = Object.values(items).filter((product): product is Product => Boolean(product));
+  const products = getOutfitProducts(items);
   const brands = Array.from(new Set(products.map((product) => product.brand))).slice(0, 2);
   if (!brands.length) return fallback;
   return brands.length === 1 ? `${brands[0]} fit` : `${brands.join(' + ')} fit`;
 }
 
 function itemsFromCollection(index: number): Partial<Record<Category, Product>> {
-  const products = getCollectionProducts(LAUNCH_COLLECTIONS[index]).filter(isHighConfidenceRenderableProduct);
-  return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
+  const products = getCollectionProducts(LAUNCH_COLLECTIONS[index]);
+  return repairOrRegenerateOutfit({
+    items: Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>,
+    vibe: LAUNCH_COLLECTIONS[index]?.vibe || 'clean',
+    frame: LAUNCH_COLLECTIONS[index]?.frame === 'all' ? 'any' : LAUNCH_COLLECTIONS[index]?.frame,
+    budget: 'under500',
+    seed: index,
+  });
 }
 
 function seedPost(
@@ -176,7 +180,13 @@ function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number]): Par
     mode: 'full',
     seed: plan.seed,
   }).products;
-  return sanitizeItems(generated);
+  return repairOrRegenerateOutfit({
+    items: generated,
+    vibe: plan.vibe,
+    frame: plan.frame,
+    budget: plan.budget,
+    seed: plan.seed,
+  });
 }
 
 const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
@@ -195,6 +205,153 @@ const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
 ));
 
 const SEED_POSTS: FeedPost[] = [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4);
+const FEED_STORAGE_VERSION = 3;
+const MAX_PERSISTED_COMMUNITY_POSTS = 12;
+const FEED_CATEGORY_ORDER: Category[] = ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'];
+const SEED_POSTS_BY_ID = new Map(SEED_POSTS.map((post) => [post.id, post]));
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function readString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  return value.trim() ? value : undefined;
+}
+
+function readBoolean(value: unknown, fallback = false): boolean {
+  return typeof value === 'boolean' ? value : fallback;
+}
+
+function readNumber(value: unknown, fallback = 0): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function readStringArray(value: unknown, fallback: string[] = []): string[] {
+  if (!Array.isArray(value)) return fallback;
+  return value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim())).slice(0, 12);
+}
+
+function normalizeFrameBias(value: unknown, fallback: FeedPost['frameBias'] = 'any'): FeedPost['frameBias'] {
+  return value === 'masc' || value === 'fem' || value === 'androgynous' || value === 'any' ? value : fallback;
+}
+
+function normalizeSourceType(value: unknown, fallback: FeedPost['sourceType'] = 'catalog'): FeedPost['sourceType'] {
+  return value === 'editorial' || value === 'community' || value === 'discover' || value === 'catalog' ? value : fallback;
+}
+
+function normalizeVisibility(value: unknown): FeedPost['visibility'] {
+  return value === 'private' ? 'private' : 'public';
+}
+
+function normalizeStoredItems(value: unknown): Partial<Record<Category, Product>> {
+  if (!isRecord(value)) return {};
+  const items: Partial<Record<Category, Product>> = {};
+
+  for (const category of FEED_CATEGORY_ORDER) {
+    const maybeProduct = value[category];
+    if (isRecord(maybeProduct) && readString(maybeProduct.id)) {
+      items[category] = maybeProduct as unknown as Product;
+    }
+  }
+
+  return items;
+}
+
+function normalizeComments(value: unknown, postId: string): FeedComment[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .slice(0, 24)
+    .map((comment, index) => {
+      const record = isRecord(comment) ? comment : {};
+      const text = readString(record.text);
+      if (!text) return null;
+      return {
+        id: readString(record.id) || `${postId}-comment-${index}`,
+        user: readString(record.user) || '@you',
+        text,
+        createdAt: readString(record.createdAt) || new Date().toISOString(),
+      } satisfies FeedComment;
+    })
+    .filter((comment): comment is FeedComment => Boolean(comment));
+}
+
+function normalizeFeedPost(rawPost: unknown, seedFallback?: FeedPost): FeedPost | null {
+  if (!isRecord(rawPost) && !seedFallback) return null;
+  const record = isRecord(rawPost) ? rawPost : {};
+  const id = readString(record.id) || seedFallback?.id;
+  if (!id) return null;
+
+  const vibe = readString(record.vibe) || seedFallback?.vibe || 'Clean';
+  const frameBias = normalizeFrameBias(record.frameBias, seedFallback?.frameBias || 'any');
+  const totalHint = readNumber(record.totalCents, seedFallback?.totalCents || 25000);
+  const items = repairOrRegenerateOutfit({
+    items: Object.keys(record).length ? normalizeStoredItems(record.items) : seedFallback?.items || {},
+    vibe: vibe.toLowerCase(),
+    frame: frameBias || 'any',
+    budget: totalHint <= 25000 ? 'under250' : 'under500',
+  });
+  const totals = fitTotals(items);
+
+  if (totals.itemCount < 4) return seedFallback || null;
+
+  return {
+    id,
+    username: readString(record.username) || seedFallback?.username || '@sylistly',
+    avatar: readString(record.avatar) || seedFallback?.avatar || 'S',
+    title: readString(record.title) || seedFallback?.title || createTitle(items, 'Catalog fit'),
+    caption: readString(record.caption) || seedFallback?.caption || 'A database-backed Sylistly outfit ready to remix.',
+    vibe,
+    occasion: readString(record.occasion) || seedFallback?.occasion,
+    story: readBoolean(record.story, seedFallback?.story || false),
+    frameBias,
+    heroImageUrl: readString(record.heroImageUrl) || seedFallback?.heroImageUrl,
+    sourceType: normalizeSourceType(record.sourceType, seedFallback?.sourceType || 'catalog'),
+    tags: readStringArray(record.tags, seedFallback?.tags || [vibe.toLowerCase()]),
+    visibility: normalizeVisibility(record.visibility || seedFallback?.visibility),
+    createdAt: readString(record.createdAt) || seedFallback?.createdAt || new Date().toISOString(),
+    totalCents: totals.totalCents,
+    itemCount: totals.itemCount,
+    items,
+    likeCount: Math.max(0, Math.round(readNumber(record.likeCount, seedFallback?.likeCount || 0))),
+    liked: readBoolean(record.liked, seedFallback?.liked || false),
+    saved: readBoolean(record.saved, seedFallback?.saved || false),
+    comments: normalizeComments(record.comments, id),
+  };
+}
+
+function normalizePersistedState(persistedState: unknown): Pick<SocialFeedState, 'posts'> {
+  const candidate = isRecord(persistedState) && isRecord(persistedState.state) ? persistedState.state : persistedState;
+  const rawPosts = isRecord(candidate) ? candidate.posts : null;
+  if (!Array.isArray(rawPosts)) return { posts: SEED_POSTS };
+
+  const persistedPosts = rawPosts
+    .map((rawPost) => {
+      const postId = isRecord(rawPost) ? readString(rawPost.id) : undefined;
+      return normalizeFeedPost(rawPost, postId ? SEED_POSTS_BY_ID.get(postId) : undefined);
+    })
+    .filter((post): post is FeedPost => Boolean(post));
+  const persistedById = new Map(persistedPosts.map((post) => [post.id, post]));
+
+  const mergedSeedPosts = SEED_POSTS.map((seedPost) => {
+    const persistedPost = persistedById.get(seedPost.id);
+    if (!persistedPost) return seedPost;
+    return {
+      ...seedPost,
+      liked: persistedPost.liked,
+      saved: persistedPost.saved,
+      likeCount: Math.max(seedPost.likeCount, persistedPost.likeCount),
+      comments: persistedPost.comments.length ? persistedPost.comments : seedPost.comments,
+    };
+  });
+  const communityPosts = persistedPosts
+    .filter((post) => !SEED_POSTS_BY_ID.has(post.id) && fitTotals(post.items).itemCount >= 4)
+    .slice(0, MAX_PERSISTED_COMMUNITY_POSTS);
+  const posts = [...communityPosts, ...mergedSeedPosts];
+
+  return { posts: posts.length ? posts.slice(0, 60) : SEED_POSTS };
+}
 
 export const useSocialFeed = create<SocialFeedState>()(
   persist(
@@ -258,7 +415,13 @@ export const useSocialFeed = create<SocialFeedState>()(
     }),
     {
       name: 'sylistly.social-feed.v1',
-      version: 2,
+      version: FEED_STORAGE_VERSION,
+      migrate: (persistedState) => normalizePersistedState(persistedState),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        posts: normalizePersistedState(persistedState).posts,
+      }),
+      partialize: (state) => ({ posts: state.posts }),
     },
   ),
 );

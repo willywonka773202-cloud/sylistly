@@ -13,9 +13,11 @@
     "catalog:expand": "node --experimental-strip-types --env-file-if-exists=.env.local scripts/expand-catalog.ts",
     "catalog:enrich": "jiti scripts/enrich-catalog-tags.ts",
     "catalog:validate": "jiti scripts/validate-catalog.ts",
+    "catalog:health": "node --experimental-strip-types scripts/catalog-health.ts",
     "catalog:audit-images": "jiti scripts/audit-product-images.ts",
     "catalog:test-search": "jiti scripts/test-catalog-search.ts",
     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
+    "import:catalog": "node --experimental-strip-types --env-file=.env.local scripts/searchapi-catalog-import.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
     "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"

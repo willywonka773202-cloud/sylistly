@@ -45,10 +45,24 @@ const CATEGORY_BACKGROUNDS: Record<Category, string> = {
 };
 
 const SIZE_CLASSES: Record<ProductImageSize, string> = {
-  sm: 'text-[7px]',
-  md: 'text-[8px]',
-  lg: 'text-[9px]',
-  hero: 'text-[10px]',
+  sm: 'text-[8px]',
+  md: 'text-[9px]',
+  lg: 'text-[10px]',
+  hero: 'text-[12px]',
+};
+
+const ICON_WRAP_CLASSES: Record<ProductImageSize, string> = {
+  sm: 'h-8 w-8',
+  md: 'h-10 w-10',
+  lg: 'h-12 w-12',
+  hero: 'h-16 w-16',
+};
+
+const ICON_SIZES: Record<ProductImageSize, number> = {
+  sm: 16,
+  md: 18,
+  lg: 23,
+  hero: 31,
 };
 
 function imageFailureKey(product?: Product, imageUrl?: string, cutout?: boolean): string {
@@ -111,18 +125,18 @@ export function ProductFallbackTile({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,.92),transparent_38%)]" />
       <div className="absolute inset-x-[20%] bottom-[14%] h-4 rounded-full bg-black/10 blur-[10px]" />
       <div className="relative flex max-w-[82%] flex-col items-center text-center text-[#2a211c]">
-        <div className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white/70 shadow-[0_10px_24px_rgba(0,0,0,.10)]">
-          <Icon size={18} />
+        <div className={`grid ${ICON_WRAP_CLASSES[size]} place-items-center rounded-full border border-black/10 bg-white/78 text-[#251b18] shadow-[0_12px_28px_rgba(0,0,0,.12)]`}>
+          <Icon size={ICON_SIZES[size]} />
         </div>
-        <div className={`mt-2 font-bold uppercase tracking-[.16em] text-[#7c6b61] ${SIZE_CLASSES[size]}`}>
+        <div className={`${size === 'sm' ? 'mt-1' : 'mt-2'} font-black uppercase tracking-[.16em] text-[#7c6b61] ${SIZE_CLASSES[size]}`}>
           {label}
         </div>
         {size === 'hero' || size === 'lg' ? (
           <>
-            <div className="mt-1 line-clamp-1 text-[10px] font-black uppercase tracking-[.12em] text-[#1f1915]">
+            <div className={`${size === 'hero' ? 'mt-2 text-[12px]' : 'mt-1 text-[10px]'} line-clamp-1 font-black uppercase tracking-[.12em] text-[#1f1915]`}>
               {displayBrand}
             </div>
-            <div className="mt-0.5 line-clamp-2 text-[10px] font-semibold leading-tight text-[#6f5e54]">
+            <div className={`${size === 'hero' ? 'text-[12px]' : 'text-[10px]'} mt-0.5 line-clamp-2 font-semibold leading-tight text-[#6f5e54]`}>
               {displayName}
             </div>
           </>
@@ -188,7 +202,7 @@ export function SafeProductImage({
 
   if (!src) {
     return (
-      <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl'}>
+      <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]'}>
         <ProductFallbackTile
           product={product}
           category={normalizedCategory}

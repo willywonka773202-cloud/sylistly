@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import { OutfitThumbnail } from '@/components/OutfitThumbnail';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
@@ -240,33 +241,15 @@ export default function ProfilePage() {
           {activeProfileTab === 'outfits' ? (
             <div className="mt-3 grid grid-cols-2 gap-3">
             {(filteredGridPosts.length ? filteredGridPosts : gridPosts).map((post) => {
-              const products = postProducts(post);
               return (
-                <button
+                <OutfitThumbnail
                   key={post.id}
-                  type="button"
+                  items={post.items}
+                  title={post.title}
+                  subtitle={`${post.vibe} / ${formatPrice(post.totalCents)}`}
                   onClick={() => setActivePost(post)}
-                  className="group overflow-hidden rounded-[24px] border border-white/10 bg-[#151311] text-left shadow-[0_18px_38px_rgba(0,0,0,.32)]"
-                >
-                  <div className="m-2 grid h-[190px] grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
-                    {products.slice(0, 5).map((product, index) => (
-                      <div key={`${post.id}-${product.id}`} className={`overflow-hidden rounded-[12px] bg-white/80 ${index === 0 ? 'row-span-2' : ''}`}>
-                        <ProductImage
-                          product={product}
-                          wrapperClassName="h-full w-full"
-                          className="h-full w-full object-contain p-1.5"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="px-3 pb-3">
-                    <h3 className="line-clamp-1 font-serif text-[18px] font-semibold text-ink">{post.title}</h3>
-                    <div className="mt-1 flex items-center gap-2 text-[10px] text-muted">
-                      <span>{post.vibe}</span>
-                      <span>{formatPrice(post.totalCents)}</span>
-                    </div>
-                  </div>
-                </button>
+                  className="min-h-[276px]"
+                />
               );
             })}
             </div>

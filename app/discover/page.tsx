@@ -215,6 +215,10 @@ export default function DiscoverPage() {
   const creatorLooks = looks
     .filter((look) => ['street', 'night', 'date', 'edgy'].includes(look.vibe))
     .slice(0, 4);
+  const campusLooks = looks.filter((look) => look.tags.some((tag) => tag.toLowerCase().includes('campus') || tag.toLowerCase().includes('college'))).slice(0, 4);
+  const workLooks = looks.filter((look) => ['office', 'work', 'preppy'].includes(look.vibe) || look.tags.some((tag) => tag.toLowerCase().includes('work'))).slice(0, 4);
+  const travelLooks = looks.filter((look) => ['vacation', 'cozy'].includes(look.vibe) || look.tags.some((tag) => tag.toLowerCase().includes('travel') || tag.toLowerCase().includes('airport'))).slice(0, 4);
+  const oldMoneyLooks = looks.filter((look) => look.tags.some((tag) => tag.toLowerCase().includes('old money') || tag.toLowerCase().includes('preppy'))).slice(0, 4);
 
   return (
     <PlaceholderScreen
@@ -254,6 +258,10 @@ export default function DiscoverPage() {
       <DiscoverRail title="Trending fits" looks={trendingLooks} />
       <DiscoverRail title="Budget-friendly finds" looks={budgetLooks} />
       <DiscoverRail title="Creator-ready looks" looks={creatorLooks} />
+      <DiscoverRail title="Campus fits" looks={campusLooks} />
+      <DiscoverRail title="Work and interview" looks={workLooks} />
+      <DiscoverRail title="Travel capsule" looks={travelLooks} />
+      <DiscoverRail title="Old money edits" looks={oldMoneyLooks} />
 
       <section className="mt-5 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
         <div className="flex items-center gap-3">

@@ -1,0 +1,568 @@
+diff --git a/.env.example b/.env.example
+index 7391e6c..8a51075 100644
+--- a/.env.example
++++ b/.env.example
+@@ -6,7 +6,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
+ SUPABASE_SERVICE_ROLE_KEY=
+ 
+ ANTHROPIC_API_KEY=
+-SEARCHAPI_KEY=
++SEARCHAPI_KEY=your_key_here
+ SEARCH_MODE=catalog-only
+ 
+ # ===== AFFILIATE =====
+diff --git a/app/build/page.tsx b/app/build/page.tsx
+index 3efca4a..cf7c6ea 100644
+--- a/app/build/page.tsx
++++ b/app/build/page.tsx
+@@ -1047,7 +1047,7 @@ function BuilderPageContent({
+                 <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
+               </div>
+               <div className="mt-1 text-[11px] text-muted">
+-                Pink-lit slots are editable pieces. The chips below choose what generates next.
++                Pink-lit slots are editable pieces. Open Controls for vibe, budget, frame, and source settings.
+               </div>
+               <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
+                 Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
+@@ -1075,212 +1075,6 @@ function BuilderPageContent({
+                   Save
+                 </button>
+               </div>
+-              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+-                {CATEGORY_ORDER.map((category) => {
+-                  const selected = selectedGenerationSlots.includes(category);
+-                  return (
+-                    <button
+-                      key={category}
+-                      type="button"
+-                      onClick={() => toggleGenerationSlot(category)}
+-                      className={`rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] transition ${
+-                        selected
+-                          ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
+-                          : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
+-                      }`}
+-                    >
+-                      {CATEGORY_LABELS[category]}
+-                    </button>
+-                  );
+-                })}
+-              </div>
+-              <div className="mt-4 grid grid-cols-2 gap-3">
+-                <button
+-                  type="button"
+-                  onClick={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
+-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
+-                >
+-                  Use vibe defaults
+-                </button>
+-                <button
+-                  type="button"
+-                  onClick={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
+-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
+-                >
+-                  Select all
+-                </button>
+-              </div>
+-              <button
+-                type="button"
+-                onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
+-                disabled={generatorLoading || selectedGenerationSlots.length === 0}
+-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:opacity-60"
+-              >
+-                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+-                Build selected fit
+-              </button>
+-            </div>
+-          </section>
+-          <section className="flex flex-col gap-3">
+-            <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
+-              <div className="flex items-start justify-between gap-3">
+-                <div>
+-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
+-                    <Sparkles size={12} className="text-accent" />
+-                    Outfit generator
+-                  </div>
+-                  <div className="mt-2 font-serif text-[25px] font-semibold leading-[1.04] text-ink">
+-                    {activeVibe.label} <em className="italic text-accent">starter look</em>
+-                  </div>
+-                  <div className="mt-2 text-[13px] leading-relaxed text-muted-2">
+-                    {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
+-                  </div>
+-                </div>
+-                <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
+-                  <div className="text-[9px] uppercase tracking-[.18em] text-muted">
+-                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'AI pass - ready'}
+-                  </div>
+-                </div>
+-              </div>
+-
+-              <div className="mt-5 flex flex-wrap gap-2">
+-                {VIBES.map((vibe) => (
+-                  <button
+-                    key={vibe.id}
+-                    type="button"
+-                    onClick={() => setSelectedVibe(vibe.id)}
+-                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition ${
+-                      selectedVibe === vibe.id
+-                        ? 'bg-accent text-white shadow-pink-glow'
+-                        : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
+-                    }`}
+-                  >
+-                    {vibe.label}
+-                  </button>
+-                ))}
+-              </div>
+-
+-              <div className="mt-5 flex items-center justify-between gap-2">
+-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
+-                <div className="flex flex-wrap justify-end gap-2">
+-                  {[ 
+-                    { value: 'any', label: 'Any' },
+-                    { value: 'under100', label: '< $100' },
+-                    { value: 'under250', label: '< $250' },
+-                    { value: 'under500', label: '< $500' },
+-                    { value: 'custom', label: 'Custom' },
+-                  ].map((option) => (
+-                    <button
+-                      key={option.value}
+-                      type="button"
+-                      onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
+-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+-                        generatorBudget === option.value
+-                          ? 'bg-white text-black'
+-                          : 'border border-hairline bg-surface-2 text-muted'
+-                      }`}
+-                    >
+-                      {option.label}
+-                    </button>
+-                  ))}
+-                </div>
+-              </div>
+-
+-              {generatorBudget === 'custom' ? (
+-                <div className="mt-3 flex items-center justify-between gap-3">
+-                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Custom max</div>
+-                  <label className="flex items-center gap-2 rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink">
+-                    <span className="text-muted">$</span>
+-                    <input
+-                      value={customBudgetInput}
+-                      onChange={(event) => {
+-                        setGeneratorBudget('custom');
+-                        setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
+-                      }}
+-                      inputMode="numeric"
+-                      placeholder="180"
+-                      className="w-16 bg-transparent text-right outline-none"
+-                    />
+-                  </label>
+-                </div>
+-              ) : null}
+-
+-                {generatorBudget === 'custom' ? (
+-                <div className="mt-2 text-[11px] text-muted-2">
+-                  {customBudgetInput
+-                    ? `Generating pieces at or below $${customBudgetInput} each.`
+-                    : 'Set a per-item max price for generated pieces.'}
+-                </div>
+-              ) : null}
+-
+-              {generatorLoading ? (
+-                <div className="mt-3 rounded-[18px] border border-accent/20 bg-accent/10 px-3 py-2 text-[11px] text-[#ffe7ee]">
+-                  {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
+-                </div>
+-              ) : null}
+-
+-              <div className="mt-5 flex items-center justify-between gap-2">
+-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
+-                <div className="flex flex-wrap justify-end gap-2">
+-                  {[
+-                    { value: 'masc', label: 'Male' },
+-                    { value: 'fem', label: 'Female' },
+-                    { value: 'androgynous', label: 'Neutral' },
+-                  ].map((option) => (
+-                    <button
+-                      key={option.value}
+-                      type="button"
+-                      onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
+-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+-                        generatorFrame === option.value
+-                          ? 'bg-white text-black'
+-                          : 'border border-hairline bg-surface-2 text-muted'
+-                      }`}
+-                    >
+-                      {option.label}
+-                    </button>
+-                  ))}
+-                </div>
+-              </div>
+-
+-              <div className="mt-6 grid grid-cols-1 gap-3">
+-                <button
+-                  type="button"
+-                  onClick={() => void generateLook('starter')}
+-                  disabled={generatorLoading}
+-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+-                >
+-                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+-                  Generate starter look
+-                </button>
+-                <button
+-                  type="button"
+-                  onClick={() => void generateLook('missing')}
+-                  disabled={generatorLoading}
+-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
+-                >
+-                  <Sparkles size={13} />
+-                  Fill missing pieces
+-                </button>
+-              </div>
+-              <div className="mt-3 grid grid-cols-2 gap-3">
+-                <button
+-                  type="button"
+-                  onClick={() => void generateLook('refresh')}
+-                  disabled={generatorLoading}
+-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+-                >
+-                  Refresh look
+-                </button>
+-                <button
+-                  type="button"
+-                  onClick={() => void generateLook('full')}
+-                  disabled={generatorLoading}
+-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+-                >
+-                  Build fuller fit
+-                </button>
+-              </div>
+             </div>
+           </section>
+ 
+diff --git a/app/feed/page.tsx b/app/feed/page.tsx
+index 3107e8a..3d702b2 100644
+--- a/app/feed/page.tsx
++++ b/app/feed/page.tsx
+@@ -1,14 +1,13 @@
+ 'use client';
+ 
+ import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+-import { useMemo, useState } from 'react';
++import { useEffect, useMemo, useRef, useState } from 'react';
+ import { useRouter } from 'next/navigation';
+ import { BottomNav } from '@/components/BottomNav';
+-import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+ import { OutfitBoard } from '@/components/OutfitBoard';
+ import { ProductImage } from '@/components/ProductImage';
+-import { getProductOutboundUrl } from '@/lib/product-links';
+-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
++import { ProductDetailSheet } from '@/components/ProductDetailSheet';
++import { getOutfitProducts, repairOrRegenerateOutfit } from '@/lib/catalog-health';
+ import type { Product } from '@/lib/types';
+ import { useFit } from '@/store/fit';
+ import { useSavedFits } from '@/store/saved-fits';
+@@ -22,10 +21,17 @@ function formatPrice(cents: number): string {
+   return `$${(cents / 100).toLocaleString()}`;
+ }
+ 
++function safePostItems(post: FeedPost) {
++  return repairOrRegenerateOutfit({
++    items: post.items,
++    vibe: post.vibe.toLowerCase(),
++    frame: post.frameBias || 'any',
++    budget: post.totalCents <= 25000 ? 'under250' : 'under500',
++  });
++}
++
+ function visibleProducts(post: FeedPost): Product[] {
+-  return Object.values(post.items).filter(
+-    (product): product is Product => isHighConfidenceRenderableProduct(product),
+-  );
++  return getOutfitProducts(safePostItems(post));
+ }
+ 
+ function postMatches(post: FeedPost, filter: string): boolean {
+@@ -43,24 +49,48 @@ export default function FitFeedPage() {
+   const toggleSave = useSocialFeed((state) => state.toggleSave);
+   const addComment = useSocialFeed((state) => state.addComment);
+   const replaceItems = useFit((state) => state.replaceItems);
++  const setBuilderItem = useFit((state) => state.setItem);
+   const saveFit = useSavedFits((state) => state.saveFit);
+   const wardrobeItems = useWardrobe((state) => state.items);
++  const setWardrobeStatus = useWardrobe((state) => state.setItemStatus);
+   const router = useRouter();
+   const [activeFilter, setActiveFilter] = useState('For You');
+   const [commentPost, setCommentPost] = useState<FeedPost | null>(null);
+   const [commentText, setCommentText] = useState('');
+-  const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
+-  const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
++  const [shopPost, setShopPost] = useState<FeedPost | null>(null);
++  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+   const [burstPostId, setBurstPostId] = useState<string | null>(null);
++  const [activePostId, setActivePostId] = useState<string | null>(null);
++  const feedRef = useRef<HTMLDivElement | null>(null);
+   const filteredPosts = useMemo(
+     () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 3),
+     [posts, activeFilter],
+   );
++  const activePost = filteredPosts.find((post) => post.id === activePostId) || filteredPosts[0] || null;
++
++  useEffect(() => {
++    const root = feedRef.current;
++    if (!root) return;
++    const nodes = Array.from(root.querySelectorAll<HTMLElement>('[data-feed-post-id]'));
++    if (!nodes.length) return;
++    const observer = new IntersectionObserver(
++      (entries) => {
++        const active = entries
++          .filter((entry) => entry.isIntersecting)
++          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
++        const nextId = active?.target.getAttribute('data-feed-post-id');
++        if (nextId) setActivePostId(nextId);
++      },
++      { root, threshold: [0.55, 0.72, 0.9] },
++    );
++    nodes.forEach((node) => observer.observe(node));
++    return () => observer.disconnect();
++  }, [filteredPosts]);
+ 
+   function remix(post: FeedPost) {
+     setBurstPostId(post.id);
+     window.setTimeout(() => {
+-      replaceItems(post.items);
++      replaceItems(safePostItems(post));
+       router.push('/build');
+     }, 180);
+   }
+@@ -73,22 +103,17 @@ export default function FitFeedPage() {
+ 
+   function savePost(post: FeedPost) {
+     toggleSave(post.id);
+-    if (!post.saved) saveFit(post.items);
++    if (!post.saved) saveFit(safePostItems(post));
+   }
+ 
+-  function shop(post: FeedPost) {
+-    const products = visibleProducts(post)
+-      .map((product) => ({
+-        id: product.id,
+-        brand: product.brand,
+-        name: product.name,
+-        retailer: product.retailer,
+-        url: getProductOutboundUrl(product),
+-        priceCents: product.priceCents,
+-      }))
+-      .filter((product) => Boolean(product.url));
+-    setCheckoutTitle(post.title);
+-    setCheckoutProducts(products);
++  function shop(post: FeedPost, product?: Product) {
++    setShopPost(post);
++    setSelectedProduct(product || null);
++  }
++
++  function useProductInBuilder(product: Product) {
++    setBuilderItem(product.category, product);
++    router.push('/build');
+   }
+ 
+   function submitComment(text = commentText) {
+@@ -131,14 +156,16 @@ export default function FitFeedPage() {
+           </div>
+         </header>
+ 
+-        <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
+-          {filteredPosts.map((post, postIndex) => {
++        <div ref={feedRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
++          {filteredPosts.map((post) => {
+             const products = visibleProducts(post);
+             const averageCents = Math.round(post.totalCents / Math.max(1, products.length));
+             return (
+               <article
+                 key={post.id}
++                data-feed-post-id={post.id}
+                 className="relative flex h-full snap-start snap-always flex-col overflow-hidden bg-[radial-gradient(circle_at_50%_8%,rgba(246,48,107,.18),transparent_32%),radial-gradient(circle_at_12%_72%,rgba(255,204,153,.12),transparent_30%),linear-gradient(180deg,#171310_0%,#090807_100%)]"
++                onDoubleClick={() => savePost(post)}
+               >
+                 {burstPostId === post.id ? (
+                   <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-accent/10">
+@@ -147,15 +174,9 @@ export default function FitFeedPage() {
+                   </div>
+                 ) : null}
+ 
+-                {postIndex === 0 ? (
+-                  <div className="pointer-events-none absolute left-4 top-[calc(env(safe-area-inset-top)+76px)] z-20 rounded-full border border-white/14 bg-black/44 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
+-                    Swipe up for more fits
+-                  </div>
+-                ) : null}
+-
+                 <div className="absolute inset-x-0 top-[92px] z-0 px-4">
+                   <OutfitBoard
+-                    items={post.items}
++                    items={safePostItems(post)}
+                     className="h-[min(54dvh,500px)] min-h-[350px] shadow-[0_26px_72px_rgba(0,0,0,.38)]"
+                   />
+                 </div>
+@@ -227,7 +248,7 @@ export default function FitFeedPage() {
+                       <button
+                         key={`${post.id}-tray-${product.id}`}
+                         type="button"
+-                        onClick={() => shop(post)}
++                        onClick={() => shop(post, product)}
+                         className="group relative h-[72px] w-[62px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)]"
+                         aria-label={`Shop ${product.brand} ${product.name}`}
+                       >
+@@ -313,11 +334,18 @@ export default function FitFeedPage() {
+         </div>
+       ) : null}
+ 
+-      <CheckoutSheet
+-        open={Boolean(checkoutProducts)}
+-        title={checkoutTitle}
+-        products={checkoutProducts || []}
+-        onClose={() => setCheckoutProducts(null)}
++      <ProductDetailSheet
++        open={Boolean(shopPost)}
++        title={shopPost?.title || activePost?.title || 'Shop the fit'}
++        products={shopPost ? visibleProducts(shopPost) : []}
++        selectedProduct={selectedProduct}
++        onClose={() => {
++          setShopPost(null);
++          setSelectedProduct(null);
++        }}
++        onAddToCloset={(product) => setWardrobeStatus(product, 'owned')}
++        onUseInBuilder={useProductInBuilder}
++        onSaveOutfit={() => shopPost && savePost(shopPost)}
+       />
+     </main>
+   );
+diff --git a/app/profile/page.tsx b/app/profile/page.tsx
+index ea07902..c01df06 100644
+--- a/app/profile/page.tsx
++++ b/app/profile/page.tsx
+@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
+ import { useRouter } from 'next/navigation';
+ import { BottomNav } from '@/components/BottomNav';
+ import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
++import { OutfitThumbnail } from '@/components/OutfitThumbnail';
+ import { ProductImage } from '@/components/ProductImage';
+ import { getProductOutboundUrl } from '@/lib/product-links';
+ import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+@@ -240,33 +241,15 @@ export default function ProfilePage() {
+           {activeProfileTab === 'outfits' ? (
+             <div className="mt-3 grid grid-cols-2 gap-3">
+             {(filteredGridPosts.length ? filteredGridPosts : gridPosts).map((post) => {
+-              const products = postProducts(post);
+               return (
+-                <button
++                <OutfitThumbnail
+                   key={post.id}
+-                  type="button"
++                  items={post.items}
++                  title={post.title}
++                  subtitle={`${post.vibe} / ${formatPrice(post.totalCents)}`}
+                   onClick={() => setActivePost(post)}
+-                  className="group overflow-hidden rounded-[24px] border border-white/10 bg-[#151311] text-left shadow-[0_18px_38px_rgba(0,0,0,.32)]"
+-                >
+-                  <div className="m-2 grid h-[190px] grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
+-                    {products.slice(0, 5).map((product, index) => (
+-                      <div key={`${post.id}-${product.id}`} className={`overflow-hidden rounded-[12px] bg-white/80 ${index === 0 ? 'row-span-2' : ''}`}>
+-                        <ProductImage
+-                          product={product}
+-                          wrapperClassName="h-full w-full"
+-                          className="h-full w-full object-contain p-1.5"
+-                        />
+-                      </div>
+-                    ))}
+-                  </div>
+-                  <div className="px-3 pb-3">
+-                    <h3 className="line-clamp-1 font-serif text-[18px] font-semibold text-ink">{post.title}</h3>
+-                    <div className="mt-1 flex items-center gap-2 text-[10px] text-muted">
+-                      <span>{post.vibe}</span>
+-                      <span>{formatPrice(post.totalCents)}</span>
+-                    </div>
+-                  </div>
+-                </button>
++                  className="min-h-[276px]"
++                />
+               );
+             })}
+             </div>
+diff --git a/package.json b/package.json
+index 408eab5..f54ac33 100644
+--- a/package.json
++++ b/package.json
+@@ -16,6 +16,7 @@
+     "catalog:audit-images": "jiti scripts/audit-product-images.ts",
+     "catalog:test-search": "jiti scripts/test-catalog-search.ts",
+     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
++    "import:catalog": "node --experimental-strip-types --env-file=.env.local scripts/searchapi-catalog-import.ts",
+     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
+     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
+     "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"
+diff --git a/store/social-feed.ts b/store/social-feed.ts
+index d1baba1..e1ef99f 100644
+--- a/store/social-feed.ts
++++ b/store/social-feed.ts
+@@ -1,7 +1,7 @@
+ import { create } from 'zustand';
+ import { persist } from 'zustand/middleware';
+ import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '@/lib/catalog';
+-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
++import { getOutfitProducts, repairOrRegenerateOutfit } from '@/lib/catalog-health';
+ import type { Category, Product } from '@/lib/types';
+ import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
+ 
+@@ -55,13 +55,11 @@ interface SocialFeedState {
+ }
+ 
+ function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
+-  return Object.fromEntries(
+-    Object.entries(items).filter((entry): entry is [Category, Product] => isHighConfidenceRenderableProduct(entry[1])),
+-  ) as Partial<Record<Category, Product>>;
++  return repairOrRegenerateOutfit({ items, vibe: 'clean', frame: 'any', budget: 'under250' });
+ }
+ 
+ function fitTotals(items: Partial<Record<Category, Product>>) {
+-  const products = Object.values(items).filter((product): product is Product => Boolean(product));
++  const products = getOutfitProducts(items);
+   return {
+     itemCount: products.length,
+     totalCents: products.reduce((sum, product) => sum + (product.priceCents || 0), 0),
+@@ -69,15 +67,21 @@ function fitTotals(items: Partial<Record<Category, Product>>) {
+ }
+ 
+ function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Posted fit'): string {
+-  const products = Object.values(items).filter((product): product is Product => Boolean(product));
++  const products = getOutfitProducts(items);
+   const brands = Array.from(new Set(products.map((product) => product.brand))).slice(0, 2);
+   if (!brands.length) return fallback;
+   return brands.length === 1 ? `${brands[0]} fit` : `${brands.join(' + ')} fit`;
+ }
+ 
+ function itemsFromCollection(index: number): Partial<Record<Category, Product>> {
+-  const products = getCollectionProducts(LAUNCH_COLLECTIONS[index]).filter(isHighConfidenceRenderableProduct);
+-  return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
++  const products = getCollectionProducts(LAUNCH_COLLECTIONS[index]);
++  return repairOrRegenerateOutfit({
++    items: Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>,
++    vibe: LAUNCH_COLLECTIONS[index]?.vibe || 'clean',
++    frame: LAUNCH_COLLECTIONS[index]?.frame === 'all' ? 'any' : LAUNCH_COLLECTIONS[index]?.frame,
++    budget: 'under500',
++    seed: index,
++  });
+ }
+ 
+ function seedPost(
+@@ -176,7 +180,13 @@ function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number]): Par
+     mode: 'full',
+     seed: plan.seed,
+   }).products;
+-  return sanitizeItems(generated);
++  return repairOrRegenerateOutfit({
++    items: generated,
++    vibe: plan.vibe,
++    frame: plan.frame,
++    budget: plan.budget,
++    seed: plan.seed,
++  });
+ }
+ 
+ const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
