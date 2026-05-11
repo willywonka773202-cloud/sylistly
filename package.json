@@ -18,7 +18,8 @@
     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
-    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"
+    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs",
+    "test:checkout": "node --experimental-strip-types scripts/test-checkout.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
