@@ -8,12 +8,15 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-  const sb = await supabaseServer();
-  const { data: fit, error } = await sb.from('fits').select('*').eq('id', id).single();
+  const [{ id }, sb] = await Promise.all([params, supabaseServer()]);
+
+  const [{ data: fit, error }, { data: { user } }] = await Promise.all([
+    sb.from('fits').select('*').eq('id', id).single(),
+    sb.auth.getUser(),
+  ]);
+
   if (error || !fit) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-  const { data: { user } } = await sb.auth.getUser();
   if (!fit.is_public && fit.owner_id && fit.owner_id !== user?.id) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
