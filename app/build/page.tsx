@@ -1001,11 +1001,12 @@ function BuilderPageContent({
                 />
               </motion.div>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2.5">
+
+            <div className="grid grid-cols-3 gap-2.5 px-0.5">
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('settings')}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
               >
                 <SlidersHorizontal size={13} />
                 Controls
@@ -1013,7 +1014,7 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={seedFromWardrobe}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
               >
                 <Shirt size={13} />
                 Closet
@@ -1022,7 +1023,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
               >
                 {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
                 Generate

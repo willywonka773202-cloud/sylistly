@@ -312,7 +312,7 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[480px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[540px]">
+    <div className="relative h-[430px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[470px]">
       <div
         className="grid h-full gap-2"
         style={{
