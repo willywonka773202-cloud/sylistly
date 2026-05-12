@@ -3,10 +3,8 @@ import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@
 import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
-import { searchBrandCatalog } from '@/lib/brand-catalog';
 import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
-import { mockSearch } from '@/lib/mock-products';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
 import { filterRenderableProducts, hasUsableImageUrl } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -180,14 +178,18 @@ function mergeCatalogCandidates(...groups: Product[][]): Product[] {
   return Array.from(merged.values());
 }
 
-function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
-  const products = filterRenderableProducts(mockSearch(category || 'top', query));
-  return NextResponse.json({
-    products,
-    mock: true,
-    mode: 'demo',
-    reason,
-  });
+function demoSearchResponse(_category: Category | undefined, _query: string, reason: string) {
+  return NextResponse.json(
+    {
+      products: [],
+      mock: false,
+      mode: 'demo',
+      reason,
+      error:
+        'Live product search is unavailable. Configure SEARCHAPI_KEY or use catalog-only mode — Sylistly will not return mock data.',
+    },
+    { status: 503 },
+  );
 }
 
 function getSearchMode(): SearchMode {
@@ -270,12 +272,8 @@ export async function POST(req: NextRequest) {
     const useCatalogFirst =
       catalogOnlyMode ||
       (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
-    const seededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery).map((product) => ({
-      ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
-    }));
     const mergedCatalogProducts = applyExplicitPriceBounds(
-      mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts),
+      mergeCatalogCandidates(photoCatalogProducts),
       explicitPriceMin,
       explicitPriceMax,
     );
@@ -408,7 +406,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (catalogPreviewMode) {
-      const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
+      const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts);
       if (previewCatalogProducts.length) {
         const rankedPreviewProducts = filterRenderableProducts(await rerankProducts(
           effectiveQuery || fastIntent.category,

@@ -3,14 +3,56 @@ import type { Category } from './types';
 export type VibeId =
   | 'night'
   | 'street'
+  | 'streetwear'
   | 'clean'
   | 'gym'
+  | 'athletic'
   | 'cozy'
   | 'date'
   | 'office'
+  | 'work'
   | 'vacation'
+  | 'travel'
   | 'edgy'
-  | 'preppy';
+  | 'techwear'
+  | 'preppy'
+  | 'old-money'
+  | 'campus'
+  | 'premium';
+
+const VIBE_ALIASES: Record<string, VibeId> = {
+  night: 'night', 'night out': 'night', evening: 'night',
+  street: 'street', streetwear: 'streetwear', urban: 'streetwear',
+  clean: 'clean', minimal: 'clean', minimalist: 'clean', 'clean girl': 'clean',
+  gym: 'gym', workout: 'gym',
+  athletic: 'athletic', sport: 'athletic', sporty: 'athletic', performance: 'athletic',
+  cozy: 'cozy', lounge: 'cozy',
+  date: 'date', 'date night': 'date', romantic: 'date',
+  office: 'office', business: 'office', 'business casual': 'office',
+  work: 'work',
+  vacation: 'vacation', resort: 'vacation', beach: 'vacation',
+  travel: 'travel', airport: 'travel',
+  edgy: 'edgy', dark: 'edgy', goth: 'edgy', punk: 'edgy',
+  techwear: 'techwear', technical: 'techwear', utility: 'techwear',
+  preppy: 'preppy', collegiate: 'preppy', ivy: 'preppy',
+  'old money': 'old-money', 'old-money': 'old-money', 'quiet luxury': 'old-money', heritage: 'old-money',
+  campus: 'campus', college: 'campus', class: 'campus',
+  premium: 'premium', luxury: 'premium', designer: 'premium', splurge: 'premium',
+};
+
+const CANONICAL_VIBE_SET: Set<VibeId> = new Set([
+  'night', 'street', 'streetwear', 'clean', 'gym', 'athletic', 'cozy', 'date',
+  'office', 'work', 'vacation', 'travel', 'edgy', 'techwear', 'preppy',
+  'old-money', 'campus', 'premium',
+]);
+
+export function normalizeVibe(value?: string | null): VibeId | null {
+  if (!value) return null;
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed) return null;
+  if (CANONICAL_VIBE_SET.has(trimmed as VibeId)) return trimmed as VibeId;
+  return VIBE_ALIASES[trimmed] ?? null;
+}
 export type GeneratorBudget = 'any' | 'under100' | 'under250' | 'under500' | 'custom';
 export type GeneratorFrame = 'masc' | 'fem' | 'androgynous';
 
@@ -110,6 +152,54 @@ export const VIBES: Array<{
     blurb: 'classic, collegiate, refined',
     slots: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
   },
+  {
+    id: 'streetwear',
+    label: 'Streetwear',
+    blurb: 'oversized, layered, modern street',
+    slots: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  },
+  {
+    id: 'campus',
+    label: 'Campus',
+    blurb: 'casual student daily, comfortable, real',
+    slots: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  },
+  {
+    id: 'travel',
+    label: 'Travel',
+    blurb: 'airport-ready, comfortable, sharp',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  },
+  {
+    id: 'old-money',
+    label: 'Old Money',
+    blurb: 'quiet luxury, heritage, refined classic',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  },
+  {
+    id: 'techwear',
+    label: 'Techwear',
+    blurb: 'black, technical, utility, modern',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  },
+  {
+    id: 'work',
+    label: 'Work',
+    blurb: 'business casual, polished, professional',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  },
+  {
+    id: 'athletic',
+    label: 'Athletic',
+    blurb: 'performance, sporty, gym-to-street',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'hat', 'bag'],
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    blurb: 'designer-leaning, splurge, elevated',
+    slots: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  },
 ];
 
 const SLOT_PHRASE: Record<Category, string> = {
@@ -166,6 +256,22 @@ export function vibeSearchQuery(
       return `${person} ${piece} edgy dark monochrome statement${budgetHint}`.trim();
     case 'preppy':
       return `${person} ${piece} preppy classic collegiate polished${budgetHint}`.trim();
+    case 'streetwear':
+      return `streetwear ${piece} oversized modern hype brands${budgetHint}`.trim();
+    case 'campus':
+      return `${person} ${piece} college campus casual student${budgetHint}`.trim();
+    case 'travel':
+      return `${person} ${piece} airport travel comfortable polished${budgetHint}`.trim();
+    case 'old-money':
+      return `${person} ${piece} quiet luxury heritage classic refined${budgetHint}`.trim();
+    case 'techwear':
+      return `${person} ${piece} techwear technical utility black modern${budgetHint}`.trim();
+    case 'work':
+      return `${person} ${piece} business casual work tailored polished${budgetHint}`.trim();
+    case 'athletic':
+      return `${person} ${piece} athletic performance sporty active${budgetHint}`.trim();
+    case 'premium':
+      return `${person} ${piece} premium designer elevated luxury${budgetHint}`.trim();
     default:
       return `${person} ${piece}${budgetHint}`.trim();
   }

@@ -14,7 +14,7 @@ import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
 import { useWardrobe, WARDROBE_STATUS_LABELS } from '@/store/wardrobe';
 
-const FILTERS = ['For You', 'Trending', 'Men', 'Women', 'Budget', 'Under $150', 'Closet', 'Streetwear', 'Clean', 'Night Out', 'Campus', 'Gym', 'Date', 'Travel', 'Work', 'Old Money'];
+const FILTERS = ['For You', 'Men', 'Women', 'Clean', 'Streetwear', 'Campus', 'Gym', 'Date', 'Work', 'Travel', 'Old Money', 'Techwear', 'Budget'];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
 
 function formatPrice(cents: number): string {

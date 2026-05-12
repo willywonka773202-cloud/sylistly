@@ -227,8 +227,6 @@ export function hasUsableImageUrl(imageUrl?: string | null): boolean {
   if (!trimmed) return false;
   const normalized = trimmed.toLowerCase();
 
-  if (normalized.startsWith('data:image/svg+xml')) return false;
-  if (normalized.startsWith('data:image/gif') && (normalized.includes('r0lgod') || normalized.includes('transparent'))) return false;
   if (normalized.startsWith('data:')) return false;
   if (normalized === '#' || normalized === 'about:blank') return false;
   if (BAD_IMAGE_URL_TERMS.some((term) => normalized.includes(term))) return false;
@@ -342,6 +340,7 @@ export function isRenderableProduct(product?: Product | null): product is Produc
     && !product.name.toLowerCase().includes('placeholder')
     && product.category
     && product.imageUrl
+    && !product.imageUrl.trim().toLowerCase().startsWith('data:')
     && hasUsableProductImage(product),
   );
 }
@@ -388,7 +387,12 @@ export function productImageQualityScore(product: Product): number {
 
   if (product.imageQuality === 'good') score += 18;
   if (product.imageQuality === 'ok') score += 6;
-  if (product.productUrl || product.retailerUrl) score += 14;
+  const productUrlText = String(product.productUrl || '');
+  const retailerUrlText = String(product.retailerUrl || '');
+  const productUrlIsSearch = /google\.com\/search/i.test(productUrlText);
+  const retailerUrlIsSearch = /google\.com\/search/i.test(retailerUrlText);
+  if ((productUrlText && !productUrlIsSearch) || (retailerUrlText && !retailerUrlIsSearch)) score += 14;
+  if (productUrlIsSearch || retailerUrlIsSearch) score -= 18;
   if (product.priceCents > 0) score += 4;
   if ((product.vibes?.length || 0) + (product.searchTerms?.length || 0) >= 3) score += 4;
 

@@ -38,26 +38,42 @@ const MISSING_GENERATOR_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer
 const STARTER_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
   night: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
   street: ['hat', 'outer', 'top', 'bottom', 'shoes', 'eyewear'],
+  streetwear: ['hat', 'outer', 'top', 'bottom', 'shoes', 'eyewear'],
   clean: ['outer', 'top', 'bottom', 'shoes', 'bag'],
   gym: ['top', 'bottom', 'shoes', 'outer', 'hat', 'bag'],
+  athletic: ['top', 'bottom', 'shoes', 'outer', 'hat', 'bag'],
   cozy: ['outer', 'top', 'bottom', 'shoes', 'hat', 'bag'],
   date: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
   office: ['outer', 'top', 'bottom', 'shoes', 'bag'],
+  work: ['outer', 'top', 'bottom', 'shoes', 'bag'],
   vacation: ['hat', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  travel: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
   edgy: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
+  techwear: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
   preppy: ['outer', 'top', 'bottom', 'shoes', 'eyewear'],
+  'old-money': ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
+  campus: ['outer', 'top', 'bottom', 'shoes', 'bag', 'hat'],
+  premium: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
 };
 const FULL_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
   night: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
   street: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  streetwear: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
   clean: ['outer', 'top', 'bottom', 'shoes', 'bag'],
   gym: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag'],
+  athletic: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag'],
   cozy: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag'],
   date: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
   office: ['outer', 'top', 'bottom', 'shoes', 'bag'],
+  work: ['outer', 'top', 'bottom', 'shoes', 'bag', 'jewelry'],
   vacation: ['hat', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  travel: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
   edgy: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  techwear: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
   preppy: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  'old-money': ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
+  campus: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
+  premium: ['outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'],
 };
 
 function defaultGenerationSlotsForVibe(vibe: VibeId): Category[] {
@@ -2207,20 +2223,6 @@ function extractPalette(products: Product[]): string[] {
 function metadataList(product: Product, key: 'colors' | 'styles' | 'vibes' | 'keywords'): string[] {
   const value = product.metadata?.[key];
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
-}
-
-function overlayFallback(label: string): string {
-  const safeLabel = label.slice(0, 10).toUpperCase();
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
-      <rect width="180" height="220" rx="24" fill="#ffffff" />
-      <rect x="10" y="10" width="160" height="200" rx="20" fill="#f4ebe4" />
-      <circle cx="90" cy="80" r="34" fill="#e8365d" opacity="0.12" />
-      <rect x="46" y="128" width="88" height="12" rx="6" fill="#cdb9ad" />
-      <text x="90" y="170" text-anchor="middle" fill="#5d4a42" font-family="Arial, sans-serif" font-size="16" font-weight="700">${safeLabel}</text>
-    </svg>
-  `.trim();
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
 function tokenize(value: string): string[] {

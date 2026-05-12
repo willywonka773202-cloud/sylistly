@@ -832,20 +832,6 @@ function defaultCanvasImageClass(category: Category): string {
   return 'h-full w-full object-contain';
 }
 
-function overlayFallback(label: string): string {
-  const safeLabel = label.slice(0, 10).toUpperCase();
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
-      <rect width="180" height="220" rx="24" fill="#ffffff" />
-      <rect x="10" y="10" width="160" height="200" rx="20" fill="#f4ebe4" />
-      <circle cx="90" cy="80" r="34" fill="#e8365d" opacity="0.12" />
-      <rect x="46" y="128" width="88" height="12" rx="6" fill="#cdb9ad" />
-      <text x="90" y="170" text-anchor="middle" fill="#5d4a42" font-family="Arial, sans-serif" font-size="16" font-weight="700">${safeLabel}</text>
-    </svg>
-  `.trim();
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function tokenize(value: string): string[] {
   return value
     .toLowerCase()
