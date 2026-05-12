@@ -125,13 +125,13 @@ export function Mannequin({
 
   return (
     <div
-      className="relative overflow-hidden rounded-[30px] border border-[#efe4dc] bg-[#fff7ef] p-2.5 shadow-[0_22px_54px_rgba(0,0,0,.3)]"
+      className="relative overflow-hidden rounded-[30px] border border-[#efe4dc] bg-[#fff7ef] p-1.5 shadow-[0_22px_54px_rgba(0,0,0,.3)]"
       style={{
         boxShadow: `0 18px 44px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.88), 0 0 0 1px ${hexToRgba(glow, 0.08)}`,
       }}
     >
       <div
-        className="rounded-[26px] border border-[#eadfd7] bg-[linear-gradient(180deg,#fffdf9_0%,#f8f1ea_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]"
+        className="rounded-[26px] border border-[#eadfd7] bg-[linear-gradient(180deg,#fffdf9_0%,#f8f1ea_100%)] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]"
         style={{
           backgroundImage: `radial-gradient(circle at 18% 14%, rgba(255,255,255,.9), transparent 28%), radial-gradient(circle at 86% 18%, rgba(255,255,255,.68), transparent 24%), radial-gradient(circle at 50% 72%, ${hexToRgba(glow, 0.12)}, transparent 38%), linear-gradient(180deg,#fffdf9 0%,#f8f1ea 100%)`,
         }}
@@ -224,10 +224,10 @@ function FrontCanvas({
       : selected
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
       : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
-    const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1.5 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
+    const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
-      <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.42)]">
-        {locked ? <Lock size={12} strokeWidth={3} /> : <Check size={13} strokeWidth={3} />}
+      <span className="absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-accent text-white shadow-[0_4px_12px_rgba(232,54,93,.42)]">
+        {locked ? <Lock size={10} strokeWidth={3} /> : <Check size={11} strokeWidth={3} />}
       </span>
     ) : null;
 
@@ -237,26 +237,26 @@ function FrontCanvas({
           type="button"
           onClick={handleSlotClick}
           disabled={slotInteractionDisabled}
-          className={`${wrapperClassName} flex flex-col items-center justify-center border-dashed bg-white/64 px-1.5 text-center`}
+          className={`${wrapperClassName} flex flex-col items-center justify-center border-dashed bg-white/64 px-1 text-center`}
           aria-pressed={selected}
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
           {selectionBadge}
           <span className={`text-[8px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
-          <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
+          <span className={`mt-0.5 text-[15px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
         </button>
       );
     }
     const imageClassName =
-      category === 'top' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'bottom' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'shoes' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.04]' :
-      category === 'bag' ? 'h-full w-full object-contain object-center p-2 scale-[1.02]' :
-      category === 'outer' ? 'h-full w-full object-contain object-center p-1.5 scale-[0.99]' :
-      category === 'hat' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'eyewear' ? 'h-full w-full object-contain object-center p-2 scale-[1.08]' :
-      category === 'jewelry' ? 'h-full w-full object-contain object-center p-2.5 scale-[1.12]' :
-      `h-full w-full object-contain ${prominent ? 'p-1' : 'p-1.5'}`;
+      category === 'top' ? 'h-full w-full object-contain object-center p-1 scale-[1.08]' :
+      category === 'bottom' ? 'h-full w-full object-contain object-center p-1 scale-[1.08]' :
+      category === 'shoes' ? 'h-full w-full object-contain object-center p-1 scale-[1.1]' :
+      category === 'bag' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.06]' :
+      category === 'outer' ? 'h-full w-full object-contain object-center p-1 scale-[1.05]' :
+      category === 'hat' ? 'h-full w-full object-contain object-center p-1 scale-[1.1]' :
+      category === 'eyewear' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.15]' :
+      category === 'jewelry' ? 'h-full w-full object-contain object-center p-2 scale-[1.18]' :
+      `h-full w-full object-contain ${prominent ? 'p-0.5' : 'p-1'}`;
     const innerFrameClassName =
       category === 'jewelry'
         ? 'flex h-full items-center justify-center overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,.7)]'
@@ -289,13 +289,13 @@ function FrontCanvas({
               event.stopPropagation();
               if (!slotInteractionDisabled) onToggleSlotLock(category);
             }}
-            className={`absolute bottom-1.5 right-1.5 z-10 grid h-6 w-6 place-items-center rounded-full border text-[10px] transition ${
+            className={`absolute bottom-1 right-1 z-10 grid h-5 w-5 place-items-center rounded-full border text-[9px] transition ${
               locked
-                ? 'border-accent bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.36)]'
+                ? 'border-accent bg-accent text-white shadow-[0_4px_12px_rgba(232,54,93,.36)]'
                 : 'border-[#d9c9bb] bg-white/82 text-[#6c5c52] hover:border-accent hover:text-accent'
             }`}
           >
-            <Lock size={12} strokeWidth={2.6} />
+            <Lock size={10} strokeWidth={2.6} />
           </span>
         ) : null}
         <div className={innerFrameClassName}>
@@ -312,9 +312,9 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[430px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[470px]">
+    <div className="relative h-[480px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[540px]">
       <div
-        className="grid h-full gap-2.5"
+        className="grid h-full gap-2"
         style={{
           gridTemplateColumns: '0.92fr 1.55fr 0.92fr',
           gridTemplateRows: 'repeat(8, minmax(0, 1fr))',
