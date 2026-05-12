@@ -442,7 +442,7 @@ export const useSocialFeed = create<SocialFeedState>()(
         })),
     }),
     {
-      name: 'sylistly.social-feed.v1',
+      name: 'sylistly.social-feed.v2',
       version: FEED_STORAGE_VERSION,
       migrate: (persistedState) => normalizePersistedState(persistedState),
       merge: (persistedState, currentState) => ({

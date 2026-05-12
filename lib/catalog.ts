@@ -1111,21 +1111,21 @@ export function hydrateItemsFromCatalog(
   for (const [slot, product] of Object.entries(items) as Array<[Category, Product | undefined]>) {
     if (!product) continue;
     const catalogProduct = getCatalogProductById(product.id);
-    const currentIsPlaceholder = String(product.imageUrl || '').startsWith('data:image/svg+xml');
+    const isUnrenderable = !isRenderableProduct(product) || (catalogProduct && !isRenderableProduct(catalogProduct));
 
-    if (catalogProduct) {
-      const catalogHasRealPhoto = hasRealPhoto(catalogProduct);
-      if (currentIsPlaceholder && catalogHasRealPhoto) {
-        nextItems[slot] = {
-          ...product,
-          ...catalogProduct,
-        };
-        continue;
-      }
+    if (catalogProduct && !isUnrenderable) {
+      nextItems[slot] = {
+        ...product,
+        ...catalogProduct,
+      };
+      continue;
     }
 
-    if (currentIsPlaceholder) {
-      nextItems[slot] = findRealPhotoReplacement(product) || product;
+    if (isUnrenderable) {
+      const replacement = findRealPhotoReplacement(product);
+      if (replacement && isRenderableProduct(replacement)) {
+        nextItems[slot] = replacement;
+      }
       continue;
     }
 
@@ -1138,7 +1138,7 @@ export function hydrateItemsFromCatalog(
 export function getCollectionProducts(collection: CatalogCollection): Product[] {
   return collection.productIds
     .map((id) => getCatalogProductById(id))
-    .filter((product): product is Product => Boolean(product));
+    .filter((product): product is Product => Boolean(product) && isRenderableProduct(product));
 }
 
 export function getCollectionsFor(vibe?: VibeId, frame?: GeneratorFrame): CatalogCollection[] {

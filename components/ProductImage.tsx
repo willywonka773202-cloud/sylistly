@@ -3,7 +3,7 @@
 import { type ComponentType, useEffect, useMemo, useState } from 'react';
 import { Footprints, Glasses, PackageSearch, Shirt, ShoppingBag, Sparkles, Watch } from 'lucide-react';
 import { proxiedImageUrl } from '@/lib/image-url';
-import { hasUsableProductImage } from '@/lib/product-image-quality';
+import { hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
 type ProductImageMode = 'contain' | 'cover';
@@ -160,11 +160,12 @@ export function SafeProductImage({
 }) {
   const normalizedCategory = normalizeCategory(category || product?.category);
   const rawImageUrl = imageUrl || product?.imageUrl || '';
+  const renderable = isRenderableProduct(product);
   const failureKey = useMemo(
     () => imageFailureKey(product, rawImageUrl, cutout),
     [product?.id, rawImageUrl, cutout],
   );
-  const [imageOk, setImageOk] = useState(() => Boolean(rawImageUrl) && !failedImageKeys.has(failureKey));
+  const [imageOk, setImageOk] = useState(() => Boolean(rawImageUrl) && renderable && !failedImageKeys.has(failureKey));
 
   const src = imageOk && rawImageUrl
     ? (cutout && product
@@ -174,8 +175,8 @@ export function SafeProductImage({
 
   useEffect(() => {
     const nextKey = imageFailureKey(product, rawImageUrl, cutout);
-    setImageOk(Boolean(rawImageUrl) && !failedImageKeys.has(nextKey));
-  }, [product?.id, rawImageUrl, cutout]);
+    setImageOk(Boolean(rawImageUrl) && isRenderableProduct(product) && !failedImageKeys.has(nextKey));
+  }, [product?.id, rawImageUrl, cutout, product]);
 
   function markUnavailable() {
     failedImageKeys.add(failureKey);
@@ -183,7 +184,7 @@ export function SafeProductImage({
     if (product) onUnavailable?.(product);
   }
 
-  if (!src) {
+  if (!src || !renderable) {
     return (
       <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]'}>
         <ProductFallbackTile

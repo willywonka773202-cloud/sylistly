@@ -42,7 +42,8 @@ export function isRealCatalogProduct(product?: Product | null): product is Produ
       && product.category
       && CATEGORY_ORDER.includes(product.category)
       && (product.priceCents || 0) >= 0
-      && getCatalogProductById(product.id),
+      && getCatalogProductById(product.id)
+      && isRenderableProduct(product),
   );
 }
 

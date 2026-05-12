@@ -30,7 +30,7 @@ export const useFit = create<FitState>()(
       count: () => Object.values(get().items).filter(Boolean).length,
     }),
     {
-      name: 'sylistly.fit.v1',
+      name: 'sylistly.fit.v2',
       version: 2,
       migrate: (persistedState) => {
         const state = persistedState as FitState | undefined;
