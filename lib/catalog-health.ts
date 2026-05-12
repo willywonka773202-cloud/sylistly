@@ -198,12 +198,14 @@ export function getCatalogStats() {
   const duplicateIds = new Set<string>();
   const seenIds = new Set<string>();
   let missingImages = 0;
+  let unrenderable = 0;
 
   for (const product of ALL_CATALOG_PRODUCTS) {
     if (seenIds.has(product.id)) duplicateIds.add(product.id);
     seenIds.add(product.id);
     byCategory[product.category] += 1;
     if (!product.imageUrl) missingImages += 1;
+    else if (!isRenderableProduct(product)) unrenderable += 1;
     for (const gender of product.gender || ['androgynous']) byGender[gender] = (byGender[gender] || 0) + 1;
     for (const vibe of product.vibes || []) styleCoverage.add(vibe);
     const price = product.priceCents || 0;
@@ -219,6 +221,7 @@ export function getCatalogStats() {
     styleCoverage: Array.from(styleCoverage).sort(),
     duplicateIds: Array.from(duplicateIds),
     missingImages,
+    unrenderable,
   };
 }
 

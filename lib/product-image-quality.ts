@@ -22,6 +22,9 @@ const BAD_IMAGE_URL_TERMS = [
   'gray.gif',
   'loading',
   'skeleton',
+  'not_found',
+  'image_not_available',
+  'img_not_available',
 ];
 
 const BLOCKED_IMAGE_URL_SUBSTRINGS = [
@@ -46,6 +49,10 @@ const BLOCKED_IMAGE_URL_SUBSTRINGS = [
   'folded-cloth',
   'textile-closeup',
   'textile-close-up',
+  'placeholder-card',
+  'fallback-card',
+  'no-photo',
+  'broken-image',
 ];
 
 const BLOCKED_PRODUCT_ID_SUBSTRINGS = [
@@ -54,6 +61,15 @@ const BLOCKED_PRODUCT_ID_SUBSTRINGS = [
   'placeholder-cloth',
   'fabric-swatch',
   'cloth-swatch',
+  'sample-item',
+  'placeholder-top',
+  'placeholder-bottom',
+  'placeholder-shoes',
+  'placeholder-outer',
+  'placeholder-bag',
+  'placeholder-hat',
+  'placeholder-jewelry',
+  'placeholder-eyewear',
 ];
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
@@ -96,6 +112,16 @@ const LOW_INFORMATION_PRODUCT_TERMS = [
   'clothing fabric only',
   'texture image',
   'unresolved product photo',
+  'product a',
+  'product b',
+  'sample item',
+  'test product',
+  'placeholder item',
+  'placeholder top',
+  'placeholder bottom',
+  'placeholder shoes',
+  'add category',
+  'insert title',
 ];
 
 const FEED_BLOCKED_PRODUCT_TERMS = [
@@ -113,6 +139,7 @@ const MARKETPLACE_TERMS = [
   'vestiaire',
   'stockx',
   'goat',
+  'tiktok',
 ];
 
 const LOW_QUALITY_LISTING_TERMS = [
@@ -133,6 +160,9 @@ const LOW_QUALITY_LISTING_TERMS = [
   'closet',
   'resale',
   'secondhand',
+  'costume',
+  'cosplay',
+  'uniform',
 ];
 
 const PREFERRED_RETAILER_TERMS = [
@@ -160,9 +190,19 @@ const PREFERRED_RETAILER_TERMS = [
   'gap',
   'banana republic',
   'abercrombie',
+  'lululemon',
+  'alo yoga',
+  'patagonia',
+  'arc\'teryx',
+  'carhartt',
+  'stussy',
+  'dickies',
+  'levi\'s',
+  'g.h. bass',
+  'dr. martens',
 ];
 
-const KNOWN_EYEWEAR_BRANDS = ['ray ban', 'ray-ban', 'oakley', 'warby parker', 'gentle monster', 'quay', 'prada eyewear', 'versace eyewear'];
+const KNOWN_EYEWEAR_BRANDS = ['ray ban', 'ray-ban', 'oakley', 'warby parker', 'gentle monster', 'quay', 'prada eyewear', 'versace eyewear', 'le specs'];
 
 const CATEGORY_CONFLICT_TERMS: Record<Product['category'], string[]> = {
   shoes: ['shirt', 'jacket', 'coat', 'pants', 'trouser', 'jeans', 'shorts', 'bag', 'tote', 'necklace', 'sunglasses'],
@@ -177,7 +217,7 @@ const CATEGORY_CONFLICT_TERMS: Record<Product['category'], string[]> = {
 
 const CATEGORY_REQUIRED_TERMS: Partial<Record<Product['category'], string[]>> = {
   eyewear: ['sunglasses', 'glasses', 'eyeglasses', 'eyewear', 'shades', 'frames'],
-  jewelry: ['necklace', 'bracelet', 'ring', 'earring', 'earrings', 'hoop', 'chain', 'pendant', 'jewelry', 'bangle', 'cuff', 'watch'],
+  jewelry: ['necklace', 'bracelet', 'ring', 'earring', 'earrings', 'hoop', 'chain', 'pendant', 'jewelry', 'bangle', 'cuff', 'watch', 'stud', 'huggie'],
   hat: ['cap', 'hat', 'beanie', 'bucket', 'headband', 'skullcap'],
 };
 
@@ -297,8 +337,11 @@ export function isRenderableProduct(product?: Product | null): product is Produc
     product
     && product.id
     && product.brand?.trim()
+    && product.brand !== 'Sylistly'
     && product.name?.trim()
+    && !product.name.toLowerCase().includes('placeholder')
     && product.category
+    && product.imageUrl
     && hasUsableProductImage(product),
   );
 }
@@ -341,6 +384,7 @@ export function productImageQualityScore(product: Product): number {
   let score = 0;
 
   if (isBlockedProductImage(product)) return -999;
+  if (!isRenderableProduct(product)) return -500;
 
   if (product.imageQuality === 'good') score += 18;
   if (product.imageQuality === 'ok') score += 6;

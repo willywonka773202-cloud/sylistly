@@ -49,16 +49,16 @@ export interface CatalogCollection {
 }
 
 const VIBE_TERMS: Record<VibeId, string[]> = {
-  night: ['night out', 'night', 'going out', 'dressy', 'glam', 'date', 'black', 'leather', 'satin', 'heel', 'loafers', 'mini bag', 'jewelry'],
-  street: ['streetwear', 'college', 'casual', 'workwear', 'retro', 'sporty', 'hoodie', 'cargo', 'cap', 'sneaker', 'baggy', 'graphic', 'denim'],
-  clean: ['clean', 'minimal', 'minimalist', 'classic', 'quiet luxury', 'neutral', 'black', 'white', 'cream', 'beige', 'grey', 'navy', 'simple'],
-  gym: ['gym', 'athletic', 'sporty', 'performance', 'wellness', 'training', 'running', 'workout', 'legging', 'shorts'],
-  cozy: ['cozy', 'winter', 'casual', 'soft', 'puffer', 'knit', 'hoodie', 'sweatpants', 'boot', 'beanie'],
-  date: ['date', 'night out', 'dressy', 'feminine', 'black', 'leather', 'satin', 'heel', 'loafers', 'jewelry', 'small bag'],
-  office: ['office', 'work', 'tailored', 'smart', 'business casual', 'blazer', 'trouser', 'loafers', 'button down', 'tote'],
-  vacation: ['vacation', 'summer', 'resort', 'coastal', 'beach', 'linen', 'sandal', 'sunglasses', 'straw', 'tote', 'shorts'],
-  edgy: ['edgy', 'dark', 'grunge', 'statement', 'techwear', 'black', 'leather', 'cargo', 'boot', 'shell jacket', 'crossbody'],
-  preppy: ['preppy', 'old money', 'classic', 'collegiate', 'smart', 'polo', 'cardigan', 'sweater', 'chinos', 'loafers', 'pleated', 'sunglasses'],
+  night: ['night', 'going out', 'party', 'elegant', 'cocktail', 'evening', 'fitted', 'polyester', 'satin', 'leather', 'sequin', 'velvet', 'heel', 'loafers', 'clutch'],
+  street: ['streetwear', 'urban', 'oversized', 'baggy', 'graphic', 'hoodie', 'cargo', 'sneaker', 'denim', 'bomber', 'utility', 'college', 'retro'],
+  clean: ['minimal', 'neutral', 'minimalist', 'clean girl', 'quiet luxury', 'staple', 'basics', 'cotton', 'linen', 'beige', 'cream', 'white', 'grey', 'monochrome', 'simple'],
+  gym: ['athletic', 'workout', 'performance', 'activewear', 'training', 'yoga', 'running', 'sport', 'nike', 'adidas', 'leggings', 'track'],
+  cozy: ['lounge', 'knit', 'soft', 'fleece', 'comfortable', 'relaxed', 'sweater', 'hoodie', 'sweatpants', 'warm', 'oversized', 'puffer', 'boot', 'beanie'],
+  date: ['date night', 'romantic', 'flirty', 'elevated', 'smart casual', 'chiffon', 'floral', 'silk', 'lace', 'blouse', 'dressy', 'heel', 'loafers', 'jewelry'],
+  office: ['office', 'business casual', 'tailored', 'workwear', 'smart', 'blazer', 'trouser', 'button down', 'oxford', 'loafers', 'structured', 'tote'],
+  vacation: ['resort', 'summer', 'beach', 'tropical', 'linen', 'sandals', 'sunny', 'shorts', 'swim', 'crochet', 'woven', 'straw', 'tote'],
+  edgy: ['dark', 'punk', 'grunge', 'goth', 'studded', 'chains', 'black', 'distressed', 'combat', 'platform', 'moto', 'acid wash', 'techwear', 'shell jacket'],
+  preppy: ['classic', 'collegiate', 'ivy', 'polo', 'knit', 'pleated', 'skirt', 'cardigan', 'loafers', 'button-up', 'tailored', 'old money', 'ralph lauren'],
 };
 
 const VIBE_TAG_ALIASES: Record<VibeId, string[]> = {
@@ -667,12 +667,14 @@ function stableHash(value: string): number {
 
 function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | null {
   if (!items.length) return null;
-  const pool = items.slice(0, Math.min(96, items.length));
+  // Increase pool size for more variety
+  const pool = items.slice(0, Math.min(128, items.length));
   const random = (stableHash(`${key}:${Math.abs(seed || 0)}`) % 1_000_000) / 1_000_000;
   const weightFor = (item: T, index: number) => {
     const id = typeof item === 'object' && item && 'id' in item ? String((item as { id?: unknown }).id || '') : '';
-    const jitter = 0.82 + ((stableHash(`${key}:${seed}:${id || index}`) % 38) / 100);
-    return Math.pow(pool.length - index, 0.9) * jitter;
+    const jitter = 0.85 + ((stableHash(`${key}:${seed}:${id || index}`) % 30) / 100);
+    // Flattened power curve (0.6 instead of 0.9) to give lower-ranked items more chance
+    return Math.pow(pool.length - index, 0.6) * jitter;
   };
   const totalWeight = pool.reduce((total, item, index) => total + weightFor(item, index), 0);
   let threshold = random * totalWeight;
@@ -1444,15 +1446,32 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
   const hasSelected = (terms: string[]) => terms.some((term) => selectedHaystack.includes(normalize(term)));
   const hasProduct = (terms: string[]) => terms.some((term) => haystack.includes(normalize(term)));
 
-  if (hasSelected(['blazer', 'trouser', 'office', 'tailored']) && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 52;
-  if (hasSelected(['puffer', 'winter', 'fleece', 'beanie']) && hasProduct(['sandal', 'linen', 'beach'])) score -= 52;
-  if (hasSelected(['linen', 'beach', 'vacation', 'resort']) && hasProduct(['puffer', 'winter', 'boot', 'fleece'])) score -= 52;
-  if (vibe === 'clean' && hasProduct(['graphic', 'neon', 'statement', 'western', 'techwear'])) score -= 44;
-  if ((vibe === 'gym' || vibe === 'cozy') && hasProduct(['heel', 'pumps', 'satin', 'dressy'])) score -= 44;
-  if ((vibe === 'night' || vibe === 'date') && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 44;
+  // Silhouette / Category conflicts
+  if (hasSelected(['blazer', 'trouser', 'office', 'tailored']) && hasProduct(['running', 'gym', 'workout', 'sweatpants'])) score -= 80;
+  if (hasSelected(['puffer', 'winter', 'fleece', 'beanie']) && hasProduct(['sandal', 'linen', 'beach'])) score -= 80;
+  if (hasSelected(['linen', 'beach', 'vacation', 'resort']) && hasProduct(['puffer', 'winter', 'boot', 'fleece'])) score -= 80;
+  
+  // Vibe specific conflicts
+  if (vibe === 'clean' && hasProduct(['graphic', 'neon', 'statement', 'western', 'techwear', 'distressed'])) score -= 60;
+  if ((vibe === 'gym' || vibe === 'cozy') && hasProduct(['heel', 'pumps', 'satin', 'dressy', 'blazer'])) score -= 60;
+  if ((vibe === 'night' || vibe === 'date') && hasProduct(['running', 'gym', 'workout', 'sweatpants', 'beanie'])) score -= 60;
+  if (vibe === 'office' && hasProduct(['sweatpants', 'hoodie', 'distressed', 'athletic', 'crocs', 'flip flops'])) score -= 100;
 
+  // Shoe logic
+  const isSandal = hasProduct(['sandal', 'flip flop', 'birkenstock']);
+  const isRainBoot = hasProduct(['rain boot', 'wellies']);
+  const isAthletic = hasProduct(['running', 'athletic', 'training']);
+  if (product.category === 'shoes') {
+    if (isSandal && (vibe === 'office' || vibe === 'night' || vibe === 'edgy')) score -= 120;
+    if (isRainBoot && (vibe === 'night' || vibe === 'date' || vibe === 'office' || vibe === 'clean')) score -= 150;
+    if (isAthletic && (vibe === 'office' || vibe === 'night')) score -= 80;
+  }
+
+  // Color harmony (basic)
   const neutralTerms = ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown'];
   if (hasSelected(neutralTerms) && hasProduct(neutralTerms)) score += 12;
+  
+  // Brand loyalty (good for gym)
   if (vibe === 'gym' && hasSelected(['nike', 'adidas', 'lululemon', 'alo', 'new balance']) && hasProduct(['nike', 'adidas', 'lululemon', 'alo', 'new balance'])) {
     score += 18;
   }

@@ -4,34 +4,36 @@ import type { GeneratorFrame } from './vibes';
 export type FrameTag = 'masc' | 'fem' | 'androgynous';
 
 const FEM_ONLY_TERMS = [
-  'women', 'womens', 'woman', 'ladies', 'lady', 'girl', 'girls',
-  'mini dress', 'slip dress', 'bodycon dress', 'maxi dress', 'midi dress',
-  'mini skirt', 'pleated skirt', 'slip skirt', 'skirt',
-  'heels', 'heel', 'pumps', 'pump', 'stiletto', 'kitten heel',
+  'women', 'womens', 'woman', 'ladies', 'lady', 'girl', 'girls', 'female',
+  'mini dress', 'slip dress', 'bodycon dress', 'maxi dress', 'midi dress', 'sundress',
+  'mini skirt', 'pleated skirt', 'slip skirt', 'skirt', 'maxi skirt', 'midi skirt',
+  'heels', 'heel', 'pumps', 'pump', 'stiletto', 'kitten heel', 'slingback', 'ballet flat',
   'sports bra', 'bralette', 'bra ', 'crop top', 'cropped cami', 'cami tank',
-  'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset', 'ballet flat',
+  'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset', 'bustier', 'blouse',
+  'leggings', 'yoga pants', 'thong', 'bikini', 'halter', 'off the shoulder',
 ];
 
 const MASC_ONLY_TERMS = [
   'men', 'mens', 'man', 'male', 'dress shirt men', 'button down men',
   'mens loafers', 'mens boots', 'mens trousers', 'boxer', 'men athletic shorts',
+  'beard', 'grooming', 'menswear', 'suit jacket men', 'sport coat men',
 ];
 
 const ANDROGYNOUS_TERMS = [
   'unisex', 'hoodie', 'sweatshirt', 'tee', 't shirt', 't-shirt', 'sneaker',
   'sneakers', 'cap', 'beanie', 'cargo', 'jeans', 'denim jacket', 'puffer',
   'bomber', 'backpack', 'sunglasses', 'tote', 'crossbody', 'converse', 'vans',
-  'nike', 'adidas', 'new balance', 'asics', 'uniqlo',
+  'nike', 'adidas', 'new balance', 'asics', 'uniqlo', 'baggu', 'patagonia',
 ];
 
 const FEM_ANDROGYNOUS_TERMS = [
   'purse', 'handbag', 'shoulder bag', 'earrings', 'earring', 'necklace',
-  'bracelet', 'mini bag', 'tote',
+  'bracelet', 'mini bag', 'tote', 'hobo bag', 'clutch', 'crossbody bag',
 ];
 
 const MASC_ANDROGYNOUS_TERMS = [
   'chain necklace', 'silver chain', 'polo', 'chinos', 'blazer', 'loafers',
-  'boots', 'trousers', 'button down',
+  'boots', 'trousers', 'button down', 'oxford shirt', 'chelsea boot',
 ];
 
 function normalize(value: string): string {
@@ -71,19 +73,24 @@ export function productFrameHaystack(product: Product): string {
 export function inferProductGender(product: Product): FrameTag[] {
   const haystack = productFrameHaystack(product);
   const explicitWomen = hasAny(haystack, ['women', 'womens', 'woman', 'ladies', 'lady', 'female', 'girls', 'girl']);
-  const explicitMen = hasAny(haystack, ['men', 'mens', 'man', 'male']);
-  const femOnly = explicitWomen || hasAny(haystack, FEM_ONLY_TERMS);
-  const mascOnly = explicitMen || hasAny(haystack, MASC_ONLY_TERMS);
+  const explicitMen = hasAny(haystack, ['men', 'mens', 'man', 'male', 'menswear']);
+  
+  const femOnly = hasAny(haystack, FEM_ONLY_TERMS);
+  const mascOnly = hasAny(haystack, MASC_ONLY_TERMS);
+  
   const androgynous = hasAny(haystack, ANDROGYNOUS_TERMS);
   const femAndrogynous = product.category === 'bag' || product.category === 'jewelry' || hasAny(haystack, FEM_ANDROGYNOUS_TERMS);
   const mascAndrogynous = hasAny(haystack, MASC_ANDROGYNOUS_TERMS);
 
-  if (explicitWomen && !androgynous) return ['fem'];
-  if (explicitMen && !androgynous) return ['masc'];
-  if (femOnly && !mascOnly) return femAndrogynous ? ['fem', 'androgynous'] : ['fem'];
-  if (mascOnly && !femOnly) return mascAndrogynous ? ['masc', 'androgynous'] : ['masc'];
+  if (explicitWomen && femOnly && !mascOnly) return ['fem'];
+  if (explicitMen && mascOnly && !femOnly) return ['masc'];
+  
+  if (femOnly && !mascOnly && !androgynous) return ['fem'];
+  if (mascOnly && !femOnly && !androgynous) return ['masc'];
+
   if (androgynous) return ['androgynous'];
-  if (femAndrogynous) return ['fem', 'androgynous'];
+  if (femAndrogynous && !mascOnly) return ['fem', 'androgynous'];
+  if (mascAndrogynous && !femOnly) return ['masc', 'androgynous'];
 
   if (product.category === 'eyewear' || product.category === 'hat' || product.category === 'shoes') {
     return ['androgynous'];
@@ -102,21 +109,34 @@ export function productGenderTags(product: Product): FrameTag[] {
 }
 
 export function genderMismatchReasons(product: Product, requestedFrame: GeneratorFrame): string[] {
-  if (requestedFrame === 'androgynous') return [];
   const haystack = productFrameHaystack(product);
   const tags = productGenderTags(product);
   const reasons: string[] = [];
 
   if (requestedFrame === 'masc') {
     if (tags.includes('fem') && !tags.includes('androgynous') && !tags.includes('masc')) reasons.push('fem-only tag');
-    if (hasAny(haystack, ['women', 'womens', 'ladies', 'mini dress', 'slip dress', 'midi dress', 'maxi dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'stiletto', 'kitten heel', 'baby tee', 'tube top', 'cami tank', 'align tank', 'cropped cami'])) {
+    if (hasAny(haystack, FEM_ONLY_TERMS) && !hasAny(haystack, ANDROGYNOUS_TERMS)) {
       reasons.push('obvious fem keyword');
+    }
+    if (hasAny(haystack, ['women', 'womens', 'female', 'girls', 'lady'])) {
+      reasons.push('explicit fem label');
     }
   }
 
   if (requestedFrame === 'fem') {
     if (tags.includes('masc') && !tags.includes('androgynous') && !tags.includes('fem')) reasons.push('masc-only tag');
-    if (hasAny(haystack, [' men ', ' mens ', 'male', 'boxer'])) reasons.push('obvious masc keyword');
+    if (hasAny(haystack, MASC_ONLY_TERMS) && !hasAny(haystack, ANDROGYNOUS_TERMS)) {
+      reasons.push('obvious masc keyword');
+    }
+    if (hasAny(haystack, [' men ', ' mens ', 'male', 'menswear'])) {
+      reasons.push('explicit masc label');
+    }
+  }
+
+  if (requestedFrame === 'androgynous') {
+    // Discourage strongly gendered items for androgynous frame
+    if (hasAny(haystack, FEM_ONLY_TERMS) && !hasAny(haystack, ANDROGYNOUS_TERMS)) reasons.push('too feminine for androgynous');
+    if (hasAny(haystack, MASC_ONLY_TERMS) && !hasAny(haystack, ANDROGYNOUS_TERMS)) reasons.push('too masculine for androgynous');
   }
 
   return Array.from(new Set(reasons));
@@ -131,13 +151,15 @@ export function frameCompatibilityScore(product: Product, requestedFrame: Genera
 
   if (requestedFrame === 'androgynous') {
     if (tags.includes('androgynous')) return 24;
-    if (tags.length === 1) return 4;
+    if (hasFrameMismatch(product, 'androgynous')) return -180;
+    if (tags.includes('fem') && !tags.includes('masc')) return -40;
+    if (tags.includes('masc') && !tags.includes('fem')) return -40;
     return 10;
   }
 
-  if (hasFrameMismatch(product, requestedFrame)) return -220;
-  if (tags.includes(requestedFrame)) return 42;
-  if (tags.includes('androgynous')) return 26;
+  if (hasFrameMismatch(product, requestedFrame)) return -320;
+  if (tags.includes(requestedFrame)) return 48;
+  if (tags.includes('androgynous')) return 32;
 
-  return -90;
+  return -140;
 }

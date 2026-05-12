@@ -29,7 +29,11 @@ const DANGEROUS_PATTERNS: Array<{ label: string; pattern: RegExp; allow?: (file:
   {
     label: 'fake product label',
     pattern: /\bProduct A\b|\bSample Item\b|\bPlaceholder Top\b|\bPlaceholder Shoes\b|placeholder product/i,
-    allow: (file) => file.endsWith('scripts\\qa-check.ts') || file.endsWith('scripts/qa-check.ts'),
+    allow: (file) =>
+      file.endsWith('scripts\\qa-check.ts')
+      || file.endsWith('scripts/qa-check.ts')
+      || file.endsWith('lib\\product-image-quality.ts')
+      || file.endsWith('lib/product-image-quality.ts'),
   },
   {
     label: 'placeholder SearchAPI key in runtime',

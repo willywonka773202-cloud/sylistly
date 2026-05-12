@@ -22,7 +22,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
   jewelry: 'Jewelry',
 };
 
-const CATEGORY_ICONS: Record<Category, ComponentType<{ size?: number; className?: string }>> = {
+const CATEGORY_ICONS: Record<Category, ComponentType<{ size?: number; className?: string; strokeWidth?: number }>> = {
   hat: PackageSearch,
   outer: Shirt,
   top: Shirt,
@@ -114,33 +114,16 @@ export function ProductFallbackTile({
   const normalizedCategory = normalizeCategory(category || product?.category);
   const Icon = CATEGORY_ICONS[normalizedCategory] || Sparkles;
   const label = CATEGORY_LABELS[normalizedCategory] || 'Piece';
-  const displayName = getDisplayName(product, name);
   const displayBrand = product?.brand || brand || 'Sylistly Pick';
 
   return (
     <div
-      className={`relative grid h-full w-full place-items-center overflow-hidden bg-gradient-to-br ${CATEGORY_BACKGROUNDS[normalizedCategory]} ${className || ''}`}
-      aria-label={`${displayBrand} ${displayName} image unavailable`}
+      className={`relative grid h-full w-full place-items-center overflow-hidden bg-[#fdfaf8] ${className || ''}`}
+      aria-label={`${displayBrand} ${getDisplayName(product, name)} image unavailable`}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,.92),transparent_38%)]" />
-      <div className="absolute inset-x-[20%] bottom-[14%] h-4 rounded-full bg-black/10 blur-[10px]" />
-      <div className="relative flex max-w-[82%] flex-col items-center text-center text-[#2a211c]">
-        <div className={`grid ${ICON_WRAP_CLASSES[size]} place-items-center rounded-full border border-black/10 bg-white/78 text-[#251b18] shadow-[0_12px_28px_rgba(0,0,0,.12)]`}>
-          <Icon size={ICON_SIZES[size]} />
-        </div>
-        <div className={`${size === 'sm' ? 'mt-1' : 'mt-2'} font-black uppercase tracking-[.16em] text-[#7c6b61] ${SIZE_CLASSES[size]}`}>
-          {label}
-        </div>
-        {size === 'hero' || size === 'lg' ? (
-          <>
-            <div className={`${size === 'hero' ? 'mt-2 text-[12px]' : 'mt-1 text-[10px]'} line-clamp-1 font-black uppercase tracking-[.12em] text-[#1f1915]`}>
-              {displayBrand}
-            </div>
-            <div className={`${size === 'hero' ? 'text-[12px]' : 'text-[10px]'} mt-0.5 line-clamp-2 font-semibold leading-tight text-[#6f5e54]`}>
-              {displayName}
-            </div>
-          </>
-        ) : null}
+      <div className="flex flex-col items-center gap-1.5 opacity-20 grayscale">
+        <Icon size={ICON_SIZES[size] * 0.8} strokeWidth={1.5} />
+        <span className="text-[9px] font-bold uppercase tracking-widest">{label}</span>
       </div>
     </div>
   );
