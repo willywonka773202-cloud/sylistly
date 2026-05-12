@@ -259,10 +259,10 @@ function FrontCanvas({
       `h-full w-full object-contain ${prominent ? 'p-1' : 'p-1.5'}`;
     const innerFrameClassName =
       category === 'jewelry'
-        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,.7)]'
+        ? 'flex h-full items-center justify-center overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,.7)]'
         : category === 'eyewear'
-        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,.65)]'
-        : 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/64 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]';
+        ? 'flex h-full items-center justify-center overflow-hidden rounded-[12px] bg-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,.65)]'
+        : 'flex h-full items-center justify-center overflow-hidden rounded-[12px] bg-white/64 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]';
 
     return (
       <button
@@ -298,7 +298,6 @@ function FrontCanvas({
             <Lock size={12} strokeWidth={2.6} />
           </span>
         ) : null}
-        <div className={`mb-0.5 text-left text-[7px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
         <div className={innerFrameClassName}>
           <PreviewImage
             product={product}
@@ -313,7 +312,7 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]">
+    <div className="relative h-[430px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[470px]">
       <div
         className="grid h-full gap-2.5"
         style={{
