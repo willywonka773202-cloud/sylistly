@@ -1,10 +1,9 @@
-import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
 import { parseSearchIntentHeuristic, rerankProducts } from './claude';
+import { EXPANSION_REVIEWED_PRODUCTS } from './expansion-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from './generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
 import { presentationScore } from './presentation-score';
 import { hasDirectRetailerUrl } from './retailer-url';
-import { searchBrandCatalog } from './brand-catalog';
 import { searchPhotoCatalog } from './photo-catalog';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
 import { frameCompatibilityScore, hasFrameMismatch } from './frame-inference';
@@ -51,27 +50,43 @@ export interface CatalogCollection {
 const VIBE_TERMS: Record<VibeId, string[]> = {
   night: ['night', 'going out', 'party', 'elegant', 'cocktail', 'evening', 'fitted', 'polyester', 'satin', 'leather', 'sequin', 'velvet', 'heel', 'loafers', 'clutch'],
   street: ['streetwear', 'urban', 'oversized', 'baggy', 'graphic', 'hoodie', 'cargo', 'sneaker', 'denim', 'bomber', 'utility', 'college', 'retro'],
+  streetwear: ['streetwear', 'urban', 'oversized', 'baggy', 'graphic', 'hoodie', 'cargo', 'sneaker', 'denim', 'bomber', 'samba', 'campus', 'stussy', 'aime leon dore', 'hype'],
   clean: ['minimal', 'neutral', 'minimalist', 'clean girl', 'quiet luxury', 'staple', 'basics', 'cotton', 'linen', 'beige', 'cream', 'white', 'grey', 'monochrome', 'simple'],
   gym: ['athletic', 'workout', 'performance', 'activewear', 'training', 'yoga', 'running', 'sport', 'nike', 'adidas', 'leggings', 'track'],
+  athletic: ['athletic', 'performance', 'sport', 'training', 'running', 'gym', 'active', 'jogger', 'nike', 'adidas', 'lululemon', 'on', 'asics', 'new balance', 'hoka'],
   cozy: ['lounge', 'knit', 'soft', 'fleece', 'comfortable', 'relaxed', 'sweater', 'hoodie', 'sweatpants', 'warm', 'oversized', 'puffer', 'boot', 'beanie'],
   date: ['date night', 'romantic', 'flirty', 'elevated', 'smart casual', 'chiffon', 'floral', 'silk', 'lace', 'blouse', 'dressy', 'heel', 'loafers', 'jewelry'],
   office: ['office', 'business casual', 'tailored', 'workwear', 'smart', 'blazer', 'trouser', 'button down', 'oxford', 'loafers', 'structured', 'tote'],
+  work: ['work', 'office', 'business casual', 'tailored', 'professional', 'blazer', 'trouser', 'button down', 'oxford', 'loafer', 'polished', 'structured'],
   vacation: ['resort', 'summer', 'beach', 'tropical', 'linen', 'sandals', 'sunny', 'shorts', 'swim', 'crochet', 'woven', 'straw', 'tote'],
+  travel: ['travel', 'airport', 'comfortable', 'wrinkle resistant', 'jogger', 'sneaker', 'crossbody', 'tote', 'backpack', 'layering', 'lightweight', 'duffel'],
   edgy: ['dark', 'punk', 'grunge', 'goth', 'studded', 'chains', 'black', 'distressed', 'combat', 'platform', 'moto', 'acid wash', 'techwear', 'shell jacket'],
+  techwear: ['techwear', 'technical', 'utility', 'shell jacket', 'gore tex', 'cargo', 'black', 'modular', 'arcteryx', 'acronym', 'stone island', 'crossbody sling', 'tactical'],
   preppy: ['classic', 'collegiate', 'ivy', 'polo', 'knit', 'pleated', 'skirt', 'cardigan', 'loafers', 'button-up', 'tailored', 'old money', 'ralph lauren'],
+  'old-money': ['quiet luxury', 'heritage', 'old money', 'classic', 'polo', 'oxford', 'cashmere', 'loafer', 'tweed', 'tailored', 'ralph lauren', 'brooks brothers', 'pearl', 'cable knit'],
+  campus: ['campus', 'college', 'class', 'student', 'casual', 'denim', 'hoodie', 'sweater', 'sneaker', 'cap', 'backpack', 'tote', 'crewneck'],
+  premium: ['premium', 'designer', 'luxury', 'splurge', 'elevated', 'cashmere', 'leather', 'silk', 'tailored', 'celine', 'the row', 'bottega', 'loro piana', 'totême'],
 };
 
 const VIBE_TAG_ALIASES: Record<VibeId, string[]> = {
   night: ['night', 'date', 'luxury', 'edgy'],
   street: ['streetwear', 'street', 'college', 'casual', 'y2k'],
+  streetwear: ['streetwear', 'street', 'college', 'casual', 'y2k', 'hype'],
   clean: ['clean', 'minimal', 'minimalist', 'casual', 'luxury'],
   gym: ['gym', 'athletic', 'sporty', 'workout'],
+  athletic: ['athletic', 'sporty', 'gym', 'workout', 'performance', 'training', 'active'],
   cozy: ['cozy', 'winter', 'casual'],
   date: ['date', 'night', 'luxury'],
   office: ['office', 'business casual', 'old money', 'preppy'],
+  work: ['work', 'office', 'business casual', 'professional', 'tailored'],
   vacation: ['vacation', 'beach', 'summer'],
+  travel: ['travel', 'airport', 'capsule', 'weekend'],
   edgy: ['edgy', 'techwear', 'night'],
+  techwear: ['techwear', 'utility', 'tactical', 'edgy', 'urban', 'modern'],
   preppy: ['preppy', 'old money', 'business casual', 'college', 'luxury'],
+  'old-money': ['old money', 'quiet luxury', 'preppy', 'heritage', 'classic', 'luxury'],
+  campus: ['campus', 'college', 'student', 'casual', 'class'],
+  premium: ['premium', 'luxury', 'designer', 'elevated', 'splurge'],
 };
 
 const OUTFIT_RECIPES: Record<VibeId, OutfitRecipe> = {
@@ -165,6 +180,78 @@ const OUTFIT_RECIPES: Record<VibeId, OutfitRecipe> = {
     jewelry: 'strong',
     eyewear: 'optional',
   },
+  streetwear: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'hat', 'bag', 'eyewear', 'jewelry'],
+    prefer: ['hoodie', 'cargo', 'denim', 'oversized', 'cap', 'sneaker', 'graphic', 'bomber', 'crossbody', 'baggy', 'samba', 'chain', 'silver'],
+    avoid: ['blazer suit', 'heels', 'office', 'formal', 'pumps', 'pleated trouser'],
+    colors: ['black', 'white', 'grey', 'gray', 'navy', 'green', 'brown', 'cream'],
+    jewelry: 'strong',
+    eyewear: 'strong',
+  },
+  campus: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'hat', 'bag', 'eyewear', 'jewelry'],
+    prefer: ['hoodie', 'crewneck', 'tee', 'jean', 'denim', 'sneaker', 'cardigan', 'flannel', 'cap', 'tote', 'backpack', 'sweater'],
+    avoid: ['suit', 'pumps', 'formal evening', 'cocktail dress'],
+    colors: ['white', 'cream', 'beige', 'navy', 'grey', 'gray', 'black', 'brown', 'blue'],
+    jewelry: 'optional',
+    eyewear: 'optional',
+  },
+  travel: {
+    required: ['top', 'bottom', 'shoes', 'bag'],
+    optional: ['outer', 'eyewear'],
+    prefer: ['jogger', 'sneaker', 'crossbody', 'tote', 'backpack', 'duffel', 'sweater', 'tee', 'hoodie', 'cardigan', 'puffer', 'sunglasses'],
+    avoid: ['heels', 'pumps', 'formal evening', 'stiletto'],
+    colors: ['black', 'grey', 'gray', 'cream', 'beige', 'navy', 'brown', 'white'],
+    jewelry: 'avoid',
+    eyewear: 'strong',
+  },
+  'old-money': {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear', 'jewelry'],
+    prefer: ['polo', 'oxford', 'cardigan', 'cashmere', 'loafer', 'cable knit', 'tailored', 'wool', 'tweed', 'trouser', 'chino', 'pearl', 'ralph lauren', 'brooks brothers'],
+    avoid: ['graphic', 'neon', 'techwear', 'cargo', 'running', 'sweatpant', 'puffer', 'logo heavy'],
+    colors: ['cream', 'beige', 'navy', 'brown', 'white', 'tan', 'grey', 'burgundy'],
+    jewelry: 'strong',
+    eyewear: 'optional',
+  },
+  techwear: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear'],
+    prefer: ['shell jacket', 'gore tex', 'cargo', 'utility', 'technical', 'modular', 'crossbody sling', 'matte black', 'arcteryx', 'stone island', 'acronym', 'sneaker'],
+    avoid: ['linen', 'beach', 'old money', 'preppy', 'sandal', 'straw', 'polo sweater', 'satin', 'pleated'],
+    colors: ['black', 'grey', 'gray', 'olive', 'silver'],
+    jewelry: 'avoid',
+    eyewear: 'optional',
+  },
+  work: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'jewelry', 'eyewear'],
+    prefer: ['blazer', 'trouser', 'button down', 'oxford', 'polo', 'cardigan', 'loafer', 'flat', 'tote', 'tailored', 'pleated'],
+    avoid: ['gym', 'beach', 'cargo', 'graphic', 'running', 'sweatpants', 'puffer', 'track', 'western'],
+    colors: ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown'],
+    jewelry: 'optional',
+    eyewear: 'optional',
+  },
+  athletic: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'hat', 'bag'],
+    prefer: ['training', 'running', 'workout', 'performance', 'athletic', 'jogger', 'tank', 'tee', 'sneaker', 'duffel', 'cap', 'gym'],
+    avoid: ['blazer', 'pleated trouser', 'satin', 'heel', 'pumps', 'dress shoe'],
+    colors: ['black', 'white', 'grey', 'gray', 'navy', 'cream'],
+    jewelry: 'avoid',
+    eyewear: 'avoid',
+  },
+  premium: {
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear', 'jewelry'],
+    prefer: ['cashmere', 'silk', 'leather', 'tailored', 'designer', 'wool', 'celine', 'the row', 'bottega', 'loro piana', 'totême', 'arcteryx'],
+    avoid: ['budget', 'fast fashion', 'graphic tee', 'shein', 'temu'],
+    colors: ['cream', 'beige', 'black', 'white', 'navy', 'brown', 'grey', 'tan'],
+    jewelry: 'strong',
+    eyewear: 'strong',
+  },
 };
 
 const FRAME_AVOID_TERMS: Record<GeneratorFrame, string[]> = {
@@ -193,20 +280,31 @@ const FRAME_AVOID_TERMS: Record<GeneratorFrame, string[]> = {
 const MISSING_SLOT_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'eyewear', 'jewelry', 'hat'];
 const REFRESH_ACCESSORY_SLOTS: Category[] = ['bag', 'eyewear', 'jewelry'];
 const CONDITIONAL_ACCESSORY_SLOTS = new Set<Category>(['hat', 'eyewear', 'jewelry']);
-const STRICT_CATEGORY_PREFERENCE_VIBES = new Set<VibeId>(['gym', 'office', 'vacation', 'night', 'date']);
+const STRICT_CATEGORY_PREFERENCE_VIBES = new Set<VibeId>([
+  'gym', 'athletic', 'office', 'work', 'vacation', 'travel',
+  'night', 'date', 'techwear', 'old-money',
+]);
 const DEBUG_GENERATOR = process.env.DEBUG_GENERATOR === '1';
 
 const DEFAULT_ACCESSORY_RATES: Record<VibeId, Partial<Record<Category, number>>> = {
   clean: { eyewear: 0.35, jewelry: 0.08 },
   street: { hat: 0.7, eyewear: 0.75, jewelry: 0.45 },
+  streetwear: { hat: 0.75, eyewear: 0.7, jewelry: 0.5 },
   night: { eyewear: 0.3, jewelry: 0.82 },
   date: { eyewear: 0.25, jewelry: 0.82 },
   gym: { hat: 0.55, eyewear: 0.04, jewelry: 0 },
+  athletic: { hat: 0.6, eyewear: 0.06, jewelry: 0 },
   cozy: { hat: 0.75, eyewear: 0.05, jewelry: 0.04 },
   office: { eyewear: 0.1, jewelry: 0.28 },
+  work: { eyewear: 0.12, jewelry: 0.3 },
   vacation: { hat: 0.5, eyewear: 0.78, jewelry: 0.24 },
+  travel: { hat: 0.25, eyewear: 0.6, jewelry: 0.1 },
   preppy: { hat: 0.35, eyewear: 0.72, jewelry: 0.36 },
+  'old-money': { eyewear: 0.5, jewelry: 0.55 },
   edgy: { eyewear: 0.58, jewelry: 0.75 },
+  techwear: { eyewear: 0.45, jewelry: 0.05 },
+  campus: { hat: 0.4, eyewear: 0.3, jewelry: 0.18 },
+  premium: { eyewear: 0.55, jewelry: 0.6 },
 };
 
 const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
@@ -427,6 +525,177 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       hardAvoid: ['straw', 'luxury handbag', 'tabby', 'michael kors', 'coach tabby', 'bottega', 'cassette', 'polene'],
     },
   },
+  streetwear: {
+    all: {
+      prefer: ['streetwear', 'hoodie', 'cargo', 'denim', 'oversized', 'cap', 'sneaker', 'crossbody', 'samba', 'campus', 'stussy', 'aime leon dore'],
+      avoid: ['formal', 'office'],
+      hardAvoid: ['blazer suit', 'pumps', 'dress pants', 'kitten heel'],
+    },
+    shoes: {
+      prefer: ['sneaker', 'samba', 'campus', 'jordan', 'nike', 'adidas', 'new balance', '2002r', '9060'],
+      hardAvoid: ['loafer', 'heel', 'pump', 'kitten heel', 'ballet flat'],
+    },
+    bottom: {
+      prefer: ['cargo', 'baggy jean', 'denim', 'jogger', 'wide leg'],
+      hardAvoid: ['pleated trouser', 'dress pant'],
+    },
+  },
+  campus: {
+    all: {
+      prefer: ['campus', 'college', 'casual', 'student', 'hoodie', 'crewneck', 'tee', 'jean', 'denim', 'sneaker', 'cardigan'],
+      hardAvoid: ['suit', 'pumps', 'satin gown', 'cocktail dress', 'stiletto'],
+    },
+    outer: {
+      prefer: ['hoodie', 'crewneck', 'cardigan', 'flannel', 'denim jacket', 'puffer', 'fleece', 'varsity'],
+      hardAvoid: ['suit jacket', 'sport coat'],
+    },
+    shoes: {
+      prefer: ['sneaker', 'samba', 'campus', '530', '574', 'converse', 'vans', 'jordan', 'air force', 'birkenstock'],
+      hardAvoid: ['stiletto', 'kitten heel', 'dress shoe'],
+    },
+    bag: {
+      prefer: ['backpack', 'tote', 'canvas tote', 'crossbody', 'duffel'],
+      hardAvoid: ['evening bag', 'clutch'],
+    },
+  },
+  travel: {
+    all: {
+      prefer: ['travel', 'airport', 'comfortable', 'jogger', 'sneaker', 'sweater', 'cardigan', 'tee', 'crossbody', 'tote', 'backpack', 'duffel'],
+      hardAvoid: ['heels', 'pumps', 'kitten heel', 'stiletto', 'cocktail dress', 'satin gown'],
+    },
+    shoes: {
+      prefer: ['sneaker', 'running', 'loafer', 'slide'],
+      hardAvoid: ['heel', 'pump', 'kitten', 'stiletto'],
+    },
+    bottom: {
+      prefer: ['jogger', 'wide leg', 'sweatpant', 'jean', 'trouser', 'legging'],
+      hardAvoid: ['mini skirt', 'pencil skirt', 'cocktail'],
+    },
+    bag: {
+      prefer: ['duffel', 'weekender', 'tote', 'crossbody', 'backpack', 'carry on'],
+      hardAvoid: ['clutch', 'evening bag', 'mini bag'],
+    },
+  },
+  'old-money': {
+    all: {
+      prefer: ['polo', 'oxford', 'cardigan', 'cashmere', 'loafer', 'cable knit', 'tweed', 'tailored', 'wool', 'pearl', 'ralph lauren', 'brooks brothers', 'aritzia'],
+      hardAvoid: ['graphic tee', 'neon', 'techwear', 'cargo pants', 'sweatpant', 'shell jacket', 'logo heavy'],
+    },
+    outer: {
+      prefer: ['blazer', 'cardigan', 'trench', 'cashmere', 'tweed', 'wool coat', 'overshirt'],
+      hardAvoid: ['puffer', 'shell jacket', 'track jacket', 'firebird'],
+    },
+    top: {
+      prefer: ['polo', 'oxford', 'button down', 'cable knit', 'cashmere', 'silk blouse', 'sweater'],
+      hardAvoid: ['graphic tee', 'tank', 'sports bra', 'workout'],
+    },
+    bottom: {
+      prefer: ['trouser', 'chino', 'tailored', 'pleated', 'wool pant', 'midi skirt'],
+      hardAvoid: ['cargo', 'sweatpant', 'shorts', 'legging'],
+    },
+    shoes: {
+      prefer: ['loafer', 'flat', 'ballet', 'oxford', 'driver', 'chelsea boot', 'dress shoe'],
+      hardAvoid: ['running', 'training', 'hiking', 'chunky sneaker', 'doc martens'],
+    },
+    bag: {
+      prefer: ['leather tote', 'satchel', 'shoulder bag', 'top handle'],
+      hardAvoid: ['gym bag', 'belt bag', 'fanny pack'],
+    },
+  },
+  techwear: {
+    all: {
+      prefer: ['techwear', 'technical', 'utility', 'shell jacket', 'cargo', 'matte black', 'arcteryx', 'stone island', 'crossbody sling', 'modular'],
+      hardAvoid: ['linen', 'beach', 'preppy', 'old money', 'satin', 'polo sweater', 'pleated trouser', 'pearl'],
+    },
+    outer: {
+      prefer: ['shell jacket', 'gore tex', 'utility', 'technical', 'bomber'],
+      hardAvoid: ['blazer', 'cardigan', 'tweed'],
+    },
+    bottom: {
+      prefer: ['cargo', 'utility', 'technical pant', 'jogger', 'parachute', 'black jean'],
+      hardAvoid: ['pleated trouser', 'chino', 'linen', 'pencil skirt'],
+    },
+    shoes: {
+      prefer: ['technical sneaker', 'trail', 'salomon', 'hoka', 'on', 'arcteryx', 'boot'],
+      hardAvoid: ['loafer', 'heel', 'sandal', 'espadrille'],
+    },
+    bag: {
+      prefer: ['crossbody sling', 'utility', 'tactical', 'shell bag', 'arcteryx', 'backpack'],
+      hardAvoid: ['straw', 'leather tote', 'luxury handbag', 'clutch'],
+    },
+  },
+  work: {
+    all: {
+      prefer: ['work', 'office', 'tailored', 'business casual', 'smart', 'polished', 'blazer', 'oxford'],
+      hardAvoid: ['track jacket', 'sweatpants', 'cargo pants', 'gym shorts', 'running shoes', 'ugg', 'graphic tee', 'training', 'workout'],
+    },
+    outer: {
+      prefer: ['blazer', 'cardigan', 'trench', 'coat', 'tailored', 'overshirt'],
+      hardAvoid: ['track jacket', 'hoodie', 'puffer', 'shell jacket'],
+    },
+    top: {
+      prefer: ['button down', 'shirt', 'polo', 'sweater', 'knit', 'blouse'],
+      hardAvoid: ['graphic tee', 'tank', 'sports bra', 'workout', 'training'],
+    },
+    bottom: {
+      prefer: ['trouser', 'chino', 'tailored', 'pant', 'pleated', 'pencil skirt'],
+      hardAvoid: ['cargo', 'sweatpant', 'shorts', 'legging', 'track pant'],
+    },
+    shoes: {
+      prefer: ['loafer', 'flat', 'dress shoe', 'chelsea', 'oxford', 'ballet', 'wallabee', 'heel'],
+      hardAvoid: ['ugg', 'running', 'training', 'hiking', 'chunky sneaker', 'samba', 'campus', 'birkenstock', 'clog'],
+    },
+    bag: {
+      prefer: ['tote', 'work bag', 'brief', 'crossbody', 'satchel'],
+      hardAvoid: ['belt bag', 'gym bag', 'duffel'],
+    },
+  },
+  athletic: {
+    all: {
+      prefer: ['athletic', 'performance', 'training', 'running', 'workout', 'gym', 'sport', 'nike', 'adidas', 'lululemon', 'alo'],
+      hardAvoid: ['blazer', 'trench', 'suit', 'loafer', 'dress pants', 'kitten heel', 'satin'],
+    },
+    outer: {
+      prefer: ['track jacket', 'hoodie', 'fleece', 'windbreaker', 'zip', 'performance jacket'],
+      hardAvoid: ['trench', 'blazer', 'suit jacket', 'leather jacket'],
+    },
+    top: {
+      prefer: ['training', 'workout', 'running', 'performance', 'tank', 'tee', 'sports bra', 'mesh'],
+      hardAvoid: ['sweater polo', 'button down', 'cardigan', 'blazer'],
+    },
+    bottom: {
+      prefer: ['short', 'legging', 'jogger', 'sweatpant', 'track pant', 'training'],
+      hardAvoid: ['dress pant', 'trouser', 'chino', 'pencil skirt'],
+    },
+    shoes: {
+      prefer: ['running', 'training', 'trainer', 'sneaker', 'workout', 'cross trainer'],
+      hardAvoid: ['boot', 'clog', 'heel', 'loafer', 'sandal', 'ugg'],
+    },
+  },
+  premium: {
+    all: {
+      prefer: ['cashmere', 'silk', 'leather', 'tailored', 'designer', 'wool', 'celine', 'the row', 'bottega', 'loro piana', 'totême', 'arcteryx', 'aritzia', 'aime leon dore'],
+      avoid: ['budget'],
+      hardAvoid: ['shein', 'temu', 'fast fashion', 'cosplay', 'costume'],
+    },
+    outer: {
+      prefer: ['cashmere', 'wool coat', 'leather jacket', 'tailored blazer', 'trench', 'designer'],
+      avoid: ['fleece basic', 'budget puffer'],
+    },
+    top: {
+      prefer: ['silk', 'cashmere', 'cable knit', 'designer', 'tailored blouse'],
+      hardAvoid: ['graphic tee budget'],
+    },
+    bottom: {
+      prefer: ['wool trouser', 'tailored', 'silk', 'designer denim'],
+    },
+    shoes: {
+      prefer: ['leather loafer', 'designer sneaker', 'leather boot', 'ballet flat', 'samba og'],
+    },
+    bag: {
+      prefer: ['leather', 'designer', 'bottega', 'celine', 'the row', 'loro piana', 'polène', 'demellier'],
+    },
+  },
 };
 
 function debugGenerator(label: string, data: Record<string, unknown>): void {
@@ -458,7 +727,7 @@ type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 
 function productCommerceScore(product: Product): number {
   let score = 0;
-  if (product.trusted !== false) score += 18;
+  if (product.trusted !== false) score += 10;
   if (hasDirectRetailerUrl(product.productUrl || '') || hasDirectRetailerUrl(product.retailerUrl || '')) score += 22;
   else if (product.googleShoppingUrl || product.fallbackUrl) score += 8;
   if (hasRealPhoto(product)) score += 16;
@@ -673,8 +942,7 @@ function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | nu
   const weightFor = (item: T, index: number) => {
     const id = typeof item === 'object' && item && 'id' in item ? String((item as { id?: unknown }).id || '') : '';
     const jitter = 0.85 + ((stableHash(`${key}:${seed}:${id || index}`) % 30) / 100);
-    // Flattened power curve (0.6 instead of 0.9) to give lower-ranked items more chance
-    return Math.pow(pool.length - index, 0.6) * jitter;
+    return Math.pow(pool.length - index, 0.5) * jitter;
   };
   const totalWeight = pool.reduce((total, item, index) => total + weightFor(item, index), 0);
   let threshold = random * totalWeight;
@@ -1055,7 +1323,7 @@ export const ALL_CATALOG_PRODUCTS: Product[] = dedupeProducts([
   ...applyCatalogTagOverridesToProducts(ULTRA_MASTER_CATALOG_PRODUCTS),
   ...applyCatalogTagOverridesToProducts(PHOTO_CATALOG_PRODUCTS),
   ...applyCatalogTagOverridesToProducts(GENERATED_CATALOG_PRODUCTS),
-  ...applyCatalogTagOverridesToProducts(BRAND_CATALOG_PRODUCTS),
+  ...applyCatalogTagOverridesToProducts(EXPANSION_REVIEWED_PRODUCTS),
 ]);
 
 const PRODUCTS_BY_ID = new Map(ALL_CATALOG_PRODUCTS.map((product) => [product.id, product]));
@@ -1083,7 +1351,7 @@ function findRealPhotoReplacement(
   return candidates
     .map((candidate) => {
       let score = 100;
-      if (candidate.metadata?.featured) score += 20;
+      if (candidate.metadata?.featured) score += 8;
       if (normalize(candidate.brand) === normalize(product.brand)) score += 30;
       score += productCommerceScore(candidate);
 
@@ -1204,7 +1472,7 @@ function scoreFallbackProduct(
 
   if (product.imageQuality === 'good') score += 8;
   if (product.imageQuality === 'missing') score -= 30;
-  if (product.popularityScore) score += Math.min(product.popularityScore, 20);
+  if (product.popularityScore) score += Math.min(product.popularityScore, 8);
 
   return score;
 }
@@ -1518,10 +1786,7 @@ function getSlotCandidates({
       .map((product) => product.id),
   );
   const searchedIds = new Set(
-    dedupeProducts([
-      ...searchPhotoCatalog(intent, query, 24),
-      ...searchBrandCatalog(intent, query, 16),
-    ]).map((product) => product.id),
+    dedupeProducts(searchPhotoCatalog(intent, query, 24)).map((product) => product.id),
   );
 
   const categoryProducts = ALL_CATALOG_PRODUCTS
@@ -1568,9 +1833,9 @@ function getSlotCandidates({
         + (hasRealPhoto(product) ? 28 : -24)
         + (collectionIds.has(product.id) ? 14 : 0)
         + (searchedIds.has(product.id) ? 24 : 0)
-        - (usedBrands.has(normalize(product.brand)) ? 28 : 0)
-        - (avoidIds.has(product.id) ? 130 : 0)
-        - (currentIds.has(product.id) ? 220 : 0)
+        - (usedBrands.has(normalize(product.brand)) ? 60 : 0)
+        - (avoidIds.has(product.id) ? 220 : 0)
+        - (currentIds.has(product.id) ? 280 : 0)
         - (product.id === currentProductId ? 320 : 0)
         + ((product.productUrl || product.retailerUrl || product.googleShoppingUrl || product.fallbackUrl) ? 6 : -10),
     }))
@@ -1582,6 +1847,7 @@ function getSlotCandidates({
   const alternatives = ranked.filter((product) => product.id !== currentProductId && !currentIds.has(product.id));
   const eligible = alternatives.length >= 3 ? alternatives : ranked;
   const preferred = eligible.filter((product) => !avoidIds.has(product.id) && !currentIds.has(product.id));
+  if (preferred.length >= 1) return preferred.slice(0, 96);
   const avoided = eligible.filter((product) => avoidIds.has(product.id) || currentIds.has(product.id));
   return [...preferred, ...avoided].slice(0, 96);
 }

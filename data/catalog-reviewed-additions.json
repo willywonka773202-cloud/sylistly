@@ -1,0 +1,328 @@
+[
+  {
+    "id": "expansion-ep01-nb-fresh-foam-1080v13-wht",
+    "brand": "New Balance",
+    "name": "Fresh Foam X 1080v13 Running Shoe White",
+    "category": "shoes",
+    "priceCents": 16500,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/fresh-foam-x-1080v13/MW1080W13.html",
+    "productUrl": "https://www.newbalance.com/pd/fresh-foam-x-1080v13/MW1080W13.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/MW1080W13_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "gym",
+      "athletic",
+      "clean"
+    ],
+    "colors": [
+      "white",
+      "grey"
+    ],
+    "searchTerms": [
+      "new balance fresh foam x 1080v13 running shoe white"
+    ],
+    "budgetTier": "premium",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-01-shoes-gym.json",
+      "sourceCandidateId": "ep01-nb-fresh-foam-1080v13-wht"
+    }
+  },
+  {
+    "id": "expansion-ep01-nb-minimus-tr-blk",
+    "brand": "New Balance",
+    "name": "Minimus TR V1 Training Shoe Black",
+    "category": "shoes",
+    "priceCents": 10000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/minimus-tr-v1/WTMTRBT1.html",
+    "productUrl": "https://www.newbalance.com/pd/minimus-tr-v1/WTMTRBT1.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/WTMTRBT1_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "gym",
+      "athletic"
+    ],
+    "colors": [
+      "black"
+    ],
+    "searchTerms": [
+      "new balance minimus tr v1 training shoe black"
+    ],
+    "budgetTier": "budget",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-01-shoes-gym.json",
+      "sourceCandidateId": "ep01-nb-minimus-tr-blk"
+    }
+  },
+  {
+    "id": "expansion-ep01-nb-fuelcell-rebel-v3-masc",
+    "brand": "New Balance",
+    "name": "FuelCell Rebel v3 Running Shoe Neon Yellow",
+    "category": "shoes",
+    "priceCents": 13000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/fuelcell-rebel-v3/MFCXLB3.html",
+    "productUrl": "https://www.newbalance.com/pd/fuelcell-rebel-v3/MFCXLB3.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/MFCXLB3_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "masc"
+    ],
+    "vibes": [
+      "gym",
+      "athletic"
+    ],
+    "colors": [
+      "yellow",
+      "black"
+    ],
+    "searchTerms": [
+      "new balance fuelcell rebel v3 running shoe neon yellow"
+    ],
+    "budgetTier": "mid",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-01-shoes-gym.json",
+      "sourceCandidateId": "ep01-nb-fuelcell-rebel-v3-masc"
+    }
+  },
+  {
+    "id": "expansion-ep02-nb-574-grey",
+    "brand": "New Balance",
+    "name": "574 Core Sneaker Grey",
+    "category": "shoes",
+    "priceCents": 8000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/574/ML574EVG.html",
+    "productUrl": "https://www.newbalance.com/pd/574/ML574EVG.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/ML574EVG_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "campus",
+      "clean",
+      "streetwear"
+    ],
+    "colors": [
+      "grey"
+    ],
+    "searchTerms": [
+      "new balance 574 core sneaker grey"
+    ],
+    "budgetTier": "budget",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-02-shoes-streetwear.json",
+      "sourceCandidateId": "ep02-nb-574-grey"
+    }
+  },
+  {
+    "id": "expansion-ep02-nb-990v6-grey",
+    "brand": "New Balance",
+    "name": "990v6 Made in USA Grey",
+    "category": "shoes",
+    "priceCents": 20000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/made-in-usa-990v6/M990GL6.html",
+    "productUrl": "https://www.newbalance.com/pd/made-in-usa-990v6/M990GL6.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/M990GL6_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "old-money",
+      "clean",
+      "campus",
+      "streetwear"
+    ],
+    "colors": [
+      "grey"
+    ],
+    "searchTerms": [
+      "new balance 990v6 made in usa grey"
+    ],
+    "budgetTier": "premium",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-02-shoes-streetwear.json",
+      "sourceCandidateId": "ep02-nb-990v6-grey"
+    }
+  },
+  {
+    "id": "expansion-ep02-nb-327-grey-green",
+    "brand": "New Balance",
+    "name": "327 Sneaker Grey Green",
+    "category": "shoes",
+    "priceCents": 8000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/327/MS327LG1.html",
+    "productUrl": "https://www.newbalance.com/pd/327/MS327LG1.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/MS327LG1_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "streetwear",
+      "campus"
+    ],
+    "colors": [
+      "grey",
+      "green"
+    ],
+    "searchTerms": [
+      "new balance 327 sneaker grey green"
+    ],
+    "budgetTier": "budget",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-02-shoes-streetwear.json",
+      "sourceCandidateId": "ep02-nb-327-grey-green"
+    }
+  },
+  {
+    "id": "expansion-ep10-new-balance-574-beige",
+    "brand": "New Balance",
+    "name": "574 Sneaker Beige",
+    "category": "shoes",
+    "priceCents": 8000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/574/ML574EVM.html",
+    "productUrl": "https://www.newbalance.com/pd/574/ML574EVM.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/ML574EVM_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "androgynous"
+    ],
+    "vibes": [
+      "campus",
+      "clean",
+      "streetwear"
+    ],
+    "colors": [
+      "beige",
+      "tan"
+    ],
+    "searchTerms": [
+      "new balance 574 sneaker beige"
+    ],
+    "budgetTier": "budget",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-10-campus-basics.json",
+      "sourceCandidateId": "ep10-new-balance-574-beige"
+    }
+  },
+  {
+    "id": "expansion-ep14-new-balance-2002r-white",
+    "brand": "New Balance",
+    "name": "2002R Protection Pack Sea Salt",
+    "category": "shoes",
+    "priceCents": 11000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/2002r/ML2002RC.html",
+    "productUrl": "https://www.newbalance.com/pd/2002r/ML2002RC.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/ML2002RC_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "fem"
+    ],
+    "vibes": [
+      "streetwear",
+      "campus",
+      "clean"
+    ],
+    "colors": [
+      "white",
+      "cream"
+    ],
+    "searchTerms": [
+      "new balance 2002r protection pack sea salt"
+    ],
+    "budgetTier": "mid",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-14-fem-trending.json",
+      "sourceCandidateId": "ep14-new-balance-2002r-white"
+    }
+  },
+  {
+    "id": "expansion-ep15-new-balance-9060-grey",
+    "brand": "New Balance",
+    "name": "9060 Sneaker Rain Cloud",
+    "category": "shoes",
+    "priceCents": 13000,
+    "currency": "USD",
+    "retailer": "New Balance",
+    "retailerUrl": "https://www.newbalance.com/pd/9060/U9060GRY.html",
+    "productUrl": "https://www.newbalance.com/pd/9060/U9060GRY.html",
+    "imageUrl": "https://nb.scene7.com/is/image/NB/U9060GRY_nb_02_i?$pdpflexf2$&wid=440&hei=440",
+    "gender": [
+      "masc"
+    ],
+    "vibes": [
+      "streetwear",
+      "campus"
+    ],
+    "colors": [
+      "grey"
+    ],
+    "searchTerms": [
+      "new balance 9060 sneaker rain cloud"
+    ],
+    "budgetTier": "mid",
+    "inStock": true,
+    "trusted": true,
+    "imageQuality": "good",
+    "popularityScore": 50,
+    "metadata": {
+      "source": "expansion-reviewed",
+      "sourcePack": "pack-15-masc-trending.json",
+      "sourceCandidateId": "ep15-new-balance-9060-grey"
+    }
+  }
+]
