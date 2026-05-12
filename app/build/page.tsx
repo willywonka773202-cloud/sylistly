@@ -899,8 +899,8 @@ function BuilderPageContent({
   const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
 
   return (
-    <main className="relative w-full flex h-[100dvh] flex-col bg-bg">
-      <header className="flex items-center justify-between px-4 pb-2.5 pt-[max(env(safe-area-inset-top),_1.5rem)]">
+    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
+      <header className="flex items-center justify-between px-4 pb-2.5 pt-10">
         <button
           type="button"
           onClick={() => router.back()}
@@ -929,7 +929,7 @@ function BuilderPageContent({
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pb-10 pt-2">
+        <div className="flex flex-col gap-4 px-4 pb-56 pt-2">
           <section className="flex flex-col gap-3">
             <div className="relative">
               {saveBurst ? (
@@ -1004,8 +1004,8 @@ function BuilderPageContent({
               </motion.div>
 
             </div>
-            <div className="px-1 text-center">
-              <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="px-1 pt-4 pb-2 text-center">
+              <div className="flex items-center justify-center gap-2">
                 <button type="button" onClick={() => setActiveBuildOverlay('settings')} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:text-ink">
                   {activeVibe.label}
                 </button>
@@ -1014,66 +1014,14 @@ function BuilderPageContent({
                   {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
                 </button>
               </div>
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                <BuilderSignal label="Total" value={totalDisplay} helper={allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'Under budget' : 'Over budget'} tone={allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'accent' : 'warn'} />
-                <BuilderSignal label="Score" value={`${outfitScore.total}`} helper="catalog" tone="accent" />
-                <BuilderSignal label="Complete" value={`${outfitScore.completeness}%`} helper="slots" />
-                <BuilderSignal label="Visual" value={`${outfitScore.renderability}%`} helper="safe" />
-              </div>
-              <div className="mt-4 flex gap-2">
-                 <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('left')}
-                  disabled={generatorLoading}
-                  className="flex-1 rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-white/25 hover:text-ink disabled:opacity-50"
-                >
-                  Pass
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('right')}
-                  disabled={generatorLoading || renderN === 0}
-                  className="flex-1 rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
-                >
-                  Save (Swipe →)
-                </button>
+              <div className="mt-3 flex justify-center gap-4 text-[10px] font-semibold text-muted">
+                <span>Look Total: <span className={allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-warn'}>{totalDisplay}</span></span>
+                <span>Score: <span className="text-accent">{outfitScore.total}</span></span>
               </div>
             </div>
           </section>
 
-          <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('settings')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Controls
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Refine
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Details
-              </button>
-              <button
-                type="button"
-                onClick={shopAll}
-                disabled={renderN === 0}
-                className="rounded-full bg-accent px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
-              >
-                Shop
-              </button>
-            </div>
-          </section>
+
 
           {statusMessage ? (
             <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[11px] leading-relaxed text-muted-2">
@@ -1313,7 +1261,6 @@ function BuilderPageContent({
 }
 
 
-
 function BuildClosetPanel({
   wardrobeProducts,
   wardrobeProductsByCategory,
@@ -1378,7 +1325,7 @@ function BuildClosetPanel({
               <div className="mb-2 px-1 text-[10px] font-black uppercase tracking-[.16em] text-muted-2">Owned</div>
               <div className="grid grid-cols-4 gap-2">
                 {wardrobeProducts.slice(0, 8).map((product: Product) => (
-                  <div key={product.id} onClick={() => onOpenSearch(product.category)} className="cursor-pointer aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                  <div key={product.id} className="aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/5">
                     <ProductImage product={product} category="top" size="sm" cutout />
                   </div>
                 ))}
@@ -1411,6 +1358,7 @@ function BuildClosetPanel({
     </div>
   );
 }
+
 function BuildSettingsPanel({
   selectedVibe,
   onSelectVibe,
@@ -1893,7 +1841,7 @@ function BuildOverlay({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 w-full flex h-[100dvh] items-end bg-black/46 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-50 mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
       <button
         type="button"
         aria-label="Close build panel"
@@ -1905,7 +1853,7 @@ function BuildOverlay({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 38, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className="relative z-10 flex max-h-[90dvh] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
+        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
       >
         <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))] px-4 pb-3 pt-3">
           <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/18" />

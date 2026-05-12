@@ -1,0 +1,8 @@
+fix: Visually open the builder UI and refine closet panel
+
+- Allowed the Mannequin to take up the full screen width and scale up vertically naturally instead of using cramped fixed heights.
+- Condensed duplicate buttons and redundant controls into a single sticky navigation bar sitting right above the main tab bar.
+- Moved verbose action buttons into overlays (Settings/Closet/Refine).
+- Made sure no mock data exists and that the new "Closet" tab only suggests real catalog `wardrobeBasic` products if empty.
+- Passed full validations (`npm run qa`, `npm run typecheck`, and `npm run build`).
+- `feed` was completely untouched and safely retains current real catalog behavior.
