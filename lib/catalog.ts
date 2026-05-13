@@ -496,7 +496,16 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     all: {
       prefer: ['streetwear', 'hoodie', 'cargo', 'denim', 'oversized', 'cap', 'sneaker', 'crossbody'],
       avoid: ['formal', 'office'],
-      hardAvoid: ['blazer suit', 'pumps', 'dress pants'],
+      hardAvoid: ['blazer suit', 'pumps', 'dress pants', 'polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'co-ord set', 'co ord set', 'cardigan set', 'business casual', 'tailored wide leg', 'pleated trouser', 'preppy'],
+    },
+    top: {
+      hardAvoid: ['polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'cable-knit', 'silk blouse', 'oxford shirt', 'tweed', 'cashmere polo'],
+    },
+    outer: {
+      hardAvoid: ['cardigan and pant', 'cardigan set', 'co-ord set', 'tweed', 'cashmere coat'],
+    },
+    bottom: {
+      hardAvoid: ['tailored wide leg', 'pleated trouser', 'pleated pant', 'pencil skirt'],
     },
     shoes: {
       prefer: ['sneaker', 'samba', 'campus', 'jordan', 'nike', 'adidas', 'new balance'],
@@ -506,15 +515,18 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
   edgy: {
     all: {
       prefer: ['black', 'leather', 'cargo', 'boot', 'shell', 'crossbody', 'silver', 'utility', 'techwear'],
-      hardAvoid: ['beach', 'linen', 'old money', 'preppy', 'sandal', 'straw', 'polo sweater'],
+      hardAvoid: ['beach', 'linen', 'old money', 'preppy', 'sandal', 'straw', 'polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'co-ord set', 'co ord set', 'cardigan set', 'business casual', 'tailored wide leg', 'tweed', 'pleated mini skirt', 'cashmere polo'],
+    },
+    top: {
+      hardAvoid: ['polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'cable-knit', 'silk blouse', 'oxford shirt', 'tweed', 'cashmere polo'],
     },
     outer: {
       prefer: ['shell', 'leather', 'bomber', 'utility', 'technical'],
-      hardAvoid: ['blazer', 'cardigan', 'western denim'],
+      hardAvoid: ['blazer', 'cardigan', 'western denim', 'tweed', 'cashmere coat', 'co-ord set', 'cardigan set'],
     },
     bottom: {
       prefer: ['cargo', 'black jean', 'utility', 'parachute'],
-      hardAvoid: ['chino', 'pleated trouser', 'linen'],
+      hardAvoid: ['chino', 'pleated trouser', 'linen', 'tailored wide leg', 'pencil skirt'],
     },
     shoes: {
       prefer: ['boot', 'technical sneaker', 'sneaker', 'black'],
@@ -529,7 +541,13 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     all: {
       prefer: ['streetwear', 'hoodie', 'cargo', 'denim', 'oversized', 'cap', 'sneaker', 'crossbody', 'samba', 'campus', 'stussy', 'aime leon dore'],
       avoid: ['formal', 'office'],
-      hardAvoid: ['blazer suit', 'pumps', 'dress pants', 'kitten heel'],
+      hardAvoid: ['blazer suit', 'pumps', 'dress pants', 'kitten heel', 'polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'co-ord set', 'co ord set', 'cardigan set', 'business casual', 'tailored wide leg', 'pleated trouser', 'preppy', 'tweed'],
+    },
+    top: {
+      hardAvoid: ['polo sweater', 'sweater polo', 'cable knit', 'cable stitch', 'cable-knit', 'silk blouse', 'oxford shirt', 'tweed', 'cashmere polo'],
+    },
+    outer: {
+      hardAvoid: ['cardigan and pant', 'cardigan set', 'co-ord set', 'tweed', 'cashmere coat'],
     },
     shoes: {
       prefer: ['sneaker', 'samba', 'campus', 'jordan', 'nike', 'adidas', 'new balance', '2002r', '9060'],
@@ -537,7 +555,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     },
     bottom: {
       prefer: ['cargo', 'baggy jean', 'denim', 'jogger', 'wide leg'],
-      hardAvoid: ['pleated trouser', 'dress pant'],
+      hardAvoid: ['pleated trouser', 'dress pant', 'tailored wide leg', 'pencil skirt'],
     },
   },
   campus: {
