@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { BottomNav } from '@/components/BottomNav';
 import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
 
@@ -48,13 +48,18 @@ export default function CheckoutPage() {
   }
 
   return (
-    <PlaceholderScreen
-      eyebrow="Checkout"
-      title="Retailer"
-      accent="links"
-      description="Use this page as a multi-store checkout helper. Sylistly can batch-open retailer tabs again, with manual links as the fallback."
-    >
-      {products.length ? (
+    <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
+      <div className="flex-1 overflow-y-auto px-4 pb-[100px] pt-10">
+        <header className="mb-6">
+          <div className="text-[10px] font-bold uppercase tracking-[.2em] text-accent">Checkout</div>
+          <h1 className="mt-1 font-serif text-[32px] font-semibold text-ink">
+            Retailer <em className="italic text-accent">links</em>
+          </h1>
+          <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
+            Multi-store checkout helper. Batch-open retailer tabs, or copy all links to share.
+          </p>
+        </header>
+        {products.length ? (
         <div className="grid gap-3">
           <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
             <div className="flex items-start justify-between gap-3">
@@ -158,6 +163,8 @@ export default function CheckoutPage() {
           </Link>
         </section>
       )}
-    </PlaceholderScreen>
+      </div>
+      <BottomNav />
+    </main>
   );
 }
