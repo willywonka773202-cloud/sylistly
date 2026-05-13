@@ -60,7 +60,7 @@ export default function TryOnPage() {
           </button>
           <div className="text-center">
             <div className="text-[9px] uppercase tracking-[.18em] text-muted">Dressing Room</div>
-            <h1 className="font-serif text-[24px] font-semibold text-ink">AI Try-On</h1>
+            <h1 className="font-serif text-[24px] font-semibold text-ink">Try-On Preview</h1>
           </div>
           <div className="grid h-10 w-10 place-items-center rounded-full bg-accent text-sm font-black text-white shadow-pink-glow">
             S
@@ -118,8 +118,8 @@ export default function TryOnPage() {
 
           <div className="mt-3 grid grid-cols-2 gap-2">
             <div className="rounded-2xl bg-white/70 px-3 py-3">
-              <div className="text-[9px] font-bold uppercase tracking-[.14em] text-[#7a6c63]">AI credits</div>
-              <div className="mt-1 font-serif text-[20px] font-semibold">Preview mode</div>
+              <div className="text-[9px] font-bold uppercase tracking-[.14em] text-[#7a6c63]">Mode</div>
+              <div className="mt-1 font-serif text-[20px] font-semibold">Honest preview</div>
             </div>
             <div className="rounded-2xl bg-white/70 px-3 py-3">
               <div className="text-[9px] font-bold uppercase tracking-[.14em] text-[#7a6c63]">Fit total</div>
@@ -134,8 +134,8 @@ export default function TryOnPage() {
               <UserRound size={18} />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-[.18em] text-muted">Try-on profile</div>
-              <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">Set up once, preview faster</h2>
+              <div className="text-[10px] uppercase tracking-[.18em] text-muted">Setup for future try-on</div>
+              <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">Save your frame and photo refs</h2>
             </div>
           </div>
 
