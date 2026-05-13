@@ -31,7 +31,7 @@ const STATUS_OPTIONS: Array<{ value: WardrobeStatus; label: string; helper: stri
 ];
 
 function formatPrice(cents: number): string {
-  return `$${(cents / 100).toLocaleString()}`;
+  return `$${(cents / 100).toLocaleString('en-US')}`;
 }
 
 function productMatchesStarter(product: Product): boolean {

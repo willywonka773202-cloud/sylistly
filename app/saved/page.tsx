@@ -66,7 +66,7 @@ export default function SavedPage() {
                   </div>
                   <h2 className="mt-2 font-serif text-[24px] font-semibold leading-[1.03] text-[#fff5ee] min-[390px]:text-[26px]">{fit.title}</h2>
                   <p className="mt-2 text-[11px] uppercase tracking-[.14em] text-[#c8b8ae]">
-                    {visualProducts.length} pieces - ${(visualProducts.reduce((sum, product) => sum + product.priceCents, 0) / 100).toLocaleString()}
+                    {visualProducts.length} pieces - ${(visualProducts.reduce((sum, product) => sum + product.priceCents, 0) / 100).toLocaleString('en-US')}
                   </p>
                   <p className="mt-2 text-[11px] text-[#9f9087]">{formatDate(fit.createdAt)}</p>
                 </div>
@@ -221,7 +221,7 @@ export default function SavedPage() {
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-center">
                 <div className="font-serif text-[20px] font-semibold text-ink">
-                  ${(activeFit.visualProducts.reduce((sum, product) => sum + product.priceCents, 0) / 100).toLocaleString()}
+                  ${(activeFit.visualProducts.reduce((sum, product) => sum + product.priceCents, 0) / 100).toLocaleString('en-US')}
                 </div>
                 <div className="mt-1 text-[8px] uppercase tracking-[.14em] text-muted">Total</div>
               </div>

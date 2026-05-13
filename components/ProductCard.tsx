@@ -15,7 +15,7 @@ interface Props {
 
 function formatPrice(priceCents: number): string {
   if (!priceCents) return 'Price pending';
-  return `$${(priceCents / 100).toLocaleString()}`;
+  return `$${(priceCents / 100).toLocaleString('en-US')}`;
 }
 
 function getHost(url: string): string {

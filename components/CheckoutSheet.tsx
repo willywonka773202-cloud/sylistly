@@ -78,7 +78,7 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
             </div>
             <div className="mt-1 text-[11px] text-muted-2">
               {validProducts.length} item{validProducts.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${' '}
-              {(totalCents / 100).toLocaleString()}
+              {(totalCents / 100).toLocaleString('en-US')}
             </div>
             <div className="mt-2 max-w-[300px] text-[11px] leading-relaxed text-muted">
               Sylistly can try opening every retailer tab at once again, with checkout review as the fallback when the browser blocks popups.

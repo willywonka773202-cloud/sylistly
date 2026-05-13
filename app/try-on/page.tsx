@@ -123,7 +123,7 @@ export default function TryOnPage() {
             </div>
             <div className="rounded-2xl bg-white/70 px-3 py-3">
               <div className="text-[9px] font-bold uppercase tracking-[.14em] text-[#7a6c63]">Fit total</div>
-              <div className="mt-1 font-serif text-[20px] font-semibold">${Math.round(totalCents / 100).toLocaleString()}</div>
+              <div className="mt-1 font-serif text-[20px] font-semibold">${Math.round(totalCents / 100).toLocaleString('en-US')}</div>
             </div>
           </div>
         </section>

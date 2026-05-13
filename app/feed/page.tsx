@@ -18,7 +18,7 @@ const FILTERS = ['For You', 'Men', 'Women', 'Clean', 'Streetwear', 'Campus', 'Gy
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
 
 function formatPrice(cents: number): string {
-  return `$${(cents / 100).toLocaleString()}`;
+  return `$${(cents / 100).toLocaleString('en-US')}`;
 }
 
 function safePostItems(post: FeedPost): ReturnType<typeof repairOrRegenerateOutfit> {

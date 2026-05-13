@@ -28,7 +28,7 @@ const BODY_TYPE_LABELS: Record<(typeof BODY_TYPES)[number], string> = {
 };
 
 function formatPrice(cents: number): string {
-  return `$${(cents / 100).toLocaleString()}`;
+  return `$${(cents / 100).toLocaleString('en-US')}`;
 }
 
 function postProducts(post: FeedPost): Product[] {

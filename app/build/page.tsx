@@ -153,7 +153,7 @@ const WARDROBE_GENERATION_MODES: Array<{ value: WardrobeGenerationMode; label: s
 ];
 
 function formatMoney(cents: number): string {
-  return `$${Math.round(cents / 100).toLocaleString()}`;
+  return `$${Math.round(cents / 100).toLocaleString('en-US')}`;
 }
 
 function BuilderSignal({ label, value, helper, tone = 'default' }: { label: string; value: string; helper?: string; tone?: 'default' | 'accent' | 'warn' }) {
@@ -1764,7 +1764,7 @@ function FocusedRefinePanel({
               <div className="truncate text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeProduct.brand}</div>
               <div className="mt-1 line-clamp-2 font-serif text-[21px] font-semibold leading-tight text-ink">{activeProduct.name}</div>
               <div className="mt-1 text-[12px] text-muted">
-                {activeProduct.priceCents ? `$${(activeProduct.priceCents / 100).toLocaleString()}` : 'Price pending'}
+                {activeProduct.priceCents ? `$${(activeProduct.priceCents / 100).toLocaleString('en-US')}` : 'Price pending'}
               </div>
             </>
           ) : null}

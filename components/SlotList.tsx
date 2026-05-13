@@ -104,7 +104,7 @@ export function SlotList({ onOpenSearch }: Props) {
                   <>
                     <div className="truncate text-[9px] font-semibold uppercase tracking-[.16em] text-[#a89a90]">{renderableProduct.brand}</div>
                     <div className="mt-1 line-clamp-2 text-[15px] font-semibold leading-[1.12] text-[#fff6ef]">{renderableProduct.name}</div>
-                    <div className="mt-2 font-serif text-[17px] font-semibold text-white">${(renderableProduct.priceCents / 100).toLocaleString()}</div>
+                    <div className="mt-2 font-serif text-[17px] font-semibold text-white">${(renderableProduct.priceCents / 100).toLocaleString('en-US')}</div>
                   </>
                 ) : (
                   <>

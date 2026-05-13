@@ -62,7 +62,7 @@ export default function CheckoutPage() {
                 <div className="text-[11px] uppercase tracking-[.18em] text-muted">Ready to shop</div>
                 <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{title}</h2>
                 <p className="mt-2 text-[12px] text-muted-2">
-                  {products.length} item{products.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString()}
+                  {products.length} item{products.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString('en-US')}
                 </p>
               </div>
               <button

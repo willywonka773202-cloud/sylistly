@@ -138,7 +138,7 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
 
         <div className="mt-4 flex flex-wrap items-center gap-2.5 text-[10px] uppercase tracking-[.14em] text-[#a9988e]">
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{frameLabel(look.frameBias)}</span>
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">${(look.estimatedTotal / 100).toLocaleString()} est.</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">${(look.estimatedTotal / 100).toLocaleString('en-US')} est.</span>
           {look.tags.slice(0, 2).map((tag) => (
             <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{tag}</span>
           ))}
