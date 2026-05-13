@@ -17,7 +17,7 @@ const BAD_IMAGE_URL_TERMS = [
   'fallback',
   'spacer',
   'pixel',
-  '1x1',
+  '1x1.',
   'grey.gif',
   'gray.gif',
   'loading',
