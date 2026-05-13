@@ -7,7 +7,7 @@ export interface RetailerGroup {
 
 export function formatCheckoutPrice(priceCents?: number): string {
   if (!priceCents) return 'Price pending';
-  return `$${(priceCents / 100).toLocaleString()}`;
+  return `$${(priceCents / 100).toLocaleString('en-US')}`;
 }
 
 export function buildRetailerGroups(products: CheckoutProduct[]): RetailerGroup[] {

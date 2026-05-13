@@ -1022,7 +1022,7 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('settings')}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98]"
               >
                 <SlidersHorizontal size={13} />
                 Controls
@@ -1030,7 +1030,7 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={seedFromWardrobe}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98]"
               >
                 <Shirt size={13} />
                 Closet
@@ -1039,89 +1039,21 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3.5 text-[11px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[.98] disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
               >
-                {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Generate
               </button>
             </div>
-            <div className="mt-2 border-t border-hairline px-1 pt-6 text-center">
-              <div className="mb-4 grid grid-cols-3 gap-3">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Look total</div>
-                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">{totalDisplay}</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Allowance</div>
-                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">
-                    {allowanceCents === null ? 'Open' : formatMoney(allowanceCents)}
-                  </div>
-                </div>
-                <div className={`rounded-2xl border px-2 py-2.5 ${
-                  allowanceDeltaCents === null || allowanceDeltaCents >= 0
-                    ? 'border-accent/25 bg-accent/10'
-                    : 'border-[#ffb38a]/30 bg-[#ff8a4a]/10'
-                }`}>
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Budget</div>
-                  <div className={`mt-1 font-serif text-[17px] font-semibold ${
-                    allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-[#ffb38a]'
-                  }`}>
-                    {allowanceDeltaCents === null
-                      ? 'Flexible'
-                      : allowanceDeltaCents >= 0
-                      ? `${formatMoney(allowanceDeltaCents)} left`
-                      : `${formatMoney(Math.abs(allowanceDeltaCents))} over`}
-                  </div>
-                </div>
+
+            <div className="mt-5 flex flex-col items-center gap-4 text-center">
+              <div className="flex flex-wrap justify-center gap-2">
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{activeVibe.label}</span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{generatorFrame === 'androgynous' ? 'Any Frame' : generatorFrame}</span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{totalDisplay}</span>
               </div>
-              <div className="text-[12px] font-medium leading-relaxed text-muted-2">
-                <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
-              </div>
-              <div className="mt-1 text-[11px] text-muted">
-                Pink-lit slots are editable pieces. Open Controls for vibe, budget, frame, and source settings.
-              </div>
-              <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
-                Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
-                {lockedSlots.length ? ` / Locked ${lockedSlots.length}` : ''}
-              </div>
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2">
-                <Shirt size={11} className="text-accent" />
-                Source: {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
-              </div>
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                <BuilderSignal label="Score" value={`${outfitScore.total}`} helper="catalog" tone="accent" />
-                <BuilderSignal label="Complete" value={`${outfitScore.completeness}%`} helper="slots" />
-                <BuilderSignal label="Visual" value={`${outfitScore.renderability}%`} helper="safe" />
-                <BuilderSignal label="Closet" value={`${outfitScore.wardrobeMatch}%`} helper="owned" />
-              </div>
-              <div className={`mt-2 rounded-2xl border px-3 py-2 text-left ${builderBudgetStatus.overBudget ? 'border-[#ffb38a]/30 bg-[#ff8a4a]/10' : 'border-accent/25 bg-accent/10'}`}>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[9px] font-black uppercase tracking-[.16em] text-muted">Budget assistant</span>
-                  <span className={`text-[10px] font-black uppercase tracking-[.14em] ${builderBudgetStatus.overBudget ? 'text-[#ffb38a]' : 'text-accent'}`}>
-                    {builderBudgetStatus.label}
-                  </span>
-                </div>
-                <div className="mt-1 text-[10px] leading-relaxed text-muted-2">
-                  Uses catalog prices and current budget mode; expensive replacements can be handled from Refine.
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('left')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-white/25 hover:text-ink disabled:opacity-50"
-                >
-                  Pass
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('right')}
-                  disabled={generatorLoading || renderN === 0}
-                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
-                >
-                  Save
-                </button>
+              <div className="text-[11px] font-medium leading-relaxed text-muted-2">
+                <span className="text-white/70">Swipe left</span> to pass / <span className="text-white/70">Swipe right</span> to save / <span className="text-white/70">Tap</span> any slot to refine
               </div>
             </div>
           </section>

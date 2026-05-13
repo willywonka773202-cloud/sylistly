@@ -107,16 +107,29 @@ function chooseGapProduct(products: Product[], category: Category, terms: string
 
 function buildWardrobeGaps(ownedProducts: Product[], catalogProducts: Product[]) {
   const ownedCategories = new Set(ownedProducts.map((product) => product.category));
-  const specs: Array<{ category: Category; title: string; helper: string; terms: string[] }> = [
+  const ownedHaystack = ownedProducts.map((product) => [product.brand, product.name, ...(product.vibes || []), ...(product.occasions || [])].join(' ').toLowerCase()).join(' ');
+
+  const hasGym = ownedHaystack.includes('gym') || ownedHaystack.includes('athletic') || ownedHaystack.includes('training');
+  const hasTravel = ownedHaystack.includes('travel') || ownedHaystack.includes('airport');
+  const hasTechwear = ownedHaystack.includes('techwear') || ownedHaystack.includes('utility');
+  const hasDate = ownedHaystack.includes('date') || ownedHaystack.includes('night');
+
+  const specs: Array<{ category: Category; title: string; helper: string; terms: string[]; condition?: boolean }> = [
     { category: 'outer', title: 'Add a neutral outer layer', helper: 'Unlock work, dinner, travel, and rainy day fits.', terms: ['blazer', 'jacket', 'trench', 'neutral', 'clean'] },
     { category: 'shoes', title: 'Add versatile shoes', helper: 'Your closet needs a repeatable sneaker, boot, or loafer anchor.', terms: ['sneaker', 'loafer', 'boot', 'clean', 'versatile'] },
     { category: 'bottom', title: 'Add black pants', helper: 'A dark bottom makes night, office, and clean fits easier.', terms: ['black', 'trouser', 'jean', 'pant'] },
     { category: 'bag', title: 'Add an everyday bag', helper: 'Travel, campus, and errands work better with a real carry piece.', terms: ['bag', 'tote', 'crossbody', 'backpack'] },
     { category: 'jewelry', title: 'Add a finishing accessory', helper: 'Small details make saved outfits feel styled instead of generated.', terms: ['watch', 'ring', 'chain', 'gold', 'silver'] },
+    { category: 'eyewear', title: 'Add staple sunglasses', helper: 'Elevate outdoor, travel, and vacation fits instantly.', terms: ['sunglasses', 'shades', 'black', 'tortoise'] },
+    { category: 'top', title: 'Add gym & activewear', helper: 'Your closet is missing athletic basics for workout and run-club fits.', terms: ['training', 'active', 'gym', 'workout', 'athletic'], condition: !hasGym },
+    { category: 'shoes', title: 'Add travel-ready sneakers', helper: 'Comfortable footwear for airport days and heavy walking.', terms: ['sneaker', 'running', 'comfort', 'travel'], condition: !hasTravel },
+    { category: 'outer', title: 'Add a utility shell', helper: 'Unlock techwear and modern utilitarian silhouettes.', terms: ['shell', 'utility', 'techwear', 'gore', 'jacket'], condition: !hasTechwear },
+    { category: 'top', title: 'Add an elevated top', helper: 'Build better date night and premium evening outfits.', terms: ['silk', 'cashmere', 'blouse', 'polo', 'button down', 'date'], condition: !hasDate },
   ];
 
   return specs
-    .filter((spec) => !ownedCategories.has(spec.category))
+    .filter((spec) => spec.condition !== false)
+    .filter((spec) => !ownedCategories.has(spec.category) || spec.condition !== undefined)
     .map((spec) => ({ ...spec, product: chooseGapProduct(catalogProducts, spec.category, spec.terms) }))
     .filter((gap): gap is typeof specs[number] & { product: Product } => Boolean(gap.product))
     .slice(0, 4);

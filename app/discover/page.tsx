@@ -1,7 +1,7 @@
 import { Sparkles } from 'lucide-react';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { ProductImage } from '@/components/ProductImage';
+import { BottomNav } from '@/components/BottomNav';
 import {
   ALL_CATALOG_PRODUCTS,
   buildCatalogLook,
@@ -215,16 +215,20 @@ const GENERATED_DISCOVER_SECTIONS: Array<{
   budget: GeneratorBudget;
   tags: string[];
 }> = [
-  { title: 'Trending fits', vibe: 'street', frame: 'androgynous', budget: 'under500', tags: ['trending', 'streetwear'] },
+  { title: 'Trending fits', vibe: 'streetwear', frame: 'androgynous', budget: 'under500', tags: ['trending', 'streetwear'] },
   { title: 'Under $150', vibe: 'clean', frame: 'androgynous', budget: 'under100', tags: ['budget', 'under 150'] },
-  { title: 'Campus', vibe: 'street', frame: 'androgynous', budget: 'under250', tags: ['campus', 'college'] },
+  { title: 'Campus', vibe: 'campus', frame: 'androgynous', budget: 'under250', tags: ['campus', 'college'] },
   { title: 'Date night', vibe: 'date', frame: 'androgynous', budget: 'under500', tags: ['date night', 'dinner'] },
   { title: 'Gym', vibe: 'gym', frame: 'androgynous', budget: 'under250', tags: ['gym', 'athletic'] },
-  { title: 'Old money', vibe: 'preppy', frame: 'androgynous', budget: 'under500', tags: ['old money', 'preppy'] },
-  { title: 'Streetwear', vibe: 'street', frame: 'masc', budget: 'under500', tags: ['streetwear', 'downtown'] },
+  { title: 'Old money', vibe: 'old-money', frame: 'androgynous', budget: 'under500', tags: ['old money', 'preppy'] },
+  { title: 'Streetwear', vibe: 'streetwear', frame: 'masc', budget: 'under500', tags: ['streetwear', 'downtown'] },
   { title: 'Clean essentials', vibe: 'clean', frame: 'fem', budget: 'under250', tags: ['clean', 'minimal'] },
-  { title: 'Travel', vibe: 'cozy', frame: 'androgynous', budget: 'under250', tags: ['travel', 'airport'] },
-  { title: 'Work', vibe: 'office', frame: 'androgynous', budget: 'under500', tags: ['work', 'office'] },
+  { title: 'Travel', vibe: 'travel', frame: 'androgynous', budget: 'under250', tags: ['travel', 'airport'] },
+  { title: 'Work', vibe: 'work', frame: 'androgynous', budget: 'under500', tags: ['work', 'office'] },
+  { title: 'Vacation', vibe: 'vacation', frame: 'androgynous', budget: 'under500', tags: ['vacation', 'resort'] },
+  { title: 'Techwear', vibe: 'techwear', frame: 'androgynous', budget: 'under500', tags: ['techwear', 'utility'] },
+  { title: 'Budget finds', vibe: 'streetwear', frame: 'androgynous', budget: 'under100', tags: ['budget', 'affordable'] },
+  { title: 'Premium splurge', vibe: 'premium', frame: 'androgynous', budget: 'any', tags: ['premium', 'luxury'] },
   { title: 'Closet ready', vibe: 'clean', frame: 'androgynous', budget: 'under250', tags: ['closet ready', 'capsule'] },
 ];
 
@@ -287,69 +291,69 @@ export default function DiscoverPage() {
   const oldMoneyLooks = looks.filter((look) => look.tags.some((tag) => tag.toLowerCase().includes('old money') || tag.toLowerCase().includes('preppy'))).slice(0, 4);
 
   return (
-    <PlaceholderScreen
-      eyebrow="Discover"
-      title="Style"
-      accent="library"
-      description="Editorial outfit directions built from renderable Sylistly catalog products."
-      maxWidthClassName="max-w-[680px]"
-    >
-      <section className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.14),transparent_32%),linear-gradient(180deg,#191513_0%,#0f0f0e_100%)] p-4 shadow-[0_22px_54px_rgba(0,0,0,.28)]">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[.18em] text-accent">Trend radar</div>
-            <h2 className="mt-1 font-serif text-[26px] font-semibold leading-tight text-ink">Find a direction, then build it</h2>
-            <p className="mt-2 max-w-[38ch] text-[12px] leading-relaxed text-muted-2">
-              Every look is assembled from renderable catalog pieces and filtered for frame coherence before it appears here.
-            </p>
-          </div>
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
-            <Sparkles size={20} />
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            ['Trending', trendingLooks.length],
-            ['Under $350', budgetLooks.length],
-            ['Creator', creatorLooks.length],
-          ].map(([label, value]) => (
-            <div key={label as string} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
-              <div className="font-serif text-[20px] font-semibold text-ink">{value as number}</div>
-              <div className="mt-1 text-[8px] uppercase tracking-[.15em] text-muted">{label as string}</div>
+    <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
+      <div className="flex-1 overflow-y-auto px-4 pb-[100px] pt-10">
+        <header className="mb-6">
+          <div className="text-[10px] font-bold uppercase tracking-[.2em] text-accent">Discover</div>
+          <h1 className="mt-1 font-serif text-[32px] font-semibold text-ink">Style Library</h1>
+          <p className="mt-2 text-[12px] leading-relaxed text-muted-2">Editorial outfit directions built from renderable Sylistly catalog products.</p>
+        </header>
+
+        <section className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.14),transparent_32%),linear-gradient(180deg,#191513_0%,#0f0f0e_100%)] p-4 shadow-[0_22px_54px_rgba(0,0,0,.28)]">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-[.18em] text-accent">Trend radar</div>
+              <h2 className="mt-1 font-serif text-[24px] font-semibold leading-tight text-ink">Find a direction</h2>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <DiscoverRail title="Trending fits" looks={trendingLooks} />
-      <DiscoverRail title="Budget-friendly finds" looks={budgetLooks} />
-      <DiscoverRail title="Creator-ready looks" looks={creatorLooks} />
-      <DiscoverRail title="Campus fits" looks={campusLooks} />
-      <DiscoverRail title="Work and interview" looks={workLooks} />
-      <DiscoverRail title="Travel capsule" looks={travelLooks} />
-      <DiscoverRail title="Old money edits" looks={oldMoneyLooks} />
-      {generatedSections.map((section) => (
-        <DiscoverRail key={section.title} title={section.title} looks={section.looks} />
-      ))}
-
-      <section className="mt-5 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
-        <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-            <Sparkles size={18} />
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
+              <Sparkles size={20} />
+            </div>
           </div>
-          <div>
-            <div className="text-[11px] uppercase tracking-[.18em] text-muted">Style library</div>
-            <h2 className="mt-1 font-serif text-[22px] font-semibold text-[#fff5ee]">Editorial outfit previews</h2>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {[
+              ['Trending', trendingLooks.length],
+              ['Under $350', budgetLooks.length],
+              ['Creator', creatorLooks.length],
+            ].map(([label, value]) => (
+              <div key={label as string} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
+                <div className="font-serif text-[20px] font-semibold text-ink">{value as number}</div>
+                <div className="mt-1 text-[8px] uppercase tracking-[.15em] text-muted">{label as string}</div>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
 
-        <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-8">
-          {looks.map((look) => (
-            <DiscoverLookCard key={look.id} look={look} />
-          ))}
-        </div>
-      </section>
-    </PlaceholderScreen>
+        <DiscoverRail title="Trending fits" looks={trendingLooks} />
+        <DiscoverRail title="Budget-friendly finds" looks={budgetLooks} />
+        <DiscoverRail title="Creator-ready looks" looks={creatorLooks} />
+        <DiscoverRail title="Campus fits" looks={campusLooks} />
+        <DiscoverRail title="Work and interview" looks={workLooks} />
+        <DiscoverRail title="Travel capsule" looks={travelLooks} />
+        <DiscoverRail title="Old money edits" looks={oldMoneyLooks} />
+        {generatedSections.map((section) => (
+          <DiscoverRail key={section.title} title={section.title} looks={section.looks} />
+        ))}
+
+        <section className="mt-8 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-[.18em] text-muted">Curated Collections</div>
+              <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">Editorial Previews</h2>
+            </div>
+          </div>
+
+          <div className="mx-auto mt-6 grid w-full grid-cols-1 gap-8">
+            {looks.map((look) => (
+              <DiscoverLookCard key={look.id} look={look} />
+            ))}
+          </div>
+        </section>
+      </div>
+      <BottomNav />
+    </main>
   );
 }
 
@@ -357,14 +361,13 @@ function DiscoverRail({ title, looks }: { title: string; looks: DiscoverLookCard
   if (!looks.length) return null;
 
   return (
-    <section className="mt-5">
-      <div className="flex items-end justify-between gap-3">
+    <section className="mt-6">
+      <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <div className="text-[9px] uppercase tracking-[.18em] text-muted">Curated</div>
-          <h2 className="mt-1 font-serif text-[22px] font-semibold text-ink">{title}</h2>
+          <h2 className="font-serif text-[20px] font-semibold text-ink">{title}</h2>
         </div>
       </div>
-      <div className="mt-3 flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="mt-3 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {looks.map((look) => (
           <div key={`${title}-${look.id}`} className="w-[176px] flex-none rounded-[24px] border border-white/10 bg-[#151311] p-3 shadow-[0_16px_34px_rgba(0,0,0,.24)]">
             <div className="grid h-[116px] grid-cols-2 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
@@ -380,7 +383,7 @@ function DiscoverRail({ title, looks }: { title: string; looks: DiscoverLookCard
                 {look.vibe}
               </span>
               <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[8px] font-bold uppercase tracking-[.1em] text-muted">
-                ${Math.round(look.estimatedTotal / 100)}
+                ${Math.round(look.estimatedTotal / 100).toLocaleString('en-US')}
               </span>
             </div>
           </div>

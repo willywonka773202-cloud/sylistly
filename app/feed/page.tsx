@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -14,7 +14,8 @@ import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
 import { useWardrobe, WARDROBE_STATUS_LABELS } from '@/store/wardrobe';
 
-const FILTERS = ['For You', 'Men', 'Women', 'Clean', 'Streetwear', 'Campus', 'Gym', 'Date', 'Work', 'Travel', 'Old Money', 'Techwear', 'Budget'];
+const PRIMARY_FILTERS = ['For You', 'Women', 'Men', 'Clean', 'Streetwear'];
+const SECONDARY_FILTERS = ['Campus', 'Gym', 'Date', 'Work', 'Travel', 'Old Money', 'Techwear', 'Budget'];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
 
 function formatPrice(cents: number): string {
@@ -70,12 +71,14 @@ export default function FitFeedPage() {
   const setWardrobeStatus = useWardrobe((state) => state.setItemStatus);
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState('For You');
+  const [showFilters, setShowFilters] = useState(false);
   const [commentPost, setCommentPost] = useState<FeedPost | null>(null);
   const [commentText, setCommentText] = useState('');
   const [shopPost, setShopPost] = useState<FeedPost | null>(null);
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const feedRef = useRef<HTMLDivElement | null>(null);
+  
   const postSafeItemsMap = useMemo(() => {
     const map = new Map<string, ReturnType<typeof repairOrRegenerateOutfit>>();
     for (const post of posts) {
@@ -83,6 +86,7 @@ export default function FitFeedPage() {
     }
     return map;
   }, [posts]);
+  
   const postVisibleProductsMap = useMemo(() => {
     const map = new Map<string, Product[]>();
     for (const post of posts) {
@@ -91,6 +95,7 @@ export default function FitFeedPage() {
     }
     return map;
   }, [posts, postSafeItemsMap]);
+  
   const filteredPosts = useMemo(
     () => posts.filter((post) => {
       if (!postMatches(post, activeFilter, wardrobeItems, postVisibleProductsMap)) return false;
@@ -98,6 +103,7 @@ export default function FitFeedPage() {
     }),
     [posts, activeFilter, wardrobeItems, postVisibleProductsMap],
   );
+  
   const activePost = filteredPosts.find((post) => post.id === activePostId) || filteredPosts[0] || null;
 
   useEffect(() => {
@@ -148,6 +154,14 @@ export default function FitFeedPage() {
     setCommentPost(null);
   }
 
+  function selectFilter(filter: string) {
+    setActiveFilter(filter);
+    setShowFilters(false);
+    if (feedRef.current) {
+      feedRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }
+
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <div className="relative flex-1 overflow-hidden">
@@ -159,11 +173,19 @@ export default function FitFeedPage() {
                 <div className="font-serif text-[20px] font-semibold leading-none text-white">Swipe <em className="italic text-accent">fits</em></div>
               </div>
               <div className="flex max-w-[250px] gap-2 overflow-x-auto scrollbar-hide">
-                {FILTERS.map((filter) => (
-                  <button key={filter} type="button" onClick={() => setActiveFilter(filter)} className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${activeFilter === filter ? 'bg-accent text-white shadow-pink-glow' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>
+                {PRIMARY_FILTERS.map((filter) => (
+                  <button key={filter} type="button" onClick={() => selectFilter(filter)} className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${activeFilter === filter ? 'bg-accent text-white shadow-pink-glow' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>
                     {filter}
                   </button>
                 ))}
+                {!PRIMARY_FILTERS.includes(activeFilter) && (
+                  <button type="button" onClick={() => setShowFilters(true)} className="flex-none rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold text-white shadow-pink-glow transition">
+                    {activeFilter}
+                  </button>
+                )}
+                <button type="button" onClick={() => setShowFilters(true)} className="flex-none rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/70 transition hover:bg-white/15">
+                  <SlidersHorizontal size={12} className="inline-block" />
+                </button>
               </div>
             </div>
           </div>
@@ -185,11 +207,11 @@ export default function FitFeedPage() {
                 ) : null}
 
                 <div className="absolute inset-x-0 top-[108px] z-[5] px-4">
-                  <OutfitBoard items={safeItems} className="h-[44dvh] min-h-[310px] max-h-[430px] shadow-[0_26px_72px_rgba(0,0,0,.38)]" onProductClick={() => setShopPost(post)} />
+                  <OutfitBoard items={safeItems} className="h-[48dvh] min-h-[340px] max-h-[460px] shadow-[0_26px_72px_rgba(0,0,0,.38)]" onProductClick={() => setShopPost(post)} />
                 </div>
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[38dvh] bg-[linear-gradient(180deg,transparent_0%,rgba(9,8,7,.72)_34%,#090807_100%)]" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[42dvh] bg-[linear-gradient(180deg,transparent_0%,rgba(9,8,7,.72)_34%,#090807_100%)]" />
 
-                <div className="absolute right-3 top-[42%] z-20 flex -translate-y-1/2 flex-col items-center gap-2">
+                <div className="absolute right-3 top-[45%] z-20 flex -translate-y-1/2 flex-col items-center gap-2">
                   <button onClick={() => { toggleLike(post.id); pulse(post.id); }} className={`grid h-11 w-11 place-items-center rounded-full border backdrop-blur-md transition ${post.liked ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-white/18 bg-black/38 text-white'}`} aria-label="Like fit"><Heart size={20} fill={post.liked ? 'currentColor' : 'none'} /></button>
                   <div className="-mt-2 text-center text-[10px] font-semibold text-white/80">{post.likeCount}</div>
                   <button onClick={() => setCommentPost(post)} className="grid h-11 w-11 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md" aria-label="Open comments"><MessageCircle size={20} /></button>
@@ -226,11 +248,34 @@ export default function FitFeedPage() {
               </article>
             );
           })}
-          {!filteredPosts.length ? <EmptyFeed onReset={() => setActiveFilter('For You')} /> : null}
+          {!filteredPosts.length ? <EmptyFeed onReset={() => selectFilter('For You')} /> : null}
         </div>
       </div>
 
       <BottomNav />
+
+      {showFilters ? (
+        <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] flex-col justify-end bg-black/60 backdrop-blur-sm transition-opacity">
+          <button className="absolute inset-0" aria-label="Close filters" onClick={() => setShowFilters(false)} />
+          <div className="relative z-10 w-full rounded-t-[32px] border-t border-white/10 bg-[#141211] p-6 pb-[calc(env(safe-area-inset-bottom)+24px)] shadow-[0_-20px_60px_rgba(0,0,0,.6)]">
+            <div className="flex items-center justify-between">
+              <h2 className="font-serif text-[22px] font-semibold text-white">More Filters</h2>
+              <button onClick={() => setShowFilters(false)} className="rounded-full bg-white/10 p-2 text-white/70 hover:text-white"><X size={18} /></button>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {SECONDARY_FILTERS.map(filter => (
+                <button
+                  key={filter}
+                  onClick={() => selectFilter(filter)}
+                  className={`rounded-full px-4 py-2.5 text-[11px] font-semibold transition ${activeFilter === filter ? 'bg-accent text-white shadow-pink-glow' : 'bg-white/10 text-white/80 hover:bg-white/20'}`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {commentPost ? (
         <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/55 backdrop-blur-sm">

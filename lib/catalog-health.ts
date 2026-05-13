@@ -9,7 +9,7 @@ const REQUIRED_SLOTS: Category[] = ['top', 'bottom', 'shoes'];
 
 export function formatPrice(cents?: number | null): string {
   if (!cents || cents <= 0) return 'Price varies';
-  return `$${Math.round(cents / 100).toLocaleString()}`;
+  return `$${Math.round(cents / 100).toLocaleString('en-US')}`;
 }
 
 export function normalizeCategory(category?: string | null): Category {
