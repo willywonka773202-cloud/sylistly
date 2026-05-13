@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentType, useEffect, useMemo, useState } from 'react';
+import { type ComponentType, memo, useEffect, useMemo, useState } from 'react';
 import { Footprints, Glasses, PackageSearch, Shirt, ShoppingBag, Sparkles, Watch } from 'lucide-react';
 import { proxiedImageUrl } from '@/lib/image-url';
 import { hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
@@ -129,7 +129,7 @@ export function ProductFallbackTile({
   );
 }
 
-export function SafeProductImage({
+function SafeProductImageBase({
   product,
   imageUrl,
   category,
@@ -221,6 +221,10 @@ export function SafeProductImage({
   );
 }
 
-export function ProductImage(props: Parameters<typeof SafeProductImage>[0] & { product: Product }) {
+export const SafeProductImage = memo(SafeProductImageBase);
+
+function ProductImageBase(props: Parameters<typeof SafeProductImage>[0] & { product: Product }) {
   return <SafeProductImage {...props} />;
 }
+
+export const ProductImage = memo(ProductImageBase);

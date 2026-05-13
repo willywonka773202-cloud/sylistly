@@ -30,12 +30,7 @@
       "reasonForInclusion": "Most popular cross-training silhouette; pairs cleanly with joggers or gym shorts across masc/fem/androgynous builds",
       "qualityScore": 9,
       "possibleDuplicateRisk": "low",
-      "imageUrlStatus": "valid",
-      "resolutionSource": "SearchAPI Google Shopping",
-      "resolvedAt": "2026-05-13T11:56:32.619Z",
-      "resolutionNotes": "Resolved to Google Thumbnail Proxy.",
-      "imageUrlSource": "googleThumbnailProxy",
-      "mergeStatus": "reviewOnly"
+      "imageUrlStatus": "valid"
     },
     {
       "id": "ep01-adidas-ultraboost-23-wht",
@@ -63,9 +58,7 @@
       "fitNotes": "Primeknit upper, responsive Boost midsole, visible heel cage",
       "reasonForInclusion": "Premium performance runner with clean white colorway that transitions gym to street",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-asics-gel-nimbus-25-blk",
@@ -90,9 +83,7 @@
       "fitNotes": "Max cushion long-distance runner; wide toe box, breathable mesh upper",
       "reasonForInclusion": "Flagship ASICS runner; strong gym/athletic vibe, recognizable silhouette in black",
       "qualityScore": 8,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-nb-fresh-foam-1080v13-wht",
@@ -119,9 +110,7 @@
       "fitNotes": "Ultra-plush Fresh Foam midsole, engineered mesh upper, excellent for treadmill or casual wear",
       "reasonForInclusion": "Premium max-cushion runner that doubles as a clean lifestyle shoe; very photogenic on white",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "merchantCdn",
-      "mergeStatus": "liveMergeReady"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-reebok-nano-x3-blk",
@@ -146,9 +135,7 @@
       "fitNotes": "Stable wide base for lifting, flexible toe for cardio, reinforced lateral sidewall",
       "reasonForInclusion": "Gold-standard CrossFit/lifting shoe; recognizable in the gym category",
       "qualityScore": 8,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-hoka-clifton-9-blk",
@@ -175,9 +162,7 @@
       "fitNotes": "Signature max-cushion stack height, midsole rocker geometry, lightweight upper",
       "reasonForInclusion": "Most recognizable max-cushion runner; strong gym and running vibe, clean black/white colorway photographs well",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-ua-hovr-phantom-3-blk",
@@ -202,9 +187,7 @@
       "fitNotes": "UA HOVR foam for energy return, sock-like knit upper, premium all-black finish",
       "reasonForInclusion": "Strong gym/athletic option filling Under Armour gap in catalog; pairs with athletic joggers",
       "qualityScore": 7,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-brooks-ghost-15-grey",
@@ -230,9 +213,7 @@
       "fitNotes": "Segmented Crash Pad for smooth heel-to-toe transitions, DNA LOFT v3 cushion",
       "reasonForInclusion": "Best-selling Brooks runner; fills the specialty running brand gap in the gym category",
       "qualityScore": 7,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-saucony-endorphin-speed-3-wht",
@@ -258,9 +239,7 @@
       "fitNotes": "Carbon-infused SpeedRoll nylon plate, PWRRUN PB foam, low stack speed shoe",
       "reasonForInclusion": "Racing flat aesthetic with clean white/black colorway; appeals to performance and gym vibes",
       "qualityScore": 8,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-nike-air-zoom-peg40-blk",
@@ -287,9 +266,7 @@
       "fitNotes": "Dual Air Zoom units, padded collar, flexible rubber outsole",
       "reasonForInclusion": "Best-in-class everyday runner; versatile enough for gym and casual campus looks",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "medium",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "medium"
     },
     {
       "id": "ep01-puma-velocity-nitro-2-wht",
@@ -315,9 +292,7 @@
       "fitNotes": "NITRO foam midsole, PUMAGRIP outsole, budget-friendly performance runner",
       "reasonForInclusion": "Affordable Puma runner that fills a budget gap in the gym shoe category",
       "qualityScore": 7,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-nb-minimus-tr-blk",
@@ -342,9 +317,7 @@
       "fitNotes": "Minimal 4mm drop, wide toe box, excellent ground feel for functional fitness",
       "reasonForInclusion": "Minimalist training shoe for powerlifting and HIIT; distinct from max-cushion runners already in catalog",
       "qualityScore": 8,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "merchantCdn",
-      "mergeStatus": "liveMergeReady"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-gymshark-training-shoe-blk",
@@ -370,9 +343,7 @@
       "fitNotes": "Wide stable base for lifting, heel wrap support, lightweight upper",
       "reasonForInclusion": "Adidas answer to Metcon for lifters; fills the weightlifting shoe gap alongside runners",
       "qualityScore": 8,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-on-cloud-x-3-blk",
@@ -398,9 +369,7 @@
       "fitNotes": "CloudTec phase pods, Speedboard for responsive training, clean silhouette",
       "reasonForInclusion": "On Running premium gym shoe; clean all-black look bridges gym and street aesthetics",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-lululemon-blissfeel-2-wht",
@@ -426,9 +395,7 @@
       "fitNotes": "Designed for female foot geometry, PEBA foam, breathable engineered mesh",
       "reasonForInclusion": "Strong fem gym shoe; Lululemon brand recognition drives outfit appeal with matching activewear",
       "qualityScore": 9,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "searchIntent",
-      "mergeStatus": "blocked"
+      "possibleDuplicateRisk": "low"
     },
     {
       "id": "ep01-nb-fuelcell-rebel-v3-masc",
@@ -454,9 +421,7 @@
       "fitNotes": "FuelCell foam, nitrogen-infused midsole, speed-oriented minimal upper",
       "reasonForInclusion": "Statement color gym shoe to balance neutral-heavy athletic category; bold colorway stands out on board",
       "qualityScore": 7,
-      "possibleDuplicateRisk": "low",
-      "imageUrlSource": "merchantCdn",
-      "mergeStatus": "liveMergeReady"
+      "possibleDuplicateRisk": "low"
     }
   ],
   "packSummary": {

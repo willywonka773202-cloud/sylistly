@@ -1,0 +1,166 @@
+{
+  "totalScanned": 227,
+  "skippedAlreadyValid": 0,
+  "attemptedResolution": 1,
+  "successfullyResolved": 1,
+  "resolvedMerchantCdnImages": 0,
+  "resolvedGoogleThumbnailProxyImages": 1,
+  "unresolvedBlocked": 0,
+  "finalClassification": {
+    "liveMergeReadyCount": 9,
+    "reviewOnlyCount": 1,
+    "blockedCount": 217
+  },
+  "resultsByPack": {
+    "pack-01-shoes-gym": {
+      "total": 16,
+      "valid": 0,
+      "needsResolution": 16
+    },
+    "pack-02-shoes-streetwear": {
+      "total": 16,
+      "valid": 0,
+      "needsResolution": 16
+    },
+    "pack-03-jewelry-clean": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-04-eyewear-sunglasses": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-05-bags-campus": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-06-techwear": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-07-vacation-resort": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-08-date-night": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-09-old-money": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-10-campus-basics": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-11-gym-fits": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-12-budget-under-100": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-13-premium-splurge": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-14-fem-trending": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    },
+    "pack-15-masc-trending": {
+      "total": 15,
+      "valid": 0,
+      "needsResolution": 15
+    }
+  },
+  "resultsByCategory": {
+    "shoes": {
+      "total": 55,
+      "valid": 0,
+      "needsResolution": 55
+    },
+    "jewelry": {
+      "total": 22,
+      "valid": 0,
+      "needsResolution": 22
+    },
+    "eyewear": {
+      "total": 22,
+      "valid": 0,
+      "needsResolution": 22
+    },
+    "bag": {
+      "total": 27,
+      "valid": 0,
+      "needsResolution": 27
+    },
+    "outer": {
+      "total": 31,
+      "valid": 0,
+      "needsResolution": 31
+    },
+    "bottom": {
+      "total": 30,
+      "valid": 0,
+      "needsResolution": 30
+    },
+    "top": {
+      "total": 31,
+      "valid": 0,
+      "needsResolution": 31
+    },
+    "hat": {
+      "total": 9,
+      "valid": 0,
+      "needsResolution": 9
+    }
+  },
+  "examples": {
+    "liveMergeReady": [
+      {
+        "id": "ep01-nb-fresh-foam-1080v13-wht",
+        "imageUrlSource": "merchantCdn",
+        "productUrl": "https://www.newbalance.com/pd/fresh-foam-x-1080v13/MW1080W13.html"
+      },
+      {
+        "id": "ep01-nb-minimus-tr-blk",
+        "imageUrlSource": "merchantCdn",
+        "productUrl": "https://www.newbalance.com/pd/minimus-tr-v1/WTMTRBT1.html"
+      }
+    ],
+    "reviewOnly": [
+      {
+        "id": "ep01-nike-free-metcon-6-blk",
+        "imageUrlSource": "googleThumbnailProxy",
+        "productUrl": "https://www.nike.com/t/free-metcon-6-training-shoes"
+      }
+    ],
+    "blocked": [
+      {
+        "id": "ep01-adidas-ultraboost-23-wht",
+        "imageUrlSource": "searchIntent",
+        "productUrl": "https://www.adidas.com/us/ultraboost-23-shoes"
+      },
+      {
+        "id": "ep01-asics-gel-nimbus-25-blk",
+        "imageUrlSource": "searchIntent",
+        "productUrl": "https://www.asics.com/us/en-us/gel-nimbus-25/p/1011B547-001.html"
+      }
+    ]
+  }
+}

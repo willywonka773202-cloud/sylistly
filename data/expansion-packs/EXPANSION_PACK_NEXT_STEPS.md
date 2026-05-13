@@ -1,6 +1,6 @@
 # Expansion Pack — Next Steps
 
-**Status:** Partial merge complete. 9 of 227 candidates promoted to live catalog.
+**Status:** Partial merge complete. 9 of 227 candidates promoted to live catalog. 1 candidate resolved via SearchAPI pipeline test.
 
 ## What was merged this session
 The 9 New Balance candidates with real `nb.scene7.com` CDN imageUrls and real `newbalance.com` productUrls were verified, written to `data/catalog-reviewed-additions.json`, loaded by `lib/expansion-catalog.ts`, and appended to `ALL_CATALOG_PRODUCTS` via the new `EXPANSION_REVIEWED_PRODUCTS` source.
@@ -19,33 +19,27 @@ The 9 New Balance candidates with real `nb.scene7.com` CDN imageUrls and real `n
 
 **Net effect**: catalog shoes 57 → 66 (+9). Gym/vacation/techwear repeat rates dropped further (see final report).
 
-## What was NOT merged
-**218 of 227 candidates remain blocked** by `invalidSearchIntentImage` status. These have Google Shopping search-intent URLs (`https://www.google.com/search?q=...&udm=28`) as `imageUrl` values that will not render as images.
+## SearchAPI Image Resolution Pipeline
 
-| Status | Count |
-|--------|-------|
-| valid (merged this session) | 9 |
-| invalidSearchIntentImage | 218 |
-| needsRealImage | 0 |
-| needsRealProductUrl | 0 |
-| duplicateRisk | 0 |
-| rejected | 0 |
+The `scripts/resolve-expansion-images.ts` script has been created to safely process the remaining 217 blocked candidates. 
 
-## Path forward for the remaining 218
+It queries the Google Shopping API via SearchAPI to find valid `https://` thumbnail images for candidates currently blocked by search-intent URLs.
 
-To safely merge the rest, each candidate needs a **real direct CDN imageUrl** — not a search-intent URL. Two options:
+### Usage
 
-1. **SearchAPI resolution** (requires user authorization): Query SearchAPI for each candidate's brand+title and extract the first `thumbnail` field from the Google Shopping response.
-2. **Manual brand CDN lookup**: For known retailers (Nike, Adidas, Lululemon, Aritzia, etc.), construct the CDN URL pattern from the brand's product page URL.
+**Dry Run Mode**
+```bash
+$env:SEARCHAPI_DRY_RUN="true"; npm run resolve:expansion-images; Remove-Item Env:\SEARCHAPI_DRY_RUN
+```
 
-**Hard rules unchanged:**
-- Do NOT invent image URLs.
-- Do NOT use `https://www.google.com/search?...` as `imageUrl`.
-- Do NOT use `data:` URLs.
-- Do NOT add candidates with weak titles or unresolved merchants.
+**Live Run (Example: max 1 query)**
+```bash
+$env:SEARCHAPI_MAX_QUERIES="1"; npm run resolve:expansion-images; Remove-Item Env:\SEARCHAPI_MAX_QUERIES
+```
 
-## Output files this session
-- `data/expansion-packs/EXPANSION_PACK_REVIEW_REPORT.json` — categorized status per candidate
-- `data/expansion-packs/EXPANSION_PACK_NEXT_STEPS.md` — this file
-- `data/catalog-reviewed-additions.json` — 9 candidate Products in catalog-compatible shape
-- `lib/expansion-catalog.ts` — strict-safety loader for the additions file
+## Next Steps
+
+1. Run the `resolve:expansion-images` script across all packs (removing the `MAX_QUERIES` limit) to resolve the remaining 217 candidates.
+2. Review the resulting modified `pack-*.json` files.
+3. Consolidate newly valid candidates into `data/catalog-reviewed-additions.json`.
+4. Validate the catalog health.

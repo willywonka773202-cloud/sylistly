@@ -38,14 +38,22 @@ function normalizedTags(post: FeedPost) {
   return [post.vibe, ...post.tags].map((tag) => tag.toLowerCase());
 }
 
-function postMatches(post: FeedPost, filter: string, wardrobeItems: Record<string, unknown>): boolean {
+function postMatches(
+  post: FeedPost,
+  filter: string,
+  wardrobeItems: Record<string, unknown>,
+  visibleProductsMap?: Map<string, Product[]>,
+): boolean {
   if (filter === 'For You') return true;
   if (filter === 'Trending') return post.likeCount >= 250 || normalizedTags(post).some((tag) => tag.includes('trend'));
   if (filter === 'Men') return post.frameBias === 'masc';
   if (filter === 'Women') return post.frameBias === 'fem';
   if (filter === 'Budget') return post.totalCents <= 25000 || normalizedTags(post).some((tag) => tag.includes('budget'));
   if (filter === 'Under $150') return post.totalCents <= 15000;
-  if (filter === 'Closet') return visibleProducts(post).some((product) => Boolean(wardrobeItems[product.id]));
+  if (filter === 'Closet') {
+    const products = visibleProductsMap?.get(post.id) ?? visibleProducts(post);
+    return products.some((product) => Boolean(wardrobeItems[product.id]));
+  }
   const needle = filter.toLowerCase().replace('night out', 'night').replace('date', 'date night');
   return normalizedTags(post).some((tag) => tag.includes(needle));
 }
@@ -68,9 +76,27 @@ export default function FitFeedPage() {
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const feedRef = useRef<HTMLDivElement | null>(null);
+  const postSafeItemsMap = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof repairOrRegenerateOutfit>>();
+    for (const post of posts) {
+      map.set(post.id, safePostItems(post));
+    }
+    return map;
+  }, [posts]);
+  const postVisibleProductsMap = useMemo(() => {
+    const map = new Map<string, Product[]>();
+    for (const post of posts) {
+      const safeItems = postSafeItemsMap.get(post.id);
+      map.set(post.id, safeItems ? getOutfitProducts(safeItems) : []);
+    }
+    return map;
+  }, [posts, postSafeItemsMap]);
   const filteredPosts = useMemo(
-    () => posts.filter((post) => postMatches(post, activeFilter, wardrobeItems) && visibleProducts(post).length >= 4),
-    [posts, activeFilter, wardrobeItems],
+    () => posts.filter((post) => {
+      if (!postMatches(post, activeFilter, wardrobeItems, postVisibleProductsMap)) return false;
+      return (postVisibleProductsMap.get(post.id)?.length || 0) >= 4;
+    }),
+    [posts, activeFilter, wardrobeItems, postVisibleProductsMap],
   );
   const activePost = filteredPosts.find((post) => post.id === activePostId) || filteredPosts[0] || null;
 
@@ -145,8 +171,8 @@ export default function FitFeedPage() {
 
         <div ref={feedRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
           {filteredPosts.map((post) => {
-            const safeItems = safePostItems(post);
-            const products = getOutfitProducts(safeItems);
+            const safeItems = postSafeItemsMap.get(post.id) ?? safePostItems(post);
+            const products = postVisibleProductsMap.get(post.id) ?? getOutfitProducts(safeItems);
             const totalCents = products.reduce((sum, product) => sum + (product.priceCents || 0), 0) || post.totalCents;
             const averageCents = Math.round(totalCents / Math.max(1, products.length));
             return (

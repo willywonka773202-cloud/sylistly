@@ -90,8 +90,14 @@ export default function ProfilePage() {
       text.includes('old money') || text.includes('preppy') ? 'Old Money' : null,
       text.includes('travel') || text.includes('airport') ? 'Travel Capsule' : null,
       text.includes('office') || text.includes('work') ? 'Workwear Pro' : null,
+      text.includes('techwear') || text.includes('utility') ? 'Techwear Builder' : null,
+      text.includes('campus') || text.includes('college') ? 'Campus Minimalist' : null,
+      text.includes('date') || text.includes('night') ? 'Date Night Curator' : null,
+      text.includes('vacation') || text.includes('resort') || text.includes('beach') ? 'Vacation Ready' : null,
+      text.includes('premium') || text.includes('luxury') ? 'Premium Picks' : null,
       savedCount >= 5 ? 'Trendsetter' : null,
       closetCount >= 8 ? 'Closet Builder' : null,
+      likedCount >= 10 ? 'Style Engaged' : null,
     ].filter((badge): badge is string => Boolean(badge)).slice(0, 6);
   }, [closetCount, profile.stylePrefs.vibes, savedCount, wardrobeProducts]);
 

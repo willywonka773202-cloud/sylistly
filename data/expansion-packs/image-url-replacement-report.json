@@ -1,0 +1,1700 @@
+{
+  "generatedAt": "2026-05-12",
+  "purpose": "Audit of expansion pack imageUrl validity — pre-merge review checkpoint",
+  "totalCandidatesScanned": 227,
+  "candidatesWithValidImageUrl": 9,
+  "candidatesNeedingReplacement": 218,
+  "candidatesRejected": 0,
+  "packsAffected": [
+    {
+      "file": "pack-03-jewelry-clean.json",
+      "packName": "Minimal Jewelry & Watches",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-04-eyewear-sunglasses.json",
+      "packName": "Sunglasses & Fashion Eyewear",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-05-bags-campus.json",
+      "packName": "Bags for Campus, Gym & Travel",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-06-techwear.json",
+      "packName": "Techwear & Technical Outerwear",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-07-vacation-resort.json",
+      "packName": "Vacation & Resort Pieces",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-08-date-night.json",
+      "packName": "Date Night Pieces",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-09-old-money.json",
+      "packName": "Old Money & Prep Pieces",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-11-gym-fits.json",
+      "packName": "Gym Fits & Activewear",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-12-budget-under-100.json",
+      "packName": "Budget Under $100 — Student Picks",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-13-premium-splurge.json",
+      "packName": "Premium Splurge Pieces",
+      "valid": 0,
+      "needsReplacement": 15,
+      "rejected": 0
+    },
+    {
+      "file": "pack-10-campus-basics.json",
+      "packName": "Campus Everyday Basics",
+      "valid": 1,
+      "needsReplacement": 14,
+      "rejected": 0
+    },
+    {
+      "file": "pack-14-fem-trending.json",
+      "packName": "Fem Trending Pieces",
+      "valid": 1,
+      "needsReplacement": 14,
+      "rejected": 0
+    },
+    {
+      "file": "pack-15-masc-trending.json",
+      "packName": "Masc Trending Pieces",
+      "valid": 1,
+      "needsReplacement": 14,
+      "rejected": 0
+    },
+    {
+      "file": "pack-01-shoes-gym.json",
+      "packName": "Gym & Athletic Shoes",
+      "valid": 3,
+      "needsReplacement": 13,
+      "rejected": 0
+    },
+    {
+      "file": "pack-02-shoes-streetwear.json",
+      "packName": "Streetwear & Lifestyle Sneakers",
+      "valid": 3,
+      "needsReplacement": 13,
+      "rejected": 0
+    }
+  ],
+  "validCandidates": [
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-nb-fresh-foam-1080v13-wht",
+      "title": "New Balance Fresh Foam X 1080v13 Running Shoe White",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/MW1080W13_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-nb-minimus-tr-blk",
+      "title": "New Balance Minimus TR V1 Training Shoe Black",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/WTMTRBT1_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-nb-fuelcell-rebel-v3-masc",
+      "title": "New Balance FuelCell Rebel v3 Running Shoe Neon Yellow",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/MFCXLB3_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-nb-574-grey",
+      "title": "New Balance 574 Core Sneaker Grey",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/ML574EVG_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-nb-990v6-grey",
+      "title": "New Balance 990v6 Made in USA Grey",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/M990GL6_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-nb-327-grey-green",
+      "title": "New Balance 327 Sneaker Grey Green",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/MS327LG1_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-new-balance-574-beige",
+      "title": "New Balance 574 Sneaker Beige",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/ML574EVM_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-new-balance-2002r-white",
+      "title": "New Balance 2002R Protection Pack Sea Salt",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/ML2002RC_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-new-balance-9060-grey",
+      "title": "New Balance 9060 Sneaker Rain Cloud",
+      "imageUrl": "https://nb.scene7.com/is/image/NB/U9060GRY_nb_02_i?$pdpflexf2$&wid=440&hei=440"
+    }
+  ],
+  "needsReplacementCandidates": [
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-nike-free-metcon-6-blk",
+      "title": "Nike Free Metcon 6 Training Shoe Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/free-metcon-6-training-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-adidas-ultraboost-23-wht",
+      "title": "Adidas Ultraboost 23 Running Shoe Cloud White",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/ultraboost-23-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-asics-gel-nimbus-25-blk",
+      "title": "ASICS Gel-Nimbus 25 Running Shoe Black",
+      "merchant": "ASICS",
+      "productUrl": "https://www.asics.com/us/en-us/gel-nimbus-25/p/1011B547-001.html"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-reebok-nano-x3-blk",
+      "title": "Reebok Nano X3 Cross-Training Shoe Black",
+      "merchant": "Reebok",
+      "productUrl": "https://www.reebok.com/us/nano-x3-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-hoka-clifton-9-blk",
+      "title": "Hoka Clifton 9 Running Shoe Black White",
+      "merchant": "Hoka",
+      "productUrl": "https://www.hoka.com/en-us/mens-road-running/clifton-9/1127895.html"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-ua-hovr-phantom-3-blk",
+      "title": "Under Armour HOVR Phantom 3 SE Running Shoe Black",
+      "merchant": "Under Armour",
+      "productUrl": "https://www.underarmour.com/en-us/p/hovr-phantom-3-se-running-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-brooks-ghost-15-grey",
+      "title": "Brooks Ghost 15 Running Shoe Grey Blue",
+      "merchant": "Brooks",
+      "productUrl": "https://www.brooksrunning.com/en_us/ghost-15-mens-neutral-running-shoe/110393.html"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-saucony-endorphin-speed-3-wht",
+      "title": "Saucony Endorphin Speed 3 Running Shoe White Black",
+      "merchant": "Saucony",
+      "productUrl": "https://www.saucony.com/en/endorphin-speed-3"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-nike-air-zoom-peg40-blk",
+      "title": "Nike Air Zoom Pegasus 40 Running Shoe Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/air-zoom-pegasus-40-road-running-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-puma-velocity-nitro-2-wht",
+      "title": "Puma Velocity Nitro 2 Running Shoe White Silver",
+      "merchant": "Puma",
+      "productUrl": "https://us.puma.com/en_US/pd/velocity-nitro-2-running-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-gymshark-training-shoe-blk",
+      "title": "Adidas Dropset 2 Cross-Trainer Black White",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/dropset-2-training-shoes"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-on-cloud-x-3-blk",
+      "title": "On Cloud X 3 Training Shoe Black Asphalt",
+      "merchant": "On",
+      "productUrl": "https://www.on-running.com/en-us/products/cloud-x-3"
+    },
+    {
+      "pack": "pack-01-shoes-gym.json",
+      "id": "ep01-lululemon-blissfeel-2-wht",
+      "title": "Lululemon Blissfeel 2 Running Shoe White",
+      "merchant": "Lululemon",
+      "productUrl": "https://shop.lululemon.com/p/womens-footwear/Blissfeel-2-Running-Shoe"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-nike-af1-07-triple-white",
+      "title": "Nike Air Force 1 '07 Low Triple White",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/air-force-1-07-shoes"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-adidas-samba-og-white",
+      "title": "Adidas Samba OG Sneaker White Black Gum",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/samba-og-shoes/B75806.html"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-nike-dunk-low-white-black",
+      "title": "Nike Dunk Low Retro White Black Panda",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/dunk-low-retro-mens-shoes-3VXn47"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-adidas-gazelle-bold-wht",
+      "title": "Adidas Gazelle Bold Platform Sneaker White Gum",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/gazelle-bold-shoes"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-vans-old-skool-blk-wht",
+      "title": "Vans Old Skool Sneaker Black White",
+      "merchant": "Vans",
+      "productUrl": "https://www.vans.com/en-us/shoes-c00081/old-skool-pvn000d3hy28"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-converse-chuck-70-hi-blk",
+      "title": "Converse Chuck 70 High Top Canvas Black",
+      "merchant": "Converse",
+      "productUrl": "https://www.converse.com/c/chuck-70"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-adidas-stan-smith-wht-grn",
+      "title": "Adidas Stan Smith Sneaker White Green",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/stan-smith-shoes/M20324.html"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-jordan-1-low-white-black",
+      "title": "Air Jordan 1 Low White Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/air-jordan-1-low-shoes"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-adidas-forum-low-wht",
+      "title": "Adidas Forum Low Sneaker Cloud White Blue Bird",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/forum-low-shoes"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-clarks-desert-boot-beeswax",
+      "title": "Clarks Originals Desert Boot Beeswax Leather",
+      "merchant": "Clarks",
+      "productUrl": "https://www.clarksusa.com/c/mens-originals/desert-boot"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-timberland-6inch-wheat",
+      "title": "Timberland 6-Inch Premium Boot Wheat Nubuck",
+      "merchant": "Timberland",
+      "productUrl": "https://www.timberland.com/en_US/p/timberland-6-premium-boot/10061713.html"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-reebok-club-c-85-wht",
+      "title": "Reebok Club C 85 Sneaker Chalk Green",
+      "merchant": "Reebok",
+      "productUrl": "https://www.reebok.com/us/club-c-85-shoes"
+    },
+    {
+      "pack": "pack-02-shoes-streetwear.json",
+      "id": "ep02-puma-suede-classic-blk",
+      "title": "Puma Suede Classic XXI Sneaker Black White",
+      "merchant": "Puma",
+      "productUrl": "https://us.puma.com/en_US/pd/suede-classic-xxi-sneakers"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-mejuri-dome-ring-gold",
+      "title": "Mejuri Gold Vermeil Dome Ring",
+      "merchant": "Mejuri",
+      "productUrl": "https://mejuri.com/collections/rings/products/dome-ring-gold-vermeil"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-mejuri-hoop-earrings-gold",
+      "title": "Mejuri Medium Hoop Earrings 18k Gold",
+      "merchant": "Mejuri",
+      "productUrl": "https://mejuri.com/collections/earrings/products/gold-hoop-medium"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-vitaly-bracelet-stainless",
+      "title": "Vitaly Quartz Stainless Steel Bracelet Silver",
+      "merchant": "Vitaly",
+      "productUrl": "https://www.vitalydesign.com/collections/bracelets"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-miansai-thin-cuff-gold",
+      "title": "Miansai Thin Cuff Bracelet Gold Plated",
+      "merchant": "Miansai",
+      "productUrl": "https://miansai.com/collections/cuffs-and-bangles"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-gorjana-pave-chain-necklace",
+      "title": "Gorjana Power Gemstone Beaded Bracelet Gold",
+      "merchant": "Gorjana",
+      "productUrl": "https://gorjana.com/collections/bracelets"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-fossil-minimalist-watch-blk",
+      "title": "Fossil Minimalist Slim Dial Watch Black Leather",
+      "merchant": "Fossil",
+      "productUrl": "https://www.fossil.com/en-us/watches"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-movado-museum-classic",
+      "title": "Movado Museum Classic Watch Black Dial Silver",
+      "merchant": "Movado",
+      "productUrl": "https://www.movado.com/collections/museum-classic"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-pandora-moments-bracelet",
+      "title": "Pandora Moments Snake Chain Bracelet Silver",
+      "merchant": "Pandora",
+      "productUrl": "https://us.pandora.net/en/jewelry/bracelets"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-le-gramme-cable-bracelet",
+      "title": "Le Gramme 7g Polished Cable Bracelet Silver",
+      "merchant": "Le Gramme",
+      "productUrl": "https://www.legramme.com/en-us/collections/bracelets"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-tiffany-t-wire-ring",
+      "title": "Tiffany & Co. T Wire Ring Rose Gold",
+      "merchant": "Tiffany & Co.",
+      "productUrl": "https://www.tiffany.com/jewelry/rings/tiffany-t-collection"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-apm-monaco-chain-necklace",
+      "title": "APM Monaco Sterling Silver Chain Necklace",
+      "merchant": "APM Monaco",
+      "productUrl": "https://www.apm.mc/en-us/collections/necklaces"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-marant-hoop-earring-gold",
+      "title": "Jacquemus Les Boucles D'Oreilles Gold Hoop Earrings",
+      "merchant": "Jacquemus",
+      "productUrl": "https://www.jacquemus.com/en-us/accessories/jewelry/earrings"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-apple-watch-series9-midnight",
+      "title": "Apple Watch Series 9 41mm Midnight Aluminum",
+      "merchant": "Apple",
+      "productUrl": "https://www.apple.com/shop/buy-apple-watch/apple-watch"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-pilgrim-ring-stack-silver",
+      "title": "Pilgrim Ring Stack Set Sterling Silver 3-Pack",
+      "merchant": "Pilgrim",
+      "productUrl": "https://www.pilgrim.net/en-us/collections/rings"
+    },
+    {
+      "pack": "pack-03-jewelry-clean.json",
+      "id": "ep03-bold-chain-necklace-gold-streetwear",
+      "title": "Tom Wood Curb Chain Necklace 18k Gold Plated",
+      "merchant": "Tom Wood",
+      "productUrl": "https://www.tomwood.eu/en-us/collections/necklaces"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-rayban-clubmaster-tortoise",
+      "title": "Ray-Ban Clubmaster Classic Sunglasses Tortoise Gold",
+      "merchant": "Ray-Ban",
+      "productUrl": "https://www.ray-ban.com/usa/sunglasses/RB3016%20UNISEX%20004/RB3016-tortoise-clubmaster-classic-sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-rayban-wayfarer-blk",
+      "title": "Ray-Ban Original Wayfarer Classic Sunglasses Black",
+      "merchant": "Ray-Ban",
+      "productUrl": "https://www.ray-ban.com/usa/sunglasses/RB2140%20UNISEX%20901/RB2140-black-wayfarer-original-sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-oakley-frogskins-blk",
+      "title": "Oakley Frogskins Sunglasses Matte Black Prizm Black",
+      "merchant": "Oakley",
+      "productUrl": "https://www.oakley.com/en-us/sunglasses/frogskins"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-persol-649-havana",
+      "title": "Persol 649 Sunglasses Havana Green Polarized",
+      "merchant": "Persol",
+      "productUrl": "https://www.persol.com/usa/sunglasses/po0649s"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-warby-parker-haskell-crystal",
+      "title": "Warby Parker Haskell Sunglasses Crystal with Oak",
+      "merchant": "Warby Parker",
+      "productUrl": "https://www.warbyparker.com/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-le-specs-air-heart-tort",
+      "title": "Le Specs Air Heart Sunglasses Syrup Tort",
+      "merchant": "Le Specs",
+      "productUrl": "https://www.lespecs.com/us/collections/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-gentle-monster-mustang-blk",
+      "title": "Gentle Monster Mustang 01 Sunglasses Black",
+      "merchant": "Gentle Monster",
+      "productUrl": "https://www.gentlemonster.com/us/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-quay-farout-blk",
+      "title": "Quay Farout Oversized Square Sunglasses Black",
+      "merchant": "Quay Australia",
+      "productUrl": "https://www.quayaustralia.com/collections/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-maui-jim-baby-beach-tort",
+      "title": "Maui Jim Baby Beach Polarized Sunglasses Tortoise",
+      "merchant": "Maui Jim",
+      "productUrl": "https://www.mauijim.com/en_US/baby-beach-sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-rayban-oval-flat-gold",
+      "title": "Ray-Ban Oval Flat Lenses Sunglasses Gold Green",
+      "merchant": "Ray-Ban",
+      "productUrl": "https://www.ray-ban.com/usa/sunglasses/round-oval-sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-celine-cl40194-tort",
+      "title": "Celine Cat Eye Sunglasses Tortoise Gold CL40194",
+      "merchant": "Celine",
+      "productUrl": "https://www.celine.com/en-us/celine-sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-tom-ford-ft0237-blk",
+      "title": "Tom Ford FT0237 Nikita Sunglasses Black Smoke",
+      "merchant": "Tom Ford",
+      "productUrl": "https://www.tomford.com/eyewear/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-moscot-lemtosh-tortoise",
+      "title": "Moscot Lemtosh Sunglasses Tortoise",
+      "merchant": "Moscot",
+      "productUrl": "https://www.moscot.com/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-quay-high-key-mini-gold",
+      "title": "Quay High Key Mini Sunglasses Gold Nude",
+      "merchant": "Quay Australia",
+      "productUrl": "https://www.quayaustralia.com/collections/sunglasses"
+    },
+    {
+      "pack": "pack-04-eyewear-sunglasses.json",
+      "id": "ep04-glassesusa-clubmaster-sport-blk",
+      "title": "Oakley Sutro Lite Sunglasses Matte Black Prizm",
+      "merchant": "Oakley",
+      "productUrl": "https://www.oakley.com/en-us/sunglasses/sutro-lite"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-herschel-little-america-blk",
+      "title": "Herschel Little America Backpack Black 25L",
+      "merchant": "Herschel Supply Co.",
+      "productUrl": "https://herschel.com/shop/backpacks/little-america-backpack"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-jansport-right-pack-black",
+      "title": "JanSport Right Pack Backpack Black 31L",
+      "merchant": "JanSport",
+      "productUrl": "https://www.jansport.com/shop/en/jansport-us/backpacks/right-pack"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-thenorthface-borealis-blk",
+      "title": "The North Face Borealis Backpack TNF Black 28L",
+      "merchant": "The North Face",
+      "productUrl": "https://www.thenorthface.com/en-us/bags-and-gear/backpacks-c225483/borealis-backpack"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-telfar-medium-bag-black",
+      "title": "Telfar Shopping Bag Medium Black",
+      "merchant": "Telfar",
+      "productUrl": "https://shop.telfar.net/collections/bags"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-carhartt-wip-delta-shell-bag",
+      "title": "Carhartt WIP Delta Shell Backpack Black 20L",
+      "merchant": "Carhartt WIP",
+      "productUrl": "https://www.carhartt-wip.com/collections/backpacks"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-fjallraven-kanken-ox-red",
+      "title": "Fjallraven Kanken Backpack Ox Red 16L",
+      "merchant": "Fjallraven",
+      "productUrl": "https://www.fjallraven.com/us/en-us/bags-gear/kanken"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-eastpak-padded-pak-r-blk",
+      "title": "Eastpak Padded Pak'r Backpack Black 24L",
+      "merchant": "Eastpak",
+      "productUrl": "https://www.eastpak.com/backpacks/padded-pakr/"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-coach-tabby-shoulder-bag",
+      "title": "Coach Tabby 26 Shoulder Bag Chalk",
+      "merchant": "Coach",
+      "productUrl": "https://www.coach.com/collections/tabby-bags"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-lululemon-everywhere-belt-bag",
+      "title": "Lululemon Everywhere Belt Bag 1L Black",
+      "merchant": "Lululemon",
+      "productUrl": "https://shop.lululemon.com/p/bags-and-pouches/Everywhere-Belt-Bag"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-nike-brasilia-duffel-blk",
+      "title": "Nike Brasilia 9.5 Training Duffel Bag Black Medium",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/brasilia-9-5-training-duffel-bag-medium"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-madewell-transport-tote-blk",
+      "title": "Madewell Transport Tote Bag True Black",
+      "merchant": "Madewell",
+      "productUrl": "https://www.madewell.com/the-transport-tote.html"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-aritzia-super-puff-mini-bag",
+      "title": "Aritzia Super Puff Mini Tote Bag Black",
+      "merchant": "Aritzia",
+      "productUrl": "https://www.aritzia.com/us/en/product/the-super-puff-tote-bag"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-stanley-quencher-tumbler",
+      "title": "Baggu Small Nylon Crescent Bag Oat",
+      "merchant": "Baggu",
+      "productUrl": "https://baggu.com/collections/bags"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-waxed-canvas-messenger-blk",
+      "title": "Fjallraven Ulvo Hip Pack Small Black",
+      "merchant": "Fjallraven",
+      "productUrl": "https://www.fjallraven.com/us/en-us/bags-gear/hip-packs"
+    },
+    {
+      "pack": "pack-05-bags-campus.json",
+      "id": "ep05-marc-jacobs-snapshot-mini",
+      "title": "Marc Jacobs The Snapshot Mini Camera Bag Black",
+      "merchant": "Marc Jacobs",
+      "productUrl": "https://www.marcjacobs.com/default/the-mini-snapshot"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-arcteryx-atom-jacket-blk",
+      "title": "Arc'teryx Atom Insulated Jacket Black",
+      "merchant": "Arc'teryx",
+      "productUrl": "https://arcteryx.com/us/en/shop/mens/atom-jacket"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-arcteryx-beta-shell-blk",
+      "title": "Arc'teryx Beta AR Shell Jacket Black",
+      "merchant": "Arc'teryx",
+      "productUrl": "https://arcteryx.com/us/en/shop/mens/beta-ar-jacket"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-nike-acg-trail-jacket-blk",
+      "title": "Nike ACG 'Chain of Craters' Trail Jacket Black",
+      "merchant": "Nike ACG",
+      "productUrl": "https://www.nike.com/c/acg"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-patagonia-nano-puff-blk",
+      "title": "Patagonia Nano Puff Jacket Black",
+      "merchant": "Patagonia",
+      "productUrl": "https://www.patagonia.com/product/mens-nano-puff-jacket"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-carhartt-wip-cargo-pant-blk",
+      "title": "Carhartt WIP Regular Cargo Pant Black",
+      "merchant": "Carhartt WIP",
+      "productUrl": "https://www.carhartt-wip.com/collections/pants/products/regular-cargo-pant"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-uniqlo-windbreaker-blk",
+      "title": "Uniqlo Blocktech Pocketable Parka Black",
+      "merchant": "Uniqlo",
+      "productUrl": "https://www.uniqlo.com/us/en/men/coats-and-jackets/windbreakers-and-parkas"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-alpha-industries-ma1-sage",
+      "title": "Alpha Industries MA-1 Slim Fit Bomber Jacket Sage",
+      "merchant": "Alpha Industries",
+      "productUrl": "https://www.alphaindustries.com/products/slim-fit-ma-1-bomber-jacket"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-nike-tech-fleece-jogger-blk",
+      "title": "Nike Tech Fleece Jogger Pants Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/sportswear-tech-fleece-mens-joggers"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-acronym-j1l-ts-jacket",
+      "title": "Stone Island Nylon Membrana Jacket Charcoal",
+      "merchant": "Stone Island",
+      "productUrl": "https://www.stoneisland.com/us/stone-island/jackets"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-nike-tech-fleece-hoodie-blk",
+      "title": "Nike Tech Fleece Full-Zip Hoodie Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/sportswear-tech-fleece-full-zip-hoodie"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-comme-des-cargo-trouser-blk",
+      "title": "Y-3 Classic Refined Wool Track Jacket Black",
+      "merchant": "Y-3",
+      "productUrl": "https://www.y-3.com/en-us/collections/jackets"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-outlier-futureworks-black",
+      "title": "Outlier Futureworks Trouser Black",
+      "merchant": "Outlier",
+      "productUrl": "https://outlier.nyc/collections/bottoms"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-apc-hoodie-blk-logo",
+      "title": "Adidas Terrex Multi Hoodie Black",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/terrex"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-thenorthface-denali-fleece",
+      "title": "The North Face Denali 2 Fleece Jacket Black",
+      "merchant": "The North Face",
+      "productUrl": "https://www.thenorthface.com/en-us/clothing/mens-clothing/fleece-c224752/denali-jacket"
+    },
+    {
+      "pack": "pack-06-techwear.json",
+      "id": "ep06-cargopants-acronym-style-blk",
+      "title": "Maharishi Original Snopant Organic Cargo Pant Black",
+      "merchant": "Maharishi",
+      "productUrl": "https://maharishi.com/collections/cargos"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-vilebrequin-moorea-swim",
+      "title": "Vilebrequin Moorea Swim Shorts Turtles In The Sky Blue",
+      "merchant": "Vilebrequin",
+      "productUrl": "https://www.vilebrequin.com/us/en/swimwear/men"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-polo-ralph-linen-shirt-wht",
+      "title": "Polo Ralph Lauren Classic Fit Linen Shirt White",
+      "merchant": "Polo Ralph Lauren",
+      "productUrl": "https://www.ralphlauren.com/mens-shirts/mens-linen-shirts"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-madewell-linen-wide-leg",
+      "title": "Madewell Garment-Dyed Linen-Blend Wide-Leg Crop Pant Dusty Peach",
+      "merchant": "Madewell",
+      "productUrl": "https://www.madewell.com/womens-bottoms/wide-leg-pants"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-birkenstock-arizona-soft-sand",
+      "title": "Birkenstock Arizona Soft Footbed Sandal Sand",
+      "merchant": "Birkenstock",
+      "productUrl": "https://www.birkenstock.com/us/arizona-birko-flor/arizona-birkoflor-sandbeige-0051063.html"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-lack-of-color-straw-hat",
+      "title": "Lack of Color Spencer Sun Hat Natural Straw",
+      "merchant": "Lack of Color",
+      "productUrl": "https://au.lackofcolor.com/collections/straw-hats"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-reformation-midi-dress-blk",
+      "title": "Reformation Cleo Dress Black",
+      "merchant": "Reformation",
+      "productUrl": "https://www.thereformation.com/collections/dresses"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-jcrew-linen-camp-shirt",
+      "title": "J.Crew Classic Linen Camp-Collar Shirt White",
+      "merchant": "J.Crew",
+      "productUrl": "https://www.jcrew.com/mens/category/shirts/camp"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-on-cloud-5-wht-vacation",
+      "title": "On Cloud 5 Lifestyle Sneaker All White",
+      "merchant": "On",
+      "productUrl": "https://www.on-running.com/en-us/products/cloud-5"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-celine-bucket-hat-canvas",
+      "title": "Jacquemus Le Bob Artichaut Bucket Hat Beige",
+      "merchant": "Jacquemus",
+      "productUrl": "https://www.jacquemus.com/en-us/accessories/hats"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-amazon-straw-tote-bag",
+      "title": "Mango Wicker Basket Tote Bag Natural",
+      "merchant": "Mango",
+      "productUrl": "https://shop.mango.com/us/bags/tote-bags"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-zara-linen-shorts-ecru",
+      "title": "Zara Linen Shorts Ecru",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/linen-shorts"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-persol-649-vacation-oval",
+      "title": "Persol PO0649 Folding Sunglasses Havana",
+      "merchant": "Persol",
+      "productUrl": "https://www.persol.com/usa/sunglasses/po0649sm"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-vans-slip-on-checkerboard",
+      "title": "Vans Classic Slip-On Checkerboard Black White",
+      "merchant": "Vans",
+      "productUrl": "https://www.vans.com/en-us/shoes-c00081/classic-slip-on-pvn000eyebw7"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-hm-linen-top-white",
+      "title": "H&M Linen-Blend Crop Top White",
+      "merchant": "H&M",
+      "productUrl": "https://www2.hm.com/en_us/women/products/tops/crop-tops.html"
+    },
+    {
+      "pack": "pack-07-vacation-resort.json",
+      "id": "ep07-ray-ban-oval-vacation",
+      "title": "Ray-Ban RB3547 Oval Sunglasses Gold Green Classic",
+      "merchant": "Ray-Ban",
+      "productUrl": "https://www.ray-ban.com/usa/sunglasses/round-oval-sunglasses"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-cos-slip-dress-black",
+      "title": "COS Relaxed Silk-Touch Midi Slip Dress Black",
+      "merchant": "COS",
+      "productUrl": "https://www.cosstores.com/en_usd/women/dresses"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-massimo-dutti-blazer-grey",
+      "title": "Massimo Dutti Slim-Fit Wool-Blend Blazer Grey",
+      "merchant": "Massimo Dutti",
+      "productUrl": "https://www.massimodutti.com/us/blazers"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-zara-satin-trousers-blk",
+      "title": "Zara Satin Effect Trousers Black",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/satin-trousers"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-theory-slim-trouser-blk",
+      "title": "Theory Harts Clean Wool Slim Trouser Black",
+      "merchant": "Theory",
+      "productUrl": "https://www.theory.com/mens/pants-and-shorts"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-louboutin-so-kate-nude",
+      "title": "Christian Louboutin So Kate 120mm Pump Nude",
+      "merchant": "Christian Louboutin",
+      "productUrl": "https://us.christianlouboutin.com/so-kate"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-toteme-cropped-tee-blk",
+      "title": "Toteme Cotton Cropped T-Shirt Black",
+      "merchant": "Toteme",
+      "productUrl": "https://www.toteme-studio.com/en-us/collections/tops"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-reiss-slim-shirt-white",
+      "title": "Reiss Charles Slim Fit Single Cuff Shirt White",
+      "merchant": "Reiss",
+      "productUrl": "https://www.reiss.com/us/p/mens-shirts"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-gucci-loafer-blk-horsebit",
+      "title": "Gucci Horsebit 1953 Loafer Black Leather",
+      "merchant": "Gucci",
+      "productUrl": "https://www.gucci.com/us/en/c/mens-shoes/loafers"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-bottega-veneta-chain-pouch",
+      "title": "Bottega Veneta Chain Cassette Bag Intrecciato Black",
+      "merchant": "Bottega Veneta",
+      "productUrl": "https://www.bottegaveneta.com/en-us/bags/shoulder-bags"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-& other-stories-blazer-camel",
+      "title": "& Other Stories Single-Breasted Blazer Camel",
+      "merchant": "& Other Stories",
+      "productUrl": "https://www.stories.com/en_usd/clothing/blazers.html"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-sam-edelman-block-heel-blk",
+      "title": "Sam Edelman Hazel Block Heel Mule Black",
+      "merchant": "Sam Edelman",
+      "productUrl": "https://www.samedelman.com/collections/heels-mules"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-marant-shirt-oversized-blk",
+      "title": "Isabel Marant Etoile Naomi Oversized Shirt Black",
+      "merchant": "Isabel Marant Étoile",
+      "productUrl": "https://www.isabelmarant.com/us/women/tops"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-mejuri-pearl-necklace",
+      "title": "Mejuri Baroque Pearl Choker Necklace Gold",
+      "merchant": "Mejuri",
+      "productUrl": "https://mejuri.com/collections/necklaces"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-loake-chelsea-boot-tan",
+      "title": "Loake Hoxton Chelsea Boot Tan Burnished Leather",
+      "merchant": "Loake",
+      "productUrl": "https://www.loake.co.uk/collections/chelsea-boots"
+    },
+    {
+      "pack": "pack-08-date-night.json",
+      "id": "ep08-cos-wide-leg-trousers-grey",
+      "title": "COS Wide-Leg Tailored Trousers Slate Grey",
+      "merchant": "COS",
+      "productUrl": "https://www.cosstores.com/en_usd/women/trousers"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-polo-rl-pique-polo-navy",
+      "title": "Polo Ralph Lauren Classic Fit Pique Polo Navy",
+      "merchant": "Polo Ralph Lauren",
+      "productUrl": "https://www.ralphlauren.com/mens-shirts/polo-shirts/classic-fit-pique-polo"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-polo-rl-pique-polo-white",
+      "title": "Polo Ralph Lauren Slim Fit Pique Polo White",
+      "merchant": "Polo Ralph Lauren",
+      "productUrl": "https://www.ralphlauren.com/mens-shirts/polo-shirts/slim-fit-pique-polo"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-ghbass-weejuns-loafer-tan",
+      "title": "G.H. Bass Larson Weejuns Penny Loafer Tan",
+      "merchant": "G.H. Bass",
+      "productUrl": "https://www.ghbass.com/collections/weejuns-mens"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-brunello-cashmere-sweater-cream",
+      "title": "Brunello Cucinelli Cashmere Crew Neck Sweater Oatmeal",
+      "merchant": "Brunello Cucinelli",
+      "productUrl": "https://www.brunellocucinelli.com/en/men/knitwear"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-jcrew-cashmere-cardigan-navy",
+      "title": "J.Crew Classic Merino Wool Cardigan Sweater Navy",
+      "merchant": "J.Crew",
+      "productUrl": "https://www.jcrew.com/mens/category/sweaters/cardigans"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-chinos-khaki-slim-gap",
+      "title": "Gap Slim Fit Khaki Chinos Khaki",
+      "merchant": "Gap",
+      "productUrl": "https://www.gap.com/browse/product.do?pid=467624342"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-dockers-alpha-slim-chino",
+      "title": "Dockers Alpha Slim Fit Chino Trouser Navy",
+      "merchant": "Dockers",
+      "productUrl": "https://www.dockers.com/us/en_us/mens-pants/chinos"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-loro-piana-polo-camel",
+      "title": "Loro Piana Polo Shirt Camel Cashmere",
+      "merchant": "Loro Piana",
+      "productUrl": "https://www.loropiana.com/en/man/polo-shirts"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-burberry-trench-coat-honey",
+      "title": "Burberry The Long Kensington Heritage Trench Coat Honey",
+      "merchant": "Burberry",
+      "productUrl": "https://us.burberry.com/mens-trench-coats"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-brooks-brothers-ocbd-shirt",
+      "title": "Brooks Brothers Original Fit Oxford OCBD Shirt Blue",
+      "merchant": "Brooks Brothers",
+      "productUrl": "https://www.brooksbrothers.com/mens-shirts/oxford-shirts"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-alden-indy-boot-tan",
+      "title": "Alden Indy Boot Suede Snuff",
+      "merchant": "Alden",
+      "productUrl": "https://www.aldenshoe.com/collections/boots"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-lacoste-polo-green",
+      "title": "Lacoste L.12.12 Classic Fit Pique Polo Vert",
+      "merchant": "Lacoste",
+      "productUrl": "https://www.lacoste.com/us/lacoste/men/clothing/polo-shirts"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-rolex-datejust-oyster",
+      "title": "Rolex Datejust 36mm Oyster Bracelet Jubilee Silver",
+      "merchant": "Rolex",
+      "productUrl": "https://www.rolex.com/watches/datejust/m126200-0005.html"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-gant-rugger-shirt-oxford",
+      "title": "GANT Rugger Oxford Shirt Navy",
+      "merchant": "GANT",
+      "productUrl": "https://www.gant.com/us/shirts/oxford-shirts"
+    },
+    {
+      "pack": "pack-09-old-money.json",
+      "id": "ep09-andother-stories-pearl-earring",
+      "title": "Mikimoto Pearl Stud Earrings 8mm White Gold",
+      "merchant": "Mikimoto",
+      "productUrl": "https://www.mikimoto.com/us/en/categories/pearl-earrings"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-champion-reverse-weave-hoodie-grey",
+      "title": "Champion Reverse Weave Hoodie Oxford Grey",
+      "merchant": "Champion",
+      "productUrl": "https://www.champion.com/reverse-weave/hoodies"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-levis-501-jeans-med-wash",
+      "title": "Levi's 501 Original Fit Jeans Medium Stonewash",
+      "merchant": "Levi's",
+      "productUrl": "https://www.levi.com/US/en_US/clothing/men/jeans/501-original-fit-jeans"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-uniqlo-crew-neck-tee-white",
+      "title": "Uniqlo Supima Cotton Crew Neck T-Shirt White",
+      "merchant": "Uniqlo",
+      "productUrl": "https://www.uniqlo.com/us/en/men/t-shirts-tops/crew-neck-t-shirts"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-hm-oversized-tee-black",
+      "title": "H&M Oversized Fit Cotton T-Shirt Black",
+      "merchant": "H&M",
+      "productUrl": "https://www2.hm.com/en_us/men/products/t-shirts-and-tops/t-shirts.html"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-carhartt-beanie-black",
+      "title": "Carhartt Watch Hat Beanie Black",
+      "merchant": "Carhartt",
+      "productUrl": "https://www.carhartt.com/beanies"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-new-era-fitted-yankees",
+      "title": "New Era 59FIFTY New York Yankees Fitted Cap Navy",
+      "merchant": "New Era",
+      "productUrl": "https://www.neweracap.com/collections/new-york-yankees"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-gap-sweatshirt-arch-grey",
+      "title": "Gap Arch Logo Crewneck Sweatshirt Heather Grey",
+      "merchant": "Gap",
+      "productUrl": "https://www.gap.com/browse/category.do?cid=1099968"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-levis-511-slim-black",
+      "title": "Levi's 511 Slim Fit Jeans Black",
+      "merchant": "Levi's",
+      "productUrl": "https://www.levi.com/US/en_US/clothing/men/jeans/511-slim-fit-jeans"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-nike-club-fleece-pants-grey",
+      "title": "Nike Club Fleece Sweatpants Dark Grey Heather",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/sportswear-club-fleece-pants"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-patagonia-fleece-pullover",
+      "title": "Patagonia Classic Retro-X Fleece Pullover Natural",
+      "merchant": "Patagonia",
+      "productUrl": "https://www.patagonia.com/product/mens-classic-retro-x-fleece-pullover"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-jansport-superbreak-burgundy",
+      "title": "JanSport SuperBreak One Backpack Burgundy",
+      "merchant": "JanSport",
+      "productUrl": "https://www.jansport.com/shop/en/jansport-us/backpacks/superbreak-one"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-uniqlo-ultra-light-down-blk",
+      "title": "Uniqlo Ultra Light Down Jacket Black",
+      "merchant": "Uniqlo",
+      "productUrl": "https://www.uniqlo.com/us/en/men/coats-and-jackets/down-jackets"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-american-eagle-straight-jeans",
+      "title": "American Eagle AirFlex+ Straight Jeans Medium Wash",
+      "merchant": "American Eagle",
+      "productUrl": "https://www.ae.com/us/en/c/men/jeans/straight-jeans"
+    },
+    {
+      "pack": "pack-10-campus-basics.json",
+      "id": "ep10-hm-canvas-tote-natural",
+      "title": "H&M Canvas Shopper Tote Bag Natural",
+      "merchant": "H&M",
+      "productUrl": "https://www2.hm.com/en_us/women/products/bags/tote-bags.html"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-gymshark-apex-seamless-set",
+      "title": "Gymshark Apex Seamless Short Sleeve Top Black",
+      "merchant": "Gymshark",
+      "productUrl": "https://us.gymshark.com/collections/tops/womens"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-lululemon-abc-jogger-blk",
+      "title": "Lululemon ABC Jogger Pant Black",
+      "merchant": "Lululemon",
+      "productUrl": "https://shop.lululemon.com/p/mens-pants/ABC-Jogger"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-gymshark-training-shorts-grey",
+      "title": "Gymshark Speed Training Shorts Grey",
+      "merchant": "Gymshark",
+      "productUrl": "https://us.gymshark.com/collections/shorts/mens"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-lululemon-align-legging-blk",
+      "title": "Lululemon Align High-Rise Pant 25\" Black",
+      "merchant": "Lululemon",
+      "productUrl": "https://shop.lululemon.com/p/womens-pants/Align-Pant"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-alo-yoga-biker-short-blk",
+      "title": "Alo Yoga 7/8 High-Waist Airbrush Legging Black",
+      "merchant": "Alo Yoga",
+      "productUrl": "https://www.aloyoga.com/collections/bottoms/womens"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-nike-dri-fit-tank-blk",
+      "title": "Nike Dri-FIT Training Tank Black",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/dri-fit-training-tank"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-under-armour-rival-hoodie-blk",
+      "title": "Under Armour Rival Fleece Full-Zip Hoodie Black",
+      "merchant": "Under Armour",
+      "productUrl": "https://www.underarmour.com/en-us/p/rival-fleece-full-zip-hoodie"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-adidas-gym-track-jacket-blk",
+      "title": "Adidas Essentials 3-Stripe Track Jacket Black White",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/essentials-3-stripes-track-jacket"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-new-era-gym-bucket-hat",
+      "title": "Nike Futura Washed Bucket Hat Grey",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/c/hats"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-gymshark-gym-bag-blk",
+      "title": "Gymshark Gym Bag Black 45L",
+      "merchant": "Gymshark",
+      "productUrl": "https://us.gymshark.com/collections/accessories/bags"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-lululemon-free-to-be-sports-bra",
+      "title": "Lululemon Free to Be Serene Bra Light Support Black",
+      "merchant": "Lululemon",
+      "productUrl": "https://shop.lululemon.com/p/womens-sports-bras/Free-To-Be-Serene-Bra"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-bylt-basics-drop-cut-tee-white",
+      "title": "BYLT Basics Drop-Cut Crew Neck Tee White",
+      "merchant": "BYLT Basics",
+      "productUrl": "https://bylt.com/collections/mens-t-shirts"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-on-cloud-gym-runner-blk",
+      "title": "On Cloudflow 4 Running Shoe Black Magnet",
+      "merchant": "On",
+      "productUrl": "https://www.on-running.com/en-us/products/cloudflow-4"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-adidas-3bar-tee-masc",
+      "title": "Adidas Aeroready Essentials 3-Stripe T-Shirt Black",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/aeroready-essentials-single-jersey-3-stripes-t-shirt"
+    },
+    {
+      "pack": "pack-11-gym-fits.json",
+      "id": "ep11-hoka-trail-shoes-gym",
+      "title": "Hoka Kawana 2 Training Shoe Black",
+      "merchant": "Hoka",
+      "productUrl": "https://www.hoka.com/en-us/training/kawana-2"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-uniqlo-white-tee-budget",
+      "title": "Uniqlo Airism Cotton Crew Neck T-Shirt White",
+      "merchant": "Uniqlo",
+      "productUrl": "https://www.uniqlo.com/us/en/men/t-shirts-tops"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-zara-mom-jeans-mid",
+      "title": "Zara Z1975 Mom Fit Jeans Mid Blue",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/z1975-mom-jeans"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-herschel-classic-backpack-black",
+      "title": "Herschel Classic Backpack Black 24L",
+      "merchant": "Herschel Supply Co.",
+      "productUrl": "https://herschel.com/shop/backpacks/classic-backpack"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-vans-old-skool-budget",
+      "title": "Vans Old Skool Sneaker Black White",
+      "merchant": "Vans",
+      "productUrl": "https://www.vans.com/en-us/shoes-c00081/old-skool-pvn000d3hy28"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-champion-crewneck-sweatshirt-grey",
+      "title": "Champion Powerblend Crewneck Sweatshirt Grey",
+      "merchant": "Champion",
+      "productUrl": "https://www.champion.com/powerblend/tops"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-quay-mini-square-sunglasses",
+      "title": "Quay All In Mini Sunglasses Black Smoke",
+      "merchant": "Quay Australia",
+      "productUrl": "https://www.quayaustralia.com/collections/sunglasses"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-pura-vida-bracelet",
+      "title": "Pura Vida Original Bracelet Pack Assorted",
+      "merchant": "Pura Vida",
+      "productUrl": "https://www.puravidabracelets.com/collections/bracelets"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-hm-windbreaker-jacket-blk",
+      "title": "H&M Relaxed Fit Windbreaker Black",
+      "merchant": "H&M",
+      "productUrl": "https://www2.hm.com/en_us/men/products/jackets/windbreakers.html"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-nike-swoosh-cap-white",
+      "title": "Nike Dri-FIT Swoosh Running Cap White",
+      "merchant": "Nike",
+      "productUrl": "https://www.nike.com/t/dri-fit-swoosh-running-cap"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-ae-wide-leg-trouser-cream",
+      "title": "American Eagle Next Level Baggy Wide Leg Pant Cream",
+      "merchant": "American Eagle",
+      "productUrl": "https://www.ae.com/us/en/c/women/pants/wide-leg-pants"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-converse-chuck-all-star-blk",
+      "title": "Converse Chuck Taylor All Star Low Top Black",
+      "merchant": "Converse",
+      "productUrl": "https://www.converse.com/c/chuck-taylor-all-star"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-zara-basic-tee-stripe",
+      "title": "Zara Striped Cotton T-Shirt Navy White",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/striped-t-shirts"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-baggu-canvas-tote-budget",
+      "title": "Baggu Standard Recycled Canvas Tote Black",
+      "merchant": "Baggu",
+      "productUrl": "https://baggu.com/collections/totes"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-old-navy-fleece-pullover-blk",
+      "title": "Old Navy Classic Fleece Pullover Hoodie Black",
+      "merchant": "Old Navy",
+      "productUrl": "https://www.oldnavy.com/c/mens-hoodies-and-sweatshirts"
+    },
+    {
+      "pack": "pack-12-budget-under-100.json",
+      "id": "ep12-warby-parker-dime-glasses",
+      "title": "Warby Parker Dime Eyeglasses Crystal",
+      "merchant": "Warby Parker",
+      "productUrl": "https://www.warbyparker.com/eyeglasses"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-bottega-veneta-cassette-caramel",
+      "title": "Bottega Veneta Cassette Bag Caramel Intrecciato",
+      "merchant": "Bottega Veneta",
+      "productUrl": "https://www.bottegaveneta.com/en-us/bags/shoulder-bags"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-acne-studios-wool-coat-camel",
+      "title": "Acne Studios Double-Breasted Wool Coat Camel",
+      "merchant": "Acne Studios",
+      "productUrl": "https://www.acnestudios.com/us/en/coats"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-amiri-mx1-jeans-indigo",
+      "title": "Amiri MX1 Leather Patchwork Jeans Indigo",
+      "merchant": "Amiri",
+      "productUrl": "https://www.amiri.com/collections/bottoms"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-common-projects-achilles-white",
+      "title": "Common Projects Achilles Low Sneaker White",
+      "merchant": "Common Projects",
+      "productUrl": "https://www.commonprojects.com/collections/achilles-low"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-rick-owens-runner-pearl",
+      "title": "Rick Owens DRKSHDW Runner Sneaker Pearl",
+      "merchant": "Rick Owens",
+      "productUrl": "https://www.rickowens.eu/en/US/men/shoes"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-celine-oversized-blazer-blk",
+      "title": "Celine Oversized Suit Jacket Black",
+      "merchant": "Celine",
+      "productUrl": "https://www.celine.com/en-us/men/coats-and-jackets"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-loewe-puzzle-bag-black",
+      "title": "Loewe Puzzle Small Bag Black",
+      "merchant": "Loewe",
+      "productUrl": "https://www.loewe.com/int/en/women-bags/puzzle-bags"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-loro-piana-cashmere-coat",
+      "title": "Loro Piana Wish Coat Vicuña Camel",
+      "merchant": "Loro Piana",
+      "productUrl": "https://www.loropiana.com/en/man/outerwear"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-cartier-love-bracelet-gold",
+      "title": "Cartier Love Bracelet 18k Yellow Gold",
+      "merchant": "Cartier",
+      "productUrl": "https://www.cartier.com/en-us/jewelry/bracelets/love-collection"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-gentle-monster-matte-blk",
+      "title": "Gentle Monster Lo Cell Sunglasses Matte Black Silver",
+      "merchant": "Gentle Monster",
+      "productUrl": "https://www.gentlemonster.com/us/sunglasses"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-off-white-diag-tee-blk",
+      "title": "Off-White Diagonal Stripe Classic T-Shirt Black",
+      "merchant": "Off-White",
+      "productUrl": "https://www.off---white.com/en-us/clothing/t-shirts"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-stone-island-track-jacket-sage",
+      "title": "Stone Island Reflective Weave Track Jacket Sage",
+      "merchant": "Stone Island",
+      "productUrl": "https://www.stoneisland.com/us/stone-island/jackets"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-isabel-marant-boots-blk",
+      "title": "Isabel Marant Denvee Leather Ankle Boot Black",
+      "merchant": "Isabel Marant",
+      "productUrl": "https://www.isabelmarant.com/us/shoes/boots"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-dior-saddle-bag-blk",
+      "title": "Dior Saddle Bag Black Grained Calfskin",
+      "merchant": "Dior",
+      "productUrl": "https://www.dior.com/en_us/women/bags/saddle-bags"
+    },
+    {
+      "pack": "pack-13-premium-splurge.json",
+      "id": "ep13-valentino-garavani-loafer-blk",
+      "title": "Valentino Garavani VLogo Signature Loafer Black",
+      "merchant": "Valentino Garavani",
+      "productUrl": "https://www.valentino.com/en-us/shoes"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-zara-corset-top-blk",
+      "title": "Zara Satin Corset Style Top Black",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/satin-corset-top"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-princess-polly-mini-skirt-beige",
+      "title": "Princess Polly Sable Mini Skirt Beige",
+      "merchant": "Princess Polly",
+      "productUrl": "https://us.princesspolly.com/collections/skirts"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-free-people-crochet-top",
+      "title": "Free People Movement Run Like The Wind Pullover Ivory",
+      "merchant": "Free People",
+      "productUrl": "https://www.freepeople.com/fp-movement/tops"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-ugg-ultra-mini-boot-sand",
+      "title": "UGG Ultra Mini Platform Boot Sand",
+      "merchant": "UGG",
+      "productUrl": "https://www.ugg.com/womens-boots/ultra-mini"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-skims-sculpting-bodysuit-onyx",
+      "title": "Skims Cotton Rib Bodysuit Onyx",
+      "merchant": "Skims",
+      "productUrl": "https://skims.com/collections/tops-bodysuits"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-abercrombie-curve-love-jean",
+      "title": "Abercrombie & Fitch Curve Love High Rise 90s Relaxed Jean Medium Wash",
+      "merchant": "Abercrombie & Fitch",
+      "productUrl": "https://www.abercrombie.com/shop/us/p/curve-love-high-rise-90s-relaxed-jean"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-urban-outfitters-denim-jacket",
+      "title": "Urban Outfitters BDG Denim Cropped Trucker Jacket Blue",
+      "merchant": "Urban Outfitters",
+      "productUrl": "https://www.urbanoutfitters.com/shop/bdg-denim-jacket"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-lack-of-color-cowboy-hat",
+      "title": "Lack of Color Prairie Straw Cowboy Hat Natural",
+      "merchant": "Lack of Color",
+      "productUrl": "https://au.lackofcolor.com/collections/cowboy-hats"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-le-specs-extreme-tort-sunglasses",
+      "title": "Le Specs Pilferer Sunglasses Syrup Tortoise",
+      "merchant": "Le Specs",
+      "productUrl": "https://www.lespecs.com/us/collections/sunglasses"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-coach-outlet-mini-bag-blk",
+      "title": "Coach Tabby 20 Mini Shoulder Bag Black",
+      "merchant": "Coach",
+      "productUrl": "https://www.coach.com/collections/tabby-bags"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-alo-yoga-crop-hoodie-blk",
+      "title": "Alo Yoga Muse Crop Hoodie Black",
+      "merchant": "Alo Yoga",
+      "productUrl": "https://www.aloyoga.com/collections/womens-hoodies"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-mejuri-tennis-necklace",
+      "title": "Mejuri Tennis Necklace Gold Crystal",
+      "merchant": "Mejuri",
+      "productUrl": "https://mejuri.com/collections/necklaces"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-aritzia-effortless-pant-blk",
+      "title": "Aritzia The Effortless Pant Black",
+      "merchant": "Aritzia",
+      "productUrl": "https://www.aritzia.com/us/en/product/effortless-pant"
+    },
+    {
+      "pack": "pack-14-fem-trending.json",
+      "id": "ep14-onrunning-cloudsurfer-white-fem",
+      "title": "On Cloudsurfer Running Shoe White Pearl",
+      "merchant": "On",
+      "productUrl": "https://www.on-running.com/en-us/products/cloudsurfer"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-ald-varsity-jacket-navy",
+      "title": "Aimé Leon Dore Wool Varsity Jacket Navy",
+      "merchant": "Aimé Leon Dore",
+      "productUrl": "https://www.aimeleondore.com/collections/outerwear"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-noah-core-logo-hoodie-grey",
+      "title": "Noah Core Logo Pullover Hoodie Grey Heather",
+      "merchant": "Noah",
+      "productUrl": "https://www.noahny.com/collections/hoodies-and-sweatshirts"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-norse-projects-fano-tee-blk",
+      "title": "Norse Projects Niels Standard T-Shirt Black",
+      "merchant": "Norse Projects",
+      "productUrl": "https://www.norseprojects.com/collections/t-shirts"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-club-monaco-chino-tan",
+      "title": "Club Monaco Slim Chino Pant Khaki",
+      "merchant": "Club Monaco",
+      "productUrl": "https://www.clubmonaco.com/en/us/mens-pants"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-carhartt-wip-chase-hoodie-blk",
+      "title": "Carhartt WIP Chase Hoodie Sweatshirt Black Gold",
+      "merchant": "Carhartt WIP",
+      "productUrl": "https://www.carhartt-wip.com/collections/hoodies/products/chase-hoodie"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-dickies-874-pant-khaki",
+      "title": "Dickies 874 Original Work Pant Khaki",
+      "merchant": "Dickies",
+      "productUrl": "https://www.dickies.com/874-original-fit-pant"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-patagonia-dad-cap-blk",
+      "title": "Patagonia P-6 Logo Trucker Hat Black",
+      "merchant": "Patagonia",
+      "productUrl": "https://www.patagonia.com/product/p-6-logo-trucker-hat"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-ray-ban-round-rb2180-tort",
+      "title": "Ray-Ban Round Metal Sunglasses Tortoise Gold Green",
+      "merchant": "Ray-Ban",
+      "productUrl": "https://www.ray-ban.com/usa/sunglasses/round-oval-sunglasses"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-wtaps-shoulder-bag-blk",
+      "title": "Carhartt WIP Essentials Bag Small Black",
+      "merchant": "Carhartt WIP",
+      "productUrl": "https://www.carhartt-wip.com/collections/bags"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-tom-wood-curb-chain-silver",
+      "title": "Tom Wood Curb Chain Necklace Sterling Silver",
+      "merchant": "Tom Wood",
+      "productUrl": "https://www.tomwood.eu/en-us/collections/necklaces"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-patagonia-synchilla-snap-t",
+      "title": "Patagonia Synchilla Snap-T Fleece Pullover Black",
+      "merchant": "Patagonia",
+      "productUrl": "https://www.patagonia.com/product/mens-synchilla-snap-t-fleece-pullover"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-zara-wide-leg-trousers-blk",
+      "title": "Zara Wide Leg Tailored Trousers Black",
+      "merchant": "Zara",
+      "productUrl": "https://www.zara.com/us/en/wide-leg-tailored-trousers-for-men"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-samba-og-black-gum",
+      "title": "Adidas Samba OG Sneaker Black Gum",
+      "merchant": "Adidas",
+      "productUrl": "https://www.adidas.com/us/samba-og-shoes/B75807.html"
+    },
+    {
+      "pack": "pack-15-masc-trending.json",
+      "id": "ep15-saturday-ny-dad-cap-grey",
+      "title": "Saturdays NYC Canvas Beach Hat Grey",
+      "merchant": "Saturdays NYC",
+      "productUrl": "https://www.saturdaysnyc.com/collections/hats"
+    }
+  ],
+  "rejectedCandidates": []
+}

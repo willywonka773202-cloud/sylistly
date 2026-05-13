@@ -1,11 +1,12 @@
 'use client';
 
+import { memo } from 'react';
 import { Check, Plus, ShoppingBag } from 'lucide-react';
 import { ProductImage } from '@/components/ProductImage';
 import { formatPrice } from '@/lib/catalog-health';
 import type { Product } from '@/lib/types';
 
-export function ProductTile({
+function ProductTileBase({
   product,
   status,
   actionLabel,
@@ -70,3 +71,4 @@ export function ProductTile({
   );
 }
 
+export const ProductTile = memo(ProductTileBase);

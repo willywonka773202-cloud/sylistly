@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductImageQualityScore } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -66,7 +67,7 @@ function pickSatelliteProducts(products: Product[], hero?: Product) {
   return [...byPriority, ...remaining].slice(0, 3);
 }
 
-export function OutfitBoard({
+function OutfitBoardBase({
   items,
   className = '',
   onImageUnavailable,
@@ -152,3 +153,5 @@ export function OutfitBoard({
     </div>
   );
 }
+
+export const OutfitBoard = memo(OutfitBoardBase);

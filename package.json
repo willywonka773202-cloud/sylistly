@@ -22,7 +22,8 @@
     "qa": "node --experimental-strip-types scripts/qa-check.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
-    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"
+    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs",
+    "resolve:expansion-images": "npx tsx scripts/resolve-expansion-images.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

@@ -1721,26 +1721,48 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
   
   // Vibe specific conflicts
   if (vibe === 'clean' && hasProduct(['graphic', 'neon', 'statement', 'western', 'techwear', 'distressed'])) score -= 60;
-  if ((vibe === 'gym' || vibe === 'cozy') && hasProduct(['heel', 'pumps', 'satin', 'dressy', 'blazer'])) score -= 60;
+  if ((vibe === 'gym' || vibe === 'cozy' || vibe === 'athletic') && hasProduct(['heel', 'pumps', 'satin', 'dressy', 'blazer'])) score -= 60;
   if ((vibe === 'night' || vibe === 'date') && hasProduct(['running', 'gym', 'workout', 'sweatpants', 'beanie'])) score -= 60;
-  if (vibe === 'office' && hasProduct(['sweatpants', 'hoodie', 'distressed', 'athletic', 'crocs', 'flip flops'])) score -= 100;
+  if ((vibe === 'office' || vibe === 'work') && hasProduct(['sweatpants', 'hoodie', 'distressed', 'athletic', 'crocs', 'flip flops'])) score -= 100;
+  if (vibe === 'old-money' && hasProduct(['graphic tee', 'neon', 'techwear', 'cargo pants', 'sweatpant', 'shell jacket', 'distressed'])) score -= 80;
+  if (vibe === 'techwear' && hasProduct(['polo sweater', 'linen', 'beach', 'satin', 'pleated trouser', 'pearl', 'cardigan'])) score -= 70;
+  if (vibe === 'streetwear' && hasProduct(['blazer suit', 'pumps', 'kitten heel', 'pencil skirt'])) score -= 60;
+  if (vibe === 'campus' && hasProduct(['cocktail dress', 'stiletto', 'satin gown', 'evening clutch'])) score -= 80;
+  if (vibe === 'travel' && hasProduct(['stiletto', 'kitten heel', 'cocktail dress', 'satin gown', 'pencil skirt'])) score -= 70;
+  if (vibe === 'premium' && hasProduct(['fast fashion', 'shein', 'temu', 'cosplay', 'costume'])) score -= 100;
 
   // Shoe logic
   const isSandal = hasProduct(['sandal', 'flip flop', 'birkenstock']);
   const isRainBoot = hasProduct(['rain boot', 'wellies']);
   const isAthletic = hasProduct(['running', 'athletic', 'training']);
+  const isHeel = hasProduct(['heel', 'pump', 'stiletto', 'kitten heel']);
+  const isLoafer = hasProduct(['loafer', 'oxford', 'dress shoe', 'derby']);
   if (product.category === 'shoes') {
-    if (isSandal && (vibe === 'office' || vibe === 'night' || vibe === 'edgy')) score -= 120;
-    if (isRainBoot && (vibe === 'night' || vibe === 'date' || vibe === 'office' || vibe === 'clean')) score -= 150;
-    if (isAthletic && (vibe === 'office' || vibe === 'night')) score -= 80;
+    if (isSandal && (vibe === 'office' || vibe === 'work' || vibe === 'night' || vibe === 'edgy' || vibe === 'techwear')) score -= 120;
+    if (isRainBoot && (vibe === 'night' || vibe === 'date' || vibe === 'office' || vibe === 'work' || vibe === 'clean' || vibe === 'old-money')) score -= 150;
+    if (isAthletic && (vibe === 'office' || vibe === 'work' || vibe === 'night' || vibe === 'date' || vibe === 'old-money')) score -= 80;
+    if (isHeel && (vibe === 'gym' || vibe === 'athletic' || vibe === 'campus' || vibe === 'travel' || vibe === 'techwear')) score -= 100;
+    if (isLoafer && (vibe === 'gym' || vibe === 'athletic')) score -= 80;
   }
 
-  // Color harmony (basic)
-  const neutralTerms = ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown'];
+  // Color harmony
+  const neutralTerms = ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown', 'tan', 'stone'];
+  const saturatedTerms = ['neon', 'hot pink', 'electric blue', 'lime', 'magenta', 'orange'];
   if (hasSelected(neutralTerms) && hasProduct(neutralTerms)) score += 12;
-  
-  // Brand loyalty (good for gym)
-  if (vibe === 'gym' && hasSelected(['nike', 'adidas', 'lululemon', 'alo', 'new balance']) && hasProduct(['nike', 'adidas', 'lululemon', 'alo', 'new balance'])) {
+  // Penalize saturated-on-saturated unless intentionally bold vibe
+  if (vibe !== 'streetwear' && vibe !== 'edgy' && hasSelected(saturatedTerms) && hasProduct(saturatedTerms)) score -= 40;
+  // Old-money / clean / work / premium prefer neutrals strictly
+  if ((vibe === 'old-money' || vibe === 'clean' || vibe === 'work' || vibe === 'premium')
+    && hasProduct(saturatedTerms)) score -= 50;
+  // Techwear prefers dark/technical tones
+  if (vibe === 'techwear') {
+    if (hasProduct(['black', 'grey', 'gray', 'olive', 'silver', 'charcoal'])) score += 8;
+    if (hasProduct(['pastel', 'pink', 'cream', 'beige'])) score -= 35;
+  }
+
+  // Brand loyalty (good for gym/athletic)
+  if ((vibe === 'gym' || vibe === 'athletic') && hasSelected(['nike', 'adidas', 'lululemon', 'alo', 'new balance', 'on', 'hoka', 'asics'])
+    && hasProduct(['nike', 'adidas', 'lululemon', 'alo', 'new balance', 'on', 'hoka', 'asics'])) {
     score += 18;
   }
 
