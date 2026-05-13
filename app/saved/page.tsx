@@ -2,8 +2,8 @@
 import { Bookmark, RotateCcw, Send, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { useFit } from '@/store/fit';
 import { type SavedFitRecord, useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
@@ -48,13 +48,18 @@ export default function SavedPage() {
     .filter(({ visualProducts }) => visualProducts.length > 0);
 
   return (
-    <PlaceholderScreen
-      eyebrow="Saved"
-      title="Fits"
-      accent="saved"
-      description="Saved looks now persist on this MacBook, even before cloud sync is fully wired."
-    >
-      {displayFits.length ? (
+    <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
+      <div className="flex-1 overflow-y-auto px-4 pb-[100px] pt-10">
+        <header className="mb-6">
+          <div className="text-[10px] font-bold uppercase tracking-[.2em] text-accent">Saved</div>
+          <h1 className="mt-1 font-serif text-[32px] font-semibold text-ink">
+            Your <em className="italic text-accent">fits</em>
+          </h1>
+          <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
+            Looks you saved from Builder, Feed, and Discover. Stored locally for now.
+          </p>
+        </header>
+        {displayFits.length ? (
         <div className="grid gap-4">
           {displayFits.map(({ fit, visualItems, visualProducts }) => (
             <section key={fit.id} className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] p-4 shadow-[0_18px_42px_rgba(0,0,0,.32)]">
@@ -159,7 +164,7 @@ export default function SavedPage() {
           </div>
           <h2 className="mt-4 font-serif text-[20px] font-semibold text-ink">No saved fits yet</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
-            Save a look from the builder and it will show up here instantly on this MacBook, even before cloud storage is turned on.
+            Save a look from Builder, Feed, or Discover and it will show up here instantly.
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <button
@@ -179,6 +184,8 @@ export default function SavedPage() {
           </div>
         </section>
       )}
+      </div>
+      <BottomNav />
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
         title={checkoutTitle}
@@ -323,6 +330,6 @@ export default function SavedPage() {
           </article>
         </div>
       ) : null}
-    </PlaceholderScreen>
+    </main>
   );
 }
