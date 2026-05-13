@@ -23,28 +23,60 @@ const ROUTE_FILES = [
   'app/checkout/page.tsx',
 ];
 const REQUIRED_SCRIPTS = ['catalog:health', 'catalog:test-generator', 'import:catalog', 'qa'];
+function isQaSelf(file: string): boolean {
+  const normalized = file.replace(/\\/g, '/');
+  return normalized.endsWith('scripts/qa-check.ts');
+}
+function isQualityLib(file: string): boolean {
+  const normalized = file.replace(/\\/g, '/');
+  return normalized.endsWith('lib/product-image-quality.ts');
+}
+function isQuarantinedMockLib(file: string): boolean {
+  const normalized = file.replace(/\\/g, '/');
+  // lib/mock-products.ts and lib/brand-catalog.ts are isolated dev/test fixtures
+  // verified not imported by app/components/store (separate QA check enforces this).
+  return normalized.endsWith('lib/mock-products.ts') || normalized.endsWith('lib/brand-catalog.ts');
+}
 const DANGEROUS_PATTERNS: Array<{ label: string; pattern: RegExp; allow?: (file: string, line: string) => boolean }> = [
   { label: 'broken template string', pattern: /return\s+\$\$\{/ },
   { label: 'invalid currentItems spread', pattern: /\.\.\.currentItems:\s*lockedItems/ },
   {
     label: 'fake product label',
     pattern: /\bProduct A\b|\bSample Item\b|\bPlaceholder Top\b|\bPlaceholder Shoes\b|placeholder product/i,
-    allow: (file) =>
-      file.endsWith('scripts\\qa-check.ts')
-      || file.endsWith('scripts/qa-check.ts')
-      || file.endsWith('lib\\product-image-quality.ts')
-      || file.endsWith('lib/product-image-quality.ts'),
+    allow: (file) => isQaSelf(file) || isQualityLib(file),
   },
   {
     label: 'placeholder SearchAPI key in runtime',
     pattern: /your_key_here/,
-    allow: (file) => file.endsWith('.env.example') || file.endsWith('scripts\\qa-check.ts') || file.endsWith('scripts/qa-check.ts'),
+    allow: (file) => file.endsWith('.env.example') || isQaSelf(file),
   },
   { label: 'black letter product fallback', pattern: /bg-black\s+text-white/ },
   {
     label: 'fallback initial variable',
     pattern: /fallbackInitial/,
-    allow: (file) => file.endsWith('scripts\\qa-check.ts') || file.endsWith('scripts/qa-check.ts'),
+    allow: (file) => isQaSelf(file),
+  },
+  {
+    label: 'data:image/svg used as runtime image URL',
+    pattern: /data:image\/svg/,
+    // Allow inside quarantined mock libs (verified not imported by runtime).
+    allow: (file) => isQaSelf(file) || isQuarantinedMockLib(file),
+  },
+  {
+    label: 'product fallback initial via charAt(0)',
+    pattern: /\.charAt\(0\)/,
+    // Only flag if the same line references brand/name/fallback/initial (product-letter-fallback context).
+    allow: (file, line) => isQaSelf(file) || !/(brand|name|fallback|initial|letter|abbrev)/i.test(line),
+  },
+  {
+    label: 'naked toLocaleString without locale (hydration risk)',
+    pattern: /\.toLocaleString\(\s*\)/,
+    allow: (file) => isQaSelf(file),
+  },
+  {
+    label: 'mock-products imported into runtime',
+    pattern: /from\s+['"](\.\.\/)*lib\/mock-products['"]/,
+    allow: (file) => isQaSelf(file),
   },
 ];
 
@@ -118,12 +150,35 @@ function checkPackageScripts(): Check {
   };
 }
 
+function checkMockIsolation(): Check {
+  // Quarantined fixtures must NOT be imported by app/components/store runtime.
+  const QUARANTINED_LIBS = ['lib/mock-products', 'lib/brand-catalog', 'lib/expansion-catalog'];
+  const RUNTIME_SCOPES = ['app', 'components', 'store'];
+  const hits: string[] = [];
+  for (const file of RUNTIME_SCOPES.flatMap(walk)) {
+    const relative = path.relative(ROOT, file).replace(/\\/g, '/');
+    const content = readFileSync(file, 'utf8');
+    for (const lib of QUARANTINED_LIBS) {
+      const importRegex = new RegExp(`from\\s+['"](\\.\\.?/)+${lib.replace('/', '\\/')}['"]`);
+      if (importRegex.test(content)) {
+        hits.push(`${relative} imports quarantined ${lib}`);
+      }
+    }
+  }
+  return {
+    name: 'mock/brand catalog isolation',
+    passed: hits.length === 0,
+    detail: hits.length ? hits.join('\n') : 'mock-products, brand-catalog, expansion-catalog not imported by app/components/store',
+  };
+}
+
 function main() {
   const checks: Check[] = [
     run(NPM, ['run', 'typecheck']),
     run(NPM, ['run', 'catalog:health']),
     run(NPM, ['run', 'catalog:test-generator']),
     scanDangerousStrings(),
+    checkMockIsolation(),
     checkRouteFiles(),
     checkPackageScripts(),
   ];
