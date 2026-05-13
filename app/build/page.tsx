@@ -246,7 +246,7 @@ function BuilderPageContent({
   quickFrame: string | null;
   quickSlots: string | null;
 }) {
-  const { items, totalCents, count, clear, replaceItems } = useFit();
+  const { items, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
@@ -283,10 +283,10 @@ function BuilderPageContent({
   const [wardrobeMode, setWardrobeMode] = useState<WardrobeGenerationMode>('mixed');
   const boardControls = useAnimation();
   const router = useRouter();
-  const total = totalCents();
   const n = count();
   const renderItems = hasMounted ? items : {};
   const renderN = hasMounted ? n : 0;
+  const total = Object.values(renderItems).reduce((sum, product) => sum + (product?.priceCents || 0), 0);
   const totalDisplay = `$${(total / 100).toFixed(2)}`;
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
   const generatorFrame: GeneratorFrame =
