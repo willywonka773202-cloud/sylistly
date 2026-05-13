@@ -14,7 +14,7 @@ import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { useWardrobe } from '@/store/wardrobe';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
-import { hydrateItemsFromCatalog } from '@/lib/catalog';
+import { hydrateItemsFromCatalog, ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { calculateBudgetStatus, calculateOutfitScore } from '@/lib/catalog-health';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { filterRenderableProducts, isRenderableProduct } from '@/lib/product-image-quality';
@@ -117,17 +117,19 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
-const BUILD_SECTION_TABS = ['build', 'settings', 'refine', 'details'] as const;
+const BUILD_SECTION_TABS = ['build', 'settings', 'closet', 'refine', 'details'] as const;
 type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
 
 const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
   build: 'Build',
   settings: 'Controls',
+  closet: 'Closet',
   refine: 'Refine',
   details: 'Details',
 };
 
-const BUILD_OVERLAY_TABS = ['settings', 'refine', 'details'] as const;
+const BUILD_OVERLAY_TABS = ['settings', 'closet', 'refine', 'details'] as const;
+type BuildOverlayTab = typeof BUILD_OVERLAY_TABS[number];
 type WardrobeGenerationMode = 'catalog' | 'wardrobe' | 'mixed';
 
 const WARDROBE_GENERATION_MODES: Array<{ value: WardrobeGenerationMode; label: string; helper: string }> = [
@@ -258,7 +260,7 @@ function BuilderPageContent({
   const [swipeHintRunCount, setSwipeHintRunCount] = useState(0);
   const [saveBurst, setSaveBurst] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
+  const [activeBuildOverlay, setActiveBuildOverlay] = useState<BuildOverlayTab | null>(null);
   const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
   const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
   const [postCaption, setPostCaption] = useState('');
@@ -1000,148 +1002,26 @@ function BuilderPageContent({
                   activeEditSlot={activeEditSlot}
                 />
               </motion.div>
-              <div className="absolute inset-x-3 bottom-3 z-30 grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveBuildOverlay('settings')}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md"
-                >
-                  <SlidersHorizontal size={13} />
-                  Controls
-                </button>
-                <button
-                  type="button"
-                  onClick={seedFromWardrobe}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.26)] backdrop-blur-md"
-                >
-                  <Shirt size={13} />
-                  Closet
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
-                  disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
-                >
-                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                  Generate
-                </button>
-              </div>
+
             </div>
-            <div className="border-t border-hairline px-1 pt-4 text-center">
-              <div className="mb-3 grid grid-cols-3 gap-2">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Look total</div>
-                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">{totalDisplay}</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2.5">
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Allowance</div>
-                  <div className="mt-1 font-serif text-[17px] font-semibold text-ink">
-                    {allowanceCents === null ? 'Open' : formatMoney(allowanceCents)}
-                  </div>
-                </div>
-                <div className={`rounded-2xl border px-2 py-2.5 ${
-                  allowanceDeltaCents === null || allowanceDeltaCents >= 0
-                    ? 'border-accent/25 bg-accent/10'
-                    : 'border-[#ffb38a]/30 bg-[#ff8a4a]/10'
-                }`}>
-                  <div className="text-[8px] uppercase tracking-[.14em] text-muted">Budget</div>
-                  <div className={`mt-1 font-serif text-[17px] font-semibold ${
-                    allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-[#ffb38a]'
-                  }`}>
-                    {allowanceDeltaCents === null
-                      ? 'Flexible'
-                      : allowanceDeltaCents >= 0
-                      ? `${formatMoney(allowanceDeltaCents)} left`
-                      : `${formatMoney(Math.abs(allowanceDeltaCents))} over`}
-                  </div>
-                </div>
-              </div>
-              <div className="text-[12px] font-medium leading-relaxed text-muted-2">
-                <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
-              </div>
-              <div className="mt-1 text-[11px] text-muted">
-                Pink-lit slots are editable pieces. Open Controls for vibe, budget, frame, and source settings.
-              </div>
-              <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
-                Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
-                {lockedSlots.length ? ` / Locked ${lockedSlots.length}` : ''}
-              </div>
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2">
-                <Shirt size={11} className="text-accent" />
-                Source: {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
-              </div>
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                <BuilderSignal label="Score" value={`${outfitScore.total}`} helper="catalog" tone="accent" />
-                <BuilderSignal label="Complete" value={`${outfitScore.completeness}%`} helper="slots" />
-                <BuilderSignal label="Visual" value={`${outfitScore.renderability}%`} helper="safe" />
-                <BuilderSignal label="Closet" value={`${outfitScore.wardrobeMatch}%`} helper="owned" />
-              </div>
-              <div className={`mt-2 rounded-2xl border px-3 py-2 text-left ${builderBudgetStatus.overBudget ? 'border-[#ffb38a]/30 bg-[#ff8a4a]/10' : 'border-accent/25 bg-accent/10'}`}>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[9px] font-black uppercase tracking-[.16em] text-muted">Budget assistant</span>
-                  <span className={`text-[10px] font-black uppercase tracking-[.14em] ${builderBudgetStatus.overBudget ? 'text-[#ffb38a]' : 'text-accent'}`}>
-                    {builderBudgetStatus.label}
-                  </span>
-                </div>
-                <div className="mt-1 text-[10px] leading-relaxed text-muted-2">
-                  Uses catalog prices and current budget mode; expensive replacements can be handled from Refine.
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('left')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-white/25 hover:text-ink disabled:opacity-50"
-                >
-                  Pass
+            <div className="px-1 pt-4 pb-2 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <button type="button" onClick={() => setActiveBuildOverlay('settings')} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:text-ink">
+                  {activeVibe.label}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('right')}
-                  disabled={generatorLoading || renderN === 0}
-                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
-                >
-                  Save
+                <button type="button" onClick={() => setActiveBuildOverlay('settings')} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:text-ink">
+                  <Shirt size={11} className={wardrobeMode === 'wardrobe' ? 'text-accent' : ''} />
+                  {WARDROBE_GENERATION_MODES.find((option) => option.value === wardrobeMode)?.label || 'Catalog'}
                 </button>
+              </div>
+              <div className="mt-3 flex justify-center gap-4 text-[10px] font-semibold text-muted">
+                <span>Look Total: <span className={allowanceDeltaCents === null || allowanceDeltaCents >= 0 ? 'text-accent' : 'text-warn'}>{totalDisplay}</span></span>
+                <span>Score: <span className="text-accent">{outfitScore.total}</span></span>
               </div>
             </div>
           </section>
 
-          <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('settings')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Controls
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Refine
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Details
-              </button>
-              <button
-                type="button"
-                onClick={shopAll}
-                disabled={renderN === 0}
-                className="rounded-full bg-accent px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
-              >
-                Shop
-              </button>
-            </div>
-          </section>
+
 
           {statusMessage ? (
             <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[11px] leading-relaxed text-muted-2">
@@ -1182,6 +1062,17 @@ function BuilderPageContent({
               onGenerate={() => void generateLook('full', { sourceLabel: 'Control panel.' })}
               generatorLoading={generatorLoading}
             />
+                    ) : activeBuildOverlay === 'closet' ? (
+            <div className="flex flex-col gap-3">
+              <BuildClosetPanel
+                wardrobeProducts={wardrobeProducts}
+                wardrobeProductsByCategory={wardrobeProductsByCategory}
+                onSeedFromWardrobe={seedFromWardrobe}
+                onGenerateFromWardrobe={() => { setWardrobeMode('wardrobe'); void generateLook('full', { sourceLabel: 'Closet generator' }); }}
+                onGenerateMixed={() => { setWardrobeMode('mixed'); void generateLook('full', { sourceLabel: 'Closet + Suggested generator' }); }}
+                onOpenSearch={setSearchFor}
+              />
+            </div>
           ) : activeBuildOverlay === 'refine' ? (
             <div className="flex flex-col gap-3">
               <FocusedRefinePanel
@@ -1301,6 +1192,53 @@ function BuilderPageContent({
         </BuildOverlay>
       ) : null}
 
+            <div className="sticky bottom-0 z-40 bg-bg/95 backdrop-blur-xl border-t border-hairline px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveBuildOverlay('settings')}
+            className="flex flex-col items-center gap-1 rounded-lg px-2 py-1 text-muted transition hover:text-ink"
+          >
+            <SlidersHorizontal size={18} />
+            <span className="text-[9px] font-semibold uppercase tracking-wider">Controls</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveBuildOverlay('closet')}
+            className="flex flex-col items-center gap-1 rounded-lg px-2 py-1 text-muted transition hover:text-ink"
+          >
+            <Shirt size={18} />
+            <span className="text-[9px] font-semibold uppercase tracking-wider">Closet</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void generateLook('full', { sourceLabel: 'Bottom Action Bar' })}
+            disabled={generatorLoading || selectedGenerationSlots.length === 0}
+            className="group relative flex flex-col items-center gap-1 rounded-lg px-2 py-1 text-accent transition hover:text-accent-hot disabled:opacity-50"
+          >
+            <div className="absolute inset-0 rounded-full bg-accent/10 opacity-0 transition group-hover:opacity-100 blur-md" />
+            {generatorLoading ? <LoaderCircle size={18} className="animate-spin relative z-10" /> : <Sparkles size={18} className="relative z-10" />}
+            <span className="relative z-10 text-[9px] font-semibold uppercase tracking-wider">Generate</span>
+          </button>
+          <button
+            onClick={saveFit}
+            disabled={renderN === 0}
+            className="flex flex-col items-center gap-1 rounded-lg px-2 py-1 text-muted transition hover:text-ink disabled:opacity-50"
+          >
+            <Bookmark size={18} />
+            <span className="text-[9px] font-semibold uppercase tracking-wider">Save</span>
+          </button>
+          <button
+            type="button"
+            onClick={shopAll}
+            disabled={renderN === 0}
+            className="flex flex-col items-center gap-1 rounded-lg px-2 py-1 text-muted transition hover:text-ink disabled:opacity-50"
+          >
+            <ExternalLink size={18} />
+            <span className="text-[9px] font-semibold uppercase tracking-wider">Shop</span>
+          </button>
+        </div>
+      </div>
       <BottomNav />
 
       <SearchSheet
@@ -1319,6 +1257,105 @@ function BuilderPageContent({
         onClose={() => setCheckoutProducts(null)}
       />
     </main>
+  );
+}
+
+
+function BuildClosetPanel({
+  wardrobeProducts,
+  wardrobeProductsByCategory,
+  onSeedFromWardrobe,
+  onGenerateFromWardrobe,
+  onGenerateMixed,
+  onOpenSearch,
+}: {
+  wardrobeProducts: Product[];
+  wardrobeProductsByCategory: Map<Category, Product[]>;
+  onSeedFromWardrobe: () => void;
+  onGenerateFromWardrobe: () => void;
+  onGenerateMixed: () => void;
+  onOpenSearch: (category: Category) => void;
+}) {
+  const hasItems = wardrobeProducts.length > 0;
+
+  // Real catalog-backed suggested basics
+  const suggestedBasics = ALL_CATALOG_PRODUCTS.filter((p) => p.metadata?.wardrobeBasic || p.vibes?.includes('clean')).slice(0, 8);
+  if (suggestedBasics.length < 8) {
+      const more = ALL_CATALOG_PRODUCTS.filter(p => !suggestedBasics.some(b => b.id === p.id)).slice(0, 8 - suggestedBasics.length);
+      suggestedBasics.push(...more);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {hasItems ? (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4 text-center">
+            <div className="font-serif text-[18px] font-semibold text-ink">{wardrobeProducts.length} Pieces in Closet</div>
+            <div className="mt-1 text-[11px] text-muted">Use your own items to build new looks.</div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onSeedFromWardrobe}
+                className="flex-1 rounded-full border border-accent/35 bg-accent/18 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white transition hover:bg-accent hover:shadow-pink-glow"
+              >
+                Seed from Closet
+              </button>
+              <button
+                type="button"
+                onClick={onGenerateFromWardrobe}
+                className="flex-1 rounded-full border border-white/18 bg-white/10 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white transition hover:bg-white/20"
+              >
+                Generate with Closet
+              </button>
+            </div>
+            <button
+                type="button"
+                onClick={onGenerateMixed}
+                className="w-full rounded-full border border-white/18 bg-white/10 px-3 py-3 text-[10px] font-black uppercase tracking-[.12em] text-white transition hover:bg-white/20"
+              >
+                Generate Closet + Suggested
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <div className="mb-2 px-1 text-[10px] font-black uppercase tracking-[.16em] text-muted-2">Owned</div>
+              <div className="grid grid-cols-4 gap-2">
+                {wardrobeProducts.slice(0, 8).map((product: Product) => (
+                  <div key={product.id} className="aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                    <ProductImage product={product} category="top" size="sm" cutout />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-6 text-center">
+            <Shirt size={32} className="mx-auto mb-3 text-muted opacity-50" />
+            <div className="font-serif text-[18px] font-semibold text-ink">Your closet is empty</div>
+            <div className="mt-2 text-[11px] leading-relaxed text-muted">
+              Add items to your closet to start generating outfits with your own pieces.
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-2 px-1 text-[10px] font-black uppercase tracking-[.16em] text-muted-2">Suggested Basics</div>
+            <div className="grid grid-cols-4 gap-2">
+              {suggestedBasics.map((product: Product) => (
+                <div key={product.id} onClick={() => onOpenSearch(product.category)} className="cursor-pointer aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                  <ProductImage product={product} category="top" size="sm" cutout />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1798,9 +1835,9 @@ function BuildOverlay({
   onChangeTab,
   onClose,
 }: {
-  activeTab: Exclude<BuildSectionTab, 'build'>;
+  activeTab: BuildOverlayTab;
   children: ReactNode;
-  onChangeTab: (tab: Exclude<BuildSectionTab, 'build'>) => void;
+  onChangeTab: (tab: BuildOverlayTab) => void;
   onClose: () => void;
 }) {
   return (

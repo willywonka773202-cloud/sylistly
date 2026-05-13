@@ -313,7 +313,7 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]">
+    <div className="relative aspect-[4/5] h-auto w-full overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] ">
       <div
         className="grid h-full gap-2.5"
         style={{
@@ -337,7 +337,7 @@ function FrontCanvas({
 
 function FlatLayCanvas({ items }: { items: Partial<Record<Category, Product>> }) {
   return (
-    <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#ffffff_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]">
+    <div className="relative aspect-[4/5] h-auto w-full overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#ffffff_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]">
       <div className="grid h-full grid-cols-2 gap-2.5">
         <div className="rounded-[20px] border border-[#ece2d9] bg-white/80 p-3">
           <div className="text-[10px] uppercase tracking-[.18em] text-[#9e8e84]">Mirror mode</div>
