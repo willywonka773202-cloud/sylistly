@@ -172,11 +172,12 @@ function checkMockIsolation(): Check {
   };
 }
 
-function main() {
+async function main() {
   const checks: Check[] = [
     run(NPM, ['run', 'typecheck']),
     run(NPM, ['run', 'catalog:health']),
     run(NPM, ['run', 'catalog:test-generator']),
+    run('npx', ['jiti', 'scripts/check-legacy-vibe-safety.ts']),
     scanDangerousStrings(),
     checkMockIsolation(),
     checkRouteFiles(),
@@ -194,4 +195,7 @@ function main() {
   if (failed.length) process.exitCode = 1;
 }
 
-main();
+main().catch((error) => {
+  console.error('QA runner failed:', error);
+  process.exitCode = 1;
+});
