@@ -104,8 +104,14 @@ function comboSignature(items: Partial<Record<Category, Product>>): string {
     .join('|');
 }
 
-// 1. Collection-derived posts.
-const launchPosts: FeedPostShape[] = LAUNCH_COLLECTIONS.map((collection) => ({
+// 1. Collection-derived posts — keep only the ones that pass the live-app
+//    SEED_POSTS filter (>= 5 sanitized products). 19 of 20 LAUNCH_COLLECTIONS
+//    at this baseline reference legacy seed products whose images fail
+//    isRenderableProduct, so only 1 truly survives — and even that one was
+//    dropped when the threshold moved from >= 4 to >= 5. Reflecting the
+//    live filter prevents the audit from FAIL-blaming the app for posts
+//    that are never actually rendered.
+const launchPostsAll: FeedPostShape[] = LAUNCH_COLLECTIONS.map((collection) => ({
   id: `feed-launch-${collection.id}`,
   items: sanitizeItems(
     Object.fromEntries(
@@ -113,6 +119,9 @@ const launchPosts: FeedPostShape[] = LAUNCH_COLLECTIONS.map((collection) => ({
     ) as Partial<Record<Category, Product>>,
   ),
 }));
+const launchPosts: FeedPostShape[] = launchPostsAll.filter(
+  (post) => Object.values(post.items).filter(Boolean).length >= 5,
+);
 
 // 2. Generated-plan posts (one per plan + 26 additional streaming posts
 //    with cursor offsets, simulating the first ~50 feed cards a user
@@ -134,7 +143,10 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
   }).products;
   const items = sanitizeItems(generated);
   const productCount = Object.values(items).filter(Boolean).length;
-  if (productCount >= 4) {
+  // Live-app filter: SEED_POSTS / normalizeFeedPost / makeGeneratedPost all
+  // require >= 5 sanitized products so OutfitBoard's 8-slot collage never
+  // renders with too many empty positions. Mirror that here.
+  if (productCount >= 5) {
     const id = cursor < PLAN.length ? `feed-plan-${plan.id}` : `feed-plan-${plan.id}-${cursor}`;
     generatedPosts.push({ id, items });
     recentIds.unshift(

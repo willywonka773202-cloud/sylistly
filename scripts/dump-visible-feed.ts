@@ -1,0 +1,213 @@
+// Prints the first 10 feed posts a fresh user (no persisted state) would
+// see when opening /feed. The store can't be imported here because it
+// uses `@/…` aliases that jiti doesn't resolve, so this script mirrors
+// store/social-feed.ts's SEED_POSTS construction — collection-derived
+// posts first (`feed-launch-${id}`), in LAUNCH_COLLECTIONS order — and
+// reports per-post:
+//   - source (launch / generated)
+//   - post id
+//   - vibe / frame
+//   - product slots and which categories are filled
+//   - hero candidate (first product that passes isFeedHeroCandidate)
+//   - weak signals (visually weak / intimates / fabric / category-mismatch)
+//   - missing required slots
+//   - combo signature (sorted product ids)
+//
+// Run: npx jiti scripts/dump-visible-feed.ts
+
+import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '../lib/catalog';
+import type { GeneratorBudget, GeneratorFrame, VibeId } from '../lib/vibes';
+import {
+  filterFeedRenderableProducts,
+  hasFeedCategoryMismatch,
+  isFeedHeroCandidate,
+  isIntimatesOrSleepwear,
+  isVisuallyWeakFeedProduct,
+  productImageQualityScore,
+  sortFeedRenderableProducts,
+} from '../lib/product-image-quality';
+import type { Category, Product } from '../lib/types';
+
+function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
+  const products = sortFeedRenderableProducts(
+    Object.values(items).filter((p): p is Product => Boolean(p)),
+  );
+  return Object.fromEntries(products.map((p) => [p.category, p])) as Partial<Record<Category, Product>>;
+}
+
+function comboSignature(items: Partial<Record<Category, Product>>): string {
+  return Object.values(items)
+    .filter((p): p is Product => Boolean(p))
+    .map((p) => p.id)
+    .sort()
+    .join('|');
+}
+
+function chooseBestFeedHero(items: Partial<Record<Category, Product>>): Product | null {
+  // Hero priority: outer > top > bottom; reject anything that fails
+  // isFeedHeroCandidate (intimates / visually weak / non-anchor categories).
+  const priorityOrder: Category[] = ['outer', 'top', 'bottom'];
+  for (const category of priorityOrder) {
+    const product = items[category];
+    if (product && isFeedHeroCandidate(product)) return product;
+  }
+  // Fall back to any feed-hero-candidate-eligible product.
+  for (const product of Object.values(items)) {
+    if (product && isFeedHeroCandidate(product)) return product;
+  }
+  return null;
+}
+
+function describeWeak(product: Product): string {
+  const reasons: string[] = [];
+  if (isIntimatesOrSleepwear(product)) reasons.push('intimates');
+  if (isVisuallyWeakFeedProduct(product)) reasons.push('visually-weak');
+  if (hasFeedCategoryMismatch(product)) reasons.push('category-mismatch');
+  if (productImageQualityScore(product) < -5) reasons.push(`low-score(${productImageQualityScore(product)})`);
+  return reasons.join(',') || 'ok';
+}
+
+interface DumpPost {
+  source: 'launch' | 'generated';
+  id: string;
+  vibe: string;
+  frame: string;
+  title: string;
+  items: Partial<Record<Category, Product>>;
+}
+
+// Mirror the COLLECTION_POSTS construction in store/social-feed.ts:120-140
+const launchPosts: DumpPost[] = LAUNCH_COLLECTIONS.map((collection) => {
+  const products = sortFeedRenderableProducts(getCollectionProducts(collection));
+  const items = Object.fromEntries(products.map((p) => [p.category, p])) as Partial<Record<Category, Product>>;
+  return {
+    source: 'launch' as const,
+    id: `feed-launch-${collection.id}`,
+    vibe: collection.vibe,
+    frame: collection.frame,
+    title: collection.label,
+    items: sanitizeItems(items),
+  };
+});
+
+// Mirror GENERATED_POST_PLAN's plans + itemsFromGeneratedLook
+const PLAN: Array<{ id: string; title: string; vibe: VibeId; frame: GeneratorFrame; budget: GeneratorBudget; seed: number }> = [
+  { id: 'coffee-clean-fem',      title: 'Coffee run clean fit', vibe: 'clean',    frame: 'fem',          budget: 'under250', seed: 101 },
+  { id: 'airport-neutral',       title: 'Airport uniform',      vibe: 'clean',    frame: 'androgynous',  budget: 'under250', seed: 102 },
+  { id: 'street-femme-downtown', title: 'Downtown street edit', vibe: 'street',   frame: 'fem',          budget: 'under500', seed: 201 },
+  { id: 'street-masc-campus',    title: 'Campus layers',        vibe: 'street',   frame: 'masc',         budget: 'under250', seed: 202 },
+  { id: 'night-masc-polish',     title: 'Night out masculine',  vibe: 'night',    frame: 'masc',         budget: 'under500', seed: 301 },
+  { id: 'night-femme-gold',      title: 'Gold hour black fit',  vibe: 'night',    frame: 'fem',          budget: 'under500', seed: 302 },
+  { id: 'date-femme-soft',       title: 'Soft date night',      vibe: 'date',     frame: 'fem',          budget: 'under250', seed: 401 },
+  { id: 'date-masc-clean',       title: 'Clean dinner fit',     vibe: 'date',     frame: 'masc',         budget: 'under500', seed: 402 },
+  { id: 'gym-femme-studio',      title: 'Studio to street',     vibe: 'gym',      frame: 'fem',          budget: 'under250', seed: 501 },
+  { id: 'gym-masc-training',     title: 'Training day',         vibe: 'gym',      frame: 'masc',         budget: 'under250', seed: 502 },
+  { id: 'office-fem-cream',      title: 'Cream office uniform', vibe: 'office',   frame: 'fem',          budget: 'under500', seed: 601 },
+  { id: 'office-masc-smart',     title: 'Smart office rotation',vibe: 'office',   frame: 'masc',         budget: 'under500', seed: 602 },
+  { id: 'vacation-femme-linen',  title: 'Beach club neutral',   vibe: 'vacation', frame: 'fem',          budget: 'under250', seed: 701 },
+  { id: 'vacation-masc-resort',  title: 'Resort morning',       vibe: 'vacation', frame: 'masc',         budget: 'under500', seed: 702 },
+  { id: 'cozy-femme-weekend',    title: 'Soft weekend stack',   vibe: 'cozy',     frame: 'fem',          budget: 'under250', seed: 801 },
+  { id: 'cozy-masc-winter',      title: 'Winter off-duty',      vibe: 'cozy',     frame: 'masc',         budget: 'under500', seed: 802 },
+  { id: 'preppy-femme-city',     title: 'Preppy city look',     vibe: 'preppy',   frame: 'fem',          budget: 'under500', seed: 901 },
+  { id: 'preppy-masc-weekend',   title: 'Clubhouse weekend',    vibe: 'preppy',   frame: 'masc',         budget: 'under500', seed: 902 },
+  { id: 'edgy-femme-downtown',   title: 'Edgy downtown',        vibe: 'edgy',     frame: 'fem',          budget: 'under500', seed: 1001 },
+  { id: 'edgy-masc-tech',        title: 'Techwear utility',     vibe: 'edgy',     frame: 'masc',         budget: 'under500', seed: 1002 },
+  { id: 'clean-masc-casual',     title: 'Clean casual base',    vibe: 'clean',    frame: 'masc',         budget: 'under250', seed: 1101 },
+  { id: 'street-any-black',      title: 'Black street uniform', vibe: 'street',   frame: 'androgynous',  budget: 'under500', seed: 1201 },
+  { id: 'office-any-soft',       title: 'Soft workday edit',    vibe: 'office',   frame: 'androgynous',  budget: 'under500', seed: 1301 },
+  { id: 'night-any-luxe',        title: 'Luxe monochrome',      vibe: 'night',    frame: 'androgynous',  budget: 'under500', seed: 1401 },
+];
+
+const generatedPosts: DumpPost[] = PLAN.map((plan) => {
+  const generated = buildCatalogLook({
+    vibe: plan.vibe,
+    frame: plan.frame,
+    budget: plan.budget,
+    mode: 'full',
+    seed: plan.seed,
+  }).products;
+  return {
+    source: 'generated' as const,
+    id: `feed-plan-${plan.id}`,
+    vibe: plan.vibe,
+    frame: plan.frame,
+    title: plan.title,
+    items: sanitizeItems(generated),
+  };
+});
+
+// Mirror store/social-feed.ts SEED_POSTS = dedupeFeedPostsById([...COLLECTION_POSTS, ...GENERATED_POSTS])
+//   .filter(post => fitTotals(post.items).itemCount >= 5)
+// The threshold was bumped 4 → 5 because OutfitBoard renders 8 slot
+// positions and sparse posts (< 5 products) leave too many empty slots.
+const seenIds = new Set<string>();
+const seedPosts: DumpPost[] = [...launchPosts, ...generatedPosts]
+  .filter((post) => {
+    if (seenIds.has(post.id)) return false;
+    seenIds.add(post.id);
+    return Object.values(post.items).filter(Boolean).length >= 5;
+  });
+
+const firstTen = seedPosts.slice(0, 10);
+
+const launchKept = launchPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 4).length;
+const launchDropped = launchPosts.length - launchKept;
+const generatedKept = generatedPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 4).length;
+const generatedDropped = generatedPosts.length - generatedKept;
+
+console.log(`First 10 visible /feed posts (fresh load — persisted state cleared at v4 bump)`);
+console.log(`Source breakdown:`);
+console.log(`  LAUNCH_COLLECTIONS  total=${launchPosts.length}  kept=${launchKept}  dropped=${launchDropped}  (filter: itemCount >= 4)`);
+console.log(`  GENERATED_POST_PLAN total=${generatedPosts.length}  kept=${generatedKept}  dropped=${generatedDropped}`);
+console.log(`  SEED_POSTS final size = ${seedPosts.length}`);
+console.log('');
+
+let okPostCount = 0;
+let weakHeroPostCount = 0;
+let missingRequiredPostCount = 0;
+
+for (let i = 0; i < firstTen.length; i += 1) {
+  const post = firstTen[i];
+  const items = post.items;
+  const products = Object.values(items).filter((p): p is Product => Boolean(p));
+  const renderableForFeed = filterFeedRenderableProducts(products);
+
+  const hero = chooseBestFeedHero(items);
+  const missingRequired = [];
+  if (!items.top) missingRequired.push('top');
+  if (!items.bottom) missingRequired.push('bottom');
+  if (!items.shoes) missingRequired.push('shoes');
+
+  const weak = products.filter(
+    (p) => isIntimatesOrSleepwear(p) || isVisuallyWeakFeedProduct(p) || hasFeedCategoryMismatch(p),
+  );
+
+  if (missingRequired.length) missingRequiredPostCount += 1;
+  if (!hero) weakHeroPostCount += 1;
+  if (!missingRequired.length && hero) okPostCount += 1;
+
+  console.log(`#${i + 1}  ${post.id}  [${post.source}]  vibe=${post.vibe}  frame=${post.frame}`);
+  console.log(`     title: ${post.title}`);
+  console.log(`     pieces (${products.length}, ${renderableForFeed.length} feed-renderable):`);
+  for (const cat of ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'] as Category[]) {
+    const product = items[cat];
+    if (!product) continue;
+    const weakNote = describeWeak(product);
+    const heroMark = product === hero ? ' ★HERO' : '';
+    const heroEligible = isFeedHeroCandidate(product) ? '' : ' (not-hero-candidate)';
+    console.log(`       ${cat.padEnd(8)} ${product.brand} ${product.name.slice(0, 60)}${heroMark}${heroEligible}  [${weakNote}]`);
+  }
+  console.log(`     hero: ${hero ? `${hero.brand} ${hero.name.slice(0, 50)} (${hero.category})` : '— NONE — visually weak post'}`);
+  if (missingRequired.length) console.log(`     missing required: ${missingRequired.join(', ')}`);
+  if (weak.length) console.log(`     weak products: ${weak.length}`);
+  console.log(`     combo: ${comboSignature(items).slice(0, 120)}`);
+  console.log('');
+}
+
+console.log('=== SUMMARY ===');
+console.log(`firstTenPosts        : ${firstTen.length}`);
+console.log(`postsWithStrongHero  : ${firstTen.length - weakHeroPostCount}`);
+console.log(`postsWithWeakHero    : ${weakHeroPostCount}  ⚠️  (these are the "broken-looking" first-page cards)`);
+console.log(`postsWithAllRequired : ${firstTen.length - missingRequiredPostCount}`);
+console.log(`postsMissingRequired : ${missingRequiredPostCount}`);
+console.log(`postsAllGood         : ${okPostCount}`);
