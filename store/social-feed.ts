@@ -222,7 +222,13 @@ function dedupeFeedPostsById(posts: FeedPost[]): FeedPost[] {
 }
 
 const SEED_POSTS: FeedPost[] = dedupeFeedPostsById(
-  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4),
+  // Require ≥ 5 sanitized products per seed post. OutfitBoard renders an
+  // 8-slot absolute-positioned collage; posts with only 3-4 products leave
+  // 4-5 visibly empty slot positions and look broken on the first /feed
+  // page. The launch + generated catalog easily produces 5+ piece outfits;
+  // sparse seeds (mostly legacy LAUNCH_COLLECTIONS with dead product refs)
+  // get filtered out.
+  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 5),
 );
 
 function postSignature(items: Partial<Record<Category, Product>>): string {
@@ -249,7 +255,10 @@ function capFeedPosts(posts: FeedPost[], limit = FEED_POST_LIMIT): FeedPost[] {
 function normalizeFeedPost(post: FeedPost): FeedPost | null {
   const items = sanitizeItems(post.items);
   const totals = fitTotals(items);
-  if (totals.itemCount < 3) return null;
+  // Persisted state must also clear the 5-product board minimum (see
+  // SEED_POSTS construction). Posts that fall below after sanitize get
+  // dropped on rehydration rather than rendering with empty board slots.
+  if (totals.itemCount < 5) return null;
   return {
     ...post,
     items,
@@ -261,7 +270,11 @@ function normalizeFeedPost(post: FeedPost): FeedPost | null {
 function makeGeneratedPost(plan: (typeof GENERATED_POST_PLAN)[number], cursor: number, avoidProductIds: string[]): FeedPost | null {
   const items = itemsFromGeneratedLook(plan, cursor, avoidProductIds);
   const totals = fitTotals(items);
-  if (totals.itemCount < 3) return null;
+  // Streaming generated posts also clear the 5-product board minimum so
+  // infinite-scroll never injects a sparse "broken-looking" card. The
+  // generateFeedBatch retry budget (count * 8) is generous enough to
+  // tolerate the higher rejection rate.
+  if (totals.itemCount < 5) return null;
   return seedPost(
     items,
     cursor + COLLECTION_POSTS.length,
@@ -442,11 +455,13 @@ export const useSocialFeed = create<SocialFeedState>()(
     }),
     {
       name: 'sylistly.social-feed.v1',
-      // Bumped 3 → 4 because the seed-post id format changed
-      // (`feed-X` → `feed-launch-X` / `feed-plan-X`). Persisted state from
-      // older builds references the old ids; resetting on bump is the safe
-      // path so React never sees the prior duplicate keys after merge.
-      version: 4,
+      // Bumped 4 → 5 because the per-post product minimum changed (3 → 5):
+      // posts persisted at v4 with itemCount=3-4 would re-render with empty
+      // OutfitBoard slot positions. Resetting on bump ensures existing
+      // users see the new fully-populated feed on first load after deploy.
+      // (Earlier v3 → v4 bump was for the namespaced `feed-launch-X` /
+      // `feed-plan-X` id format.)
+      version: 5,
       migrate: (persistedState) => {
         const state = persistedState as Partial<SocialFeedState> | undefined;
         const posts = (state?.posts?.length ? state.posts : SEED_POSTS)

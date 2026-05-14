@@ -60,7 +60,12 @@ export default function FitFeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 3),
+    // Require ≥ 5 visible (post-image-failure-filter) products so every feed
+    // card fills enough of OutfitBoard's 8 fixed slot positions to avoid the
+    // "broken-looking" empty-board appearance. The store-level filters
+    // (SEED_POSTS, normalizeFeedPost, makeGeneratedPost) already enforce 5+
+    // pre-render; this final UI guard catches images that fail at runtime.
+    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 5),
     [posts, activeFilter, failedImageIds],
   );
 
