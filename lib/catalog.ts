@@ -7,8 +7,8 @@ import { hasDirectRetailerUrl } from './retailer-url';
 import { searchBrandCatalog } from './brand-catalog';
 import { searchPhotoCatalog } from './photo-catalog';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
-import { frameCompatibilityScore, hasFrameMismatch } from './frame-inference';
-import { hasUsableProductImage, isRenderableProduct } from './product-image-quality';
+import { frameCompatibilityScore, genderMismatchReasons, hasFrameMismatch } from './frame-inference';
+import { hasHighCategoryConfidence, hasUsableProductImage, isRenderableProduct } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
 import {
   VIBES,
@@ -37,6 +37,7 @@ type QualityRule = {
 };
 
 type SlotQualityRules = Partial<Record<Category | 'all', QualityRule>>;
+type DiversityStrength = 'low' | 'medium' | 'high';
 
 export interface CatalogCollection {
   id: string;
@@ -273,7 +274,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     },
     shoes: {
       prefer: ['running', 'training', 'trainer', 'sneaker', 'basketball', 'workout'],
-      hardAvoid: ['boot', 'clog', 'heel', 'loafer', 'sandal', 'ugg', 'samba', 'campus', 'gazelle', 'air force', 'af1', 'converse', 'chuck'],
+      hardAvoid: ['boot', 'clog', 'heel', 'loafer', 'sandal', 'ugg', 'birkenstock', 'boston', 'arizona'],
     },
     bag: {
       prefer: ['duffel', 'backpack', 'gym bag', 'training bag', 'tote'],
@@ -647,15 +648,103 @@ function stableHash(value: string): number {
   return hash;
 }
 
+export function productIdOf(product?: Product | null): string | null {
+  return product?.id || null;
+}
+
+export function collectOutfitProductIds(items: Partial<Record<Category, Product>>): string[] {
+  return CATEGORY_ORDER
+    .map((slot) => productIdOf(items[slot]))
+    .filter((id): id is string => Boolean(id));
+}
+
+export function outfitRequiredSignature(items: Partial<Record<Category, Product>>): string {
+  return ['top', 'bottom', 'shoes']
+    .map((slot) => `${slot}:${items[slot as Category]?.id || '-'}`)
+    .join('|');
+}
+
+export function outfitFullSignature(items: Partial<Record<Category, Product>>): string {
+  return CATEGORY_ORDER
+    .map((slot) => `${slot}:${items[slot]?.id || '-'}`)
+    .join('|');
+}
+
+export function outfitCategorySignature(items: Partial<Record<Category, Product>>): string {
+  return CATEGORY_ORDER
+    .filter((slot) => Boolean(items[slot]))
+    .join('+');
+}
+
+export function getPrimaryProductIds(items: Partial<Record<Category, Product>>): string[] {
+  return ['top', 'bottom', 'shoes', 'outer', 'bag']
+    .map((slot) => items[slot as Category]?.id)
+    .filter((id): id is string => Boolean(id));
+}
+
+export function getShoeId(items: Partial<Record<Category, Product>>): string | null {
+  return items.shoes?.id || null;
+}
+
+export function getBrandOrMerchant(product?: Product | null): string {
+  return normalize(product?.brand || product?.retailer || '').trim();
+}
+
+export function getOutfitBrandCounts(items: Partial<Record<Category, Product>>): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const product of Object.values(items)) {
+    const key = getBrandOrMerchant(product);
+    if (!key) continue;
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
+export function getOutfitCategorySet(items: Partial<Record<Category, Product>>): Set<Category> {
+  return new Set(CATEGORY_ORDER.filter((slot) => Boolean(items[slot])));
+}
+
+export function getOutfitColorTags(items: Partial<Record<Category, Product>>): string[] {
+  return Array.from(new Set(
+    Object.values(items)
+      .filter((product): product is Product => Boolean(product))
+      .flatMap((product) => product.colors || [])
+      .map(normalize)
+      .filter(Boolean),
+  ));
+}
+
+export function isDuplicateCombo(items: Partial<Record<Category, Product>>, seenCombos: Set<string>): boolean {
+  const required = outfitRequiredSignature(items);
+  const full = outfitFullSignature(items);
+  return seenCombos.has(required) || seenCombos.has(full);
+}
+
+function diversityPenaltyScale(strength: DiversityStrength): number {
+  if (strength === 'high') return 1.35;
+  if (strength === 'low') return 0.65;
+  return 1;
+}
+
+function selectionPoolLimit(key: string, itemCount: number): number {
+  const slot = CATEGORY_ORDER.find((category) => key.includes(`:${category}:`));
+  const base =
+    slot === 'top' || slot === 'bottom' ? 28 :
+    slot === 'shoes' ? 22 :
+    slot === 'outer' || slot === 'bag' ? 24 :
+    30;
+  return Math.min(Math.max(base, 12), itemCount);
+}
+
 function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | null {
   if (!items.length) return null;
-  const pool = items.slice(0, Math.min(48, items.length));
+  const pool = items.slice(0, selectionPoolLimit(key, items.length));
   const random = (stableHash(`${key}:${Math.abs(seed || 0)}`) % 1_000_000) / 1_000_000;
-  const totalWeight = pool.reduce((total, _item, index) => total + Math.pow(pool.length - index, 1.35), 0);
+  const totalWeight = pool.reduce((total, _item, index) => total + Math.pow(pool.length - index, 0.82), 0);
   let threshold = random * totalWeight;
 
   for (let index = 0; index < pool.length; index += 1) {
-    threshold -= Math.pow(pool.length - index, 1.35);
+    threshold -= Math.pow(pool.length - index, 0.82);
     if (threshold <= 0) return pool[index] || pool[0] || null;
   }
 
@@ -1072,6 +1161,29 @@ export function getFeaturedCatalogProducts(limit = 8, category?: Category): Prod
   return dedupeProducts([...featured, ...fallback]).slice(0, limit);
 }
 
+function countBrandsForProductIds(ids: string[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const id of ids) {
+    const product = PRODUCTS_BY_ID.get(id);
+    const key = getBrandOrMerchant(product);
+    if (!key) continue;
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
+function countFamiliesForProductIds(ids: string[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const id of ids) {
+    const product = PRODUCTS_BY_ID.get(id);
+    if (!product) continue;
+    const key = productFamilyKey(product);
+    if (!key) continue;
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
 function scoreFallbackProduct(
   product: Product,
   vibe: VibeId,
@@ -1378,6 +1490,23 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
   return score;
 }
 
+function productFamilyKey(product: Product): string {
+  const text = normalize(`${product.brand} ${product.name}`)
+    .replace(/\b(men|mens|women|womens|ladies|unisex|black|white|cream|brown|navy|grey|gray|green|blue|size|small|medium|large|xs|xl)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.split(' ').slice(0, 5).join(' ');
+}
+
+function hasExplicitOppositeFrameTerm(product: Product, frame: GeneratorFrame): boolean {
+  if (frame === 'androgynous') return false;
+  const text = ` ${searchHaystack(product)} `;
+  if (frame === 'fem') {
+    return text.includes(' mens ') || text.includes(' men s ') || text.includes(' men ');
+  }
+  return text.includes(' womens ') || text.includes(' women s ') || text.includes(' ladies ') || text.includes(' women ');
+}
+
 function getSlotCandidates({
   slot,
   vibe,
@@ -1389,6 +1518,10 @@ function getSlotCandidates({
   currentIds,
   currentProductId,
   usedBrands,
+  recentShoeIds,
+  recentBrandCounts,
+  recentProductFamilyCounts,
+  diversityStrength,
   selectedProducts,
   collectionCandidates,
 }: {
@@ -1402,6 +1535,10 @@ function getSlotCandidates({
   currentIds: Set<string>;
   currentProductId?: string;
   usedBrands: Set<string>;
+  recentShoeIds: Set<string>;
+  recentBrandCounts: Record<string, number>;
+  recentProductFamilyCounts: Record<string, number>;
+  diversityStrength: DiversityStrength;
   selectedProducts: Product[];
   collectionCandidates: Product[];
 }): Product[] {
@@ -1428,6 +1565,7 @@ function getSlotCandidates({
     .filter(isRenderableProduct)
     .filter(isAdultCatalogCandidate)
     .filter((product) => !hasCategoryMismatch(product))
+    .filter((product) => !REQUIRED_OUTFIT_SLOTS.includes(slot) || hasHighCategoryConfidence(product, slot))
     .filter((product) => isUnderBudget(product, budget, customMaxCents))
     .filter((product) => !usedIds.has(product.id));
   const vibeCoherentProducts = categoryProducts.filter((product) => !hasHardVibeContradiction(product, vibe, frame));
@@ -1439,39 +1577,67 @@ function getSlotCandidates({
     : vibePool;
   const frameMatched = frame === 'androgynous'
     ? qualityPool
-    : qualityPool.filter((product) => !hasFrameMismatch(product, frame));
-  const framePool = frame !== 'androgynous' && frameMatched.length >= 2 ? frameMatched : qualityPool;
+    : qualityPool.filter((product) =>
+        !hasFrameMismatch(product, frame)
+        && !hasExplicitOppositeFrameTerm(product, frame)
+        && !genderMismatchReasons(product, frame).length,
+      );
+  const framePool = frame === 'androgynous' ? qualityPool : frameMatched;
 
-  const ranked = framePool
-    .map((product) => ({
-      product,
-      score:
-        scoreFallbackProduct(product, vibe, frame)
-        + frameCompatibilityScore(product, frame)
-        + scoreRecipeProduct(product, vibe)
-        + scoreCatalogQuality(product, vibe, frame)
-        + scoreCategoryIntegrity(product)
-        + scoreVibeCategoryFit(product, vibe, frame)
-        + scoreOutfitCompatibility(product, vibe, selectedProducts)
-        + (hasRealPhoto(product) ? 28 : -24)
-        + (collectionIds.has(product.id) ? 14 : 0)
-        + (searchedIds.has(product.id) ? 24 : 0)
-        - (usedBrands.has(normalize(product.brand)) ? 28 : 0)
-        - (avoidIds.has(product.id) ? 130 : 0)
-        - (currentIds.has(product.id) ? 220 : 0)
-        - (product.id === currentProductId ? 320 : 0)
-        + ((product.productUrl || product.retailerUrl || product.googleShoppingUrl || product.fallbackUrl) ? 6 : -10),
-    }))
-    .filter((entry) => entry.score > 0)
+  const penaltyScale = diversityPenaltyScale(diversityStrength);
+  const scored = framePool
+    .map((product) => {
+      const brandKey = getBrandOrMerchant(product);
+      const familyKey = productFamilyKey(product);
+      const recentBrandCount = brandKey ? recentBrandCounts[brandKey] || 0 : 0;
+      const recentFamilyCount = familyKey ? recentProductFamilyCounts[familyKey] || 0 : 0;
+      const isRecentShoe = slot === 'shoes' && recentShoeIds.has(product.id);
+
+      return {
+        product,
+        score:
+          scoreFallbackProduct(product, vibe, frame)
+          + frameCompatibilityScore(product, frame)
+          + scoreRecipeProduct(product, vibe)
+          + scoreCatalogQuality(product, vibe, frame)
+          + scoreCategoryIntegrity(product)
+          + scoreVibeCategoryFit(product, vibe, frame)
+          + scoreOutfitCompatibility(product, vibe, selectedProducts)
+          + (hasRealPhoto(product) ? 28 : -24)
+          + (collectionIds.has(product.id) ? 10 : 0)
+          + (searchedIds.has(product.id) ? 18 : 0)
+          - (usedBrands.has(brandKey) ? 34 : 0)
+          - (avoidIds.has(product.id) ? Math.round(170 * penaltyScale) : 0)
+          - (currentIds.has(product.id) ? 240 : 0)
+          - (product.id === currentProductId ? 340 : 0)
+          - (isRecentShoe ? Math.round(220 * penaltyScale) : 0)
+          - Math.min(160, Math.round(recentBrandCount * 36 * penaltyScale))
+          - Math.min(120, Math.round(recentFamilyCount * 46 * penaltyScale))
+          + ((product.productUrl || product.retailerUrl || product.googleShoppingUrl || product.fallbackUrl) ? 6 : -10),
+      };
+    });
+  const rankedEntries = (scored.filter((entry) => entry.score > 0).length >= 3
+    ? scored.filter((entry) => entry.score > 0)
+    : scored.filter((entry) => entry.score > -120))
     .sort((left, right) => right.score - left.score)
     .map((entry) => entry.product)
     .filter((product, index, list) => list.findIndex((entry) => entry.id === product.id) === index);
 
-  const alternatives = ranked.filter((product) => product.id !== currentProductId && !currentIds.has(product.id));
-  const eligible = alternatives.length >= 3 ? alternatives : ranked;
-  const preferred = eligible.filter((product) => !avoidIds.has(product.id) && !currentIds.has(product.id));
+  const alternatives = rankedEntries.filter((product) => product.id !== currentProductId && !currentIds.has(product.id));
+  const eligible = alternatives.length >= 3 ? alternatives : rankedEntries;
+  const preferred = eligible.filter((product) =>
+    !avoidIds.has(product.id)
+    && !currentIds.has(product.id)
+    && !(slot === 'shoes' && recentShoeIds.has(product.id)),
+  );
+  const recentShoes = eligible.filter((product) =>
+    slot === 'shoes'
+    && recentShoeIds.has(product.id)
+    && !avoidIds.has(product.id)
+    && !currentIds.has(product.id),
+  );
   const avoided = eligible.filter((product) => avoidIds.has(product.id) || currentIds.has(product.id));
-  return [...preferred, ...avoided].slice(0, 96);
+  return [...(preferred.length ? preferred : recentShoes), ...avoided].slice(0, 96);
 }
 
 function getGenerationAnchorProducts({
@@ -1490,6 +1656,66 @@ function getGenerationAnchorProducts({
   return dedupeProducts([...lockedAnchors, ...existingAnchors]);
 }
 
+function getRequiredSlotEmergencyCandidate({
+  slot,
+  vibe,
+  frame,
+  budget,
+  customMaxCents,
+  usedIds,
+  currentIds,
+  selectedProducts,
+  seed,
+}: {
+  slot: Category;
+  vibe: VibeId;
+  frame: GeneratorFrame;
+  budget: GeneratorBudget;
+  customMaxCents?: number | null;
+  usedIds: Set<string>;
+  currentIds: Set<string>;
+  selectedProducts: Product[];
+  seed: number;
+}): Product | null {
+  const basePool = ALL_CATALOG_PRODUCTS
+    .filter((product) => product.category === slot)
+    .filter(isRenderableProduct)
+    .filter(isAdultCatalogCandidate)
+    .filter((product) => !usedIds.has(product.id))
+    .filter((product) => !currentIds.has(product.id))
+    .filter((product) => !hasCategoryMismatch(product))
+    .filter((product) => hasHighCategoryConfidence(product, slot))
+    .filter((product) => isUnderBudget(product, budget, customMaxCents));
+  const frameMatched = frame === 'androgynous'
+    ? basePool
+    : basePool.filter((product) =>
+        !hasFrameMismatch(product, frame)
+        && !hasExplicitOppositeFrameTerm(product, frame)
+        && !genderMismatchReasons(product, frame).length,
+      );
+  const framePool = frame === 'androgynous' ? basePool : frameMatched;
+  const vibeCoherent = framePool.filter((product) => !hasHardVibeContradiction(product, vibe, frame));
+  const candidatePool = vibeCoherent.length ? vibeCoherent : framePool;
+  const ranked = candidatePool
+    .map((product) => ({
+      product,
+      score:
+        scoreFallbackProduct(product, vibe, frame)
+        + frameCompatibilityScore(product, frame)
+        + scoreRecipeProduct(product, vibe)
+        + scoreCatalogQuality(product, vibe, frame)
+        + scoreCategoryIntegrity(product)
+        + scoreVibeCategoryFit(product, vibe, frame)
+        + scoreOutfitCompatibility(product, vibe, selectedProducts)
+        + (hasRealPhoto(product) ? 24 : -20),
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort((left, right) => right.score - left.score)
+    .map((entry) => entry.product);
+
+  return chooseVariedCandidate(ranked, seed, `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:required-emergency`);
+}
+
 export function buildCatalogLook({
   vibe,
   frame,
@@ -1500,7 +1726,12 @@ export function buildCatalogLook({
   mode,
   seed = 0,
   avoidProductIds = [],
+  avoidComboSignatures = [],
+  recentShoeIds = [],
+  recentBrandCounts,
+  diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
+  _diversityRetry = 0,
 }: {
   vibe: VibeId;
   frame: GeneratorFrame;
@@ -1511,7 +1742,12 @@ export function buildCatalogLook({
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
+  avoidComboSignatures?: string[];
+  recentShoeIds?: string[];
+  recentBrandCounts?: Record<string, number>;
+  diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
+  _diversityRetry?: number;
 }): {
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
@@ -1537,6 +1773,12 @@ export function buildCatalogLook({
     ...avoidProductIds,
     ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? Array.from(currentIds) : []),
   ]);
+  const recentShoeSet = new Set(recentShoeIds);
+  const brandCountsForDiversity = {
+    ...countBrandsForProductIds(avoidProductIds),
+    ...(recentBrandCounts || {}),
+  };
+  const productFamilyCountsForDiversity = countFamiliesForProductIds(avoidProductIds);
 
   const collections = getCollectionsFor(vibe, frame);
   const bestCollection = collections.length
@@ -1574,6 +1816,10 @@ export function buildCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
+      recentShoeIds: recentShoeSet,
+      recentBrandCounts: brandCountsForDiversity,
+      recentProductFamilyCounts: productFamilyCountsForDiversity,
+      diversityStrength,
       selectedProducts: [
         ...anchorProducts,
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),
@@ -1662,6 +1908,10 @@ export function buildCatalogLook({
           currentIds,
           currentProductId: existingItems[slot]?.id,
           usedBrands,
+          recentShoeIds: recentShoeSet,
+          recentBrandCounts: brandCountsForDiversity,
+          recentProductFamilyCounts: productFamilyCountsForDiversity,
+          diversityStrength,
           selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
           collectionCandidates,
         });
@@ -1691,9 +1941,61 @@ export function buildCatalogLook({
         break;
       }
     }
+
+    for (const slot of REQUIRED_OUTFIT_SLOTS) {
+      if (!targetSlots.includes(slot) || picked[slot]) continue;
+      const emergencyChosen = getRequiredSlotEmergencyCandidate({
+        slot,
+        vibe,
+        frame,
+        budget,
+        customMaxCents,
+        usedIds,
+        currentIds,
+        selectedProducts: [
+          ...anchorProducts,
+          ...Object.values(picked).filter((product): product is Product => Boolean(product)),
+        ],
+        seed: seed + 13_337,
+      });
+      if (!emergencyChosen) continue;
+      picked[slot] = emergencyChosen;
+      usedIds.add(emergencyChosen.id);
+      usedBrands.add(normalize(emergencyChosen.brand));
+      debugGenerator('required-emergency-fill', {
+        vibe,
+        frame,
+        slot,
+        chosenId: emergencyChosen.id,
+        chosen: `${emergencyChosen.brand} ${emergencyChosen.name}`,
+      });
+    }
   }
 
   const missingSlots = targetSlots.filter((slot) => !picked[slot] && !(mode === 'missing' && existingItems[slot]));
+  const duplicateCombo = avoidComboSignatures.includes(outfitRequiredSignature(picked))
+    || avoidComboSignatures.includes(outfitFullSignature(picked));
+  if (duplicateCombo && _diversityRetry < 2) {
+    const lockedIds = new Set(collectOutfitProductIds(lockedItems || {}));
+    const extraAvoid = collectOutfitProductIds(picked).filter((id) => !lockedIds.has(id));
+    return buildCatalogLook({
+      vibe,
+      frame,
+      budget,
+      customMaxCents,
+      currentItems,
+      lockedItems,
+      mode,
+      seed: seed + 7_919 + _diversityRetry * 1_009,
+      avoidProductIds: Array.from(new Set([...avoidProductIds, ...extraAvoid])),
+      avoidComboSignatures,
+      recentShoeIds,
+      recentBrandCounts,
+      diversityStrength,
+      targetSlots: selectedTargetSlots,
+      _diversityRetry: _diversityRetry + 1,
+    });
+  }
   if (DEBUG_GENERATOR) {
     for (const accessory of REFRESH_ACCESSORY_SLOTS) {
       if (targetSlots.includes(accessory) && !picked[accessory]) {
@@ -1719,6 +2021,10 @@ export async function buildAiCatalogLook({
   mode,
   seed = 0,
   avoidProductIds = [],
+  avoidComboSignatures = [],
+  recentShoeIds = [],
+  recentBrandCounts,
+  diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
 }: {
   vibe: VibeId;
@@ -1730,6 +2036,10 @@ export async function buildAiCatalogLook({
   mode: GeneratorMode;
   seed?: number;
   avoidProductIds?: string[];
+  avoidComboSignatures?: string[];
+  recentShoeIds?: string[];
+  recentBrandCounts?: Record<string, number>;
+  diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
 }): Promise<{
   products: Partial<Record<Category, Product>>;
@@ -1737,7 +2047,22 @@ export async function buildAiCatalogLook({
   missingSlots: Category[];
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
-  const base = buildCatalogLook({ vibe, frame, budget, customMaxCents, currentItems, lockedItems, mode, seed, avoidProductIds, targetSlots: selectedTargetSlots });
+  const base = buildCatalogLook({
+    vibe,
+    frame,
+    budget,
+    customMaxCents,
+    currentItems,
+    lockedItems,
+    mode,
+    seed,
+    avoidProductIds,
+    avoidComboSignatures,
+    recentShoeIds,
+    recentBrandCounts,
+    diversityStrength,
+    targetSlots: selectedTargetSlots,
+  });
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
   const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
@@ -1784,6 +2109,13 @@ export async function buildAiCatalogLook({
       currentIds,
       currentProductId: existingItems[slot]?.id,
       usedBrands,
+      recentShoeIds: new Set(recentShoeIds),
+      recentBrandCounts: {
+        ...countBrandsForProductIds(avoidProductIds),
+        ...(recentBrandCounts || {}),
+      },
+      recentProductFamilyCounts: countFamiliesForProductIds(avoidProductIds),
+      diversityStrength,
       selectedProducts: [
         ...anchorProducts,
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),

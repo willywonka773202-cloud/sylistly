@@ -35,8 +35,12 @@
 
 import {
   buildCatalogLook,
+  getBrandOrMerchant,
   getCollectionProducts,
+  getShoeId,
   LAUNCH_COLLECTIONS,
+  outfitFullSignature,
+  outfitRequiredSignature,
 } from '../lib/catalog';
 import {
   filterFeedRenderableProducts,
@@ -96,12 +100,8 @@ function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Recor
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
 
-function comboSignature(items: Partial<Record<Category, Product>>): string {
-  return Object.values(items)
-    .filter((product): product is Product => Boolean(product))
-    .map((product) => product.id)
-    .sort()
-    .join('|');
+function hasRequiredSlots(items: Partial<Record<Category, Product>>): boolean {
+  return Boolean(items.top && items.bottom && items.shoes);
 }
 
 // 1. Collection-derived posts — keep only the ones that pass the live-app
@@ -120,7 +120,7 @@ const launchPostsAll: FeedPostShape[] = LAUNCH_COLLECTIONS.map((collection) => (
   ),
 }));
 const launchPosts: FeedPostShape[] = launchPostsAll.filter(
-  (post) => Object.values(post.items).filter(Boolean).length >= 5,
+  (post) => Object.values(post.items).filter(Boolean).length >= 5 && hasRequiredSlots(post.items),
 );
 
 // 2. Generated-plan posts (one per plan + 26 additional streaming posts
@@ -128,6 +128,10 @@ const launchPosts: FeedPostShape[] = launchPostsAll.filter(
 //    would see after a couple of scroll-triggered batches).
 const generatedPosts: FeedPostShape[] = [];
 const recentIds: string[] = [];
+const recentShoes: string[] = [];
+const requiredCombos: string[] = [];
+const fullCombos: string[] = [];
+const generationBrandCounts: Record<string, number> = {};
 let cursor = 0;
 const targetGenerated = PLAN.length + 26;
 let attempts = 0;
@@ -140,13 +144,17 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
     mode: 'full',
     seed: plan.seed + cursor * 1019,
     avoidProductIds: Array.from(new Set(recentIds)).slice(0, 90),
+    avoidComboSignatures: [...requiredCombos, ...fullCombos],
+    recentShoeIds: recentShoes,
+    recentBrandCounts: generationBrandCounts,
+    diversityStrength: 'high',
   }).products;
   const items = sanitizeItems(generated);
   const productCount = Object.values(items).filter(Boolean).length;
   // Live-app filter: SEED_POSTS / normalizeFeedPost / makeGeneratedPost all
   // require >= 5 sanitized products so OutfitBoard's 8-slot collage never
   // renders with too many empty positions. Mirror that here.
-  if (productCount >= 5) {
+  if (productCount >= 5 && hasRequiredSlots(items)) {
     const id = cursor < PLAN.length ? `feed-plan-${plan.id}` : `feed-plan-${plan.id}-${cursor}`;
     generatedPosts.push({ id, items });
     recentIds.unshift(
@@ -155,6 +163,19 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
         .map((product) => product.id),
     );
     if (recentIds.length > 90) recentIds.length = 90;
+    const shoeId = getShoeId(items);
+    if (shoeId) {
+      recentShoes.unshift(shoeId);
+      recentShoes.splice(18);
+    }
+    requiredCombos.unshift(outfitRequiredSignature(items));
+    fullCombos.unshift(outfitFullSignature(items));
+    requiredCombos.splice(80);
+    fullCombos.splice(80);
+    for (const product of Object.values(items).filter((item): item is Product => Boolean(item))) {
+      const brand = getBrandOrMerchant(product);
+      if (brand) generationBrandCounts[brand] = Math.min(16, (generationBrandCounts[brand] || 0) + 1);
+    }
   }
   cursor += 1;
   attempts += 1;
@@ -162,6 +183,7 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
 
 const posts = [...launchPosts, ...generatedPosts];
 const totalPosts = posts.length;
+const firstTen = posts.slice(0, 10);
 
 // === Metrics ===
 
@@ -171,13 +193,33 @@ const duplicateIds = Array.from(idCounts.entries()).filter(([, n]) => n > 1);
 
 const comboCounts = new Map<string, string[]>();
 for (const post of posts) {
-  const sig = comboSignature(post.items);
+  const sig = outfitFullSignature(post.items);
   if (!sig) continue;
   const ids = comboCounts.get(sig) || [];
   ids.push(post.id);
   comboCounts.set(sig, ids);
 }
 const duplicateCombos = Array.from(comboCounts.values()).filter((ids) => ids.length > 1);
+
+const first10ProductIds = new Set<string>();
+const first10Shoes = new Set<string>();
+const first10Brands = new Set<string>();
+const first10RequiredCombos = new Set<string>();
+let first10DuplicateCombos = 0;
+let first10Picks = 0;
+for (const post of firstTen) {
+  const required = outfitRequiredSignature(post.items);
+  if (first10RequiredCombos.has(required)) first10DuplicateCombos += 1;
+  first10RequiredCombos.add(required);
+  for (const product of Object.values(post.items).filter((item): item is Product => Boolean(item))) {
+    first10Picks += 1;
+    first10ProductIds.add(product.id);
+    if (product.category === 'shoes') first10Shoes.add(product.id);
+    const brand = getBrandOrMerchant(product);
+    if (brand) first10Brands.add(brand);
+  }
+}
+const first10AverageItems = firstTen.length ? first10Picks / firstTen.length : 0;
 
 let missingTop = 0;
 let missingBottom = 0;
@@ -270,6 +312,7 @@ const comboDupThreshold = Math.max(2, Math.ceil(totalPosts * 0.25));
 if (duplicateCombos.length > comboDupThreshold) {
   failures.push(`duplicateFeedCombos=${duplicateCombos.length} > threshold ${comboDupThreshold} (>25% of ${totalPosts} posts share exact product combos)`);
 }
+if (first10DuplicateCombos > 0) failures.push(`first10DuplicateCombos=${first10DuplicateCombos}`);
 if (weakHeroProducts > weakHeroThreshold) {
   failures.push(`weakHeroProducts=${weakHeroProducts} > threshold ${weakHeroThreshold} (no strong hero candidate per post — first-page feed cards will look weak)`);
 }
@@ -280,6 +323,7 @@ if (failures.length) {
   console.error('Feed quality: FAILED');
   for (const failure of failures) console.error(`  ${failure}`);
   console.error(`  metrics: posts=${totalPosts} uniqueProducts=${uniqueProducts} feedCatalogUseRate=${(feedCatalogUseRate * 100).toFixed(1)}% averageItems=${averageItems.toFixed(1)} weakImages=${weakFeedImageCount} weakHero=${weakHeroProducts} badNormalTops=${badNormalTops} badNormalBottoms=${badNormalBottoms} badNormalShoes=${badNormalShoes} categoryConfidenceFailures=${categoryConfidenceFailures} duplicateCombos=${duplicateCombos.length}`);
+  console.error(`  first10: uniqueProducts=${first10ProductIds.size} uniqueShoes=${first10Shoes.size} uniqueBrands=${first10Brands.size} duplicateCombos=${first10DuplicateCombos} averageItems=${first10AverageItems.toFixed(1)}`);
   if (topRepeated.length) {
     console.error(`  topRepeatedFeedProducts: ${topRepeated.map((p) => `${p.brand} ${p.name} ×${p.count}`).join('; ')}`);
   }
@@ -299,6 +343,11 @@ console.log(
     `feedUniqueProducts=${uniqueProducts}`,
     `feedCatalogUseRate=${(feedCatalogUseRate * 100).toFixed(1)}%`,
     `averageItemsPerPost=${averageItems.toFixed(1)}`,
+    `first10UniqueProducts=${first10ProductIds.size}`,
+    `first10UniqueShoes=${first10Shoes.size}`,
+    `first10UniqueBrands=${first10Brands.size}`,
+    `first10DuplicateCombos=${first10DuplicateCombos}`,
+    `first10AverageItems=${first10AverageItems.toFixed(1)}`,
     `duplicateFeedPostIds=0`,
     `duplicateFeedCombos=${duplicateCombos.length}`,
     `missingTop=0 missingBottom=0 missingShoes=0`,

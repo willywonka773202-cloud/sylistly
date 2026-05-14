@@ -1,6 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '@/lib/catalog';
+import {
+  buildCatalogLook,
+  getBrandOrMerchant,
+  getCollectionProducts,
+  getShoeId,
+  LAUNCH_COLLECTIONS,
+  outfitCategorySignature,
+  outfitFullSignature,
+  outfitRequiredSignature,
+} from '@/lib/catalog';
 import { sortFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
@@ -62,6 +71,10 @@ function fitTotals(items: Partial<Record<Category, Product>>) {
     itemCount: products.length,
     totalCents: products.reduce((sum, product) => sum + (product.priceCents || 0), 0),
   };
+}
+
+function hasRequiredSlots(items: Partial<Record<Category, Product>>): boolean {
+  return Boolean(items.top && items.bottom && items.shoes);
 }
 
 function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Posted fit'): string {
@@ -175,14 +188,27 @@ const GENERATED_POST_PLAN: Array<{
   { id: 'night-any-luxe', title: 'Luxe monochrome', caption: 'A darker outfit board built around sleek shapes and shine.', vibe: 'night', label: 'Night out', frame: 'androgynous', budget: 'under500', seed: 1401, tags: ['luxury', 'night', 'monochrome'] },
 ];
 
-function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number], cursor = 0, avoidProductIds: string[] = []): Partial<Record<Category, Product>> {
+function itemsFromGeneratedLook(
+  plan: (typeof GENERATED_POST_PLAN)[number],
+  cursor = 0,
+  options: {
+    avoidProductIds?: string[];
+    avoidComboSignatures?: string[];
+    recentShoeIds?: string[];
+    recentBrandCounts?: Record<string, number>;
+  } = {},
+): Partial<Record<Category, Product>> {
   const generated = buildCatalogLook({
     vibe: plan.vibe,
     frame: plan.frame,
     budget: plan.budget,
     mode: 'full',
     seed: plan.seed + cursor * 1_019,
-    avoidProductIds,
+    avoidProductIds: options.avoidProductIds || [],
+    avoidComboSignatures: options.avoidComboSignatures || [],
+    recentShoeIds: options.recentShoeIds || [],
+    recentBrandCounts: options.recentBrandCounts,
+    diversityStrength: 'high',
   }).products;
   return sanitizeItems(generated);
 }
@@ -228,16 +254,8 @@ const SEED_POSTS: FeedPost[] = dedupeFeedPostsById(
   // page. The launch + generated catalog easily produces 5+ piece outfits;
   // sparse seeds (mostly legacy LAUNCH_COLLECTIONS with dead product refs)
   // get filtered out.
-  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 5),
+  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 5 && hasRequiredSlots(post.items)),
 );
-
-function postSignature(items: Partial<Record<Category, Product>>): string {
-  return Object.values(items)
-    .filter((product): product is Product => Boolean(product))
-    .map((product) => product.id)
-    .sort()
-    .join('|');
-}
 
 function recentProductIds(posts: FeedPost[]): string[] {
   return Array.from(new Set(
@@ -258,7 +276,7 @@ function normalizeFeedPost(post: FeedPost): FeedPost | null {
   // Persisted state must also clear the 5-product board minimum (see
   // SEED_POSTS construction). Posts that fall below after sanitize get
   // dropped on rehydration rather than rendering with empty board slots.
-  if (totals.itemCount < 5) return null;
+  if (totals.itemCount < 5 || !hasRequiredSlots(items)) return null;
   return {
     ...post,
     items,
@@ -267,14 +285,23 @@ function normalizeFeedPost(post: FeedPost): FeedPost | null {
   };
 }
 
-function makeGeneratedPost(plan: (typeof GENERATED_POST_PLAN)[number], cursor: number, avoidProductIds: string[]): FeedPost | null {
-  const items = itemsFromGeneratedLook(plan, cursor, avoidProductIds);
+function makeGeneratedPost(
+  plan: (typeof GENERATED_POST_PLAN)[number],
+  cursor: number,
+  options: {
+    avoidProductIds?: string[];
+    avoidComboSignatures?: string[];
+    recentShoeIds?: string[];
+    recentBrandCounts?: Record<string, number>;
+  },
+): FeedPost | null {
+  const items = itemsFromGeneratedLook(plan, cursor, options);
   const totals = fitTotals(items);
   // Streaming generated posts also clear the 5-product board minimum so
   // infinite-scroll never injects a sparse "broken-looking" card. The
   // generateFeedBatch retry budget (count * 8) is generous enough to
   // tolerate the higher rejection rate.
-  if (totals.itemCount < 5) return null;
+  if (totals.itemCount < 5 || !hasRequiredSlots(items)) return null;
   return seedPost(
     items,
     cursor + COLLECTION_POSTS.length,
@@ -309,18 +336,20 @@ const FEED_SHOE_REPEAT_CAP = 2;
 const FEED_BRAND_REPEAT_CAP = 3;
 
 function shoesId(post: FeedPost): string | undefined {
-  return post.items.shoes?.id;
+  return getShoeId(post.items) || undefined;
 }
 
 function postPrimaryBrands(post: FeedPost): string[] {
   const slots: Category[] = ['top', 'bottom', 'outer', 'bag'];
   return slots
-    .map((slot) => post.items[slot]?.brand?.toLowerCase().trim())
+    .map((slot) => getBrandOrMerchant(post.items[slot]))
     .filter((brand): brand is string => Boolean(brand));
 }
 
 function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count: number): { posts: FeedPost[]; cursor: number } {
-  const signatures = new Set(existingPosts.map((post) => postSignature(post.items)).filter(Boolean));
+  const requiredSignatures = new Set(existingPosts.map((post) => outfitRequiredSignature(post.items)).filter(Boolean));
+  const fullSignatures = new Set(existingPosts.map((post) => outfitFullSignature(post.items)).filter(Boolean));
+  const categoryStructureCounts = new Map<string, number>();
   const shoeCounts = new Map<string, number>();
   const brandCounts = new Map<string, number>();
   for (const post of existingPosts) {
@@ -329,6 +358,8 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
     for (const brand of postPrimaryBrands(post)) {
       brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
     }
+    const structure = outfitCategorySignature(post.items);
+    categoryStructureCounts.set(structure, (categoryStructureCounts.get(structure) || 0) + 1);
   }
   const batch: FeedPost[] = [];
   let cursor = startCursor;
@@ -346,15 +377,27 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
       ...overUsedShoes,
     ])).slice(0, 120);
 
-    const post = makeGeneratedPost(plan, cursor, avoidProductIds);
+    const post = makeGeneratedPost(plan, cursor, {
+      avoidProductIds,
+      avoidComboSignatures: [
+        ...Array.from(requiredSignatures),
+        ...Array.from(fullSignatures),
+      ].slice(-80),
+      recentShoeIds: Array.from(shoeCounts.entries())
+        .sort((left, right) => right[1] - left[1])
+        .slice(0, 18)
+        .map(([id]) => id),
+      recentBrandCounts: Object.fromEntries(brandCounts),
+    });
     cursor += 1;
     attempts += 1;
     if (!post) continue;
 
     // Reject duplicate combo signatures outright — exact same top+bottom+
     // shoes+accessories combination as an earlier post.
-    const signature = postSignature(post.items);
-    if (!signature || signatures.has(signature)) continue;
+    const requiredSignature = outfitRequiredSignature(post.items);
+    const fullSignature = outfitFullSignature(post.items);
+    if (!requiredSignature || requiredSignatures.has(requiredSignature) || fullSignatures.has(fullSignature)) continue;
 
     // Reject when this post's shoes have already hit the cap and we still
     // have other plans we could try. Falls through after cap exhaustion
@@ -370,13 +413,18 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
     const brands = postPrimaryBrands(post);
     const wouldOvercap = brands.some((brand) => (brandCounts.get(brand) || 0) >= FEED_BRAND_REPEAT_CAP);
     if (wouldOvercap && attempts < count * 6) continue;
+    const structure = outfitCategorySignature(post.items);
+    const structureCount = categoryStructureCounts.get(structure) || 0;
+    if (structureCount >= 6 && attempts < count * 6) continue;
 
     // Accept.
-    signatures.add(signature);
+    requiredSignatures.add(requiredSignature);
+    fullSignatures.add(fullSignature);
     if (sid) shoeCounts.set(sid, (shoeCounts.get(sid) || 0) + 1);
     for (const brand of brands) {
       brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
     }
+    categoryStructureCounts.set(structure, structureCount + 1);
     batch.push(post);
   }
 

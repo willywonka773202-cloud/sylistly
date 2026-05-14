@@ -15,7 +15,15 @@
 //
 // Run: npx jiti scripts/dump-visible-feed.ts
 
-import { buildCatalogLook, getCollectionProducts, LAUNCH_COLLECTIONS } from '../lib/catalog';
+import {
+  buildCatalogLook,
+  getBrandOrMerchant,
+  getCollectionProducts,
+  getShoeId,
+  LAUNCH_COLLECTIONS,
+  outfitFullSignature,
+  outfitRequiredSignature,
+} from '../lib/catalog';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '../lib/vibes';
 import {
   filterFeedRenderableProducts,
@@ -36,11 +44,11 @@ function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Recor
 }
 
 function comboSignature(items: Partial<Record<Category, Product>>): string {
-  return Object.values(items)
-    .filter((p): p is Product => Boolean(p))
-    .map((p) => p.id)
-    .sort()
-    .join('|');
+  return outfitFullSignature(items);
+}
+
+function hasRequiredSlots(items: Partial<Record<Category, Product>>): boolean {
+  return Boolean(items.top && items.bottom && items.shoes);
 }
 
 function chooseBestFeedHero(items: Partial<Record<Category, Product>>): Product | null {
@@ -118,23 +126,55 @@ const PLAN: Array<{ id: string; title: string; vibe: VibeId; frame: GeneratorFra
   { id: 'night-any-luxe',        title: 'Luxe monochrome',      vibe: 'night',    frame: 'androgynous',  budget: 'under500', seed: 1401 },
 ];
 
-const generatedPosts: DumpPost[] = PLAN.map((plan) => {
+const generatedPosts: DumpPost[] = [];
+const recentIds: string[] = [];
+const recentShoes: string[] = [];
+const requiredCombos: string[] = [];
+const fullCombos: string[] = [];
+const generationBrandCounts: Record<string, number> = {};
+
+for (const [index, plan] of PLAN.entries()) {
   const generated = buildCatalogLook({
     vibe: plan.vibe,
     frame: plan.frame,
     budget: plan.budget,
     mode: 'full',
-    seed: plan.seed,
+    seed: plan.seed + index * 1_019,
+    avoidProductIds: Array.from(new Set(recentIds)).slice(0, 90),
+    avoidComboSignatures: [...requiredCombos, ...fullCombos],
+    recentShoeIds: recentShoes,
+    recentBrandCounts: generationBrandCounts,
+    diversityStrength: 'high',
   }).products;
-  return {
+  const items = sanitizeItems(generated);
+  generatedPosts.push({
     source: 'generated' as const,
     id: `feed-plan-${plan.id}`,
     vibe: plan.vibe,
     frame: plan.frame,
     title: plan.title,
-    items: sanitizeItems(generated),
-  };
-});
+    items,
+  });
+  recentIds.unshift(
+    ...Object.values(items)
+      .filter((product): product is Product => Boolean(product))
+      .map((product) => product.id),
+  );
+  recentIds.splice(90);
+  const shoeId = getShoeId(items);
+  if (shoeId) {
+    recentShoes.unshift(shoeId);
+    recentShoes.splice(18);
+  }
+  requiredCombos.unshift(outfitRequiredSignature(items));
+  fullCombos.unshift(outfitFullSignature(items));
+  requiredCombos.splice(80);
+  fullCombos.splice(80);
+  for (const product of Object.values(items).filter((item): item is Product => Boolean(item))) {
+    const brand = getBrandOrMerchant(product);
+    if (brand) generationBrandCounts[brand] = Math.min(16, (generationBrandCounts[brand] || 0) + 1);
+  }
+}
 
 // Mirror store/social-feed.ts SEED_POSTS = dedupeFeedPostsById([...COLLECTION_POSTS, ...GENERATED_POSTS])
 //   .filter(post => fitTotals(post.items).itemCount >= 5)
@@ -145,19 +185,19 @@ const seedPosts: DumpPost[] = [...launchPosts, ...generatedPosts]
   .filter((post) => {
     if (seenIds.has(post.id)) return false;
     seenIds.add(post.id);
-    return Object.values(post.items).filter(Boolean).length >= 5;
+    return Object.values(post.items).filter(Boolean).length >= 5 && hasRequiredSlots(post.items);
   });
 
 const firstTen = seedPosts.slice(0, 10);
 
-const launchKept = launchPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 4).length;
+const launchKept = launchPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 5 && hasRequiredSlots(p.items)).length;
 const launchDropped = launchPosts.length - launchKept;
-const generatedKept = generatedPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 4).length;
+const generatedKept = generatedPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 5 && hasRequiredSlots(p.items)).length;
 const generatedDropped = generatedPosts.length - generatedKept;
 
 console.log(`First 10 visible /feed posts (fresh load — persisted state cleared at v4 bump)`);
 console.log(`Source breakdown:`);
-console.log(`  LAUNCH_COLLECTIONS  total=${launchPosts.length}  kept=${launchKept}  dropped=${launchDropped}  (filter: itemCount >= 4)`);
+console.log(`  LAUNCH_COLLECTIONS  total=${launchPosts.length}  kept=${launchKept}  dropped=${launchDropped}  (filter: itemCount >= 5 + required slots)`);
 console.log(`  GENERATED_POST_PLAN total=${generatedPosts.length}  kept=${generatedKept}  dropped=${generatedDropped}`);
 console.log(`  SEED_POSTS final size = ${seedPosts.length}`);
 console.log('');

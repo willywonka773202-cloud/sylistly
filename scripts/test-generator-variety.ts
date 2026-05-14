@@ -334,9 +334,25 @@ const lockReports = [
 ];
 
 const reports = SCENARIOS.map(simulateScenario);
+const aggregateTotalPicks = reports.reduce((sum, report) => sum + report.totalPicks, 0);
+const aggregateUniqueScenarioProducts = reports.reduce((sum, report) => sum + report.uniqueIds, 0);
+const aggregateMissingRequiredRuns = reports.reduce((sum, report) =>
+  sum
+  + (report.missingByCategory.top || 0)
+  + (report.missingByCategory.bottom || 0)
+  + (report.missingByCategory.shoes || 0),
+0);
+const weakestScenarios = [...reports]
+  .sort((left, right) => right.repeatRate - left.repeatRate)
+  .slice(0, 4)
+  .map((report) => `${report.label}:${(report.repeatRate * 100).toFixed(1)}%`)
+  .join(', ');
 
 console.log(`Generator variety simulation: ${RUNS_PER_SCENARIO} full-look runs per scenario`);
 console.log('No SearchAPI calls are made by this script.');
+console.log(
+  `Aggregate: totalPicks=${aggregateTotalPicks} scenarioUniqueSum=${aggregateUniqueScenarioProducts} completionRateTopBottomShoes=${aggregateMissingRequiredRuns === 0 ? '100.0%' : 'below-100'} missingRequiredSlots=${aggregateMissingRequiredRuns} weakestScenarios=${weakestScenarios}`,
+);
 console.log('');
 
 for (const report of reports) {

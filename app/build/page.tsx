@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,7 +12,14 @@ import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
-import { hydrateItemsFromCatalog } from '@/lib/catalog';
+import {
+  collectOutfitProductIds,
+  getOutfitBrandCounts,
+  getShoeId,
+  hydrateItemsFromCatalog,
+  outfitFullSignature,
+  outfitRequiredSignature,
+} from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { proxiedImageUrl } from '@/lib/image-url';
 import { filterRenderableProducts, hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
@@ -291,6 +298,10 @@ function BuilderPageContent({
   const [generatorLoading, setGeneratorLoading] = useState(false);
   const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
+  const recentRequiredComboRef = useRef<string[]>([]);
+  const recentFullComboRef = useRef<string[]>([]);
+  const recentShoeIdsRef = useRef<string[]>([]);
+  const recentBrandCountsRef = useRef<Record<string, number>>({});
   const [boardDragging, setBoardDragging] = useState(false);
   const [activeEditSlot, setActiveEditSlot] = useState<Category | null>(null);
   const [swipeFeedback, setSwipeFeedback] = useState<'save' | 'pass' | null>(null);
@@ -502,6 +513,15 @@ function BuilderPageContent({
       const currentProductIds = Object.values(items)
         .filter((product): product is Product => Boolean(product))
         .map((product) => product.id);
+      const lockedProductIds = new Set(
+        Object.values(lockedItems)
+          .filter((product): product is Product => Boolean(product))
+          .map((product) => product.id),
+      );
+      const avoidProductIds = Array.from(new Set([
+        ...recentGeneratedIds.filter((id) => !lockedProductIds.has(id)),
+        ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds.filter((id) => !lockedProductIds.has(id)) : []),
+      ]));
 
       const lookResponse = await fetch('/api/look', {
         method: 'POST',
@@ -512,10 +532,14 @@ function BuilderPageContent({
           budget: generatorBudget,
           customMaxCents: customBudgetCents,
           seed: Date.now(),
-          avoidProductIds: Array.from(new Set([
-            ...recentGeneratedIds,
-            ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds : []),
-          ])),
+          avoidProductIds,
+          avoidComboSignatures: [
+            ...recentRequiredComboRef.current,
+            ...recentFullComboRef.current,
+          ],
+          recentShoeIds: recentShoeIdsRef.current.filter((id) => !lockedProductIds.has(id)),
+          recentBrandCounts: recentBrandCountsRef.current,
+          diversityStrength: 'high',
           mode,
           currentItems: items,
           lockedItems,
@@ -573,11 +597,27 @@ function BuilderPageContent({
 
       replaceItems(nextItems);
       setRecentGeneratedIds((current) => {
-        const freshIds = Object.values(nextItems)
-          .filter((product): product is Product => Boolean(product))
-          .map((product) => product.id);
+        const freshIds = collectOutfitProductIds(nextItems).filter((id) => !lockedProductIds.has(id));
         return Array.from(new Set([...freshIds, ...current])).slice(0, 72);
       });
+      const requiredSignature = outfitRequiredSignature(nextItems);
+      const fullSignature = outfitFullSignature(nextItems);
+      recentRequiredComboRef.current = Array.from(new Set([requiredSignature, ...recentRequiredComboRef.current])).slice(0, 18);
+      recentFullComboRef.current = Array.from(new Set([fullSignature, ...recentFullComboRef.current])).slice(0, 18);
+      const shoeId = getShoeId(nextItems);
+      if (shoeId && !lockedProductIds.has(shoeId)) {
+        recentShoeIdsRef.current = Array.from(new Set([shoeId, ...recentShoeIdsRef.current])).slice(0, 12);
+      }
+      const brandCounts = getOutfitBrandCounts(nextItems);
+      const nextBrandCounts = { ...recentBrandCountsRef.current };
+      for (const [brand, count] of Object.entries(brandCounts)) {
+        nextBrandCounts[brand] = Math.min(12, (nextBrandCounts[brand] || 0) + count);
+      }
+      recentBrandCountsRef.current = Object.fromEntries(
+        Object.entries(nextBrandCounts)
+          .sort((left, right) => right[1] - left[1])
+          .slice(0, 28),
+      );
       const sourceLead = options?.sourceLabel ? `${options.sourceLabel} ` : '';
       setStatusMessage(
         mode === 'starter'

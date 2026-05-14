@@ -12,6 +12,10 @@ interface LookBody {
   mode?: 'starter' | 'missing' | 'full' | 'refresh';
   seed?: number;
   avoidProductIds?: string[];
+  avoidComboSignatures?: string[];
+  recentShoeIds?: string[];
+  recentBrandCounts?: Record<string, number>;
+  diversityStrength?: 'low' | 'medium' | 'high';
   currentItems?: Partial<Record<Category, Product>>;
   lockedItems?: Partial<Record<Category, Product>>;
   targetSlots?: Category[];
@@ -52,6 +56,10 @@ export async function POST(req: NextRequest) {
     customMaxCents: typeof body.customMaxCents === 'number' ? body.customMaxCents : null,
     seed,
     avoidProductIds,
+    avoidComboSignatures: Array.isArray(body.avoidComboSignatures) ? body.avoidComboSignatures : [],
+    recentShoeIds: Array.isArray(body.recentShoeIds) ? body.recentShoeIds : [],
+    recentBrandCounts: body.recentBrandCounts && typeof body.recentBrandCounts === 'object' ? body.recentBrandCounts : undefined,
+    diversityStrength: body.diversityStrength || 'medium',
     currentItems: body.currentItems || {},
     lockedItems: body.lockedItems || {},
     mode,
