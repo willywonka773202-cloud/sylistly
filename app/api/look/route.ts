@@ -15,6 +15,8 @@ interface LookBody {
   avoidComboSignatures?: string[];
   recentShoeIds?: string[];
   recentBrandCounts?: Record<string, number>;
+  recentFormulaIds?: string[];
+  preferredFormulaId?: string;
   diversityStrength?: 'low' | 'medium' | 'high';
   currentItems?: Partial<Record<Category, Product>>;
   lockedItems?: Partial<Record<Category, Product>>;
@@ -59,6 +61,8 @@ export async function POST(req: NextRequest) {
     avoidComboSignatures: Array.isArray(body.avoidComboSignatures) ? body.avoidComboSignatures : [],
     recentShoeIds: Array.isArray(body.recentShoeIds) ? body.recentShoeIds : [],
     recentBrandCounts: body.recentBrandCounts && typeof body.recentBrandCounts === 'object' ? body.recentBrandCounts : undefined,
+    recentFormulaIds: Array.isArray(body.recentFormulaIds) ? body.recentFormulaIds : [],
+    preferredFormulaId: typeof body.preferredFormulaId === 'string' ? body.preferredFormulaId : undefined,
     diversityStrength: body.diversityStrength || 'medium',
     currentItems: body.currentItems || {},
     lockedItems: body.lockedItems || {},
@@ -80,6 +84,12 @@ export async function POST(req: NextRequest) {
         }
       : null,
     missingSlots: result.missingSlots,
+    formula: {
+      id: result.formula.id,
+      label: result.formula.label,
+      structure: result.formula.structure,
+      reason: result.formula.reason,
+    },
     source: 'catalog',
     assistantMode: result.assistantMode,
   });

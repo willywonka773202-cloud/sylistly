@@ -1,5 +1,5 @@
-// Prints the first 10 feed posts a fresh user (no persisted state) would
-// see when opening /feed. The store can't be imported here because it
+// Prints the first 10 feed posts a fresh user or migrated v6 persisted
+// store would see when opening /feed. The store can't be imported here because it
 // uses `@/…` aliases that jiti doesn't resolve, so this script mirrors
 // store/social-feed.ts's SEED_POSTS construction — collection-derived
 // posts first (`feed-launch-${id}`), in LAUNCH_COLLECTIONS order — and
@@ -21,6 +21,7 @@ import {
   getCollectionProducts,
   getShoeId,
   LAUNCH_COLLECTIONS,
+  OUTFIT_FORMULAS,
   outfitFullSignature,
   outfitRequiredSignature,
 } from '../lib/catalog';
@@ -81,6 +82,9 @@ interface DumpPost {
   vibe: string;
   frame: string;
   title: string;
+  formulaId?: string;
+  formulaLabel?: string;
+  outfitReason?: string;
   items: Partial<Record<Category, Product>>;
 }
 
@@ -126,6 +130,51 @@ const PLAN: Array<{ id: string; title: string; vibe: VibeId; frame: GeneratorFra
   { id: 'night-any-luxe',        title: 'Luxe monochrome',      vibe: 'night',    frame: 'androgynous',  budget: 'under500', seed: 1401 },
 ];
 
+const PLAN_FORMULA_IDS: Record<string, string> = {
+  'coffee-clean-fem': 'clean-elevated',
+  'airport-neutral': 'travel-airport',
+  'street-femme-downtown': 'streetwear-sneaker-led',
+  'street-masc-campus': 'campus-cozy',
+  'night-masc-polish': 'night-out',
+  'night-femme-gold': 'date-polished',
+  'date-femme-soft': 'date-polished',
+  'date-masc-clean': 'date-polished',
+  'gym-femme-studio': 'gym-training',
+  'gym-masc-training': 'gym-training',
+  'office-fem-cream': 'office-smart-casual',
+  'office-masc-smart': 'office-smart-casual',
+  'vacation-femme-linen': 'vacation-resort',
+  'vacation-masc-resort': 'vacation-resort',
+  'cozy-femme-weekend': 'campus-cozy',
+  'cozy-masc-winter': 'travel-airport',
+  'preppy-femme-city': 'old-money-knit',
+  'preppy-masc-weekend': 'old-money-knit',
+  'edgy-femme-downtown': 'techwear-utility',
+  'edgy-masc-tech': 'techwear-utility',
+  'clean-masc-casual': 'clean-elevated',
+  'street-any-black': 'streetwear-sneaker-led',
+  'office-any-soft': 'office-smart-casual',
+  'night-any-luxe': 'date-polished',
+};
+
+const FIRST_SCREEN_POST_IDS = [
+  'feed-plan-airport-neutral',
+  'feed-plan-street-femme-downtown',
+  'feed-plan-street-masc-campus',
+  'feed-plan-gym-masc-training',
+  'feed-plan-date-femme-soft',
+  'feed-plan-vacation-femme-linen',
+  'feed-plan-office-masc-smart',
+  'feed-plan-preppy-masc-weekend',
+  'feed-plan-edgy-masc-tech',
+  'feed-plan-night-femme-gold',
+];
+
+function prioritizeFirstScreenPosts(posts: DumpPost[]): DumpPost[] {
+  const order = new Map(FIRST_SCREEN_POST_IDS.map((id, index) => [id, index]));
+  return [...posts].sort((left, right) => (order.get(left.id) ?? 999) - (order.get(right.id) ?? 999));
+}
+
 const generatedPosts: DumpPost[] = [];
 const recentIds: string[] = [];
 const recentShoes: string[] = [];
@@ -144,15 +193,19 @@ for (const [index, plan] of PLAN.entries()) {
     avoidComboSignatures: [...requiredCombos, ...fullCombos],
     recentShoeIds: recentShoes,
     recentBrandCounts: generationBrandCounts,
+    preferredFormulaId: PLAN_FORMULA_IDS[plan.id],
     diversityStrength: 'high',
-  }).products;
-  const items = sanitizeItems(generated);
+  });
+  const items = sanitizeItems(generated.products);
   generatedPosts.push({
     source: 'generated' as const,
     id: `feed-plan-${plan.id}`,
     vibe: plan.vibe,
     frame: plan.frame,
     title: plan.title,
+    formulaId: generated.formula.id,
+    formulaLabel: generated.formula.label,
+    outfitReason: generated.formula.reason,
     items,
   });
   recentIds.unshift(
@@ -188,14 +241,15 @@ const seedPosts: DumpPost[] = [...launchPosts, ...generatedPosts]
     return Object.values(post.items).filter(Boolean).length >= 5 && hasRequiredSlots(post.items);
   });
 
-const firstTen = seedPosts.slice(0, 10);
+const orderedSeedPosts = prioritizeFirstScreenPosts(seedPosts);
+const firstTen = orderedSeedPosts.slice(0, 10);
 
 const launchKept = launchPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 5 && hasRequiredSlots(p.items)).length;
 const launchDropped = launchPosts.length - launchKept;
 const generatedKept = generatedPosts.filter((p) => Object.values(p.items).filter(Boolean).length >= 5 && hasRequiredSlots(p.items)).length;
 const generatedDropped = generatedPosts.length - generatedKept;
 
-console.log(`First 10 visible /feed posts (fresh load — persisted state cleared at v4 bump)`);
+console.log(`First 10 visible /feed posts (fresh load or v6 migrated persisted feed)`);
 console.log(`Source breakdown:`);
 console.log(`  LAUNCH_COLLECTIONS  total=${launchPosts.length}  kept=${launchKept}  dropped=${launchDropped}  (filter: itemCount >= 5 + required slots)`);
 console.log(`  GENERATED_POST_PLAN total=${generatedPosts.length}  kept=${generatedKept}  dropped=${generatedDropped}`);
@@ -205,12 +259,26 @@ console.log('');
 let okPostCount = 0;
 let weakHeroPostCount = 0;
 let missingRequiredPostCount = 0;
+const seenRequired = new Set<string>();
+const seenShoes = new Set<string>();
+const seenFormulas = new Set<string>();
+const seenStructures = new Set<string>();
 
 for (let i = 0; i < firstTen.length; i += 1) {
   const post = firstTen[i];
   const items = post.items;
   const products = Object.values(items).filter((p): p is Product => Boolean(p));
   const renderableForFeed = filterFeedRenderableProducts(products);
+  const requiredSignature = outfitRequiredSignature(items);
+  const shoeId = getShoeId(items);
+  const brandList = Array.from(new Set(products.map((product) => getBrandOrMerchant(product)).filter(Boolean))).slice(0, 6);
+  const categoryStructure = (['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'] as Category[])
+    .filter((category) => Boolean(items[category]))
+    .join('+');
+  const duplicateRequired = requiredSignature ? seenRequired.has(requiredSignature) : false;
+  const duplicateShoe = shoeId ? seenShoes.has(shoeId) : false;
+  if (post.formulaId) seenFormulas.add(post.formulaId);
+  if (categoryStructure) seenStructures.add(categoryStructure);
 
   const hero = chooseBestFeedHero(items);
   const missingRequired = [];
@@ -225,9 +293,13 @@ for (let i = 0; i < firstTen.length; i += 1) {
   if (missingRequired.length) missingRequiredPostCount += 1;
   if (!hero) weakHeroPostCount += 1;
   if (!missingRequired.length && hero) okPostCount += 1;
+  const formula = post.formulaLabel || OUTFIT_FORMULAS.find((entry) => entry.id === post.formulaId)?.label || post.formulaId || 'unknown';
 
   console.log(`#${i + 1}  ${post.id}  [${post.source}]  vibe=${post.vibe}  frame=${post.frame}`);
   console.log(`     title: ${post.title}`);
+  console.log(`     formula: ${formula}  structure=${categoryStructure || 'unknown'}  shoe=${shoeId || 'none'}${duplicateShoe ? ' DUPLICATE-SHOE' : ''}`);
+  if (post.outfitReason) console.log(`     reason: ${post.outfitReason}`);
+  console.log(`     brands: ${brandList.join(', ') || 'none'}`);
   console.log(`     pieces (${products.length}, ${renderableForFeed.length} feed-renderable):`);
   for (const cat of ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'] as Category[]) {
     const product = items[cat];
@@ -240,8 +312,11 @@ for (let i = 0; i < firstTen.length; i += 1) {
   console.log(`     hero: ${hero ? `${hero.brand} ${hero.name.slice(0, 50)} (${hero.category})` : '— NONE — visually weak post'}`);
   if (missingRequired.length) console.log(`     missing required: ${missingRequired.join(', ')}`);
   if (weak.length) console.log(`     weak products: ${weak.length}`);
-  console.log(`     combo: ${comboSignature(items).slice(0, 120)}`);
+  console.log(`     combo: ${comboSignature(items).slice(0, 120)}${duplicateRequired ? ' DUPLICATE-REQUIRED' : ''}`);
   console.log('');
+
+  if (requiredSignature) seenRequired.add(requiredSignature);
+  if (shoeId) seenShoes.add(shoeId);
 }
 
 console.log('=== SUMMARY ===');
@@ -250,4 +325,6 @@ console.log(`postsWithStrongHero  : ${firstTen.length - weakHeroPostCount}`);
 console.log(`postsWithWeakHero    : ${weakHeroPostCount}  ⚠️  (these are the "broken-looking" first-page cards)`);
 console.log(`postsWithAllRequired : ${firstTen.length - missingRequiredPostCount}`);
 console.log(`postsMissingRequired : ${missingRequiredPostCount}`);
+console.log(`formulaDiversity     : ${seenFormulas.size}`);
+console.log(`structureDiversity   : ${seenStructures.size}`);
 console.log(`postsAllGood         : ${okPostCount}`);

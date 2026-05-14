@@ -48,6 +48,7 @@ interface ScenarioReport {
   repeatedProducts: Array<{ label: string; count: number }>;
   warningSamples: string[];
   samples: string[];
+  formulaDiversity: number;
 }
 
 function productIds(products: Partial<Record<Category, Product>>): string[] {
@@ -153,6 +154,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
   let accessoryOveruseRuns = 0;
   let weakCategoryMatches = 0;
   const warningSamples: string[] = [];
+  const formulaCounts = new Map<string, number>();
 
   for (let run = 0; run < RUNS_PER_SCENARIO; run += 1) {
     const currentIds = productIds(currentItems);
@@ -164,9 +166,11 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
       seed: 40_000 + run * 1_019 + label.length * 53,
       currentItems,
       avoidProductIds: Array.from(new Set([...recentIds, ...currentIds])),
+      recentFormulaIds: Array.from(formulaCounts.keys()).slice(0, 6),
     });
 
     const products = result.products;
+    formulaCounts.set(result.formula.id, (formulaCounts.get(result.formula.id) || 0) + 1);
     const ids = productIds(products);
     totalPicks += ids.length;
 
@@ -228,6 +232,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
       .slice(0, 5),
     warningSamples,
     samples,
+    formulaDiversity: formulaCounts.size,
   };
 }
 
@@ -368,6 +373,7 @@ for (const report of reports) {
       `catMismatch=${report.categoryMismatchCount}`,
       `offFrame=${report.offFrameCount}`,
       `vibeContradictions=${report.vibeContradictions}`,
+      `formulaDiversity=${report.formulaDiversity}`,
       `accessoryOveruse=${report.accessoryOveruseRuns}/${RUNS_PER_SCENARIO}`,
       `weakCategory=${report.weakCategoryMatches}`,
       `missing=${formatMissing(report.missingByCategory)}`,

@@ -39,6 +39,7 @@ import {
   getCollectionProducts,
   getShoeId,
   LAUNCH_COLLECTIONS,
+  OUTFIT_FORMULAS,
   outfitFullSignature,
   outfitRequiredSignature,
 } from '../lib/catalog';
@@ -62,6 +63,8 @@ import type { GeneratorBudget, GeneratorFrame, VibeId } from '../lib/vibes';
 interface FeedPostShape {
   id: string;
   items: Partial<Record<Category, Product>>;
+  formulaId?: string;
+  formulaLabel?: string;
 }
 
 // Mirrors store/social-feed.ts:GENERATED_POST_PLAN at this commit so the
@@ -92,6 +95,55 @@ const PLAN: Array<{ id: string; vibe: VibeId; frame: GeneratorFrame; budget: Gen
   { id: 'office-any-soft', vibe: 'office', frame: 'androgynous', budget: 'under500', seed: 1301 },
   { id: 'night-any-luxe', vibe: 'night', frame: 'androgynous', budget: 'under500', seed: 1401 },
 ];
+
+const PLAN_FORMULA_IDS: Record<string, string> = {
+  'coffee-clean-fem': 'clean-elevated',
+  'airport-neutral': 'travel-airport',
+  'street-femme-downtown': 'streetwear-sneaker-led',
+  'street-masc-campus': 'campus-cozy',
+  'night-masc-polish': 'night-out',
+  'night-femme-gold': 'date-polished',
+  'date-femme-soft': 'date-polished',
+  'date-masc-clean': 'date-polished',
+  'gym-femme-studio': 'gym-training',
+  'gym-masc-training': 'gym-training',
+  'office-fem-cream': 'office-smart-casual',
+  'office-masc-smart': 'office-smart-casual',
+  'vacation-femme-linen': 'vacation-resort',
+  'vacation-masc-resort': 'vacation-resort',
+  'cozy-femme-weekend': 'campus-cozy',
+  'cozy-masc-winter': 'travel-airport',
+  'preppy-femme-city': 'old-money-knit',
+  'preppy-masc-weekend': 'old-money-knit',
+  'edgy-femme-downtown': 'techwear-utility',
+  'edgy-masc-tech': 'techwear-utility',
+  'clean-masc-casual': 'clean-elevated',
+  'street-any-black': 'streetwear-sneaker-led',
+  'office-any-soft': 'office-smart-casual',
+  'night-any-luxe': 'date-polished',
+};
+
+const FIRST_SCREEN_POST_IDS = [
+  'feed-plan-airport-neutral',
+  'feed-plan-street-femme-downtown',
+  'feed-plan-street-masc-campus',
+  'feed-plan-gym-masc-training',
+  'feed-plan-date-femme-soft',
+  'feed-plan-vacation-femme-linen',
+  'feed-plan-office-masc-smart',
+  'feed-plan-preppy-masc-weekend',
+  'feed-plan-edgy-masc-tech',
+  'feed-plan-night-femme-gold',
+];
+
+function formulaLabel(id?: string): string | undefined {
+  return OUTFIT_FORMULAS.find((formula) => formula.id === id)?.label;
+}
+
+function prioritizeFirstScreenPosts<T extends FeedPostShape>(posts: T[]): T[] {
+  const order = new Map(FIRST_SCREEN_POST_IDS.map((id, index) => [id, index]));
+  return [...posts].sort((left, right) => (order.get(left.id) ?? 999) - (order.get(right.id) ?? 999));
+}
 
 function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
   const products = sortFeedRenderableProducts(
@@ -147,16 +199,22 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
     avoidComboSignatures: [...requiredCombos, ...fullCombos],
     recentShoeIds: recentShoes,
     recentBrandCounts: generationBrandCounts,
+    preferredFormulaId: PLAN_FORMULA_IDS[plan.id],
     diversityStrength: 'high',
-  }).products;
-  const items = sanitizeItems(generated);
+  });
+  const items = sanitizeItems(generated.products);
   const productCount = Object.values(items).filter(Boolean).length;
   // Live-app filter: SEED_POSTS / normalizeFeedPost / makeGeneratedPost all
   // require >= 5 sanitized products so OutfitBoard's 8-slot collage never
   // renders with too many empty positions. Mirror that here.
   if (productCount >= 5 && hasRequiredSlots(items)) {
     const id = cursor < PLAN.length ? `feed-plan-${plan.id}` : `feed-plan-${plan.id}-${cursor}`;
-    generatedPosts.push({ id, items });
+    generatedPosts.push({
+      id,
+      items,
+      formulaId: generated.formula.id,
+      formulaLabel: generated.formula.label,
+    });
     recentIds.unshift(
       ...Object.values(items)
         .filter((product): product is Product => Boolean(product))
@@ -181,7 +239,7 @@ while (generatedPosts.length < targetGenerated && attempts < targetGenerated * 5
   attempts += 1;
 }
 
-const posts = [...launchPosts, ...generatedPosts];
+const posts = prioritizeFirstScreenPosts([...launchPosts, ...generatedPosts]);
 const totalPosts = posts.length;
 const firstTen = posts.slice(0, 10);
 
@@ -204,14 +262,30 @@ const duplicateCombos = Array.from(comboCounts.values()).filter((ids) => ids.len
 const first10ProductIds = new Set<string>();
 const first10Shoes = new Set<string>();
 const first10Brands = new Set<string>();
+const first10Formulas = new Set<string>();
+const first10CategoryStructures = new Set<string>();
 const first10RequiredCombos = new Set<string>();
 let first10DuplicateCombos = 0;
 let first10Picks = 0;
+let first10StrongHero = 0;
+const first10WeakHeroPostIds: string[] = [];
 for (const post of firstTen) {
   const required = outfitRequiredSignature(post.items);
+  if (post.formulaId) first10Formulas.add(post.formulaId);
+  first10CategoryStructures.add(
+    (['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'] as Category[])
+      .filter((category) => Boolean(post.items[category]))
+      .join('+'),
+  );
   if (first10RequiredCombos.has(required)) first10DuplicateCombos += 1;
   first10RequiredCombos.add(required);
-  for (const product of Object.values(post.items).filter((item): item is Product => Boolean(item))) {
+  const first10Products = Object.values(post.items).filter((item): item is Product => Boolean(item));
+  if (first10Products.some(isFeedHeroCandidate)) {
+    first10StrongHero += 1;
+  } else {
+    first10WeakHeroPostIds.push(post.id);
+  }
+  for (const product of first10Products) {
     first10Picks += 1;
     first10ProductIds.add(product.id);
     if (product.category === 'shoes') first10Shoes.add(product.id);
@@ -237,8 +311,15 @@ let badNormalShoes = 0;       // posts whose shoes are present but fail isNormal
 const productCounts = new Map<string, { brand: string; name: string; count: number }>();
 const shoeCounts = new Map<string, { brand: string; name: string; count: number }>();
 const brandCounts = new Map<string, number>();
+const formulaCounts = new Map<string, number>();
+const categoryStructureCounts = new Map<string, number>();
 
 for (const post of posts) {
+  if (post.formulaId) formulaCounts.set(post.formulaId, (formulaCounts.get(post.formulaId) || 0) + 1);
+  const structure = (['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'] as Category[])
+    .filter((category) => Boolean(post.items[category]))
+    .join('+');
+  categoryStructureCounts.set(structure, (categoryStructureCounts.get(structure) || 0) + 1);
   if (!post.items.top) missingTop += 1;
   if (!post.items.bottom) missingBottom += 1;
   if (!post.items.shoes) missingShoes += 1;
@@ -313,6 +394,9 @@ if (duplicateCombos.length > comboDupThreshold) {
   failures.push(`duplicateFeedCombos=${duplicateCombos.length} > threshold ${comboDupThreshold} (>25% of ${totalPosts} posts share exact product combos)`);
 }
 if (first10DuplicateCombos > 0) failures.push(`first10DuplicateCombos=${first10DuplicateCombos}`);
+if (first10StrongHero < firstTen.length) failures.push(`first10StrongHero=${first10StrongHero}/${firstTen.length} weak=${first10WeakHeroPostIds.join(',')}`);
+if (first10Formulas.size < 5) failures.push(`first10FormulaDiversity=${first10Formulas.size} (expected at least 5)`);
+if (first10CategoryStructures.size < 5) failures.push(`first10CategoryStructureDiversity=${first10CategoryStructures.size} (expected at least 5)`);
 if (weakHeroProducts > weakHeroThreshold) {
   failures.push(`weakHeroProducts=${weakHeroProducts} > threshold ${weakHeroThreshold} (no strong hero candidate per post — first-page feed cards will look weak)`);
 }
@@ -346,10 +430,15 @@ console.log(
     `first10UniqueProducts=${first10ProductIds.size}`,
     `first10UniqueShoes=${first10Shoes.size}`,
     `first10UniqueBrands=${first10Brands.size}`,
+    `first10FormulaDiversity=${first10Formulas.size}`,
+    `first10CategoryStructureDiversity=${first10CategoryStructures.size}`,
     `first10DuplicateCombos=${first10DuplicateCombos}`,
+    `first10StrongHero=${first10StrongHero}/${firstTen.length}`,
     `first10AverageItems=${first10AverageItems.toFixed(1)}`,
     `duplicateFeedPostIds=0`,
     `duplicateFeedCombos=${duplicateCombos.length}`,
+    `formulaDiversity=${formulaCounts.size}`,
+    `categoryStructureDiversity=${categoryStructureCounts.size}`,
     `missingTop=0 missingBottom=0 missingShoes=0`,
     `intimatesLeak=0`,
     `unrenderable=0`,

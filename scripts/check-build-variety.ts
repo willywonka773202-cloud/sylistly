@@ -62,6 +62,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
   const productCounts = new Map<string, { product: Product; count: number }>();
   const shoeCounts = new Map<string, { product: Product; count: number }>();
   const brandTotals = new Map<string, number>();
+  const formulaCounts = new Map<string, number>();
   const requiredComboCounts = new Map<string, number>();
   const fullComboCounts = new Map<string, number>();
   let missingTop = 0;
@@ -83,9 +84,11 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
       avoidComboSignatures: [...requiredCombos, ...fullCombos],
       recentShoeIds: recentShoes,
       recentBrandCounts: brandCounts,
+      recentFormulaIds: Array.from(formulaCounts.entries()).sort((left, right) => right[1] - left[1]).map(([id]) => id).slice(0, 8),
       diversityStrength: 'high',
     });
     const products = result.products;
+    bump(formulaCounts, result.formula.id);
     if (!products.top) missingTop += 1;
     if (!products.bottom) missingBottom += 1;
     if (!products.shoes) missingShoes += 1;
@@ -154,6 +157,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
     label,
     totalItems,
     uniqueProducts,
+    productIds: Array.from(productCounts.keys()),
     catalogUseRate,
     duplicateRequiredCombos,
     duplicateFullCombos,
@@ -166,6 +170,7 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
     averageItems,
     maxShoeRepeats,
     maxBrandRepeats,
+    formulaDiversity: formulaCounts.size,
     topProducts: topProductCounts(productCounts),
     topShoes: topProductCounts(shoeCounts, 4),
     topBrands: topNumberCounts(brandTotals, (brand) => String(brand), 4),
@@ -174,8 +179,25 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
 }
 
 const reports = SCENARIOS.map(simulateScenario);
+const aggregateProductIds = new Set(reports.flatMap((report) => report.productIds));
+const aggregateItems = reports.reduce((sum, report) => sum + report.totalItems, 0);
+const aggregateDuplicateRequiredCombos = reports.reduce((sum, report) => sum + report.duplicateRequiredCombos, 0);
+const aggregateDuplicateFullCombos = reports.reduce((sum, report) => sum + report.duplicateFullCombos, 0);
+const aggregateMissingTop = reports.reduce((sum, report) => sum + report.missingTop, 0);
+const aggregateMissingBottom = reports.reduce((sum, report) => sum + report.missingBottom, 0);
+const aggregateMissingShoes = reports.reduce((sum, report) => sum + report.missingShoes, 0);
 
 console.log(`Build variety simulation: ${RUNS_PER_SCENARIO} generate clicks per scenario`);
+console.log(
+  [
+    'Aggregate:',
+    `uniqueProducts=${aggregateProductIds.size}`,
+    `catalogUseRate=${aggregateItems ? ((aggregateProductIds.size / aggregateItems) * 100).toFixed(1) : '0.0'}%`,
+    `duplicateRequiredCombos=${aggregateDuplicateRequiredCombos}`,
+    `duplicateFullCombos=${aggregateDuplicateFullCombos}`,
+    `missing=${aggregateMissingTop}/${aggregateMissingBottom}/${aggregateMissingShoes}`,
+  ].join('  '),
+);
 for (const report of reports) {
   console.log(
     [
@@ -191,6 +213,7 @@ for (const report of reports) {
       `avgItems=${report.averageItems.toFixed(1)}`,
       `maxShoe=${report.maxShoeRepeats}`,
       `maxBrand=${report.maxBrandRepeats}`,
+      `formulaDiversity=${report.formulaDiversity}`,
     ].join('  '),
   );
   console.log(`  topProducts: ${report.topProducts}`);

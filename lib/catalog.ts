@@ -39,6 +39,18 @@ type QualityRule = {
 type SlotQualityRules = Partial<Record<Category | 'all', QualityRule>>;
 type DiversityStrength = 'low' | 'medium' | 'high';
 
+export interface OutfitFormula {
+  id: string;
+  label: string;
+  vibeIds: VibeId[];
+  structure: string;
+  reason: string;
+  required: Category[];
+  optional: Category[];
+  prefer: Partial<Record<Category | 'all', string[]>>;
+  avoid?: Partial<Record<Category | 'all', string[]>>;
+}
+
 export interface CatalogCollection {
   id: string;
   label: string;
@@ -366,7 +378,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       hardAvoid: ['work pants', 'double knee', 'cargo', 'sweatpant', 'hiking', 'duck pant'],
     },
     shoes: {
-      prefer: ['heel', 'boot', 'loafer', 'sleek sneaker', 'dress shoe'],
+      prefer: ['heel', 'boot', 'loafer', 'sleek sneaker', 'dress shoe', 'flat', 'ballet', 'slingback', 'mary jane', 'chelsea', 'pointed', 'samba', 'converse'],
       hardAvoid: ['ugg', 'work boot', 'running', 'training', 'hiking', 'sandal', 'clog', 'birkenstock'],
     },
     bag: {
@@ -393,7 +405,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       hardAvoid: ['work pants', 'double knee', 'cargo', 'sweatpant', 'hiking', 'duck pant'],
     },
     shoes: {
-      prefer: ['heel', 'boot', 'loafer', 'sleek sneaker', 'dress shoe'],
+      prefer: ['heel', 'boot', 'loafer', 'sleek sneaker', 'dress shoe', 'flat', 'ballet', 'slingback', 'mary jane', 'chelsea', 'pointed', 'samba', 'converse'],
       hardAvoid: ['ugg', 'work boot', 'running', 'training', 'hiking', 'sandal', 'clog', 'birkenstock', 'western boot', 'cowboy boot'],
     },
     bag: {
@@ -648,6 +660,199 @@ function stableHash(value: string): number {
   return hash;
 }
 
+export const OUTFIT_FORMULAS: OutfitFormula[] = [
+  {
+    id: 'clean-elevated',
+    label: 'Clean Elevated',
+    vibeIds: ['clean', 'office', 'preppy'],
+    structure: 'polished top + tailored bottom + refined shoe',
+    reason: 'Clean anchors, tailored proportions, and one refined accessory keep it wearable without looking basic.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear'],
+    prefer: {
+      all: ['clean', 'minimal', 'neutral', 'quiet luxury', 'tailored'],
+      top: ['knit', 'polo', 'button', 'blouse', 'sweater', 'cardigan'],
+      bottom: ['trouser', 'tailored', 'chino', 'straight jean', 'skirt'],
+      shoes: ['loafer', 'flat', 'sneaker', 'boot'],
+      bag: ['tote', 'shoulder', 'structured'],
+    },
+  },
+  {
+    id: 'streetwear-sneaker-led',
+    label: 'Sneaker-Led Street',
+    vibeIds: ['street', 'edgy'],
+    structure: 'oversized layer + cargo/denim bottom + statement sneaker',
+    reason: 'The silhouette starts with volume and lets the shoe carry the streetwear read.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'hat', 'bag', 'jewelry'],
+    prefer: {
+      all: ['streetwear', 'oversized', 'cargo', 'denim', 'black', 'graphic'],
+      top: ['hoodie', 'tee', 'mesh', 'cropped', 'oversized'],
+      bottom: ['cargo', 'double knee', 'jean', 'work pant', 'baggy'],
+      shoes: ['sneaker', 'samba', 'campus', 'gazelle', 'air force'],
+      hat: ['cap', 'beanie', 'skullcap'],
+      bag: ['crossbody', 'shoulder', 'backpack'],
+    },
+  },
+  {
+    id: 'campus-cozy',
+    label: 'Campus Cozy',
+    vibeIds: ['street', 'cozy', 'clean'],
+    structure: 'soft top + easy bottom + walkable sneaker',
+    reason: 'Comfort pieces are balanced with a cleaner shoe and useful carry piece.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'hat'],
+    prefer: {
+      all: ['campus', 'college', 'cozy', 'hoodie', 'crewneck', 'casual'],
+      top: ['hoodie', 'crewneck', 'sweater', 'tee'],
+      bottom: ['jean', 'jogger', 'sweatpant', 'legging', 'cargo'],
+      shoes: ['sneaker', 'gazelle', 'samba', 'converse'],
+      bag: ['backpack', 'tote'],
+    },
+  },
+  {
+    id: 'gym-training',
+    label: 'Training Day',
+    vibeIds: ['gym'],
+    structure: 'performance top + athletic bottom + training shoe',
+    reason: 'Athletic pieces stay practical first, with a bag or cap for outside-the-gym utility.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'hat'],
+    prefer: {
+      all: ['gym', 'training', 'workout', 'performance', 'athletic'],
+      top: ['training', 'performance', 'tank', 'tee', 'hoodie'],
+      bottom: ['shorts', 'jogger', 'legging', 'track', 'sweatpant'],
+      shoes: ['training', 'running', 'trainer', 'sneaker'],
+      bag: ['gym bag', 'backpack', 'duffel'],
+    },
+    avoid: {
+      all: ['heel', 'loafer', 'blazer', 'satin', 'dressy'],
+      jewelry: ['necklace', 'bracelet', 'ring'],
+    },
+  },
+  {
+    id: 'date-polished',
+    label: 'Date Polished',
+    vibeIds: ['date', 'night'],
+    structure: 'elevated top + clean bottom + polished shoe',
+    reason: 'Dressier shoes and a small accessory sharpen the outfit without making it formal.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'jewelry'],
+    prefer: {
+      all: ['date', 'dressy', 'polished', 'black', 'sleek'],
+      top: ['blouse', 'knit', 'button', 'satin', 'polo'],
+      bottom: ['trouser', 'dark jean', 'skirt', 'tailored'],
+      shoes: ['boot', 'loafer', 'heel', 'dress shoe', 'flat', 'ballet', 'slingback', 'mary jane', 'chelsea', 'pointed', 'sleek sneaker', 'samba', 'converse'],
+      bag: ['shoulder', 'mini', 'crossbody', 'clutch'],
+      jewelry: ['gold', 'silver', 'hoop', 'chain', 'bracelet'],
+    },
+  },
+  {
+    id: 'night-out',
+    label: 'Night Out',
+    vibeIds: ['night', 'date', 'edgy'],
+    structure: 'sleek layer + dark bottom + going-out shoe',
+    reason: 'Darker anchors, polished footwear, and one shine detail make the fit feel night-ready.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'jewelry'],
+    prefer: {
+      all: ['night', 'black', 'sleek', 'dressy', 'leather', 'satin'],
+      outer: ['leather', 'blazer', 'bomber', 'jacket'],
+      top: ['satin', 'knit', 'button', 'dressy', 'sleek'],
+      bottom: ['dark jean', 'trouser', 'skirt', 'tailored'],
+      shoes: ['boot', 'heel', 'loafer', 'dress shoe', 'flat', 'ballet', 'slingback', 'mary jane', 'chelsea', 'pointed', 'sleek sneaker', 'samba', 'converse'],
+      bag: ['shoulder', 'mini', 'crossbody', 'clutch'],
+      jewelry: ['chain', 'hoop', 'gold', 'silver', 'bracelet'],
+    },
+    avoid: {
+      all: ['running', 'training', 'gym', 'hiking', 'sleepwear'],
+    },
+  },
+  {
+    id: 'travel-airport',
+    label: 'Airport Utility',
+    vibeIds: ['clean', 'cozy', 'vacation'],
+    structure: 'comfortable layer + easy pant + practical bag',
+    reason: 'Travel-friendly pieces keep movement easy while the bag and shoe make it intentional.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'hat', 'eyewear'],
+    prefer: {
+      all: ['travel', 'airport', 'comfortable', 'utility', 'layer'],
+      top: ['tee', 'hoodie', 'sweater', 'polo'],
+      bottom: ['jogger', 'jean', 'chino', 'legging', 'cargo'],
+      shoes: ['sneaker', 'clog', 'loafer'],
+      bag: ['tote', 'backpack', 'duffel', 'crossbody'],
+    },
+  },
+  {
+    id: 'office-smart-casual',
+    label: 'Office Smart Casual',
+    vibeIds: ['office', 'preppy'],
+    structure: 'structured top + tailored bottom + work shoe',
+    reason: 'The formula keeps office polish while avoiding a stiff suit read.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear'],
+    prefer: {
+      all: ['office', 'work', 'tailored', 'business casual'],
+      outer: ['blazer', 'coat', 'cardigan', 'overshirt'],
+      top: ['button', 'polo', 'sweater', 'blouse', 'knit'],
+      bottom: ['trouser', 'chino', 'tailored', 'pleated'],
+      shoes: ['loafer', 'flat', 'oxford', 'chelsea', 'dress shoe'],
+      bag: ['tote', 'satchel', 'work bag'],
+    },
+  },
+  {
+    id: 'old-money-knit',
+    label: 'Old-Money Knit',
+    vibeIds: ['preppy', 'office', 'clean'],
+    structure: 'knit/polo + trouser/chino + classic shoe',
+    reason: 'Classic knitwear and restrained accessories make the look feel refined.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'eyewear', 'jewelry'],
+    prefer: {
+      all: ['old money', 'preppy', 'classic', 'quiet luxury', 'polo'],
+      outer: ['blazer', 'cardigan', 'trench', 'coat'],
+      top: ['polo', 'knit', 'button', 'cardigan', 'sweater'],
+      bottom: ['chino', 'trouser', 'pleated', 'tailored', 'skirt'],
+      shoes: ['loafer', 'flat', 'sneaker', 'boot'],
+    },
+  },
+  {
+    id: 'vacation-resort',
+    label: 'Resort Easy',
+    vibeIds: ['vacation'],
+    structure: 'light top + warm-weather bottom + sun accessory',
+    reason: 'Light fabrics, easy shoes, and sun-ready accessories keep the outfit seasonal.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['bag', 'hat', 'eyewear', 'jewelry'],
+    prefer: {
+      all: ['vacation', 'resort', 'summer', 'linen', 'beach'],
+      top: ['linen', 'tank', 'tee', 'shirt', 'polo'],
+      bottom: ['shorts', 'skirt', 'linen', 'easy pant'],
+      shoes: ['sandal', 'slide', 'sneaker', 'loafer'],
+      bag: ['tote', 'straw', 'canvas'],
+      eyewear: ['sunglasses'],
+    },
+  },
+  {
+    id: 'techwear-utility',
+    label: 'Techwear Utility',
+    vibeIds: ['edgy', 'street'],
+    structure: 'utility layer + cargo bottom + technical shoe',
+    reason: 'Black utility pieces and practical accessories make the fit read technical, not random.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'hat', 'eyewear'],
+    prefer: {
+      all: ['techwear', 'utility', 'black', 'technical', 'cargo'],
+      outer: ['shell', 'utility', 'technical', 'bomber', 'jacket'],
+      top: ['tee', 'technical', 'black', 'performance'],
+      bottom: ['cargo', 'utility', 'technical', 'black jean'],
+      shoes: ['boot', 'technical sneaker', 'black sneaker'],
+      bag: ['crossbody', 'sling', 'messenger', 'belt bag'],
+    },
+  },
+];
+
 export function productIdOf(product?: Product | null): string | null {
   return product?.id || null;
 }
@@ -749,6 +954,28 @@ function chooseVariedCandidate<T>(items: T[], seed: number, key: string): T | nu
   }
 
   return pool[0] || null;
+}
+
+export function chooseOutfitFormula({
+  vibe,
+  seed = 0,
+  recentFormulaIds = [],
+  preferredFormulaId,
+}: {
+  vibe: VibeId;
+  seed?: number;
+  recentFormulaIds?: string[];
+  preferredFormulaId?: string;
+}): OutfitFormula {
+  const compatible = OUTFIT_FORMULAS.filter((formula) => formula.vibeIds.includes(vibe));
+  const pool = compatible.length ? compatible : OUTFIT_FORMULAS;
+  const preferred = preferredFormulaId ? pool.find((formula) => formula.id === preferredFormulaId) : undefined;
+  if (preferred && !recentFormulaIds.slice(0, 3).includes(preferred.id)) return preferred;
+  const recentSet = new Set(recentFormulaIds.slice(0, Math.min(4, pool.length - 1)));
+  const fresh = pool.filter((formula) => !recentSet.has(formula.id));
+  const candidates = fresh.length ? fresh : pool;
+  const index = stableHash(`${vibe}:${seed}:formula:${recentFormulaIds.join('|')}`) % candidates.length;
+  return candidates[index] || candidates[0] || OUTFIT_FORMULAS[0];
 }
 
 export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
@@ -1342,6 +1569,24 @@ function scoreRecipeProduct(product: Product, vibe: VibeId): number {
   return score;
 }
 
+function scoreFormulaProduct(product: Product, slot: Category, formula: OutfitFormula): number {
+  const haystack = searchHaystack(product);
+  const preferTerms = [
+    ...(formula.prefer.all || []),
+    ...(formula.prefer[slot] || []),
+  ];
+  const avoidTerms = [
+    ...(formula.avoid?.all || []),
+    ...(formula.avoid?.[slot] || []),
+  ];
+  let score = 0;
+  if (formula.required.includes(slot)) score += 18;
+  if (formula.optional.includes(slot)) score += 8;
+  score += Math.min(matchedTerms(haystack, preferTerms).length * 34, 120);
+  score -= matchedTerms(haystack, avoidTerms).length * 190;
+  return score;
+}
+
 function scoreCatalogQuality(product: Product, vibe: VibeId, frame: GeneratorFrame): number {
   const haystack = searchHaystack(product);
   const retailer = normalize(product.retailer || '');
@@ -1522,6 +1767,7 @@ function getSlotCandidates({
   recentBrandCounts,
   recentProductFamilyCounts,
   diversityStrength,
+  formula,
   selectedProducts,
   collectionCandidates,
 }: {
@@ -1539,6 +1785,7 @@ function getSlotCandidates({
   recentBrandCounts: Record<string, number>;
   recentProductFamilyCounts: Record<string, number>;
   diversityStrength: DiversityStrength;
+  formula: OutfitFormula;
   selectedProducts: Product[];
   collectionCandidates: Product[];
 }): Product[] {
@@ -1599,6 +1846,7 @@ function getSlotCandidates({
           scoreFallbackProduct(product, vibe, frame)
           + frameCompatibilityScore(product, frame)
           + scoreRecipeProduct(product, vibe)
+          + scoreFormulaProduct(product, slot, formula)
           + scoreCatalogQuality(product, vibe, frame)
           + scoreCategoryIntegrity(product)
           + scoreVibeCategoryFit(product, vibe, frame)
@@ -1607,10 +1855,10 @@ function getSlotCandidates({
           + (collectionIds.has(product.id) ? 10 : 0)
           + (searchedIds.has(product.id) ? 18 : 0)
           - (usedBrands.has(brandKey) ? 34 : 0)
-          - (avoidIds.has(product.id) ? Math.round(170 * penaltyScale) : 0)
+          - (avoidIds.has(product.id) ? Math.round((slot === 'shoes' ? 380 : 190) * penaltyScale) : 0)
           - (currentIds.has(product.id) ? 240 : 0)
           - (product.id === currentProductId ? 340 : 0)
-          - (isRecentShoe ? Math.round(220 * penaltyScale) : 0)
+          - (isRecentShoe ? Math.round(620 * penaltyScale) : 0)
           - Math.min(160, Math.round(recentBrandCount * 36 * penaltyScale))
           - Math.min(120, Math.round(recentFamilyCount * 46 * penaltyScale))
           + ((product.productUrl || product.retailerUrl || product.googleShoppingUrl || product.fallbackUrl) ? 6 : -10),
@@ -1729,6 +1977,8 @@ export function buildCatalogLook({
   avoidComboSignatures = [],
   recentShoeIds = [],
   recentBrandCounts,
+  recentFormulaIds = [],
+  preferredFormulaId,
   diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
   _diversityRetry = 0,
@@ -1745,6 +1995,8 @@ export function buildCatalogLook({
   avoidComboSignatures?: string[];
   recentShoeIds?: string[];
   recentBrandCounts?: Record<string, number>;
+  recentFormulaIds?: string[];
+  preferredFormulaId?: string;
   diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
   _diversityRetry?: number;
@@ -1752,8 +2004,10 @@ export function buildCatalogLook({
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
   missingSlots: Category[];
+  formula: OutfitFormula;
 } {
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
+  const formula = chooseOutfitFormula({ vibe, seed, recentFormulaIds, preferredFormulaId });
   const existingItems = currentItems || {};
   const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
@@ -1820,6 +2074,7 @@ export function buildCatalogLook({
       recentBrandCounts: brandCountsForDiversity,
       recentProductFamilyCounts: productFamilyCountsForDiversity,
       diversityStrength,
+      formula,
       selectedProducts: [
         ...anchorProducts,
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),
@@ -1912,6 +2167,7 @@ export function buildCatalogLook({
           recentBrandCounts: brandCountsForDiversity,
           recentProductFamilyCounts: productFamilyCountsForDiversity,
           diversityStrength,
+          formula,
           selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
           collectionCandidates,
         });
@@ -1991,6 +2247,8 @@ export function buildCatalogLook({
       avoidComboSignatures,
       recentShoeIds,
       recentBrandCounts,
+      recentFormulaIds,
+      preferredFormulaId,
       diversityStrength,
       targetSlots: selectedTargetSlots,
       _diversityRetry: _diversityRetry + 1,
@@ -2008,6 +2266,7 @@ export function buildCatalogLook({
     products: picked,
     collection: bestCollection,
     missingSlots,
+    formula,
   };
 }
 
@@ -2024,6 +2283,8 @@ export async function buildAiCatalogLook({
   avoidComboSignatures = [],
   recentShoeIds = [],
   recentBrandCounts,
+  recentFormulaIds = [],
+  preferredFormulaId,
   diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
 }: {
@@ -2039,12 +2300,15 @@ export async function buildAiCatalogLook({
   avoidComboSignatures?: string[];
   recentShoeIds?: string[];
   recentBrandCounts?: Record<string, number>;
+  recentFormulaIds?: string[];
+  preferredFormulaId?: string;
   diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
 }): Promise<{
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
   missingSlots: Category[];
+  formula: OutfitFormula;
   assistantMode: 'ai-assisted' | 'catalog';
 }> {
   const base = buildCatalogLook({
@@ -2060,6 +2324,8 @@ export async function buildAiCatalogLook({
     avoidComboSignatures,
     recentShoeIds,
     recentBrandCounts,
+    recentFormulaIds,
+    preferredFormulaId,
     diversityStrength,
     targetSlots: selectedTargetSlots,
   });
@@ -2116,6 +2382,7 @@ export async function buildAiCatalogLook({
       },
       recentProductFamilyCounts: countFamiliesForProductIds(avoidProductIds),
       diversityStrength,
+      formula: base.formula,
       selectedProducts: [
         ...anchorProducts,
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),
@@ -2217,6 +2484,7 @@ export async function buildAiCatalogLook({
     products: mergedProducts,
     collection: base.collection,
     missingSlots,
+    formula: base.formula,
     assistantMode: aiEnabled ? 'ai-assisted' : 'catalog',
   };
 }

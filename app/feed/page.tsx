@@ -21,10 +21,10 @@ function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
-function visibleProducts(post: FeedPost, failedImageIds?: Set<string>): Product[] {
+function visibleProducts(post: FeedPost): Product[] {
   return filterFeedRenderableProducts(Object.values(post.items).filter(
     (product): product is Product =>
-      Boolean(product) && !failedImageIds?.has(product.id),
+      Boolean(product),
   ));
 }
 
@@ -55,7 +55,6 @@ export default function FitFeedPage() {
   const [commentText, setCommentText] = useState('');
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
-  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -65,8 +64,8 @@ export default function FitFeedPage() {
     // "broken-looking" empty-board appearance. The store-level filters
     // (SEED_POSTS, normalizeFeedPost, makeGeneratedPost) already enforce 5+
     // pre-render; this final UI guard catches images that fail at runtime.
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post, failedImageIds).length >= 5),
-    [posts, activeFilter, failedImageIds],
+    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 5),
+    [posts, activeFilter],
   );
 
   useEffect(() => {
@@ -90,7 +89,7 @@ export default function FitFeedPage() {
   }, [generateMorePosts, filteredPosts.length]);
 
   function remix(post: FeedPost) {
-    const products = visibleProducts(post, failedImageIds);
+    const products = visibleProducts(post);
     if (products.length < 3) return;
     setBurstPostId(post.id);
     window.setTimeout(() => {
@@ -108,13 +107,13 @@ export default function FitFeedPage() {
   function savePost(post: FeedPost) {
     toggleSave(post.id);
     if (!post.saved) {
-      const products = visibleProducts(post, failedImageIds);
+      const products = visibleProducts(post);
       if (products.length >= 3) saveFit(itemsFromProducts(products));
     }
   }
 
   function shop(post: FeedPost) {
-    const products = visibleProducts(post, failedImageIds)
+    const products = visibleProducts(post)
       .map((product) => ({
         id: product.id,
         brand: product.brand,
@@ -170,7 +169,8 @@ export default function FitFeedPage() {
 
         <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
           {filteredPosts.map((post) => {
-            const products = visibleProducts(post, failedImageIds);
+            const products = visibleProducts(post);
+            const formulaLabel = post.formulaLabel || [post.tags[0], post.tags[1]].filter(Boolean).join(' / ');
             return (
               <article
                 key={post.id}
@@ -183,11 +183,11 @@ export default function FitFeedPage() {
                   </div>
                 ) : null}
 
-                <div className="absolute inset-x-0 top-[78px] z-0 px-4">
+                <div className="absolute inset-x-0 top-[92px] z-0 px-4">
                   <OutfitBoard
                     items={itemsFromProducts(products)}
-                    className="h-[min(58dvh,520px)] min-h-[390px]"
-                    onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
+                    variant="feed"
+                    className="h-[clamp(320px,48dvh,450px)]"
                   />
                 </div>
 
@@ -213,13 +213,13 @@ export default function FitFeedPage() {
                 <div className="relative z-10 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+18px)] pr-[76px]">
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/34 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
                     <Sparkles size={12} className="text-accent" />
-                    {post.sourceType || 'catalog'} fit
+                    {formulaLabel || post.sourceType || 'catalog'} fit
                   </div>
                   <h1 className="mt-3 font-serif text-[35px] font-semibold leading-[.94] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,.42)]">
                     {post.title}
                   </h1>
                   <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-white/78">
-                    {post.caption || `${post.vibe} outfit, ready to remix in Builder.`}
+                    {post.outfitReason || post.caption || `${post.vibe} outfit, ready to remix in Builder.`}
                   </p>
 
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -249,7 +249,6 @@ export default function FitFeedPage() {
                           product={product}
                           wrapperClassName="h-full w-full"
                           className="h-full w-full object-contain p-1.5 transition group-active:scale-95"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                         />
                         <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
                           {product.category}

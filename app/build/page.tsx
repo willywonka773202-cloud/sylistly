@@ -302,6 +302,7 @@ function BuilderPageContent({
   const recentFullComboRef = useRef<string[]>([]);
   const recentShoeIdsRef = useRef<string[]>([]);
   const recentBrandCountsRef = useRef<Record<string, number>>({});
+  const recentFormulaIdsRef = useRef<string[]>([]);
   const [boardDragging, setBoardDragging] = useState(false);
   const [activeEditSlot, setActiveEditSlot] = useState<Category | null>(null);
   const [swipeFeedback, setSwipeFeedback] = useState<'save' | 'pass' | null>(null);
@@ -539,6 +540,7 @@ function BuilderPageContent({
           ],
           recentShoeIds: recentShoeIdsRef.current.filter((id) => !lockedProductIds.has(id)),
           recentBrandCounts: recentBrandCountsRef.current,
+          recentFormulaIds: recentFormulaIdsRef.current,
           diversityStrength: 'high',
           mode,
           currentItems: items,
@@ -561,6 +563,9 @@ function BuilderPageContent({
         }
         if (lookData.assistantMode === 'ai-assisted') {
           assistantLabel = ' with AI stylist assist';
+        }
+        if (lookData.formula?.id && typeof lookData.formula.id === 'string') {
+          recentFormulaIdsRef.current = Array.from(new Set([lookData.formula.id, ...recentFormulaIdsRef.current])).slice(0, 10);
         }
       }
 
