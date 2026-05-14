@@ -56,6 +56,44 @@ const BLOCKED_PRODUCT_ID_SUBSTRINGS = [
   'cloth-swatch',
 ];
 
+/**
+ * Intimates / sleepwear / lingerie / loose-bodywear keywords that read as
+ * "underwear-style image" rather than a wearable normal-outfit top or
+ * bottom. Products matching these terms can still live in the catalog —
+ * they're just not allowed to fill required slots on a normal /feed card
+ * (the user complaint was bras and lace sets rendering as a "bottom" or
+ * sole top in clean/travel/casual feed posts).
+ *
+ * Sports-bra is intentionally NOT here — it's a valid gym/athletic top and
+ * is handled by vibe rules elsewhere. Pure-fashion items that happen to
+ * contain 'bra' as a substring ("bracelet", "abracadabra") are protected
+ * by hasAnyTerm's whole-word matching.
+ */
+const INTIMATES_SLEEPWEAR_TERMS = [
+  'lingerie', 'intimate', 'intimates',
+  'thong', 'panty', 'panties',
+  'underwear', 'undergarment', 'undergarments',
+  'boyshort', 'boyshorts',
+  'g string', 'g-string',
+  'lace bra', 'push up bra', 'padded bra', 'wireless bra', 'underwire bra',
+  'corset lingerie', 'lace set', 'lingerie set',
+  'pajama', 'pajamas', 'pyjama', 'pyjamas', 'pjs',
+  'sleepwear', 'nightgown', 'nightie', 'nightshirt',
+  'bikini bottom', 'bikini set', 'swim brief', 'swim briefs',
+];
+
+/**
+ * Generic visual-weakness signals beyond fabric-closeup / placeholder
+ * already covered above. These indicate products whose image is more
+ * likely a detail crop or a body-part photo than a clean product shot.
+ */
+const VISUALLY_WEAK_PRODUCT_TERMS = [
+  'detail shot', 'close up of', 'closeup of',
+  'fabric detail', 'fabric texture', 'texture detail',
+  'body part', 'body shot', 'cropped body',
+  'macro shot', 'macro photo',
+];
+
 const LOW_INFORMATION_PRODUCT_TERMS = [
   'fabric swatch',
   'cloth swatch',
@@ -100,6 +138,8 @@ const LOW_INFORMATION_PRODUCT_TERMS = [
 
 const FEED_BLOCKED_PRODUCT_TERMS = [
   ...LOW_INFORMATION_PRODUCT_TERMS,
+  ...INTIMATES_SLEEPWEAR_TERMS,
+  ...VISUALLY_WEAK_PRODUCT_TERMS,
 ];
 
 const MARKETPLACE_TERMS = [
@@ -270,6 +310,177 @@ export function isFeedBlockedProductImage(product?: Product | null): boolean {
   if (FEED_BLOCKED_PRODUCT_TERMS.some((term) => hasAnyTerm(descriptive, [term]))) return true;
   if (BLOCKED_IMAGE_URL_SUBSTRINGS.some((term) => urlContext.includes(term))) return true;
   return false;
+}
+
+/**
+ * True when a product's text strongly suggests intimates/lingerie/sleepwear.
+ * Used to block these items from filling normal-outfit required slots on
+ * /feed cards. Sports bras (which read "sports bra" not "lace bra") are
+ * NOT caught by this gate.
+ */
+export function isIntimatesOrSleepwear(product?: Product | null): boolean {
+  if (!product) return false;
+  const descriptive = productDescriptiveContext(product);
+  return INTIMATES_SLEEPWEAR_TERMS.some((term) => hasAnyTerm(descriptive, [term]));
+}
+
+/**
+ * True when a product's text suggests a visually weak feed card —
+ * detail crops, body-part shots, macro/texture photography. These pass
+ * basic renderability but render poorly as feed hero or rail products.
+ */
+export function isVisuallyWeakFeedProduct(product?: Product | null): boolean {
+  if (!product) return false;
+  const descriptive = productDescriptiveContext(product);
+  return VISUALLY_WEAK_PRODUCT_TERMS.some((term) => hasAnyTerm(descriptive, [term]));
+}
+
+// Positive-whitelist term sets — a product whose category claims to be X
+// but whose title/description does not include any of the X terms below is
+// treated as low category confidence and blocked from feed required slots.
+// Mirrors lib/catalog.ts:scoreCategoryIntegrity so the feed gate applies
+// the same standard to BOTH generator-produced AND collection-derived
+// feed posts (collection sanitize was bypassing the integrity score).
+const NORMAL_TOP_TERMS = [
+  'shirt', 't shirt', 't-shirt', 'tee', 'tank', 'top', 'blouse', 'sweater',
+  'knit', 'polo', 'button down', 'button-down', 'oxford', 'cardigan',
+  'hoodie', 'crewneck', 'crew neck', 'pullover', 'henley', 'turtleneck',
+  'mock neck', 'mock-neck', 'long sleeve', 'short sleeve', 'jersey',
+  'sweatshirt', 'cami', 'camisole',
+];
+
+const NORMAL_BOTTOM_TERMS = [
+  'pant', 'pants', 'trouser', 'trousers', 'jean', 'jeans', 'denim',
+  'short', 'shorts', 'skirt', 'cargo', 'cargos', 'chino', 'chinos',
+  'legging', 'leggings', 'jogger', 'joggers', 'sweatpant', 'sweatpants',
+  'culotte', 'culottes', 'slack', 'slacks', 'midi skirt', 'mini skirt',
+];
+
+const NORMAL_SHOE_TERMS = [
+  'shoe', 'shoes', 'sneaker', 'sneakers', 'trainer', 'trainers',
+  'loafer', 'loafers', 'boot', 'boots', 'heel', 'heels', 'sandal',
+  'sandals', 'clog', 'clogs', 'mule', 'mules', 'flat', 'flats',
+  'oxford', 'derby', 'wedge', 'wedges', 'slip on', 'slip-on',
+  'pump', 'pumps',
+  // Flagship sneaker model names that frequently appear in product titles
+  // without a generic word like "sneaker". Without these the positive
+  // whitelist would reject Adidas Samba / Campus / Gazelle, Nike Air Force /
+  // Dunk / Jordan, New Balance 530/574/9060, Dr Martens 1460, etc. —
+  // catalog flagship products that should remain feed-eligible.
+  'samba', 'gazelle', 'campus', 'spezial', 'forum',
+  'air force', 'air max', 'dunk', 'jordan', 'blazer mid', 'cortez',
+  '530', '574', '550', '9060', '993', '2002r', '1080',
+  '1460', '1461', 'jadon', 'pascal',
+  'birkenstock', 'boston', 'arizona',
+  'converse', 'chuck taylor', 'vans', 'authentic', 'old skool',
+  'reebok', 'club c', 'classic leather',
+];
+
+const NORMAL_BAG_TERMS = [
+  'bag', 'tote', 'backpack', 'crossbody', 'cross body', 'cross-body',
+  'shoulder bag', 'duffel', 'duffle', 'purse', 'clutch', 'satchel',
+  'messenger', 'fanny pack', 'belt bag', 'sling',
+];
+
+const NORMAL_OUTER_TERMS = [
+  'jacket', 'coat', 'blazer', 'cardigan', 'puffer', 'parka',
+  'hoodie', 'overshirt', 'trench', 'bomber', 'shell', 'windbreaker',
+  'shacket', 'fleece', 'gilet', 'vest',
+];
+
+/**
+ * Word-boundary positive-whitelist check: does the product's
+ * title/description contain at least one term that confirms it really is
+ * the kind of product its `category` claims it is?
+ *
+ * Used for the categories that have to be visually correct on every feed
+ * card (top, bottom, shoes, bag, outer). Returns true (no constraint) for
+ * categories without a positive whitelist defined here.
+ */
+function hasNormalCategoryWhitelistMatch(product: Product): boolean {
+  const text = productDescriptiveContext(product);
+  switch (product.category) {
+    case 'top':
+      return hasAnyTerm(text, NORMAL_TOP_TERMS);
+    case 'bottom':
+      return hasAnyTerm(text, NORMAL_BOTTOM_TERMS);
+    case 'shoes':
+      return hasAnyTerm(text, NORMAL_SHOE_TERMS);
+    case 'bag':
+      return hasAnyTerm(text, NORMAL_BAG_TERMS);
+    case 'outer':
+      return hasAnyTerm(text, NORMAL_OUTER_TERMS);
+    default:
+      return true; // hat / eyewear / jewelry handled by CATEGORY_REQUIRED_TERMS
+  }
+}
+
+/**
+ * True when product.category=top AND the product reads as a wearable
+ * shirt/tank/sweater/etc. — NOT a bra, lingerie set, swim top, or other
+ * non-normal-outfit top.
+ */
+export function isNormalOutfitTop(product?: Product | null): boolean {
+  if (!product || product.category !== 'top') return false;
+  if (isIntimatesOrSleepwear(product)) return false;
+  return hasAnyTerm(productDescriptiveContext(product), NORMAL_TOP_TERMS);
+}
+
+/**
+ * True when product.category=bottom AND the product reads as wearable
+ * pants/jeans/trousers/shorts/skirt/leggings/joggers — NOT underwear,
+ * lingerie, swim bottom, sleep shorts, etc.
+ */
+export function isNormalOutfitBottom(product?: Product | null): boolean {
+  if (!product || product.category !== 'bottom') return false;
+  if (isIntimatesOrSleepwear(product)) return false;
+  return hasAnyTerm(productDescriptiveContext(product), NORMAL_BOTTOM_TERMS);
+}
+
+/**
+ * True when product.category=shoes AND the product reads as actual
+ * footwear — NOT a fabric closeup or accessory miscategorized as shoes.
+ */
+export function isNormalOutfitShoe(product?: Product | null): boolean {
+  if (!product || product.category !== 'shoes') return false;
+  return hasAnyTerm(productDescriptiveContext(product), NORMAL_SHOE_TERMS);
+}
+
+/**
+ * Combined category-confidence check: a product really looks like what
+ * its category claims it is. Returns true for high-confidence,
+ * false for products that should not represent that category in feed.
+ */
+export function hasHighCategoryConfidence(product?: Product | null, category?: Product['category']): boolean {
+  if (!product) return false;
+  const targetCategory = category ?? product.category;
+  if (!targetCategory) return false;
+  if (product.category !== targetCategory) return false;
+  if (isIntimatesOrSleepwear(product)) return false;
+  if (hasFeedCategoryMismatch(product)) return false;
+  if (!hasNormalCategoryWhitelistMatch(product)) {
+    // hat / eyewear / jewelry use the existing CATEGORY_REQUIRED_TERMS gate
+    // already enforced by hasFeedCategoryMismatch above.
+    return ['hat', 'eyewear', 'jewelry'].includes(targetCategory);
+  }
+  return true;
+}
+
+/**
+ * True when a product is a strong candidate to anchor a feed card as the
+ * large hero image. Hero products should be the visual centerpiece —
+ * tops, outer, and bottoms in that order; not accessories, not shoes
+ * (unless explicitly a shoe-focused editorial), and never visually weak.
+ */
+export function isFeedHeroCandidate(product?: Product | null): boolean {
+  if (!product) return false;
+  if (!isRenderableProductForFeed(product)) return false;
+  if (isVisuallyWeakFeedProduct(product)) return false;
+  if (isIntimatesOrSleepwear(product)) return false;
+  // Hero anchors: pieces large enough to fill the visual frame.
+  return product.category === 'top'
+    || product.category === 'outer'
+    || product.category === 'bottom';
 }
 
 export function hasFeedCategoryMismatch(product: Product): boolean {
