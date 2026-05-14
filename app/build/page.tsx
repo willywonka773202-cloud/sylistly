@@ -133,6 +133,23 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
+
+/**
+ * Stable signature for an outfit-items map, keyed by category + product id.
+ *
+ * Used to decide whether two `Partial<Record<Category, Product>>` values
+ * represent the same outfit even when their object references differ — e.g.
+ * after `hydrateItemsFromCatalog` spreads fresh `{ ...product, ...catalogProduct }`
+ * shells on every call. Comparing signatures prevents an effect that calls
+ * `replaceItems(hydrated)` from looping forever on referentially-new but
+ * semantically-identical results.
+ */
+function itemSignature(items: Partial<Record<Category, Product>>): string {
+  return Object.entries(items)
+    .sort(([leftCat], [rightCat]) => leftCat.localeCompare(rightCat))
+    .map(([cat, product]) => `${cat}:${product?.id ?? ''}`)
+    .join('|');
+}
 const BUILD_SECTION_TABS = ['build', 'settings', 'refine', 'details'] as const;
 type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
 
@@ -371,10 +388,14 @@ function BuilderPageContent({
 
   useEffect(() => {
     const hydrated = hydrateItemsFromCatalog(items);
-    const changed = Object.entries(hydrated).some(([slot, product]) => product !== items[slot as Category]);
-    if (changed) {
-      replaceItems(hydrated);
-    }
+    // hydrateItemsFromCatalog returns a fresh `{ ...product, ...catalogProduct }`
+    // object for every slot every call, so a referential `!==` check is
+    // always true and `replaceItems(hydrated)` would loop forever
+    // (re-runs effect → fresh refs → replaceItems → re-runs → …). Compare
+    // stable category:id signatures instead so the effect only writes when
+    // the underlying outfit actually changed.
+    if (itemSignature(items) === itemSignature(hydrated)) return;
+    replaceItems(hydrated);
   }, [items, replaceItems]);
 
   useEffect(() => {
