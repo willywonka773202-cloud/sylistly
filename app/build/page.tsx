@@ -1046,27 +1046,52 @@ function BuilderPageContent({
               </button>
             </div>
 
-            <div className="mt-5 flex flex-col items-center gap-4 text-center">
-              <div className="flex flex-wrap justify-center gap-2">
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{activeVibe.label}</span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{generatorFrame === 'androgynous' ? 'Any Frame' : generatorFrame}</span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{totalDisplay}</span>
+            <div className="mt-5 flex flex-col items-center gap-3 text-center">
+              <div className="flex flex-wrap justify-center gap-1.5">
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{activeVibe.label}</span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{generatorFrame === 'androgynous' ? 'Any Frame' : generatorFrame}</span>
+                <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-accent">Score {outfitScore.total}</span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/80">{outfitScore.completeness}% complete</span>
+                <span
+                  className={`rounded-full border px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[.14em] ${
+                    allowanceDeltaCents !== null && allowanceDeltaCents < 0
+                      ? 'border-[#ffb38a]/40 bg-[#ff8a4a]/10 text-[#ffb38a]'
+                      : 'border-white/10 bg-white/[0.04] text-white/80'
+                  }`}
+                >
+                  {allowanceDeltaCents === null
+                    ? totalDisplay
+                    : allowanceDeltaCents >= 0
+                    ? `${totalDisplay} · ${builderBudgetStatus.label}`
+                    : `${totalDisplay} · ${builderBudgetStatus.label}`}
+                </span>
               </div>
               <div className="text-[11px] font-medium leading-relaxed text-muted-2">
                 <span className="text-white/70">Swipe left</span> to pass / <span className="text-white/70">Swipe right</span> to save / <span className="text-white/70">Tap</span> any slot to refine
+              </div>
+              <div className="grid w-full grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => void performBoardSwipe('left')}
+                  disabled={generatorLoading}
+                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition active:scale-[.98] hover:border-white/25 hover:text-ink disabled:opacity-50"
+                >
+                  Pass
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void performBoardSwipe('right')}
+                  disabled={generatorLoading || renderN === 0}
+                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition active:scale-[.98] hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
+                >
+                  Save
+                </button>
               </div>
             </div>
           </section>
 
           <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveBuildOverlay('settings')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-3 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
-              >
-                Controls
-              </button>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('refine')}
