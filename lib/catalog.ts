@@ -177,6 +177,71 @@ const MISSING_SLOT_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'b
 const REFRESH_ACCESSORY_SLOTS: Category[] = ['bag', 'eyewear', 'jewelry'];
 const CONDITIONAL_ACCESSORY_SLOTS = new Set<Category>(['hat', 'eyewear', 'jewelry']);
 const STRICT_CATEGORY_PREFERENCE_VIBES = new Set<VibeId>(['gym', 'office', 'vacation', 'night', 'date']);
+
+/**
+ * Required outfit slots — every standard outfit must have top + bottom + shoes.
+ * If a required slot cannot be filled from the primary vibe pool,
+ * buildCatalogLook performs a controlled cross-vibe fallback (see
+ * CROSS_VIBE_FALLBACKS) rather than silently returning an incomplete outfit.
+ */
+export const REQUIRED_OUTFIT_SLOTS: readonly Category[] = ['top', 'bottom', 'shoes'];
+
+/**
+ * Ordered style-compatible vibe fallback chain. When a strict vibe + slot pool
+ * is exhausted (e.g. office.shoes drained by avoidIds across multiple runs),
+ * try each fallback vibe's preferences in order before giving up. 'clean' is
+ * always the universal last resort.
+ *
+ * Rules preserved by routing through getSlotCandidates with a different vibe:
+ *   - renderability check (isRenderableProduct) still applies
+ *   - frame / budget / not-used / category-mismatch filters still apply
+ *   - the PRIMARY vibe's hardAvoid is re-applied after the fallback returns
+ *     (see the fallbackPool.filter call inside buildCatalogLook) — so office
+ *     never gets Dr Martens even if old-money tolerates them
+ * What changes: the prefer/hardAvoid term set used for ranking comes from
+ * the fallback vibe.
+ *
+ * Examples of intent:
+ *   - office shoes → old-money loafers → date dress shoes → clean basics
+ *   - gym shoes   → athletic / streetwear sneakers   → clean
+ *   - techwear shoes → streetwear / edgy technical sneakers → clean
+ *   - vacation shoes → travel / campus light sneakers → clean
+ */
+// Note on taxonomy: the broken-branch version of this map referenced an
+// 18-vibe VibeId union (added streetwear/techwear/old-money/work/athletic/
+// travel/campus/premium). At this restored 179d720 baseline VibeId has 10
+// values only, so the chain stays within those. Each entry below uses ONLY
+// canonical VibeIds from lib/vibes.ts — anything else would be a TS error.
+const CROSS_VIBE_FALLBACKS: Record<VibeId, readonly VibeId[]> = {
+  clean:    ['date'],
+  street:   ['edgy', 'clean'],
+  night:    ['date', 'preppy', 'clean'],
+  date:     ['night', 'preppy', 'clean'],
+  gym:      ['clean'],
+  cozy:     ['clean'],
+  office:   ['preppy', 'date', 'clean'],
+  vacation: ['clean'],
+  edgy:     ['street', 'clean'],
+  preppy:   ['office', 'date', 'clean'],
+};
+
+/**
+ * Returns true when an outfit has all three required slots filled with
+ * renderable catalog products. Accessory-only or partial outfits return false.
+ *
+ * Use this as the final gate before treating an outfit as visually complete
+ * (feed cards, builder Generate result, saved fit display, etc.).
+ */
+export function isCompleteOutfit(items: Partial<Record<Category, Product>>): boolean {
+  for (const slot of REQUIRED_OUTFIT_SLOTS) {
+    const product = items[slot];
+    if (!product) return false;
+    if (!product.id) return false;
+    if (!isRenderableProduct(product)) return false;
+  }
+  return true;
+}
+
 const DEBUG_GENERATOR = process.env.DEBUG_GENERATOR === '1';
 
 const DEFAULT_ACCESSORY_RATES: Record<VibeId, Partial<Record<Category, number>>> = {
@@ -1564,6 +1629,68 @@ export function buildCatalogLook({
     picked[slot] = chosen;
     usedIds.add(chosen.id);
     usedBrands.add(normalize(chosen.brand));
+  }
+
+  // ─── Required-slot cross-vibe fallback ─────────────────────────────────────
+  // Standard outfits must have top + bottom + shoes (see REQUIRED_OUTFIT_SLOTS).
+  // The primary slot loop above can return early with an empty candidate pool
+  // when the strict vibe rules + avoidIds drain the eligible products
+  // (observed: office.shoes after 4 consecutive runs — only ~8 loafers/flats
+  // survive office.hardAvoid + frame + budget; avoidIds eats them).
+  //
+  // Rather than emit an incomplete outfit, retry each missing required slot
+  // through the style-compatible fallback chain (CROSS_VIBE_FALLBACKS).
+  // getSlotCandidates is re-used so renderability / gender / budget /
+  // not-used filters are all preserved — only the vibe-specific prefer /
+  // hardAvoid term set changes. After the fallback returns, the PRIMARY
+  // vibe's hardAvoid is re-applied so office still rejects Dr Martens even
+  // though old-money tolerates them.
+  if (mode !== 'missing') {
+    const fallbackVibes = CROSS_VIBE_FALLBACKS[vibe] ?? [];
+    for (const slot of targetSlots) {
+      if (picked[slot]) continue;
+      if (!REQUIRED_OUTFIT_SLOTS.includes(slot)) continue;
+      for (const fallbackVibe of fallbackVibes) {
+        const rawFallbackPool = getSlotCandidates({
+          slot,
+          vibe: fallbackVibe,
+          frame,
+          budget,
+          customMaxCents,
+          usedIds,
+          avoidIds,
+          currentIds,
+          currentProductId: existingItems[slot]?.id,
+          usedBrands,
+          selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
+          collectionCandidates,
+        });
+        // Even though the fallback uses a different vibe's prefer/ranking,
+        // the primary vibe's hard-avoid list still applies — office must
+        // not get Dr Martens boots even if old-money tolerates them.
+        const fallbackPool = rawFallbackPool.filter(
+          (product) => !hasHardVibeContradiction(product, vibe, frame),
+        );
+        const fallbackChosen = chooseVariedCandidate(
+          fallbackPool,
+          seed,
+          `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:fallback:${fallbackVibe}`,
+        );
+        if (!fallbackChosen) continue;
+        picked[slot] = fallbackChosen;
+        usedIds.add(fallbackChosen.id);
+        usedBrands.add(normalize(fallbackChosen.brand));
+        debugGenerator('cross-vibe-fallback', {
+          originalVibe: vibe,
+          fallbackVibe,
+          frame,
+          slot,
+          chosenId: fallbackChosen.id,
+          chosen: `${fallbackChosen.brand} ${fallbackChosen.name}`,
+        });
+        break;
+      }
+    }
   }
 
   const missingSlots = targetSlots.filter((slot) => !picked[slot] && !(mode === 'missing' && existingItems[slot]));
