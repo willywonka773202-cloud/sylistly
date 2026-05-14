@@ -38,6 +38,25 @@ const VIBE_ALIASES: Record<string, VibeId> = {
   'old money': 'old-money', 'old-money': 'old-money', 'quiet luxury': 'old-money', heritage: 'old-money',
   campus: 'campus', college: 'campus', class: 'campus',
   premium: 'premium', luxury: 'premium', designer: 'premium', splurge: 'premium',
+
+  // Legacy / UX-label aliases — these strings flow in from stale persisted
+  // localStorage (e.g. `vibe: 'Saved'` set by /saved Post, `vibe: 'Builder'`
+  // default in social-feed.postFit). Without these, post.vibe.toLowerCase()
+  // produces a non-canonical key that crashes OUTFIT_RECIPES[vibe] access.
+  saved: 'clean',
+  builder: 'clean',
+  remix: 'clean',
+  post: 'clean',
+  posted: 'clean',
+  fit: 'clean',
+  fits: 'clean',
+  casual: 'clean',
+  cool: 'streetwear',
+  trend: 'streetwear',
+  trending: 'streetwear',
+  fitted: 'clean',
+  starter: 'clean',
+  any: 'clean',
 };
 
 const CANONICAL_VIBE_SET: Set<VibeId> = new Set([
@@ -47,11 +66,25 @@ const CANONICAL_VIBE_SET: Set<VibeId> = new Set([
 ]);
 
 export function normalizeVibe(value?: string | null): VibeId | null {
-  if (!value) return null;
+  if (!value || typeof value !== 'string') return null;
   const trimmed = value.trim().toLowerCase();
   if (!trimmed) return null;
   if (CANONICAL_VIBE_SET.has(trimmed as VibeId)) return trimmed as VibeId;
   return VIBE_ALIASES[trimmed] ?? null;
+}
+
+/**
+ * Always returns a canonical VibeId. Unlike normalizeVibe, never returns null.
+ *
+ * Safe to call with stale persisted localStorage values that may contain
+ * legacy/UX labels like 'Saved', 'Builder', 'Remix', or any other unknown
+ * string. Falls back to 'clean' for anything unrecognized.
+ *
+ * Use this at every boundary where a string-typed vibe value is about to be
+ * passed to buildCatalogLook / repairOrRegenerateOutfit / OUTFIT_RECIPES[…].
+ */
+export function canonicalizeVibeId(value?: string | null): VibeId {
+  return normalizeVibe(value) ?? 'clean';
 }
 export type GeneratorBudget = 'any' | 'under100' | 'under250' | 'under500' | 'custom';
 export type GeneratorFrame = 'masc' | 'fem' | 'androgynous';
