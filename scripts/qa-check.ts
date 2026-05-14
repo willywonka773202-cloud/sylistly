@@ -177,6 +177,7 @@ async function main() {
     run(NPM, ['run', 'typecheck']),
     run(NPM, ['run', 'catalog:health']),
     run(NPM, ['run', 'catalog:test-generator']),
+    run('npx', ['jiti', 'scripts/check-outfit-completeness.ts']),
     run('npx', ['jiti', 'scripts/check-legacy-vibe-safety.ts']),
     scanDangerousStrings(),
     checkMockIsolation(),

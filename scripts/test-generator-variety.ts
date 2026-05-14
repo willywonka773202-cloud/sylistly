@@ -50,6 +50,10 @@ interface ScenarioReport {
   samples: string[];
   productCounts: Record<string, number>;
   missingRequiredRuns: number;
+  missingTopRuns: number;
+  missingBottomRuns: number;
+  missingShoesRuns: number;
+  completeRequiredRuns: number;
 }
 
 function productIds(products: Partial<Record<Category, Product>>): string[] {
@@ -156,6 +160,10 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
   let accessoryOveruseRuns = 0;
   let weakCategoryMatches = 0;
   let missingRequiredRuns = 0;
+  let missingTopRuns = 0;
+  let missingBottomRuns = 0;
+  let missingShoesRuns = 0;
+  let completeRequiredRuns = 0;
   const warningSamples: string[] = [];
 
   for (let run = 0; run < RUNS_PER_SCENARIO; run += 1) {
@@ -197,7 +205,14 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
 
     if (products.eyewear) eyewearRuns += 1;
     if (products.jewelry) jewelryRuns += 1;
-    if (!products.top || !products.bottom || !products.shoes) missingRequiredRuns += 1;
+    const missingTop = !products.top;
+    const missingBottom = !products.bottom;
+    const missingShoes = !products.shoes;
+    if (missingTop || missingBottom || missingShoes) missingRequiredRuns += 1;
+    if (missingTop) missingTopRuns += 1;
+    if (missingBottom) missingBottomRuns += 1;
+    if (missingShoes) missingShoesRuns += 1;
+    if (!missingTop && !missingBottom && !missingShoes) completeRequiredRuns += 1;
     if (isAccessoryOveruse(vibe, products)) accessoryOveruseRuns += 1;
 
     for (const category of CATEGORY_ORDER) {
@@ -236,6 +251,10 @@ function simulateScenario({ label, vibe, frame }: { label: string; vibe: VibeId;
     samples,
     productCounts,
     missingRequiredRuns,
+    missingTopRuns,
+    missingBottomRuns,
+    missingShoesRuns,
+    completeRequiredRuns,
   };
 }
 
@@ -345,21 +364,34 @@ const aggregateProductCounts = new Map<string, number>();
 let aggregatePicks = 0;
 let aggregateUnique = 0;
 let aggregateMissingRequiredRuns = 0;
+let aggregateMissingTopRuns = 0;
+let aggregateMissingBottomRuns = 0;
+let aggregateMissingShoesRuns = 0;
+let aggregateCompleteRequiredRuns = 0;
 let aggregateMismatchCount = 0;
 let aggregateCategoryMismatchCount = 0;
 let aggregateOffFrameCount = 0;
+let aggregateVibeContradictions = 0;
 
 for (const report of reports) {
   aggregatePicks += report.totalPicks;
   aggregateUnique += report.uniqueIds;
   aggregateMissingRequiredRuns += report.missingRequiredRuns;
+  aggregateMissingTopRuns += report.missingTopRuns;
+  aggregateMissingBottomRuns += report.missingBottomRuns;
+  aggregateMissingShoesRuns += report.missingShoesRuns;
+  aggregateCompleteRequiredRuns += report.completeRequiredRuns;
   aggregateMismatchCount += report.mismatchCount;
   aggregateCategoryMismatchCount += report.categoryMismatchCount;
   aggregateOffFrameCount += report.offFrameCount;
+  aggregateVibeContradictions += report.vibeContradictions;
   for (const [id, count] of Object.entries(report.productCounts)) {
     aggregateProductCounts.set(id, (aggregateProductCounts.get(id) || 0) + count);
   }
 }
+
+const totalRuns = reports.length * RUNS_PER_SCENARIO;
+const completionRateTopBottomShoes = totalRuns ? aggregateCompleteRequiredRuns / totalRuns : 0;
 
 console.log(`Generator variety simulation: ${RUNS_PER_SCENARIO} full-look runs per scenario`);
 console.log('No SearchAPI calls are made by this script.');
@@ -371,11 +403,33 @@ console.log(
     `catalogUseRate=${((aggregateProductCounts.size / aggregatePicks) * 100).toFixed(1)}%`,
     `scenarioUniqueSum=${aggregateUnique}`,
     `missingRequiredRuns=${aggregateMissingRequiredRuns}`,
+    `missingTop=${aggregateMissingTopRuns}`,
+    `missingBottom=${aggregateMissingBottomRuns}`,
+    `missingShoes=${aggregateMissingShoesRuns}`,
+    `completionRateTopBottomShoes=${(completionRateTopBottomShoes * 100).toFixed(1)}%`,
     `genderMismatches=${aggregateMismatchCount}`,
     `categoryMismatches=${aggregateCategoryMismatchCount}`,
     `offFrame=${aggregateOffFrameCount}`,
+    `vibeContradictions=${aggregateVibeContradictions}`,
   ].join('  '),
 );
+// Machine-parseable single-line summary — read by scripts/qa-check.ts to
+// gate CI on outfit completeness. Format: `SUMMARY_JSON: { … }`.
+const summary = {
+  totalOutfits: totalRuns,
+  uniqueProducts: aggregateProductCounts.size,
+  totalPicks: aggregatePicks,
+  missingRequiredRuns: aggregateMissingRequiredRuns,
+  missingTop: aggregateMissingTopRuns,
+  missingBottom: aggregateMissingBottomRuns,
+  missingShoes: aggregateMissingShoesRuns,
+  completionRateTopBottomShoes,
+  genderMismatches: aggregateMismatchCount,
+  categoryMismatches: aggregateCategoryMismatchCount,
+  offFrame: aggregateOffFrameCount,
+  vibeContradictions: aggregateVibeContradictions,
+};
+console.log(`SUMMARY_JSON: ${JSON.stringify(summary)}`);
 console.log('');
 
 for (const report of reports) {
