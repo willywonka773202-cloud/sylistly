@@ -124,10 +124,16 @@ function seedPost(
   };
 }
 
+// Collection-derived seed posts namespace their IDs with `feed-launch-` so
+// they cannot collide with generated-plan posts (`feed-plan-…`). Several
+// LAUNCH_COLLECTIONS ids historically overlapped with GENERATED_POST_PLAN
+// ids (vacation-masc-resort, street-femme-downtown, gym-femme-studio,
+// gym-masc-training, cozy-femme-weekend) — those overlaps produced React
+// "Encountered two children with the same key" warnings on /feed.
 const COLLECTION_POSTS = LAUNCH_COLLECTIONS.map((collection, index) => seedPost(
   itemsFromCollection(index),
   index,
-  `feed-${collection.id}`,
+  `feed-launch-${collection.id}`,
   ['@selene.studio', '@downtown.dia', '@neutralindex', '@studioafter', '@workwearweek', '@resortfile', '@clubroom'][index % 7] || '@sylistly',
   collection.label.slice(0, 1).toUpperCase(),
   collection.label,
@@ -204,11 +210,38 @@ function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number], avoi
   });
 }
 
+/**
+ * Stable combo signature for a generated outfit — sorted product ids joined.
+ * Used to dedupe planned feed posts that, after generation, happen to land on
+ * the exact same product combination (e.g. two plans for the same vibe/frame
+ * pick the same loafer + chinos + shirt). Combos that repeat produce
+ * visually identical cards and waste catalog breadth.
+ */
+function outfitComboSignature(items: Partial<Record<Category, Product>>): string {
+  return getOutfitProducts(items)
+    .map((product) => product.id)
+    .sort()
+    .join('|');
+}
+
 function buildGeneratedPosts(): FeedPost[] {
   const recentIds: string[] = [];
+  const seenCombos = new Set<string>();
 
   return GENERATED_POST_PLAN.map((plan, index) => {
-    const items = itemsFromGeneratedLook(plan, recentIds);
+    let items = itemsFromGeneratedLook(plan, recentIds);
+    let combo = outfitComboSignature(items);
+
+    // If the produced outfit duplicates an earlier post's exact product
+    // combination, regenerate once with the combo's product ids added to the
+    // avoid list. This lifts uniqueness without weakening any other filter.
+    if (combo && seenCombos.has(combo)) {
+      const dedupeAvoid = Array.from(new Set([...combo.split('|'), ...recentIds]));
+      items = itemsFromGeneratedLook(plan, dedupeAvoid);
+      combo = outfitComboSignature(items);
+    }
+    if (combo) seenCombos.add(combo);
+
     const products = getOutfitProducts(items);
     recentIds.unshift(...products.map((product) => product.id));
     recentIds.splice(96);
@@ -216,7 +249,10 @@ function buildGeneratedPosts(): FeedPost[] {
     return seedPost(
       items,
       index + COLLECTION_POSTS.length,
-      `feed-${plan.id}`,
+      // Generated-plan posts get a `feed-plan-` prefix so they cannot collide
+      // with `feed-launch-*` collection posts even when both lists share an
+      // id like `vacation-masc-resort`. See COLLECTION_POSTS for context.
+      `feed-plan-${plan.id}`,
       ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
       plan.title.slice(0, 1).toUpperCase(),
       plan.title,
@@ -232,8 +268,32 @@ function buildGeneratedPosts(): FeedPost[] {
 
 const GENERATED_POSTS = buildGeneratedPosts();
 
-const SEED_POSTS: FeedPost[] = [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4);
-const FEED_STORAGE_VERSION = 3;
+/**
+ * Defense-in-depth dedupe by id. The namespaced prefixes (`feed-launch-` /
+ * `feed-plan-`) already guarantee no cross-source collisions, but if a future
+ * edit ever introduces a duplicate inside one of the two source lists we want
+ * the first occurrence to win silently instead of crashing React with a
+ * duplicate-key warning.
+ */
+function dedupeFeedPostsById(posts: FeedPost[]): FeedPost[] {
+  const seen = new Set<string>();
+  const out: FeedPost[] = [];
+  for (const post of posts) {
+    if (seen.has(post.id)) continue;
+    seen.add(post.id);
+    out.push(post);
+  }
+  return out;
+}
+
+const SEED_POSTS: FeedPost[] = dedupeFeedPostsById(
+  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4),
+);
+// Bumped from 3 to 4 because the seed-post id format changed
+// (`feed-X` → `feed-launch-X` / `feed-plan-X`). Persisted state from earlier
+// builds references the old ids and would render with stale or duplicate
+// keys after merge; resetting on bump is the safe path.
+const FEED_STORAGE_VERSION = 4;
 const MAX_PERSISTED_COMMUNITY_POSTS = 12;
 const FEED_CATEGORY_ORDER: Category[] = ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'];
 const SEED_POSTS_BY_ID = new Map(SEED_POSTS.map((post) => [post.id, post]));
