@@ -117,10 +117,16 @@ function seedPost(
   };
 }
 
+// Collection-derived seed posts namespace their IDs with `feed-launch-` so
+// they cannot collide with generated-plan posts (`feed-plan-…`). Several
+// LAUNCH_COLLECTIONS ids (vacation-masc-resort, street-femme-downtown,
+// gym-femme-studio, gym-masc-training, cozy-femme-weekend) appear with the
+// SAME literal id in GENERATED_POST_PLAN below — without namespacing, both
+// produced `feed-X` and React fired duplicate-key warnings on /feed.
 const COLLECTION_POSTS = LAUNCH_COLLECTIONS.map((collection, index) => seedPost(
   itemsFromCollection(index),
   index,
-  `feed-${collection.id}`,
+  `feed-launch-${collection.id}`,
   ['@selene.studio', '@downtown.dia', '@neutralindex', '@studioafter', '@workwearweek', '@resortfile', '@clubroom'][index % 7] || '@sylistly',
   collection.label.slice(0, 1).toUpperCase(),
   collection.label,
@@ -184,7 +190,10 @@ function itemsFromGeneratedLook(plan: (typeof GENERATED_POST_PLAN)[number], curs
 const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
   itemsFromGeneratedLook(plan),
   index + COLLECTION_POSTS.length,
-  `feed-${plan.id}`,
+  // Generated-plan posts get a `feed-plan-` prefix so they cannot collide
+  // with `feed-launch-*` collection posts even when both lists share an
+  // id like `vacation-masc-resort`. See COLLECTION_POSTS for context.
+  `feed-plan-${plan.id}`,
   ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
   plan.title.slice(0, 1).toUpperCase(),
   plan.title,
@@ -196,7 +205,25 @@ const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => seedPost(
   'catalog',
 ));
 
-const SEED_POSTS: FeedPost[] = [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4);
+/**
+ * Defense-in-depth dedupe by id. The namespaced prefixes already prevent
+ * cross-source collisions; this also catches any future within-list
+ * duplicate silently rather than crashing React with a key warning.
+ */
+function dedupeFeedPostsById(posts: FeedPost[]): FeedPost[] {
+  const seen = new Set<string>();
+  const out: FeedPost[] = [];
+  for (const post of posts) {
+    if (seen.has(post.id)) continue;
+    seen.add(post.id);
+    out.push(post);
+  }
+  return out;
+}
+
+const SEED_POSTS: FeedPost[] = dedupeFeedPostsById(
+  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4),
+);
 
 function postSignature(items: Partial<Record<Category, Product>>): string {
   return Object.values(items)
@@ -238,7 +265,10 @@ function makeGeneratedPost(plan: (typeof GENERATED_POST_PLAN)[number], cursor: n
   return seedPost(
     items,
     cursor + COLLECTION_POSTS.length,
-    `feed-${plan.id}-${cursor}`,
+    // Streaming feed posts use `feed-plan-${id}-${cursor}` so they also
+    // share the `feed-plan-` namespace and can never collide with seed
+    // collection posts (`feed-launch-…`).
+    `feed-plan-${plan.id}-${cursor}`,
     ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile', '@cityuniform', '@dailyform'][cursor % 7] || '@sylistly',
     plan.title.slice(0, 1).toUpperCase(),
     plan.title,
@@ -251,22 +281,89 @@ function makeGeneratedPost(plan: (typeof GENERATED_POST_PLAN)[number], cursor: n
   );
 }
 
+/**
+ * Per-shoe usage cap when generating a streaming feed batch. The catalog
+ * has only ~63 shoes; without this guard the same Steve Madden Slingback /
+ * Nike Air Force / Birkenstock Boston dominate the entire feed because
+ * they outscore lower-quality alternatives every call.
+ */
+const FEED_SHOE_REPEAT_CAP = 2;
+
+/**
+ * Per-brand cap on top/bottom/outer/bag picks across a streaming batch.
+ * Same rationale — prevents one brand monopolising the visible feed.
+ */
+const FEED_BRAND_REPEAT_CAP = 3;
+
+function shoesId(post: FeedPost): string | undefined {
+  return post.items.shoes?.id;
+}
+
+function postPrimaryBrands(post: FeedPost): string[] {
+  const slots: Category[] = ['top', 'bottom', 'outer', 'bag'];
+  return slots
+    .map((slot) => post.items[slot]?.brand?.toLowerCase().trim())
+    .filter((brand): brand is string => Boolean(brand));
+}
+
 function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count: number): { posts: FeedPost[]; cursor: number } {
   const signatures = new Set(existingPosts.map((post) => postSignature(post.items)).filter(Boolean));
+  const shoeCounts = new Map<string, number>();
+  const brandCounts = new Map<string, number>();
+  for (const post of existingPosts) {
+    const sid = shoesId(post);
+    if (sid) shoeCounts.set(sid, (shoeCounts.get(sid) || 0) + 1);
+    for (const brand of postPrimaryBrands(post)) {
+      brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
+    }
+  }
   const batch: FeedPost[] = [];
   let cursor = startCursor;
   let attempts = 0;
 
-  while (batch.length < count && attempts < count * 6) {
+  while (batch.length < count && attempts < count * 8) {
     const plan = GENERATED_POST_PLAN[cursor % GENERATED_POST_PLAN.length];
-    const avoidProductIds = recentProductIds([...batch, ...existingPosts]);
+    // Build avoid list: rolling recent IDs + over-capped shoes that we
+    // want the generator to actively avoid this iteration.
+    const overUsedShoes = Array.from(shoeCounts.entries())
+      .filter(([, n]) => n >= FEED_SHOE_REPEAT_CAP)
+      .map(([id]) => id);
+    const avoidProductIds = Array.from(new Set([
+      ...recentProductIds([...batch, ...existingPosts]),
+      ...overUsedShoes,
+    ])).slice(0, 120);
+
     const post = makeGeneratedPost(plan, cursor, avoidProductIds);
     cursor += 1;
     attempts += 1;
     if (!post) continue;
+
+    // Reject duplicate combo signatures outright — exact same top+bottom+
+    // shoes+accessories combination as an earlier post.
     const signature = postSignature(post.items);
     if (!signature || signatures.has(signature)) continue;
+
+    // Reject when this post's shoes have already hit the cap and we still
+    // have other plans we could try. Falls through after cap exhaustion
+    // so we never starve the feed entirely.
+    const sid = shoesId(post);
+    if (sid) {
+      const used = shoeCounts.get(sid) || 0;
+      if (used >= FEED_SHOE_REPEAT_CAP && attempts < count * 6) continue;
+    }
+
+    // Reject when this post would push a brand past the brand cap. Same
+    // soft-rejection — only enforced while we still have retry budget.
+    const brands = postPrimaryBrands(post);
+    const wouldOvercap = brands.some((brand) => (brandCounts.get(brand) || 0) >= FEED_BRAND_REPEAT_CAP);
+    if (wouldOvercap && attempts < count * 6) continue;
+
+    // Accept.
     signatures.add(signature);
+    if (sid) shoeCounts.set(sid, (shoeCounts.get(sid) || 0) + 1);
+    for (const brand of brands) {
+      brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
+    }
     batch.push(post);
   }
 
@@ -345,7 +442,11 @@ export const useSocialFeed = create<SocialFeedState>()(
     }),
     {
       name: 'sylistly.social-feed.v1',
-      version: 3,
+      // Bumped 3 → 4 because the seed-post id format changed
+      // (`feed-X` → `feed-launch-X` / `feed-plan-X`). Persisted state from
+      // older builds references the old ids; resetting on bump is the safe
+      // path so React never sees the prior duplicate keys after merge.
+      version: 4,
       migrate: (persistedState) => {
         const state = persistedState as Partial<SocialFeedState> | undefined;
         const posts = (state?.posts?.length ? state.posts : SEED_POSTS)
