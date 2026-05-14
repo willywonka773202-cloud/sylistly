@@ -11,6 +11,7 @@ import { hasUsableProductImage, isRenderableProduct } from './product-image-qual
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
 import {
   VIBES,
+  canonicalizeVibeId,
   getBudgetMaxCents,
   vibeSearchQuery,
   type GeneratorBudget,
@@ -891,7 +892,10 @@ function resolveTargetSlots(
     return selected;
   }
 
-  const recipe = OUTFIT_RECIPES[vibe];
+  // Defense-in-depth: OUTFIT_RECIPES[vibe] would be undefined for any
+  // non-canonical vibe slipping past the canonicalize step above. Fall back
+  // to the 'clean' recipe rather than letting `recipe.optional` crash.
+  const recipe = OUTFIT_RECIPES[vibe] ?? OUTFIT_RECIPES.clean;
   const includeDefaultSlot = (slot: Category, salt: string): boolean => {
     if (!CONDITIONAL_ACCESSORY_SLOTS.has(slot)) return true;
     const rate = DEFAULT_ACCESSORY_RATES[vibe]?.[slot] ?? 0;
@@ -1456,11 +1460,13 @@ function scoreFallbackProduct(
   const haystack = searchHaystack(product);
   score += presentationScore(product, buildFrameIntent(product.category, frame));
 
-  for (const term of VIBE_TAG_ALIASES[vibe]) {
+  // Defense-in-depth: VIBE_TAG_ALIASES/VIBE_TERMS are keyed by VibeId only.
+  // A non-canonical vibe would produce `undefined` and crash the for-of.
+  for (const term of (VIBE_TAG_ALIASES[vibe] ?? [])) {
     if (haystack.includes(normalize(term))) score += 26;
   }
 
-  for (const term of VIBE_TERMS[vibe]) {
+  for (const term of (VIBE_TERMS[vibe] ?? [])) {
     if (haystack.includes(normalize(term))) score += 12;
   }
 
@@ -1570,7 +1576,9 @@ function scoreVibeCategoryFit(product: Product, vibe: VibeId, frame: GeneratorFr
 }
 
 function scoreRecipeProduct(product: Product, vibe: VibeId): number {
-  const recipe = OUTFIT_RECIPES[vibe];
+  // Defense-in-depth: fall back to the clean recipe so legacy/non-canonical
+  // vibes from stale state can't crash this scorer.
+  const recipe = OUTFIT_RECIPES[vibe] ?? OUTFIT_RECIPES.clean;
   const haystack = searchHaystack(product);
   let score = 0;
 
@@ -1893,7 +1901,7 @@ function getSlotCandidates({
 }
 
 export function buildCatalogLook({
-  vibe,
+  vibe: vibeInput,
   frame,
   budget,
   customMaxCents,
@@ -1917,6 +1925,12 @@ export function buildCatalogLook({
   collection: CatalogCollection | null;
   missingSlots: Category[];
 } {
+  // Canonicalize vibe at the boundary — stale persisted state can deliver
+  // non-canonical strings like 'saved'/'builder'/'Night Out' that would
+  // otherwise crash downstream OUTFIT_RECIPES[vibe] / VIBE_TERMS[vibe] /
+  // VIBE_TAG_ALIASES[vibe] accesses. The rest of this function uses `vibe`
+  // unchanged.
+  const vibe: VibeId = canonicalizeVibeId(vibeInput);
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);

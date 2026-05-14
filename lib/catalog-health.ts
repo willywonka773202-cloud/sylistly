@@ -1,7 +1,7 @@
 import { ALL_CATALOG_PRODUCTS, buildCatalogLook, getCatalogProductById } from './catalog';
 import { isRenderableProduct, productImageQualityScore } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from './types';
-import type { GeneratorBudget, GeneratorFrame, VibeId } from './vibes';
+import { canonicalizeVibeId, type GeneratorBudget, type GeneratorFrame, type VibeId } from './vibes';
 
 export type OutfitItems = Partial<Record<Category, Product>>;
 
@@ -169,17 +169,22 @@ export function repairOrRegenerateOutfit({
   budget?: GeneratorBudget;
   seed?: number;
 }): OutfitItems {
-  const repaired = repairOutfit(items, { vibe, frame });
+  // Canonicalize vibe once at the boundary. Stale persisted state (e.g. a
+  // saved fit posted with `vibe: 'Saved'`) would otherwise feed a
+  // non-canonical key to buildCatalogLook, where OUTFIT_RECIPES[vibe] is
+  // undefined and crashes on click (remix / shop / open saved post).
+  const safeVibe: VibeId = canonicalizeVibeId(vibe);
+  const repaired = repairOutfit(items, { vibe: safeVibe, frame });
   if (validateOutfit(repaired).valid) return repaired;
 
   const generated = buildCatalogLook({
-    vibe: (vibe as VibeId) || 'clean',
+    vibe: safeVibe,
     frame: frame === 'any' ? 'androgynous' : frame,
     budget,
     mode: 'full',
     seed,
   }).products;
-  return repairOutfit(generated, { vibe, frame });
+  return repairOutfit(generated, { vibe: safeVibe, frame });
 }
 
 export function assertRenderableOutfit(items: OutfitItems): OutfitItems {
