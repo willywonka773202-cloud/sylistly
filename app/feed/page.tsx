@@ -9,6 +9,7 @@ import { ProductImage } from '@/components/ProductImage';
 import { ShopFitSheet } from '@/components/ShopFitSheet';
 import { getOutfitProducts, repairOrRegenerateOutfit } from '@/lib/catalog-health';
 import type { Product } from '@/lib/types';
+import { canonicalizeVibeId } from '@/lib/vibes';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
@@ -23,9 +24,13 @@ function formatPrice(cents: number): string {
 }
 
 function safePostItems(post: FeedPost): ReturnType<typeof repairOrRegenerateOutfit> {
+  // `canonicalizeVibeId` tolerates null/undefined and legacy/UX labels like
+  // 'Saved' or 'Builder' from stale persisted posts. The previous
+  // `post.vibe.toLowerCase()` would crash if post.vibe was undefined and
+  // could feed a non-canonical key downstream to OUTFIT_RECIPES.
   return repairOrRegenerateOutfit({
     items: post.items,
-    vibe: post.vibe.toLowerCase(),
+    vibe: canonicalizeVibeId(post.vibe),
     frame: post.frameBias || 'any',
     budget: post.totalCents <= 25000 ? 'under250' : 'under500',
   });
@@ -158,7 +163,7 @@ export default function FitFeedPage() {
     setActiveFilter(filter);
     setShowFilters(false);
     if (feedRef.current) {
-      feedRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      feedRef.current.scrollTo({ top: 0, behavior: 'auto' });
     }
   }
 
