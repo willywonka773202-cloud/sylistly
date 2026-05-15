@@ -187,6 +187,7 @@ export default function FitFeedPage() {
                   <OutfitBoard
                     items={itemsFromProducts(products)}
                     variant="feed"
+                    feedContext={{ formulaId: post.formulaId, formulaLabel: post.formulaLabel }}
                     className="h-[clamp(320px,48dvh,450px)]"
                   />
                 </div>
