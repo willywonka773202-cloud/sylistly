@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, Sparkles, Wand2 } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -267,18 +267,71 @@ interface OutfitAnalysis {
   };
 }
 
+// Picks the single most useful next action based on real builder state.
+// All hints are concrete instructions that map to controls already on
+// the page — no aspirational copy.  Returning null is allowed: when the
+// fit is healthy, the next-best block hides instead of forcing chatter.
+function computeNextBestAction(
+  items: Partial<Record<Category, Product>>,
+  lockedSlots: Category[],
+  itemCount: number,
+): { label: string; hint: string } | null {
+  if (itemCount === 0) {
+    return {
+      label: 'Generate your first look',
+      hint: 'Tap Quick Fit below to pull a starter outfit for the selected vibe.',
+    };
+  }
+  if (!items.shoes) {
+    return {
+      label: 'Add shoes to anchor the fit',
+      hint: 'Shoes finish the silhouette — tap Fill Missing to slot them in.',
+    };
+  }
+  if (!items.bottom) {
+    return {
+      label: 'Add bottoms to ground the look',
+      hint: 'A bottom locks in the proportions — tap Fill Missing.',
+    };
+  }
+  if (!items.top) {
+    return {
+      label: 'Add a top to balance the fit',
+      hint: 'A top anchors the upper half — tap Fill Missing.',
+    };
+  }
+  if (lockedSlots.length === 0) {
+    return {
+      label: 'Lock your favorite piece',
+      hint: 'Tap any slot, then Lock to keep that piece while you remix the rest.',
+    };
+  }
+  if (itemCount >= 7) {
+    return {
+      label: 'Try Fuller Fit for variation',
+      hint: 'You have a rich outfit — Fuller Fit shuffles unlocked pieces for new combos.',
+    };
+  }
+  return {
+    label: 'Remix to refine',
+    hint: 'Tap Remix to swap your unlocked pieces while locked items stay put.',
+  };
+}
+
 function BuilderPageContent({
   quickSlot,
   quickQuery,
   quickVibe,
   quickFrame,
   quickSlots,
+  quickLock,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
   quickVibe: string | null;
   quickFrame: string | null;
   quickSlots: string | null;
+  quickLock: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -437,6 +490,21 @@ function BuilderPageContent({
       .filter((slot): slot is Category => CATEGORY_ORDER.includes(slot as Category));
     if (slots.length) setSelectedGenerationSlots(CATEGORY_ORDER.filter((slot) => slots.includes(slot)));
   }, [quickSlots]);
+
+  // `?lock=<category>` from feed's "Build around hero" — lock the hero
+  // category on first mount once the matching product is actually present.
+  // Guarded by a ref so it runs at most once per navigation; without the
+  // ref, the effect could re-lock after the user manually unlocks.
+  const quickLockProcessedRef = useRef(false);
+  useEffect(() => {
+    if (!hasMounted) return;
+    if (quickLockProcessedRef.current) return;
+    if (!quickLock || !CATEGORY_ORDER.includes(quickLock as Category)) return;
+    const category = quickLock as Category;
+    if (!items[category]) return;
+    setLockedSlots((current) => (current.includes(category) ? current : [...current, category]));
+    quickLockProcessedRef.current = true;
+  }, [quickLock, hasMounted, items]);
 
   function closeSearchSheet() {
     setSearchFor(null);
@@ -1117,6 +1185,125 @@ function BuilderPageContent({
               </button>
             </div>
           </section>
+
+          {/* AI Stylist Command Center — live state, next-best-action, mode pills */}
+          <section className="flex flex-col gap-3">
+            <div className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(246,48,107,.22),transparent_45%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.025))] p-5 shadow-[0_28px_64px_rgba(246,48,107,.22)]">
+              <div className="flex items-center gap-3">
+                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                  <Wand2 size={19} strokeWidth={2.2} />
+                </span>
+                <div className="flex-1">
+                  <div className="text-[9px] font-black uppercase tracking-[.24em] text-accent">AI stylist</div>
+                  <div className="mt-0.5 font-serif text-[20px] font-semibold leading-tight text-ink">Command Center</div>
+                </div>
+                {generatorLoading ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/45 bg-accent/14 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-accent">
+                    <LoaderCircle size={11} className="animate-spin" />
+                    Styling
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Vibe</div>
+                  <div className="mt-0.5 truncate text-[13px] font-semibold text-ink">{activeVibe.label}</div>
+                </div>
+                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Total</div>
+                  <div className="mt-0.5 truncate text-[13px] font-semibold text-ink">{renderN > 0 ? totalDisplay : '—'}</div>
+                </div>
+                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Filled</div>
+                  <div className="mt-0.5 text-[13px] font-semibold text-ink">{renderN} / {CATEGORY_ORDER.length}</div>
+                </div>
+                <div className={`rounded-[16px] border p-2.5 ${lockedSlots.length > 0 ? 'border-accent/45 bg-accent/14' : 'border-white/10 bg-white/[0.04]'}`}>
+                  <div className={`text-[8px] font-bold uppercase tracking-[.16em] ${lockedSlots.length > 0 ? 'text-accent' : 'text-muted'}`}>Locked</div>
+                  <div className={`mt-0.5 text-[13px] font-semibold ${lockedSlots.length > 0 ? 'text-accent' : 'text-ink'}`}>
+                    {lockedSlots.length === 0 ? 'none' : `${lockedSlots.length} piece${lockedSlots.length === 1 ? '' : 's'}`}
+                  </div>
+                </div>
+              </div>
+
+              {(() => {
+                const nba = computeNextBestAction(renderItems, lockedSlots, renderN);
+                if (!nba) return null;
+                return (
+                  <div className="mt-4 flex items-start gap-2.5 rounded-[18px] border border-accent/35 bg-accent/10 px-3 py-2.5">
+                    <span className="mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full bg-accent text-white">
+                      <Sparkles size={11} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Next best</div>
+                      <div className="mt-0.5 text-[12px] font-semibold leading-snug text-white/92">{nba.label}</div>
+                      <div className="mt-0.5 text-[11px] leading-relaxed text-white/72">{nba.hint}</div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => void generateLook('starter')}
+                  disabled={generatorLoading}
+                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
+                >
+                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  </span>
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-ink">Quick Fit</div>
+                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Starter look</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('full')}
+                  disabled={generatorLoading}
+                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
+                >
+                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Layers size={14} />}
+                  </span>
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-ink">Fuller Fit</div>
+                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">More pieces</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('refresh')}
+                  disabled={generatorLoading || renderN === 0}
+                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
+                >
+                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <RotateCcw size={14} />}
+                  </span>
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-ink">Remix</div>
+                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Swap unlocked</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('missing')}
+                  disabled={generatorLoading}
+                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
+                >
+                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Plus size={14} />}
+                  </span>
+                  <div className="leading-none">
+                    <div className="text-[11px] font-bold text-ink">Fill Missing</div>
+                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Empty slots only</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </section>
+
           <section className="flex flex-col gap-3">
             <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
               <div className="flex items-start justify-between gap-3">
@@ -2150,13 +2337,14 @@ function BuilderPageWithSearchParams() {
       quickVibe={searchParams.get('vibe')}
       quickFrame={searchParams.get('frame')}
       quickSlots={searchParams.get('slots')}
+      quickLock={searchParams.get('lock')}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

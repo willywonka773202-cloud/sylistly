@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Check, ChevronRight, Heart, Info, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, X } from 'lucide-react';
+import { Bookmark, Check, ChevronRight, Heart, Info, Layers, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, Wand2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -153,6 +153,29 @@ export default function FitFeedPage() {
     }, 620);
   }
 
+  // "Build around this" is a stronger version of remix: it sends the
+  // visible products to /build AND locks the hero category so the user
+  // sees an obvious "this piece stays, swap everything else around it"
+  // experience.  Lock is communicated via the existing search-param
+  // pattern (`?lock=outer`) so /build can pick it up on mount without
+  // any cross-route store coupling.
+  function buildAroundHero(post: FeedPost) {
+    const products = visibleProducts(post);
+    if (products.length < 3) return;
+    if (remixingPostId) return;
+    const hero = heroProductForPost(post) ?? products[0];
+    if (!hero) {
+      remix(post);
+      return;
+    }
+    setRemixingPostId(post.id);
+    setBurstPostId(post.id);
+    window.setTimeout(() => {
+      replaceItems(itemsFromProducts(products));
+      router.push(`/build?lock=${encodeURIComponent(hero.category)}`);
+    }, 620);
+  }
+
   function like(post: FeedPost) {
     toggleLike(post.id);
     setBurstPostId(post.id);
@@ -289,6 +312,21 @@ export default function FitFeedPage() {
                   />
                 </div>
 
+                {/* Stylist Pick badge — anchors each card with a clear AI-stylist signal */}
+                <div className="pointer-events-none absolute left-4 top-[calc(env(safe-area-inset-top)+72px)] z-[15]">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#0e0a0a]/82 px-3 py-1.5 shadow-[0_10px_26px_rgba(246,48,107,.4)] backdrop-blur-md">
+                    <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
+                      <Wand2 size={10} strokeWidth={2.6} />
+                    </span>
+                    <div className="leading-none">
+                      <div className="text-[7px] font-black uppercase tracking-[.22em] text-accent">Stylist pick</div>
+                      <div className="mt-0.5 text-[10px] font-semibold text-white">
+                        {post.formulaLabel || post.vibe || 'Catalog fit'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="absolute right-3 top-[47%] z-20 flex -translate-y-1/2 flex-col items-center gap-3">
                   <button
                     onClick={() => like(post)}
@@ -413,6 +451,26 @@ export default function FitFeedPage() {
                     >
                       <ShoppingBag size={14} />
                       Shop Fit
+                    </button>
+                  </div>
+
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setWhyPostId(post.id)}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 backdrop-blur-md transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:text-white"
+                    >
+                      <Layers size={12} className="text-accent" />
+                      More like this
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => buildAroundHero(post)}
+                      disabled={remixingPostId === post.id}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/45 bg-accent/15 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/70 hover:bg-accent/22 disabled:opacity-70"
+                    >
+                      <Wand2 size={12} className="text-accent" />
+                      Build around hero
                     </button>
                   </div>
                 </div>
