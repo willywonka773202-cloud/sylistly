@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  BarChart3,
   Bookmark,
+  Check,
   Heart,
   Layers,
   Plus,
@@ -16,13 +18,16 @@ import {
 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
+import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
+import { isRenderableProduct } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
+import { useSocialFeed } from '@/store/social-feed';
 import { selectWardrobeItems, useWardrobe, type WardrobeItem } from '@/store/wardrobe';
 
-const TABS = ['Clothes', 'Outfits', 'Collections'] as const;
+const TABS = ['Clothes', 'Insights', 'Outfits', 'Collections'] as const;
 type Tab = (typeof TABS)[number];
 
 const CATEGORY_FILTERS: Array<{ label: string; categories: Category[] | null }> = [
@@ -38,18 +43,34 @@ function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
+function uniqueProducts(products: Product[], limit: number, excludedIds = new Set<string>()): Product[] {
+  const seen = new Set<string>();
+  const out: Product[] = [];
+  for (const product of products) {
+    if (!isRenderableProduct(product)) continue;
+    if (seen.has(product.id) || excludedIds.has(product.id)) continue;
+    seen.add(product.id);
+    out.push(product);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 export default function WardrobePage() {
   const items = useWardrobe(selectWardrobeItems);
   const removeItem = useWardrobe((state) => state.removeItem);
   const moveToCloset = useWardrobe((state) => state.moveToCloset);
   const moveToWishlist = useWardrobe((state) => state.moveToWishlist);
+  const addToWishlist = useWardrobe((state) => state.addToWishlist);
   const savedFits = useSavedFits((state) => state.fits);
+  const feedPosts = useSocialFeed((state) => state.posts);
   const replaceItems = useFit((state) => state.replaceItems);
   const router = useRouter();
 
   const [tab, setTab] = useState<Tab>('Clothes');
   const [filterLabel, setFilterLabel] = useState<string>('All');
   const [showWishlist, setShowWishlist] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const closetItems = useMemo(() => items.filter((entry) => entry.status === 'closet'), [items]);
   const wishlistItems = useMemo(() => items.filter((entry) => entry.status === 'wishlist'), [items]);
@@ -73,7 +94,67 @@ export default function WardrobePage() {
 
   const totalCloset = closetItems.length;
   const estClosetValueCents = closetItems.reduce((sum, entry) => sum + (entry.product.priceCents || 0), 0);
+  const estWishlistValueCents = wishlistItems.reduce((sum, entry) => sum + (entry.product.priceCents || 0), 0);
   const categoriesCovered = new Set(closetItems.map((entry) => entry.product.category)).size;
+  const wardrobeProductIds = useMemo(() => new Set(items.map((entry) => entry.productId)), [items]);
+  const categoryDistribution = useMemo(() => {
+    return CATEGORY_ORDER.map((category) => ({
+      category,
+      closet: closetItems.filter((entry) => entry.product.category === category).length,
+      wishlist: wishlistItems.filter((entry) => entry.product.category === category).length,
+    }));
+  }, [closetItems, wishlistItems]);
+  const topBrands = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const entry of items) {
+      counts.set(entry.product.brand, (counts.get(entry.product.brand) || 0) + 1);
+    }
+    return Array.from(counts.entries()).sort((left, right) => right[1] - left[1]).slice(0, 5);
+  }, [items]);
+  const gapSuggestions = useMemo(() => {
+    const feedProducts = feedPosts.flatMap((post) =>
+      Object.values(post.items).filter((product): product is Product => Boolean(product)),
+    );
+    const topMissing = gapCategories.length ? gapCategories : CATEGORY_ORDER.filter((category) => !closetItems.some((entry) => entry.product.category === category));
+    const suggestions = topMissing.flatMap((category) => {
+      const fromFeed = feedProducts.filter((product) => product.category === category);
+      const fromCatalog = ALL_CATALOG_PRODUCTS
+        .filter((product) => product.category === category)
+        .filter(isRenderableProduct)
+        .sort((left, right) => {
+          const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + (left.priceCents ? 2 : 0);
+          const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + (right.priceCents ? 2 : 0);
+          return rightScore - leftScore;
+        });
+      return uniqueProducts([...fromFeed, ...fromCatalog], 2, wardrobeProductIds);
+    });
+    return uniqueProducts(suggestions, 8, wardrobeProductIds);
+  }, [closetItems, feedPosts, gapCategories, wardrobeProductIds]);
+
+  function showToast(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 1800);
+  }
+
+  function handleRemove(productId: string) {
+    removeItem(productId);
+    showToast('Removed from wardrobe');
+  }
+
+  function handleMove(productId: string) {
+    if (showWishlist) {
+      moveToCloset(productId);
+      showToast('Moved to closet');
+    } else {
+      moveToWishlist(productId);
+      showToast('Moved to wishlist');
+    }
+  }
+
+  function saveSuggestion(product: Product) {
+    addToWishlist(product, 'catalog');
+    showToast('Added suggestion to wishlist');
+  }
 
   function startBuildAround(product: Product) {
     // Drop the product into the active build slot and route to /build with
@@ -140,15 +221,31 @@ export default function WardrobePage() {
             items={filteredItems}
             filterLabel={filterLabel}
             onFilter={setFilterLabel}
-            onRemove={removeItem}
+            onRemove={handleRemove}
             onShop={shopProduct}
             onBuildAround={startBuildAround}
-            onMove={(productId) => (showWishlist ? moveToCloset(productId) : moveToWishlist(productId))}
+            onMove={handleMove}
             isWishlist={showWishlist}
             totalCloset={totalCloset}
             categoriesCovered={categoriesCovered}
             estValueCents={estClosetValueCents}
             gapCategories={gapCategories}
+          />
+        ) : null}
+
+        {tab === 'Insights' ? (
+          <InsightsTab
+            closetCount={closetItems.length}
+            wishlistCount={wishlistItems.length}
+            closetValueCents={estClosetValueCents}
+            wishlistValueCents={estWishlistValueCents}
+            categoryDistribution={categoryDistribution}
+            topBrands={topBrands}
+            missingCategories={gapCategories}
+            suggestions={gapSuggestions}
+            onWishlist={saveSuggestion}
+            onBuildAround={startBuildAround}
+            onShop={shopProduct}
           />
         ) : null}
 
@@ -160,6 +257,15 @@ export default function WardrobePage() {
       </div>
 
       <BottomNav />
+
+      {toast ? (
+        <div className="fixed inset-x-0 bottom-[86px] z-[70] mx-auto flex max-w-[480px] justify-center px-4">
+          <div className="flex items-center gap-2 rounded-full border border-accent/35 bg-[#15110f]/95 px-4 py-2 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_42px_rgba(246,48,107,.35)] backdrop-blur-md">
+            <Check size={13} className="text-accent" />
+            {toast}
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -312,6 +418,176 @@ function ClothesTab({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function InsightsTab({
+  closetCount,
+  wishlistCount,
+  closetValueCents,
+  wishlistValueCents,
+  categoryDistribution,
+  topBrands,
+  missingCategories,
+  suggestions,
+  onWishlist,
+  onBuildAround,
+  onShop,
+}: {
+  closetCount: number;
+  wishlistCount: number;
+  closetValueCents: number;
+  wishlistValueCents: number;
+  categoryDistribution: Array<{ category: Category; closet: number; wishlist: number }>;
+  topBrands: Array<[string, number]>;
+  missingCategories: Category[];
+  suggestions: Product[];
+  onWishlist: (product: Product) => void;
+  onBuildAround: (product: Product) => void;
+  onShop: (product: Product) => void;
+}) {
+  const maxCategoryCount = Math.max(1, ...categoryDistribution.map((entry) => entry.closet + entry.wishlist));
+
+  return (
+    <div className="flex flex-col gap-4">
+      <section className="grid grid-cols-2 gap-2">
+        <InsightStat label="Closet pieces" value={closetCount.toString()} icon={Layers} />
+        <InsightStat label="Wishlist" value={wishlistCount.toString()} icon={Heart} />
+        <InsightStat label="Closet value" value={closetValueCents > 0 ? formatPrice(closetValueCents) : '$0'} icon={ShoppingBag} />
+        <InsightStat label="Wishlist value" value={wishlistValueCents > 0 ? formatPrice(wishlistValueCents) : '$0'} icon={Bookmark} />
+      </section>
+
+      <section className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.18em] text-accent">
+          <BarChart3 size={13} />
+          Category distribution
+        </div>
+        <div className="mt-4 space-y-3">
+          {categoryDistribution.map((entry) => {
+            const total = entry.closet + entry.wishlist;
+            const width = `${Math.max(6, Math.round((total / maxCategoryCount) * 100))}%`;
+            return (
+              <div key={entry.category}>
+                <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-[.14em] text-muted">
+                  <span>{entry.category}</span>
+                  <span>{entry.closet} closet · {entry.wishlist} wish</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <div className="h-full rounded-full bg-accent shadow-pink-glow" style={{ width }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-2">
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Top brands</div>
+          {topBrands.length === 0 ? (
+            <p className="mt-2 text-[12px] leading-relaxed text-muted-2">Add closet or wishlist pieces to calculate real brand concentration.</p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {topBrands.map(([brand, count]) => (
+                <span key={brand} className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-white/85">
+                  {brand} · {count}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-[24px] border border-accent/25 bg-accent/10 p-4">
+          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.18em] text-accent">
+            <Sparkles size={13} />
+            Gap assistant
+          </div>
+          <p className="mt-2 text-[12px] leading-relaxed text-white/85">
+            {missingCategories.length > 0
+              ? `Top missing closet categories: ${missingCategories.slice(0, 4).join(', ')}.`
+              : 'Your required top, bottom, shoes, and outerwear categories are covered.'}
+          </p>
+        </div>
+      </section>
+
+      {suggestions.length > 0 ? (
+        <section>
+          <div className="mb-2 px-1">
+            <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Real suggestions</div>
+            <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Fill the gaps</div>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {suggestions.map((product) => (
+              <article
+                key={product.id}
+                className="w-[142px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-white/[0.055] shadow-[0_12px_28px_rgba(0,0,0,.28)]"
+              >
+                <button type="button" onClick={() => onBuildAround(product)} className="block w-full text-left">
+                  <div className="relative h-[132px] bg-[#fff7ef]">
+                    <ProductImage
+                      product={product}
+                      wrapperClassName="h-full w-full"
+                      className="h-full w-full object-contain p-2.5"
+                    />
+                    <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                      {product.category}
+                    </div>
+                  </div>
+                  <div className="p-2.5">
+                    <div className="truncate text-[8px] font-black uppercase tracking-[.14em] text-accent">{product.brand}</div>
+                    <div className="mt-1 line-clamp-2 min-h-[30px] text-[11px] font-semibold leading-tight text-ink">{product.name}</div>
+                    <div className="mt-1 text-[10px] font-bold text-white">{formatPrice(product.priceCents)}</div>
+                  </div>
+                </button>
+                <div className="grid grid-cols-2 gap-1.5 px-2.5 pb-2.5">
+                  <button
+                    type="button"
+                    onClick={() => onWishlist(product)}
+                    className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
+                  >
+                    Wishlist
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onBuildAround(product)}
+                    className="rounded-full bg-accent px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white shadow-pink-glow transition active:scale-95"
+                  >
+                    Build
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onShop(product)}
+                    className="col-span-2 rounded-full bg-white px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-black transition active:scale-95"
+                  >
+                    Shop
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+function InsightStat({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: typeof Plus;
+}) {
+  return (
+    <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">{label}</div>
+        <Icon size={13} className="text-accent" />
+      </div>
+      <div className="mt-2 font-serif text-[22px] font-semibold leading-none text-ink">{value}</div>
     </div>
   );
 }
