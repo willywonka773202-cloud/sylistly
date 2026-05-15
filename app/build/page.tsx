@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, LoaderCircle, Lock, Send, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
@@ -314,6 +314,12 @@ function BuilderPageContent({
   const [hasMounted, setHasMounted] = useState(false);
   const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
   const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
+  // Tracks which slots were updated in the most recent successful generate.
+  // Used only for a one-shot visual glow on the slot pills; cleared after
+  // ~1.4s. State is set inside the user-triggered generateLook callback —
+  // NOT inside a useEffect that depends on `items` — so it can't loop.
+  const [recentChangedSlots, setRecentChangedSlots] = useState<Category[]>([]);
+  const recentChangedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
   const boardControls = useAnimation();
   const router = useRouter();
@@ -601,6 +607,25 @@ function BuilderPageContent({
       }
 
       replaceItems(nextItems);
+      // Surface which slots actually moved so the slot pills can play a
+      // brief glow. Capture diff vs the `items` snapshot we read at the
+      // top of generateLook (closure value, not post-replace).
+      const changedSlots: Category[] = CATEGORY_ORDER.filter((slot) => {
+        const prevId = items[slot]?.id;
+        const nextId = nextItems[slot]?.id;
+        return nextId && prevId !== nextId;
+      });
+      if (recentChangedTimeoutRef.current) {
+        clearTimeout(recentChangedTimeoutRef.current);
+        recentChangedTimeoutRef.current = null;
+      }
+      setRecentChangedSlots(changedSlots);
+      if (changedSlots.length > 0) {
+        recentChangedTimeoutRef.current = setTimeout(() => {
+          setRecentChangedSlots([]);
+          recentChangedTimeoutRef.current = null;
+        }, 1400);
+      }
       setRecentGeneratedIds((current) => {
         const freshIds = collectOutfitProductIds(nextItems).filter((id) => !lockedProductIds.has(id));
         return Array.from(new Set([...freshIds, ...current])).slice(0, 72);
@@ -1106,6 +1131,23 @@ function BuilderPageContent({
                   <div className="mt-2 text-[13px] leading-relaxed text-muted-2">
                     {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveBuildOverlay('details')}
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-[#1a0d12]/80 px-3 py-2 text-white shadow-[0_8px_22px_rgba(246,48,107,.36)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/70 hover:shadow-[0_12px_28px_rgba(246,48,107,.5)]"
+                    aria-label="Open fit insight"
+                  >
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                      <Info size={11} />
+                    </span>
+                    <div className="flex flex-col leading-none text-left">
+                      <span className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Fit insight</span>
+                      <span className="mt-0.5 text-[11px] font-semibold text-white">
+                        {renderN > 0 ? `${renderN} pieces · ${lockedSlots.length} locked` : 'Generate to see styling notes'}
+                      </span>
+                    </div>
+                    <ChevronRight size={12} className="text-white/70" />
+                  </button>
                 </div>
                 <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
                   <div className="text-[9px] uppercase tracking-[.18em] text-muted">
@@ -1302,6 +1344,7 @@ function BuilderPageContent({
                 items={renderItems}
                 activeCategory={refineFocusCategory}
                 lockedSlots={lockedSlots}
+                recentChangedSlots={recentChangedSlots}
                 onFocusCategory={focusRefineCategory}
                 onToggleLock={toggleLockedSlot}
                 onOpenSearch={openFocusedSearch}
@@ -1314,6 +1357,9 @@ function BuilderPageContent({
                 bagLayer={bagLayer}
                 onOpenSearch={setSearchFor}
                 onToggleBagLayer={() => setBagLayer((value) => (value === 'front' ? 'behind' : 'front'))}
+                lockedSlots={lockedSlots}
+                itemCount={renderN}
+                vibeLabel={activeVibe.label}
               />
               <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-4 shadow-[0_18px_42px_rgba(0,0,0,.18)]">
                 <div className="flex items-start justify-between gap-3">
@@ -1397,6 +1443,7 @@ function FocusedRefinePanel({
   items,
   activeCategory,
   lockedSlots,
+  recentChangedSlots = [],
   onFocusCategory,
   onToggleLock,
   onOpenSearch,
@@ -1404,6 +1451,7 @@ function FocusedRefinePanel({
   items: Partial<Record<Category, Product>>;
   activeCategory: Category;
   lockedSlots: Category[];
+  recentChangedSlots?: Category[];
   onFocusCategory: (category: Category) => void;
   onToggleLock: (category: Category) => void;
   onOpenSearch: (category: Category) => void;
@@ -1450,7 +1498,7 @@ function FocusedRefinePanel({
                     : active
                     ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
                     : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
-                }`}
+                } ${recentChangedSlots.includes(category) ? 'motion-safe:animate-[pulse_.7s_ease-out_1] ring-2 ring-accent/70 shadow-[0_0_26px_rgba(232,54,93,.65)]' : ''}`}
               >
                 {lockedSlots.includes(category) ? (
                   <span className="absolute -right-1.5 -top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.65)] ring-2 ring-[#0e0c0b]">
@@ -1468,11 +1516,14 @@ function FocusedRefinePanel({
                       modeClassName="h-full w-full object-contain p-1.5"
                     />
                   ) : (
-                    <span className="text-lg text-muted">+</span>
+                    <div className="flex flex-col items-center justify-center gap-0.5 px-1">
+                      <span className="text-base font-bold text-accent/70">+</span>
+                      <span className="text-[8px] font-bold uppercase tracking-[.08em] text-muted">Add</span>
+                    </div>
                   )}
                 </div>
                 <div className={`mt-1 truncate text-[8px] font-bold uppercase tracking-[.1em] ${
-                  active ? 'text-accent' : 'text-muted'
+                  active ? 'text-accent' : product ? 'text-white/65' : 'text-muted'
                 }`}>
                   {CATEGORY_LABELS[category]}
                 </div>
@@ -1710,19 +1761,39 @@ function FitDiagnosticsPanel({
   bagLayer,
   onOpenSearch,
   onToggleBagLayer,
+  lockedSlots,
+  itemCount,
+  vibeLabel,
 }: {
   analysis: OutfitAnalysis;
   bagLayer: 'front' | 'behind';
   onOpenSearch: (category: Category) => void;
   onToggleBagLayer: () => void;
+  lockedSlots: Category[];
+  itemCount: number;
+  vibeLabel: string;
 }) {
+  if (itemCount === 0) {
+    return (
+      <section className="rounded-[24px] border border-white/8 bg-white/[0.04] p-5 text-center shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/12 text-accent">
+          <Sparkles size={20} />
+        </div>
+        <div className="mt-3 font-serif text-[20px] font-semibold text-[#fff6f0]">Fit insight</div>
+        <p className="mt-2 text-[12px] leading-relaxed text-[#a8968b]">
+          Generate a look first to see styling notes — pick a vibe, tap <em className="not-italic text-accent">Generate starter look</em>, then come back here for a breakdown.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="rounded-[24px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="font-serif text-[18px] font-semibold text-[#fff6f0]">Fit Diagnostics</div>
+          <div className="font-serif text-[18px] font-semibold text-[#fff6f0]">Fit insight</div>
           <div className="mt-1 text-[11px] leading-relaxed text-[#a8968b]">
-            Real-time feedback to elevate your look.
+            {vibeLabel} · {itemCount} piece{itemCount === 1 ? '' : 's'} · real-time feedback.
           </div>
         </div>
         <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-accent bg-accent/10 text-center shadow-pink-glow">
@@ -1732,6 +1803,18 @@ function FitDiagnosticsPanel({
           </div>
         </div>
       </div>
+
+      {lockedSlots.length > 0 ? (
+        <div className="mt-3 rounded-[18px] border border-accent/40 bg-accent/8 p-3">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-accent">
+            <Lock size={11} strokeWidth={2.8} />
+            {lockedSlots.length} locked piece{lockedSlots.length === 1 ? '' : 's'}
+          </div>
+          <div className="mt-1 text-[11px] leading-relaxed text-[#e8d9cf]">
+            {lockedSlots.join(', ')} will stay put — tap <em className="not-italic text-accent">Generate</em> to swap everything else around them.
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <MetricChip label="Color harmony" value={analysis.colorHarmony} detail={analysis.harmonyLabel} />

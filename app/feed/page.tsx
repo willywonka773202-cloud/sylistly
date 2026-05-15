@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Check, Heart, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bookmark, Check, ChevronRight, Heart, Info, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -41,6 +41,56 @@ function postMatches(post: FeedPost, filter: string): boolean {
   return [post.vibe, ...post.tags].some((tag) => tag.toLowerCase().includes(needle));
 }
 
+function feedPostElementId(postId: string): string {
+  return `feed-post-${postId}`;
+}
+
+// Composes 2-3 styling notes from REAL post + product data.  No fake
+// AI text — every line is sourced from fields the generator already
+// populated (outfitReason, vibe, frameBias) or derived from the actual
+// product categories present in the post.
+function computeStylingNotes(post: FeedPost, products: Product[]): string[] {
+  const notes: string[] = [];
+  if (post.outfitReason && post.outfitReason.trim()) {
+    notes.push(post.outfitReason.trim());
+  }
+
+  const cats = new Set(products.map((p) => p.category));
+  const stack: string[] = [];
+  if (cats.has('outer')) stack.push('layered outer');
+  if (cats.has('top')) stack.push('grounded top');
+  if (cats.has('bottom')) stack.push('tailored bottom');
+  if (cats.has('shoes')) stack.push('anchor shoes');
+  if (cats.has('bag')) stack.push('intentional bag');
+  if (stack.length >= 2 && notes.length < 2) {
+    notes.push(`${capitalize(stack.slice(0, 3).join(', '))} — ${products.length} pieces working together.`);
+  }
+
+  if (post.frameBias && post.frameBias !== 'any' && notes.length < 3) {
+    notes.push(`Tuned for a ${post.frameBias} frame in the ${post.vibe} vibe.`);
+  } else if (notes.length < 3 && post.formulaLabel) {
+    notes.push(`${post.formulaLabel} formula — the structure does the work.`);
+  }
+
+  return notes.slice(0, 3);
+}
+
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function findSimilarPosts(current: FeedPost, all: FeedPost[], limit = 3): FeedPost[] {
+  if (!current.formulaId) return [];
+  return all
+    .filter((post) => post.id !== current.id && post.formulaId === current.formulaId)
+    .slice(0, limit);
+}
+
+function heroProductForPost(post: FeedPost): Product | null {
+  const items = post.items as Partial<Record<Category, Product>>;
+  return items.outer || items.top || items.bottom || items.shoes || null;
+}
+
 export default function FitFeedPage() {
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
@@ -58,6 +108,7 @@ export default function FitFeedPage() {
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
   const [remixingPostId, setRemixingPostId] = useState<string | null>(null);
   const [savedPulsePostId, setSavedPulsePostId] = useState<string | null>(null);
+  const [whyPostId, setWhyPostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
@@ -142,6 +193,20 @@ export default function FitFeedPage() {
     setCommentPost(null);
   }
 
+  function jumpToPost(postId: string) {
+    setWhyPostId(null);
+    // Defer the scroll until after the sheet close commits and the
+    // browser has painted — running inside the same tick fights the
+    // snap-scroll layout and lands one snap off.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById(feedPostElementId(postId))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  const whyPost = whyPostId ? posts.find((post) => post.id === whyPostId) ?? null : null;
+
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <div className="relative flex-1 overflow-hidden">
@@ -191,6 +256,7 @@ export default function FitFeedPage() {
             return (
               <article
                 key={post.id}
+                id={feedPostElementId(post.id)}
                 className="relative flex h-full snap-start snap-always flex-col overflow-hidden bg-[radial-gradient(circle_at_50%_10%,rgba(246,48,107,.14),transparent_34%),linear-gradient(180deg,#14110f_0%,#090807_100%)]"
               >
                 {burstPostId === post.id ? (
@@ -268,17 +334,27 @@ export default function FitFeedPage() {
                 </div>
 
                 <div className="relative z-10 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+18px)] pr-[76px]">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/35 bg-[#1a0d12]/70 px-3.5 py-2 text-white shadow-[0_10px_28px_rgba(246,48,107,.28)] backdrop-blur-md">
+                  <button
+                    type="button"
+                    onClick={() => setWhyPostId(post.id)}
+                    aria-label="Why this fit works"
+                    className="inline-flex items-center gap-2 rounded-full border border-accent/35 bg-[#1a0d12]/70 px-3.5 py-2 text-white shadow-[0_10px_28px_rgba(246,48,107,.28)] backdrop-blur-md transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/60 hover:shadow-[0_14px_34px_rgba(246,48,107,.45)]"
+                  >
                     <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
                       <Sparkles size={12} />
                     </span>
-                    <div className="flex flex-col leading-none">
+                    <div className="flex flex-col leading-none text-left">
                       <span className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Formula</span>
                       <span className="mt-0.5 text-[12px] font-semibold tracking-tight text-white">
                         {formulaLabel || post.sourceType || 'Catalog fit'}
                       </span>
                     </div>
-                  </div>
+                    <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-white/12 px-2 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-white/85">
+                      <Info size={10} />
+                      Why
+                      <ChevronRight size={10} className="-mr-1" />
+                    </span>
+                  </button>
                   <h1 className="mt-3 font-serif text-[35px] font-semibold leading-[.94] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,.42)]">
                     {post.title}
                   </h1>
@@ -388,6 +464,177 @@ export default function FitFeedPage() {
           </section>
         </div>
       ) : null}
+
+      {whyPost ? (() => {
+        const whyProducts = visibleProducts(whyPost);
+        const notes = computeStylingNotes(whyPost, whyProducts);
+        const similar = findSimilarPosts(whyPost, posts);
+        const heroProduct = heroProductForPost(whyPost) ?? whyProducts[0] ?? null;
+        const keyProducts = whyProducts.slice(0, 5);
+        return (
+          <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/60 backdrop-blur-sm">
+            <button className="absolute inset-0" aria-label="Close why this works" onClick={() => setWhyPostId(null)} />
+            <section className="relative z-10 max-h-[82dvh] w-full overflow-y-auto rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.55)]">
+              <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
+
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                    <Sparkles size={16} />
+                  </span>
+                  <div className="leading-tight">
+                    <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Why this works</div>
+                    <div className="mt-0.5 font-serif text-[22px] font-semibold text-ink">
+                      {whyPost.formulaLabel || 'Catalog fit'}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      <span className="rounded-full border border-white/14 bg-white/8 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/75">
+                        {whyPost.vibe}
+                      </span>
+                      {whyPost.frameBias && whyPost.frameBias !== 'any' ? (
+                        <span className="rounded-full border border-white/14 bg-white/8 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[.14em] text-white/75">
+                          {whyPost.frameBias} frame
+                        </span>
+                      ) : null}
+                      <span className="rounded-full border border-accent/40 bg-accent/12 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-accent">
+                        {formatPrice(whyPost.totalCents)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWhyPostId(null)}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/10"
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {notes.length > 0 ? (
+                <div className="mt-5 space-y-2">
+                  {notes.map((note, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-2.5 rounded-[18px] border border-white/8 bg-white/[0.04] px-3 py-2.5"
+                    >
+                      <span className="mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full bg-accent/22 text-accent text-[10px] font-black">
+                        {index + 1}
+                      </span>
+                      <p className="text-[13px] leading-relaxed text-white/86">{note}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {heroProduct ? (
+                <div className="mt-5">
+                  <div className="text-[10px] font-bold uppercase tracking-[.18em] text-muted">Hero piece</div>
+                  <div className="mt-2 flex items-center gap-3 rounded-[20px] border border-white/8 bg-white/[0.04] p-2.5">
+                    <div className="h-16 w-16 flex-none overflow-hidden rounded-[14px] bg-[#fff7ef]">
+                      <ProductImage
+                        product={heroProduct}
+                        wrapperClassName="h-full w-full"
+                        className="h-full w-full object-contain p-1.5"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[10px] font-bold uppercase tracking-[.16em] text-accent">{heroProduct.brand}</div>
+                      <div className="mt-0.5 line-clamp-2 text-[13px] font-semibold leading-tight text-ink">{heroProduct.name}</div>
+                      <div className="mt-0.5 text-[11px] text-muted-2">{formatPrice(heroProduct.priceCents)} · {heroProduct.category}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {keyProducts.length > 0 ? (
+                <div className="mt-5">
+                  <div className="text-[10px] font-bold uppercase tracking-[.18em] text-muted">Key pieces</div>
+                  <div className="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {keyProducts.map((product) => (
+                      <div
+                        key={`${whyPost.id}-key-${product.id}`}
+                        className="h-[78px] w-[64px] flex-none overflow-hidden rounded-[16px] border border-white/10 bg-[#fff7ef] shadow-[0_8px_18px_rgba(0,0,0,.28)]"
+                      >
+                        <ProductImage
+                          product={product}
+                          wrapperClassName="h-full w-full"
+                          className="h-full w-full object-contain p-1.5"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {similar.length > 0 ? (
+                <div className="mt-5">
+                  <div className="flex items-baseline justify-between">
+                    <div className="text-[10px] font-bold uppercase tracking-[.18em] text-muted">More like this</div>
+                    <div className="text-[10px] text-muted">{similar.length} similar</div>
+                  </div>
+                  <div className="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {similar.map((sim) => {
+                      const simHero = heroProductForPost(sim);
+                      return (
+                        <button
+                          key={sim.id}
+                          type="button"
+                          onClick={() => jumpToPost(sim.id)}
+                          className="group relative h-[96px] w-[78px] flex-none overflow-hidden rounded-[18px] border border-white/12 bg-[#fff7ef] shadow-[0_10px_24px_rgba(0,0,0,.32)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_18px_36px_rgba(246,48,107,.42)] motion-safe:transition-all motion-safe:duration-200"
+                          aria-label={`Jump to similar fit: ${sim.title}`}
+                        >
+                          {simHero ? (
+                            <ProductImage
+                              product={simHero}
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-contain p-1.5"
+                            />
+                          ) : (
+                            <div className="grid h-full w-full place-items-center bg-white/[0.04] text-[10px] text-muted">—</div>
+                          )}
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-9 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,.78)_100%)]" />
+                          <div className="pointer-events-none absolute inset-x-1 bottom-1 truncate text-[8px] font-bold uppercase tracking-[.14em] text-white">
+                            {sim.vibe}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = whyPost;
+                    setWhyPostId(null);
+                    if (target) remix(target);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                >
+                  <RotateCcw size={13} />
+                  Remix in Builder
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = whyPost;
+                    setWhyPostId(null);
+                    if (target) shop(target);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-3 text-[11px] font-semibold uppercase tracking-[.12em] text-white transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/14"
+                >
+                  <ShoppingBag size={13} />
+                  Shop fit
+                </button>
+              </div>
+            </section>
+          </div>
+        );
+      })() : null}
 
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
