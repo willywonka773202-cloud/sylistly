@@ -7,12 +7,14 @@ import {
   Bell,
   Bookmark,
   ChevronRight,
+  Check,
   Crown,
   Flame,
   Heart,
   Layers,
   Plus,
   Search,
+  ShoppingBag,
   Sparkles,
   Wand2,
 } from 'lucide-react';
@@ -34,15 +36,23 @@ function fitCoverProduct(fit: SavedFitRecord): Product | null {
   return items.outer || items.top || items.bottom || items.shoes || Object.values(items).find(Boolean) || null;
 }
 
+function itemsFromProduct(product: Product): Partial<Record<Category, Product>> {
+  return { [product.category]: product } as Partial<Record<Category, Product>>;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   useEffect(() => setHasMounted(true), []);
 
   const savedFits = useSavedFits((state) => state.fits);
   const wardrobeItems = useWardrobe(selectWardrobeItems);
+  const addToCloset = useWardrobe((state) => state.addToCloset);
+  const addToWishlist = useWardrobe((state) => state.addToWishlist);
   const feedPosts = useSocialFeed((state) => state.posts);
   const currentFitItems = useFit((state) => state.items);
+  const replaceItems = useFit((state) => state.replaceItems);
 
   // Counts derive from real state — never seeded, never inflated.
   const savedCount = hasMounted ? savedFits.length : 0;
@@ -52,12 +62,100 @@ export default function HomePage() {
   const currentFitCount = hasMounted
     ? Object.values(currentFitItems).filter(Boolean).length
     : 0;
+  const requiredClosetMissing = useMemo(() => {
+    if (!hasMounted) return [];
+    const closetCategories = new Set(
+      wardrobeItems
+        .filter((entry) => entry.status === 'closet')
+        .map((entry) => entry.product.category),
+    );
+    return (['top', 'bottom', 'shoes'] as Category[]).filter((category) => !closetCategories.has(category));
+  }, [wardrobeItems, hasMounted]);
 
   const recentSavedFits = hasMounted ? savedFits.slice(0, 6) : [];
   const recentWardrobe = useMemo(
     () => (hasMounted ? wardrobeItems.slice(0, 6) : []),
     [wardrobeItems, hasMounted],
   );
+  const nextBestAction = useMemo(() => {
+    if (!hasMounted) {
+      return {
+        eyebrow: 'Next',
+        title: 'Loading your style OS',
+        body: 'Reading local saved fits, wardrobe, wishlist, and builder state.',
+        cta: 'Open Builder',
+        href: '/build',
+        disabled: true,
+      };
+    }
+    if (savedCount === 0) {
+      return {
+        eyebrow: 'Save',
+        title: 'Save your first fit',
+        body: currentFitCount > 0 ? `${currentFitCount} builder pieces are ready to refine or save.` : 'Build a complete outfit, then save it for remixing.',
+        cta: 'Open Builder',
+        href: '/build',
+      };
+    }
+    if (closetCount === 0) {
+      return {
+        eyebrow: 'Wardrobe',
+        title: 'Start your wardrobe',
+        body: 'Add real catalog pieces to unlock closet gaps and better local styling context.',
+        cta: 'Open Wardrobe',
+        href: '/wardrobe',
+      };
+    }
+    if (requiredClosetMissing.length > 0) {
+      return {
+        eyebrow: 'Closet gap',
+        title: 'Complete your closet',
+        body: `Missing ${requiredClosetMissing.join(', ')} from the required top-bottom-shoes base.`,
+        cta: 'See gaps',
+        href: '/wardrobe',
+      };
+    }
+    if (currentFitCount > 0) {
+      return {
+        eyebrow: 'Builder',
+        title: 'Finish current fit',
+        body: `${currentFitCount} piece${currentFitCount === 1 ? '' : 's'} are in Builder. Refine, save, or shop the look.`,
+        cta: 'Finish fit',
+        href: '/build',
+      };
+    }
+    return {
+      eyebrow: 'Remix',
+      title: 'Remix a saved fit',
+      body: `${savedCount} saved fit${savedCount === 1 ? '' : 's'} can be loaded back into Builder.`,
+      cta: 'Open Saved',
+      href: '/saved',
+    };
+  }, [closetCount, currentFitCount, hasMounted, requiredClosetMissing, savedCount]);
+
+  const recentActivity = useMemo(() => {
+    if (!hasMounted) return [];
+    return [
+      ...savedFits.map((fit) => ({
+        id: `saved-${fit.id}`,
+        eyebrow: 'Saved fit',
+        title: fit.title,
+        meta: `${fit.itemCount} pieces · ${formatPrice(fit.totalCents)}`,
+        createdAt: fit.createdAt,
+        href: '/saved',
+      })),
+      ...wardrobeItems.map((item) => ({
+        id: `wardrobe-${item.id}`,
+        eyebrow: item.status === 'closet' ? 'Closet add' : 'Wishlist add',
+        title: `${item.product.brand} ${item.product.name}`,
+        meta: `${item.product.category} · ${formatPrice(item.product.priceCents)}`,
+        createdAt: item.addedAt,
+        href: '/wardrobe',
+      })),
+    ]
+      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+      .slice(0, 6);
+  }, [hasMounted, savedFits, wardrobeItems]);
 
   // "Basics" suggestions come from the feed posts the user has already
   // generated/loaded — that's our real catalog footprint. We surface the
@@ -84,6 +182,21 @@ export default function HomePage() {
     }
     return suggestions;
   }, [feedPosts, wardrobeItems, hasMounted]);
+
+  function showToast(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 1800);
+  }
+
+  function buildAround(product: Product) {
+    replaceItems(itemsFromProduct(product));
+    router.push(`/build?lock=${encodeURIComponent(product.category)}`);
+  }
+
+  function shopProduct(product: Product) {
+    const url = getProductOutboundUrl(product);
+    if (url && url !== '#') window.open(url, '_blank', 'noopener,noreferrer');
+  }
 
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
@@ -133,6 +246,31 @@ export default function HomePage() {
             <QuickStat label="Wishlist" hint="Open wishlist" href="/wardrobe" icon={Heart} count={wishlistCount} unit="pieces" />
             <QuickStat label="AI Stylist" hint="Open Syli" href="/stylist" icon={Wand2} count={currentFitCount} unit="build" />
           </div>
+        </section>
+
+        {/* Next best action */}
+        <section className="mt-5 px-4">
+          <button
+            type="button"
+            disabled={nextBestAction.disabled}
+            onClick={() => router.push(nextBestAction.href)}
+            className="group w-full rounded-[26px] border border-accent/30 bg-[radial-gradient(circle_at_18%_0%,rgba(246,48,107,.22),transparent_38%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))] p-4 text-left shadow-[0_22px_54px_rgba(0,0,0,.34)] transition active:scale-[0.98] hover:border-accent/60 motion-safe:transition-all motion-safe:duration-200 disabled:opacity-65 disabled:active:scale-100"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">{nextBestAction.eyebrow}</div>
+                <div className="mt-1 font-serif text-[21px] font-semibold leading-tight text-ink">{nextBestAction.title}</div>
+              </div>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-accent text-white shadow-pink-glow transition group-hover:scale-105">
+                <Sparkles size={17} />
+              </span>
+            </div>
+            <p className="mt-2 text-[12px] leading-relaxed text-muted-2">{nextBestAction.body}</p>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-black">
+              {nextBestAction.cta}
+              <ChevronRight size={11} />
+            </span>
+          </button>
         </section>
 
         {/* AI Stylist cards */}
@@ -299,12 +437,12 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* Basics you may have */}
+        {/* Catalog spotlight */}
         <section className="mt-6 pb-6">
           <div className="mb-2 flex items-center justify-between px-4">
             <div>
-              <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Basics</div>
-              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">You may have these</div>
+              <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Catalog spotlight</div>
+              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Real pieces to act on</div>
             </div>
           </div>
           {basicSuggestions.length === 0 ? (
@@ -316,29 +454,102 @@ export default function HomePage() {
           ) : (
             <div className="flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
               {basicSuggestions.map((product) => (
-                <button
+                <article
                   key={`basic-${product.id}`}
-                  type="button"
-                  onClick={() => {
-                    const url = getProductOutboundUrl(product);
-                    if (url && url !== '#') window.open(url, '_blank', 'noopener,noreferrer');
-                  }}
-                  className="group relative h-[140px] w-[110px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-[#fff7ef] shadow-[0_12px_28px_rgba(0,0,0,.28)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 motion-safe:transition-all motion-safe:duration-200"
-                  aria-label={`Shop ${product.brand} ${product.name}`}
+                  className="group w-[136px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-white/[0.055] shadow-[0_12px_28px_rgba(0,0,0,.28)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 motion-safe:transition-all motion-safe:duration-200"
                 >
-                  <ProductImage
-                    product={product}
-                    wrapperClassName="h-full w-full"
-                    className="h-full w-full object-contain p-2"
-                  />
-                  <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
-                    {product.category}
+                  <button
+                    type="button"
+                    onClick={() => buildAround(product)}
+                    className="block w-full text-left"
+                    aria-label={`Build around ${product.name}`}
+                  >
+                    <div className="relative h-[128px] bg-[#fff7ef]">
+                      <ProductImage
+                        product={product}
+                        wrapperClassName="h-full w-full"
+                        className="h-full w-full object-contain p-2.5"
+                      />
+                      <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                        {product.category}
+                      </div>
+                    </div>
+                    <div className="p-2.5">
+                      <div className="truncate text-[8px] font-black uppercase tracking-[.14em] text-accent">{product.brand}</div>
+                      <div className="mt-1 line-clamp-2 min-h-[30px] text-[11px] font-semibold leading-tight text-ink">{product.name}</div>
+                      <div className="mt-1 text-[10px] font-bold text-white">{formatPrice(product.priceCents)}</div>
+                    </div>
+                  </button>
+                  <div className="grid grid-cols-2 gap-1.5 px-2.5 pb-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToWishlist(product, 'catalog');
+                        showToast('Added to wishlist');
+                      }}
+                      className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
+                    >
+                      Wish
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToCloset(product, 'catalog');
+                        showToast('Added to closet');
+                      }}
+                      className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
+                    >
+                      Closet
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => buildAround(product)}
+                      className="rounded-full bg-accent px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white shadow-pink-glow transition active:scale-95"
+                    >
+                      Build
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => shopProduct(product)}
+                      className="rounded-full bg-white px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-black transition active:scale-95"
+                    >
+                      Shop
+                    </button>
                   </div>
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-9 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,.78)_100%)]" />
-                  <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 truncate text-[9px] font-bold uppercase tracking-[.14em] text-white">
-                    {formatPrice(product.priceCents)}
-                  </div>
-                </button>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Recent activity */}
+        <section className="mt-2 px-4 pb-6">
+          <div className="mb-2">
+            <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Activity</div>
+            <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Recent local actions</div>
+          </div>
+          {recentActivity.length === 0 ? (
+            <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-4 text-[12px] leading-relaxed text-muted-2">
+              Save fits, add wardrobe pieces, or wishlist products to build a real activity trail here.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {recentActivity.map((activity) => (
+                <Link
+                  key={activity.id}
+                  href={activity.href}
+                  className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/[0.04] p-3 transition active:scale-[0.98] hover:border-accent/50 motion-safe:transition-all motion-safe:duration-200"
+                >
+                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/14 text-accent">
+                    <Check size={14} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[8px] font-black uppercase tracking-[.18em] text-accent">{activity.eyebrow}</span>
+                    <span className="mt-0.5 block truncate text-[12px] font-semibold text-ink">{activity.title}</span>
+                    <span className="mt-0.5 block text-[10px] text-muted">{activity.meta}</span>
+                  </span>
+                  <ChevronRight size={13} className="text-muted" />
+                </Link>
               ))}
             </div>
           )}
@@ -371,6 +582,15 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+
+      {toast ? (
+        <div className="fixed inset-x-0 bottom-[86px] z-[70] mx-auto flex max-w-[480px] justify-center px-4">
+          <div className="flex items-center gap-2 rounded-full border border-accent/35 bg-[#15110f]/95 px-4 py-2 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_42px_rgba(246,48,107,.35)] backdrop-blur-md">
+            <ShoppingBag size={13} className="text-accent" />
+            {toast}
+          </div>
+        </div>
+      ) : null}
 
       <BottomNav />
     </main>
