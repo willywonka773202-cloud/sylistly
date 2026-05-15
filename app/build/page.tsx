@@ -987,6 +987,21 @@ function BuilderPageContent({
                     <Bookmark size={17} fill="currentColor" />
                   </div>
                 ) : null}
+                {generatorLoading ? (
+                  <div className="pointer-events-none absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 rounded-[34px] bg-[#0a0707]/74 backdrop-blur-md">
+                    <div className="relative grid h-24 w-24 place-items-center">
+                      <span className="absolute inset-0 animate-ping rounded-full bg-accent/35" />
+                      <span className="absolute inset-3 rounded-full bg-accent/20" />
+                      <LoaderCircle size={44} className="relative animate-spin text-white drop-shadow-[0_0_22px_rgba(246,48,107,.9)]" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] font-bold uppercase tracking-[.24em] text-accent">Styling your fit</div>
+                      <div className="mt-1 max-w-[80%] font-serif text-[18px] font-semibold leading-tight text-white">
+                        {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
                 <Mannequin
                   items={renderItems}
                   skinTone={skinTone}
@@ -1070,7 +1085,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-4 text-[12px] font-semibold uppercase tracking-[.14em] text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] transition active:scale-[0.97] hover:bg-right motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
               >
                 {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Build selected fit
@@ -1204,7 +1219,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('starter')}
                   disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-4 text-[12px] font-semibold uppercase tracking-[.14em] text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
                 >
                   {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
                   Generate starter look
@@ -1429,15 +1444,17 @@ function FocusedRefinePanel({
                 key={category}
                 type="button"
                 onClick={() => onFocusCategory(category)}
-                className={`relative w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
-                  active || lockedSlots.includes(category)
+                className={`relative w-[68px] flex-none rounded-[16px] border-2 p-1.5 text-left transition active:scale-95 motion-safe:transition-all motion-safe:duration-200 ${
+                  lockedSlots.includes(category)
+                    ? 'border-accent bg-accent/18 ring-2 ring-accent/45 shadow-[0_0_28px_rgba(232,54,93,.55)] scale-[1.04]'
+                    : active
                     ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
                     : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
                 }`}
               >
                 {lockedSlots.includes(category) ? (
-                  <span className="absolute right-1 top-1 z-10 grid h-4 w-4 place-items-center rounded-full bg-accent text-white">
-                    <Lock size={9} strokeWidth={3} />
+                  <span className="absolute -right-1.5 -top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.65)] ring-2 ring-[#0e0c0b]">
+                    <Lock size={11} strokeWidth={3} />
                   </span>
                 ) : null}
                 <div className={`grid aspect-square place-items-center overflow-hidden rounded-[12px] ${
@@ -1487,10 +1504,10 @@ function FocusedRefinePanel({
             <button
               type="button"
               onClick={() => onToggleLock(activeCategory)}
-              className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 ${
+              className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] transition active:scale-90 motion-safe:transition-all motion-safe:duration-200 ${
                 activeLocked
-                  ? 'border-accent bg-accent text-white shadow-[0_8px_18px_rgba(232,54,93,.34)] motion-safe:animate-[pulse_.5s_ease-out_1]'
-                  : 'border-[#d8c7b8] bg-white/85 text-[#6c5c52] hover:border-accent hover:text-accent'
+                  ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_10px_28px_rgba(232,54,93,.55)] ring-2 ring-white/30'
+                  : 'border-[#d8c7b8] bg-white/90 text-[#6c5c52] hover:border-accent hover:text-accent'
               }`}
             >
               <Lock size={11} strokeWidth={2.7} />

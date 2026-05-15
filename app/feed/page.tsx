@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Heart, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bookmark, Check, Heart, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -99,7 +99,7 @@ export default function FitFeedPage() {
     window.setTimeout(() => {
       replaceItems(itemsFromProducts(products));
       router.push('/build');
-    }, 220);
+    }, 620);
   }
 
   function like(post: FeedPost) {
@@ -115,7 +115,7 @@ export default function FitFeedPage() {
       const products = visibleProducts(post);
       if (products.length >= 3) saveFit(itemsFromProducts(products));
       setSavedPulsePostId(post.id);
-      window.setTimeout(() => setSavedPulsePostId((current) => (current === post.id ? null : current)), 480);
+      window.setTimeout(() => setSavedPulsePostId((current) => (current === post.id ? null : current)), 1200);
     }
   }
 
@@ -145,6 +145,16 @@ export default function FitFeedPage() {
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <div className="relative flex-1 overflow-hidden">
+        {savedPulsePostId ? (
+          <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+76px)] z-40 flex justify-center px-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] backdrop-blur-md">
+              <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                <Check size={13} strokeWidth={3} />
+              </span>
+              Saved to your fits
+            </div>
+          </div>
+        ) : null}
         <header className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-[calc(env(safe-area-inset-top)+12px)]">
           <div className="pointer-events-auto rounded-full border border-white/10 bg-black/38 px-3 py-2 shadow-[0_16px_34px_rgba(0,0,0,.32)] backdrop-blur-md">
             <div className="flex items-center justify-between gap-3">
@@ -160,10 +170,10 @@ export default function FitFeedPage() {
                     key={filter}
                     type="button"
                     onClick={() => setActiveFilter(filter)}
-                    className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-semibold transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
+                    className={`flex-none rounded-full px-3.5 py-1.5 text-[10px] font-semibold tracking-wide transition active:scale-90 motion-safe:transition-all motion-safe:duration-200 ${
                       activeFilter === filter
-                        ? 'bg-accent text-white shadow-pink-glow scale-[1.04]'
-                        : 'bg-white/10 text-white/70 hover:bg-white/15'
+                        ? 'scale-[1.08] bg-accent text-white shadow-[0_0_0_2px_rgba(255,255,255,.16),0_8px_28px_rgba(246,48,107,.55)] ring-1 ring-white/30'
+                        : 'bg-white/10 text-white/70 ring-1 ring-white/0 hover:bg-white/20 hover:text-white'
                     }`}
                   >
                     {filter}
@@ -187,6 +197,20 @@ export default function FitFeedPage() {
                   <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-accent/10">
                     <div className="grid h-28 w-28 animate-ping place-items-center rounded-full border border-accent/40 bg-accent/15" />
                     <Heart className="absolute text-accent drop-shadow-[0_0_28px_rgba(246,48,107,.95)]" size={74} fill="currentColor" />
+                  </div>
+                ) : null}
+
+                {remixingPostId === post.id ? (
+                  <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-[#0a0707]/75 backdrop-blur-md">
+                    <div className="relative grid h-20 w-20 place-items-center">
+                      <span className="absolute inset-0 animate-ping rounded-full bg-accent/35" />
+                      <span className="absolute inset-2 rounded-full bg-accent/20" />
+                      <LoaderCircle size={36} className="relative animate-spin text-white drop-shadow-[0_0_18px_rgba(246,48,107,.85)]" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] font-bold uppercase tracking-[.24em] text-accent">Building similar fit</div>
+                      <div className="mt-1 font-serif text-[18px] font-semibold text-white">Opening Builder…</div>
+                    </div>
                   </div>
                 ) : null}
 
@@ -244,9 +268,16 @@ export default function FitFeedPage() {
                 </div>
 
                 <div className="relative z-10 mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+18px)] pr-[76px]">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/34 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.16em] text-white/78 backdrop-blur-md">
-                    <Sparkles size={12} className="text-accent" />
-                    {formulaLabel || post.sourceType || 'catalog'} fit
+                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/35 bg-[#1a0d12]/70 px-3.5 py-2 text-white shadow-[0_10px_28px_rgba(246,48,107,.28)] backdrop-blur-md">
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+                      <Sparkles size={12} />
+                    </span>
+                    <div className="flex flex-col leading-none">
+                      <span className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Formula</span>
+                      <span className="mt-0.5 text-[12px] font-semibold tracking-tight text-white">
+                        {formulaLabel || post.sourceType || 'Catalog fit'}
+                      </span>
+                    </div>
                   </div>
                   <h1 className="mt-3 font-serif text-[35px] font-semibold leading-[.94] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,.42)]">
                     {post.title}
@@ -275,17 +306,18 @@ export default function FitFeedPage() {
                         key={`${post.id}-tray-${product.id}`}
                         type="button"
                         onClick={() => shop(post)}
-                        className="group relative h-[72px] w-[62px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)] transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150"
+                        className="group relative h-[78px] w-[66px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)] ring-0 ring-accent/0 transition active:scale-90 hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(246,48,107,.4)] hover:ring-2 hover:ring-accent/60 motion-safe:transition-all motion-safe:duration-200"
                         aria-label={`Shop ${product.brand} ${product.name}`}
                       >
                         <ProductImage
                           product={product}
                           wrapperClassName="h-full w-full"
-                          className="h-full w-full object-contain p-1.5 transition group-active:scale-95"
+                          className="h-full w-full object-contain p-1.5 motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105 group-active:scale-95"
                         />
                         <div className="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white">
                           {product.category}
                         </div>
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,.55)_100%)] opacity-0 transition group-hover:opacity-100" />
                       </button>
                     ))}
                   </div>
