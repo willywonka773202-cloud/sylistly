@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bookmark, Grid3X3, Heart, Layers, MessageCircle, Palette, Pencil, RotateCcw, Ruler, ShoppingBag, Sparkles, WandSparkles, X } from 'lucide-react';
+import { Bookmark, CheckCircle2, Grid3X3, Heart, Layers, MessageCircle, Palette, Pencil, RotateCcw, Ruler, ShoppingBag, Sparkles, WandSparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -54,6 +54,7 @@ export default function ProfilePage() {
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
   const replaceItems = useFit((state) => state.replaceItems);
+  const currentFitItems = useFit((state) => state.items);
   const router = useRouter();
   const [activePost, setActivePost] = useState<FeedPost | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
@@ -70,6 +71,7 @@ export default function ProfilePage() {
   const likedCount = posts.filter((post) => post.liked).length;
   const closetCount = wardrobeItems.filter((entry) => entry.status === 'closet').length;
   const wishlistCount = wardrobeItems.filter((entry) => entry.status === 'wishlist').length;
+  const currentBuildCount = Object.values(currentFitItems).filter(Boolean).length;
 
   // Style DNA — derived from REAL saved fits + wardrobe. No invented
   // stats. If the user hasn't saved anything, the panel says so rather
@@ -77,8 +79,11 @@ export default function ProfilePage() {
   const styleDna = useMemo(() => {
     const brandCounts = new Map<string, number>();
     const categoryCounts = new Map<Category, number>();
+    const vibeCounts = new Map<string, number>();
+    const formulaCounts = new Map<string, number>();
     const prices: number[] = [];
     let totalPiecesObserved = 0;
+    const textSignals: string[] = [];
 
     for (const fit of savedFits) {
       for (const product of Object.values(fit.items)) {
@@ -87,6 +92,10 @@ export default function ProfilePage() {
         if (product.brand) brandCounts.set(product.brand, (brandCounts.get(product.brand) || 0) + 1);
         categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
         if (product.priceCents > 0) prices.push(product.priceCents);
+        for (const vibe of [...(product.vibes || []), ...(product.occasions || [])]) {
+          vibeCounts.set(vibe, (vibeCounts.get(vibe) || 0) + 1);
+        }
+        textSignals.push(product.brand, product.name, ...(product.vibes || []), ...(product.occasions || []), ...(product.searchTerms || []));
       }
     }
     for (const entry of wardrobeItems) {
@@ -95,6 +104,23 @@ export default function ProfilePage() {
       if (product.brand) brandCounts.set(product.brand, (brandCounts.get(product.brand) || 0) + 1);
       categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
       if (product.priceCents > 0) prices.push(product.priceCents);
+      for (const vibe of [...(product.vibes || []), ...(product.occasions || [])]) {
+        vibeCounts.set(vibe, (vibeCounts.get(vibe) || 0) + 1);
+      }
+      textSignals.push(product.brand, product.name, ...(product.vibes || []), ...(product.occasions || []), ...(product.searchTerms || []));
+    }
+    for (const post of posts.filter((entry) => entry.liked || entry.saved || entry.username === '@you')) {
+      vibeCounts.set(post.vibe, (vibeCounts.get(post.vibe) || 0) + 1);
+      if (post.formulaLabel) formulaCounts.set(post.formulaLabel, (formulaCounts.get(post.formulaLabel) || 0) + 1);
+      textSignals.push(post.vibe, post.title, post.formulaLabel || '', ...(post.tags || []));
+    }
+    for (const vibe of profile.stylePrefs.vibes || []) {
+      vibeCounts.set(vibe, (vibeCounts.get(vibe) || 0) + 1);
+      textSignals.push(vibe);
+    }
+    for (const brand of profile.stylePrefs.brands || []) {
+      brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
+      textSignals.push(brand);
     }
 
     const topBrands = Array.from(brandCounts.entries())
@@ -105,6 +131,8 @@ export default function ProfilePage() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([category]) => category);
+    const topVibe = Array.from(vibeCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+    const topFormula = Array.from(formulaCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
     const medianPriceCents = prices.length
       ? prices.slice().sort((a, b) => a - b)[Math.floor(prices.length / 2)]
       : 0;
@@ -118,9 +146,47 @@ export default function ProfilePage() {
         : medianPriceCents < 60000
         ? 'Premium'
         : 'Luxury';
+    const signalText = textSignals.join(' ').toLowerCase();
+    const archetypeScores = [
+      {
+        label: 'Clean Minimalist',
+        score: ['clean', 'minimal', 'neutral', 'white', 'black', 'tailored', 'basics'].filter((term) => signalText.includes(term)).length,
+      },
+      {
+        label: 'Streetwear Athlete',
+        score: ['street', 'sneaker', 'hoodie', 'cargo', 'nike', 'adidas', 'campus', 'samba'].filter((term) => signalText.includes(term)).length,
+      },
+      {
+        label: 'Elevated Casual',
+        score: ['date', 'night', 'office', 'blazer', 'trouser', 'leather', 'polo', 'coach'].filter((term) => signalText.includes(term)).length,
+      },
+      {
+        label: 'Gym Utility',
+        score: ['gym', 'training', 'athletic', 'alo', 'track', 'utility', 'shorts'].filter((term) => signalText.includes(term)).length,
+      },
+      {
+        label: 'Old Money Prep',
+        score: ['old money', 'preppy', 'linen', 'loafer', 'cardigan', 'polo', 'khaki'].filter((term) => signalText.includes(term)).length,
+      },
+    ].sort((left, right) => right.score - left.score);
+    const archetype = totalPiecesObserved >= 5 || savedFits.length >= 2 || wardrobeItems.length >= 5
+      ? archetypeScores[0]?.label || 'Building Your Style DNA'
+      : 'Building Your Style DNA';
 
-    return { topBrands, topCategories, medianPriceCents, budgetTier, totalPiecesObserved };
-  }, [savedFits, wardrobeItems]);
+    return { topBrands, topCategories, topVibe, topFormula, medianPriceCents, budgetTier, totalPiecesObserved, archetype };
+  }, [posts, profile.stylePrefs.brands, profile.stylePrefs.vibes, savedFits, wardrobeItems]);
+
+  const progressChecklist = useMemo(() => {
+    const hasShoes = wardrobeItems.some((entry) => entry.product.category === 'shoes');
+    const hasFavoriteVibes = Boolean(profile.stylePrefs.vibes?.length);
+    return [
+      { label: 'Save 3 fits', complete: savedFits.length >= 3, detail: `${Math.min(savedFits.length, 3)}/3 saved` },
+      { label: 'Add 5 wardrobe items', complete: wardrobeItems.length >= 5, detail: `${Math.min(wardrobeItems.length, 5)}/5 added` },
+      { label: 'Add shoes', complete: hasShoes, detail: hasShoes ? 'Shoe slot covered' : 'No shoes in wardrobe yet' },
+      { label: 'Use a build', complete: currentBuildCount > 0 || savedFits.length > 0, detail: currentBuildCount > 0 ? `${currentBuildCount} builder pieces` : savedFits.length > 0 ? 'Saved fit detected' : 'No build detected' },
+      { label: 'Choose favorite vibes', complete: hasFavoriteVibes, detail: hasFavoriteVibes ? (profile.stylePrefs.vibes || []).join(', ') : 'Add vibes below' },
+    ];
+  }, [currentBuildCount, profile.stylePrefs.vibes, savedFits.length, wardrobeItems]);
 
   function remix(post: FeedPost) {
     replaceItems(post.items);
@@ -285,38 +351,37 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {styleDna.totalPiecesObserved === 0 ? (
-            <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.03] p-3 text-[12px] leading-relaxed text-muted-2">
-              Save some fits and add closet pieces to see your Style DNA. Once you do, this panel will show your top brands, favorite categories, and budget tendency.
+          <div className="mt-4 rounded-[22px] border border-accent/25 bg-accent/10 p-4">
+            <div className="text-[8px] font-black uppercase tracking-[.18em] text-accent">Style archetype</div>
+            <div className="mt-1 font-serif text-[24px] font-semibold leading-tight text-ink">{styleDna.archetype}</div>
+            <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
+              {styleDna.archetype === 'Building Your Style DNA'
+                ? 'Add more saved fits and wardrobe pieces before Sylistly assigns a stronger archetype.'
+                : 'Computed from saved fits, wardrobe items, liked/saved feed posts, and profile preferences.'}
+            </p>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <DnaStat label="Top formula/vibe" value={styleDna.topFormula || styleDna.topVibe || 'Not enough data'} />
+            <DnaStat label="Top category" value={styleDna.topCategories[0] || 'Not enough data'} />
+            <DnaStat label="Top brand" value={styleDna.topBrands[0] || 'Not enough data'} />
+            <DnaStat label="Budget tendency" value={styleDna.budgetTier || profile.stylePrefs.budget || 'Not enough data'} accent />
+          </div>
+
+          <div className="mt-4 rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Progress checklist</div>
+            <div className="mt-3 space-y-2">
+              {progressChecklist.map((item) => (
+                <div key={item.label} className="flex items-start gap-3 rounded-[16px] border border-white/8 bg-white/[0.035] p-3">
+                  <CheckCircle2 size={16} className={item.complete ? 'mt-0.5 flex-none text-accent' : 'mt-0.5 flex-none text-muted'} />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-semibold text-ink">{item.label}</div>
+                    <div className="mt-0.5 text-[10px] leading-relaxed text-muted-2">{item.detail}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Top brands</div>
-                <div className="mt-1 truncate text-[12px] font-semibold text-ink">
-                  {styleDna.topBrands.length ? styleDna.topBrands.join(' · ') : '—'}
-                </div>
-              </div>
-              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Top categories</div>
-                <div className="mt-1 truncate text-[12px] font-semibold text-ink">
-                  {styleDna.topCategories.length ? styleDna.topCategories.join(' · ') : '—'}
-                </div>
-              </div>
-              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Median price</div>
-                <div className="mt-1 text-[12px] font-semibold text-ink">
-                  {styleDna.medianPriceCents > 0 ? formatPrice(styleDna.medianPriceCents) : '—'}
-                </div>
-              </div>
-              <div className="rounded-[16px] border border-accent/30 bg-accent/10 p-2.5">
-                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-accent">Budget tier</div>
-                <div className="mt-1 truncate text-[12px] font-semibold text-white">
-                  {styleDna.budgetTier || '—'}
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
 
           <div id="style-dna" className="mt-5 border-t border-white/10 pt-4">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-accent">
@@ -468,5 +533,22 @@ export default function ProfilePage() {
 
       <CheckoutSheet open={Boolean(checkoutProducts)} title={checkoutTitle} products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
     </main>
+  );
+}
+
+function DnaStat({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className={`rounded-[16px] border p-2.5 ${accent ? 'border-accent/30 bg-accent/10' : 'border-white/10 bg-white/[0.04]'}`}>
+      <div className={`text-[8px] font-bold uppercase tracking-[.16em] ${accent ? 'text-accent' : 'text-muted'}`}>{label}</div>
+      <div className={`mt-1 line-clamp-2 text-[12px] font-semibold ${accent ? 'text-white' : 'text-ink'}`}>{value}</div>
+    </div>
   );
 }
