@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, Heart, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Bookmark, Heart, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -56,6 +56,8 @@ export default function FitFeedPage() {
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Fit Feed');
   const [burstPostId, setBurstPostId] = useState<string | null>(null);
+  const [remixingPostId, setRemixingPostId] = useState<string | null>(null);
+  const [savedPulsePostId, setSavedPulsePostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filteredPosts = useMemo(
@@ -91,11 +93,13 @@ export default function FitFeedPage() {
   function remix(post: FeedPost) {
     const products = visibleProducts(post);
     if (products.length < 3) return;
+    if (remixingPostId) return;
+    setRemixingPostId(post.id);
     setBurstPostId(post.id);
     window.setTimeout(() => {
       replaceItems(itemsFromProducts(products));
       router.push('/build');
-    }, 180);
+    }, 220);
   }
 
   function like(post: FeedPost) {
@@ -105,10 +109,13 @@ export default function FitFeedPage() {
   }
 
   function savePost(post: FeedPost) {
+    const wasSaved = post.saved;
     toggleSave(post.id);
-    if (!post.saved) {
+    if (!wasSaved) {
       const products = visibleProducts(post);
       if (products.length >= 3) saveFit(itemsFromProducts(products));
+      setSavedPulsePostId(post.id);
+      window.setTimeout(() => setSavedPulsePostId((current) => (current === post.id ? null : current)), 480);
     }
   }
 
@@ -153,9 +160,9 @@ export default function FitFeedPage() {
                     key={filter}
                     type="button"
                     onClick={() => setActiveFilter(filter)}
-                    className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${
+                    className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-semibold transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
                       activeFilter === filter
-                        ? 'bg-accent text-white shadow-pink-glow'
+                        ? 'bg-accent text-white shadow-pink-glow scale-[1.04]'
                         : 'bg-white/10 text-white/70 hover:bg-white/15'
                     }`}
                   >
@@ -193,20 +200,45 @@ export default function FitFeedPage() {
                 </div>
 
                 <div className="absolute right-3 top-[47%] z-20 flex -translate-y-1/2 flex-col items-center gap-3">
-                  <button onClick={() => like(post)} className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition ${post.liked ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-white/18 bg-black/38 text-white'}`} aria-label="Like fit">
+                  <button
+                    onClick={() => like(post)}
+                    className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 ${
+                      post.liked ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-white/18 bg-black/38 text-white'
+                    }`}
+                    aria-label="Like fit"
+                  >
                     <Heart size={20} fill={post.liked ? 'currentColor' : 'none'} />
                   </button>
                   <div className="-mt-2 text-center text-[10px] font-semibold text-white/80">{post.likeCount}</div>
-                  <button onClick={() => setCommentPost(post)} className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md" aria-label="Open comments">
+                  <button
+                    onClick={() => setCommentPost(post)}
+                    className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150"
+                    aria-label="Open comments"
+                  >
                     <MessageCircle size={20} />
                   </button>
-                  <button onClick={() => savePost(post)} className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md ${post.saved ? 'border-accent bg-accent/18 text-accent' : 'border-white/18 bg-black/38 text-white'}`} aria-label="Save fit">
+                  <button
+                    onClick={() => savePost(post)}
+                    className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 ${
+                      post.saved ? 'border-accent bg-accent/18 text-accent' : 'border-white/18 bg-black/38 text-white'
+                    } ${savedPulsePostId === post.id ? 'motion-safe:animate-[pulse_.42s_ease-out_1] scale-110' : ''}`}
+                    aria-label="Save fit"
+                  >
                     <Bookmark size={20} fill={post.saved ? 'currentColor' : 'none'} />
                   </button>
-                  <button onClick={() => remix(post)} className="grid h-12 w-12 place-items-center rounded-full border border-accent/45 bg-accent text-white shadow-pink-glow" aria-label="Remix in Builder">
-                    <RotateCcw size={20} />
+                  <button
+                    onClick={() => remix(post)}
+                    disabled={remixingPostId === post.id}
+                    className="grid h-12 w-12 place-items-center rounded-full border border-accent/45 bg-accent text-white shadow-pink-glow transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-70"
+                    aria-label="Remix in Builder"
+                  >
+                    {remixingPostId === post.id ? <LoaderCircle size={20} className="animate-spin" /> : <RotateCcw size={20} />}
                   </button>
-                  <button onClick={() => shop(post)} className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md" aria-label="Shop fit">
+                  <button
+                    onClick={() => shop(post)}
+                    className="grid h-12 w-12 place-items-center rounded-full border border-white/18 bg-black/38 text-white backdrop-blur-md transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150"
+                    aria-label="Shop fit"
+                  >
                     <ShoppingBag size={20} />
                   </button>
                 </div>
@@ -243,7 +275,7 @@ export default function FitFeedPage() {
                         key={`${post.id}-tray-${product.id}`}
                         type="button"
                         onClick={() => shop(post)}
-                        className="group relative h-[72px] w-[62px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)]"
+                        className="group relative h-[72px] w-[62px] flex-none overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] shadow-[0_12px_30px_rgba(0,0,0,.28)] transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150"
                         aria-label={`Shop ${product.brand} ${product.name}`}
                       >
                         <ProductImage
@@ -259,11 +291,18 @@ export default function FitFeedPage() {
                   </div>
 
                   <div className="mt-4 grid grid-cols-[1fr_.78fr] gap-2">
-                    <button onClick={() => remix(post)} className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow">
-                      <RotateCcw size={14} />
-                      Build this
+                    <button
+                      onClick={() => remix(post)}
+                      disabled={remixingPostId === post.id}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-70"
+                    >
+                      {remixingPostId === post.id ? <LoaderCircle size={14} className="animate-spin" /> : <RotateCcw size={14} />}
+                      {remixingPostId === post.id ? 'Loading' : 'Build this'}
                     </button>
-                    <button onClick={() => shop(post)} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                    <button
+                      onClick={() => shop(post)}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-white backdrop-blur-md transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                    >
                       <ShoppingBag size={14} />
                       Shop Fit
                     </button>

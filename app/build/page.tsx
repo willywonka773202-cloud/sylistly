@@ -1070,7 +1070,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:opacity-60"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
               >
                 {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Build selected fit
@@ -1105,7 +1105,7 @@ function BuilderPageContent({
                     key={vibe.id}
                     type="button"
                     onClick={() => setSelectedVibe(vibe.id)}
-                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition ${
+                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
                       selectedVibe === vibe.id
                         ? 'bg-accent text-white shadow-pink-glow'
                         : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
@@ -1130,7 +1130,7 @@ function BuilderPageContent({
                       key={option.value}
                       type="button"
                       onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
                         generatorBudget === option.value
                           ? 'bg-white text-black'
                           : 'border border-hairline bg-surface-2 text-muted'
@@ -1187,7 +1187,7 @@ function BuilderPageContent({
                       key={option.value}
                       type="button"
                       onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition ${
+                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
                         generatorFrame === option.value
                           ? 'bg-white text-black'
                           : 'border border-hairline bg-surface-2 text-muted'
@@ -1204,7 +1204,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('starter')}
                   disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[11px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
                 >
                   {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
                   Generate starter look
@@ -1213,7 +1213,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('missing')}
                   disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
                 >
                   <Sparkles size={13} />
                   Fill missing pieces
@@ -1224,7 +1224,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('refresh')}
                   disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
                 >
                   Refresh look
                 </button>
@@ -1232,7 +1232,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('full')}
                   disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-60"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
                 >
                   Build fuller fit
                 </button>
@@ -1245,14 +1245,14 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Refine
               </button>
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink"
+                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Details
               </button>
@@ -1260,7 +1260,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={shopAll}
                 disabled={renderN === 0}
-                className="rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none"
+                className="rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none disabled:active:scale-100"
               >
                 Shop
               </button>
@@ -1429,7 +1429,7 @@ function FocusedRefinePanel({
                 key={category}
                 type="button"
                 onClick={() => onFocusCategory(category)}
-                className={`relative w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition ${
+                className={`relative w-[68px] flex-none rounded-[16px] border p-1.5 text-left transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
                   active || lockedSlots.includes(category)
                     ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
                     : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
@@ -1487,9 +1487,9 @@ function FocusedRefinePanel({
             <button
               type="button"
               onClick={() => onToggleLock(activeCategory)}
-              className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] transition ${
+              className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 ${
                 activeLocked
-                  ? 'border-accent bg-accent text-white shadow-[0_8px_18px_rgba(232,54,93,.34)]'
+                  ? 'border-accent bg-accent text-white shadow-[0_8px_18px_rgba(232,54,93,.34)] motion-safe:animate-[pulse_.5s_ease-out_1]'
                   : 'border-[#d8c7b8] bg-white/85 text-[#6c5c52] hover:border-accent hover:text-accent'
               }`}
             >
