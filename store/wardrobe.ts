@@ -85,17 +85,39 @@ function upsertItem(
   return [makeItem(product, status, source), ...current].slice(0, MAX_ITEMS);
 }
 
+// Coerce arbitrary input into a clean WardrobeItem[].  Used by every
+// path that might surface bad shape: store mutations, rehydration, and
+// the selectWardrobeItems read selector below.  We accept the cost of
+// re-validating on every read because the alternative is reasoning
+// about "is the store healthy yet?" at every call site — which is what
+// caused the .filter-is-not-a-function crash.
+function normalizeItems(value: unknown): WardrobeItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is WardrobeItem => {
+    if (!entry || typeof entry !== 'object') return false;
+    const candidate = entry as Partial<WardrobeItem>;
+    return (
+      typeof candidate.id === 'string'
+      && typeof candidate.productId === 'string'
+      && (candidate.status === 'closet' || candidate.status === 'wishlist')
+      && typeof candidate.product === 'object'
+      && candidate.product !== null
+      && typeof (candidate.product as Product).id === 'string'
+    );
+  });
+}
+
 export const useWardrobe = create<WardrobeState>()(
   persist(
     (set, get) => ({
       items: [],
 
-      closetCount: () => get().items.filter((item) => item.status === 'closet').length,
-      wishlistCount: () => get().items.filter((item) => item.status === 'wishlist').length,
+      closetCount: () => normalizeItems(get().items).filter((item) => item.status === 'closet').length,
+      wishlistCount: () => normalizeItems(get().items).filter((item) => item.status === 'wishlist').length,
 
       byCategory: () => {
         const out: Partial<Record<Category, WardrobeItem[]>> = {};
-        for (const item of get().items) {
+        for (const item of normalizeItems(get().items)) {
           const cat = item.product.category;
           if (!out[cat]) out[cat] = [];
           out[cat]!.push(item);
@@ -103,20 +125,20 @@ export const useWardrobe = create<WardrobeState>()(
         return out;
       },
 
-      hasItem: (productId) => get().items.some((entry) => entry.productId === productId),
+      hasItem: (productId) => normalizeItems(get().items).some((entry) => entry.productId === productId),
       isInCloset: (productId) =>
-        get().items.some((entry) => entry.productId === productId && entry.status === 'closet'),
+        normalizeItems(get().items).some((entry) => entry.productId === productId && entry.status === 'closet'),
       isInWishlist: (productId) =>
-        get().items.some((entry) => entry.productId === productId && entry.status === 'wishlist'),
+        normalizeItems(get().items).some((entry) => entry.productId === productId && entry.status === 'wishlist'),
 
       addToCloset: (product, source = 'manual') =>
-        set((state) => ({ items: upsertItem(state.items, product, 'closet', source) })),
+        set((state) => ({ items: upsertItem(normalizeItems(state.items), product, 'closet', source) })),
       addToWishlist: (product, source = 'manual') =>
-        set((state) => ({ items: upsertItem(state.items, product, 'wishlist', source) })),
+        set((state) => ({ items: upsertItem(normalizeItems(state.items), product, 'wishlist', source) })),
 
       moveToCloset: (productId) =>
         set((state) => {
-          const next = state.items.map((item) =>
+          const next = normalizeItems(state.items).map((item) =>
             item.productId === productId && item.status !== 'closet'
               ? { ...item, status: 'closet' as WardrobeStatus, addedAt: new Date().toISOString() }
               : item,
@@ -125,7 +147,7 @@ export const useWardrobe = create<WardrobeState>()(
         }),
       moveToWishlist: (productId) =>
         set((state) => {
-          const next = state.items.map((item) =>
+          const next = normalizeItems(state.items).map((item) =>
             item.productId === productId && item.status !== 'wishlist'
               ? { ...item, status: 'wishlist' as WardrobeStatus, addedAt: new Date().toISOString() }
               : item,
@@ -134,16 +156,51 @@ export const useWardrobe = create<WardrobeState>()(
         }),
 
       removeItem: (productId) =>
-        set((state) => ({ items: state.items.filter((entry) => entry.productId !== productId) })),
+        set((state) => ({ items: normalizeItems(state.items).filter((entry) => entry.productId !== productId) })),
 
       clearAll: () => set({ items: [] }),
     }),
     {
+      // Keep the storage key stable so we don't strand the user's prior
+      // closet entries — the version bump + migrate is what recovers
+      // from a malformed v1 shape (e.g. items persisted as an object
+      // map, or a future schema we don't yet recognize).
       name: 'sylistly.wardrobe.v1',
-      version: 1,
-      // We persist the Product snapshot inside each WardrobeItem so a
-      // user's wardrobe survives a catalog refresh that drops a product.
-      // No migration logic needed yet — v1 is the first shape.
+      version: 2,
+      migrate: (persistedState, fromVersion) => {
+        // Accept anything, normalize to a known-good array. Earlier
+        // drafts of this store had a different shape; this migrate
+        // path is what stops the .filter-is-not-a-function crash for
+        // users who already loaded the old shape into localStorage.
+        if (!persistedState || typeof persistedState !== 'object') {
+          return { items: [] };
+        }
+        const candidate = persistedState as { items?: unknown };
+        return { ...(persistedState as object), items: normalizeItems(candidate.items) };
+      },
+      // Belt-and-suspenders: even if migrate isn't invoked (e.g. fresh
+      // user, no persisted state) the rehydration callback coerces
+      // items to an array. The state arg can be undefined on
+      // hydration error, hence the guard.
+      onRehydrateStorage: () => (state) => {
+        if (state && !Array.isArray(state.items)) {
+          state.items = normalizeItems(state.items);
+        }
+      },
     },
   ),
 );
+
+/**
+ * Read-side safe selector. Every consumer should use this instead of
+ * `useWardrobe((state) => state.items)` — it guarantees an array
+ * regardless of persistence state, so components can call
+ * `.filter` / `.map` / for-of without defensive checks of their own.
+ *
+ * Usage:
+ *   const wardrobeItems = useWardrobe(selectWardrobeItems);
+ *   const closet = wardrobeItems.filter((i) => i.status === 'closet');
+ */
+export function selectWardrobeItems(state: WardrobeState): WardrobeItem[] {
+  return Array.isArray(state.items) ? state.items : [];
+}

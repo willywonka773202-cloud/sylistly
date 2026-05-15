@@ -14,7 +14,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
-import { useWardrobe } from '@/store/wardrobe';
+import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
@@ -49,7 +49,7 @@ export default function ProfilePage() {
   const setBrandsFromText = useProfile((state) => state.setBrandsFromText);
   const savedCount = useSavedFits((state) => state.fits.length);
   const savedFits = useSavedFits((state) => state.fits);
-  const wardrobeItems = useWardrobe((state) => state.items);
+  const wardrobeItems = useWardrobe(selectWardrobeItems);
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);

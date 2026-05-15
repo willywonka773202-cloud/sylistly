@@ -23,7 +23,7 @@ import type { Category, Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
-import { useWardrobe } from '@/store/wardrobe';
+import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
@@ -40,7 +40,7 @@ export default function HomePage() {
   useEffect(() => setHasMounted(true), []);
 
   const savedFits = useSavedFits((state) => state.fits);
-  const wardrobeItems = useWardrobe((state) => state.items);
+  const wardrobeItems = useWardrobe(selectWardrobeItems);
   const feedPosts = useSocialFeed((state) => state.posts);
   const currentFitItems = useFit((state) => state.items);
 

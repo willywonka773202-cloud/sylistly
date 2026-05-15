@@ -20,7 +20,7 @@ import { getProductOutboundUrl } from '@/lib/product-links';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
-import { useWardrobe, type WardrobeItem } from '@/store/wardrobe';
+import { selectWardrobeItems, useWardrobe, type WardrobeItem } from '@/store/wardrobe';
 
 const TABS = ['Clothes', 'Outfits', 'Collections'] as const;
 type Tab = (typeof TABS)[number];
@@ -39,7 +39,7 @@ function formatPrice(cents: number): string {
 }
 
 export default function WardrobePage() {
-  const items = useWardrobe((state) => state.items);
+  const items = useWardrobe(selectWardrobeItems);
   const removeItem = useWardrobe((state) => state.removeItem);
   const moveToCloset = useWardrobe((state) => state.moveToCloset);
   const moveToWishlist = useWardrobe((state) => state.moveToWishlist);
