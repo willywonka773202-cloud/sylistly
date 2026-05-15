@@ -1,6 +1,7 @@
 'use client';
 
-import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, UserPlus, WandSparkles, X } from 'lucide-react';
+import Link from 'next/link';
+import { Bookmark, Grid3X3, Heart, Layers, MessageCircle, Palette, Pencil, RotateCcw, Ruler, ShoppingBag, Sparkles, WandSparkles, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -13,6 +14,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { useWardrobe } from '@/store/wardrobe';
 
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
@@ -46,6 +48,8 @@ export default function ProfilePage() {
   const setVibesFromText = useProfile((state) => state.setVibesFromText);
   const setBrandsFromText = useProfile((state) => state.setBrandsFromText);
   const savedCount = useSavedFits((state) => state.fits.length);
+  const savedFits = useSavedFits((state) => state.fits);
+  const wardrobeItems = useWardrobe((state) => state.items);
   const posts = useSocialFeed((state) => state.posts);
   const toggleLike = useSocialFeed((state) => state.toggleLike);
   const toggleSave = useSocialFeed((state) => state.toggleSave);
@@ -64,8 +68,59 @@ export default function ProfilePage() {
     ? userPosts
     : posts.filter((post) => postProducts(post, failedImageIds).length >= 3).slice(0, 8);
   const likedCount = posts.filter((post) => post.liked).length;
-  const savedSocialCount = posts.filter((post) => post.saved).length;
-  const remixCount = Math.max(12, userPosts.length * 3 + savedSocialCount);
+  const closetCount = wardrobeItems.filter((entry) => entry.status === 'closet').length;
+  const wishlistCount = wardrobeItems.filter((entry) => entry.status === 'wishlist').length;
+
+  // Style DNA — derived from REAL saved fits + wardrobe. No invented
+  // stats. If the user hasn't saved anything, the panel says so rather
+  // than fabricating "top vibe: streetwear".
+  const styleDna = useMemo(() => {
+    const brandCounts = new Map<string, number>();
+    const categoryCounts = new Map<Category, number>();
+    const prices: number[] = [];
+    let totalPiecesObserved = 0;
+
+    for (const fit of savedFits) {
+      for (const product of Object.values(fit.items)) {
+        if (!product) continue;
+        totalPiecesObserved += 1;
+        if (product.brand) brandCounts.set(product.brand, (brandCounts.get(product.brand) || 0) + 1);
+        categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
+        if (product.priceCents > 0) prices.push(product.priceCents);
+      }
+    }
+    for (const entry of wardrobeItems) {
+      const product = entry.product;
+      totalPiecesObserved += 1;
+      if (product.brand) brandCounts.set(product.brand, (brandCounts.get(product.brand) || 0) + 1);
+      categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
+      if (product.priceCents > 0) prices.push(product.priceCents);
+    }
+
+    const topBrands = Array.from(brandCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([brand]) => brand);
+    const topCategories = Array.from(categoryCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category]) => category);
+    const medianPriceCents = prices.length
+      ? prices.slice().sort((a, b) => a - b)[Math.floor(prices.length / 2)]
+      : 0;
+    const budgetTier =
+      medianPriceCents === 0
+        ? null
+        : medianPriceCents < 10000
+        ? 'Budget-conscious'
+        : medianPriceCents < 25000
+        ? 'Smart spend'
+        : medianPriceCents < 60000
+        ? 'Premium'
+        : 'Luxury';
+
+    return { topBrands, topCategories, medianPriceCents, budgetTier, totalPiecesObserved };
+  }, [savedFits, wardrobeItems]);
 
   function remix(post: FeedPost) {
     replaceItems(post.items);
@@ -99,12 +154,15 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h1 className="font-serif text-[28px] font-semibold leading-none text-ink">Style profile</h1>
-                  <p className="mt-1 text-[12px] font-semibold text-muted-2">@you</p>
+                  <p className="mt-1 text-[12px] font-semibold text-muted-2">@you · local</p>
                 </div>
-                <button className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow">
-                  <UserPlus size={12} />
-                  Follow
-                </button>
+                <a
+                  href="#style-dna"
+                  className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.96] motion-safe:transition-transform motion-safe:duration-150"
+                >
+                  <Pencil size={12} />
+                  Edit
+                </a>
               </div>
               <p className="mt-3 text-[12px] leading-relaxed text-[#cfc0b8]">
                 Building swipeable fits around clean layers, sharp night pieces, and image-backed shopping picks.
@@ -114,16 +172,37 @@ export default function ProfilePage() {
 
           <div className="mt-5 grid grid-cols-4 gap-2">
             {[
-              ['Posts', userPosts.length],
               ['Saved', savedCount],
-              ['Likes', likedCount],
-              ['Remixes', remixCount],
+              ['Closet', closetCount],
+              ['Wishlist', wishlistCount],
+              ['Liked', likedCount],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.045] px-2 py-3 text-center">
                 <div className="font-serif text-[20px] font-semibold text-ink">{value}</div>
                 <div className="mt-1 text-[8px] uppercase tracking-[.15em] text-muted">{label}</div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-1.5">
+            <Link
+              href="/wardrobe"
+              className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
+            >
+              Clothes
+            </Link>
+            <Link
+              href="/saved"
+              className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
+            >
+              Outfits
+            </Link>
+            <Link
+              href="/wardrobe"
+              className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
+            >
+              Collections
+            </Link>
           </div>
 
           <div className="mt-4 flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
@@ -199,8 +278,50 @@ export default function ProfilePage() {
               <WandSparkles size={17} />
             </div>
             <div>
-              <h2 className="font-serif text-[20px] font-semibold text-ink">Style DNA</h2>
-              <p className="mt-1 text-[12px] text-muted-2">Preferences still tune Builder generation locally.</p>
+              <h2 className="font-serif text-[20px] font-semibold text-ink">Style DNA insights</h2>
+              <p className="mt-1 text-[12px] text-muted-2">
+                Computed from your real saved fits + closet — no fake stats.
+              </p>
+            </div>
+          </div>
+
+          {styleDna.totalPiecesObserved === 0 ? (
+            <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.03] p-3 text-[12px] leading-relaxed text-muted-2">
+              Save some fits and add closet pieces to see your Style DNA. Once you do, this panel will show your top brands, favorite categories, and budget tendency.
+            </div>
+          ) : (
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Top brands</div>
+                <div className="mt-1 truncate text-[12px] font-semibold text-ink">
+                  {styleDna.topBrands.length ? styleDna.topBrands.join(' · ') : '—'}
+                </div>
+              </div>
+              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Top categories</div>
+                <div className="mt-1 truncate text-[12px] font-semibold text-ink">
+                  {styleDna.topCategories.length ? styleDna.topCategories.join(' · ') : '—'}
+                </div>
+              </div>
+              <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
+                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Median price</div>
+                <div className="mt-1 text-[12px] font-semibold text-ink">
+                  {styleDna.medianPriceCents > 0 ? formatPrice(styleDna.medianPriceCents) : '—'}
+                </div>
+              </div>
+              <div className="rounded-[16px] border border-accent/30 bg-accent/10 p-2.5">
+                <div className="text-[8px] font-bold uppercase tracking-[.16em] text-accent">Budget tier</div>
+                <div className="mt-1 truncate text-[12px] font-semibold text-white">
+                  {styleDna.budgetTier || '—'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div id="style-dna" className="mt-5 border-t border-white/10 pt-4">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-accent">
+              <Pencil size={11} />
+              Edit your preferences
             </div>
           </div>
 
