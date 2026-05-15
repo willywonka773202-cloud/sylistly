@@ -131,7 +131,7 @@ export default function HomePage() {
             <QuickStat label="Saved" hint="Open saved fits" href="/saved" icon={Bookmark} count={savedCount} unit="fits" />
             <QuickStat label="Closet" hint="Open wardrobe" href="/wardrobe" icon={Layers} count={closetCount} unit="pieces" />
             <QuickStat label="Wishlist" hint="Open wishlist" href="/wardrobe" icon={Heart} count={wishlistCount} unit="pieces" />
-            <QuickStat label="AI Stylist" hint="Beta — coming later" disabled icon={Wand2} count={0} unit="beta" />
+            <QuickStat label="AI Stylist" hint="Open Syli" href="/stylist" icon={Wand2} count={currentFitCount} unit="build" />
           </div>
         </section>
 
@@ -166,10 +166,10 @@ export default function HomePage() {
               title="Rate my fit"
               body={
                 currentFitCount > 0
-                  ? `${currentFitCount} pieces in builder — open Fit Insight.`
+                  ? `${currentFitCount} pieces in builder. Ask Syli to rate it.`
                   : 'Generate a fit first to rate it.'
               }
-              onClick={() => router.push('/build')}
+              onClick={() => router.push('/stylist')}
               disabled={currentFitCount === 0}
             />
             <StylistCard
@@ -198,7 +198,7 @@ export default function HomePage() {
             <ShortcutTile label="Discover" href="/discover" icon={Heart} />
             <ShortcutTile label="Profile" href="/profile" icon={Wand2} />
             <ShortcutTile label="Try On" disabled />
-            <ShortcutTile label="Stylist" disabled />
+            <ShortcutTile label="Stylist" href="/stylist" icon={Wand2} />
           </div>
         </section>
 

@@ -36,6 +36,7 @@ export function BottomNav() {
       saveFit(currentFitItems);
       router.push('/saved');
     } else if (action === 'feed') router.push('/feed');
+    else if (action === 'stylist') router.push('/stylist');
   }
 
   return (
@@ -153,11 +154,11 @@ export function BottomNav() {
                 onClick={() => dispatch('feed')}
               />
               <ActionCard
-                eyebrow="Coming later"
+                eyebrow="Local beta"
                 title="AI Stylist chat"
-                body="Local stylist beta — next sprint."
+                body="Ask Syli about your real fits."
                 icon={Wand2}
-                disabled
+                onClick={() => dispatch('stylist')}
               />
               <ActionCard
                 eyebrow="Coming later"
