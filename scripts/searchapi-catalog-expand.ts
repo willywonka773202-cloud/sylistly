@@ -1,34 +1,11 @@
-// SearchAPI catalog expansion — DRY RUN BY DEFAULT.
+// SearchAPI catalog expansion - DRY RUN BY DEFAULT.
 //
-// This script generates the QUERY PLAN we would send to SearchAPI to
-// fill catalog gaps. In dry-run mode (the default) it prints/writes
-// the plan and does NOT contact SearchAPI. Live mode requires THREE
-// gates simultaneously:
-//
-//   1. process.env.SEARCHAPI_KEY     present (key is never printed)
-//   2. process.env.SEARCHAPI_LIVE    === 'true'
-//   3. CLI flag --live --max-queries=N where N > 0
-//
-// Even in live mode, results land in
-// `data/catalog/candidates/searchapi-results-YYYYMMDD.json` for review
-// and are NEVER auto-merged into the live catalog. Each candidate is
-// marked `source: 'searchapi'`, `reviewStatus: 'candidate'`,
-// `imageStatus: 'original'`, `liveMergeReady: false`.
-//
-//   npx jiti scripts/searchapi-catalog-expand.ts
-//   npx jiti scripts/searchapi-catalog-expand.ts --json
-//   npx jiti scripts/searchapi-catalog-expand.ts --limit=20
-//   npx jiti scripts/searchapi-catalog-expand.ts --write
-//
-// Live mode (requires all three gates):
-//   SEARCHAPI_KEY=... SEARCHAPI_LIVE=true \
-//     npx jiti scripts/searchapi-catalog-expand.ts --live --max-queries=5
+// Generates a query plan for catalog gaps. It never calls SearchAPI unless all
+// live gates are satisfied. Live fetching is still intentionally stubbed.
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
-import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
-import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 
 type Frame = 'masc' | 'fem' | 'androgynous' | 'any';
@@ -48,15 +25,48 @@ interface CliFlags {
   limit: number;
   write: boolean;
   live: boolean;
+  dryRun: boolean;
   maxQueries: number;
 }
 
+interface PlanReport {
+  generatedAt: string;
+  mode: 'dry-run' | 'live';
+  totalCandidates: number;
+  emittedCount: number;
+  estimatedMaxQueries: number;
+  estimatedMaxResults: number;
+  candidates: QueryCandidate[];
+  liveCheck: {
+    hasKey: boolean;
+    liveEnvFlag: boolean;
+    liveCliFlag: boolean;
+    maxQueriesFromEnv: number;
+    maxQueriesFromCli: number;
+    wouldRunLive: boolean;
+    blockedReason: string | null;
+  };
+  notes: string[];
+}
+
+const FORMULA_VIBES: Record<Category, string[]> = {
+  top: ['clean elevated', 'streetwear hoodie', 'date polished', 'gym training', 'office smart casual', 'old money knit'],
+  bottom: ['tailored trouser', 'wide leg pant', 'cargo pants', 'denim jeans', 'mini skirt', 'midi skirt'],
+  shoes: ['white sneaker', 'loafer', 'platform boot', 'sandals', 'running sneaker'],
+  outer: ['oversized blazer', 'puffer jacket', 'trench coat', 'leather jacket', 'cardigan'],
+  bag: ['structured tote', 'crossbody bag', 'shoulder bag', 'gym backpack'],
+  hat: ['baseball cap', 'beanie', 'sun hat', 'bucket hat'],
+  eyewear: ['cat eye sunglasses', 'aviator sunglasses', 'wayfarer sunglasses'],
+  jewelry: ['hoop earrings', 'gold necklace', 'pearl earrings', 'cuban chain'],
+};
+
 function parseFlags(argv: string[]): CliFlags {
-  const flags: CliFlags = { json: false, limit: 30, write: false, live: false, maxQueries: 0 };
+  const flags: CliFlags = { json: false, limit: 30, write: false, live: false, dryRun: false, maxQueries: 0 };
   for (const arg of argv) {
     if (arg === '--json') flags.json = true;
     else if (arg === '--write') flags.write = true;
     else if (arg === '--live') flags.live = true;
+    else if (arg === '--dry-run') flags.dryRun = true;
     else if (arg.startsWith('--limit=')) {
       const n = Number.parseInt(arg.slice('--limit='.length), 10);
       if (Number.isFinite(n) && n > 0) flags.limit = Math.min(n, 300);
@@ -68,17 +78,6 @@ function parseFlags(argv: string[]): CliFlags {
   return flags;
 }
 
-const FORMULA_VIBES: Record<string, string[]> = {
-  top: ['clean elevated', 'streetwear hoodie', 'date polished', 'gym training', 'office smart-casual', 'old-money knit'],
-  bottom: ['tailored trouser', 'wide-leg pant', 'cargo pants', 'denim jeans', 'mini skirt', 'midi skirt'],
-  shoes: ['white sneaker', 'sambas', 'loafer', 'platform boot', 'sandals', 'running sneaker'],
-  outer: ['oversized blazer', 'puffer jacket', 'trench coat', 'leather jacket', 'cardigan'],
-  bag: ['structured tote', 'crossbody bag', 'shoulder bag', 'gym backpack'],
-  hat: ['baseball cap', 'beanie', 'sun hat', 'bucket hat'],
-  eyewear: ['cat-eye sunglasses', 'aviator sunglasses', 'wayfarer sunglasses'],
-  jewelry: ['hoop earrings', 'gold necklace', 'pearl earrings', 'cuban chain'],
-};
-
 function classifyFrame(product: Product): Frame {
   if (!Array.isArray(product.gender) || product.gender.length === 0) return 'any';
   if (product.gender.includes('masc') && !product.gender.includes('fem')) return 'masc';
@@ -88,75 +87,55 @@ function classifyFrame(product: Product): Frame {
 }
 
 function buildPlan(): QueryCandidate[] {
-  const products: Product[] = [
-    ...(BRAND_CATALOG_PRODUCTS as Product[]),
-    ...(GENERATED_CATALOG_PRODUCTS as Product[]),
-    ...(PHOTO_CATALOG_PRODUCTS as Product[]),
-  ];
-
-  // Cross-tab category × frame to find thin combinations to expand.
+  const products = ALL_CATALOG_PRODUCTS as Product[];
   const counts = new Map<string, number>();
   for (const product of products) {
     if (!CATEGORY_ORDER.includes(product.category as Category)) continue;
     const frame = classifyFrame(product);
-    const key = `${product.category}|${frame}`;
-    counts.set(key, (counts.get(key) || 0) + 1);
+    counts.set(`${product.category}|${frame}`, (counts.get(`${product.category}|${frame}`) || 0) + 1);
   }
 
   const candidates: QueryCandidate[] = [];
   for (const category of CATEGORY_ORDER) {
     const frames: Frame[] = ['masc', 'fem', 'androgynous'];
-    const vibes = FORMULA_VIBES[category] || [''];
+    const categoryProducts = products.filter((product) => product.category === category);
+    const transparentCount = categoryProducts.filter((product) => product.imageTransparentUrl).length;
+    const affordableCount = categoryProducts.filter((product) => product.priceCents > 0 && product.priceCents < 15000).length;
+    const imageGapBoost = Math.max(0, 10 - transparentCount);
+    const priceDiversityBoost = affordableCount < 20 ? 12 : 0;
     for (const frame of frames) {
       const count = counts.get(`${category}|${frame}`) || 0;
-      // Hard target: at least 15 per (category, frame). Anything below
-      // becomes a candidate, weighted by how thin it is.
       if (count >= 15) continue;
+      const frameLabel = frame === 'androgynous' ? 'unisex' : frame === 'masc' ? "men's" : "women's";
+      const vibes = FORMULA_VIBES[category] || [''];
       for (const vibe of vibes) {
-        const frameLabel = frame === 'androgynous' ? 'unisex' : frame === 'masc' ? "men's" : "women's";
-        const query = vibe ? `${frameLabel} ${vibe} ${category}` : `${frameLabel} ${category}`;
         candidates.push({
-          query,
-          targetCategory: category as Category,
+          query: `${frameLabel} ${vibe} ${category}`.replace(/\s+/g, ' ').trim(),
+          targetCategory: category,
           targetFrame: frame,
-          targetVibe: vibe || undefined,
+          targetVibe: vibe,
           maxResults: 20,
-          reason: `thin combination — ${category} × ${frame} has ${count} products (target 15+)`,
-          priority: (15 - count) * 10 + (vibes.length - vibes.indexOf(vibe)) * 1,
+          reason: `Thin ${category} x ${frame} coverage (${count}/15 target); ${transparentCount} transparent assets; ${affordableCount} under $150.`,
+          priority: (15 - count) * 10 + imageGapBoost + priceDiversityBoost + (vibes.length - vibes.indexOf(vibe)),
         });
       }
     }
   }
 
-  candidates.sort((a, b) => b.priority - a.priority);
-  return candidates;
-}
-
-interface PlanReport {
-  generatedAt: string;
-  mode: 'dry-run' | 'live';
-  totalCandidates: number;
-  emittedCount: number;
-  candidates: QueryCandidate[];
-  liveCheck: {
-    hasKey: boolean;
-    liveEnvFlag: boolean;
-    liveCliFlag: boolean;
-    maxQueriesFromCli: number;
-    wouldRunLive: boolean;
-    blockedReason: string | null;
-  };
-  notes: string[];
+  return candidates.sort((a, b) => b.priority - a.priority);
 }
 
 function buildReport(flags: CliFlags): PlanReport {
   const candidates = buildPlan();
+  const emitted = candidates.slice(0, flags.limit);
   const hasKey = Boolean(process.env.SEARCHAPI_KEY && process.env.SEARCHAPI_KEY.trim());
   const liveEnvFlag = process.env.SEARCHAPI_LIVE === 'true';
+  const maxQueriesFromEnv = Number.parseInt(process.env.SEARCHAPI_MAX_QUERIES || '', 10);
   const liveCliFlag = flags.live;
   const blockedReasons: string[] = [];
   if (!hasKey) blockedReasons.push('SEARCHAPI_KEY missing');
   if (!liveEnvFlag) blockedReasons.push('SEARCHAPI_LIVE!="true"');
+  if (!Number.isFinite(maxQueriesFromEnv) || maxQueriesFromEnv <= 0) blockedReasons.push('SEARCHAPI_MAX_QUERIES not set or <=0');
   if (!liveCliFlag) blockedReasons.push('--live flag absent');
   if (flags.maxQueries <= 0) blockedReasons.push('--max-queries not set or <=0');
   const wouldRunLive = blockedReasons.length === 0;
@@ -165,28 +144,36 @@ function buildReport(flags: CliFlags): PlanReport {
     generatedAt: new Date().toISOString(),
     mode: wouldRunLive ? 'live' : 'dry-run',
     totalCandidates: candidates.length,
-    emittedCount: Math.min(flags.limit, candidates.length),
-    candidates: candidates.slice(0, flags.limit),
+    emittedCount: emitted.length,
+    estimatedMaxQueries: emitted.length,
+    estimatedMaxResults: emitted.reduce((sum, candidate) => sum + candidate.maxResults, 0),
+    candidates: emitted,
     liveCheck: {
       hasKey,
       liveEnvFlag,
       liveCliFlag,
+      maxQueriesFromEnv: Number.isFinite(maxQueriesFromEnv) ? maxQueriesFromEnv : 0,
       maxQueriesFromCli: flags.maxQueries,
       wouldRunLive,
-      blockedReason: wouldRunLive ? null : blockedReasons.join(' · '),
+      blockedReason: wouldRunLive ? null : blockedReasons.join(' | '),
     },
     notes: [
-      'This script does NOT call SearchAPI by default. The query plan is local.',
-      'Live mode requires SEARCHAPI_KEY + SEARCHAPI_LIVE=true + --live + --max-queries=N.',
-      'Even in live mode, results land in data/catalog/candidates/ and are NEVER auto-merged.',
-      'Every result is tagged source=searchapi, reviewStatus=candidate, imageStatus=original, liveMergeReady=false.',
-      'SearchAPI helps find better merchant images and product URLs — it does NOT remove backgrounds.',
+      'This script does not call SearchAPI in dry-run mode.',
+      'Live mode requires SEARCHAPI_KEY + SEARCHAPI_LIVE=true + SEARCHAPI_MAX_QUERIES=N + --live + --max-queries=N.',
+      'Live results must remain candidate-only with reviewStatus=candidate and liveMergeReady=false.',
+      'SearchAPI can find better merchant images and product URLs, but it does not remove backgrounds.',
     ],
   };
 }
 
 function pad(text: string, width: number): string {
   return text.length >= width ? text : text + ' '.repeat(width - text.length);
+}
+
+function writeReport(report: PlanReport): void {
+  const reportsDir = join(process.cwd(), 'data', 'catalog', 'reports');
+  mkdirSync(reportsDir, { recursive: true });
+  writeFileSync(join(reportsDir, 'searchapi-expansion-plan-report.json'), `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 }
 
 function printHuman(report: PlanReport): void {
@@ -199,63 +186,47 @@ function printHuman(report: PlanReport): void {
   console.log('---------------');
   console.log(`  SEARCHAPI_KEY present : ${report.liveCheck.hasKey}`);
   console.log(`  SEARCHAPI_LIVE=true   : ${report.liveCheck.liveEnvFlag}`);
+  console.log(`  SEARCHAPI_MAX_QUERIES : ${report.liveCheck.maxQueriesFromEnv}`);
   console.log(`  --live flag           : ${report.liveCheck.liveCliFlag}`);
   console.log(`  --max-queries         : ${report.liveCheck.maxQueriesFromCli}`);
   console.log(`  would run live        : ${report.liveCheck.wouldRunLive}`);
-  if (report.liveCheck.blockedReason) {
-    console.log(`  blocked by            : ${report.liveCheck.blockedReason}`);
-  }
+  if (report.liveCheck.blockedReason) console.log(`  blocked by            : ${report.liveCheck.blockedReason}`);
   console.log('');
-  console.log(`Plan size: ${report.totalCandidates} candidates · emitting ${report.emittedCount}`);
+  console.log(`Plan size: ${report.totalCandidates} candidates; emitting ${report.emittedCount}`);
+  console.log(`Estimated live queries for emitted plan: ${report.estimatedMaxQueries}`);
+  console.log(`Estimated max result rows: ${report.estimatedMaxResults}`);
   console.log('');
   console.log('Top candidates');
   console.log('--------------');
   for (const candidate of report.candidates) {
-    console.log(`  (p=${candidate.priority}) [${pad(candidate.targetCategory, 8)} · ${pad(candidate.targetFrame, 12)}] "${candidate.query}"`);
+    console.log(`  (p=${candidate.priority}) [${pad(candidate.targetCategory, 8)} | ${pad(candidate.targetFrame, 12)}] "${candidate.query}"`);
     console.log(`      reason: ${candidate.reason}`);
   }
   console.log('');
-  for (const note of report.notes) console.log(`  · ${note}`);
+  for (const note of report.notes) console.log(`  - ${note}`);
 }
 
 function main(): void {
   const flags = parseFlags(process.argv.slice(2));
   const report = buildReport(flags);
+  writeReport(report);
 
-  if (flags.json) {
-    console.log(JSON.stringify(report, null, 2));
-  } else {
-    printHuman(report);
-  }
+  if (flags.json) console.log(JSON.stringify(report, null, 2));
+  else printHuman(report);
 
   if (flags.write) {
-    try {
-      const outDir = join(process.cwd(), 'data', 'catalog', 'candidates');
-      mkdirSync(outDir, { recursive: true });
-      const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const outFile = join(outDir, `searchapi-plan-${stamp}.json`);
-      writeFileSync(outFile, JSON.stringify(report, null, 2), 'utf-8');
-      console.log(`\nWrote ${outFile}`);
-    } catch (error) {
-      console.error('Failed to write report:', error);
-    }
+    const outDir = join(process.cwd(), 'data', 'catalog', 'candidates');
+    mkdirSync(outDir, { recursive: true });
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const outFile = join(outDir, `searchapi-plan-${stamp}.json`);
+    writeFileSync(outFile, JSON.stringify(report, null, 2), 'utf8');
+    console.log(`\nWrote ${outFile}`);
   }
 
   if (report.mode === 'live') {
-    // Live execution path is intentionally NOT implemented in this
-    // sprint. The script gates everything correctly so a future change
-    // can add the actual fetch call without restructuring the surface.
     console.log('');
-    console.log('Live execution stub:');
-    console.log('  All live-mode gates are satisfied, but the actual SearchAPI fetch is');
-    console.log('  not implemented in this script yet. When ready to ship:');
-    console.log('    1. Add `lib/searchapi-client.ts` with a single fetch function.');
-    console.log('    2. Call it for the first N candidates (N = --max-queries).');
-    console.log('    3. Write each result to data/catalog/candidates/searchapi-results-*.json.');
-    console.log('    4. NEVER auto-merge into the live catalog.');
+    console.log('Live execution stub: all live gates are satisfied, but fetching is intentionally not implemented yet.');
   }
-
-  process.exit(0);
 }
 
 main();
