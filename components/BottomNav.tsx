@@ -1,20 +1,17 @@
 'use client';
-import { Bookmark, Flame, House, Layers, Plus, Sparkles, User, Wand2, X } from 'lucide-react';
+
+import { Flame, House, Layers, Plus, Sparkles, User, Wand2, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 
-// 5-tab nav with Syli as the elevated center tab.  The create action
-// sheet stays accessible from a small floating "+" button rendered
-// alongside the nav (bottom-right), so no route loses an entry point.
-const tabs: Array<{ href: string; label: string; icon: typeof Flame; emphasis?: 'syli' }> = [
-  { href: '/',         label: 'Home',    icon: House },
-  { href: '/feed',     label: 'Feed',    icon: Flame },
-  { href: '/stylist',  label: 'Syli',    icon: Wand2,   emphasis: 'syli' },
-  { href: '/saved',    label: 'Saved',   icon: Bookmark },
-  { href: '/profile',  label: 'Profile', icon: User },
+const tabs: Array<{ href: string; label: string; icon: typeof Flame }> = [
+  { href: '/', label: 'Home', icon: House },
+  { href: '/feed', label: 'Feed', icon: Flame },
+  { href: '/stylist', label: 'Syli', icon: Wand2 },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export function BottomNav() {
@@ -22,8 +19,6 @@ export function BottomNav() {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
 
-  // Snapshot real state for the action sheet — used to enable/disable
-  // actions, never to display fake "yes you can do this" affordances.
   const currentFitItems = useFit((state) => state.items);
   const saveFit = useSavedFits((state) => state.saveFit);
   const savedCount = useSavedFits((state) => state.fits.length);
@@ -45,58 +40,27 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="relative h-[68px] grid grid-cols-5 border-t border-hairline bg-bg pb-3.5 pt-1.5">
-        {tabs.map(({ href, label, icon: Icon, emphasis }) => {
-          const active = pathname === href;
-          // Syli is the elevated center tab — magenta gradient, lifted
-          // above the nav line, ring + glow. All other tabs are
-          // standard flat link tabs with an accent underline when active.
-          if (emphasis === 'syli') {
-            return (
-              <div key={href} className="relative flex items-start justify-center">
-                <Link
-                  href={href}
-                  aria-current={active ? 'page' : undefined}
-                  aria-label="Open Syli AI Stylist"
-                  className={`sy-press absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] transition hover:bg-right motion-safe:transition-all motion-safe:duration-200 ${
-                    active ? 'ring-2 ring-white/40 scale-[1.04]' : 'ring-1 ring-white/20'
-                  }`}
-                >
-                  <Icon size={24} strokeWidth={2.2} />
-                </Link>
-                <span className="pointer-events-none absolute -bottom-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-accent">{label}</span>
-              </div>
-            );
-          }
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active ? 'page' : undefined}
-              className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
-                active ? 'text-ink opacity-100' : 'text-muted opacity-55'
-              }`}
-            >
-              {active ? <span className="absolute top-0.5 h-0.5 w-4 rounded bg-accent" /> : null}
-              <Icon size={22} strokeWidth={1.6} />
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
+      <nav className="relative grid h-[72px] grid-cols-5 border-t border-hairline bg-bg pb-3.5 pt-1.5">
+        {tabs.slice(0, 2).map((tab) => (
+          <NavTab key={tab.href} {...tab} active={pathname === tab.href} />
+        ))}
 
-      {/* Floating Create button — replaces the old center FAB without
-          stealing the prominent center slot from Syli. Sits above the
-          nav, right-aligned, smaller than the Syli tab so the visual
-          hierarchy reads: Syli (primary) > Create (secondary). */}
-      <button
-        type="button"
-        onClick={() => setCreateOpen(true)}
-        aria-label="Open create menu"
-        className="sy-press fixed bottom-[78px] right-3 z-40 grid h-12 w-12 place-items-center rounded-full border border-white/14 bg-[#1c0f15]/92 text-white shadow-[0_14px_28px_rgba(0,0,0,.45)] backdrop-blur-md transition hover:border-accent motion-safe:transition-all motion-safe:duration-200"
-      >
-        <Plus size={20} strokeWidth={2.4} />
-      </button>
+        <div className="relative flex items-start justify-center">
+          <button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            aria-label="Open create menu"
+            className="sy-press absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] transition hover:bg-right motion-safe:transition-all motion-safe:duration-200"
+          >
+            <Plus size={24} strokeWidth={2.4} />
+          </button>
+          <span className="pointer-events-none absolute -bottom-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-accent">Create</span>
+        </div>
+
+        {tabs.slice(2).map((tab) => (
+          <NavTab key={tab.href} {...tab} active={pathname === tab.href} />
+        ))}
+      </nav>
 
       {createOpen ? (
         <div className="fixed inset-0 z-[60] mx-auto flex max-w-[480px] items-end bg-black/60 backdrop-blur-sm">
@@ -114,7 +78,7 @@ export function BottomNav() {
                 <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">Create</div>
                 <div className="mt-0.5 font-serif text-[22px] font-semibold text-ink">Start a real style flow</div>
                 <p className="mt-1 max-w-[28ch] text-[11px] leading-relaxed text-muted-2">
-                  Every action routes to Builder, Syli, Wardrobe, Canvas, or Feed with local data.
+                  Builder, Syli, Wardrobe, Canvas, and Feed stay one tap away.
                 </p>
               </div>
               <button
@@ -129,16 +93,16 @@ export function BottomNav() {
 
             <div className="mt-4 grid grid-cols-2 gap-2">
               <ActionCard
-                eyebrow="Start with AI"
+                eyebrow="Builder"
                 title="Make outfit"
                 body="Open Builder and generate a catalog-backed fit."
                 icon={Sparkles}
                 onClick={() => dispatch('make-outfit')}
               />
               <ActionCard
-                eyebrow="Local beta"
+                eyebrow="AI stylist"
                 title="Ask Syli"
-                body="Get rule-based styling help from your real state."
+                body="Get local beta styling help from your real state."
                 icon={Wand2}
                 onClick={() => dispatch('stylist')}
               />
@@ -157,7 +121,7 @@ export function BottomNav() {
                     ? `${currentFitCount} piece${currentFitCount === 1 ? '' : 's'} ready to save.`
                     : 'Build a fit first.'
                 }
-                icon={Bookmark}
+                icon={Sparkles}
                 onClick={() => dispatch('save-current')}
                 disabled={currentFitCount === 0}
               />
@@ -183,12 +147,39 @@ export function BottomNav() {
             </div>
 
             <div className="mt-4 rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2 text-[11px] leading-relaxed text-muted-2">
-              Saved fits: <strong className="text-white">{savedCount}</strong> · Builder slots filled: <strong className="text-white">{currentFitCount}</strong>
+              Saved fits: <strong className="text-white">{savedCount}</strong> · Builder slots filled:{' '}
+              <strong className="text-white">{currentFitCount}</strong>
             </div>
           </section>
         </div>
       ) : null}
     </>
+  );
+}
+
+function NavTab({
+  href,
+  label,
+  icon: Icon,
+  active,
+}: {
+  href: string;
+  label: string;
+  icon: typeof Flame;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
+        active ? 'text-ink opacity-100' : 'text-muted opacity-55'
+      }`}
+    >
+      {active ? <span className="absolute top-0.5 h-0.5 w-4 rounded bg-accent" /> : null}
+      <Icon size={22} strokeWidth={1.6} />
+      {label}
+    </Link>
   );
 }
 
