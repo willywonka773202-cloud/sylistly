@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T21:51:56.904Z",
+  "generatedAt": "2026-05-16T22:28:40.403Z",
   "mode": "dry-run",
   "totalCandidates": 31,
   "emittedCount": 25,
@@ -7,7 +7,7 @@
   "estimatedMaxResults": 500,
   "candidates": [
     {
-      "query": "unisex hoop earrings jewelry",
+      "query": "unisex hoop earrings jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "androgynous",
       "targetVibe": "hoop earrings",
@@ -16,7 +16,7 @@
       "priority": 164
     },
     {
-      "query": "unisex gold necklace jewelry",
+      "query": "unisex gold necklace jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "androgynous",
       "targetVibe": "gold necklace",
@@ -25,7 +25,7 @@
       "priority": 163
     },
     {
-      "query": "unisex pearl earrings jewelry",
+      "query": "unisex pearl earrings jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "androgynous",
       "targetVibe": "pearl earrings",
@@ -34,7 +34,7 @@
       "priority": 162
     },
     {
-      "query": "unisex cuban chain jewelry",
+      "query": "unisex cuban chain jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "androgynous",
       "targetVibe": "cuban chain",
@@ -43,7 +43,7 @@
       "priority": 161
     },
     {
-      "query": "men's cat eye sunglasses eyewear",
+      "query": "men's cat eye sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "masc",
       "targetVibe": "cat eye sunglasses",
@@ -52,7 +52,7 @@
       "priority": 134
     },
     {
-      "query": "women's cat eye sunglasses eyewear",
+      "query": "women's cat eye sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "fem",
       "targetVibe": "cat eye sunglasses",
@@ -61,7 +61,7 @@
       "priority": 134
     },
     {
-      "query": "men's aviator sunglasses eyewear",
+      "query": "men's aviator sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "masc",
       "targetVibe": "aviator sunglasses",
@@ -70,7 +70,7 @@
       "priority": 133
     },
     {
-      "query": "women's aviator sunglasses eyewear",
+      "query": "women's aviator sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "fem",
       "targetVibe": "aviator sunglasses",
@@ -79,7 +79,7 @@
       "priority": 133
     },
     {
-      "query": "men's wayfarer sunglasses eyewear",
+      "query": "men's wayfarer sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "masc",
       "targetVibe": "wayfarer sunglasses",
@@ -88,7 +88,7 @@
       "priority": 132
     },
     {
-      "query": "women's wayfarer sunglasses eyewear",
+      "query": "women's wayfarer sunglasses eyewear product photo",
       "targetCategory": "eyewear",
       "targetFrame": "fem",
       "targetVibe": "wayfarer sunglasses",
@@ -97,7 +97,7 @@
       "priority": 132
     },
     {
-      "query": "men's hoop earrings jewelry",
+      "query": "men's hoop earrings jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "masc",
       "targetVibe": "hoop earrings",
@@ -106,7 +106,7 @@
       "priority": 124
     },
     {
-      "query": "men's structured tote bag",
+      "query": "men's structured tote bag product photo",
       "targetCategory": "bag",
       "targetFrame": "masc",
       "targetVibe": "structured tote",
@@ -115,7 +115,7 @@
       "priority": 123
     },
     {
-      "query": "men's gold necklace jewelry",
+      "query": "men's gold necklace jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "masc",
       "targetVibe": "gold necklace",
@@ -124,7 +124,7 @@
       "priority": 123
     },
     {
-      "query": "men's crossbody bag bag",
+      "query": "men's crossbody bag bag product photo",
       "targetCategory": "bag",
       "targetFrame": "masc",
       "targetVibe": "crossbody bag",
@@ -133,7 +133,7 @@
       "priority": 122
     },
     {
-      "query": "men's pearl earrings jewelry",
+      "query": "men's pearl earrings jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "masc",
       "targetVibe": "pearl earrings",
@@ -142,7 +142,7 @@
       "priority": 122
     },
     {
-      "query": "men's shoulder bag bag",
+      "query": "men's shoulder bag bag product photo",
       "targetCategory": "bag",
       "targetFrame": "masc",
       "targetVibe": "shoulder bag",
@@ -151,7 +151,7 @@
       "priority": 121
     },
     {
-      "query": "men's cuban chain jewelry",
+      "query": "men's cuban chain jewelry product photo",
       "targetCategory": "jewelry",
       "targetFrame": "masc",
       "targetVibe": "cuban chain",
@@ -160,7 +160,7 @@
       "priority": 121
     },
     {
-      "query": "men's gym backpack bag",
+      "query": "men's gym backpack bag product photo",
       "targetCategory": "bag",
       "targetFrame": "masc",
       "targetVibe": "gym backpack",
@@ -169,7 +169,7 @@
       "priority": 120
     },
     {
-      "query": "men's white sneaker shoes",
+      "query": "men's white sneaker shoes product photo",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetVibe": "white sneaker",
@@ -178,7 +178,7 @@
       "priority": 94
     },
     {
-      "query": "men's loafer shoes",
+      "query": "men's loafer shoes product photo",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetVibe": "loafer",
@@ -187,7 +187,7 @@
       "priority": 93
     },
     {
-      "query": "men's platform boot shoes",
+      "query": "men's platform boot shoes product photo",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetVibe": "platform boot",
@@ -196,7 +196,7 @@
       "priority": 92
     },
     {
-      "query": "men's sandals shoes",
+      "query": "men's sandals shoes product photo",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetVibe": "sandals",
@@ -205,7 +205,7 @@
       "priority": 91
     },
     {
-      "query": "men's running sneaker shoes",
+      "query": "men's running sneaker shoes product photo",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetVibe": "running sneaker",
@@ -214,7 +214,7 @@
       "priority": 90
     },
     {
-      "query": "women's baseball cap hat",
+      "query": "women's baseball cap hat product photo",
       "targetCategory": "hat",
       "targetFrame": "fem",
       "targetVibe": "baseball cap",
@@ -223,7 +223,7 @@
       "priority": 64
     },
     {
-      "query": "women's beanie hat",
+      "query": "women's beanie hat product photo",
       "targetCategory": "hat",
       "targetFrame": "fem",
       "targetVibe": "beanie",
@@ -239,12 +239,13 @@
     "maxQueriesFromEnv": 0,
     "maxQueriesFromCli": 0,
     "wouldRunLive": false,
-    "blockedReason": "SEARCHAPI_KEY missing | SEARCHAPI_LIVE!=\"true\" | SEARCHAPI_MAX_QUERIES not set or <=0 | --live flag absent | --max-queries not set or <=0"
+    "blockedReason": "SEARCHAPI_KEY missing | SEARCHAPI_LIVE!=\"true\" | SEARCHAPI_MAX_QUERIES not set or <=0 | --live flag absent | --max-queries not set or <=0",
+    "liveQueryLimit": 0
   },
   "notes": [
     "This script does not call SearchAPI in dry-run mode.",
     "Live mode requires SEARCHAPI_KEY + SEARCHAPI_LIVE=true + SEARCHAPI_MAX_QUERIES=N + --live + --max-queries=N.",
-    "Live results must remain candidate-only with reviewStatus=candidate and liveMergeReady=false.",
+    "Live results are candidate-only with reviewStatus=candidate and liveMergeReady=false.",
     "SearchAPI can find better merchant images and product URLs, but it does not remove backgrounds."
   ]
 }
