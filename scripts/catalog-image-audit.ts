@@ -14,8 +14,11 @@
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { applyCatalogCutoutOverridesToProducts } from '../lib/catalog-cutout-overrides';
 import { validateProduct } from '../lib/catalog-schemas/product.v2';
 import type { Category, Product } from '../lib/types';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog';
 
@@ -53,6 +56,13 @@ interface ImageAuditReport {
   }>;
   byCategoryNeedingCutout: Record<string, number>;
   topCutoutCandidates: ImageAuditRow[];
+  generatedAssets: {
+    cutoutDir: string;
+    totalFiles: number;
+    registeredFiles: number;
+    missingCatalogRegistration: string[];
+    registeredLocalUrlsMissingFiles: string[];
+  };
 }
 
 interface CliFlags {
@@ -150,9 +160,9 @@ function buildRow(product: unknown, source: SourceLabel): ImageAuditRow | null {
 
 function audit(): ImageAuditReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
-    { label: 'brand-catalog', products: BRAND_CATALOG_PRODUCTS as unknown[] },
-    { label: 'generated-catalog', products: GENERATED_CATALOG_PRODUCTS as unknown[] },
-    { label: 'photo-catalog', products: PHOTO_CATALOG_PRODUCTS as unknown[] },
+    { label: 'brand-catalog', products: applyCatalogCutoutOverridesToProducts(BRAND_CATALOG_PRODUCTS as Product[]) as unknown[] },
+    { label: 'generated-catalog', products: applyCatalogCutoutOverridesToProducts(GENERATED_CATALOG_PRODUCTS as Product[]) as unknown[] },
+    { label: 'photo-catalog', products: applyCatalogCutoutOverridesToProducts(PHOTO_CATALOG_PRODUCTS as Product[]) as unknown[] },
   ];
 
   const rows: ImageAuditRow[] = [];
@@ -213,12 +223,40 @@ function audit(): ImageAuditReport {
     Array.from(categoryCounts.entries()).sort((a, b) => b[1] - a[1]),
   );
 
+  const root = process.cwd();
+  const cutoutDir = join(root, 'public', 'assets', 'cutouts');
+  const files = existsSync(cutoutDir)
+    ? readdirSync(cutoutDir).filter((file) => /\.(png|webp|avif)$/i.test(file)).sort()
+    : [];
+  const registeredUrls = new Set(
+    rows
+      .filter((row) => row.hasTransparent)
+      .map((row) => {
+        const product = sources.flatMap((source) => source.products as Array<Partial<Product>>).find((entry) => entry.id === row.id);
+        return typeof product?.imageTransparentUrl === 'string' ? product.imageTransparentUrl : '';
+      })
+      .filter(Boolean),
+  );
+  const missingCatalogRegistration = files
+    .map((file) => `/assets/cutouts/${file}`)
+    .filter((assetPath) => !registeredUrls.has(assetPath));
+  const registeredLocalUrlsMissingFiles = Array.from(registeredUrls)
+    .filter((url) => url.startsWith('/assets/cutouts/'))
+    .filter((url) => !existsSync(join(root, 'public', url.replace(/^\//, ''))));
+
   return {
     generatedAt: new Date().toISOString(),
     totals,
     bySource,
     byCategoryNeedingCutout,
     topCutoutCandidates,
+    generatedAssets: {
+      cutoutDir: 'public/assets/cutouts',
+      totalFiles: files.length,
+      registeredFiles: files.length - missingCatalogRegistration.length,
+      missingCatalogRegistration,
+      registeredLocalUrlsMissingFiles,
+    },
   };
 }
 
@@ -247,6 +285,13 @@ function printHuman(report: ImageAuditReport, flags: CliFlags): void {
   console.log(`  unsafe image          : ${report.totals.withUnsafeImage}`);
   console.log(`  cutout-candidate set  : ${report.totals.needsCutoutPriority}`);
   console.log('');
+  console.log('Generated cutout assets');
+  console.log('-----------------------');
+  console.log(`  files in ${report.generatedAssets.cutoutDir}       : ${report.generatedAssets.totalFiles}`);
+  console.log(`  registered in runtime catalog : ${report.generatedAssets.registeredFiles}`);
+  console.log(`  missing catalog registration  : ${report.generatedAssets.missingCatalogRegistration.length}`);
+  console.log(`  registered missing files      : ${report.generatedAssets.registeredLocalUrlsMissingFiles.length}`);
+  console.log('');
   if (Object.keys(report.byCategoryNeedingCutout).length) {
     console.log('Cutout candidates by category');
     console.log('-----------------------------');
@@ -270,9 +315,20 @@ function printHuman(report: ImageAuditReport, flags: CliFlags): void {
   console.log('See scripts/prepare-cutout-candidates.ts for a pipeline-ready candidate list.');
 }
 
+function writeJsonReport(report: ImageAuditReport): void {
+  const outDir = join(process.cwd(), 'data', 'catalog', 'reports');
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(
+    join(outDir, 'catalog-image-audit-report.json'),
+    `${JSON.stringify(report, null, 2)}\n`,
+    'utf8',
+  );
+}
+
 function main(): void {
   const flags = parseFlags(process.argv.slice(2));
   const report = audit();
+  writeJsonReport(report);
   if (flags.json) {
     console.log(JSON.stringify(report, null, 2));
   } else {

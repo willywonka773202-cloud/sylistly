@@ -9,9 +9,13 @@
 //   npx jiti scripts/catalog-coverage.ts
 //   npx jiti scripts/catalog-coverage.ts --json
 
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { validateProduct } from '../lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 
 interface CliFlags {
@@ -45,6 +49,7 @@ interface CoverageReport {
   generatedAt: string;
   total: number;
   byCategory: Record<Category, number>;
+  bySource: Record<string, number>;
   byFrame: Record<Frame, number>;
   byPriceTier: Record<PriceTier, number>;
   byCategoryAndFrame: Record<Category, Record<Frame, number>>;
@@ -53,13 +58,21 @@ interface CoverageReport {
   topVibes: Array<{ vibe: string; count: number }>;
   transparent: {
     withTransparent: number;
+    originalOnly: number;
+    unsafeImages: number;
     needsCutout: number;
     transparentByCategory: Record<Category, number>;
     needsCutoutByCategory: Record<Category, number>;
   };
+  missingAssets: {
+    missingProductUrl: number;
+    missingImageUrl: number;
+    registeredTransparentUrlMissingFile: string[];
+  };
   thinCombinations: Array<{ category: Category; frame: Frame; count: number }>;
   thinPriceTiers: Array<{ category: Category; priceTier: PriceTier; count: number }>;
   overrepresentedBrands: Array<{ brand: string; share: number }>;
+  recommendedNextExpansionCategories: Array<{ category: Category; reason: string; priority: number }>;
 }
 
 function emptyCategoryRecord<T>(value: () => T): Record<Category, T> {
@@ -67,13 +80,14 @@ function emptyCategoryRecord<T>(value: () => T): Record<Category, T> {
 }
 
 function build(): CoverageReport {
-  const products: Product[] = [
-    ...(BRAND_CATALOG_PRODUCTS as Product[]),
-    ...(GENERATED_CATALOG_PRODUCTS as Product[]),
-    ...(PHOTO_CATALOG_PRODUCTS as Product[]),
-  ];
+  const products: Product[] = ALL_CATALOG_PRODUCTS as Product[];
+  const sourceById = new Map<string, string>();
+  for (const product of BRAND_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, 'brand-catalog');
+  for (const product of GENERATED_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, 'generated-catalog');
+  for (const product of PHOTO_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, sourceById.get(product.id) || 'photo-catalog');
 
   const byCategory = emptyCategoryRecord(() => 0);
+  const bySource: Record<string, number> = {};
   const byFrame: Record<Frame, number> = { masc: 0, fem: 0, androgynous: 0, unspecified: 0 };
   const byPriceTier: Record<PriceTier, number> = { 'under-50': 0, 'under-150': 0, 'under-400': 0, '400-plus': 0, unknown: 0 };
   const byCategoryAndFrame = emptyCategoryRecord<Record<Frame, number>>(() => ({ masc: 0, fem: 0, androgynous: 0, unspecified: 0 }));
@@ -83,11 +97,27 @@ function build(): CoverageReport {
   const transparentByCategory = emptyCategoryRecord(() => 0);
   const needsCutoutByCategory = emptyCategoryRecord(() => 0);
   let withTransparent = 0;
+  let originalOnly = 0;
+  let unsafeImages = 0;
   let needsCutout = 0;
+  let missingProductUrl = 0;
+  let missingImageUrl = 0;
+  const registeredTransparentUrlMissingFile: string[] = [];
+  const imageBlockingCodes = new Set([
+    'IMAGE_URL_DATA_URL',
+    'IMAGE_URL_SVG_DATA',
+    'IMAGE_URL_SEARCH_INTENT',
+    'IMAGE_URL_PLACEHOLDER',
+    'IMAGE_URL_UNSAFE_HOST',
+    'IMAGE_URL_NOT_STRING',
+    'MISSING_IMAGE_URL',
+  ]);
 
   for (const product of products) {
     if (!product || !CATEGORY_ORDER.includes(product.category as Category)) continue;
     const category = product.category as Category;
+    const source = sourceById.get(product.id) || 'runtime';
+    bySource[source] = (bySource[source] || 0) + 1;
     byCategory[category] += 1;
     const frame = classifyFrame(product);
     byFrame[frame] += 1;
@@ -99,11 +129,22 @@ function build(): CoverageReport {
     for (const vibe of [...(product.vibes || []), ...(product.occasions || [])]) {
       if (typeof vibe === 'string') vibeCounts.set(vibe, (vibeCounts.get(vibe) || 0) + 1);
     }
-    const transparent = (product as Product & { imageTransparentUrl?: unknown }).imageTransparentUrl;
+    const validation = validateProduct(product);
+    const isUnsafe = validation.issues.some((issue) => imageBlockingCodes.has(issue.code as string));
+    if (isUnsafe) unsafeImages += 1;
+    if (!product.productUrl && !product.retailerUrl) missingProductUrl += 1;
+    if (!product.imageUrl) missingImageUrl += 1;
+
+    const transparent = product.imageTransparentUrl;
     if (typeof transparent === 'string' && transparent.trim() && !transparent.startsWith('data:')) {
       withTransparent += 1;
       transparentByCategory[category] += 1;
-    } else if (typeof product.imageUrl === 'string' && product.imageUrl.trim()) {
+      if (transparent.startsWith('/assets/cutouts/')) {
+        const filePath = join(process.cwd(), 'public', transparent.replace(/^\//, ''));
+        if (!existsSync(filePath)) registeredTransparentUrlMissingFile.push(transparent);
+      }
+    } else if (!isUnsafe && typeof product.imageUrl === 'string' && product.imageUrl.trim()) {
+      originalOnly += 1;
       needsCutout += 1;
       needsCutoutByCategory[category] += 1;
     }
@@ -141,20 +182,38 @@ function build(): CoverageReport {
     .filter((entry) => entry.count / Math.max(1, total) > 0.04)
     .map((entry) => ({ brand: entry.brand, share: Number((entry.count / total).toFixed(3)) }));
 
+  const recommendedNextExpansionCategories = CATEGORY_ORDER
+    .map((category) => {
+      const count = byCategory[category];
+      const transparentGap = needsCutoutByCategory[category];
+      const thinFramePenalty = thinCombinations.filter((entry) => entry.category === category).length * 8;
+      const priority = Math.max(0, 120 - count) + Math.min(40, transparentGap / 3) + thinFramePenalty;
+      return {
+        category,
+        priority: Number(priority.toFixed(1)),
+        reason: `${count} runtime products, ${transparentGap} still need transparent assets`,
+      };
+    })
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 6);
+
   return {
     generatedAt: new Date().toISOString(),
     total,
     byCategory,
+    bySource,
     byFrame,
     byPriceTier,
     byCategoryAndFrame,
     byCategoryAndPriceTier,
     topBrands,
     topVibes,
-    transparent: { withTransparent, needsCutout, transparentByCategory, needsCutoutByCategory },
+    transparent: { withTransparent, originalOnly, unsafeImages, needsCutout, transparentByCategory, needsCutoutByCategory },
+    missingAssets: { missingProductUrl, missingImageUrl, registeredTransparentUrlMissingFile },
     thinCombinations,
     thinPriceTiers,
     overrepresentedBrands,
+    recommendedNextExpansionCategories,
   };
 }
 
@@ -172,6 +231,12 @@ function printHuman(report: CoverageReport): void {
   console.log('-----------');
   for (const [category, count] of Object.entries(report.byCategory)) {
     console.log(`  ${pad(category, 14)} ${count}`);
+  }
+  console.log('');
+  console.log('By source');
+  console.log('---------');
+  for (const [source, count] of Object.entries(report.bySource)) {
+    console.log(`  ${pad(source, 18)} ${count}`);
   }
   console.log('');
   console.log('By frame/gender');
@@ -195,7 +260,10 @@ function printHuman(report: CoverageReport): void {
   console.log('Transparent-asset coverage');
   console.log('--------------------------');
   console.log(`  with transparent : ${report.transparent.withTransparent}`);
+  console.log(`  original-only    : ${report.transparent.originalOnly}`);
+  console.log(`  unsafe images    : ${report.transparent.unsafeImages}`);
   console.log(`  needs cutout     : ${report.transparent.needsCutout}`);
+  console.log(`  missing cutout files: ${report.missingAssets.registeredTransparentUrlMissingFile.length}`);
   console.log('');
   console.log('Thinnest category × frame combinations (<=4)');
   console.log('--------------------------------------------');
@@ -208,11 +276,28 @@ function printHuman(report: CoverageReport): void {
   for (const row of report.overrepresentedBrands) {
     console.log(`  ${pad(row.brand, 30)} ${(row.share * 100).toFixed(1)}%`);
   }
+  console.log('');
+  console.log('Recommended next expansion categories');
+  console.log('--------------------------------------');
+  for (const row of report.recommendedNextExpansionCategories) {
+    console.log(`  ${pad(row.category, 14)} p=${row.priority}  ${row.reason}`);
+  }
+}
+
+function writeJsonReport(report: CoverageReport): void {
+  const outDir = join(process.cwd(), 'data', 'catalog', 'reports');
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(
+    join(outDir, 'catalog-coverage-report.json'),
+    `${JSON.stringify(report, null, 2)}\n`,
+    'utf8',
+  );
 }
 
 function main(): void {
   const flags = parseFlags(process.argv.slice(2));
   const report = build();
+  writeJsonReport(report);
   if (flags.json) console.log(JSON.stringify(report, null, 2));
   else printHuman(report);
   process.exit(0);

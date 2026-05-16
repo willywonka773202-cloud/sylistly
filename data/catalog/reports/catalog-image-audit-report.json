@@ -1,0 +1,2855 @@
+{
+  "generatedAt": "2026-05-16T21:49:00.508Z",
+  "totals": {
+    "products": 680,
+    "withTransparent": 50,
+    "withOriginalOnly": 540,
+    "withUnsafeImage": 90,
+    "needsCutoutPriority": 540
+  },
+  "bySource": [
+    {
+      "label": "brand-catalog",
+      "total": 95,
+      "withTransparent": 2,
+      "withOriginalOnly": 3,
+      "withUnsafeImage": 90,
+      "needsCutoutPriority": 3
+    },
+    {
+      "label": "generated-catalog",
+      "total": 175,
+      "withTransparent": 42,
+      "withOriginalOnly": 133,
+      "withUnsafeImage": 0,
+      "needsCutoutPriority": 133
+    },
+    {
+      "label": "photo-catalog",
+      "total": 410,
+      "withTransparent": 6,
+      "withOriginalOnly": 404,
+      "withUnsafeImage": 0,
+      "needsCutoutPriority": 404
+    }
+  ],
+  "byCategoryNeedingCutout": {
+    "outer": 122,
+    "bottom": 98,
+    "top": 74,
+    "hat": 70,
+    "shoes": 51,
+    "bag": 48,
+    "jewelry": 48,
+    "eyewear": 29
+  },
+  "topCutoutCandidates": [
+    {
+      "source": "brand-catalog",
+      "id": "catalog-top-uniqlo-airism",
+      "brand": "Uniqlo",
+      "name": "AIRism Cotton Oversized Tee",
+      "category": "top",
+      "imageUrl": "https://image.uniqlo.com/UQ/ST3/us/imagesgoods/465185/feature/usgoods_465185_feature1.jpg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "029f01cd130820ba",
+      "brand": "Adidas",
+      "name": "Girls T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTBQEK86zWR9QoiIZmv51ftTp5pSgg1pKsXG6SIim9hGqEeOtajX7ysaj07okWhQ9eecIo3yuEBKbToNEnDN4IJ-nZK6Ikx7NUCexf9Q9p4XWQQ8CKLWUjnjw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4ad253197ca27e5d",
+      "brand": "Adidas",
+      "name": "ORIGINALS BABY TEE Blue Cotton L",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTHikqJN_5lgQrV0nAUEntb0HzKU62eJKo9VCv3VIcvuwXYvzHQJ18_FHDL6oNi6d9JSZkFBIiwG5bkypX78w16AjcS26Q57dP_Xjt0eV7mPChHFx9bGvaqDECZ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f6a88127f3d78198",
+      "brand": "Adidas",
+      "name": "ORIGINALS BABY TEE White Cotton S",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcShnMzAqSIwHGJClr2x3XS2fpGtK0J_QvbDzH-2Z3d-Jj0KxtTN5R1H7hiErpQVXHnlrP2aW-dpcgzXPiDlb15YB464tol63-UDHSbvm7uZVXeH5xLmSV-ntw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "87db99cc2d21cab9",
+      "brand": "Adidas",
+      "name": "T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQEuom17-2Vc-DVW9X5krj3KLCrLAImkj7ZrHlgVlcGxuu8f46nOENJVlMOPwUj4RZME5LJ4mmyphofZkAd_vL6eq3XfOGKsfbgMhUYgh-FpVzafn4ql-jCg3E",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cbd9a5cc4b666306",
+      "brand": "Adidas",
+      "name": "Women's adidas Z.N.E Baby. Tee",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRqEAmdDo-1oHs1XxDlTOXCjxk36WaD0UZM4dCb0DQsAfAhFLZrpw6sD4Xsd11lyheQSXRlRWzOYOdzRSJPQKXLIo5sOqfu8J0TAx0AfNpwh8nTbrYPftSq0XXC",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "9f04bd292d326bb9",
+      "brand": "Adidas",
+      "name": "Women's Z.N.E. Baby T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTl4Led-wTohRHBLqHSBlZRpTVkIsawiOAHCoh1fUhY5mjFqN9J1ttuaf6bvs7E-Pxeaw82_nEhSWskZkWx8Bs3KbgJJCvWLQhf6mV9g93cVOdwCyNJkGG0mvY",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "bf179175d6aaf92a",
+      "brand": "ALO",
+      "name": "Accolade Hoodie",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS9sYyBbAZhI3qYeNIAEDSffeJ4Ltcf4pod8BqnWsPc8wDo_UNNd89TZPKC_qYT_hLE8_vFZpysZ5wN9nP62KFNdZLbMq8I427OT1f5t1fuFPGg7vfmW5JFeIo",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "94e822c4f776c9cf",
+      "brand": "ALO",
+      "name": "Airbrush Better Together Bra",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSL5yGsbp7_GgGmZT0qSs4GgZ7II8XjmRj3n3BSctawpka-ovJc-lMN51vKY4dXgqpi61pLQ0af5HhQNRT9UHC-iVKhWDPQGFft30O4KSh56nSVbiygPt8pFw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cdd5235be1cd7ad9",
+      "brand": "ALO",
+      "name": "Airbrush Refined Bra Tank Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTQd-v0u55uUYJmYwbvw_Lp016Sen1am9Exzq19Sb8L1MdmUS8JlojOxj4gPWUV_UvZlffUxQ3FafuRLciHw9jJCD3A1j6Ais4thDMwXMjxkY2Bo6xVKNn0LaI",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1d45f487a10e4879",
+      "brand": "ALO",
+      "name": "Airbrush Streamlined Bra Tank",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR6KVf2Mc_tQOoVPcytKk1uweUiu8pQd1VqkFaenxf8lR8qS021vvjl5NP3O1wz1GLD3IwRx5YsxFEyyI2zp2uBrQFvN139_nwkWykCezQXIKvu8DLcNTmU6w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4e94323561e2c69b",
+      "brand": "ALO",
+      "name": "Alosoft Crop Finesse Short Sleeve Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQwY7A7L4Q2VCDKM2F4WWL68txvH3fXGFLeaq1qprPQXgCNNgQHVZMDVXiaTNxxLRqg3PPMfzp16Rvtt2jl5CCQSNtnZZNqqdU5l6WChN1vs6abAeDBy4p2fklN",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7cc5572679916720",
+      "brand": "ALO",
+      "name": "Cable Knit Winter Bliss Hoodie",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTsK0XrlS8CKmhko0LWfMiv32eEgIKiPTFLEJHpnJZVP2eR7HsWpEhDvUUZITSmnIRl80lk1V13HZheLYWa0jl_WJoMqzyt3YAFNxl-u-hF93BkXEaC22TJuw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "bda1b78116fa1bae",
+      "brand": "ALO",
+      "name": "Cropped Accolade Crewneck Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRDCWG3tzNXaaTuhOO5L3xASaxH_wz4a9pNMYWKMJl9VqVYByTmou8mEsIUdPG2lGP-hc_pYSs5JWuu0c5ciaG7fe6DTanC_cfe-K841G8zrPAvDunbpFL4Ow",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "8252d27aaa590ef7",
+      "brand": "ALO",
+      "name": "Make Waves Hoodie",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQlzyPzfSQLxWEqZIGrrQfe4N0L47tJxWbUpeqR2JWsiy2DfTSaP_iZ9wxGVWUzLWDFQKHy7UxKo2Ml4MmeOugLoOft4IKkLLeO_51i5TQ0tUAHyXCcq01YK1w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c4559fa941068021",
+      "brand": "ALO",
+      "name": "Yoga Airbrush Real Bra Tank",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQmksMclREauqubGE3ClfBgPSJLIlXs5OZYI5hZkSe41GdA4eYhaXGMIf5RLRr03pm69pIcDqoAhgpnE4gtTU-YD5WB63ZDajG_maa16t056AgewwtcmeIPwSvD",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "10ca18b59fee0ced",
+      "brand": "ALO",
+      "name": "Yoga Airbrush Streamlined Bra Tank Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRzK1qrTJV9zvtmySiMS3kLUUf8E_6KObI2EsX0_pFzcukAjaWhHY2UAiPsi8ZAXulwijx5qnjibuAVSEXyUwoEF3UTaF84FfvUgbhEsDJvtTTRdLj85jQM7Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2769001a06b9cb29",
+      "brand": "ALO",
+      "name": "Yoga Alo Airbrush Heart Throb Bra",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSLzrzRcqWH0cSFslgcE-XTm_J0XgK9O0nRxnquJgcJmitkS7SWbuZ7DbQ7lHF5nGlhtRbO4e8Clk15FA5zfCPQdkexBc8F0tQqpNSIo9h2xia0pFgalMqwpb4",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "49ed5b7ba93a9a0c",
+      "brand": "ALO",
+      "name": "Yoga Alo Conquer Reform Long Sleeve With Hood Sweatshirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSQDU4wm6J3zfv12QsOMmV9qu2-lCF1nm2ty8OjzFQqp8WvNpMxLJQly_VjjbbaA_kOZUbPbse6ef1vIyl6m_7NCJI6w8OTEidEu5xz34NbSCnJ4yqowwY31rE",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f7e0e830523b5a8b",
+      "brand": "ALO",
+      "name": "Yoga Alo Cropped All Day Short Sleeve Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRbvIVh3opRdsT_Hw2lpO9DShkCuK9u2P_EIoLND82CQqlFl5E9w7oHyiFtl7a93RIzT9rPISPVo1rvbcPPFvgqIUg3qpDG5XqLX0bATL6VRutOuXeomMVtCg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "d4028f140642ce28",
+      "brand": "ALO",
+      "name": "Yoga Alo Mesh Cropped Mirage Tee",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRpt4gD-cKGk7bMspPR1MXNQNNzf9QlCUKcRBc_dtQluMHNdKC2hNC3qatK9bc0spm3TCF-cC6dAf90LX9dD2QLFvrZL1BBem7pFU0g4N3L0UK6EAxCouXpbQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1e93d50833634413",
+      "brand": "ALO",
+      "name": "Yoga Alo Scholar Hooded Sweater",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSJtKVuizUh0C8zmAiwk5r8ANBymNw-gnZuyEpzyL2c9UBQnXkK_-H4vXAnznrW5yyNpbDyLCTt2_7clUaJjDxUMIhpZpyEA9Os14IHI_dy1SB45_Q20lBTIDE",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "8275a01ab1449a7b",
+      "brand": "ALO",
+      "name": "Yoga Axis Hooded Pullover Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQNGQxD9wEezMdrn1ckNRjs5NurcisdVwXiH9Ds5V97n-JjegMlZEu4pRgW8dZXkm5TNWtZQN3-3Y_DWMmVfBbMAxNQCRxFxICo9Q9eIRfhq61zOHizXEZLww",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cebdcfdd8d4c0278",
+      "brand": "ALO",
+      "name": "Yoga Extreme Cropped Pullover Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRL4Z4pezYfbYfTXvnh9xc_NWCDnIW4ZCK14wB1_mAmWtBAK_exPw9KTdwTDTrGvxDK93hP0Agqn_hvvyaAUx75E6WDn07uoRS_MLBYtybEM9EIVmA6VwlOJas",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7da4e424545101c1",
+      "brand": "ALO",
+      "name": "Yoga Women's Serene Ribbed Cropped Short Sleeve Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQt02R_DWhClSaLcMau4EOX2XLshV1TZUcrwOo4Qd_VJgBYqTcx0aRHw00WURpAZYGrHUkvI4k8XhQ_CKygRBV5eUwauLdL2H_ExvoUzlYrtRQazDcNX2mCFQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "8cc0da92e798c4c2",
+      "brand": "Aritzia",
+      "name": "Babaton Interlock Cotton Script Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQDqsBY1fKorCsfiBsVsxfl1Gs8e4_WogZfm73cykVZqD9vovLyLkV8T-aMs_uDpZ37H4ve2itAiogJHR_4i4KzWBiR_7UOIU1utv3SP52WkOT0sDpliPChVHk7",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "a25d8a6196dace2e",
+      "brand": "Aritzia",
+      "name": "Babaton Smooth Matter Gallery Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR7b1Cf_nnZ1ACJv_nIiBtNa-DFnn04xh--WnemRfzeJGCh0bGB2nl2sMOz6VwMS-QlNpYO6wuihyaYYvcuE-1TOh7gnQKpSy-A10tvwZLiaEsyylTAel3j",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "88b6ce760d5454d5",
+      "brand": "Aritzia",
+      "name": "Women's Babaton Interlock Cotton Pegasus T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQicjbEieM7ahdmPVr-XeHGR-e2UliF4t-ig2txqQR3C73o2ZuFTa_LxqpbqhU1KIVUL51YUBGXd4Xp7dRYDSzOyrkqictuj0_RWNCPDcZd4vs0o6PyMBf_UCZX",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1016aa1323d54c43",
+      "brand": "Aritzia",
+      "name": "Women's Babaton Interlock Cotton Steps Longsleeve Blouse",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcStbIHU6JCQSNwzPz3QDXnK2ojfKoZdo9mjgDA-WRXhjSjN0nowhVAZNeWBmxOqj7AZeLZKtRv59kW9-C4kx9CnATcgN2Tx-EgcqXUaMOY9uMuLE_mCU2hVRfWu",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7bd0eb42c5648dfa",
+      "brand": "Aritzia",
+      "name": "Women's Babaton Interlock Cotton T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSZLJPp-jiYx26M-NLaVkspIJQqhgmqSTamfcIlYtwVUx-pUOHOK9UOwVt3iZX1uJeQJ6rYwUuNCJnbf5FOfrt3f5eR25NsuCXCd_JybzVc0_fJDskQo_KUymmM",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4363dd470225598f",
+      "brand": "Aritzia",
+      "name": "Women's Babaton Interlock Cotton Wirth T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRBd-XzNhsSOFC603vjKhIsEqfl92JL1aftVTk4r_bwGSs4aWLlJQ5I1HwP2UlMipQthQvZ93ega9VLEnUF2wkh1eAW8Fv71DwGgNSjA7GzLhFN_Etv-QkcAvU",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c80d0a81da4d5d08",
+      "brand": "Essentials",
+      "name": "Abercrombie & Fitch Tops | Abercrombie And Fitch Black Essentials Tshirt Size Xs | Color: Black | Size: Xs",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQmKG9E1Of_i4uk9QCpITuoHnZqtzUT1y0ZsbT3ttQ1fkMFMBdgPU5rnGEqvg9GggrBhGUc9iGqwZQov4Vh1k4x3X1cnS7PUAqkyn06CO4_VcS9VxApi8r7sg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "13361c64c762cb01",
+      "brand": "Etsy - Seller",
+      "name": "Abercrombie & Fitch Vintage / Classic Striped Oxford / Blue + White / Boyfriend Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSx5B3SfRWXMwIUGaAuGFbW1YJ7J-myDyZ2vYI-A5-EbJbbDMQdejQ4qbT1N4LtJ32dfAlW6udN42spT7rJSXGSKIOVOSrSxpTDIrqCN_XGXvCdUlu7QFHq",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "97aa6e52bc2fb725",
+      "brand": "Etsy - Seller",
+      "name": "Abercrombie & Fitch Women's Single Button Boho Sweater Vest",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTWOdGzz45SMRstkpEerncVGihpbC8TJTd4JcYH98oKzSn1FA-m80Oe2txN5jcUnjRKeU1U4iiI9iU754nu8fzfVpaQ1sxsxEDt_jefcoeC",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1c676a8dbb87c605",
+      "brand": "H&M",
+      "name": "Ladies Fine",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR1N1spdWccmU7BpmpGst_Ue3sXF2fxkEvoCmeUcbF5niNIdNkn5yVX2JwQYexrBFbv2E_K372UnGjAEAvFn5eijY7szSVubkQbULHIMaAFhdnyGpmDP1e2",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "efbbbf9aa5c0f59e",
+      "brand": "H&M",
+      "name": "Ladies H&M Oversized Printed T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT5du2STP8IXxQRTese0jqOkszCZjnpZ6WqEtVB3VQeokIYZ0QlYT2i-FlIltSVsJXqmgWPXQmAAI9DpnWFRsSytXtFR-DaZM7UXX3iWTV6UwWO_8xhDUJS",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "fb2d62955dd2230f",
+      "brand": "H&M",
+      "name": "Ladies H&M Striped Short",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTslghf3-bkoUBZdkIpM9YSPnDcC_a860aNyOX6onezmTFwGZ7a6b3_wBduRxRqlMbgU4lwArwvL_X9aCXbSoJhqYyDMTpDtJRY7cSm5LkfTvcKxOq_s2N0og",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "41522e46fe2c215d",
+      "brand": "H&M",
+      "name": "Ladies Knit Cardigan",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSNrUMa_wHlFXzWdFFOdQ-aUcXRyBQawfpa-EOaFLn_uBm-jSzuCHgidVkib5GV_NGCjpUAmXkawgxmEc86S4XR4ERFltcI7scB-T6jJFodDna3uoxxrM76YA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7d302c60bd9152c1",
+      "brand": "H&M",
+      "name": "Ladies Layered Cardigan",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRMvgN5YrQcXkwzDTe6oaYL2LJ0TIzvY0EqzT3WhaSD1Xy3R7eHKAvFuZAE_G7oo5XHp08gmrHwryvL7aebvq6tXfu8ukKMlommPRbIqGSlisIfBxUPQVEU1hg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cd0348d03136c0d0",
+      "brand": "H&M",
+      "name": "Ladies Loose",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQsNI7Z2W25bi63L3oyzDu37k5-CRJcrh8DZ6o2q6Kcbf-3bzzOoDBBZEL7GDyIkVYBZ773SloQDOh2eirtW_XDHmWSqKatEW-FKc6uRIoLb5Exhf7IkDgm",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b6ffc050711fea23",
+      "brand": "H&M",
+      "name": "Ladies Melange Rib",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRQV-WJA4U-TWztrhObNh6Btjh0CbmSf25CNFIya0sp4HKvsWTpGFeFW1b0-AFv9DjYcSTsk8lrYsOOnAiL97a2L2Ei8dpHMJrxeAHWrx9hwwiyEm6rmKtSjQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "03371809724786a1",
+      "brand": "H&M",
+      "name": "Ladies Melange Rib",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT4J7NzMr-FhEbDgYZzDlZr_gIJS4YIhSmNzXofK4gFSdIpgK4gr_lzvhmdL1XuO8wiHsyTUQrsZadsKBfBnIWvfVbcqpxqwJjBi6zoEkqEzNzynBR8fBL2",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "81b6bfb50f963faf",
+      "brand": "H&M",
+      "name": "Ladies Oversized Cotton T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQyqlZPQ060O1A70SM3APn3po3HzzgkwtLbvWYbZfB1fjL89PSOUvodcxhSvGYDssw1DF9-LNryVWNAmVZXvLvKU6Fq3OffMtyDIfarHCJO08lJgRMefVuX9w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f39838fd27b0374c",
+      "brand": "H&M",
+      "name": "Ladies Oversized T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSYGBBt8Js9UTHoKzHqozpbgoja3ceM-Y8CAjitgnGuoBInei6IgSpeylWBUvLgDGAE7F1AmEh3s3JfraNpeKaAXPPC6c2SHIrDygErmUG6Vw5TIBX2_Vostw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2136ccf0bd6a6fdc",
+      "brand": "H&M",
+      "name": "Ladies Oversized Wool T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTp9LsOfmX9L9mzHKNZ0YaY6Zcn0j2D9POnHVUHPQ4hAv5JxTl-RLXfDoFEZM6UPgVKobqfCqyh3eM6kZdqlxMZKYv3D6wUObhz2KtLUzIdfa9mqIRyR9_B",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "0606096e8a42bc9b",
+      "brand": "H&M",
+      "name": "Ladies Rib",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ5-3KFcqGFbqlnYX2QARKKZaIqbZw8sjD6cCBJY1LnWiQo51C6B_OPRdfn36Ww8dSIlHMY1omMb3rSG2tUwbSC058mAQ7Bhx1eNKE4bzQ3kQHA5LxmO8AipDA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ffa7ed6ad4820bd2",
+      "brand": "H&M",
+      "name": "Ladies Rib",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRv8za4b5RV7wNnU_8FBtHecFpQBBY0qFvzZYmlD-EAbUuv3PW7JPuBrmVfjmlVK9ki-GeQQcjdX0lBxgNDTjqtrQLZRtWYncpspdnKgJdGk2HiDtkj14-iUw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ae5d09caf7ff5869",
+      "brand": "H&M",
+      "name": "Ladies Rib-Knit T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR0kFPugxQQfNExlkzSDYCnIB6KWinaUaj83uKL2bswHOPAL2LtHcj-gaKMj597fQG6M6ErTj4OIII2HNnYd6m35bE6Iq0-ZJOUSKoSi7AlU9MZmiSgBijR5Yc",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "5fa75f026289c26e",
+      "brand": "H&M",
+      "name": "Ladies Ribbed Tank Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcT3khgojOU1EbSLFIRQlWdn5wT8T9FjlHh1yNw3XaS_6M0e6CYNzrYRCWLV65x6axOEHguPZbxfdQquvkbmXOX2W_Y5DuGg9pFuZ4WxnO7Ctaei4FjqD0DjtQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4d9f797ef03b99d9",
+      "brand": "H&M",
+      "name": "Ladies Short",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRliqPp87PXD5bC-cwHkfiguiccrtqFs8f7FjS3B4k-PvtrdMUWySwN3ZgFZi4hDFdF5L79rCatEfJFmuR1tWTd6UkVg8NKrmYkFtYBA1Gv5DFQN9IGd-SxD_w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4c0dbcf9e9143e34",
+      "brand": "H&M",
+      "name": "Men's Oversized Interlock T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSRobILv1XcprNku-0Yu9vVDbKDKgvd1Efp3DfFBywBl2UbbRxsh3pU-a_ea1-yAoYZO3nljb-qgM35qOazO80pjYOlMDCgh3zhNzAmJXOR1hDmukVBx_zvhA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "738d591b534f6b5c",
+      "brand": "H&M",
+      "name": "Men's Oversized-Fit T",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ-ACPUOdSYKcF9ziM9bE5SQ7NpmHUv562HXpktFL9e045n6e8lpMKPTZA2FxKQVQwICiYPh78hfnNsZO7aihPavcQ_YR-byYlX3k--YbIiMJ7gsZBZMT2Jmkk",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "9ddbd0ef3217050a",
+      "brand": "lululemon",
+      "name": "Align Cropped Cami Tank Top Light Support",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRFMz0KgAlZ3nZ-OH9k5SKop2NFmjUDkKjgWbM2A1u_bCVv6bU-jcjx14quGCgac_7cG7BpYoCznufogMvd5yM9aLMIqMagwnj5PqKHk8VENsDCQzqtHML07jQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "67889d1300fa3bc3",
+      "brand": "lululemon",
+      "name": "Align High",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQNFNEASBNyDqHMOOM2WXFdc1QNJWh7jFBvnDI5VWDLuTl3WPRgDVV1fTp6yPlaLrsV03M2TaOALa7g2GFwkzyKPjCXpQTVMjMxcvCv1OrgaGxGUtGiFxoUqpI",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "bf6c370941719bb5",
+      "brand": "lululemon",
+      "name": "Align Tank Top Light Support",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR6JHXi1yJO-D0emcSWHDFcWFgAJED5PMUGX-VCr9WtfAFgo3TgtMLHlrl8OCJyuvneOgsqrR2edscQZOZDN19FOoSixk2UF8PCxx4NrnGdXtD_blZpuAgXmI0",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b724f855cfefdae8",
+      "brand": "lululemon",
+      "name": "Align Tank Top Light Support, A/B Cup - Size 0",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSVj02gquFt_x2oRvsDMD52UqqQUXVYkXrSCPumQzc9eZy8hIDac6kJqJSXapOB9rQ7nzYgYtJGFS4ynbhlmIFVU2tgCD3ecwSpYySUxIB4le_lNbTRGFxJimie",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "e2544ff951b1919d",
+      "brand": "lululemon",
+      "name": "Align Tank Top Light Support, A/B Cup - Size 0",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTjm38dD0pdXoIhheFuskedJuFrYHH2gC_g238grQUcSjAwBGAk1K_GLKuyhN79iuHuEvyhT695-i3WEoshyyMlvE0si_MFTHR_6Ml65LABZTLlsFYNFkA4BA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "9dd6b8c6eca8f5ef",
+      "brand": "lululemon",
+      "name": "Align Waist",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS0pbGtn6b6HMBBEqWNxTFuL_SsEUn0K3HZY4BEgyorQm43ZWeQajhGM7P3reHYaKydtqgYg5O6hh9vjwytJbUS1-HyVixc6uOTBlwn34XyJKY7MEpwoembZw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b77074545d6aceff",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Classic Oxford Collar Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR7x-jh5tLC1S3lcldKsrjH-4U77H5xz0zHUKX2gOSfKsGFBCIbKWhamjkv7lt3tMwQtnfXfqfdZ_sly6YKTCYSGE2Vw7O1",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "9a35b9b0bb4654e1",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Cream Skimming Crew Sweater Tee NWT",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQHH2r2_g2VcdQDVf4HHCTUKyvDwT1nIMrFfYzkmv2QbJ6Wug5gh2HCoprxa5r9FnTt5w2BWLnh5TPVZ52nayHKyS5KVt0F",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "dd9ebfc6914420f5",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Icon Oxford Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRoq2KSJfO0_p-vPYHIoAZnQD8ZXn5D2MaN212XlpGDg7INGjq5aJprEcQbRaNKoYzh2dPMicG8Gz4R4yglP2yibvUoO5REjlvGoofryS_fNVpxJvV4H0eU",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "42c63513f8528453",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Men's white Oxford shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQjewcCLy_3k5XtvoKrOJAVwKVpNwE1SM13a_UZiKWIQv8inicoyDrgphCRExqGT-EAbcbCRCQ1T4Gn_4llfFMABpgiKYAa1Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ff42c5d8fdbc1fc0",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Oxford Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTa9cGt27O2PjxhkHwUCm3nv8nWwaKiKbvfStm5sOPadIwdIE6bDvCBuY-8kkE3Cj5Rn7yxWFrHZKfLgLD_RCzFv1RZtZe1mP6c9c7fr4dCXfBawE4DyKrXOw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "228a4cb3ce24ff97",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie & Fitch - Preppy Oxford Shirt - Xs | Color: Blue | Size: Xs",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQFpio89iDsZSS9fpY1YqbbKkdlpzWG_h0hCOuNRIu5KUw1azl3QEgWMIPdgAE1KvN8skVkLpmLCJtWFY88UxxtXWs9-2mL0WgKvnhp_DUWxGiehiHvhGpb3Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "05eef18ff3be4ddd",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie & Fitch Sweater Vest | Color: Tan | Size: M",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTdazaTxESrpHTCDDeVWZ0GtZ85LT0IyFHgIwiOyxAsJYtC_VZeLlt0-_aFwY_intrx4v-HJYg6QHSimwaPpt0_cZL8e2MDrsIJoymDpeEdQFfmW-hpAiqJMjw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ab1293f3974b479d",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie & Fitch Sweater Vest | Color: White | Size: M",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQxeq_op2aE2tlBOkeusumtprmWo52nxVh_YxY6ZMQO8WuIVG6nrDpPXY2M9xW5UMVUDqhYxV2uKcxdnMQ4A9oNZoGSZ2wET3nZFJ4tIHWitd_-wkP16D6HDQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cd31b44d73f9c680",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie And Fitch Essential Polished Body Skimming Tee | Color: Blue/White | Size: S",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR_7OTGf_f9xQtginX7spLI9uPP6CtTsXSbRX2N7fImI2sTMwuFXT1Qb_G_8h4nwlTUDtn_NzgcdNMrIUTojfr4F83XNJUfM0mq9j5k145MCYrQsypz4b_n44E",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "6062b22b478cbc7a",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie Essential Baby Tee | Color: White | Size: Xxs | Pm",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTlDwdDoj5bL1u8xxauBHChoQYr2bdWXTJdsonR26NqbGgTAPQx4S04SZIFpGc1ejegqZTgDktL1Eo_bmv6sYXwWXREHWQ-iyLIncmZEIORpcvgCF5Ov2_O9dHU",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2e174aac72360c08",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie Essential Polished Body Skimming Tee Wine | Color: Purple/Red | Size: Xxs | Pm",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTjPpsIi4f7Mfj6GetqrIbyoCkTTFfURh-XNxS56JPFcQWwyjiPLkMz2fpyVbIoQ8i3PVCGjwi1G8TkSrHPCPSBcMLdxsdECmDpyGT6YP6f",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c7095f3f52002cf6",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie Sweater Vest | Color: Black | Size: L",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT0uKiNdJwALrWL_wieqRtWl77UiCNA0Obxw8WRB3P3E2Dp-nu3ohZEDdytcOhU4-H3TADnjxtAU6K8XRXH7CRZgizKmicM4S9MDemm30oVfuiige4efJsQSA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "351f93a9bb603742",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Tops | Abercrombie Sweater Vest | Color: Black/White | Size: S",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQQMtOXryGGXKi8YXIUvx2DFK3WwLoEbOUzjlUSlfRquWHZnyXK1a0iuAfmE-XIBMKnQuzPvfxhanY0flCs0ByAiEEqxdO58pKwQh3XboI",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "101a634588ba57f4",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch V Neck Sleeveless Sweater",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQziGj4WjoGPcCDypbPAKIUeaLUuRfagoKLmagbvgW6OC_GOg4YGlP4tb8-LDFh7GUMaWh2WB7jmWR0yF-hz-dsZ4D3BlIshekPLQ4BRV_f9XiJCQlDnx14",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "80953e6893e1cb73",
+      "brand": "Poshmark",
+      "name": "Abercrombie & Fitch Women's Essential Rib Tuckable Baby Tee",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT30tlkWQ0LzNFduighopEu0LeqrM1TJgjUGJSdvkji18vWvmZtcAL6sf1713LfiN7XT44S0E8-OWjK4I0idXP0Yod_4pZZdDh_gn2EViUE7XkcoxiQpphgZQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "catalog-top-uniqlo-airism",
+      "brand": "Uniqlo",
+      "name": "AIRism Cotton Oversized Tee",
+      "category": "top",
+      "imageUrl": "https://image.uniqlo.com/UQ/ST3/us/imagesgoods/465185/feature/usgoods_465185_feature1.jpg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "brand-catalog",
+      "id": "catalog-bottom-aritzia-effortless",
+      "brand": "Aritzia",
+      "name": "The Effortless Pant",
+      "category": "bottom",
+      "imageUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-021735e8705aba59",
+      "brand": "eBay",
+      "name": "$395 NEW DKNY Mens 40R Solid Charcoal Gray 2 Piece Suit With Dress Pants 33x32",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTJnHeXJ2iLjchFupdfaZqWm6_hA03Xp_TzPIBmgRXo8IW6EVbdw2FDqGdGPvPENYYGuw1kQEftRfHcHrF3BydP7U2MG0JZkw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-035f9f9fc0f43cba",
+      "brand": "eBay",
+      "name": "Techwear Tactical Jacket & Cargo Pants Set Men's Utility Streetwear",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRiPSDXhuOiYFRISN-2wnpSZftTbTUq1MkS_WXHAAbmQolc4nR0CpUJWpmAKlV4XI7cLWfu4u74dF62UhctiCGF-rRB5U-6lUJRdEvKAjpGsHaXrpHnSb5G9g",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-225686ca63c9d93c",
+      "brand": "Ecom Vision",
+      "name": "Techwear Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS4Q40MeaWcMoRpSAro5J2x-HHvV_0spxqfSerLJ_mzKcjMnBhiuJ-BKjhsSySLZ-YC_FZY0NpwXAFh6Shc2AmsbQg4lOME_w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d64c113a09b624ae",
+      "brand": "Etsy - Seller",
+      "name": "Women's Tailored 2 Piece Pantsuit",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT7KRKCxx3kUI9yZw9RdpSqdsOCCuYSpfHUtVkHR_lvWKFVlUfTuOYarbBB0hrdvDx4lm_3tN-ZSQyZLfRhCLCxPbl5V3_6xRA_X6wpPuNUqfbIi8E8g4hmCw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-be3dae134bffe286",
+      "brand": "Express",
+      "name": "Express Women's Editor Studio Stretch Twill Mid Rise Trousers",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSsI32uI8eVxcaTuKtGQuhPa1jozHwxzbY9eNdaNVUiWFuNAkRX5o2kJIJO2xZ0SYnbYSfkvqm23URgi5f5NxdVPmJ7Dp6YSA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d040c1609028be81",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Men's Bahamas Linen Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQzTYP5wrYk3y0ZAiqIcTEO3OYs_VS7FJcgq0hbI0ALZYI9hg30l8xMUEGfj116uTrO_hNDpco0kLa4VvvHQ6Gv0KBKWn7mUU23Gg0VIAFiruRTinMJohzLnu8",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-b0b6e135c92a2b63",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Men's Versatile Slim Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRS5hHrG00efvg55Rv7O9sQ_1j2LDp1XIYn1UCFw3ywc1SS8kUh28kTVCjzN_vIwvjD0MKsBL8qj40JW8p02uyrgD9I4lem2y80OjBbPmp0uguwuq4vTv1boA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-bc055db1ce947a03",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Women's Linen Beach Walks Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSzaocfJXLviWVTKnuaHQiyDf1fmxuSAy_3QdO29UWaIHq9uKqvaXy0OyKwZNAeg4PtJ9z_LDQwq_i3JuWe5fMiISYEerWnMUWPFUsAwiD2WrRjW9VlXB1VBw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-ced193ac65308724",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Women's Sporty and Preppy Skirt Set",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSbbVz4jFNDfucfN3F7hxhsUuY4B5Ku-PXFQIlLuCju6Yxg2yQ4uZbEHIldT-Irhc4CYiBzjFXgHCEJCotFbGKe0gRTofCSU1eY71uy2onG4QkQAsfwCF7EHw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-aadcd62d367dcfcb",
+      "brand": "French Connection US",
+      "name": "French Connection Women's Harrie Suiting Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTs1ooxrIujZoZtFnOwQhSZoWJHzDVLxkoXv_t6YV4Uw5Fvmiz1LTqMh09QH__754gP7UizSer3F_jBvo8g_9jiaM_ZHGI5BnSxhehXbUTT3NU5vbPXEhQt7A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-a652be2c81696296",
+      "brand": "Gap",
+      "name": "Gap Women's 365 High Rise Linen-Blend Trousers",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRvuDX1jOrIv2Yyelg943346NeThaMoYN1gw8uqKB6kMOUkfujapd4_56WRXkBCmYGt3WVTwuHZdSyB71nuSq7nDKswS31Nm_YpKc921wYbE3ZeoZ3KGQkhusU",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-5a90055854903873",
+      "brand": "GustoNYC",
+      "name": "NY Street Tech V1 Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSvrGidxJhglqPd2aBy_Mr1k0k4t1ypIuDteso1-hgipyHjL__-RgbKUX8Jkto6XsIy4ayo4ZMrO87J7CEZf3f-jrb7X8MYbjafuAhmOCiJeINqw8hHau5x",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-4cef990da518596a",
+      "brand": "H&M",
+      "name": "Express Women's Editor Signature Stretch Mid Rise Trouser Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSEJjz27RBJ_BQFR222f91kKLsJF2IzTxZM3I3rNwud20pEqLvoDKmSZYOP-2bWkFkGoqkBmNvGTjtUG19XUp3IvvQEs1BL4A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-4e5b08cc31bf2b02",
+      "brand": "H&M",
+      "name": "H&M Ladies Linen-Blend Drawstring Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTVQoK1nMbllL8FHFK8WzKBKvxCh9_3KHOkZr6kl4xA-WgWzlPiqajeWJTNevph2aeLMQmMcRhfSEba5kS2rj4n_m3T9FWaEWwSVjqFCaxyZKY5IGh4CcBV6g",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-de7d7fa0912bedd2",
+      "brand": "H&M",
+      "name": "H&M Men's Loose Fit Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRnpF_LTUvjUMnA7CiEkzkTvlylhux3jhCvbudzOiMDfNXqTx0BEatWThRIqiOqaMF1obYD2GHViXqpGvtpNSuIraiHvfFCP9chELIQSbR32WuvBnziElDe",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-efea7e82501f92dd",
+      "brand": "H&M",
+      "name": "H&M Men's Loose-Fit Tailored Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRJzr9brNISAJ4JBob3gjGgFuyl4lQ4dLDIfIyyN6WlZM3M5uak1T404s12yTlw1jdFyh6FIbYLKoDzi3CHRSLMLts0m0y2W7rP-mYmU8jcY_MrSREwRXi2pw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d846c2cc5d7d5160",
+      "brand": "H&M",
+      "name": "H&M Men's Regular-Fit Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRD_5_2qwifxbWG1wKcS6tJz0hPqw7BnOP1rN9UYR_mR9b8CJLJLZALfOwAk78DmV2IbMwEcUnYawJPcQOSg_-oJDF5LI0jOYYQEnYCCm8qStWEb_CsWi2A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-5741f5f0220aecd3",
+      "brand": "J.Crew",
+      "name": "J.Crew Women's Hampton Linen-Blend Beach Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYd_YeYVOzhUWiC2-ulE5bowDIs1zLMJFHE0yze1mX5pJ1z0gY-IhPlZRL-wIAeBK8oNCcPY5sCkVdxcsg4xPaeM91jGe5olDPHhq9iFgSH8bmPc0Q1SDu",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-4e43016dfc8eedee",
+      "brand": "Jos. A. Bank",
+      "name": "Jos. A. Bank Men's Tailored Fit Comfort Stretch Dress Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFD95xhndVCT7Nb-bqvbU0RFydDFGhFYEi2ULnB7sBDGXaHikCvvPLF1l6ojepn5vFQyKALAHq96ovPhKxxBzbVNp9r4qSS5EQ5kyvHM9qOPi2Ea0ThoUqcw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-837496a0a03041b8",
+      "brand": "Kohl's",
+      "name": "Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8VQJ84SYOsty71kt2-Njf5Fpgu0opRdO2iTauBt2W3aPz8ysq77bQNcvt1T6XTPP73NdOm3u0ZvmY5dRRJkp9lLt_jkiTu2QViAtEF2o9kScbszO6OJs2mA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-a47079a869c3e20d",
+      "brand": "Kohl's",
+      "name": "Women Linen Palazzo Pants Boho Wide Leg High Waist Casual Lounge Pant Beach Travel Vacation Outfits, Women's, Size: Large, Navy",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSpL7bliaKhU_3S_LpoGTqg0vY3DOryx4RmsfAtA6rwxoH-eW7IjWbMOAsdBGRWOmmWnpo7DNuqpHwpmPtF8lmrPS5_8eF6ulksxlaaGlU",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-99aeccf41750984d",
+      "brand": "Kohl's",
+      "name": "Women Wide Leg Pants Dressy Business Casual High Waisted Straight Leg Work Office Trousers Slacks, Women's, Size: Small, Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRlTXfBUJhIykNqYdBNncpW9zPTPdtyD4mQfNFnfD4dQrEb5v8QG9OpKmrxuKkunaYRVFOf_kBLD_Wcg7nuFe6jPCXL6mJr-2BQ0q59GRbKI0otBAdue_-e",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-f7c73ba185c8e08c",
+      "brand": "Lands' End",
+      "name": "Lands' End Women's Linen High Rise Pull On 7\" Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ32ns4O2j-JkLwveBUIxvnxu3KkdJb1WSQjiiKJcgnOEmf83GPox7wPUynm3UTi5O6V0X_Tw7NPACRWd5VbQNl2JHF-SFT2PBvUtFD5tvu1HtvfXoCihkJx6w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-6eb51c3be129f9a1",
+      "brand": "Lulus",
+      "name": "Lulus Seashell Drawstring Wide-Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ5uZhH3DFHGdbuRkLXPphDfB4REJSVWTPH5p_3e-6Yo5-osHp3hU-JyVi4NMku9s26rtDNh_39YacoQu1PKq2L8o9fAdp0h4i0XsSCcEyN4St-sqe0uXXi",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-6d3010389559c096",
+      "brand": "Macy's",
+      "name": "Tommy Hilfiger Men's Stretch Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQhTEUh7CtJ1iQcwEniahBHIFCMq2moXfi-lLaFQsMSabSW5RoUtH8FjVV5FV7nlbwuMeaKmtm0FqYQqjZ02FQpspJqR1d97CfD55WWw1Twh1nJwfoR8ywu",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-07a062f2c9f7de29",
+      "brand": "Nordstrom",
+      "name": "Men Bonobos Stretch Weekday Warrior Slim Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ3QPw5HCBooXj6e6m1CBNlxwe3yPUR0XELO9J_iFhP9csW6fkvjP77zakGJOdVdcTmM9Qd07OxeSc2ua9j7TKRfeWHanFo11F-w8EoRrNQ9y_hsS49DmBcRQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-74fe933994f14082",
+      "brand": "Nordstrom",
+      "name": "Open Edit The Icon Trousers",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS6dcuLwrtDiAQaX8aMOkrUlPicj6tJ1D9A48JwjNIoiCuGDHSUkNMyWTy39CkHu6z36_h4VB7eaYAFJMmtah4zHhzZ1F71KQ0g6h2YahbWdOzQ3-YcDwPEWw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-decef491b31eaba0",
+      "brand": "Quince",
+      "name": "Quince Women's European Linen Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRuK_hRPObUXvsl3knlReq_TOCayJr4ijqOB_dUT7QTQ633SXqTGEZpbBCHQu0UvYlbiQuT7J3Vxot7NqIuOmEOi54tReHX6ceu0jytIbh2onO1YXBfPp_7AeQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-81fe35b932b13d40",
+      "brand": "Techwear Storm",
+      "name": "Techwear cargo pants \"Shinji",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbc37DxDnm369p16P_uEc6DtS46DmJjnGqtxwmeCybk4hy8CGYvi6xo6XLfN9tJMzFtvF0NTSxOM5z18b2DlYlPJj7L-RU-n_VJ1didzk8L5ucf4Pa_b-NkQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-3475f4f3d7fe7731",
+      "brand": "Techwear Storm",
+      "name": "Techwear Kisuke Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRebt7VsrX8gOPrgHsgeRiYoGdcb6IHQRLOXkSfiBWwP1cpGFUkGIBlqDHNmWAqMOz8MThV1Pm0wwqOoscVLAVYRd5F7dnW-hW9eKU27aQfW-a1syCFgeFnhQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-f7db09272e73cd2c",
+      "brand": "Techwear Storm",
+      "name": "Techwear Storm Techwear Cargo Pants Faux Two Piece",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRrrsJPPsgNlVyG5f6fW8WiCwftbZUrlKULQSoGbtQrAzQTe9cePaWaTZdXYlPbhV4nchr529M35AsxnsOgxgyMxe3Xb4X4M9HgLUff4BqCd6-QXHQcqTHb",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-0491e77adf091fc8",
+      "brand": "Techwearofficial",
+      "name": "Black Zip Pocket Cargo Pants for Men",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQCTA1poXOow6Kjwat6lysGSTL0Cfqqwj6GuXoW2nSiRHnwgA3J1TG358FVlmwgLWm0dJ5O6o2sEY_GD8cIYBSHwBwbdQdPPPTg2mzdErykfCy2_5pNMD3J",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d6b77dc008f90720",
+      "brand": "Techwearofficial",
+      "name": "Techwear Heavyweight Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSbkJnahErFqHe_sNIRI1pFoWHYHLBieHosFJmlhLZFLDtKPbdJNF6niP7Y4yhRqAjDUJ83ai9nk7zQdfG-z-aCS_qb2w6sDlyS9XTqmft-bgY8GGzGOAKY",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-817a4ed69864f46a",
+      "brand": "Techwearofficial",
+      "name": "Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTynUMOL6VQ8o3REEb9hv26nnYxce-Vv_RHKQ0bs8J-SMCY8d8LkBfoPQx0HYbjP3p44LpQ6_nk7xyHanlUPZzWL06VpJapEzmdqzs0rhocGGwGXutVoKdM5A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-bdef400df8894d74",
+      "brand": "UGG",
+      "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROjezAPRefJrgk-5_8wVXpXOyhum0krtVJd2Q1k5hQTKq0-DDUoTFl6sh2eESnocigBV_dQeZ1A7rbJX4dNRv72ksvcHyaF9Ac2U4dNmZkbBFglunGyREY",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-e83a5278351c8f78",
+      "brand": "UGG",
+      "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZ5fDVVS1uZFTAkD5ffyjKg5sfC6EYQ36cwYmcMMSepWZOMcGWZe6nrCK8gOqsZXghfpWAzErXfVNcva3zqkv7d5-quKAD",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-275150bce379b9a7",
+      "brand": "UGG",
+      "name": "Ugg Classic Women Sweatpants - Sand Heather",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRT8aHLepMiPugzN2vhiG70FmpxwxI9pjIMuHaRYzOrZ9vwU14F_sO-VXyO_gahNu6BmnFkiEdx9tSOW0VkM1-HHNR6dGjfNTj-PHXQpd2m7GJ_ZOYusdF7vP0",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-91163af986a5b635",
+      "brand": "UGG",
+      "name": "UGG Women's Classic Cotton Blend Sweatpants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT2WZCd8wYvCKeXQXkH2FQ2ahYsElemzQX7uTf7VL5gqBQ03UmQwIDiHMJcR1s-loVSsL33tHg3Mac8uPgan3P6lJUwBHEliMMffTh1X5HlX7uzGQxNWiSRWOI",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d3d13a615df5b8b1",
+      "brand": "UGG",
+      "name": "Uggs Women's Sweatpants Set",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-867a2968367d0d14",
+      "brand": "Walmart - DUDHUH-US",
+      "name": "Men's Techwear Hip Hop Streetwear Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRzzbxmH5NW98kZLieZ-02l5mRDJHOgPd5BSb8hyz6qiCH_Sj6eXnqlJss_oOcUKSLAVigXLjXVAXPo1lmjkq6KGBUi2RMKbw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-70b1660ec9405a6b",
+      "brand": "Walmart - UPPADA Fashion",
+      "name": "Women's Dressy Two Piece Set with Long Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ2Fp6dNmyOSN9aaQV51_LaLunh43VT1dBx8jGG1_iiYpkqCACeHby7HIKydxhF4-LhT8sDdD2UBY14NY6Y1XVGvQSFaDZq",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-16008bf3bb3a8476",
+      "brand": "Zara",
+      "name": "Zara Men's Comfort Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQMhpMzTa_ArYWTuRaCOxzK0d-_Sc7c00Fg-E9fqqlxXgwpDIryhjhz9A_6aGxHfqYKXwp3Q0LLUTWLjSXPSILwq6w_3gmPCDi8VC21iwuJpIuZrJrXMQyb7hY",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "498d191d2862fbd9",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's 90s Ultra High Rise Straight Jean",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRoG8m6_wyhjksdUq3YY5u2UNAsBgHfjA582kjeKZvwyFTLlXR75_nin23wAoEltgUlOpHZr8XHioYbY_Z3bmVeeKJfIgkgFmtiF0gRWls",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c5b53ce44ff7a6f4",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Abercrombie & Fitch A&F Sloane Tailored Wide Leg Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRLC2Y6VWTG0RtYVNjbUKUI4jvwyBPgV-znb3MCSJMuMJ7b83tOn7O5mFnxCRjOhCVtmDchGM_xdk7XA3LP419BGlxDSmdJ3gdwMBlO2n0Ftl8pL6m4OcZ4cw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2b159d12314dd862",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Abercrombie & Fitch Curve Love A&F Sloane Tailored Wide Leg Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQpioNZbL3RAFb94x151lqGjVb_JAcu-dOc9WzYo-VsAOV7tAsWJiU8szwXyKQjFT7gps9dQgWVBDwjAYef4v_oXLDvIVphXDWRejUNxq5nO-nGuam3-wh6zNk",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "a5ab56bfad6bb68a",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Curve Love Mid Rise 90s Straight Jean",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSVrLYuvsLt-vEQ2Nj8iGzynigBIIpbWPHxGKJ4H1A4KLM-UnHYSYcpuA2EGj00bUGvwBDFDA3XcMqmjKzewqqlhH1lPUJGY3h2AcLBFyQsRXKThu6HW-bbDL4",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ea5d30d5693566c4",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's High Rise 90s Cutoff Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRg0m2BmnfFV984OL8YsRYH4Pq7HJXvdVNVCQY6XNCu0Sn9dd7_2ZgmOtj_-UdVVCLej58Lm-hYWi8VG6sXMMB3i0UxNDB5yc3a_xuNR9kAoqUSiKI6IBS2tQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4537d277c9afa851",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's High Rise 90s Relaxed Jean",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQwFxZg1maomPOXBDOAP1p6kqsXuqjbUcvScKg4m0OlRJh5aa80qKtuFETguO0emQqXOTjrwZawQzw6Mq5sOt9WCySGr91k_mMXHYhikdX5jWGtnIVdaJ86dXM",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "dc608aed94ea242f",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's High Rise Dad Short",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT1mSsoAqQt8SNh87IdnatXBZsZeD7wtAmmrRjogFdc338o_pO6x8ExImDALMNkwj-wbd350joa2b_4Hne2kjdVoKU1YbTRsbnMm8kV9rbmazt_Bo-wS8QjPQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "35e401e224b5c784",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's High Rise Vintage Straight Jean",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTQYMJodnRijV7-Ozb2WlFAme9Go_200qs1s1fn20Dp0XA4xauPE4fn5CjohXFHQbp_AUBaOFiUd-Dx7-h-mJd4izjCWocooRcxpSPi0G-tdsAQt1jFdZ0ae9Y",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2ef7be021645bdae",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Mid Rise 90s Straight Jean",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSqXFvEJXlsMZszpp9hPiMVQQflYwltUNxnPWA0XFugqPNdodGBOoDE55dgTSTrGCr6IqpjcsfLzR-WsNzcycyHeJK7VqpeeHVGaq_bApHk3UC-4ScNsQt_uQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "700dc5ca1ee7da32",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Mid Rise A",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRJmB_CusRAFYuznwG8J-kjvV0YoMnT-z-kpI6XrmaKfeVVUO5sMwWKTGaKQKOPafO6j--d1hzjvq0sRq9Sx4dVE4Yw7w8zfLYkqvJBLNq9jKZw23Fi0LzBr18",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f6bdc710d5ec8daa",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Sloane Crepe Tailored Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTWineZLFtOYGKKPGEVnqp0clNYuq3CTAVh3Ilkj3rB5sGpagWrCSER0kRN2Ro8wwm1FG3F9ZPXKjDs9RG-dGWx9cQ1FirD7jYpIk5SBwmFdpGODpaaPNyRd7A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "a7ff48bd965577a3",
+      "brand": "Abercrombie & Fitch",
+      "name": "Women's Sloane Low Rise Tailored Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS01E_Q4HcZTgPVPr70ecd3_IA9cmX3N5q7fgClbxtwzg3pOOmYFOltitLl_DOL_VrwOe1O08izfXfIHfGz1WzIRqaJMX_mwZmYViaDOb_dinr2VPnAIBZ98Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b4638b55a2d1930b",
+      "brand": "Adidas",
+      "name": "Men's Originals Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTBxXNNm300eAk-x0x80o3ia4VSZvzqEK06etSrrGvYRSihYV4c90MBAf7h38WaVuGLmqukQ_45TS7mSHW534IW3nRq-9RpHbQZly7xooO9p42VQ8C6U0pb2A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "61d35ec74c5df345",
+      "brand": "Adidas",
+      "name": "Mens adidas Tiro Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTJNzq17UNHncIMv3pMZBb0kEUowd5Pve8bPd0IwgCQ0A8TZ1J2u8qCgaPIA7IrcrY_gwXxphV5f5j67ME8TZ90DLRutSanJ5LPXHBUfCe7qd7N-DQX8F3z",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4f6bb04fb1c6ff38",
+      "brand": "Adidas",
+      "name": "Mens adidas Y",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQOAKRyVQv7zPA4u2L3K6O3GiXIUAXxMkKDYqJJ-DBHS1NHT6UPna8OeDoq9nqPPMsQuuKB3o1bY6Zn0KlTvHm3c4CieQl71Oa1b22L-6k8On3bJmxxW2mMb8yi",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "23534e30bab8541d",
+      "brand": "Adidas",
+      "name": "Women's Originals Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSH-x2OBM6WCk9nIu0z9xIhkPa5tVFHu2SLq-pgt1EusXFbnQtBKon4juJumFHpgTAUiMgXi31YdG4LE2GxIccuCrPbt22IXttV-dsLa1YBcnlLhHjr_emSVA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "8cda3e3030555d9b",
+      "brand": "Adidas",
+      "name": "Women's Terrex Xploric Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTIaPQ6HWmpDfUWCo_KphlMTLBq2Ep3hj-eRxr3dEVSQjrMzffmz5yEvElruIUP8LFcsSiW2-fIK30eSApzH3f89nMZc7_SQKlTI4zxjct5hvOczKPvCziB",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "915d0910a80f7107",
+      "brand": "Adidas",
+      "name": "Women's Z.N.E. Woven Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSbjTBSgs-hK9krH-24QXpHJjmpIvFGP_04tQtaYtukhKcnnH4meKTFNi4onEakdmJ1ceAzNyZpNh-LS1toDWmKmkwj-q_uq2PCzeUGMoNlOQ0ZKoTQcpVoag",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "066d62081ef5d07b",
+      "brand": "ALO",
+      "name": "Accolade Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRI_GL4Sm5SV-oj81Mw1D-AmObWQmwcZfOkeY6An9fxCxnhWb6lIQHRga6U8PzGhNkrUuz4v5FMN-9Vrj3XysXuM1MQFoeGQQbMnmjIXuzjS98JzblUodLS1A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "542a069ef4907d25",
+      "brand": "ALO",
+      "name": "Airbrush High",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQM0tHnNWDOUbPdgpXlh1pDEnDMie8kJpYhNmTOmYucDKs2Wk0JbW3mH8dHlOW6g046wpPsCb5D76bNRLCjUYgZMnIC7Zz1p10lEpWnUcdv3j3SKAbq-0AD9Zo",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cf3c1961defc340d",
+      "brand": "ALO",
+      "name": "Airbrush High",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQM0tHnNWDOUbPdgpXlh1pDEnDMie8kJpYhNmTOmYucDKs2Wk0JbW3mH8dHlOW6g046wpPsCb5D76bNRLCjUYgZMnIC7Zz1p10lEpWnUcdv3j3SKAbq-0AD9Zo",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "beb9247993f66036",
+      "brand": "ALO",
+      "name": "Alosoft High",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTMd-cOjzHl2Uvy71e9nJGz6U1y8Uc9AX9SupE_64YBYjp9GxOLr9v42rvDO3pCvrGTgNGuBfvZD-fc93GQft16d4erT6-b6h34J4F6Xl9xhzbaf8XTB88F",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "63446789bee65421",
+      "brand": "ALO",
+      "name": "Chill Sweatpant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQA6hYCpB9SpL7CVd1RbrN2gtM8_zh98Q3V2A__CQb_f3wYn-yieWvVO9qs5Q63_zHqIu19DIxW8-yIqsP43PnRLvp6GBsmEKolf9wGvpfdBoLtRhSo-iUf6Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b8345bb1911a6f0d",
+      "brand": "ALO",
+      "name": "Serenity Wide Leg Sweatpants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTRmvHvDT08fC348ZQ1EDwEXlMiE2OXcz_wBFBlDcyuS74xTAqI7sIk13sukLhCw7xCFrOZQ15OP4D7wBKF4QadzDJPnD8OyF7nAUfDybHk92JJueuCKbfMOg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4f1cfeb7736cf171",
+      "brand": "ALO",
+      "name": "SHEIN Alo Airbrush High",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ6V0Y-G_hjSQvs8SdYfnDvNDMlwhCyyZfbB6RLcfMZy4T1XmbNd0TBEtVlURJ7g_sVbsiHuMzRczEar8zMyKRRXPwsE5X06cflsxqgr4X7KBJSTux-1XrhdA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4fb89eb2a47918e6",
+      "brand": "ALO",
+      "name": "Suit Up Trouser",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTufZ9QhOshduHK6O84BQv2ZzyeqSh-gXoCmD9aKLqCjWHEA3wD6k0gPzPp7_a60VXCr0Jg22rCSbB3pdn-aFN7554oVEu3aJJbphvlhNCzHLQbtqm0K974",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2c450a98aa0cf3bc",
+      "brand": "ALO",
+      "name": "Washed Accolade Straight Leg Sweatpant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR6AgcQoPHWOaHiDWVGSSUErrxJbe6_8g6jT2nZuuYK8UqqEvTbos88W1P8DjoRdZFdWjguuMOo6o5Oc9xk2C7kGOy6OjmfGyqF_f-S2APb--aoFkhIpyqzGhs",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "686d660767cde696",
+      "brand": "ALO",
+      "name": "Women's Alo Yoga Pants & Jumpsuits Alo Airlift High Waist Suit Up Leggings",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTYdAet7VWF47s0BKWNDWl1EQAp2uQrt9wKWiG6772Bd3U3UrK5B9_KEH65CPdqGuWVjhiNgOOALoFGcF_DXYPRfo6I53rOSPEAZiMIpfwfqeuibC3fQJDW7Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f9a32f7dc2e18882",
+      "brand": "ALO",
+      "name": "Yoga Match Point Tennis Skirt",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT9nYdWYAjWlKgbTLw5bRGmiwQGaP5ciT6vbFngGkGwqnt_MN0gFWYiH5ELZHBYprVpBpgaQXqRig8HEckRFOBDeu9WwNVGMfzcucGAiwTlBHU_IfJFgGFP-io",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7ed2f62a7ac3e865",
+      "brand": "ALO",
+      "name": "Yoga Match Point Tennis Skirt",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT9nYdWYAjWlKgbTLw5bRGmiwQGaP5ciT6vbFngGkGwqnt_MN0gFWYiH5ELZHBYprVpBpgaQXqRig8HEckRFOBDeu9WwNVGMfzcucGAiwTlBHU_IfJFgGFP-io",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "catalog-bottom-aritzia-effortless",
+      "brand": "Aritzia",
+      "name": "The Effortless Pant",
+      "category": "bottom",
+      "imageUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "e9d03f4e24011e74",
+      "brand": "Carhartt",
+      "name": "Men's WIP Double Knee Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRrATrjTLvHvoFY_cTW2Nwb4Af1o47mlTFXBQ0sLsIn5Hv6z-o5kgYJLeu8RDBgqpej8fN1IAW2MPoZELQzsMrymyN0yKG2dM91IsU2BLKWywfDZUFxP1dNEQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "e7715642b8920c80",
+      "brand": "Carhartt",
+      "name": "WIP Double Knee Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSFpJXKsZ7Fu-u0YZRZGscXSEmEoMfy9icy0lumYwksakv94BhG8DlMw1kj0z9yTUGG3m8rv0bhpBzg4ZDMTGE2TNSW63YlnKApX5kRcKXIcnFALDP9x3e5Rw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "72a2186d04300b7a",
+      "brand": "Carhartt",
+      "name": "WIP Double Knee Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQwuvFYJ6tIsGGQ_OkinFlNFQONe425W4wEEC3l22enxOJfFCFG68gKJJZoBgDd8tY1x8IPLm9_Leb7SYjJcb9nBVQVXqHg4VaR5w-uOsN7GCKxcP3Chrtj",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ca58de3680654cff",
+      "brand": "Carhartt",
+      "name": "WIP Double Knee Pant - Denim",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS4lc4rV0zBhAYkqfrma7HonR5JYQsID0w97Le6sG_Ft05pgRGfhW__hiMyFXxLwAZWu49fIjJ-1IT0BV8CZiEycKJxcjoEEYVd3xSX34FrohezTAoWGDsx",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "add61e0936a72d68",
+      "brand": "Carhartt",
+      "name": "WIP Double Knee Pant Men",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQMEKSr_pozQ87ksQkHgrk8m5Q_7emvxSRsqdZ5_NxQnUeN-yz8GLXusQXqVDobwHxeSXOMgoOihK6TYFmf1UfzLOcF4a-Tr7eQKpwoJH8dqmjRwRwXsZoC",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "5d26acac38a761d1",
+      "brand": "Carhartt",
+      "name": "WIP Men Double Knee Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSGfS53nlhZyilraM_KUztzWJeNsHrPB0xsokPnIAXKnTrvSoLjcee-7vozyeBR2QpAw-GfxRGDjRRqARdxX7pkN_1JPMynZL6miMOnrwF0S118Wg8640qrFg8",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f771664dadefaed2",
+      "brand": "Dickies",
+      "name": "Men's 874 Flex Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS5CJrGKzIY5SE0EzqkvjSWsI3hP7OV3H_gFz-2j7Ihla6EcUhC0ixYLXXJLjpsM4hEfyo2Kcw_U876Lj7VVB6YUtwfFsLFhBvgFhlju57mCURTnYffv9u0",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "9efb1a5e7e4b665e",
+      "brand": "Dickies",
+      "name": "Men's Loose",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT9u0HX_xp9TGIkjC-gT16NgZxn6EGjlz_L0agDIfa8LwZ48DVLNLTbjBcriktoZFrvepEXTqjkbuCGnQ6fIHRyzDhujFwdJUI1h2NgvSUw7TOUu553oXdKPg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "e66f5eead713ac36",
+      "brand": "Dickies",
+      "name": "Men's Loose Fit Cargo Pants in Rinsed Black size 44",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQCToUJZzNC9VAE4IjY48Bzxu2JL-gN2-w6Ltlug3H3374SXo5C__eMPdLcQO69GcSTE4IRtmm05NAUS9PJOvZWUuC2gj6B159ydm9uvozXEtHbvUAJAi2vcA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ac2418a49414ad11",
+      "brand": "Dickies",
+      "name": "Men's Original 874 Work Pants in Airforce Blue size 36",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRWl1wDwjf38pYnJJcGTn-NdpSCCFX75kgEHLyWJXBUntpVkJj-rjvxjmB8wPcu0FxksRqAj7rKD0WODilWdoMl1ZJF7z4KZCUZ0kGJHTrcDbZcaurhuZgZcg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "60760dad3cb845e3",
+      "brand": "Dickies",
+      "name": "Men's Original 874 Work Pants in Black size 38",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRtl4paU2TMHJhyjAwxhTwwU131Y-P_hQj3p-2t44mQqksLfQZUuywIzF0YTQsbnhvDR3Z0h8kaSL5Sn51QP7U3fzOpGWmF8ROsGnJruhE_zC7byFuhONut",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "d4fd6c0d5b01cbc8",
+      "brand": "Dickies",
+      "name": "Men's Original 874 Work Pants in Dark Navy size 36",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTXRYg_2Ut92IaYQdVBG_UX8pzAtObsgDQKGpkzJAth61qXNJVQKv0Gkh3iSe8fjhp-gxdeXeTvhI8bx8bncv3X0Qe7PE1qz-Bg0g-H9jMgyWSs3JsYcfolig",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c528b2b2502d0220",
+      "brand": "Dickies",
+      "name": "Men's Pro Series Cargo Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcT3vM39YLB7l3KhpLA2nr2_1IwgPqC2dpB7Ynohu0PRNKUx80Uh-bD7cu4nsZj5EV9Imu85GyvxXm_i6UEnS5fX1JdAV-Bn7tdl2MwS3oRuvjlMC-H7K1Vofw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b57b7e3b22192789",
+      "brand": "Dickies",
+      "name": "Men's Relaxed Fit Cargo Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRs5mA-snVlo-KiYJ78Hw7iIR6ISF2bu2yv4_AzsH6BrffTFwl7XotFXllNZprVj9F1NGmlA3ZAx9P6ugI4kXYOSx8_q9hQwcKUL6k4RYcXM4d8WfA8gQ2vMw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "368de3d68fb9c21c",
+      "brand": "Dickies",
+      "name": "Men's Tradebuilt Duck Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRPpkcAyLd-cKbC2jKoSFOQwUCVzzcw0Rywkkf9jOA_UUuONeI1ekcw_YW54G5b8fH-GVYiXjIcLzIKhNYLAY1Edt8-fyjuVdF_01KcZ83jMft0WH3G0HFIBg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "325b659a09a5cbd3",
+      "brand": "Dickies",
+      "name": "Original 874 Black Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTpXyzM6ZU_sa75VkeZs1_j-51vlsueJpHRpBfin9fqanNcOzxfjdENmwGy2-ObqtgAW_P_aeP51K_MLel2fJ3TLNPw9xmSoQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7b6c2a2055272f52",
+      "brand": "Dickies",
+      "name": "Women's 874 Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQyOZnDWimZ5syHMNNdyJG_rnpaSpYMp4LoxweWdgM78vycJTEx7jvzs_Ys2JZb0hw_Tb2SpRNqNRYVA_igqO45BFQabvoFmjSQoetpPa4lHLwQYI8dfZpMRQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "d849b2938e39fcb1",
+      "brand": "Dickies",
+      "name": "Women's Relaxed Fit Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS2HQMIgs4mCZdYO5Hyrla7t6HFQNkh9zFHw63dTttjSe4U4u1ts1Ys304bBaQ9o3B4E3kXRrDcRregX4kjcxxOZK5a_ULc25p6pEZQmjPSFmDyL9pNVUdE",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "7b7e0fb66808bb40",
+      "brand": "H&M",
+      "name": "Hm Linen Drawstring Trousers Light Beige Women's",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQoAchdpIsOi0cxSZSr1WPWr-Gjw1uSa1oq9sgdI8iZ6ssB7zMsUIsTfWfron9Sh78uyGwqgFXPlSavYfiiURXDRj5lQlDY-w0pSjq0rrCRZWSgmG7g6w4L",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "709dcf53cd0281f3",
+      "brand": "H&M",
+      "name": "Ladies Linen",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQE1c2va-efifBnLejzutEfyPzbbhOhcjvMVaIGW69mD7uki04eH1Td4qzfh7lYH8rLk0aW5kwQlGw-mbFB4SSXYi6tr1UhS2AzZWwCM9IxZCjt3Ch5IiHPnw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "c8b20ca27b39d256",
+      "brand": "H&M",
+      "name": "Ladies Linen",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQX0sddN2P0kwkiRHZg09dPltbqrjZY-pAmYkEEEseAAxMQ0X9MDaTlxx8oWFOQjodnvcRJsFC3tmGqUlPI2lRAP4QUfBbK2zTkv7XeFd2Qc1e9N9vVim1Q0w",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "186820dba6db1ed5",
+      "brand": "H&M",
+      "name": "Ladies Linen-Blend Pull",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRQ1-UXIyCQytVzVTUCUxWMlKMsn1Jkf7HBDiohcmZc7WiNgTwgx9qpWmYUS_W0KEvllkp8MHpU1tNjC-6lKNxoiuyF5xEWI-mLcQEYSf0_SUPU9U5m6k0e",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "44d838f88a7340c5",
+      "brand": "H&M",
+      "name": "Ladies Wide-Leg Linen",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ3dYhyQ4L5fbaZbRowZmh-pogoQUzPXN5aoxRCUKq38JvhjCMx6SmJc14fraWZANXVMiK3EiQgL94gkTX8oKWXyXgxR__dWErWVQmL9iZtjZYujcj4BOmY9jQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "bddcd54327924130",
+      "brand": "H&M",
+      "name": "Ladies Wide-Leg Linen",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTXo0NalgISdlxjaZe8PC2pIu4aXfEFWRHQ1-liYIo6hYIYnCADStGsRdiGVcBp1zZBxVfVtJYh3hh3X191mkR4t7RI8-6fXobolJeNUVE19tP8Ze6Vh3onD1A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "brand-catalog",
+      "id": "catalog-shoes-nike-af1",
+      "brand": "Nike",
+      "name": "Air Force 1 '07",
+      "category": "shoes",
+      "imageUrl": "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/b7d9211c-26e7-431a-ac24-b0540fb3c00f/AIR+FORCE+1+%2707.png",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-337c9d9b715b6bc1",
+      "brand": "Boot Barn",
+      "name": "Dan Post Women's Denim Darlin' Snip Toe Western Boots",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSJRZrgQdju8Mbe5qGKrXmL4nKTu06maFYXefTZC8UQopAvMuj53IR6HhIwJKoGLOMFOkRtyTj05eSbUxhnrVQCVM44eqkqKl0QAmi4HCZBjvDdjRKuCbUmKQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-ddc54504be20e392",
+      "brand": "Chuck's Boots",
+      "name": "Circle G Corral Women's Blue Jean Western Boots",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSwOrS6q2r3dZ8uKG1xyE5M0upxAM1hEvhpSDljHMwQaTI4bD34D_ADutYBBXwOlVIUYCfwcZoUZtWwEYm4KSaCS0K-pTgRrT-c3gucIw1IaRYQW_TIwo4C",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-159e2aa9e34f2b1b",
+      "brand": "Etsy - Seller",
+      "name": "Embroidered Western Outfit for Women, Luxury Handmade Complete Outfit with Coat, Hat & Boots",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQaV85Sv7VLjSZIJ8kpa92RoqghuiiMhAC87kUMysPzSrSALo1rCeIqryV_qG9zjIlbvsJxCu1emDrYVREEKz8Xcyg9X-5yoLVTBSm0JEbf1_R4pv0G1IKwDg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-758ef28a0e13da4b",
+      "brand": "Wild Jolie",
+      "name": "Fashion Denim Buckled Belt Chain Knee High Cowgirl Boots",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSDNevcFfmyUHRhD8Jeh6IT1_1MXbZ8FFsGP_7wdqwh1dD5xxriMVHZiVWVmoUVzBakT2duEKZ9h4JQnFvUhZmm9oGpAOXikNSoBi7djTbk4Cqr2OPFWqgM-g",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-527df40db87c7c7a",
+      "brand": "Zazzle",
+      "name": "Country Western Cowgirl Denim Boots Hat Jacket",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQi-ilmg8NmxYQQvMVLDy03c66pJ_7Puu2mcM1r7F92gSyQbQ4ly5Z0sr2ub9CshHwVW7LxPAIOlrePRAVF4UTZY4bRVjjm45bJuEZnseqDuMeDZsCzJn9S",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-03bf3dee802d4e4d",
+      "brand": "zazzle.com",
+      "name": "Western Cowboy Boots and Hat Denim Jacket",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRKDMx2QFj2fBZeLLsx_fGvdCgRBIWigTGiwizlbgVYcszqHkUvbjVr8SYIXdccXy7p8L4vm0sqGM0OpjPm3lY4slDmX5CR",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cf644945808d11f8",
+      "brand": "Adidas",
+      "name": "'Campus 00s Beta' Sneakers",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQHzd1pHYjn_X8NHFO3kqvuuk8U4p64uacgh5T4yrtaKaQ8GzNqu_kv6k4bPLJGktK1XFlzyFTExiH33xWeWDvdqSohhw8RvA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "d855f06268e8998f",
+      "brand": "Adidas",
+      "name": "Black Campus 00s Mens",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSCOCSYcbcASrbw7GZ7ogXK_-SXbMagE5tQnb_1edMtYpWaot1yIxsPiivBv8RNYh5tmJmKNMczcLwF0xK44LmLSHbMIW_F4yfP5p1NtjjbR4WjgbqB5SfmEAQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "b65e8cd40ecfc8dc",
+      "brand": "Adidas",
+      "name": "Campus 00s Wonder White Gum",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQEnxnBM0QHasiWMmuKFXGhqTYKNa6Kc9mqltmOeBzxNY-V81-jvFo-LiKpXw0hZeq9amQ9xbPpHIAKvEpr6GcSerfOoB-xVuheaSCJn6OVo2oSyHslLxUSgw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ba6bc7345521288d",
+      "brand": "Adidas",
+      "name": "Men's adidas Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS78QS70gGxnSmIfRwSn-sOgsyBp45rZjnxW0LQ42PefFXRB0ZiW2g5X1Z4e9vn7q8OeUFvvSPzf69yzB4TPN4SF6vr15JGuVCcZ3GYyjY7D2cpevLUZzhHLc0",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "4b3c4d4cbbdeeb49",
+      "brand": "Adidas",
+      "name": "Men's adidas Originals Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRnKoFAh1UBRmN2DdLxxzRQc63ZB8HftNdqKcY7rc3_jNNkJpaafu8VcWmv6HMT_9uPLWfkjWFR0uJM74AdVQPaepijjHt_YYWSDfGsRpS5vsLgPt3jeJTglg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "a4818afdac3cab16",
+      "brand": "Adidas",
+      "name": "Men's Campus 00s",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRTMIMr41PwgKCV-Cmf_MEE2pDrZ_-IrUja42bdUxamD0JHuHE-9iZB8WwNNlAgazeYx9c-5hIXJoHBFATuJcbZTbMepwPBObmSHLLOTLjVr4hhFVkpsnItZYY",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "f5186afd2ae75287",
+      "brand": "Adidas",
+      "name": "Men's Samba OG",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTLokWOSGdvDMGY5QTBTxKIt_rwKiK4Hqb_Mlk8QSvz39j0XJzlpZvlaDw5Lxy6oWuKfAIX0ynK26AxBc89WWUGhpcxzfRMPaMZ3Gn6yhqY2uEvrjqhjx-o",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "ee1b0c35cccddadc",
+      "brand": "Adidas",
+      "name": "Mens adidas Originals Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQsULdu_qmhBvOb9zTbM_bSGuLrZcPEOO2_J-XHju2vfkgXfNh_00tEqp2UiTMaRPBimifThRqkWQ6EXhMnUGOtxzuKLZ6Kq0gvpEhmckmqkmMwh-Dv8YpOWxA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2eb1265214ad2ebf",
+      "brand": "Adidas",
+      "name": "Samba Indoor Soccer Shoes Black M 5.5 / W 6.5",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR0He9fmObR4yK6kqSPuBubFP_p1lmNfRO37_7M0M2NzbkiWjWVE_gf6XT8MENlbHc4i2Ti3nLNcLss7t5H0G7A3JEJHbhhd8_kbV6EAOlyx0aHmAvNVf6kBg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1590fdbf9e938ba2",
+      "brand": "Adidas",
+      "name": "Women's Campus 00s",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTObA8jOIfY8phCvB9K7SywGyC64HJ-Qyev3RK5c76LLExrnuV62VWtLgIZ2ByPGIFOqXNCt18NRVgumCRhPZc-yfqFfKz3790jacPz9RomQtcu8yfziKb-ZQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "624766d90d2add01",
+      "brand": "Adidas",
+      "name": "Women's Campus 00s Low",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRWXJWHO72Q_Eoj6_zxXXwInUi06ENJKhpKuHC6fg059ULqDDEz1l2h3n21v5xqaE_Rtwh20Nz9VxT9MbyyB5VI6UfznhmvwomtLFp1t3zV-RK--L7G6JbKsg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "74ec37a10152f779",
+      "brand": "Adidas",
+      "name": "Women's Originals Gazelle Bold",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ-aCNdmNYbN-5lb_mkq2CEeMNi-tSs72sYZeCkcJAF9xozUxMsw4Wf1oqszXb9Enfbw4fdh8PqxO0kQOqGN2zqZV9mVpiMQMFG99YRVgrd0FdU3fBLgeEaRA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "308ab130cf25efc7",
+      "brand": "Adidas",
+      "name": "Women's Originals Gazelle Indoor Casual Shoes",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSTBOMfUPtJyUqL19qrTvYsD9IqG1VJg_3OZqUwtv9IysTIOacCSWM7w2LrEYBFKdA8TNhE4DAAZnby4KeFT90esbKrLccJzYNDh8qJ7OW_WG_IHnbvHyxrMB4",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "5164c533627b66b7",
+      "brand": "Adidas",
+      "name": "Women's Samba Jane",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRxUMQEjfRmEmNjBJBOVpV9W-RdwHY8EyjMVemv59kZEzt6XNAUOm2gTeMbGmLCZd9Y6TqrmGYvo-_Rai0FIVqzrNFKqIsRBWANrSDpsAlaW1o_g9PEcQ91yA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "5dc51d39f1e90cbc",
+      "brand": "Adidas",
+      "name": "Women's Samba OG",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRR-P3XiBYUzrYFxqNhZEr53MZqyyxS4NHsX-HbooDHiVQ3RQGoYZxf179D4qeTSBITAUGUh1vlsnlkrqB9OhEw4ZSgOs3GrXmmtFt6YtpCaxchv5QbnJni5Tw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "1102d7c0957645d8",
+      "brand": "Adidas",
+      "name": "Womens adidas Originals Gazelle Indoor Shoes",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTNrTb3uVsLM0T2AsNHZ7unOYLGGmNzf4ACokaESkrnP7v2IiGBF-BXMJ78OUOGv0y-XHI9EdhO5GN_IkoKe3fiPIXggJmsPyD9DabtSzY-BXz2CinY_ykNjA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "bc779d64393c89c3",
+      "brand": "Adidas",
+      "name": "Womens adidas Sneaker Samba OG",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQbS16UYVCpsshLu87g0-_ihlV1iTw5MPhz_yx_Wyqw7ZYGccHCMoNSlNM7zUukW_3Tbkb4QCYVF8YCKB3noSOfNV0yPUUoeiFpJRvtlcqYciuBa-pYiMYaQAg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "5900548a25fdab3b",
+      "brand": "Adidas",
+      "name": "Womens Samba LT",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTQAm4IOBzJA94UpmBtx8Sh45mdgLRFo-QCRe6P797wH2B4z_EktlxgPEcSuEgndSwfTDoIJdeEdM7zWNJPITnYSNU9RnjQ81Xa6B_jQ-jyCFJnGOM2APuDcA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "de21c621d9ba8da9",
+      "brand": "BIRKENSTOCK",
+      "name": "Arizona Birkibuc Mocha Two",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSDIym_WRTQq8FvKliWpD-rsb4dbaq9MS6J9OeyqhOrllPnNUdWcKDzEpMfR2AAPx8KArGTHtAVWEsfmJIP02b7wrjK594k4v3PB2jRamEql5tQujorv9P2aA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "026fe5055b512f48",
+      "brand": "BIRKENSTOCK",
+      "name": "Arizona Birkibuc Stone Two",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSmvI1stBz4MnGhaMx0R3DmQt7JfGtW5wE-XPjoeUjQRM9mKYAWhzx7JFXT6hYh6-JLfztLUzjJ68Q4PFghfHhubH7m5DnroI-0K8JiKGKUiuNflBmagsUbAQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "db0a55956c92f23e",
+      "brand": "BIRKENSTOCK",
+      "name": "Arizona Birko-Flor Dark Brown Two",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTJ20FD32h7ThbeMryvTigK3QmN6FESwKzEWFRfjCqEGTz3ppB5_PgUNo-nPv-Wytxwux-APjN14ZS_wl0wdIANZmUjXleq5yta5jEPhBqyTppAjmYO54bB",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    }
+  ],
+  "generatedAssets": {
+    "cutoutDir": "public/assets/cutouts",
+    "totalFiles": 48,
+    "registeredFiles": 48,
+    "missingCatalogRegistration": [],
+    "registeredLocalUrlsMissingFiles": []
+  }
+}

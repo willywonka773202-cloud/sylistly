@@ -1,0 +1,213 @@
+{
+  "generatedAt": "2026-05-16T21:49:28.308Z",
+  "totals": {
+    "products": 674,
+    "transparentProducts": 48,
+    "originalOnlyProducts": 537,
+    "unsafeImages": 89,
+    "missingProductUrl": 175
+  },
+  "categoryGaps": [
+    {
+      "target": "bottom",
+      "priority": 49.3,
+      "reason": "115 products now; 97 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "eyewear",
+      "priority": 48.3,
+      "reason": "39 products now; 29 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "jewelry",
+      "priority": 35,
+      "reason": "57 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "outer",
+      "priority": 34.5,
+      "reason": "136 products now; 122 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "bag",
+      "priority": 32,
+      "reason": "60 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "top",
+      "priority": 31.3,
+      "reason": "127 products now; 73 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "shoes",
+      "priority": 29.8,
+      "reason": "63 products now; 51 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    },
+    {
+      "target": "hat",
+      "priority": 20.3,
+      "reason": "77 products now; 69 safe originals still need transparent assets",
+      "recommendedAction": "Add reviewed products, then run cutout pipeline for high-visibility items."
+    }
+  ],
+  "vibeGaps": [
+    {
+      "target": "street",
+      "priority": 55,
+      "reason": "0 products tagged for street; target is 55+ for reliable generation variety",
+      "recommendedAction": "Use reviewed additions or SearchAPI candidates, then keep generator tags explicit."
+    },
+    {
+      "target": "edgy",
+      "priority": 39,
+      "reason": "16 products tagged for edgy; target is 55+ for reliable generation variety",
+      "recommendedAction": "Use reviewed additions or SearchAPI candidates, then keep generator tags explicit."
+    },
+    {
+      "target": "cozy",
+      "priority": 32,
+      "reason": "23 products tagged for cozy; target is 55+ for reliable generation variety",
+      "recommendedAction": "Use reviewed additions or SearchAPI candidates, then keep generator tags explicit."
+    },
+    {
+      "target": "vacation",
+      "priority": 7,
+      "reason": "48 products tagged for vacation; target is 55+ for reliable generation variety",
+      "recommendedAction": "Use reviewed additions or SearchAPI candidates, then keep generator tags explicit."
+    }
+  ],
+  "priceGaps": [
+    {
+      "target": "under-400",
+      "priority": 40,
+      "reason": "140 products in under-400; target is 180",
+      "recommendedAction": "Fill price tier gaps with real product URLs and images before expanding adjacent vibes."
+    },
+    {
+      "target": "400-plus",
+      "priority": 12,
+      "reason": "38 products in 400-plus; target is 50",
+      "recommendedAction": "Fill price tier gaps with real product URLs and images before expanding adjacent vibes."
+    }
+  ],
+  "imageQualityPlan": [
+    {
+      "target": "transparent-assets",
+      "priority": 537,
+      "reason": "537 runtime products still have safe original-only images",
+      "recommendedAction": "Batch local cutout generation in reviewed chunks, starting with Feed/Build-visible products."
+    },
+    {
+      "target": "unsafe-images",
+      "priority": 178,
+      "reason": "89 products have unsafe or weak image URLs",
+      "recommendedAction": "Use SearchAPI or manual review to replace source images before cutout processing."
+    },
+    {
+      "target": "missing-product-url",
+      "priority": 175,
+      "reason": "175 products are missing a productUrl/retailerUrl",
+      "recommendedAction": "Resolve merchant URLs before considering products live-merge ready."
+    }
+  ],
+  "searchApiPlan": [
+    {
+      "target": "bottom search queries",
+      "priority": 49.3,
+      "reason": "115 products now; 97 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    },
+    {
+      "target": "eyewear search queries",
+      "priority": 48.3,
+      "reason": "39 products now; 29 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    },
+    {
+      "target": "jewelry search queries",
+      "priority": 35,
+      "reason": "57 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    },
+    {
+      "target": "outer search queries",
+      "priority": 34.5,
+      "reason": "136 products now; 122 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    },
+    {
+      "target": "bag search queries",
+      "priority": 32,
+      "reason": "60 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    },
+    {
+      "target": "top search queries",
+      "priority": 31.3,
+      "reason": "127 products now; 73 safe originals still need transparent assets",
+      "recommendedAction": "Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only."
+    }
+  ],
+  "backgroundRemovalPlan": [
+    {
+      "target": "bottom cutout queue",
+      "priority": 49.3,
+      "reason": "115 products now; 97 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "eyewear cutout queue",
+      "priority": 48.3,
+      "reason": "39 products now; 29 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "jewelry cutout queue",
+      "priority": 35,
+      "reason": "57 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "outer cutout queue",
+      "priority": 34.5,
+      "reason": "136 products now; 122 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "bag cutout queue",
+      "priority": 32,
+      "reason": "60 products now; 48 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "top cutout queue",
+      "priority": 31.3,
+      "reason": "127 products now; 73 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "shoes cutout queue",
+      "priority": 29.8,
+      "reason": "63 products now; 51 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    },
+    {
+      "target": "hat cutout queue",
+      "priority": 20.3,
+      "reason": "77 products now; 69 safe originals still need transparent assets",
+      "recommendedAction": "Run prepare-cutout-candidates, generate a limited local batch, register only verified transparent files."
+    }
+  ],
+  "notes": [
+    "SearchAPI can improve original product images and URLs, but does not remove backgrounds.",
+    "Background removal should run in batches and land in public/assets/cutouts before registration.",
+    "Expansion packs should remain candidate/review-only until quality checks pass."
+  ]
+}
