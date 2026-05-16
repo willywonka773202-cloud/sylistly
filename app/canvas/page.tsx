@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Camera, Check, Images, Lock, Share2, Sparkles } from 'lucide-react';
+import { Camera, Check, Copy, Grip, Images, Lock, Share2, Sparkles } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
 import type { Category, Product } from '@/lib/types';
@@ -25,6 +25,28 @@ function productsFromItems(items: Partial<Record<Category, Product>>): Product[]
   return Object.values(items).filter((product): product is Product => Boolean(product));
 }
 
+function topSignal(products: Product[]): string {
+  const counts = new Map<string, number>();
+  for (const product of products) {
+    for (const signal of [...(product.vibes || []), ...(product.occasions || []), product.category]) {
+      if (!signal) continue;
+      counts.set(signal, (counts.get(signal) || 0) + 1);
+    }
+  }
+  return Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'custom outfit';
+}
+
+const CANVAS_TILE_CLASSES = [
+  'left-[5%] top-[4%] h-[42%] w-[55%] rotate-[-2deg]',
+  'right-[5%] top-[9%] h-[27%] w-[34%] rotate-[3deg]',
+  'right-[9%] top-[39%] h-[25%] w-[34%] rotate-[-1deg]',
+  'left-[10%] top-[49%] h-[25%] w-[38%] rotate-[2deg]',
+  'left-[48%] top-[66%] h-[24%] w-[36%] rotate-[-3deg]',
+  'left-[4%] bottom-[5%] h-[18%] w-[28%] rotate-[4deg]',
+  'right-[3%] bottom-[4%] h-[18%] w-[28%] rotate-[1deg]',
+  'left-[37%] bottom-[7%] h-[16%] w-[24%] rotate-[-1deg]',
+];
+
 export default function CanvasPage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [mode, setMode] = useState<CanvasMode>('canvas');
@@ -36,26 +58,45 @@ export default function CanvasPage() {
   const savedFits = useSavedFits((state) => state.fits);
 
   const source = useMemo(() => {
-    if (!hasMounted) return { label: 'Loading local outfit', products: [] as Product[], totalCents: 0 };
+    if (!hasMounted) return { label: 'Loading local outfit', products: [] as Product[], totalCents: 0, kind: 'Local' };
     const currentProducts = productsFromItems(currentItems);
     if (currentProducts.length > 0) {
       return {
         label: 'Current build',
         products: currentProducts,
         totalCents: currentProducts.reduce((sum, product) => sum + product.priceCents, 0),
+        kind: 'Builder',
       };
     }
     const latest = savedFits[0];
-    if (!latest) return { label: 'No outfit selected', products: [] as Product[], totalCents: 0 };
+    if (!latest) return { label: 'No outfit selected', products: [] as Product[], totalCents: 0, kind: 'Empty' };
     return {
       label: latest.title,
       products: productsFromItems(latest.items),
       totalCents: latest.totalCents,
+      kind: 'Saved',
     };
   }, [currentItems, hasMounted, savedFits]);
 
+  const sourceSignal = useMemo(() => topSignal(source.products), [source.products]);
+  const shareCaption = useMemo(() => {
+    const brands = Array.from(new Set(source.products.map((product) => product.brand))).slice(0, 4);
+    const categories = Array.from(new Set(source.products.map((product) => product.category))).slice(0, 5);
+    return `Sylistly ${source.label}: ${brands.join(', ') || 'real catalog pieces'} across ${categories.join(', ') || 'outfit slots'}. Total ${formatPrice(source.totalCents)}.`;
+  }, [source.label, source.products, source.totalCents]);
+
   function localShare() {
     setToast('Local share card prepared');
+    window.setTimeout(() => setToast(null), 1800);
+  }
+
+  async function copyCaption() {
+    try {
+      await navigator.clipboard.writeText(shareCaption);
+      setToast('Caption copied');
+    } catch {
+      setToast('Caption ready to copy manually');
+    }
     window.setTimeout(() => setToast(null), 1800);
   }
 
@@ -90,7 +131,10 @@ export default function CanvasPage() {
           <div className="mt-4 grid grid-cols-3 gap-2">
             <ContextPill label="Pieces" value={source.products.length.toString()} />
             <ContextPill label="Total" value={source.totalCents > 0 ? formatPrice(source.totalCents) : '$0'} />
-            <ContextPill label="Mode" value={mode === 'try-on' ? 'Future' : 'Local'} />
+            <ContextPill label="Signal" value={sourceSignal} />
+          </div>
+          <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-2 text-[11px] leading-relaxed text-muted-2">
+            Source: <strong className="text-white">{source.kind}</strong>. Canvas and Share are local. Try-On is future-disabled until a real image backend is connected.
           </div>
         </section>
 
@@ -133,19 +177,28 @@ export default function CanvasPage() {
               <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Moodboard</div>
               <div className="font-serif text-[20px] font-semibold leading-tight text-ink">Product collage</div>
             </div>
-            <div className="grid min-h-[420px] grid-cols-3 auto-rows-[118px] gap-2 rounded-[28px] border border-[#eadfd5] bg-[#fff7ef] p-3 shadow-[0_24px_58px_rgba(0,0,0,.36)]">
+            <div className="relative h-[500px] overflow-hidden rounded-[30px] border border-[#eadfd5] bg-[radial-gradient(circle_at_28%_18%,#fffdf8_0%,#fff7ef_48%,#ead7c7_100%)] p-3 shadow-[0_24px_58px_rgba(0,0,0,.36)]">
+              <div className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-[8px] font-black uppercase tracking-[.18em] text-white backdrop-blur-md">
+                {sourceSignal}
+              </div>
+              <div className="absolute bottom-4 left-4 max-w-[58%] rounded-[18px] bg-white/78 px-3 py-2 text-[#191513] shadow-[0_16px_32px_rgba(70,45,28,.16)] backdrop-blur-md">
+                <div className="text-[8px] font-black uppercase tracking-[.16em] text-[#8a4b5c]">Outfit title</div>
+                <div className="mt-0.5 line-clamp-2 font-serif text-[16px] font-semibold leading-tight">{source.label}</div>
+                <div className="mt-1 text-[11px] font-bold">{formatPrice(source.totalCents)}</div>
+              </div>
               {source.products.slice(0, 8).map((product, index) => (
                 <div
                   key={product.id}
-                  className={`relative overflow-hidden rounded-[20px] bg-white/78 ring-1 ring-[#eadfd5] ${
-                    index === 0 ? 'col-span-2 row-span-2' : index === 3 ? 'row-span-2' : ''
-                  }`}
+                  className={`absolute overflow-hidden rounded-[22px] bg-white/82 shadow-[0_18px_36px_rgba(89,55,32,.18)] ring-1 ring-[#eadfd5] ${CANVAS_TILE_CLASSES[index] || CANVAS_TILE_CLASSES[7]}`}
                 >
                   <ProductImage
                     product={product}
                     wrapperClassName="h-full w-full"
                     className="h-full w-full object-contain p-2.5 drop-shadow-[0_16px_20px_rgba(0,0,0,.22)]"
                   />
+                  <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white/82 text-[#6d5b50] shadow-[0_8px_18px_rgba(0,0,0,.12)]">
+                    <Grip size={12} />
+                  </span>
                   <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-1 text-[8px] font-black uppercase tracking-[.12em] text-white backdrop-blur-md">
                     {product.category}
                   </span>
@@ -162,7 +215,7 @@ export default function CanvasPage() {
                 <Camera size={32} className="mx-auto text-accent" />
                 <div className="mt-3 font-serif text-[24px] font-semibold text-ink">AI try-on needs a real backend</div>
                 <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
-                  Sylistly is not generating a fake try-on photo here. This preview will connect to a future image backend when it exists.
+                  Sylistly is not generating a fake try-on photo here. A future backend would need user image upload, consent controls, product masking, model selection, and generated image storage before this button can be enabled.
                 </p>
                 <button
                   type="button"
@@ -204,6 +257,14 @@ export default function CanvasPage() {
             >
               <Share2 size={14} />
               Prepare local share card
+            </button>
+            <button
+              type="button"
+              onClick={copyCaption}
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-4 py-3 text-[11px] font-black uppercase tracking-[.14em] text-white/86 transition active:scale-[0.98] hover:border-accent/50"
+            >
+              <Copy size={14} />
+              Copy caption
             </button>
           </section>
         ) : null}
