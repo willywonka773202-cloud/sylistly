@@ -136,6 +136,9 @@ export default function ProfilePage() {
     const medianPriceCents = prices.length
       ? prices.slice().sort((a, b) => a - b)[Math.floor(prices.length / 2)]
       : 0;
+    const averagePriceCents = prices.length
+      ? Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length)
+      : 0;
     const budgetTier =
       medianPriceCents === 0
         ? null
@@ -173,7 +176,7 @@ export default function ProfilePage() {
       ? archetypeScores[0]?.label || 'Building Your Style DNA'
       : 'Building Your Style DNA';
 
-    return { topBrands, topCategories, topVibe, topFormula, medianPriceCents, budgetTier, totalPiecesObserved, archetype };
+    return { topBrands, topCategories, topVibe, topFormula, medianPriceCents, averagePriceCents, budgetTier, totalPiecesObserved, archetype };
   }, [posts, profile.stylePrefs.brands, profile.stylePrefs.vibes, savedFits, wardrobeItems]);
 
   const progressChecklist = useMemo(() => {
@@ -187,6 +190,8 @@ export default function ProfilePage() {
       { label: 'Choose favorite vibes', complete: hasFavoriteVibes, detail: hasFavoriteVibes ? (profile.stylePrefs.vibes || []).join(', ') : 'Add vibes below' },
     ];
   }, [currentBuildCount, profile.stylePrefs.vibes, savedFits.length, wardrobeItems]);
+  const completedProgress = progressChecklist.filter((item) => item.complete).length;
+  const progressPercent = Math.round((completedProgress / progressChecklist.length) * 100);
 
   function remix(post: FeedPost) {
     replaceItems(post.items);
@@ -351,13 +356,24 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-4 rounded-[22px] border border-accent/25 bg-accent/10 p-4">
-            <div className="text-[8px] font-black uppercase tracking-[.18em] text-accent">Style archetype</div>
-            <div className="mt-1 font-serif text-[24px] font-semibold leading-tight text-ink">{styleDna.archetype}</div>
-            <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
+          <div className="mt-4 rounded-[24px] border border-accent/30 bg-[radial-gradient(circle_at_18%_0%,rgba(246,48,107,.18),transparent_44%),rgba(246,48,107,.08)] p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-[8px] font-black uppercase tracking-[.18em] text-accent">Style archetype</div>
+                <div className="mt-1 font-serif text-[27px] font-semibold leading-tight text-ink">{styleDna.archetype}</div>
+              </div>
+              <div className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
+                <WandSparkles size={19} />
+              </div>
+            </div>
+            <p className="mt-3 text-[12px] leading-relaxed text-muted-2">
               {styleDna.archetype === 'Building Your Style DNA'
-                ? 'Add more saved fits and wardrobe pieces before Sylistly assigns a stronger archetype.'
-                : 'Computed from saved fits, wardrobe items, liked/saved feed posts, and profile preferences.'}
+                ? `Sylistly has ${styleDna.totalPiecesObserved} real style signal${styleDna.totalPiecesObserved === 1 ? '' : 's'}. Add more saved fits and wardrobe pieces before assigning a stronger archetype.`
+                : `Assigned from ${styleDna.totalPiecesObserved} real signals. Strongest cues: ${[
+                    styleDna.topVibe,
+                    styleDna.topCategories[0],
+                    styleDna.topBrands[0],
+                  ].filter(Boolean).join(', ') || 'saved fits, wardrobe, feed likes, and preferences'}.`}
             </p>
           </div>
 
@@ -365,11 +381,18 @@ export default function ProfilePage() {
             <DnaStat label="Top formula/vibe" value={styleDna.topFormula || styleDna.topVibe || 'Not enough data'} />
             <DnaStat label="Top category" value={styleDna.topCategories[0] || 'Not enough data'} />
             <DnaStat label="Top brand" value={styleDna.topBrands[0] || 'Not enough data'} />
+            <DnaStat label="Average price" value={styleDna.averagePriceCents > 0 ? formatPrice(styleDna.averagePriceCents) : 'Not enough data'} />
             <DnaStat label="Budget tendency" value={styleDna.budgetTier || profile.stylePrefs.budget || 'Not enough data'} accent />
           </div>
 
           <div className="mt-4 rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
-            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Progress checklist</div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Progress checklist</div>
+              <div className="text-[10px] font-bold uppercase tracking-[.14em] text-muted-2">{completedProgress}/{progressChecklist.length}</div>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.07]">
+              <div className="h-full rounded-full bg-accent shadow-pink-glow" style={{ width: `${Math.max(6, progressPercent)}%` }} />
+            </div>
             <div className="mt-3 space-y-2">
               {progressChecklist.map((item) => (
                 <div key={item.label} className="flex items-start gap-3 rounded-[16px] border border-white/8 bg-white/[0.035] p-3">
@@ -380,6 +403,17 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-[22px] border border-accent/25 bg-accent/10 p-4">
+            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Improve recommendations</div>
+            <div className="mt-3 grid gap-2">
+              <RecommendationLink href="/saved" label="Save 3 fits" complete={savedFits.length >= 3} />
+              <RecommendationLink href="/wardrobe" label="Add 5 closet items" complete={wardrobeItems.length >= 5} />
+              <RecommendationLink href="/wardrobe" label="Add shoes" complete={wardrobeItems.some((entry) => entry.product.category === 'shoes')} />
+              <RecommendationLink href="/stylist" label="Try Stylist" complete={currentBuildCount > 0 || savedFits.length > 0} />
+              <RecommendationLink href="/canvas" label="Create Canvas card" complete={currentBuildCount > 0 || savedFits.length > 0} />
             </div>
           </div>
 
@@ -550,5 +584,29 @@ function DnaStat({
       <div className={`text-[8px] font-bold uppercase tracking-[.16em] ${accent ? 'text-accent' : 'text-muted'}`}>{label}</div>
       <div className={`mt-1 line-clamp-2 text-[12px] font-semibold ${accent ? 'text-white' : 'text-ink'}`}>{value}</div>
     </div>
+  );
+}
+
+function RecommendationLink({
+  href,
+  label,
+  complete,
+}: {
+  href: string;
+  label: string;
+  complete: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between gap-3 rounded-[16px] border border-white/8 bg-black/18 px-3 py-2.5 transition active:scale-[0.98] hover:border-accent/45"
+    >
+      <span className="text-[12px] font-semibold text-ink">{label}</span>
+      <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-[.14em] ${
+        complete ? 'bg-accent text-white shadow-pink-glow' : 'border border-white/10 bg-white/[0.04] text-muted'
+      }`}>
+        {complete ? 'Done' : 'Open'}
+      </span>
+    </Link>
   );
 }
