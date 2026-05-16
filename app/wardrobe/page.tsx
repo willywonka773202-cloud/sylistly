@@ -314,7 +314,27 @@ function ClothesTab({
         </div>
       </section>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+      <section className="rounded-[20px] border border-accent/25 bg-accent/10 p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Closet coverage</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-white/84">
+              {categoriesCovered}/{CATEGORY_ORDER.length} categories covered from real closet items.
+            </p>
+          </div>
+          <div className="font-serif text-[24px] font-semibold text-white">
+            {Math.round((categoriesCovered / CATEGORY_ORDER.length) * 100)}%
+          </div>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.08]">
+          <div
+            className="h-full rounded-full bg-accent shadow-pink-glow"
+            style={{ width: `${Math.max(8, Math.round((categoriesCovered / CATEGORY_ORDER.length) * 100))}%` }}
+          />
+        </div>
+      </section>
+
+      <div className="flex flex-wrap gap-1.5 pb-1">
         {CATEGORY_FILTERS.map((option) => (
           <button
             key={option.label}
@@ -364,7 +384,7 @@ function ClothesTab({
           {items.map((item) => (
             <article
               key={item.id}
-              className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.04] shadow-[0_12px_28px_rgba(0,0,0,.26)]"
+              className="sy-lift sy-press group relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.04] shadow-[0_12px_28px_rgba(0,0,0,.26)] hover:border-accent/45"
             >
               <button
                 type="button"
@@ -448,9 +468,46 @@ function InsightsTab({
   onShop: (product: Product) => void;
 }) {
   const maxCategoryCount = Math.max(1, ...categoryDistribution.map((entry) => entry.closet + entry.wishlist));
+  const coveredCount = categoryDistribution.filter((entry) => entry.closet > 0).length;
+  const coveragePercent = Math.round((coveredCount / CATEGORY_ORDER.length) * 100);
 
   return (
     <div className="flex flex-col gap-4">
+      <section className="sy-card-strong rounded-[26px] p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Closet manager</div>
+            <div className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">
+              {coveragePercent}% category coverage
+            </div>
+            <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+              Insights are computed from pieces you added to closet and wishlist. Missing essentials stay visible until you fill them.
+            </p>
+          </div>
+          <span className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent/18 text-accent">
+            <BarChart3 size={19} />
+          </span>
+        </div>
+        <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/[0.07]">
+          <div className="h-full rounded-full bg-accent shadow-pink-glow" style={{ width: `${Math.max(6, coveragePercent)}%` }} />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {CATEGORY_ORDER.map((category) => {
+            const covered = categoryDistribution.some((entry) => entry.category === category && entry.closet > 0);
+            return (
+              <span
+                key={`coverage-${category}`}
+                className={`rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] ${
+                  covered ? 'bg-accent text-white shadow-pink-glow' : 'border border-white/10 bg-white/[0.04] text-muted'
+                }`}
+              >
+                {category}
+              </span>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="grid grid-cols-2 gap-2">
         <InsightStat label="Closet pieces" value={closetCount.toString()} icon={Layers} />
         <InsightStat label="Wishlist" value={wishlistCount.toString()} icon={Heart} />
@@ -508,6 +565,15 @@ function InsightsTab({
               ? `Top missing closet categories: ${missingCategories.slice(0, 4).join(', ')}.`
               : 'Your required top, bottom, shoes, and outerwear categories are covered.'}
           </p>
+          {missingCategories.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {missingCategories.slice(0, 5).map((category) => (
+                <span key={`missing-${category}`} className="rounded-full bg-black/20 px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/82">
+                  {category}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -620,26 +686,39 @@ function OutfitsTab({ fitsCount }: { fitsCount: number }) {
 }
 
 function CollectionsTab({ wishlistCount, closetCount }: { wishlistCount: number; closetCount: number }) {
-  const cells: Array<{ label: string; count: number; description: string; href?: string }> = [
-    { label: 'Wishlist', count: wishlistCount, description: 'Pieces saved to buy later', href: '/wardrobe' },
+  const cells: Array<{ label: string; count: number; description: string; future?: boolean }> = [
+    { label: 'Wishlist', count: wishlistCount, description: 'Pieces saved to buy later' },
     { label: 'Closet', count: closetCount, description: 'Pieces you already own' },
     { label: 'Packing', count: 0, description: 'Coming next sprint — local trip checklists' },
     { label: 'Custom', count: 0, description: 'Coming next sprint — user-named collections' },
   ];
   return (
     <div className="grid grid-cols-2 gap-2">
-      {cells.map((cell) => (
+      {cells.map((cell) => {
+        const isFuture = cell.future || cell.label === 'Packing' || cell.label === 'Custom';
+        const description =
+          cell.label === 'Packing'
+            ? 'Future: local trip checklists from real closet items'
+            : cell.label === 'Custom'
+            ? 'Future: user-named collections from saved items'
+            : cell.description;
+        return (
         <div
           key={cell.label}
-          className="rounded-[20px] border border-white/10 bg-white/[0.04] p-3 shadow-[0_10px_24px_rgba(0,0,0,.18)]"
+          className={`rounded-[22px] border p-3 shadow-[0_10px_24px_rgba(0,0,0,.18)] ${
+            isFuture ? 'border-white/8 bg-white/[0.025] opacity-75' : 'border-white/10 bg-white/[0.04]'
+          }`}
         >
           <div className="flex items-center justify-between gap-2">
             <div className="text-[9px] font-bold uppercase tracking-[.18em] text-accent">{cell.label}</div>
-            <div className="text-[11px] font-bold text-white/80">{cell.count}</div>
+            <div className={`text-[11px] font-bold ${isFuture ? 'text-muted' : 'text-white/80'}`}>
+              {isFuture ? 'Soon' : cell.count}
+            </div>
           </div>
-          <div className="mt-2 text-[11px] leading-relaxed text-muted-2">{cell.description}</div>
+          <div className="mt-2 text-[11px] leading-relaxed text-muted-2">{description}</div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
