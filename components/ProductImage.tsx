@@ -122,6 +122,26 @@ export function getCleanProductImageUrl(product: Product, cutout = false): strin
     : proxiedImageUrl(product.imageUrl);
 }
 
+/**
+ * Prefer a true transparent-background asset when one is present in the
+ * catalog record. Modes that lean cutout/moodboard/hero get the most
+ * benefit. Default/thumbnail/closet can also use it — there's no downside
+ * for the user when it exists.
+ *
+ * If `imageTransparentUrl` is missing, returns null and callers fall back
+ * to the proxied original `imageUrl`. We do NOT claim background removal
+ * has happened just because we asked — only when the field actually
+ * carries a URL.
+ */
+function pickTransparentUrl(product: Product): string | null {
+  const candidate = (product as Product & { imageTransparentUrl?: unknown }).imageTransparentUrl;
+  if (typeof candidate !== 'string') return null;
+  const trimmed = candidate.trim();
+  if (!trimmed) return null;
+  if (trimmed.toLowerCase().startsWith('data:')) return null;
+  return trimmed;
+}
+
 export function ProductImage({
   product,
   className,
@@ -144,11 +164,23 @@ export function ProductImage({
 }) {
   const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
   const [cutoutTried, setCutoutTried] = useState(false);
-  const src = getCleanProductImageUrl(product, cutoutTried);
+  const [transparentFailed, setTransparentFailed] = useState(false);
+
+  // Resolve which URL to actually fetch this render. We honestly prefer
+  // a transparent asset when one exists in the catalog record — and we
+  // surface that via a `data-image-kind` attribute on the <img>. If the
+  // transparent URL fails to load, we transparently fall back to the
+  // original (one-shot, tracked via state) so a broken cutout never
+  // breaks the entire tile.
+  const transparentUrl = !transparentFailed ? pickTransparentUrl(product) : null;
+  const originalSrc = getCleanProductImageUrl(product, cutoutTried);
+  const src = transparentUrl ?? originalSrc;
+  const imageKind: 'transparent' | 'original' = transparentUrl ? 'transparent' : 'original';
 
   useEffect(() => {
     setImageOk(hasUsableProductImage(product));
     setCutoutTried(false);
+    setTransparentFailed(false);
   }, [product.id, product.imageUrl]);
 
   const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
@@ -172,6 +204,10 @@ export function ProductImage({
         alt={`${product.brand} ${product.name}`}
         loading={loading}
         referrerPolicy="no-referrer"
+        // `data-image-kind` is observable from devtools and route-smoke
+        // checks — it proves whether a real transparent asset was
+        // rendered, without making any user-facing cutout claim.
+        data-image-kind={imageKind}
         className={resolvedImageClass}
         onLoad={(event) => {
           const image = event.currentTarget;
@@ -182,6 +218,13 @@ export function ProductImage({
           onAvailable?.(product);
         }}
         onError={() => {
+          // First fallback: if we tried the transparent asset and it
+          // failed, switch to the original.  Tracked via state so we
+          // don't loop.
+          if (imageKind === 'transparent' && !transparentFailed) {
+            setTransparentFailed(true);
+            return;
+          }
           if (cutoutTried) {
             setCutoutTried(false);
             return;

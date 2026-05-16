@@ -39,7 +39,17 @@ export type ProductValidationIssueCode =
   | 'FAKE_BRAND_TERM'
   | 'VIBES_WRONG_TYPE'
   | 'GENDER_WRONG_TYPE'
-  | 'GENDER_INVALID_VALUE';
+  | 'GENDER_INVALID_VALUE'
+  // ── Transparent-image pipeline fields (v2 additions) ────────────
+  // These are ADVISORY — products without a transparent image still
+  // pass validation. The fields exist so the schema can describe the
+  // future cutout database without blocking the live runtime.
+  | 'TRANSPARENT_URL_NOT_STRING'
+  | 'TRANSPARENT_URL_DATA_URL'
+  | 'TRANSPARENT_URL_UNSAFE_HOST'
+  | 'TRANSPARENT_URL_NOT_IMAGE'
+  | 'IMAGE_SOURCE_INVALID'
+  | 'IMAGE_STATUS_INVALID';
 
 export interface ProductValidationIssue {
   code: ProductValidationIssueCode;
@@ -244,6 +254,89 @@ export function validateProduct(input: unknown): ProductValidationResult {
     pushIssue(issues, 'MISSING_PRODUCT_URL', 'productUrl|retailerUrl', 'one of productUrl or retailerUrl is required', 'warning');
   }
 
+  // imageTransparentUrl — optional cutout asset (validated when present).
+  // Advisory: a missing transparent URL does NOT make the product
+  // invalid; the audit script surfaces missing-transparent counts.
+  if (input.imageTransparentUrl !== undefined && input.imageTransparentUrl !== null) {
+    if (typeof input.imageTransparentUrl !== 'string') {
+      pushIssue(
+        issues,
+        'TRANSPARENT_URL_NOT_STRING',
+        'imageTransparentUrl',
+        `imageTransparentUrl must be string when present, got ${typeof input.imageTransparentUrl}`,
+        'warning',
+      );
+    } else {
+      const trimmed = input.imageTransparentUrl.trim();
+      if (trimmed) {
+        const normalized = trimmed.toLowerCase();
+        if (normalized.startsWith('data:')) {
+          pushIssue(
+            issues,
+            'TRANSPARENT_URL_DATA_URL',
+            'imageTransparentUrl',
+            'imageTransparentUrl cannot be a data: URL — must point at a real transparent PNG/WebP asset',
+            'warning',
+          );
+        } else if (
+          !normalized.startsWith('http://') &&
+          !normalized.startsWith('https://') &&
+          !normalized.startsWith('/')
+        ) {
+          pushIssue(
+            issues,
+            'TRANSPARENT_URL_UNSAFE_HOST',
+            'imageTransparentUrl',
+            `imageTransparentUrl scheme not recognised: ${trimmed.slice(0, 80)}`,
+            'warning',
+          );
+        } else if (
+          !/\.(png|webp|avif)(\?|$)/.test(normalized) &&
+          !normalized.includes('format=png') &&
+          !normalized.includes('format=webp')
+        ) {
+          // Soft check — many CDNs serve PNG/WebP from URLs without an
+          // extension. Treat as a soft warning, not a blocker.
+          pushIssue(
+            issues,
+            'TRANSPARENT_URL_NOT_IMAGE',
+            'imageTransparentUrl',
+            'imageTransparentUrl does not look like a PNG/WebP/AVIF asset — verify the cutout pipeline output',
+            'warning',
+          );
+        }
+      }
+    }
+  }
+
+  // imageSource — optional provenance flag (validated when present).
+  if (input.imageSource !== undefined && input.imageSource !== null) {
+    const validSources = ['merchant', 'searchapi', 'manual', 'generated', 'transparent-pipeline'];
+    if (typeof input.imageSource !== 'string' || !validSources.includes(input.imageSource)) {
+      pushIssue(
+        issues,
+        'IMAGE_SOURCE_INVALID',
+        'imageSource',
+        `imageSource must be one of ${validSources.join(', ')}`,
+        'warning',
+      );
+    }
+  }
+
+  // imageStatus — optional pipeline status (validated when present).
+  if (input.imageStatus !== undefined && input.imageStatus !== null) {
+    const validStatuses = ['original', 'needs-cutout', 'cutout-ready', 'cutout-failed', 'review-only', 'quarantined'];
+    if (typeof input.imageStatus !== 'string' || !validStatuses.includes(input.imageStatus)) {
+      pushIssue(
+        issues,
+        'IMAGE_STATUS_INVALID',
+        'imageStatus',
+        `imageStatus must be one of ${validStatuses.join(', ')}`,
+        'warning',
+      );
+    }
+  }
+
   // title/brand fake-term scan
   const text = lowerJoined(input.name, input.brand);
   if (text) {
@@ -300,6 +393,9 @@ export function validateProducts(inputs: unknown[]): ProductBatchValidationSumma
     'IMAGE_URL_PLACEHOLDER', 'IMAGE_URL_UNSAFE_HOST', 'MISSING_PRODUCT_URL',
     'FAKE_TITLE_TERM', 'FAKE_BRAND_TERM', 'VIBES_WRONG_TYPE',
     'GENDER_WRONG_TYPE', 'GENDER_INVALID_VALUE',
+    'TRANSPARENT_URL_NOT_STRING', 'TRANSPARENT_URL_DATA_URL',
+    'TRANSPARENT_URL_UNSAFE_HOST', 'TRANSPARENT_URL_NOT_IMAGE',
+    'IMAGE_SOURCE_INVALID', 'IMAGE_STATUS_INVALID',
   ];
   for (const code of allCodes) issueCountsByCode[code] = 0;
 
