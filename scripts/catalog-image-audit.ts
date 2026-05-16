@@ -14,6 +14,7 @@
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 import { applyCatalogCutoutOverridesToProducts } from '../lib/catalog-cutout-overrides';
 import { validateProduct } from '../lib/catalog-schemas/product.v2';
 import type { Category, Product } from '../lib/types';
@@ -56,6 +57,22 @@ interface ImageAuditReport {
   }>;
   byCategoryNeedingCutout: Record<string, number>;
   topCutoutCandidates: ImageAuditRow[];
+  runtimeTransparentProducts: Array<{
+    id: string;
+    title: string;
+    category: Category;
+    imageUrl: string;
+    imageTransparentUrl: string;
+    publicFileExists: boolean;
+    productImageShouldPrefer: boolean;
+  }>;
+  routeVisibility: {
+    discover: Array<{ id: string; title: string; category: Category; section: string }>;
+    feedFirst50: Array<{ id: string; title: string; category: Category }>;
+    wardrobe: string;
+    saved: string;
+    canvas: string;
+  };
   generatedAssets: {
     cutoutDir: string;
     totalFiles: number;
@@ -103,6 +120,49 @@ const RETAIL_BACKGROUND_HINTS = [
 function looksRetailWhite(url: string): boolean {
   const normalized = url.toLowerCase();
   return RETAIL_BACKGROUND_HINTS.some((hint) => normalized.includes(hint));
+}
+
+function runtimeTransparentRows(root: string): ImageAuditReport['runtimeTransparentProducts'] {
+  return (ALL_CATALOG_PRODUCTS as Product[])
+    .filter((product) => typeof product.imageTransparentUrl === 'string' && product.imageTransparentUrl.trim())
+    .map((product) => {
+      const transparentUrl = product.imageTransparentUrl || '';
+      const filePath = transparentUrl.startsWith('/assets/')
+        ? join(root, 'public', transparentUrl.replace(/^\//, ''))
+        : '';
+      return {
+        id: product.id,
+        title: `${product.brand} ${product.name}`,
+        category: product.category,
+        imageUrl: product.imageUrl,
+        imageTransparentUrl: transparentUrl,
+        publicFileExists: Boolean(filePath && existsSync(filePath)),
+        productImageShouldPrefer: true,
+      };
+    })
+    .sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
+}
+
+function routeVisibility(rows: ImageAuditReport['runtimeTransparentProducts']): ImageAuditReport['routeVisibility'] {
+  const topByTitle = rows.slice(0, 48);
+  const discover = topByTitle.slice(0, 24).map((row) => ({
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    section: 'Discover: Transparent-ready pieces rail',
+  }));
+  const feedFirst50 = rows.slice(0, 20).map((row) => ({
+    id: row.id,
+    title: row.title,
+    category: row.category,
+  }));
+  return {
+    discover,
+    feedFirst50,
+    wardrobe: 'Visible after the user adds a transparent-ready product to closet or wishlist.',
+    saved: 'Visible only inside saved fits that include one of the transparent-ready product ids.',
+    canvas: 'Visible only when the current or loaded fit contains one of the transparent-ready product ids.',
+  };
 }
 
 function buildRow(product: unknown, source: SourceLabel): ImageAuditRow | null {
@@ -224,6 +284,7 @@ function audit(): ImageAuditReport {
   );
 
   const root = process.cwd();
+  const runtimeTransparentProducts = runtimeTransparentRows(root);
   const cutoutDir = join(root, 'public', 'assets', 'cutouts');
   const files = existsSync(cutoutDir)
     ? readdirSync(cutoutDir).filter((file) => /\.(png|webp|avif)$/i.test(file)).sort()
@@ -250,6 +311,8 @@ function audit(): ImageAuditReport {
     bySource,
     byCategoryNeedingCutout,
     topCutoutCandidates,
+    runtimeTransparentProducts,
+    routeVisibility: routeVisibility(runtimeTransparentProducts),
     generatedAssets: {
       cutoutDir: 'public/assets/cutouts',
       totalFiles: files.length,
@@ -292,6 +355,27 @@ function printHuman(report: ImageAuditReport, flags: CliFlags): void {
   console.log(`  missing catalog registration  : ${report.generatedAssets.missingCatalogRegistration.length}`);
   console.log(`  registered missing files      : ${report.generatedAssets.registeredLocalUrlsMissingFiles.length}`);
   console.log('');
+  const transparentSample = report.runtimeTransparentProducts.slice(0, Math.min(flags.limit, 20));
+  if (transparentSample.length) {
+    console.log(`First ${transparentSample.length} runtime products with transparent assets`);
+    console.log('-------------------------------------------------------');
+    for (const row of transparentSample) {
+      console.log(`  ${row.id} | ${row.category} | ${row.title}`);
+      console.log(`    original    : ${row.imageUrl.slice(0, 120)}`);
+      console.log(`    transparent : ${row.imageTransparentUrl} | file=${row.publicFileExists} | ProductImage prefers=${row.productImageShouldPrefer}`);
+    }
+    console.log('');
+  }
+  if (report.routeVisibility.discover.length) {
+    console.log('Route visibility');
+    console.log('----------------');
+    console.log(`  /discover      : ${report.routeVisibility.discover.length} products in Transparent-ready pieces rail`);
+    console.log(`  /feed first 50 : ${report.routeVisibility.feedFirst50.length} transparent products may appear depending on generated feed composition`);
+    console.log(`  /wardrobe      : ${report.routeVisibility.wardrobe}`);
+    console.log(`  /saved         : ${report.routeVisibility.saved}`);
+    console.log(`  /canvas        : ${report.routeVisibility.canvas}`);
+    console.log('');
+  }
   if (Object.keys(report.byCategoryNeedingCutout).length) {
     console.log('Cutout candidates by category');
     console.log('-----------------------------');

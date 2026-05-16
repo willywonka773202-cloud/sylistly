@@ -1,6 +1,8 @@
 import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { validateProduct } from '@/lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import type { ReactNode } from 'react';
 
 const imageBlockingCodes = new Set([
@@ -28,6 +30,11 @@ function topEntries(record: Record<string, number>, limit: number) {
   return Object.entries(record).sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+function transparentFileExists(product: Product): boolean {
+  if (!product.imageTransparentUrl?.startsWith('/assets/')) return false;
+  return existsSync(join(process.cwd(), 'public', product.imageTransparentUrl.replace(/^\//, '')));
+}
+
 export default function CatalogLabPage() {
   const products = ALL_CATALOG_PRODUCTS as Product[];
   const safeProducts = products.filter((product) => !isUnsafeImage(product));
@@ -45,6 +52,7 @@ export default function CatalogLabPage() {
     .sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category))
     .slice(0, 20);
   const readyProducts = transparentProducts.slice(0, 20);
+  const transparentPreviewProducts = transparentProducts.slice(0, 48);
 
   return (
     <main className="min-h-screen bg-[#f7efe6] px-4 pb-24 pt-6 text-[#2c2118]">
@@ -74,6 +82,26 @@ export default function CatalogLabPage() {
           </div>
           <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#eadfd3]">
             <div className="h-full rounded-full bg-[#2f5d50]" style={{ width: `${progress}%` }} />
+          </div>
+        </section>
+
+        <section className="rounded-[28px] border border-[#b7d8c7] bg-[#f8fbf7] p-4 shadow-[0_20px_70px_rgba(31,72,54,.1)]">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[.2em] text-[#2f6f55]">Transparent Asset Preview</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight">Original image beside registered transparent PNG</h2>
+              <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-[#597060]">
+                This section uses only runtime products with imageTransparentUrl. The right image is shown on a checkerboard so the alpha channel is visually obvious.
+              </p>
+            </div>
+            <div className="rounded-full bg-[#2f6f55] px-3 py-1.5 text-xs font-black uppercase tracking-[.14em] text-white">
+              {transparentPreviewProducts.length} shown
+            </div>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {transparentPreviewProducts.map((product) => (
+              <TransparentPreviewCard key={product.id} product={product} />
+            ))}
           </div>
         </section>
 
@@ -110,6 +138,62 @@ export default function CatalogLabPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function checkerStyle() {
+  return {
+    backgroundColor: '#f8faf7',
+    backgroundImage:
+      'linear-gradient(45deg, rgba(47,111,85,.18) 25%, transparent 25%), linear-gradient(-45deg, rgba(47,111,85,.18) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(47,111,85,.18) 75%), linear-gradient(-45deg, transparent 75%, rgba(47,111,85,.18) 75%)',
+    backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0',
+    backgroundSize: '20px 20px',
+  };
+}
+
+function TransparentPreviewCard({ product }: { product: Product }) {
+  const exists = transparentFileExists(product);
+  return (
+    <article className="overflow-hidden rounded-[22px] border border-[#d8eadf] bg-white shadow-[0_18px_48px_rgba(31,72,54,.1)]">
+      <div className="grid grid-cols-2 gap-0">
+        <div className="border-r border-[#e4eee7] bg-[#fbf5ec] p-3">
+          <div className="mb-2 text-[10px] font-black uppercase tracking-[.16em] text-[#8b6b55]">Original</div>
+          <div className="grid aspect-square place-items-center rounded-2xl bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={product.imageUrl} alt="" className="h-full w-full object-contain p-3" data-image-kind="original" />
+          </div>
+        </div>
+        <div className="p-3" style={checkerStyle()}>
+          <div className="mb-2 text-[10px] font-black uppercase tracking-[.16em] text-[#245f49]">Transparent</div>
+          <div className="grid aspect-square place-items-center rounded-2xl bg-white/35">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={product.imageTransparentUrl}
+              alt=""
+              className="h-full w-full object-contain p-3 drop-shadow-[0_24px_22px_rgba(0,0,0,.4)]"
+              data-image-kind="transparent"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2 p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-[#2f6f55] px-2 py-1 text-[10px] font-black uppercase tracking-[.13em] text-white">transparent</span>
+          <span className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[.13em] ${exists ? 'bg-[#e7f5ed] text-[#245f49]' : 'bg-[#ffe3df] text-[#8c2d22]'}`}>
+            file exists: {exists ? 'yes' : 'no'}
+          </span>
+          <span className="rounded-full bg-[#f3eee7] px-2 py-1 text-[10px] font-black uppercase tracking-[.13em] text-[#715846]">{product.category}</span>
+        </div>
+        <div>
+          <div className="truncate text-sm font-black">{product.brand}</div>
+          <div className="line-clamp-2 text-sm font-semibold leading-5 text-[#5f4c3d]">{product.name}</div>
+        </div>
+        <div className="rounded-2xl bg-[#f6f0e9] p-2 text-[10px] font-semibold leading-4 text-[#6b5748]">
+          <div className="break-all">id: {product.id}</div>
+          <div className="mt-1 break-all">src: {product.imageTransparentUrl}</div>
+        </div>
+      </div>
+    </article>
   );
 }
 

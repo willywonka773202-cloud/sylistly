@@ -331,6 +331,19 @@ export default function DiscoverPage() {
     [posts],
   );
 
+  const transparentReadyProducts = useMemo(() => {
+    const products = ALL_CATALOG_PRODUCTS
+      .filter((product) => Boolean(product.imageTransparentUrl))
+      .filter(isRenderableProduct)
+      .sort((left, right) => {
+        const leftCategory = CATEGORY_ORDER.indexOf(left.category);
+        const rightCategory = CATEGORY_ORDER.indexOf(right.category);
+        if (leftCategory !== rightCategory) return leftCategory - rightCategory;
+        return `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`);
+      });
+    return uniqueProducts(products, 24, wardrobeProductIds);
+  }, [wardrobeProductIds]);
+
   const formulaRails = useMemo(() => {
     return FORMULA_RAILS.map((rail) => {
       const postProducts = posts
@@ -467,6 +480,24 @@ export default function DiscoverPage() {
             </div>
           ) : null}
         </section>
+
+        <ProductRail
+          title="Transparent-ready pieces"
+          subtitle="Registered cutout assets shown first so you can verify the real transparent image pipeline."
+          badge="Cutout assets"
+          products={transparentReadyProducts}
+          wardrobeProductIds={wardrobeProductIds}
+          onWishlist={(product) => {
+            addToWishlist(product, 'catalog');
+            showToast('Added to wishlist');
+          }}
+          onCloset={(product) => {
+            addToCloset(product, 'catalog');
+            showToast('Added to closet');
+          }}
+          onBuild={buildAround}
+          onShop={shop}
+        />
 
         {formulaRails.map((rail) => (
           <ProductRail

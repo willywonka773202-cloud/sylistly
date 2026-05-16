@@ -117,47 +117,47 @@ const MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
 
 const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
   default: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-2xl bg-transparent',
-    image: 'h-full w-full object-contain p-3 drop-shadow-[0_18px_18px_rgba(60,32,18,.2)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-2xl bg-[radial-gradient(circle_at_50%_68%,rgba(255,255,255,.18)_0%,rgba(255,255,255,.08)_34%,transparent_68%)]',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_24px_22px_rgba(0,0,0,.42)]',
   },
   cutout: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[24px] bg-transparent',
-    image: 'h-full w-full object-contain p-3 drop-shadow-[0_22px_20px_rgba(60,32,18,.24)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[24px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.2)_0%,rgba(255,255,255,.08)_34%,transparent_70%)]',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_30px_24px_rgba(0,0,0,.46)]',
     paddingByCategory: {
-      shoes: 'p-2.5 drop-shadow-[0_22px_20px_rgba(60,32,18,.26)]',
-      jewelry: 'p-4 drop-shadow-[0_14px_16px_rgba(60,32,18,.18)]',
-      eyewear: 'p-3.5 drop-shadow-[0_14px_16px_rgba(60,32,18,.18)]',
-      bag: 'p-3 drop-shadow-[0_20px_20px_rgba(60,32,18,.24)]',
+      shoes: 'p-2.5 drop-shadow-[0_28px_22px_rgba(0,0,0,.48)]',
+      jewelry: 'p-4 drop-shadow-[0_18px_18px_rgba(0,0,0,.36)]',
+      eyewear: 'p-3.5 drop-shadow-[0_18px_18px_rgba(0,0,0,.36)]',
+      bag: 'p-3 drop-shadow-[0_26px_22px_rgba(0,0,0,.44)]',
     },
   },
   closet: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[20px] bg-transparent',
-    image: 'h-full w-full object-contain p-3.5 drop-shadow-[0_18px_18px_rgba(60,32,18,.18)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[20px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.22)_0%,rgba(255,255,255,.08)_36%,transparent_72%)]',
+    image: 'h-full w-full object-contain p-3.5 drop-shadow-[0_26px_22px_rgba(0,0,0,.42)]',
     paddingByCategory: {
-      shoes: 'p-2.5 drop-shadow-[0_18px_18px_rgba(60,32,18,.2)]',
-      jewelry: 'p-4 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)]',
-      eyewear: 'p-3.5 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)]',
+      shoes: 'p-2.5 drop-shadow-[0_24px_20px_rgba(0,0,0,.42)]',
+      jewelry: 'p-4 drop-shadow-[0_16px_16px_rgba(0,0,0,.32)]',
+      eyewear: 'p-3.5 drop-shadow-[0_16px_16px_rgba(0,0,0,.32)]',
     },
   },
   moodboard: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[22px] bg-transparent',
-    image: 'h-full w-full object-contain p-3 drop-shadow-[0_26px_24px_rgba(60,32,18,.26)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[22px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.2)_0%,rgba(255,255,255,.08)_35%,transparent_72%)]',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_32px_26px_rgba(0,0,0,.48)]',
     paddingByCategory: {
-      shoes: 'p-2 drop-shadow-[0_28px_24px_rgba(60,32,18,.3)]',
-      bag: 'p-2.5 drop-shadow-[0_24px_22px_rgba(60,32,18,.26)]',
+      shoes: 'p-2 drop-shadow-[0_32px_26px_rgba(0,0,0,.5)]',
+      bag: 'p-2.5 drop-shadow-[0_30px_24px_rgba(0,0,0,.46)]',
     },
   },
   hero: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[28px] bg-transparent',
-    image: 'h-full w-full object-contain p-5 drop-shadow-[0_34px_32px_rgba(60,32,18,.3)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[28px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.22)_0%,rgba(255,255,255,.08)_34%,transparent_72%)]',
+    image: 'h-full w-full object-contain p-5 drop-shadow-[0_40px_34px_rgba(0,0,0,.5)]',
     paddingByCategory: {
-      shoes: 'p-4 drop-shadow-[0_36px_34px_rgba(60,32,18,.32)]',
-      bag: 'p-5 drop-shadow-[0_32px_30px_rgba(60,32,18,.28)]',
+      shoes: 'p-4 drop-shadow-[0_42px_34px_rgba(0,0,0,.52)]',
+      bag: 'p-5 drop-shadow-[0_38px_32px_rgba(0,0,0,.48)]',
     },
   },
   thumbnail: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[14px] bg-transparent',
-    image: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_10px_rgba(60,32,18,.16)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[14px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.18)_0%,rgba(255,255,255,.06)_36%,transparent_72%)]',
+    image: 'h-full w-full object-contain p-1.5 drop-shadow-[0_12px_12px_rgba(0,0,0,.36)]',
   },
 };
 
