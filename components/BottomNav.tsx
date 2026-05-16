@@ -26,6 +26,7 @@ export function BottomNav() {
   const saveFit = useSavedFits((state) => state.saveFit);
   const savedCount = useSavedFits((state) => state.fits.length);
   const currentFitCount = Object.values(currentFitItems).filter(Boolean).length;
+  const hasCanvasSource = currentFitCount > 0 || savedCount > 0;
 
   function dispatch(action: string) {
     setCreateOpen(false);
@@ -37,7 +38,7 @@ export function BottomNav() {
       router.push('/saved');
     } else if (action === 'feed') router.push('/feed');
     else if (action === 'stylist') router.push('/stylist');
-    else if (action === 'canvas') router.push('/canvas');
+    else if (action === 'canvas' && hasCanvasSource) router.push('/canvas');
   }
 
   return (
@@ -68,7 +69,7 @@ export function BottomNav() {
             type="button"
             onClick={() => setCreateOpen(true)}
             aria-label="Create"
-            className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_36px_rgba(246,48,107,.55)] transition active:scale-90 hover:bg-right motion-safe:transition-all motion-safe:duration-200"
+            className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] ring-1 ring-white/20 transition active:scale-90 hover:bg-right motion-safe:transition-all motion-safe:duration-200"
           >
             <Plus size={26} strokeWidth={2.4} />
           </button>
@@ -102,13 +103,16 @@ export function BottomNav() {
             aria-label="Close create menu"
             onClick={() => setCreateOpen(false)}
           />
-          <section className="sy-enter relative z-10 w-full rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
+          <section className="sy-sheet-enter relative z-10 w-full rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
             <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
 
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">Create</div>
-                <div className="mt-0.5 font-serif text-[22px] font-semibold text-ink">What do you want to do?</div>
+                <div className="mt-0.5 font-serif text-[22px] font-semibold text-ink">Start a real style flow</div>
+                <p className="mt-1 max-w-[28ch] text-[11px] leading-relaxed text-muted-2">
+                  Every action routes to Builder, Syli, Wardrobe, Canvas, or Feed with local data.
+                </p>
               </div>
               <button
                 type="button"
@@ -122,21 +126,28 @@ export function BottomNav() {
 
             <div className="mt-4 grid grid-cols-2 gap-2">
               <ActionCard
-                eyebrow="Make"
-                title="Make an outfit"
-                body="Open Builder and generate."
+                eyebrow="Start with AI"
+                title="Make outfit"
+                body="Open Builder and generate a catalog-backed fit."
                 icon={Sparkles}
                 onClick={() => dispatch('make-outfit')}
               />
               <ActionCard
-                eyebrow="Closet"
+                eyebrow="Local beta"
+                title="Ask Syli"
+                body="Get rule-based styling help from your real state."
+                icon={Wand2}
+                onClick={() => dispatch('stylist')}
+              />
+              <ActionCard
+                eyebrow="Use your closet"
                 title="Add wardrobe item"
-                body="Open closet to add pieces."
+                body="Manage closet, wishlist, and gap suggestions."
                 icon={Layers}
                 onClick={() => dispatch('wardrobe')}
               />
               <ActionCard
-                eyebrow="Save"
+                eyebrow={currentFitCount > 0 ? 'Ready to save' : 'Needs a fit'}
                 title="Save current fit"
                 body={
                   currentFitCount > 0
@@ -148,25 +159,23 @@ export function BottomNav() {
                 disabled={currentFitCount === 0}
               />
               <ActionCard
-                eyebrow="Browse"
-                title="Open feed"
-                body="Catalog-backed fits to remix."
-                icon={Flame}
-                onClick={() => dispatch('feed')}
-              />
-              <ActionCard
-                eyebrow="Local beta"
-                title="AI Stylist chat"
-                body="Ask Syli about your real fits."
-                icon={Wand2}
-                onClick={() => dispatch('stylist')}
-              />
-              <ActionCard
-                eyebrow="Local shell"
-                title="Canvas / Try On"
-                body="Make a collage or share card."
+                eyebrow={hasCanvasSource ? 'Share-ready' : 'Needs outfit'}
+                title="Canvas / Share"
+                body={
+                  hasCanvasSource
+                    ? 'Turn this fit into a moodboard or share card.'
+                    : 'Build or save a fit first.'
+                }
                 icon={Sparkles}
                 onClick={() => dispatch('canvas')}
+                disabled={!hasCanvasSource}
+              />
+              <ActionCard
+                eyebrow="Browse real looks"
+                title="Browse feed"
+                body="Swipe catalog-backed fits and remix them."
+                icon={Flame}
+                onClick={() => dispatch('feed')}
               />
             </div>
 
