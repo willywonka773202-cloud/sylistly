@@ -13,6 +13,7 @@ const routeFiles = [
   'app/profile/page.tsx',
   'app/discover/page.tsx',
   'app/canvas/page.tsx',
+  'app/catalog-lab/page.tsx',
   'app/stylist/page.tsx',
   'app/checkout/page.tsx',
 ];
@@ -59,10 +60,12 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'scripts/catalog-image-audit.ts', text: 'needs-cutout', label: 'Catalog image audit script exists' },
   { file: 'scripts/prepare-cutout-candidates.ts', text: 'Cutout candidate plan', label: 'Cutout candidate prep script exists' },
   { file: 'scripts/generate-cutouts-local.py', text: 'Default mode is dry-run', label: 'Local cutout generator is dry-run by default' },
-  { file: 'scripts/register-cutouts.ts', text: 'does not mutate catalog data yet', label: 'Cutout registration is manual-review first' },
+  { file: 'scripts/register-cutouts.ts', text: 'data/catalog-cutout-overrides.json', label: 'Cutout registration writes reviewed override layer only' },
   { file: 'scripts/catalog-coverage.ts', text: 'Catalog Coverage', label: 'Catalog coverage script exists' },
+  { file: 'scripts/catalog-expansion-plan.ts', text: 'Catalog Expansion Plan', label: 'Catalog expansion plan script exists' },
   { file: 'scripts/searchapi-catalog-expand.ts', text: 'DRY RUN BY DEFAULT', label: 'SearchAPI expand is dry-run by default' },
   { file: 'scripts/searchapi-catalog-expand.ts', text: 'SEARCHAPI_LIVE', label: 'SearchAPI expand requires explicit live env flag' },
+  { file: 'app/catalog-lab/page.tsx', text: 'Catalog Lab · local read-only', label: 'Catalog Lab is read-only and clearly labeled' },
 ];
 
 function fail(message: string): never {
