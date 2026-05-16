@@ -6,6 +6,115 @@ import { proxiedImageUrl } from '@/lib/image-url';
 import { hasUsableProductImage } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
+/**
+ * Display mode system for product photography across the app.
+ *
+ * Every mode controls TWO surfaces: the outer `wrapper` (background +
+ * shadow + radius) and the inner `image` (padding + object-fit).  The
+ * goal is consistent, premium clothing display whether the original
+ * source has a transparent cutout or a hard white retail background.
+ *
+ * We do NOT perform background removal here — that would require
+ * server-side image processing we haven't shipped. Instead we rely on
+ * (a) object-contain padding so products never get cropped, (b) soft
+ * neutral / radial gradients so a hard white background blends into
+ * the page instead of looking like a harsh box, and (c) consistent
+ * shadows that make pieces feel like floating cutouts even when they
+ * aren't truly transparent.
+ *
+ * Modes:
+ *   default     — generic catalog tile, neutral warm background
+ *   cutout      — floating product, transparent-feel, radial soft shadow under product
+ *   closet      — premium closet grid tile (Wardrobe), clean light gradient, larger padding
+ *   moodboard   — collage/outfit-board card, slight rotation-ready, dramatic soft shadow
+ *   hero        — large feature image (feed/build hero), maximum breathing room
+ *   thumbnail   — compact preview (chat, lists), tight padding, smaller shadow
+ *
+ * Callers can still pass `wrapperClassName` / `className` to override
+ * any mode — the mode is just a strong sensible default.
+ */
+export type ProductImageDisplayMode =
+  | 'default'
+  | 'cutout'
+  | 'closet'
+  | 'moodboard'
+  | 'hero'
+  | 'thumbnail';
+
+interface DisplayModeStyle {
+  wrapper: string;
+  image: string;
+  /** Padding scale by category — accessories want less padding than tops/outer. */
+  paddingByCategory?: Partial<Record<Category, string>>;
+}
+
+const MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
+  default: {
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]',
+    image: 'h-full w-full object-contain p-2.5',
+  },
+  cutout: {
+    // Floating-product look: soft warm radial behind the piece, no hard
+    // edges, drop-shadow under the image so it reads as elevated even on
+    // images that have a baked-in white background.
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-[24px] bg-[radial-gradient(circle_at_50%_42%,#fffdf7_0%,#f5ece1_55%,#e8dccd_100%)] ring-1 ring-[#eadfd5]/55 shadow-[inset_0_1px_0_rgba(255,255,255,.6)]',
+    image:
+      'h-full w-full object-contain p-3.5 drop-shadow-[0_18px_18px_rgba(60,32,18,.18)]',
+    paddingByCategory: {
+      shoes: 'p-3 drop-shadow-[0_18px_18px_rgba(60,32,18,.22)]',
+      jewelry: 'p-5 drop-shadow-[0_12px_14px_rgba(60,32,18,.16)]',
+      eyewear: 'p-4 drop-shadow-[0_14px_16px_rgba(60,32,18,.16)]',
+      hat: 'p-3.5 drop-shadow-[0_16px_18px_rgba(60,32,18,.2)]',
+    },
+  },
+  closet: {
+    // Premium closet tile: clean warm gradient, generous padding so
+    // products feel like they're hanging in a real closet rather than
+    // packed into a thumbnail.
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-[20px] bg-[linear-gradient(180deg,#fffaf2_0%,#f0e7da_100%)] ring-1 ring-[#e8dccd]/70 shadow-[inset_0_1px_0_rgba(255,255,255,.5)]',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)]',
+    paddingByCategory: {
+      shoes: 'p-2.5 drop-shadow-[0_14px_16px_rgba(60,32,18,.18)]',
+      jewelry: 'p-4 drop-shadow-[0_8px_10px_rgba(60,32,18,.12)]',
+      eyewear: 'p-3.5 drop-shadow-[0_10px_12px_rgba(60,32,18,.14)]',
+    },
+  },
+  moodboard: {
+    // Outfit-board collage card: warm cream background, stronger soft
+    // shadow so the piece pops off the moodboard without looking
+    // photo-cropped.
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fffdf6_0%,#f3e9da_100%)] ring-1 ring-[#eadfd5]/55 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]',
+    image:
+      'h-full w-full object-contain p-3 drop-shadow-[0_20px_22px_rgba(60,32,18,.22)]',
+    paddingByCategory: {
+      shoes: 'p-2.5 drop-shadow-[0_22px_22px_rgba(60,32,18,.26)]',
+      bag: 'p-3 drop-shadow-[0_18px_20px_rgba(60,32,18,.22)]',
+    },
+  },
+  hero: {
+    // Feature image — soft warm background, maximum breathing room,
+    // strong but soft shadow so the hero feels editorial.
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-[28px] bg-[radial-gradient(circle_at_30%_25%,#fffdf6_0%,#f6ecdc_45%,#dac9b3_100%)] ring-1 ring-[#eadfd5]/60',
+    image:
+      'h-full w-full object-contain p-5 drop-shadow-[0_28px_28px_rgba(60,32,18,.26)]',
+    paddingByCategory: {
+      shoes: 'p-4 drop-shadow-[0_32px_30px_rgba(60,32,18,.3)]',
+      bag: 'p-5 drop-shadow-[0_28px_28px_rgba(60,32,18,.26)]',
+    },
+  },
+  thumbnail: {
+    // Compact preview — used in chat bubbles, key-piece strips, lists.
+    wrapper:
+      'relative h-full w-full overflow-hidden rounded-[14px] bg-[linear-gradient(180deg,#fff8ee_0%,#efe4d4_100%)] ring-1 ring-[#eadfd5]/50',
+    image: 'h-full w-full object-contain p-1.5',
+  },
+};
+
 export function getCleanProductImageUrl(product: Product, cutout = false): string {
   if (!hasUsableProductImage(product)) return '';
   return cutout
@@ -18,42 +127,52 @@ export function ProductImage({
   className,
   wrapperClassName,
   loading = 'lazy',
+  displayMode = 'default',
   onAvailable,
   onUnavailable,
 }: {
   product: Product;
+  /** Override the inner image className. Takes precedence over displayMode's image style. */
   className?: string;
+  /** Override the outer wrapper className. Takes precedence over displayMode's wrapper style. */
   wrapperClassName?: string;
   loading?: 'lazy' | 'eager';
+  /** Curated styling preset — applied when className/wrapperClassName not overridden. */
+  displayMode?: ProductImageDisplayMode;
   onAvailable?: (product: Product) => void;
   onUnavailable?: (product: Product) => void;
 }) {
   const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
-  const [cutout, setCutout] = useState(false);
-  const src = getCleanProductImageUrl(product, cutout);
+  const [cutoutTried, setCutoutTried] = useState(false);
+  const src = getCleanProductImageUrl(product, cutoutTried);
 
   useEffect(() => {
     setImageOk(hasUsableProductImage(product));
-    setCutout(false);
+    setCutoutTried(false);
   }, [product.id, product.imageUrl]);
+
+  const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
+  const resolvedWrapperClass = wrapperClassName || mode.wrapper;
+  const resolvedImageClass =
+    className || mode.paddingByCategory?.[product.category] || mode.image;
 
   if (!imageOk || !src) {
     return (
-      <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl'}>
+      <div className={resolvedWrapperClass}>
         <CategoryFallback product={product} className={className} />
       </div>
     );
   }
 
   return (
-    <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]'}>
+    <div className={resolvedWrapperClass}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
         loading={loading}
         referrerPolicy="no-referrer"
-        className={className || 'h-full w-full object-contain p-2.5'}
+        className={resolvedImageClass}
         onLoad={(event) => {
           const image = event.currentTarget;
           if (image.naturalWidth < 32 || image.naturalHeight < 32) {
@@ -63,11 +182,12 @@ export function ProductImage({
           onAvailable?.(product);
         }}
         onError={() => {
-          if (cutout) {
-            setCutout(false);
+          if (cutoutTried) {
+            setCutoutTried(false);
             return;
           }
           setImageOk(false);
+          onUnavailable?.(product);
         }}
       />
     </div>
@@ -128,7 +248,7 @@ function CategoryFallback({ product, className }: { product: Product; className?
         </div>
         <div className="text-[10px] font-black uppercase tracking-[.18em]">{fallback.label}</div>
         <div className="line-clamp-2 max-w-[13ch] text-[9px] font-semibold leading-tight opacity-78">
-          {product.brand}
+          Image unavailable
         </div>
       </div>
     </div>

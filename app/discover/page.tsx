@@ -688,12 +688,8 @@ function DiscoverProductCard({
         className="block w-full text-left"
         aria-label={`Build around ${product.name}`}
       >
-        <div className="relative h-[168px] bg-[#fff7ef]">
-          <ProductImage
-            product={product}
-            wrapperClassName="h-full w-full"
-            className="h-full w-full object-contain p-3 drop-shadow-[0_16px_22px_rgba(0,0,0,.24)]"
-          />
+        <div className="relative h-[168px]">
+          <ProductImage product={product} displayMode="closet" />
           <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white backdrop-blur-md">
             {product.category}
           </div>

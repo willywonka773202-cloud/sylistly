@@ -394,11 +394,11 @@ function ClothesTab({
               >
                 <X size={13} />
               </button>
-              <div className="aspect-square overflow-hidden bg-[linear-gradient(180deg,#fff7ef_0%,#f1e6da_100%)]">
+              <div className="aspect-square overflow-hidden">
                 <ProductImage
                   product={item.product}
-                  wrapperClassName="h-full w-full"
-                  className="h-full w-full object-contain p-3 motion-safe:transition-transform motion-safe:duration-200 group-hover:scale-105"
+                  displayMode="closet"
+                  className="h-full w-full object-contain p-3 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)] motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.04]"
                 />
               </div>
               <div className="px-3 pb-3 pt-2">
@@ -590,12 +590,8 @@ function InsightsTab({
                 className="w-[142px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-white/[0.055] shadow-[0_12px_28px_rgba(0,0,0,.28)]"
               >
                 <button type="button" onClick={() => onBuildAround(product)} className="block w-full text-left">
-                  <div className="relative h-[132px] bg-[#fff7ef]">
-                    <ProductImage
-                      product={product}
-                      wrapperClassName="h-full w-full"
-                      className="h-full w-full object-contain p-2.5"
-                    />
+                  <div className="relative h-[132px]">
+                    <ProductImage product={product} displayMode="closet" />
                     <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
                       {product.category}
                     </div>

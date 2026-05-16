@@ -471,12 +471,11 @@ function SavedDetailSheet({
             {visualProducts.slice(0, 6).map((product, index) => (
               <div
                 key={`${fit.id}-detail-${product.id}`}
-                className={`overflow-hidden rounded-[14px] bg-white/80 ring-1 ring-[#eadfd5] ${index === 0 ? 'row-span-2' : ''}`}
+                className={`overflow-hidden rounded-[14px] ${index === 0 ? 'row-span-2' : ''}`}
               >
                 <ProductImage
                   product={product}
-                  wrapperClassName="h-full w-full"
-                  className="h-full w-full object-contain p-2"
+                  displayMode="moodboard"
                   onUnavailable={onProductFailed}
                 />
               </div>
@@ -494,12 +493,8 @@ function SavedDetailSheet({
                   key={`${fit.id}-piece-${product.id}`}
                   className="flex h-[64px] w-[180px] flex-none items-center gap-2 rounded-[14px] border border-white/10 bg-white/[0.04] p-1.5"
                 >
-                  <div className="h-full w-[60px] flex-none overflow-hidden rounded-[10px] bg-[#fff7ef]">
-                    <ProductImage
-                      product={product}
-                      wrapperClassName="h-full w-full"
-                      className="h-full w-full object-contain p-1"
-                    />
+                  <div className="h-full w-[60px] flex-none overflow-hidden">
+                    <ProductImage product={product} displayMode="thumbnail" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[8px] font-bold uppercase tracking-[.14em] text-accent">{category}</div>

@@ -189,13 +189,10 @@ export default function CanvasPage() {
               {source.products.slice(0, 8).map((product, index) => (
                 <div
                   key={product.id}
-                  className={`absolute overflow-hidden rounded-[22px] bg-white/82 shadow-[0_18px_36px_rgba(89,55,32,.18)] ring-1 ring-[#eadfd5] ${CANVAS_TILE_CLASSES[index] || CANVAS_TILE_CLASSES[7]}`}
+                  className={`absolute overflow-hidden rounded-[22px] ${CANVAS_TILE_CLASSES[index] || CANVAS_TILE_CLASSES[7]}`}
                 >
-                  <ProductImage
-                    product={product}
-                    wrapperClassName="h-full w-full"
-                    className="h-full w-full object-contain p-2.5 drop-shadow-[0_16px_20px_rgba(0,0,0,.22)]"
-                  />
+                  <ProductImage product={product} displayMode="moodboard" />
+
                   <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white/82 text-[#6d5b50] shadow-[0_8px_18px_rgba(0,0,0,.12)]">
                     <Grip size={12} />
                   </span>
@@ -244,8 +241,8 @@ export default function CanvasPage() {
               </div>
               <div className="mt-4 grid grid-cols-4 gap-2">
                 {source.products.slice(0, 8).map((product) => (
-                  <div key={`share-${product.id}`} className="aspect-square overflow-hidden rounded-[16px] bg-white ring-1 ring-[#eadfd5]">
-                    <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1.5" />
+                  <div key={`share-${product.id}`} className="aspect-square overflow-hidden rounded-[16px]">
+                    <ProductImage product={product} displayMode="cutout" />
                   </div>
                 ))}
               </div>
