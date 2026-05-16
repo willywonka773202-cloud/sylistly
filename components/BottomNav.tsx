@@ -6,11 +6,13 @@ import { useState } from 'react';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 
-const tabs: Array<{ href: string; label: string; icon: typeof Flame }> = [
+// 5-tab nav with Syli as the elevated center tab.  The create action
+// sheet stays accessible from a small floating "+" button rendered
+// alongside the nav (bottom-right), so no route loses an entry point.
+const tabs: Array<{ href: string; label: string; icon: typeof Flame; emphasis?: 'syli' }> = [
   { href: '/',         label: 'Home',    icon: House },
   { href: '/feed',     label: 'Feed',    icon: Flame },
-  // Center slot is the create FAB — rendered separately so it can lift
-  // above the nav bar visually.
+  { href: '/stylist',  label: 'Syli',    icon: Wand2,   emphasis: 'syli' },
   { href: '/saved',    label: 'Saved',   icon: Bookmark },
   { href: '/profile',  label: 'Profile', icon: User },
 ];
@@ -44,40 +46,28 @@ export function BottomNav() {
   return (
     <>
       <nav className="relative h-[68px] grid grid-cols-5 border-t border-hairline bg-bg pb-3.5 pt-1.5">
-        {/* Left two tabs */}
-        {tabs.slice(0, 2).map(({ href, label, icon: Icon }) => {
+        {tabs.map(({ href, label, icon: Icon, emphasis }) => {
           const active = pathname === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active ? 'page' : undefined}
-              className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
-                active ? 'text-ink opacity-100' : 'text-muted opacity-55'
-              }`}
-            >
-              {active ? <span className="absolute top-0.5 h-0.5 w-4 rounded bg-accent" /> : null}
-              <Icon size={22} strokeWidth={1.6} />
-              {label}
-            </Link>
-          );
-        })}
-
-        {/* Center create FAB — lifts above the nav line for emphasis */}
-        <div className="relative flex items-start justify-center">
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
-            aria-label="Create"
-            className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] ring-1 ring-white/20 transition active:scale-90 hover:bg-right motion-safe:transition-all motion-safe:duration-200"
-          >
-            <Plus size={26} strokeWidth={2.4} />
-          </button>
-        </div>
-
-        {/* Right two tabs */}
-        {tabs.slice(2).map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
+          // Syli is the elevated center tab — magenta gradient, lifted
+          // above the nav line, ring + glow. All other tabs are
+          // standard flat link tabs with an accent underline when active.
+          if (emphasis === 'syli') {
+            return (
+              <div key={href} className="relative flex items-start justify-center">
+                <Link
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  aria-label="Open Syli AI Stylist"
+                  className={`sy-press absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] transition hover:bg-right motion-safe:transition-all motion-safe:duration-200 ${
+                    active ? 'ring-2 ring-white/40 scale-[1.04]' : 'ring-1 ring-white/20'
+                  }`}
+                >
+                  <Icon size={24} strokeWidth={2.2} />
+                </Link>
+                <span className="pointer-events-none absolute -bottom-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-accent">{label}</span>
+              </div>
+            );
+          }
           return (
             <Link
               key={href}
@@ -94,6 +84,19 @@ export function BottomNav() {
           );
         })}
       </nav>
+
+      {/* Floating Create button — replaces the old center FAB without
+          stealing the prominent center slot from Syli. Sits above the
+          nav, right-aligned, smaller than the Syli tab so the visual
+          hierarchy reads: Syli (primary) > Create (secondary). */}
+      <button
+        type="button"
+        onClick={() => setCreateOpen(true)}
+        aria-label="Open create menu"
+        className="sy-press fixed bottom-[78px] right-3 z-40 grid h-12 w-12 place-items-center rounded-full border border-white/14 bg-[#1c0f15]/92 text-white shadow-[0_14px_28px_rgba(0,0,0,.45)] backdrop-blur-md transition hover:border-accent motion-safe:transition-all motion-safe:duration-200"
+      >
+        <Plus size={20} strokeWidth={2.4} />
+      </button>
 
       {createOpen ? (
         <div className="fixed inset-0 z-[60] mx-auto flex max-w-[480px] items-end bg-black/60 backdrop-blur-sm">
