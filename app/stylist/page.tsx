@@ -4,12 +4,16 @@ import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
+  Bookmark,
   Boxes,
   CheckCircle2,
   ClipboardList,
+  Heart,
+  Layers,
   MessageCircle,
   Send,
   Shirt,
+  ShoppingBag,
   Sparkles,
   Star,
   Wand2,
@@ -20,7 +24,7 @@ import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
-type StylistIntent = 'make' | 'rate' | 'packing' | 'closet' | 'piece';
+type StylistIntent = 'make' | 'rate' | 'packing' | 'closet' | 'piece' | 'remix' | 'buy';
 
 interface PromptCard {
   intent: StylistIntent;
@@ -34,10 +38,7 @@ interface Message {
   id: string;
   role: 'user' | 'syli';
   text: string;
-  cta?: {
-    label: string;
-    href: string;
-  };
+  ctas?: Array<{ label: string; href: string }>;
 }
 
 const REQUIRED_CATEGORIES: Category[] = ['top', 'bottom', 'shoes'];
@@ -46,9 +47,9 @@ const PLANNING_CATEGORIES: Category[] = ['hat', 'outer', 'top', 'bottom', 'shoes
 const PROMPTS: PromptCard[] = [
   {
     intent: 'make',
-    title: 'Make me an outfit',
-    body: 'Start a real build from the Builder.',
-    prompt: 'Make me an outfit',
+    title: 'Build a fit for today',
+    body: 'Start a real catalog-backed build.',
+    prompt: 'Build a fit for today',
     icon: Sparkles,
   },
   {
@@ -79,6 +80,20 @@ const PROMPTS: PromptCard[] = [
     prompt: 'Build around a piece',
     icon: Shirt,
   },
+  {
+    intent: 'remix',
+    title: 'Remix my saved style',
+    body: 'Use saved outfits as the source of truth.',
+    prompt: 'Remix my saved style',
+    icon: Bookmark,
+  },
+  {
+    intent: 'buy',
+    title: 'What should I buy next?',
+    body: 'Prioritize real wardrobe gaps first.',
+    prompt: 'What should I buy next?',
+    icon: ShoppingBag,
+  },
 ];
 
 function formatPrice(cents: number): string {
@@ -100,6 +115,8 @@ function productsByCategory(products: Product[]): Partial<Record<Category, numbe
 function detectIntent(input: string): StylistIntent {
   const normalized = input.toLowerCase();
   if (normalized.includes('pack') || normalized.includes('trip') || normalized.includes('travel')) return 'packing';
+  if (normalized.includes('buy') || normalized.includes('purchase') || normalized.includes('shop') || normalized.includes('next')) return 'buy';
+  if (normalized.includes('remix') || normalized.includes('saved style') || normalized.includes('saved fit')) return 'remix';
   if (normalized.includes('closet') || normalized.includes('gap') || normalized.includes('missing') || normalized.includes('complete')) return 'closet';
   if (normalized.includes('rate') || normalized.includes('score') || normalized.includes('current fit') || normalized.includes('review')) return 'rate';
   if (normalized.includes('piece') || normalized.includes('around') || normalized.includes('anchor') || normalized.includes('item')) return 'piece';
@@ -125,6 +142,10 @@ export default function StylistPage() {
     () => (hasMounted ? wardrobeItems.filter((item) => item.status === 'closet').map((item) => item.product) : []),
     [wardrobeItems, hasMounted],
   );
+  const wishlistProducts = useMemo(
+    () => (hasMounted ? wardrobeItems.filter((item) => item.status === 'wishlist').map((item) => item.product) : []),
+    [wardrobeItems, hasMounted],
+  );
   const savedProducts = useMemo(
     () =>
       hasMounted
@@ -143,6 +164,16 @@ export default function StylistPage() {
     const closetGaps = PLANNING_CATEGORIES.filter((category) => !closetCategories.has(category));
     const packingGaps = PLANNING_CATEGORIES.filter((category) => !availableCategories.has(category));
     const closetDistribution = productsByCategory(closetProducts);
+    const allKnownProducts = [...currentProducts, ...closetProducts, ...wishlistProducts, ...savedProducts];
+    const categoryCounts = productsByCategory(allKnownProducts);
+    const topCategory = Object.entries(categoryCounts).sort((a, b) => (b[1] || 0) - (a[1] || 0))[0]?.[0] as Category | undefined;
+    const vibeCounts = new Map<string, number>();
+    for (const product of allKnownProducts) {
+      for (const vibe of [...(product.vibes || []), ...(product.occasions || [])]) {
+        vibeCounts.set(vibe, (vibeCounts.get(vibe) || 0) + 1);
+      }
+    }
+    const topVibe = Array.from(vibeCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
 
     return {
       currentTotal,
@@ -150,8 +181,10 @@ export default function StylistPage() {
       closetGaps,
       packingGaps,
       closetDistribution,
+      topCategory: topCategory || null,
+      topVibe,
     };
-  }, [closetProducts, currentProducts, savedProducts]);
+  }, [closetProducts, currentProducts, savedProducts, wishlistProducts]);
 
   function buildResponse(intent: StylistIntent, rawPrompt: string): Message {
     if (intent === 'rate') {
@@ -161,7 +194,7 @@ export default function StylistPage() {
           id: `syli-${Date.now()}`,
           role: 'syli',
           text: 'I do not see a current build yet. Open Builder, add a top, bottom, and shoes, then I can rate the real fit from those local pieces.',
-          cta: { label: 'Open Builder', href: '/build' },
+          ctas: [{ label: 'Open Builder', href: '/build' }],
         };
       }
 
@@ -174,7 +207,10 @@ export default function StylistPage() {
           missing.length === 0
             ? `Your current fit has ${filled} piece${filled === 1 ? '' : 's'} and covers the required top, bottom, and shoes slots. Local read: ${score}/10. Estimated visible total is ${formatPrice(localContext.currentTotal)}. Next move: refine accessories or save it.`
             : `Your current fit has ${filled} piece${filled === 1 ? '' : 's'} with an estimated total of ${formatPrice(localContext.currentTotal)}. Local read: ${score}/10 because it is missing ${missing.join(', ')}. Fill those slots before styling accessories.`,
-        cta: { label: missing.length === 0 ? 'Save or refine fit' : 'Finish in Builder', href: '/build' },
+        ctas: [
+          { label: missing.length === 0 ? 'Save or refine fit' : 'Finish in Builder', href: '/build' },
+          { label: 'Open Canvas', href: '/canvas' },
+        ],
       };
     }
 
@@ -189,7 +225,10 @@ export default function StylistPage() {
           gaps.length === 0
             ? `Packing base is strong: I can see ${owned} closet piece${owned === 1 ? '' : 's'} and ${saved} saved fit${saved === 1 ? '' : 's'} covering the core categories. Use saved outfits as complete looks, then add one backup top and shoes from your closet.`
             : `For a packing list, I can use ${owned} closet piece${owned === 1 ? '' : 's'} and ${saved} saved fit${saved === 1 ? '' : 's'}. Your local data is light on ${gaps.slice(0, 4).join(', ')}, so add those before relying on this as a complete trip list.`,
-        cta: { label: gaps.length ? 'Fill wardrobe gaps' : 'Review saved fits', href: gaps.length ? '/wardrobe' : '/saved' },
+        ctas: [
+          { label: gaps.length ? 'Fill wardrobe gaps' : 'Review saved fits', href: gaps.length ? '/wardrobe' : '/saved' },
+          { label: 'Open Canvas', href: '/canvas' },
+        ],
       };
     }
 
@@ -205,8 +244,11 @@ export default function StylistPage() {
         text:
           gaps.length === 0
             ? `Your closet covers all core Sylistly categories. Strongest areas: ${strongest.join(', ') || 'balanced basics'}. Next move is editing quality, not adding volume.`
-            : `Your closet has ${closetProducts.length} real piece${closetProducts.length === 1 ? '' : 's'}. The clearest gaps are ${gaps.slice(0, 5).join(', ')}. Start with top, bottom, and shoes if any are missing, then add outerwear and bag for complete outfit range.`,
-        cta: { label: 'Open Wardrobe', href: '/wardrobe' },
+            : `Your closet has ${closetProducts.length} real piece${closetProducts.length === 1 ? '' : 's'} and ${wishlistProducts.length} wishlist piece${wishlistProducts.length === 1 ? '' : 's'}. The clearest gaps are ${gaps.slice(0, 5).join(', ')}. Start with top, bottom, and shoes if any are missing, then add outerwear and bag for complete outfit range.`,
+        ctas: [
+          { label: 'Open Wardrobe', href: '/wardrobe' },
+          { label: 'Shop Discover', href: '/discover' },
+        ],
       };
     }
 
@@ -215,15 +257,52 @@ export default function StylistPage() {
         id: `syli-${Date.now()}`,
         role: 'syli',
         text: `I can help you build around a real selected piece, but this beta does not invent items from "${rawPrompt}". Open Wardrobe to choose an owned or wished item, or open Builder and lock the anchor piece before generating around it.`,
-        cta: { label: wardrobeItems.length > 0 ? 'Choose from Wardrobe' : 'Open Builder', href: wardrobeItems.length > 0 ? '/wardrobe' : '/build' },
+        ctas: [
+          { label: wardrobeItems.length > 0 ? 'Choose from Wardrobe' : 'Open Builder', href: wardrobeItems.length > 0 ? '/wardrobe' : '/build' },
+          { label: 'Open Discover', href: '/discover' },
+        ],
+      };
+    }
+
+    if (intent === 'remix') {
+      return {
+        id: `syli-${Date.now()}`,
+        role: 'syli',
+        text:
+          savedFits.length > 0
+            ? `You have ${savedFits.length} saved fit${savedFits.length === 1 ? '' : 's'} to remix. Start in Saved, load one into Builder, then use locked slots to keep the pieces that define your style.`
+            : 'There are no saved fits yet. Build or save one first, then Syli can help you remix from a real outfit library.',
+        ctas: [
+          { label: savedFits.length > 0 ? 'Open Saved' : 'Build first fit', href: savedFits.length > 0 ? '/saved' : '/build' },
+          { label: 'Open Builder', href: '/build' },
+        ],
+      };
+    }
+
+    if (intent === 'buy') {
+      const gaps = localContext.closetGaps.map(categoryLabel);
+      return {
+        id: `syli-${Date.now()}`,
+        role: 'syli',
+        text:
+          gaps.length > 0
+            ? `Buy next should solve a real gap: ${gaps.slice(0, 4).join(', ')}. Discover can show catalog-backed options, and Wardrobe can save them to wishlist before you commit.`
+            : `Your closet covers every planning category. Buy next should upgrade quality, not volume. Your strongest signal is ${localContext.topVibe || localContext.topCategory || 'your saved style data'}.`,
+        ctas: [
+          { label: 'Open Discover', href: '/discover' },
+          { label: 'Open Wardrobe', href: '/wardrobe' },
+        ],
       };
     }
 
     return {
       id: `syli-${Date.now()}`,
       role: 'syli',
-      text: 'I can start the outfit in Builder using the real generator and catalog-backed products. This chat is local guidance only, so I will not pretend to generate a fit here.',
-      cta: { label: 'Make outfit in Builder', href: '/build' },
+      text: `I can start this in Builder using the real generator and catalog-backed products. This chat is local guidance only, so I will not pretend to generate a fit here. Current context: ${currentProducts.length} build pieces, ${closetProducts.length} closet pieces, ${savedFits.length} saved fits.`,
+      ctas: [
+        { label: 'Make outfit in Builder', href: '/build' },
+        { label: 'Open Discover', href: '/discover' },
+      ],
     };
   }
 
@@ -270,7 +349,7 @@ export default function StylistPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
-        <section className="rounded-[28px] border border-white/12 bg-[radial-gradient(circle_at_20%_0%,rgba(246,48,107,.22),transparent_42%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))] p-4 shadow-[0_24px_60px_rgba(0,0,0,.34)]">
+        <section className="sy-card-strong rounded-[28px] p-4">
           <div className="flex items-start gap-3">
             <span className="grid h-11 w-11 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
               <Wand2 size={20} />
@@ -283,10 +362,15 @@ export default function StylistPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-4 gap-2">
             <ContextPill label="Saved" value={hasMounted ? savedFits.length : 0} />
             <ContextPill label="Closet" value={hasMounted ? closetProducts.length : 0} />
+            <ContextPill label="Wish" value={hasMounted ? wishlistProducts.length : 0} />
             <ContextPill label="Build" value={hasMounted ? currentProducts.length : 0} />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <SignalPill icon={Layers} label={localContext.topCategory ? categoryLabel(localContext.topCategory) : 'No top category yet'} />
+            <SignalPill icon={Heart} label={localContext.topVibe || 'No vibe signal yet'} />
           </div>
         </section>
 
@@ -297,7 +381,7 @@ export default function StylistPage() {
               <div className="font-serif text-[18px] font-semibold leading-tight text-ink">Ask Syli</div>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {PROMPTS.map((prompt) => {
               const Icon = prompt.icon;
               return (
@@ -305,7 +389,7 @@ export default function StylistPage() {
                   key={prompt.intent}
                   type="button"
                   onClick={() => submitPrompt(prompt.prompt)}
-                  className="group flex items-center gap-3 rounded-[22px] border border-white/12 bg-white/[0.05] p-3 text-left shadow-[0_12px_26px_rgba(0,0,0,.2)] transition active:scale-[0.98] hover:border-accent/50 hover:bg-white/[0.08] motion-safe:transition-all motion-safe:duration-200"
+                  className="sy-lift sy-press group flex min-h-[132px] flex-col rounded-[22px] border border-white/12 bg-white/[0.05] p-3 text-left shadow-[0_12px_26px_rgba(0,0,0,.2)] transition hover:border-accent/50 hover:bg-white/[0.08] motion-safe:transition-all motion-safe:duration-200"
                 >
                   <span className="grid h-10 w-10 flex-none place-items-center rounded-2xl bg-accent/16 text-accent transition group-hover:bg-accent group-hover:text-white">
                     <Icon size={17} />
@@ -314,7 +398,7 @@ export default function StylistPage() {
                     <span className="block font-serif text-[15px] font-semibold leading-tight text-ink">{prompt.title}</span>
                     <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-2">{prompt.body}</span>
                   </span>
-                  <ArrowRight size={15} className="text-muted transition group-hover:translate-x-0.5 group-hover:text-accent" />
+                  <ArrowRight size={15} className="mt-auto text-muted transition group-hover:translate-x-0.5 group-hover:text-accent" />
                 </button>
               );
             })}
@@ -328,8 +412,8 @@ export default function StylistPage() {
           </div>
 
           {messages.length === 0 ? (
-            <div className="rounded-[24px] border border-white/10 bg-white/[0.035] p-4 text-[12px] leading-relaxed text-muted-2">
-              Start with a prompt above or type a request. Syli will answer with local guidance and route you to the real app flow.
+            <div className="rounded-[24px] border border-accent/20 bg-[radial-gradient(circle_at_20%_0%,rgba(246,48,107,.14),transparent_42%),rgba(255,255,255,.035)] p-4 text-[12px] leading-relaxed text-muted-2">
+              Start with a prompt above or type a request. Syli will answer with local guidance, route you to real app flows, and never claim a cloud model generated content.
             </div>
           ) : (
             messages.map((message) => (
@@ -345,14 +429,19 @@ export default function StylistPage() {
                   }`}
                 >
                   <p>{message.text}</p>
-                  {message.cta ? (
-                    <Link
-                      href={message.cta.href}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-black transition active:scale-95"
-                    >
-                      {message.cta.label}
-                      <ArrowRight size={11} />
-                    </Link>
+                  {message.ctas?.length ? (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {message.ctas.map((cta) => (
+                        <Link
+                          key={`${message.id}-${cta.href}`}
+                          href={cta.href}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-black transition active:scale-95"
+                        >
+                          {cta.label}
+                          <ArrowRight size={11} />
+                        </Link>
+                      ))}
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -362,7 +451,7 @@ export default function StylistPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="border-t border-hairline bg-bg px-4 py-3">
-        <div className="flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] p-1.5">
+        <div className="flex items-center gap-2 rounded-full border border-accent/30 bg-white/[0.06] p-1.5 shadow-[0_0_34px_rgba(246,48,107,.18)]">
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
@@ -393,6 +482,15 @@ function ContextPill({ label, value }: { label: string; value: number }) {
         {label}
       </div>
       <div className="mt-1 font-serif text-[20px] font-semibold leading-none text-ink">{value}</div>
+    </div>
+  );
+}
+
+function SignalPill({ icon: Icon, label }: { icon: typeof Layers; label: string }) {
+  return (
+    <div className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-white/78">
+      <Icon size={11} className="flex-none text-accent" />
+      <span className="truncate">{label}</span>
     </div>
   );
 }
