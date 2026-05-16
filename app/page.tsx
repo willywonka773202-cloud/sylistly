@@ -11,6 +11,7 @@ import {
   Crown,
   Flame,
   Heart,
+  Images,
   Layers,
   Plus,
   Search,
@@ -106,6 +107,15 @@ export default function HomePage() {
         href: '/wardrobe',
       };
     }
+    if (currentFitCount > 0) {
+      return {
+        eyebrow: 'Builder',
+        title: 'Continue your build',
+        body: `${currentFitCount} piece${currentFitCount === 1 ? '' : 's'} are in Builder. Refine, save, or shop the look.`,
+        cta: 'Finish fit',
+        href: '/build',
+      };
+    }
     if (requiredClosetMissing.length > 0) {
       return {
         eyebrow: 'Closet gap',
@@ -113,15 +123,6 @@ export default function HomePage() {
         body: `Missing ${requiredClosetMissing.join(', ')} from the required top-bottom-shoes base.`,
         cta: 'See gaps',
         href: '/wardrobe',
-      };
-    }
-    if (currentFitCount > 0) {
-      return {
-        eyebrow: 'Builder',
-        title: 'Finish current fit',
-        body: `${currentFitCount} piece${currentFitCount === 1 ? '' : 's'} are in Builder. Refine, save, or shop the look.`,
-        cta: 'Finish fit',
-        href: '/build',
       };
     }
     return {
@@ -237,6 +238,62 @@ export default function HomePage() {
       </header>
 
       <div className="flex-1 overflow-y-auto pb-32">
+        {/* Launch hero */}
+        <section className="px-4 pt-4">
+          <div className="sy-card-strong sy-enter rounded-[30px] p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="sy-eyebrow">AI fashion OS</div>
+                <h2 className="mt-2 font-serif text-[32px] font-semibold leading-[.95] text-ink">
+                  Your AI stylist is ready.
+                </h2>
+                <p className="mt-3 text-[12px] leading-relaxed text-muted-2">
+                  Sylistly connects Builder, Feed, Saved fits, Wardrobe, Discover, Syli, and Canvas using your real local style data.
+                </p>
+              </div>
+              <span className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
+                <Wand2 size={21} />
+              </span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-4 gap-2">
+              <HeroMetric label="Saved" value={savedCount} />
+              <HeroMetric label="Closet" value={closetCount} />
+              <HeroMetric label="Wish" value={wishlistCount} />
+              <HeroMetric label="Build" value={currentFitCount} />
+            </div>
+
+            <div className="mt-4 grid grid-cols-[1.15fr_.85fr] gap-2">
+              <Link
+                href="/build"
+                className="sy-cta-primary px-4 py-3 text-[11px] font-black uppercase tracking-[.14em]"
+              >
+                <Sparkles size={13} />
+                Build a fit
+              </Link>
+              <Link
+                href="/stylist"
+                className="sy-cta-secondary px-4 py-3 text-[11px] font-black uppercase tracking-[.14em]"
+              >
+                Open Syli
+              </Link>
+            </div>
+
+            <Link
+              href="/canvas"
+              className="mt-2 flex items-center justify-between rounded-[18px] border border-white/10 bg-white/[0.045] px-3 py-2.5 text-left transition active:scale-[0.98] hover:border-accent/45"
+            >
+              <span>
+                <span className="block text-[8px] font-black uppercase tracking-[.18em] text-accent">Canvas / Try-On</span>
+                <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-2">
+                  Share card is local. AI try-on is clearly marked as future backend.
+                </span>
+              </span>
+              <ChevronRight size={14} className="text-accent" />
+            </Link>
+          </div>
+        </section>
+
         {/* Quick profile row */}
         <section className="px-4 pt-4">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -294,28 +351,30 @@ export default function HomePage() {
               icon={Layers}
               eyebrow="Build"
               title="Build from your closet"
-              body={closetCount > 0 ? `${closetCount} pieces ready` : 'Add pieces to your closet first.'}
+              body={closetCount > 0 ? `${closetCount} pieces ready` : 'Open Wardrobe to add your first pieces.'}
               onClick={() => router.push('/wardrobe')}
-              disabled={closetCount === 0}
             />
             <StylistCard
               icon={Wand2}
               eyebrow="Insight"
-              title="Rate my fit"
+              title="Ask Syli"
               body={
                 currentFitCount > 0
-                  ? `${currentFitCount} pieces in builder. Ask Syli to rate it.`
-                  : 'Generate a fit first to rate it.'
+                  ? `${currentFitCount} pieces in Builder. Syli can rate it.`
+                  : 'Local chat can guide your next real action.'
               }
               onClick={() => router.push('/stylist')}
-              disabled={currentFitCount === 0}
             />
             <StylistCard
-              icon={Flame}
-              eyebrow="Discover"
-              title="Browse the feed"
-              body={`${feedPosts.length} catalog-backed fits ready.`}
-              onClick={() => router.push('/feed')}
+              icon={Images}
+              eyebrow="Canvas"
+              title="Create a share card"
+              body={
+                savedCount > 0 || currentFitCount > 0
+                  ? 'Turn a real outfit into a share-ready board.'
+                  : 'Canvas opens with a clear build-first empty state.'
+              }
+              onClick={() => router.push('/canvas')}
             />
           </div>
         </section>
@@ -529,17 +588,18 @@ export default function HomePage() {
             <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Recent local actions</div>
           </div>
           {recentActivity.length === 0 ? (
-            <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-4 text-[12px] leading-relaxed text-muted-2">
-              Save fits, add wardrobe pieces, or wishlist products to build a real activity trail here.
-            </div>
+            <HomeOnboardingEmpty />
           ) : (
-            <div className="space-y-2">
+            <div className="relative space-y-2 pl-4 before:absolute before:bottom-3 before:left-[7px] before:top-3 before:w-px before:bg-white/10">
               {recentActivity.map((activity) => (
                 <Link
                   key={activity.id}
                   href={activity.href}
-                  className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/[0.04] p-3 transition active:scale-[0.98] hover:border-accent/50 motion-safe:transition-all motion-safe:duration-200"
+                  className="sy-lift sy-press relative flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/[0.04] p-3 transition hover:border-accent/50 motion-safe:transition-all motion-safe:duration-200"
                 >
+                  <span className="absolute -left-[18px] top-1/2 grid h-3.5 w-3.5 -translate-y-1/2 place-items-center rounded-full border border-accent bg-bg">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  </span>
                   <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/14 text-accent">
                     <Check size={14} />
                   </span>
@@ -594,6 +654,44 @@ export default function HomePage() {
 
       <BottomNav />
     </main>
+  );
+}
+
+function HeroMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 px-2 py-2.5 text-center">
+      <div className="font-serif text-[20px] font-semibold leading-none text-ink">{value}</div>
+      <div className="mt-1 text-[8px] font-black uppercase tracking-[.16em] text-muted">{label}</div>
+    </div>
+  );
+}
+
+function HomeOnboardingEmpty() {
+  return (
+    <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent/14 text-accent">
+          <Sparkles size={16} />
+        </span>
+        <div>
+          <div className="font-serif text-[18px] font-semibold leading-tight text-ink">Start your local style graph</div>
+          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+            Build a fit, save it, then add pieces to Wardrobe. Home will turn those real actions into your timeline.
+          </p>
+        </div>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <Link href="/build" className="sy-cta-primary px-3 py-2.5 text-[9px] font-black uppercase tracking-[.12em]">
+          Build
+        </Link>
+        <Link href="/feed" className="sy-cta-secondary px-3 py-2.5 text-[9px] font-black uppercase tracking-[.12em]">
+          Feed
+        </Link>
+        <Link href="/wardrobe" className="sy-cta-secondary px-3 py-2.5 text-[9px] font-black uppercase tracking-[.12em]">
+          Closet
+        </Link>
+      </div>
+    </div>
   );
 }
 
