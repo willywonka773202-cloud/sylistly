@@ -335,7 +335,7 @@ export default function HomePage() {
             <ShortcutTile label="Saved" href="/saved" icon={Bookmark} />
             <ShortcutTile label="Discover" href="/discover" icon={Heart} />
             <ShortcutTile label="Profile" href="/profile" icon={Wand2} />
-            <ShortcutTile label="Try On" disabled />
+            <ShortcutTile label="Try On" href="/canvas" icon={Sparkles} />
             <ShortcutTile label="Stylist" href="/stylist" icon={Wand2} />
           </div>
         </section>
@@ -566,16 +566,16 @@ export default function HomePage() {
                 <div className="text-[9px] font-black uppercase tracking-[.22em] text-accent">Share your style</div>
                 <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Make a share card</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
-                  Generate a polished card from your latest saved fit — local-only for now, no fake cloud generation.
+                  Generate a polished card from your current or latest saved fit. Local-only for now, no fake cloud generation.
                 </p>
                 <button
                   type="button"
-                  disabled={savedCount === 0}
-                  onClick={() => router.push('/saved')}
+                  disabled={savedCount === 0 && currentFitCount === 0}
+                  onClick={() => router.push('/canvas')}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-50 disabled:active:scale-100"
                 >
                   <Plus size={11} />
-                  {savedCount > 0 ? 'Open saved fits' : 'Save a fit first'}
+                  {savedCount > 0 || currentFitCount > 0 ? 'Open Canvas' : 'Save a fit first'}
                 </button>
               </div>
             </div>

@@ -37,6 +37,7 @@ export function BottomNav() {
       router.push('/saved');
     } else if (action === 'feed') router.push('/feed');
     else if (action === 'stylist') router.push('/stylist');
+    else if (action === 'canvas') router.push('/canvas');
   }
 
   return (
@@ -161,11 +162,11 @@ export function BottomNav() {
                 onClick={() => dispatch('stylist')}
               />
               <ActionCard
-                eyebrow="Coming later"
+                eyebrow="Local shell"
                 title="Canvas / Try On"
-                body="Dressing-room view — next sprint."
+                body="Make a collage or share card."
                 icon={Sparkles}
-                disabled
+                onClick={() => dispatch('canvas')}
               />
             </div>
 
