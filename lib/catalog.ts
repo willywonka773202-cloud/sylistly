@@ -7,6 +7,7 @@ import { hasDirectRetailerUrl } from './retailer-url';
 import { searchBrandCatalog } from './brand-catalog';
 import { searchPhotoCatalog } from './photo-catalog';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
+import { applyCatalogCutoutOverridesToProducts } from './catalog-cutout-overrides';
 import { frameCompatibilityScore, genderMismatchReasons, hasFrameMismatch } from './frame-inference';
 import { hasHighCategoryConfidence, hasUsableProductImage, isRenderableProduct } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
@@ -1280,10 +1281,14 @@ export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
   },
 ];
 
+function applyRuntimeCatalogOverrides(products: Product[]): Product[] {
+  return applyCatalogCutoutOverridesToProducts(applyCatalogTagOverridesToProducts(products));
+}
+
 export const ALL_CATALOG_PRODUCTS: Product[] = dedupeProducts([
-  ...applyCatalogTagOverridesToProducts(PHOTO_CATALOG_PRODUCTS),
-  ...applyCatalogTagOverridesToProducts(GENERATED_CATALOG_PRODUCTS),
-  ...applyCatalogTagOverridesToProducts(BRAND_CATALOG_PRODUCTS),
+  ...applyRuntimeCatalogOverrides(PHOTO_CATALOG_PRODUCTS),
+  ...applyRuntimeCatalogOverrides(GENERATED_CATALOG_PRODUCTS),
+  ...applyRuntimeCatalogOverrides(BRAND_CATALOG_PRODUCTS),
 ]);
 
 const PRODUCTS_BY_ID = new Map(ALL_CATALOG_PRODUCTS.map((product) => [product.id, product]));

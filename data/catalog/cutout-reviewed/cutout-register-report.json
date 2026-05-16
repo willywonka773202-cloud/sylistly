@@ -1,14 +1,889 @@
 {
-  "generatedAt": "2026-05-16T20:18:05.154Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-05-16T21:45:05.933Z",
+  "mode": "apply",
   "cutoutDir": "public/assets/cutouts",
-  "totalAssets": 0,
-  "matchedProducts": 0,
+  "overrideFile": "data/catalog-cutout-overrides.json",
+  "totalAssets": 48,
+  "matchedProducts": 48,
   "unmatchedAssets": 0,
-  "matches": [],
+  "appliedCount": 48,
+  "matches": [
+    {
+      "id": "85f6cb6cd1ec6df2",
+      "assetPath": "/assets/cutouts/85f6cb6cd1ec6df2.png",
+      "matched": true,
+      "product": {
+        "id": "85f6cb6cd1ec6df2",
+        "brand": "Nike",
+        "name": "Men's Woven Cargo Pants",
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/85f6cb6cd1ec6df2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "ac42819e80705c93",
+      "assetPath": "/assets/cutouts/ac42819e80705c93.png",
+      "matched": true,
+      "product": {
+        "id": "ac42819e80705c93",
+        "brand": "END. Clothing",
+        "name": "Arc'teryx Men's Atom Hooded Jacket in Black, Size S",
+        "category": "outer",
+        "currentTransparentUrl": "/assets/cutouts/ac42819e80705c93.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/ac42819e80705c93.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/ac42819e80705c93.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "catalog-bag-longchamp-lepliage",
+      "assetPath": "/assets/cutouts/catalog-bag-longchamp-lepliage.png",
+      "matched": true,
+      "product": {
+        "id": "catalog-bag-longchamp-lepliage",
+        "brand": "Longchamp",
+        "name": "Le Pliage Original Tote",
+        "category": "bag",
+        "currentTransparentUrl": "/assets/cutouts/catalog-bag-longchamp-lepliage.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/catalog-bag-longchamp-lepliage.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/catalog-bag-longchamp-lepliage.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "catalog-shoes-stevemadden-heel",
+      "assetPath": "/assets/cutouts/catalog-shoes-stevemadden-heel.png",
+      "matched": true,
+      "product": {
+        "id": "catalog-shoes-stevemadden-heel",
+        "brand": "Steve Madden",
+        "name": "Madden pointed slingback heel",
+        "category": "shoes",
+        "currentTransparentUrl": "/assets/cutouts/catalog-shoes-stevemadden-heel.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/catalog-shoes-stevemadden-heel.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/catalog-shoes-stevemadden-heel.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "f2e4852913aacbdf",
+      "assetPath": "/assets/cutouts/f2e4852913aacbdf.png",
+      "matched": true,
+      "product": {
+        "id": "f2e4852913aacbdf",
+        "brand": "Nike",
+        "name": "Men's Oversized Cargo Shorts",
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/f2e4852913aacbdf.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/f2e4852913aacbdf.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/f2e4852913aacbdf.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "f70fd86e50d9418c",
+      "assetPath": "/assets/cutouts/f70fd86e50d9418c.png",
+      "matched": true,
+      "product": {
+        "id": "f70fd86e50d9418c",
+        "brand": "Oakley",
+        "name": "Sutro Lite Sunglasses with Prizm Ruby Lens",
+        "category": "eyewear"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/f70fd86e50d9418c.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/f70fd86e50d9418c.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-041da4cfe0a7056b",
+      "assetPath": "/assets/cutouts/generated-041da4cfe0a7056b.png",
+      "matched": true,
+      "product": {
+        "id": "generated-041da4cfe0a7056b",
+        "brand": "H&M",
+        "name": "Abercrombie & Fitch Men's Crochet-Style Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-041da4cfe0a7056b.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-041da4cfe0a7056b.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-130411501038e332",
+      "assetPath": "/assets/cutouts/generated-130411501038e332.png",
+      "matched": true,
+      "product": {
+        "id": "generated-130411501038e332",
+        "brand": "Banana Republic Factory",
+        "name": "Men's Button-Down Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-130411501038e332.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-130411501038e332.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-156d42979e60b705",
+      "assetPath": "/assets/cutouts/generated-156d42979e60b705.png",
+      "matched": true,
+      "product": {
+        "id": "generated-156d42979e60b705",
+        "brand": "Walmart - Daily Haute",
+        "name": "Braveman Men's Classic Fit 2-Piece Suit",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-156d42979e60b705.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-156d42979e60b705.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-1f202726dff2f014",
+      "assetPath": "/assets/cutouts/generated-1f202726dff2f014.png",
+      "matched": true,
+      "product": {
+        "id": "generated-1f202726dff2f014",
+        "brand": "Macy's",
+        "name": "Polo Ralph Lauren Men's Straight Fit Performance Twill Pants",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-1f202726dff2f014.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-1f202726dff2f014.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-2b668469c7d84f6e",
+      "assetPath": "/assets/cutouts/generated-2b668469c7d84f6e.png",
+      "matched": true,
+      "product": {
+        "id": "generated-2b668469c7d84f6e",
+        "brand": "BOOHOOMAN US",
+        "name": "boohooMAN Men's Regular Revere Linen Blend Shirt & Short Set",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-2b668469c7d84f6e.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-2b668469c7d84f6e.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-2e0beab658a1e16a",
+      "assetPath": "/assets/cutouts/generated-2e0beab658a1e16a.png",
+      "matched": true,
+      "product": {
+        "id": "generated-2e0beab658a1e16a",
+        "brand": "Nordstrom",
+        "name": "Mens Reiss Duchie Wool Open-Collar Polo Shirt",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-2e0beab658a1e16a.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-2e0beab658a1e16a.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-2eeb9177b2a156a5",
+      "assetPath": "/assets/cutouts/generated-2eeb9177b2a156a5.png",
+      "matched": true,
+      "product": {
+        "id": "generated-2eeb9177b2a156a5",
+        "brand": "Macy's",
+        "name": "Polo Ralph Lauren Men's Norwich Straight Fit Performance Twill Golf Pants",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-2eeb9177b2a156a5.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-2eeb9177b2a156a5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-3084801187d53eaa",
+      "assetPath": "/assets/cutouts/generated-3084801187d53eaa.png",
+      "matched": true,
+      "product": {
+        "id": "generated-3084801187d53eaa",
+        "brand": "Ralph Lauren",
+        "name": "Polo Ralph Lauren Men's Cable-Knit Cotton Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-3084801187d53eaa.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-3084801187d53eaa.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-33973f1c68b0c2e0",
+      "assetPath": "/assets/cutouts/generated-33973f1c68b0c2e0.png",
+      "matched": true,
+      "product": {
+        "id": "generated-33973f1c68b0c2e0",
+        "brand": "H&M",
+        "name": "H&M Men's Linen-Blend Shirt and Shorts Set",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-33973f1c68b0c2e0.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-33973f1c68b0c2e0.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-35f0341cafaf810d",
+      "assetPath": "/assets/cutouts/generated-35f0341cafaf810d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-35f0341cafaf810d",
+        "brand": "Kohl's",
+        "name": "COOFANDY Men's 2 Piece Linen Shirt Set",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-35f0341cafaf810d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-35f0341cafaf810d.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-3869739e43797ced",
+      "assetPath": "/assets/cutouts/generated-3869739e43797ced.png",
+      "matched": true,
+      "product": {
+        "id": "generated-3869739e43797ced",
+        "brand": "Madewell",
+        "name": "Madewell Men's Tuck-Stitch Button-Up Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-3869739e43797ced.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-3869739e43797ced.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-3bd50b88a0cafbe5",
+      "assetPath": "/assets/cutouts/generated-3bd50b88a0cafbe5.png",
+      "matched": true,
+      "product": {
+        "id": "generated-3bd50b88a0cafbe5",
+        "brand": "Cyber Techwear",
+        "name": "Techwear Cargo Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-3bd50b88a0cafbe5.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-3bd50b88a0cafbe5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-487eeeb7ad2ed5b2",
+      "assetPath": "/assets/cutouts/generated-487eeeb7ad2ed5b2.png",
+      "matched": true,
+      "product": {
+        "id": "generated-487eeeb7ad2ed5b2",
+        "brand": "Macy's",
+        "name": "Polo Ralph Lauren Men's Straight-Fit Stretch Chino Pants",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-487eeeb7ad2ed5b2.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-487eeeb7ad2ed5b2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-589e8f931d3c29f7",
+      "assetPath": "/assets/cutouts/generated-589e8f931d3c29f7.png",
+      "matched": true,
+      "product": {
+        "id": "generated-589e8f931d3c29f7",
+        "brand": "Ann Taylor",
+        "name": "Ann Taylor Women's Perfect Wide-Leg Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-589e8f931d3c29f7.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-589e8f931d3c29f7.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-5aefcd19a46a76a7",
+      "assetPath": "/assets/cutouts/generated-5aefcd19a46a76a7.png",
+      "matched": true,
+      "product": {
+        "id": "generated-5aefcd19a46a76a7",
+        "brand": "Macy's",
+        "name": "Polo Ralph Lauren Men's Stretch Straight Fit Chino Pants",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-5aefcd19a46a76a7.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-5aefcd19a46a76a7.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-624a9117048c37d2",
+      "assetPath": "/assets/cutouts/generated-624a9117048c37d2.png",
+      "matched": true,
+      "product": {
+        "id": "generated-624a9117048c37d2",
+        "brand": "Ralph Lauren",
+        "name": "Ralph Lauren Cable-knit Cotton Polo Men Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-624a9117048c37d2.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-624a9117048c37d2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-6256d844cd2f73bc",
+      "assetPath": "/assets/cutouts/generated-6256d844cd2f73bc.png",
+      "matched": true,
+      "product": {
+        "id": "generated-6256d844cd2f73bc",
+        "brand": "Jos. A. Bank",
+        "name": "Jos. A. Bank Men's Tailored Fit Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-6256d844cd2f73bc.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-6256d844cd2f73bc.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-6de1b00357f7dd68",
+      "assetPath": "/assets/cutouts/generated-6de1b00357f7dd68.png",
+      "matched": true,
+      "product": {
+        "id": "generated-6de1b00357f7dd68",
+        "brand": "J.Crew Factory",
+        "name": "J.Crew Men's Cotton Waffle Johnny-Collar Sweater- Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-6de1b00357f7dd68.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-6de1b00357f7dd68.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-7ca4be6cd09823e8",
+      "assetPath": "/assets/cutouts/generated-7ca4be6cd09823e8.png",
+      "matched": true,
+      "product": {
+        "id": "generated-7ca4be6cd09823e8",
+        "brand": "Buck Mason",
+        "name": "Buck Mason Men's Avalon Knit Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-7ca4be6cd09823e8.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-7ca4be6cd09823e8.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-7fd5d321466f69e2",
+      "assetPath": "/assets/cutouts/generated-7fd5d321466f69e2.png",
+      "matched": true,
+      "product": {
+        "id": "generated-7fd5d321466f69e2",
+        "brand": "H&M",
+        "name": "Abercrombie & Fitch Men's Wavy Crochet-Style Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-7fd5d321466f69e2.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-7fd5d321466f69e2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-88f416d38d4962b4",
+      "assetPath": "/assets/cutouts/generated-88f416d38d4962b4.png",
+      "matched": true,
+      "product": {
+        "id": "generated-88f416d38d4962b4",
+        "brand": "Nordstrom",
+        "name": "Rodd Gunn Men's Palm Beach Short Sleeve Slim Fit Shirt",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-88f416d38d4962b4.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-88f416d38d4962b4.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-958408328a58e8bb",
+      "assetPath": "/assets/cutouts/generated-958408328a58e8bb.png",
+      "matched": true,
+      "product": {
+        "id": "generated-958408328a58e8bb",
+        "brand": "Express",
+        "name": "Express Men's Modern Prep Short Sleeve Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-958408328a58e8bb.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-958408328a58e8bb.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-9bc59c9d7498e99f",
+      "assetPath": "/assets/cutouts/generated-9bc59c9d7498e99f.png",
+      "matched": true,
+      "product": {
+        "id": "generated-9bc59c9d7498e99f",
+        "brand": "DevilInspired",
+        "name": "Preppy High Waist Plaid Blouse with Pleat Skirt",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-9bc59c9d7498e99f.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-9bc59c9d7498e99f.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-a40b4a1a792a2517",
+      "assetPath": "/assets/cutouts/generated-a40b4a1a792a2517.png",
+      "matched": true,
+      "product": {
+        "id": "generated-a40b4a1a792a2517",
+        "brand": "Zara",
+        "name": "Zara Men's Contrast Collar Polo Sweatshirt",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-a40b4a1a792a2517.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-a40b4a1a792a2517.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-b18046b88d650cff",
+      "assetPath": "/assets/cutouts/generated-b18046b88d650cff.png",
+      "matched": true,
+      "product": {
+        "id": "generated-b18046b88d650cff",
+        "brand": "Tommy Bahama",
+        "name": "Tommy Bahama Men's Paradise Breezer Linen Short-Sleeve Shirt",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-b18046b88d650cff.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-b18046b88d650cff.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-bb0fee93a3e25796",
+      "assetPath": "/assets/cutouts/generated-bb0fee93a3e25796.png",
+      "matched": true,
+      "product": {
+        "id": "generated-bb0fee93a3e25796",
+        "brand": "Madewell",
+        "name": "Madewell Men's Tuck-Stitch Three-Button Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-bb0fee93a3e25796.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-bb0fee93a3e25796.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-bf4f3fe2a92cf5a3",
+      "assetPath": "/assets/cutouts/generated-bf4f3fe2a92cf5a3.png",
+      "matched": true,
+      "product": {
+        "id": "generated-bf4f3fe2a92cf5a3",
+        "brand": "Walmart - Kallspin Global",
+        "name": "Kallspin Men's Cotton Knit Long Sleeve Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-bf4f3fe2a92cf5a3.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-bf4f3fe2a92cf5a3.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-c677c02745bffdd5",
+      "assetPath": "/assets/cutouts/generated-c677c02745bffdd5.png",
+      "matched": true,
+      "product": {
+        "id": "generated-c677c02745bffdd5",
+        "brand": "H&M",
+        "name": "Abercrombie & Fitch Men's Cable Button-Through Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-c677c02745bffdd5.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-c677c02745bffdd5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-ca938ba8cedc6c1f",
+      "assetPath": "/assets/cutouts/generated-ca938ba8cedc6c1f.png",
+      "matched": true,
+      "product": {
+        "id": "generated-ca938ba8cedc6c1f",
+        "brand": "Madewell",
+        "name": "Madewell Men's Long-Sleeve Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-ca938ba8cedc6c1f.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-ca938ba8cedc6c1f.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-cb9a8d25c4d3df34",
+      "assetPath": "/assets/cutouts/generated-cb9a8d25c4d3df34.png",
+      "matched": true,
+      "product": {
+        "id": "generated-cb9a8d25c4d3df34",
+        "brand": "Walmart - TianJu",
+        "name": "Men's Linen 2 Piece Shirt Set",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-cb9a8d25c4d3df34.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-cb9a8d25c4d3df34.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d21d09ad6fd72b69",
+      "assetPath": "/assets/cutouts/generated-d21d09ad6fd72b69.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d21d09ad6fd72b69",
+        "brand": "Banana Republic Factory",
+        "name": "Men's Luxe Touch Polo",
+        "category": "top",
+        "currentTransparentUrl": "/assets/cutouts/generated-d21d09ad6fd72b69.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d21d09ad6fd72b69.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d21d09ad6fd72b69.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d7fe8cdb6fe638b2",
+      "assetPath": "/assets/cutouts/generated-d7fe8cdb6fe638b2.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d7fe8cdb6fe638b2",
+        "brand": "J.Crew Factory",
+        "name": "J.Crew Men's Textured Johnny-Collar Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d7fe8cdb6fe638b2.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d7fe8cdb6fe638b2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d8f231535ba88b4a",
+      "assetPath": "/assets/cutouts/generated-d8f231535ba88b4a.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d8f231535ba88b4a",
+        "brand": "Nordstrom",
+        "name": "Brooks Brothers Men's Supima Cotton Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d8f231535ba88b4a.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d8f231535ba88b4a.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-dc188b225d49fbd3",
+      "assetPath": "/assets/cutouts/generated-dc188b225d49fbd3.png",
+      "matched": true,
+      "product": {
+        "id": "generated-dc188b225d49fbd3",
+        "brand": "American Eagle Outfitters",
+        "name": "AE Striped Button-Up Sweater Polo Men's",
+        "category": "top",
+        "currentTransparentUrl": "/assets/cutouts/generated-dc188b225d49fbd3.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-dc188b225d49fbd3.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-dc188b225d49fbd3.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e0ad64fcd8e46714",
+      "assetPath": "/assets/cutouts/generated-e0ad64fcd8e46714.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e0ad64fcd8e46714",
+        "brand": "Macy's",
+        "name": "Polo Ralph Lauren Men's Slim-Fit Stretch Chino Pants",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e0ad64fcd8e46714.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e0ad64fcd8e46714.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e190f85176ee9be5",
+      "assetPath": "/assets/cutouts/generated-e190f85176ee9be5.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e190f85176ee9be5",
+        "brand": "shop.mango.com",
+        "name": "MANGO Men's Knitted Structured Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e190f85176ee9be5.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e190f85176ee9be5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e6454b5080145d0e",
+      "assetPath": "/assets/cutouts/generated-e6454b5080145d0e.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e6454b5080145d0e",
+        "brand": "Target",
+        "name": "COOFANDY Men's Lightweight Knit Long Sleeve Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e6454b5080145d0e.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e6454b5080145d0e.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e946a57f141dc54c",
+      "assetPath": "/assets/cutouts/generated-e946a57f141dc54c.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e946a57f141dc54c",
+        "brand": "H&M",
+        "name": "Abercrombie & Fitch Men's Preppy Zip Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e946a57f141dc54c.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e946a57f141dc54c.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-ef1ef5d28cfcf7d5",
+      "assetPath": "/assets/cutouts/generated-ef1ef5d28cfcf7d5.png",
+      "matched": true,
+      "product": {
+        "id": "generated-ef1ef5d28cfcf7d5",
+        "brand": "Nautica",
+        "name": "Nautica Men's Tipped Textured Sweater Polo",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-ef1ef5d28cfcf7d5.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef1ef5d28cfcf7d5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-ef8c18a9ce9f8c03",
+      "assetPath": "/assets/cutouts/generated-ef8c18a9ce9f8c03.png",
+      "matched": true,
+      "product": {
+        "id": "generated-ef8c18a9ce9f8c03",
+        "brand": "Old Navy",
+        "name": "Old Navy Men's Short-Sleeve Polo Sweater",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-ef8c18a9ce9f8c03.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef8c18a9ce9f8c03.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-efe763d1bf479e59",
+      "assetPath": "/assets/cutouts/generated-efe763d1bf479e59.png",
+      "matched": true,
+      "product": {
+        "id": "generated-efe763d1bf479e59",
+        "brand": "Gentleman's Seoul",
+        "name": "Korean Men's Linen Shirt and Shorts Set",
+        "category": "top"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-efe763d1bf479e59.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-efe763d1bf479e59.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-f1e5461b86e85cb7",
+      "assetPath": "/assets/cutouts/generated-f1e5461b86e85cb7.png",
+      "matched": true,
+      "product": {
+        "id": "generated-f1e5461b86e85cb7",
+        "brand": "Banana Republic Factory",
+        "name": "Johnny Collar Marled Sweater Polo",
+        "category": "top",
+        "currentTransparentUrl": "/assets/cutouts/generated-f1e5461b86e85cb7.png"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-f1e5461b86e85cb7.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-16T21:45:05.933Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-f1e5461b86e85cb7.png by scripts/register-cutouts.ts."
+      }
+    }
+  ],
   "notes": [
-    "This script does not mutate catalog data yet.",
-    "Use the proposedPatch fields only after visually reviewing each transparent asset.",
-    "Catalog source ownership should be chosen before applying patches to live product JSON."
+    "Applied matched cutout assets to data/catalog-cutout-overrides.json. Source product files were not edited.",
+    "The runtime catalog reads this reviewed override layer after tag overrides.",
+    "Unmatched assets are reported but never applied."
   ]
 }

@@ -23,6 +23,7 @@ import { join } from 'node:path';
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { applyCatalogCutoutOverridesToProducts } from '../lib/catalog-cutout-overrides';
 import { validateProduct } from '../lib/catalog-schemas/product.v2';
 import type { Category, Product } from '../lib/types';
 
@@ -161,9 +162,9 @@ interface CutoutReport {
 
 function build(): CutoutReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
-    { label: 'brand-catalog', products: BRAND_CATALOG_PRODUCTS as unknown[] },
-    { label: 'generated-catalog', products: GENERATED_CATALOG_PRODUCTS as unknown[] },
-    { label: 'photo-catalog', products: PHOTO_CATALOG_PRODUCTS as unknown[] },
+    { label: 'brand-catalog', products: applyCatalogCutoutOverridesToProducts(BRAND_CATALOG_PRODUCTS as Product[]) as unknown[] },
+    { label: 'generated-catalog', products: applyCatalogCutoutOverridesToProducts(GENERATED_CATALOG_PRODUCTS as Product[]) as unknown[] },
+    { label: 'photo-catalog', products: applyCatalogCutoutOverridesToProducts(PHOTO_CATALOG_PRODUCTS as Product[]) as unknown[] },
   ];
 
   let totalCatalog = 0;
@@ -199,7 +200,7 @@ function build(): CutoutReport {
       'A "candidate" is a product with a safe original image and no transparent asset.',
       'Priority weighs feed-critical category, retail-white-bg hint, and presence of productUrl.',
       'Background removal still requires an external tool (e.g. remove.bg, Photoroom, local rembg).',
-      'After the user runs a real cutout pipeline, write the result to product.imageTransparentUrl.',
+      'After a real cutout pipeline runs, register reviewed assets with scripts/register-cutouts.ts.',
     ],
   };
 }

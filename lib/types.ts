@@ -26,7 +26,14 @@ export interface Product {
   retailer: string;
   retailerUrl: string;
   affiliateUrl?: string;       // Rakuten/Skimlinks-wrapped
-  imageUrl: string;            // our CDN copy, bg-removed
+  imageUrl: string;            // original merchant/catalog image
+  imageTransparentUrl?: string; // real transparent PNG/WebP/AVIF asset when reviewed
+  imageCutoutUrl?: string;      // optional alias for future cutout providers
+  imageSource?: 'merchant' | 'searchapi' | 'manual' | 'generated' | 'transparent-pipeline';
+  imageStatus?: 'original' | 'needs-cutout' | 'cutout-ready' | 'cutout-failed' | 'review-only' | 'quarantined';
+  imageQualityFlags?: string[];
+  imageUpdatedAt?: string;
+  imageReviewNotes?: string;
   imageOriginalUrl?: string;   // debug
   inStock?: boolean;
   trusted?: boolean;

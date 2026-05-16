@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 
@@ -6,6 +6,7 @@ const root = process.cwd();
 const cutoutDir = join(root, 'public', 'assets', 'cutouts');
 const reportDir = join(root, 'data', 'catalog', 'cutout-reviewed');
 const reportPath = join(reportDir, 'cutout-register-report.json');
+const overridePath = join(root, 'data', 'catalog-cutout-overrides.json');
 const apply = process.argv.includes('--apply');
 const json = process.argv.includes('--json');
 
@@ -28,8 +29,25 @@ type CutoutMatch = {
     imageTransparentUrl: string;
     imageSource: 'transparent-pipeline';
     imageStatus: 'cutout-ready';
+    imageUpdatedAt: string;
+    imageReviewNotes: string;
   };
 };
+
+type CutoutOverride = NonNullable<CutoutMatch['proposedPatch']> & {
+  imageQualityFlags?: string[];
+};
+
+function readExistingOverrides(): Record<string, CutoutOverride> {
+  if (!existsSync(overridePath)) return {};
+  try {
+    const parsed = JSON.parse(readFileSync(overridePath, 'utf8')) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return parsed as Record<string, CutoutOverride>;
+  } catch {
+    return {};
+  }
+}
 
 const productById = new Map(ALL_CATALOG_PRODUCTS.map((product) => [product.id, product]));
 
@@ -43,6 +61,7 @@ function publicUrlFor(file: string): string {
 
 function main() {
   mkdirSync(reportDir, { recursive: true });
+  const generatedAt = new Date().toISOString();
   const files = existsSync(cutoutDir) ? readdirSync(cutoutDir).filter(isCutoutAsset).sort() : [];
   const matches: CutoutMatch[] = files.map((file) => {
     const id = file.replace(/\.(png|webp|avif)$/i, '');
@@ -66,23 +85,45 @@ function main() {
             imageTransparentUrl: assetPath,
             imageSource: 'transparent-pipeline',
             imageStatus: 'cutout-ready',
+            imageUpdatedAt: generatedAt,
+            imageReviewNotes: `Registered from ${relative(root, join(cutoutDir, file)).replace(/\\/g, '/')} by scripts/register-cutouts.ts.`,
           }
         : undefined,
     };
   });
 
+  let appliedCount = 0;
+  let overrideFile = relative(root, overridePath).replace(/\\/g, '/');
+  if (apply) {
+    const existing = readExistingOverrides();
+    const next = { ...existing };
+    for (const match of matches) {
+      if (!match.matched || !match.proposedPatch) continue;
+      next[match.id] = {
+        ...(existing[match.id] || {}),
+        ...match.proposedPatch,
+      };
+      appliedCount += 1;
+    }
+    writeFileSync(overridePath, `${JSON.stringify(next, null, 2)}\n`, 'utf8');
+  }
+
   const report = {
-    generatedAt: new Date().toISOString(),
-    mode: apply ? 'apply-requested-but-manual-only' : 'dry-run',
+    generatedAt,
+    mode: apply ? 'apply' : 'dry-run',
     cutoutDir: relative(root, cutoutDir).replace(/\\/g, '/'),
+    overrideFile,
     totalAssets: files.length,
     matchedProducts: matches.filter((match) => match.matched).length,
     unmatchedAssets: matches.filter((match) => !match.matched).length,
+    appliedCount,
     matches,
     notes: [
-      'This script does not mutate catalog data yet.',
-      'Use the proposedPatch fields only after visually reviewing each transparent asset.',
-      'Catalog source ownership should be chosen before applying patches to live product JSON.',
+      apply
+        ? 'Applied matched cutout assets to data/catalog-cutout-overrides.json. Source product files were not edited.'
+        : 'Dry-run only. Use --apply after reviewing assets to write data/catalog-cutout-overrides.json.',
+      'The runtime catalog reads this reviewed override layer after tag overrides.',
+      'Unmatched assets are reported but never applied.',
     ],
   };
 
@@ -98,9 +139,10 @@ function main() {
   console.log(`Assets found       : ${report.totalAssets}`);
   console.log(`Matched products   : ${report.matchedProducts}`);
   console.log(`Unmatched assets   : ${report.unmatchedAssets}`);
+  console.log(`Applied overrides  : ${report.appliedCount}`);
   console.log(`Report written     : ${relative(root, reportPath).replace(/\\/g, '/')}`);
   if (apply) {
-    console.log('Apply mode is intentionally manual-only. Review the report before editing product data.');
+    console.log(`Override file      : ${report.overrideFile}`);
   }
 }
 
