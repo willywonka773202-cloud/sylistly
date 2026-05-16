@@ -217,6 +217,7 @@ export default function SavedPage() {
             onChange={setActiveFilter}
             counts={collectionCounts}
           />
+          <CreateCollectionFuture />
           {visibleFits.length === 0 ? (
             <section className="rounded-[20px] border border-white/10 bg-white/[0.04] p-5 text-center">
               <p className="text-[12px] leading-relaxed text-muted-2">
@@ -244,11 +245,11 @@ export default function SavedPage() {
                   onClick={() => setDetailFitId(fit.id)}
                   className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] text-left shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(246,48,107,.32)]"
                 >
-                  <div className="relative aspect-[3/4] grid grid-cols-2 grid-rows-2 gap-1.5 overflow-hidden bg-[#fff7ef] p-1.5">
-                    {visualProducts.slice(0, 4).map((product) => (
+                  <div className="relative aspect-[3/4] grid grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden bg-[#fff7ef] p-1.5">
+                    {visualProducts.slice(0, 6).map((product, index) => (
                       <div
                         key={`${fit.id}-tile-${product.id}`}
-                        className="overflow-hidden rounded-[12px] bg-white/80 ring-1 ring-[#eadfd5]"
+                        className={`overflow-hidden rounded-[12px] bg-white/80 ring-1 ring-[#eadfd5] ${index === 0 ? 'row-span-2' : ''}`}
                       >
                         <ProductImage
                           product={product}
@@ -383,6 +384,27 @@ function CollectionFilters({
   );
 }
 
+function CreateCollectionFuture() {
+  return (
+    <section className="rounded-[20px] border border-dashed border-white/12 bg-white/[0.025] p-4">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent/12 text-accent">
+          <Layers size={16} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Create collection</div>
+          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+            Future: user-named collections will organize real saved fits. Current filters are inferred from each fit.
+          </p>
+        </div>
+        <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[8px] font-black uppercase tracking-[.14em] text-muted">
+          Soon
+        </span>
+      </div>
+    </section>
+  );
+}
+
 function SavedDetailSheet({
   fit,
   visualItems,
@@ -413,7 +435,7 @@ function SavedDetailSheet({
   return (
     <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/65 backdrop-blur-sm">
       <button className="absolute inset-0" aria-label="Close saved fit" onClick={onClose} />
-      <article className="relative z-10 max-h-[88dvh] w-full overflow-y-auto rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
+      <article className="sy-sheet-enter relative z-10 max-h-[88dvh] w-full overflow-y-auto rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
         <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
 
         <div className="flex items-start justify-between gap-3">
@@ -435,6 +457,12 @@ function SavedDetailSheet({
           >
             <X size={15} />
           </button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <DetailStat label="Pieces" value={visualProducts.length.toString()} />
+          <DetailStat label="Total" value={formatPrice(fit.totalCents)} />
+          <DetailStat label="Saved" value={formatDate(fit.createdAt).split(',')[0]} />
         </div>
 
         {/* Large preview */}
@@ -548,9 +576,18 @@ function SavedDetailSheet({
   );
 }
 
+function DetailStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2">
+      <div className="text-[8px] font-black uppercase tracking-[.16em] text-muted">{label}</div>
+      <div className="mt-1 truncate font-serif text-[16px] font-semibold leading-none text-ink">{value}</div>
+    </div>
+  );
+}
+
 function SavedEmptyState() {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 text-center">
+    <section className="sy-card-strong rounded-[26px] p-6 text-center">
       <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/15 text-accent shadow-pink-glow">
         <Bookmark size={22} />
       </div>
@@ -558,7 +595,7 @@ function SavedEmptyState() {
       <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
         Save a look from the feed or build one in Builder — every fit lands here ready to remix, shop, or move to your closet.
       </p>
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         <Link
           href="/feed"
           className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
@@ -572,6 +609,13 @@ function SavedEmptyState() {
         >
           <Wand2 size={11} />
           Open builder
+        </Link>
+        <Link
+          href="/discover"
+          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
+        >
+          <ShoppingBag size={11} />
+          Discover
         </Link>
       </div>
     </section>
