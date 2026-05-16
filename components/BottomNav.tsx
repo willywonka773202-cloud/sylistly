@@ -51,7 +51,7 @@ export function BottomNav() {
               key={href}
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
+              className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
                 active ? 'text-ink opacity-100' : 'text-muted opacity-55'
               }`}
             >
@@ -82,7 +82,7 @@ export function BottomNav() {
               key={href}
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
+              className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
                 active ? 'text-ink opacity-100' : 'text-muted opacity-55'
               }`}
             >
@@ -102,7 +102,7 @@ export function BottomNav() {
             aria-label="Close create menu"
             onClick={() => setCreateOpen(false)}
           />
-          <section className="relative z-10 w-full rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
+          <section className="sy-enter relative z-10 w-full rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
             <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
 
             <div className="flex items-center justify-between">
@@ -200,7 +200,7 @@ function ActionCard({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col gap-2 rounded-[20px] border-2 p-3 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 ${
+      className={`sy-lift sy-press flex flex-col gap-2 rounded-[20px] border-2 p-3 text-left ${
         disabled
           ? 'cursor-not-allowed border-white/8 bg-white/[0.02] opacity-60'
           : 'border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))]'

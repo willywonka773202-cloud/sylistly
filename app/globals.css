@@ -38,3 +38,52 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes sy-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .sy-enter {
+    animation: sy-rise-in 220ms ease-out both;
+  }
+
+  .sy-press {
+    transition: transform 150ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .sy-press:active {
+    transform: scale(.97);
+  }
+
+  .sy-lift {
+    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+  }
+
+  .sy-lift:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sy-enter {
+    animation: none;
+  }
+
+  .sy-press,
+  .sy-lift {
+    transition: none;
+  }
+
+  .sy-press:active,
+  .sy-lift:hover {
+    transform: none;
+  }
+}
