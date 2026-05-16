@@ -36,6 +36,19 @@ interface ExpansionPlanReport {
   notes: string[];
 }
 
+const TRANSPARENT_TARGETS: Record<Category, number> = {
+  hat: 10,
+  outer: 20,
+  top: 25,
+  bottom: 25,
+  shoes: 20,
+  bag: 10,
+  eyewear: 8,
+  jewelry: 8,
+};
+
+const SEARCHAPI_TRANSPARENT_PRIORITY: Category[] = ['shoes', 'bottom', 'outer', 'bag', 'hat', 'jewelry', 'top', 'eyewear'];
+
 function priceTier(product: Product): PriceTier {
   if (!Number.isFinite(product.priceCents) || product.priceCents <= 0) return 'unknown';
   if (product.priceCents < 5000) return 'under-50';
@@ -93,14 +106,17 @@ function buildReport(): ExpansionPlanReport {
       const count = byCategory.get(category) || 0;
       const cutoutGap = needsCutoutByCategory.get(category) || 0;
       const target = category === 'top' || category === 'bottom' || category === 'outer' ? 140 : 80;
-      const priority = Math.max(0, target - count) + Math.min(35, cutoutGap / 4);
+      const transparentCount = products.filter((product) => product.category === category && product.imageTransparentUrl).length;
+      const transparentGap = Math.max(0, TRANSPARENT_TARGETS[category] - transparentCount);
+      const searchPriorityBoost = Math.max(0, SEARCHAPI_TRANSPARENT_PRIORITY.length - SEARCHAPI_TRANSPARENT_PRIORITY.indexOf(category)) * 3;
+      const priority = transparentGap * 12 + Math.max(0, target - count) + Math.min(35, cutoutGap / 4) + searchPriorityBoost;
       return {
         target: category,
         priority: Number(priority.toFixed(1)),
-        reason: `${count} products now; ${cutoutGap} safe originals still need transparent assets`,
+        reason: `${count} products now; ${transparentCount}/${TRANSPARENT_TARGETS[category]} transparent assets; ${cutoutGap} safe originals still need transparent assets`,
         recommendedAction: count < target
-          ? 'Add reviewed products, then run cutout pipeline for high-visibility items.'
-          : 'Prioritize cutout generation before adding more volume.',
+          ? 'Add reviewed products from transparent-gap categories, then run cutout pipeline for high-visibility items.'
+          : 'Prioritize source-image quality and cutout generation before adding more volume.',
       };
     })
     .sort((a, b) => b.priority - a.priority)
@@ -161,12 +177,18 @@ function buildReport(): ExpansionPlanReport {
     },
   ].filter((item) => item.priority > 0);
 
-  const searchApiPlan: PlanItem[] = categoryGaps.slice(0, 6).map((gap) => ({
-    target: `${gap.target} search queries`,
-    priority: gap.priority,
-    reason: gap.reason,
-    recommendedAction: 'Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped and review-only.',
-  }));
+  const searchApiPlan: PlanItem[] = [];
+  for (const category of SEARCHAPI_TRANSPARENT_PRIORITY) {
+    const gap = categoryGaps.find((item) => item.target === category);
+    if (!gap) continue;
+    searchApiPlan.push({
+      target: `${gap.target} search queries`,
+      priority: gap.priority,
+      reason: gap.reason,
+      recommendedAction: 'Run scripts/searchapi-catalog-expand.ts in dry-run first; live mode should stay capped, transparent-gap focused, and review-only.',
+    });
+    if (searchApiPlan.length >= 7) break;
+  }
 
   const backgroundRemovalPlan: PlanItem[] = categoryGaps.slice(0, 8).map((gap) => ({
     target: `${gap.target} cutout queue`,
