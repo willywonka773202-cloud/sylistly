@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Check, Heart, Layers, ShoppingBag, Sparkles, Wand2 } from 'lucide-react';
+import { Check, Heart, Layers, ShoppingBag, Sparkles, Wand2 } from 'lucide-react';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { ProductImage } from '@/components/ProductImage';
@@ -39,6 +39,7 @@ interface FormulaRail {
   formulaIds: string[];
   keywords: string[];
   categories?: Category[];
+  chip: string;
 }
 
 const DISCOVER_RECIPES = new Map(
@@ -52,6 +53,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Quiet staples, polished layers, and sharp basics.',
     formulaIds: ['clean-elevated', 'old-money-knit'],
     keywords: ['clean', 'minimal', 'neutral', 'tailored', 'polo', 'trouser', 'blazer', 'loafer'],
+    chip: 'Polished basics',
   },
   {
     id: 'sneaker-led',
@@ -59,6 +61,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Fits that start with the shoe and keep the shape casual.',
     formulaIds: ['streetwear-sneaker-led', 'campus-cozy'],
     keywords: ['sneaker', 'samba', 'campus', 'air force', 'chuck', 'street', 'cargo', 'hoodie'],
+    chip: 'Shoe-first',
   },
   {
     id: 'gym-training',
@@ -66,6 +69,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Performance pieces that still read intentional.',
     formulaIds: ['gym-training'],
     keywords: ['gym', 'training', 'alo', 'adidas', 'track', 'shorts', 'woven', 'studio'],
+    chip: 'Training',
   },
   {
     id: 'date-polished',
@@ -73,6 +77,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Dinner-ready pieces with shine, structure, and better shoes.',
     formulaIds: ['date-polished', 'night-out'],
     keywords: ['date', 'night', 'black', 'leather', 'slingback', 'jewelry', 'dressy', 'tabby'],
+    chip: 'Night polish',
   },
   {
     id: 'travel',
@@ -80,6 +85,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Airport and resort pieces that pack cleanly.',
     formulaIds: ['travel-airport', 'vacation-resort'],
     keywords: ['travel', 'airport', 'vacation', 'resort', 'linen', 'tote', 'sunglasses', 'shorts'],
+    chip: 'Packable',
   },
   {
     id: 'office',
@@ -87,6 +93,7 @@ const FORMULA_RAILS: FormulaRail[] = [
     subtitle: 'Workday pieces with real outfit range.',
     formulaIds: ['office-smart-casual'],
     keywords: ['office', 'workwear', 'tailored', 'suit', 'blazer', 'button', 'trouser', 'weekday'],
+    chip: 'Workday',
   },
 ];
 
@@ -312,6 +319,12 @@ export default function DiscoverPage() {
     () => new Set(wardrobeItems.filter((item) => item.status === 'closet').map((item) => item.product.category)),
     [wardrobeItems],
   );
+  const closetCount = wardrobeItems.filter((item) => item.status === 'closet').length;
+  const wishlistCount = wardrobeItems.filter((item) => item.status === 'wishlist').length;
+  const missingCategories = useMemo(
+    () => CATEGORY_ORDER.filter((category) => !closetCategories.has(category)),
+    [closetCategories],
+  );
 
   const feedProducts = useMemo(
     () => posts.flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product))),
@@ -352,8 +365,7 @@ export default function DiscoverPage() {
   }, [feedProducts, wardrobeProductIds]);
 
   const gapProducts = useMemo(() => {
-    const missing = CATEGORY_ORDER.filter((category) => !closetCategories.has(category));
-    const suggestions = missing.flatMap((category) => {
+    const suggestions = missingCategories.flatMap((category) => {
       const fromFeed = feedProducts.filter((product) => product.category === category);
       const fromCatalog = ALL_CATALOG_PRODUCTS
         .filter((product) => product.category === category)
@@ -366,7 +378,43 @@ export default function DiscoverPage() {
       return uniqueProducts([...fromFeed, ...fromCatalog], 2, wardrobeProductIds);
     });
     return uniqueProducts(suggestions, 12, wardrobeProductIds);
-  }, [closetCategories, feedProducts, wardrobeProductIds]);
+  }, [feedProducts, missingCategories, wardrobeProductIds]);
+
+  const budgetFinds = useMemo(() => {
+    const products = [...feedProducts, ...ALL_CATALOG_PRODUCTS]
+      .filter((product) => product.priceCents > 0 && product.priceCents <= 9000)
+      .filter(isRenderableProduct)
+      .sort((left, right) => {
+        const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 4 : 0) - left.priceCents / 10000;
+        const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 4 : 0) - right.priceCents / 10000;
+        return rightScore - leftScore;
+      });
+    return uniqueProducts(products, 12, wardrobeProductIds);
+  }, [feedProducts, wardrobeProductIds]);
+
+  const premiumPicks = useMemo(() => {
+    const products = [...feedProducts, ...ALL_CATALOG_PRODUCTS]
+      .filter((product) => product.priceCents >= 25000)
+      .filter(isRenderableProduct)
+      .sort((left, right) => {
+        const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + left.priceCents / 100000;
+        const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + right.priceCents / 100000;
+        return rightScore - leftScore;
+      });
+    return uniqueProducts(products, 12, wardrobeProductIds);
+  }, [feedProducts, wardrobeProductIds]);
+
+  const underusedGems = useMemo(() => {
+    const products = [...ALL_CATALOG_PRODUCTS, ...feedProducts]
+      .filter(isRenderableProduct)
+      .filter((product) => !wardrobeProductIds.has(product.id))
+      .sort((left, right) => {
+        const leftScore = (left.metadata?.featured ? 4 : 0) + (left.imageQuality === 'good' ? 8 : 0);
+        const rightScore = (right.metadata?.featured ? 4 : 0) + (right.imageQuality === 'good' ? 8 : 0);
+        return rightScore - leftScore;
+      });
+    return uniqueProducts(products, 12);
+  }, [feedProducts, wardrobeProductIds]);
 
   const looks = useMemo(() => buildDiscoverLooks(), []);
 
@@ -395,19 +443,29 @@ export default function DiscoverPage() {
       maxWidthClassName="max-w-[680px]"
     >
       <div className="space-y-6">
-        <section className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_18%_0%,rgba(246,48,107,.18),transparent_38%),linear-gradient(180deg,#151412_0%,#0f0f0e_100%)] p-4 shadow-[0_22px_54px_rgba(0,0,0,.34)]">
+        <section className="sy-card-strong rounded-[28px] p-4">
           <div className="flex items-center gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/14 text-accent">
               <Sparkles size={18} />
             </div>
             <div>
-              <div className="text-[9px] font-bold uppercase tracking-[.2em] text-accent">Formula rails</div>
-              <h2 className="mt-1 font-serif text-[22px] font-semibold leading-tight text-[#fff5ee]">Shop by outfit logic</h2>
+              <div className="text-[9px] font-bold uppercase tracking-[.2em] text-accent">Discovery engine</div>
+              <h2 className="mt-1 font-serif text-[25px] font-semibold leading-tight text-[#fff5ee]">Discover pieces that complete your style</h2>
             </div>
           </div>
           <p className="mt-3 max-w-[46ch] text-[12px] leading-relaxed text-muted-2">
-            Rails use catalog-backed feed products and real catalog entries. No fake trend counts, sponsored blocks, or placeholder items.
+            Rails use catalog-backed feed products, real catalog entries, and your local closet/wishlist state. No fake trend counts, sponsored blocks, or placeholder items.
           </p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <ContextChip label="Closet" value={closetCount.toString()} />
+            <ContextChip label="Wishlist" value={wishlistCount.toString()} />
+            <ContextChip label="Missing" value={missingCategories.length.toString()} />
+          </div>
+          {missingCategories.length > 0 ? (
+            <div className="mt-3 rounded-[18px] border border-accent/25 bg-accent/10 px-3 py-2 text-[11px] leading-relaxed text-white/82">
+              Complete your closet first: {missingCategories.slice(0, 4).join(', ')}.
+            </div>
+          ) : null}
         </section>
 
         {formulaRails.map((rail) => (
@@ -415,6 +473,7 @@ export default function DiscoverPage() {
             key={rail.id}
             title={rail.title}
             subtitle={rail.subtitle}
+            badge={rail.chip}
             products={rail.products}
             wardrobeProductIds={wardrobeProductIds}
             onWishlist={(product) => {
@@ -433,6 +492,7 @@ export default function DiscoverPage() {
         <ProductRail
           title="Basics"
           subtitle="Renderable essentials not already in your closet or wishlist."
+          badge="Essentials"
           products={basics}
           wardrobeProductIds={wardrobeProductIds}
           onWishlist={(product) => {
@@ -449,8 +509,9 @@ export default function DiscoverPage() {
 
         {gapProducts.length > 0 ? (
           <ProductRail
-            title="Wardrobe gaps"
+            title="Complete your closet"
             subtitle="Missing closet categories with real product suggestions."
+            badge={missingCategories.slice(0, 3).join(' + ') || 'Covered'}
             products={gapProducts}
             wardrobeProductIds={wardrobeProductIds}
             onWishlist={(product) => {
@@ -465,6 +526,60 @@ export default function DiscoverPage() {
             onShop={shop}
           />
         ) : null}
+
+        <ProductRail
+          title="Budget finds"
+          subtitle="Lower-price real products with usable images."
+          badge="Under $90"
+          products={budgetFinds}
+          wardrobeProductIds={wardrobeProductIds}
+          onWishlist={(product) => {
+            addToWishlist(product, 'catalog');
+            showToast('Added to wishlist');
+          }}
+          onCloset={(product) => {
+            addToCloset(product, 'catalog');
+            showToast('Added to closet');
+          }}
+          onBuild={buildAround}
+          onShop={shop}
+        />
+
+        <ProductRail
+          title="Premium picks"
+          subtitle="Higher-price pieces for upgrading quality, not volume."
+          badge="Investment"
+          products={premiumPicks}
+          wardrobeProductIds={wardrobeProductIds}
+          onWishlist={(product) => {
+            addToWishlist(product, 'catalog');
+            showToast('Added to wishlist');
+          }}
+          onCloset={(product) => {
+            addToCloset(product, 'catalog');
+            showToast('Added to closet');
+          }}
+          onBuild={buildAround}
+          onShop={shop}
+        />
+
+        <ProductRail
+          title="Underused gems"
+          subtitle="Renderable catalog pieces not already in closet or wishlist."
+          badge="Fresh"
+          products={underusedGems}
+          wardrobeProductIds={wardrobeProductIds}
+          onWishlist={(product) => {
+            addToWishlist(product, 'catalog');
+            showToast('Added to wishlist');
+          }}
+          onCloset={(product) => {
+            addToCloset(product, 'catalog');
+            showToast('Added to closet');
+          }}
+          onBuild={buildAround}
+          onShop={shop}
+        />
 
         <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#141311_0%,#0f0f0e_100%)] p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3">
@@ -497,6 +612,7 @@ export default function DiscoverPage() {
 function ProductRail({
   title,
   subtitle,
+  badge,
   products,
   wardrobeProductIds,
   onWishlist,
@@ -506,6 +622,7 @@ function ProductRail({
 }: {
   title: string;
   subtitle: string;
+  badge: string;
   products: Product[];
   wardrobeProductIds: Set<string>;
   onWishlist: (product: Product) => void;
@@ -519,10 +636,17 @@ function ProductRail({
     <section>
       <div className="mb-3 flex items-end justify-between gap-3 px-1">
         <div>
-          <h2 className="font-serif text-[21px] font-semibold leading-tight text-ink">{title}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-serif text-[21px] font-semibold leading-tight text-ink">{title}</h2>
+            <span className="rounded-full border border-accent/35 bg-accent/12 px-2 py-0.5 text-[8px] font-black uppercase tracking-[.14em] text-accent">
+              {badge}
+            </span>
+          </div>
           <p className="mt-1 text-[11px] leading-relaxed text-muted-2">{subtitle}</p>
         </div>
-        <ArrowRight size={15} className="mb-1 text-accent" />
+        <div className="mb-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-muted-2">
+          {products.length} pieces
+        </div>
       </div>
       <div className="flex gap-3 overflow-x-auto px-1 pb-2 scrollbar-hide">
         {products.map((product) => (
@@ -623,5 +747,14 @@ function DiscoverProductCard({
         </button>
       </div>
     </article>
+  );
+}
+
+function ContextChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+      <div className="text-[8px] font-black uppercase tracking-[.16em] text-muted">{label}</div>
+      <div className="mt-1 truncate font-serif text-[18px] font-semibold leading-none text-ink">{value}</div>
+    </div>
   );
 }
