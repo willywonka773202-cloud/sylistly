@@ -115,6 +115,52 @@ const MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
   },
 };
 
+const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
+  default: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-2xl bg-transparent',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_18px_18px_rgba(60,32,18,.2)]',
+  },
+  cutout: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-[24px] bg-transparent',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_22px_20px_rgba(60,32,18,.24)]',
+    paddingByCategory: {
+      shoes: 'p-2.5 drop-shadow-[0_22px_20px_rgba(60,32,18,.26)]',
+      jewelry: 'p-4 drop-shadow-[0_14px_16px_rgba(60,32,18,.18)]',
+      eyewear: 'p-3.5 drop-shadow-[0_14px_16px_rgba(60,32,18,.18)]',
+      bag: 'p-3 drop-shadow-[0_20px_20px_rgba(60,32,18,.24)]',
+    },
+  },
+  closet: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-[20px] bg-transparent',
+    image: 'h-full w-full object-contain p-3.5 drop-shadow-[0_18px_18px_rgba(60,32,18,.18)]',
+    paddingByCategory: {
+      shoes: 'p-2.5 drop-shadow-[0_18px_18px_rgba(60,32,18,.2)]',
+      jewelry: 'p-4 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)]',
+      eyewear: 'p-3.5 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)]',
+    },
+  },
+  moodboard: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-[22px] bg-transparent',
+    image: 'h-full w-full object-contain p-3 drop-shadow-[0_26px_24px_rgba(60,32,18,.26)]',
+    paddingByCategory: {
+      shoes: 'p-2 drop-shadow-[0_28px_24px_rgba(60,32,18,.3)]',
+      bag: 'p-2.5 drop-shadow-[0_24px_22px_rgba(60,32,18,.26)]',
+    },
+  },
+  hero: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-[28px] bg-transparent',
+    image: 'h-full w-full object-contain p-5 drop-shadow-[0_34px_32px_rgba(60,32,18,.3)]',
+    paddingByCategory: {
+      shoes: 'p-4 drop-shadow-[0_36px_34px_rgba(60,32,18,.32)]',
+      bag: 'p-5 drop-shadow-[0_32px_30px_rgba(60,32,18,.28)]',
+    },
+  },
+  thumbnail: {
+    wrapper: 'relative h-full w-full overflow-visible rounded-[14px] bg-transparent',
+    image: 'h-full w-full object-contain p-1.5 drop-shadow-[0_8px_10px_rgba(60,32,18,.16)]',
+  },
+};
+
 export function getCleanProductImageUrl(product: Product, cutout = false): string {
   if (!hasUsableProductImage(product)) return '';
   return cutout
@@ -134,7 +180,7 @@ export function getCleanProductImageUrl(product: Product, cutout = false): strin
  * carries a URL.
  */
 function pickTransparentUrl(product: Product): string | null {
-  const candidate = (product as Product & { imageTransparentUrl?: unknown }).imageTransparentUrl;
+  const candidate = product.imageTransparentUrl || product.imageCutoutUrl;
   if (typeof candidate !== 'string') return null;
   const trimmed = candidate.trim();
   if (!trimmed) return null;
@@ -184,20 +230,22 @@ export function ProductImage({
   }, [product.id, product.imageUrl]);
 
   const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
-  const resolvedWrapperClass = wrapperClassName || mode.wrapper;
+  const transparentMode = TRANSPARENT_MODE_STYLES[displayMode] ?? TRANSPARENT_MODE_STYLES.default;
+  const activeMode = imageKind === 'transparent' ? transparentMode : mode;
+  const resolvedWrapperClass = wrapperClassName || activeMode.wrapper;
   const resolvedImageClass =
-    className || mode.paddingByCategory?.[product.category] || mode.image;
+    className || activeMode.paddingByCategory?.[product.category] || activeMode.image;
 
   if (!imageOk || !src) {
     return (
-      <div className={resolvedWrapperClass}>
+      <div className={resolvedWrapperClass} data-image-kind={imageKind} data-display-mode={displayMode}>
         <CategoryFallback product={product} className={className} />
       </div>
     );
   }
 
   return (
-    <div className={resolvedWrapperClass}>
+    <div className={resolvedWrapperClass} data-image-kind={imageKind} data-display-mode={displayMode}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
