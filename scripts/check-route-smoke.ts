@@ -58,6 +58,8 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'lib/catalog-schemas/product.v2.ts', text: 'TRANSPARENT_URL_NOT_STRING', label: 'Product schema validates transparent URL' },
   { file: 'scripts/catalog-image-audit.ts', text: 'needs-cutout', label: 'Catalog image audit script exists' },
   { file: 'scripts/prepare-cutout-candidates.ts', text: 'Cutout candidate plan', label: 'Cutout candidate prep script exists' },
+  { file: 'scripts/generate-cutouts-local.py', text: 'Default mode is dry-run', label: 'Local cutout generator is dry-run by default' },
+  { file: 'scripts/register-cutouts.ts', text: 'does not mutate catalog data yet', label: 'Cutout registration is manual-review first' },
   { file: 'scripts/catalog-coverage.ts', text: 'Catalog Coverage', label: 'Catalog coverage script exists' },
   { file: 'scripts/searchapi-catalog-expand.ts', text: 'DRY RUN BY DEFAULT', label: 'SearchAPI expand is dry-run by default' },
   { file: 'scripts/searchapi-catalog-expand.ts', text: 'SEARCHAPI_LIVE', label: 'SearchAPI expand requires explicit live env flag' },

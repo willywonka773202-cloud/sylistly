@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-16T20:18:05.154Z",
+  "mode": "dry-run",
+  "cutoutDir": "public/assets/cutouts",
+  "totalAssets": 0,
+  "matchedProducts": 0,
+  "unmatchedAssets": 0,
+  "matches": [],
+  "notes": [
+    "This script does not mutate catalog data yet.",
+    "Use the proposedPatch fields only after visually reviewing each transparent asset.",
+    "Catalog source ownership should be chosen before applying patches to live product JSON."
+  ]
+}

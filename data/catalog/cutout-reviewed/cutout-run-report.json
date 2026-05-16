@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-16T20:18:04Z",
+  "mode": "dry-run",
+  "limit": 5,
+  "rembgAvailable": false,
+  "rembgError": "No module named 'rembg'",
+  "outputDir": "public/assets/cutouts",
+  "items": [
+    {
+      "id": "generated-d21d09ad6fd72b69",
+      "brand": "Banana Republic Factory",
+      "name": "Men's Luxe Touch Polo",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSdQmuqW31Q6rnKXrfDVKaK_4RSJ9Fo5VYg_Mk1G-0gRcwclgVtCnt7i3Pq_wMVwNdQze1Gf1OkQr9qOYPDPFKLLtyVmra5hefQkGU9XdNRgVLoW8xXhQxofw",
+      "outputPath": "public/assets/cutouts/generated-d21d09ad6fd72b69.png",
+      "status": "dry-run",
+      "reason": "pass --apply after installing rembg to generate this PNG"
+    },
+    {
+      "id": "f2e4852913aacbdf",
+      "brand": "Nike",
+      "name": "Men's Oversized Cargo Shorts",
+      "category": "bottom",
+      "imageUrl": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/9d4aefe3-43f4-4289-aaa1-066a4ddf1e50/M%2BNK%2BCLUB%2BOS%2BCARGO%2BSHORT.png",
+      "outputPath": "public/assets/cutouts/f2e4852913aacbdf.png",
+      "status": "dry-run",
+      "reason": "pass --apply after installing rembg to generate this PNG"
+    },
+    {
+      "id": "85f6cb6cd1ec6df2",
+      "brand": "Nike",
+      "name": "Men's Woven Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
+      "outputPath": "public/assets/cutouts/85f6cb6cd1ec6df2.png",
+      "status": "dry-run",
+      "reason": "pass --apply after installing rembg to generate this PNG"
+    },
+    {
+      "id": "catalog-shoes-stevemadden-heel",
+      "brand": "Steve Madden",
+      "name": "Madden pointed slingback heel",
+      "category": "shoes",
+      "imageUrl": "https://www.stevemadden.com/cdn/shop/files/STEVEMADDEN_SHOES_CARY_BLACK-LEATHER_01.jpg?v=1729613675",
+      "outputPath": "public/assets/cutouts/catalog-shoes-stevemadden-heel.png",
+      "status": "dry-run",
+      "reason": "pass --apply after installing rembg to generate this PNG"
+    },
+    {
+      "id": "catalog-shoes-stevemadden-heel",
+      "brand": "Steve Madden",
+      "name": "Madden pointed slingback heel",
+      "category": "shoes",
+      "imageUrl": "https://www.stevemadden.com/cdn/shop/files/STEVEMADDEN_SHOES_CARY_BLACK-LEATHER_01.jpg?v=1729613675",
+      "outputPath": "public/assets/cutouts/catalog-shoes-stevemadden-heel.png",
+      "status": "dry-run",
+      "reason": "pass --apply after installing rembg to generate this PNG"
+    }
+  ]
+}
