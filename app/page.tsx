@@ -210,28 +210,37 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="grid h-9 w-9 place-items-center rounded-full border border-white/12 bg-white/[0.05] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
-              aria-label="Search (coming later)"
+              className="relative grid h-9 w-9 cursor-not-allowed place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/45 opacity-75"
+              aria-label="Search coming later"
+              title="Search coming later"
               disabled
             >
               <Search size={16} />
+              <span className="absolute -bottom-1 -right-1 rounded-full bg-white px-1 py-0.5 text-[6px] font-black uppercase tracking-[.08em] text-black">
+                Soon
+              </span>
             </button>
             <button
               type="button"
-              className="grid h-9 w-9 place-items-center rounded-full border border-white/12 bg-white/[0.05] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
-              aria-label="Notifications (coming later)"
+              className="relative grid h-9 w-9 cursor-not-allowed place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/45 opacity-75"
+              aria-label="Notifications coming later"
+              title="Notifications coming later"
               disabled
             >
               <Bell size={16} />
+              <span className="absolute -bottom-1 -right-1 rounded-full bg-white px-1 py-0.5 text-[6px] font-black uppercase tracking-[.08em] text-black">
+                Soon
+              </span>
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-full border border-accent/45 bg-accent/14 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-accent transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 hover:bg-accent/22"
+              className="inline-flex cursor-not-allowed items-center gap-1 rounded-full border border-accent/25 bg-accent/8 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-accent/70 opacity-80"
               aria-label="Pro coming later"
+              title="Pro coming later"
               disabled
             >
               <Crown size={11} />
-              Pro
+              Pro soon
             </button>
           </div>
         </div>
