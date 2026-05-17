@@ -14,6 +14,9 @@ type Frame = 'masc' | 'fem' | 'androgynous' | 'any';
 type ImageUrlType = 'merchantCdn' | 'googleThumbnailProxy' | 'googleShoppingImage' | 'searchIntent' | 'unsafe' | 'missing';
 type LinkType = 'directProductUrl' | 'merchantUrl' | 'googleShoppingFallback' | 'missing';
 type CutoutReadiness = 'high' | 'medium' | 'low' | 'reviewOnly' | 'blocked';
+type SearchMode = 'shopping' | 'organic' | 'merchant-intent' | 'catalog-replacement' | 'vibe-expansion';
+type SearchEngine = 'google_shopping' | 'google';
+type QueryPlanType = 'shopping-coverage' | 'merchant-organic-page' | 'existing-catalog-replacement' | 'vibe-category-expansion';
 
 interface QueryTemplate {
   frame: Frame;
@@ -35,9 +38,14 @@ interface CategoryPriority {
 
 interface QueryCandidate {
   query: string;
+  planType: QueryPlanType;
+  mode: SearchMode;
+  engine: SearchEngine;
   targetCategory: Category;
   targetFrame: Frame;
+  targetVibe: string;
   targetProductType: string;
+  replacementProductId: string;
   maxResults: number;
   reason: string;
   priority: number;
@@ -54,6 +62,8 @@ interface CliFlags {
   live: boolean;
   dryRun: boolean;
   maxQueries: number;
+  mode: SearchMode | 'all';
+  engine: SearchEngine | 'auto';
 }
 
 interface LiveCheck {
@@ -75,9 +85,14 @@ interface SearchApiCandidate {
   liveMergeReady: false;
   query: string;
   queryIndex: number;
+  planType: QueryPlanType;
+  mode: SearchMode;
+  engine: SearchEngine;
   targetCategory: Category;
   targetFrame: Frame;
+  targetVibe: string;
   targetProductType: string;
+  replacementProductId: string;
   reason: string;
   title: string;
   brand: string;
@@ -117,8 +132,12 @@ interface LiveRunReport {
   outputFile: string;
   queryReports: Array<{
     query: string;
+    planType: QueryPlanType;
+    mode: SearchMode;
+    engine: SearchEngine;
     targetCategory: Category;
     targetFrame: Frame;
+    targetVibe: string;
     targetProductType: string;
     resultsReceived: number;
     candidatesAccepted: number;
@@ -228,8 +247,74 @@ const QUERY_TEMPLATES: Record<Category, QueryTemplate[]> = {
   ],
 };
 
+const ORGANIC_TEST_QUERIES: QueryCandidate[] = [
+  {
+    query: "Zappos men's white leather sneakers product page",
+    planType: 'merchant-organic-page',
+    mode: 'organic',
+    engine: 'google',
+    targetCategory: 'shoes',
+    targetFrame: 'masc',
+    targetVibe: 'classic',
+    targetProductType: 'white leather sneakers',
+    replacementProductId: '',
+    maxResults: 10,
+    reason: 'One-query merchant organic test. Uses Google organic results to seek direct merchant product pages instead of Google Shopping cards.',
+    priority: 10000,
+    transparentCount: 20,
+    transparentTarget: 20,
+    transparentGap: 0,
+    categoryMaxQueries: 1,
+  },
+  {
+    query: "Longchamp Le Pliage Original Tote product page official",
+    planType: 'existing-catalog-replacement',
+    mode: 'catalog-replacement',
+    engine: 'google',
+    targetCategory: 'bag',
+    targetFrame: 'androgynous',
+    targetVibe: 'classic',
+    targetProductType: 'tote bag',
+    replacementProductId: 'catalog-bag-longchamp-lepliage',
+    maxResults: 10,
+    reason: 'One-query existing-catalog replacement test. Looks for a better direct product/source URL for an existing catalog item.',
+    priority: 9990,
+    transparentCount: 9,
+    transparentTarget: 10,
+    transparentGap: 1,
+    categoryMaxQueries: 1,
+  },
+  {
+    query: 'androgynous cozy cardigan product page official',
+    planType: 'vibe-category-expansion',
+    mode: 'vibe-expansion',
+    engine: 'google',
+    targetCategory: 'outer',
+    targetFrame: 'androgynous',
+    targetVibe: 'cozy',
+    targetProductType: 'cardigan',
+    replacementProductId: '',
+    maxResults: 10,
+    reason: 'One-query vibe/frame blocker test. Targets androgynous + cozy transparent-only readiness gaps through organic merchant pages.',
+    priority: 9980,
+    transparentCount: 20,
+    transparentTarget: 20,
+    transparentGap: 0,
+    categoryMaxQueries: 1,
+  },
+];
+
 function parseFlags(argv: string[]): CliFlags {
-  const flags: CliFlags = { json: false, limit: 30, write: false, live: false, dryRun: false, maxQueries: 0 };
+  const flags: CliFlags = {
+    json: false,
+    limit: 30,
+    write: false,
+    live: false,
+    dryRun: false,
+    maxQueries: 0,
+    mode: 'all',
+    engine: 'auto',
+  };
   for (const arg of argv) {
     if (arg === '--json') flags.json = true;
     else if (arg === '--write') flags.write = true;
@@ -241,6 +326,14 @@ function parseFlags(argv: string[]): CliFlags {
     } else if (arg.startsWith('--max-queries=')) {
       const n = Number.parseInt(arg.slice('--max-queries='.length), 10);
       if (Number.isFinite(n) && n > 0) flags.maxQueries = Math.min(n, 100);
+    } else if (arg.startsWith('--mode=')) {
+      const mode = arg.slice('--mode='.length) as SearchMode | 'all';
+      if (['all', 'shopping', 'organic', 'merchant-intent', 'catalog-replacement', 'vibe-expansion'].includes(mode)) {
+        flags.mode = mode;
+      }
+    } else if (arg.startsWith('--engine=')) {
+      const engine = arg.slice('--engine='.length) as SearchEngine | 'auto';
+      if (['auto', 'google_shopping', 'google'].includes(engine)) flags.engine = engine;
     }
   }
   return flags;
@@ -395,10 +488,20 @@ function buildCategoryPriorities(products: Product[]): CategoryPriority[] {
   return priorities.sort((a, b) => b.priority - a.priority);
 }
 
-function buildPlan(): { priorities: CategoryPriority[]; candidates: QueryCandidate[] } {
+function applyPlanFilters(candidates: QueryCandidate[], flags: Pick<CliFlags, 'mode' | 'engine'>): QueryCandidate[] {
+  return candidates
+    .filter((candidate) => flags.mode === 'all' || candidate.mode === flags.mode)
+    .map((candidate) => ({
+      ...candidate,
+      engine: flags.engine === 'auto' ? candidate.engine : flags.engine,
+      mode: flags.engine === 'google_shopping' ? 'shopping' : candidate.mode,
+    }));
+}
+
+function buildPlan(flags: Pick<CliFlags, 'mode' | 'engine'>): { priorities: CategoryPriority[]; candidates: QueryCandidate[] } {
   const products = ALL_CATALOG_PRODUCTS as Product[];
   const priorities = buildCategoryPriorities(products);
-  const candidates: QueryCandidate[] = [];
+  const candidates: QueryCandidate[] = [...ORGANIC_TEST_QUERIES];
 
   for (const priority of priorities) {
     if (priority.transparentGap <= 0 && priority.category !== 'top') continue;
@@ -406,9 +509,14 @@ function buildPlan(): { priorities: CategoryPriority[]; candidates: QueryCandida
     templates.forEach((template, index) => {
       candidates.push({
         query: buildQuery(template),
+        planType: 'shopping-coverage',
+        mode: 'shopping',
+        engine: 'google_shopping',
         targetCategory: priority.category,
         targetFrame: template.frame,
+        targetVibe: '',
         targetProductType: template.productType,
+        replacementProductId: '',
         maxResults: 20,
         reason: `${priority.reason} Query uses merchant-intent product page terms to avoid strict site filters and broad outfit/editorial results.`,
         priority: Number((priority.priority - index).toFixed(1)),
@@ -420,7 +528,7 @@ function buildPlan(): { priorities: CategoryPriority[]; candidates: QueryCandida
     });
   }
 
-  return { priorities, candidates: candidates.sort((a, b) => b.priority - a.priority) };
+  return { priorities, candidates: applyPlanFilters(candidates.sort((a, b) => b.priority - a.priority), flags) };
 }
 
 function buildLiveCheck(flags: CliFlags): LiveCheck {
@@ -456,7 +564,7 @@ function buildLiveCheck(flags: CliFlags): LiveCheck {
 }
 
 function buildReport(flags: CliFlags): PlanReport {
-  const plan = buildPlan();
+  const plan = buildPlan(flags);
   const emitted = plan.candidates.slice(0, flags.limit);
   const liveCheck = buildLiveCheck(flags);
   const plannedQueryCountByCategory = countRecord(CATEGORY_ORDER);
@@ -479,7 +587,8 @@ function buildReport(flags: CliFlags): PlanReport {
     liveCheck,
     notes: [
       'This script does not call SearchAPI in dry-run mode.',
-      'The query plan prioritizes transparent coverage gaps before broad catalog count gaps.',
+      'The query plan tests organic merchant-page discovery before falling back to Google Shopping coverage queries.',
+      'The shopping mode remains available, but previous tests showed Google Shopping thumbnail proxies are not enough for cutout expansion.',
       'Live mode requires SEARCHAPI_KEY + SEARCHAPI_LIVE=true + SEARCHAPI_MAX_QUERIES=N + --live + --max-queries=N.',
       'Live results are candidate-only with reviewStatus=candidate and liveMergeReady=false.',
       'SearchAPI can find better merchant images and product URLs, but it does not remove backgrounds.',
@@ -616,7 +725,11 @@ function maybeWriteDebugSample(plan: QueryCandidate, payload: unknown, results: 
   const sample = {
     generatedAt: new Date().toISOString(),
     query: plan.query,
+    planType: plan.planType,
+    mode: plan.mode,
+    engine: plan.engine,
     targetCategory: plan.targetCategory,
+    targetVibe: plan.targetVibe,
     topLevelKeys: Object.keys(record),
     resultCounts: {
       shopping_results: Array.isArray(record.shopping_results) ? record.shopping_results.length : 0,
@@ -670,6 +783,9 @@ function classifyCandidate(result: SearchApiRawResult, plan: QueryCandidate): { 
   if (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl') flags.push('merchant-link-found');
   if (!targetWeakCategory) flags.push('not-priority-transparent-gap-category');
 
+  if (productLikeTitle && (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl') && (imageType === 'missing' || imageType === 'googleThumbnailProxy')) {
+    return { readiness: 'reviewOnly', flags, imageType, linkType: urls.linkType };
+  }
   if (!title || !productLikeTitle || imageType === 'unsafe' || imageType === 'missing' || imageType === 'searchIntent') {
     return { readiness: 'blocked', flags, imageType, linkType: urls.linkType };
   }
@@ -704,9 +820,14 @@ function toSearchApiCandidate(result: SearchApiRawResult, plan: QueryCandidate, 
     liveMergeReady: false,
     query: plan.query,
     queryIndex,
+    planType: plan.planType,
+    mode: plan.mode,
+    engine: plan.engine,
     targetCategory: plan.targetCategory,
     targetFrame: plan.targetFrame,
+    targetVibe: plan.targetVibe,
     targetProductType: plan.targetProductType,
+    replacementProductId: plan.replacementProductId,
     reason: plan.reason,
     title,
     brand: firstString(result.brand, retailer),
@@ -732,7 +853,7 @@ async function fetchSearchApiResults(plan: QueryCandidate): Promise<SearchApiRaw
   if (!apiKey) throw new Error('SEARCHAPI_KEY is missing');
 
   const params = new URLSearchParams({
-    engine: 'google_shopping',
+    engine: plan.engine,
     q: plan.query,
     hl: 'en',
     gl: 'us',
@@ -810,8 +931,12 @@ async function runLiveSearch(report: PlanReport): Promise<LiveRunReport> {
 
       queryReports.push({
         query: plan.query,
+        planType: plan.planType,
+        mode: plan.mode,
+        engine: plan.engine,
         targetCategory: plan.targetCategory,
         targetFrame: plan.targetFrame,
+        targetVibe: plan.targetVibe,
         targetProductType: plan.targetProductType,
         resultsReceived: results.length,
         candidatesAccepted: accepted,
@@ -820,8 +945,12 @@ async function runLiveSearch(report: PlanReport): Promise<LiveRunReport> {
     } catch (error) {
       queryReports.push({
         query: plan.query,
+        planType: plan.planType,
+        mode: plan.mode,
+        engine: plan.engine,
         targetCategory: plan.targetCategory,
         targetFrame: plan.targetFrame,
+        targetVibe: plan.targetVibe,
         targetProductType: plan.targetProductType,
         resultsReceived: 0,
         candidatesAccepted: 0,
@@ -925,7 +1054,7 @@ function printHuman(report: PlanReport): void {
   console.log('Top query plan');
   console.log('--------------');
   for (const candidate of report.candidates) {
-    console.log(`  (p=${candidate.priority}) [${pad(candidate.targetCategory, 8)} | ${pad(candidate.targetFrame, 12)}] "${candidate.query}"`);
+    console.log(`  (p=${candidate.priority}) [${pad(candidate.planType, 28)} | ${pad(candidate.engine, 15)} | ${pad(candidate.targetCategory, 8)} | ${pad(candidate.targetFrame, 12)}] "${candidate.query}"`);
     console.log(`      reason: ${candidate.reason}`);
   }
   console.log('');
@@ -945,6 +1074,11 @@ function printHuman(report: PlanReport): void {
     console.log(`  output                   : ${report.liveRun.outputFile}`);
     console.log('  queries run by category  :');
     printCountMap(report.liveRun.queriesRunByCategory);
+    console.log('  query reports            :');
+    for (const entry of report.liveRun.queryReports) {
+      console.log(`    [${entry.planType} | ${entry.engine}] ${entry.query}`);
+      console.log(`      results=${entry.resultsReceived} accepted=${entry.candidatesAccepted} blocked=${entry.blockedCandidates}${entry.error ? ` error=${entry.error}` : ''}`);
+    }
     console.log('  candidates by category   :');
     printCountMap(report.liveRun.candidatesByCategory);
     console.log('  image URL types          :');
