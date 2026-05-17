@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-17T14:39:07.842Z",
-  "query": "androgynous cozy cardigan product page official",
+  "generatedAt": "2026-05-17T15:51:13.242Z",
+  "query": "streetwear bomber jacket product page official",
   "planType": "vibe-category-expansion",
   "mode": "vibe-expansion",
   "engine": "google",
   "targetCategory": "outer",
-  "targetVibe": "cozy",
+  "targetVibe": "street",
   "topLevelKeys": [
     "search_metadata",
     "search_parameters",
     "search_information",
     "organic_results",
-    "related_questions",
+    "inline_shopping",
     "related_searches",
     "pagination"
   ],
@@ -19,56 +19,75 @@
     "shopping_results": 0,
     "inline_shopping_results": 0,
     "product_results": 0,
-    "organic_results": 4,
-    "extractedResults": 4
+    "organic_results": 10,
+    "extractedResults": 10
   },
   "firstResults": [
     {
       "position": 1,
-      "title": "Kirrin Finch | Non-Binary and Androgynous Clothing",
-      "link": "https://kirrinfinch.com/?srsltid=AfmBOopLi5Z1uO7fAsITg5SXnArJoFGaknHrqhVkMFviTHx_V2TpvaPo",
-      "source": "Kirrin Finch",
-      "domain": "kirrinfinch.com",
-      "displayed_link": "https://kirrinfinch.com",
-      "snippet": "Kirrin Finch challenges fashion norms with menswear-inspired apparel for women, trans, and non-binary folks. From dress shirts to suits, express your true ...",
+      "title": "Streetwear Signature Bomber Jacket",
+      "link": "https://www.streetwearts.com/products/streetwear-signature-bomber-jacket?srsltid=AfmBOopL4x4qu2vYiJZQsJtMbB8jZLCqylSHk2Pd6j_hPGBdGXNvnmaE",
+      "source": "streetwear",
+      "domain": "www.streetwearts.com",
+      "displayed_link": "https://www.streetwearts.com › products › streetwear-si...",
+      "snippet": "This bomber embodies the essence of local streetwear, featuring a sleek black design and iconic branding that stands out in the realm of Urban Fashion Egypt.",
       "snippet_highlighted_words": [
-        "menswear-inspired apparel for women, trans, and non-binary folks"
+        "bomber",
+        "streetwear"
       ],
-      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAe1BMVEX+/v79/f3///+5x8xQb3t8kpvj6Orn7O6ywcaktLsAABwAHjQAECpFXWrW3eBMZG8AIDSbrbQAJzkAMUIKN0dWbXhec31le4UINEQAJDjO1dcAJTh6j5cALkAVP1CUpq0sUWHz9fYzV2TEzdCImJ4iSFc3UmDS2NoAGTC89I4sAAABA0lEQVR4AWIYQMAI4IossCMIgSDK1rgLJPi63f+E6SECmX5WvN9aUOxUZKD4lpsimrIsL0oEVhV5jX+sabt+GEFsnPq5XZCweuVCzB8VY9XnLARf67/OgFyFUlwbwFiulFgl/mrhtFDCH0dgPHqSukBsWw6d8nw5kD55r7qpim1pxXNPDBSXk++vF7DY9oDLbQxvgI23Cw6kE5psgD0ra8oP+nKryY6UjufO3y9h5p13jzE1YRy04htll2...[truncated]"
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAP1BMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC6E+JdAAAAFXRSTlMAARMCHnyavEkHh2PL/+eq8Vcz2m8JFE91AAAA2UlEQVR4Aa3OwbZDEQyF4S0CCQHO+z/rbTu7ath/YvCtnQW/yQHOAaCrecbbwjc5cExZ4DXBHwZXqlmrPVk4ERTTsE+NzptzjBW0tlZ3PoZeurWlAqJSxOGGDAmRgW8cjxJFazFf0FrNsdnrXTgOr2pmm0vdZgX+2FIYmzHnc0GHHAn+jsjKIsgXdFhdNWou+YXzWFKyd60+2pT/kUexXfeHYxYcmAIzz23jIXzVBR6guECTzmWcnwcQDeJwfHY/i5nXTIkBHDr32LWOERmXVui9axbcEy...[truncated]"
     },
     {
       "position": 2,
-      "title": "WILDFANG | BEST SELF GUARANTEED – Wildfang",
-      "link": "https://www.wildfang.com/?srsltid=AfmBOooz720kukrAYkkhgiglCsCKSHPlaakL-SJ6Fz75Hn25gK33NzQV",
-      "source": "Wildfang",
-      "domain": "www.wildfang.com",
-      "displayed_link": "https://www.wildfang.com",
-      "snippet": "Women Founded & Run. We create bold suiting, reimagined workwear, and statement staples in sizes XS–4X, made to give you the confidence to walk into any ...",
-      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAABvklEQVR4AU3RIey8IBQHcPoIbI5NwtuAarNcNNqMRov1kvEqfcweLtpnvmQ3XzaRiW7C/+F/7H7f8nj78F4AEnOuK6QSsORkDCF6d2Ccx2PGTG6zfV3yqjOfA/sf4vEzScJKAFFQPqxnDBlDPN8VBaUVRitgpfVJEZNZDkrJHOSXS3qvXUr4UVLJ7BkThrjVAg3ghrsqKNcbo3/RZI/mvzWpKjYcN+5pENpt74WUotv2Tigc/cRAwrlQvMnH83wVUvKnj89CS0WMv8iFWzVuq61tIG239oFVF73DSTcwRAkCQN5VpKrK+ogkui5tSZ6TOiU0YrhRlH8RCqFEhXj5J9XQT1zmaN6YTheNw0lvCYzvFYTKj0ftudTk6QMJ8VMWozFGg5JKasWrxh5jQd9nwqMv+GP9jsAkSMbbxvZTxR77/b...[truncated]"
+      "title": "Streetwear Bomber Jacket | Premium Apparel",
+      "link": "https://www.shakawear.com/products/bomber-jacket?srsltid=AfmBOortrpd9UoREkfXkcyuvmyjuS06C6VmJbFQFsxPtCYaKGnSlzt7O",
+      "source": "Shakawear",
+      "domain": "www.shakawear.com",
+      "displayed_link": "https://www.shakawear.com › Products",
+      "snippet": "A streetwear bomber jacket from Shaka Wear is constructed with heavy-duty cuffs and ribbing for maximum quality and a premium look and feel. Buy today!",
+      "snippet_highlighted_words": [
+        "is constructed with heavy-duty cuffs and ribbing"
+      ],
+      "rich_snippet": {
+        "detected_extensions": {
+          "rating": 4.4,
+          "reviews": 18
+        },
+        "extensions": [
+          "$43.90 to $49.00",
+          "In stock",
+          "4.4",
+          "(18)",
+          "$5 delivery"
+        ]
+      },
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAsUlEQVR4Ac3SERCEUBSF4d8tl/TZcpxEwUq8TlmQ7Uw+E4XZcr6cRkH0MAgeJMnd2Wnl7d6WO3Jn7mdnDvInZ8DxUQ8H2AUAs4olpOi4XclXS2qt/UFneIpsZQLcvnAJzCJr9ZaIzEcLtTSQdau0tD4mAKZ1IrLFTD4WUH1eOUZ8FLefhjWk1hu6wwZOxZG4H6hFxYJJzEV0JJ7DyOk4EoMVHaO9OR1TaOUIXdGfaH1KXs9CuJbZAQyQAAAAAElFTkSuQmCC"
     },
     {
       "position": 3,
-      "title": "Androgynous Cardigan",
-      "link": "https://www.etsy.com/market/androgynous_cardigan",
-      "source": "Etsy",
-      "domain": "www.etsy.com",
-      "displayed_link": "https://www.etsy.com › market › androgynous_cardigan",
-      "snippet": "Explore unique androgynous cardigans, from vintage finds to handwoven wool. Discover cozy knits, celestial prints, and statement pieces for every style.",
+      "title": "Bomber Jackets | Streetwear | Culture Kings US",
+      "link": "https://www.culturekings.com/collections/bomber-jackets?srsltid=AfmBOoooDMEQC_OAyvpWG5syk2gv_pXVtZB4radeU6_xS0whTL_a_vdD",
+      "source": "culturekings.com",
+      "domain": "www.culturekings.com",
+      "displayed_link": "https://www.culturekings.com › collections › bomber-ja...",
+      "snippet": "Stay stylish and warm with our collection of Bomber Jackets. Choose from a variety of brands, colors, and styles. Afterpay & free shipping available.",
       "snippet_highlighted_words": [
-        "Explore unique androgynous cardigans"
+        "Bomber Jackets"
       ],
       "rich_snippet": {
         "detected_extensions": {
           "rating": 4.5,
-          "reviews": 1200
+          "reviews": 7800
         },
         "extensions": [
           "4.5 store rating",
-          "(1.2K)",
-          "$6 to $213"
+          "(7.8K)",
+          "$41 to $111",
+          "Free delivery over $100",
+          "30-day returns"
         ]
       },
-      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAdVBMVEXzZAP1ZAD1YgD1XgD3gz32fDL2dij2cSP4kFT1bSL////83M31XQD0VgD2eyz+6+L4kVv2agD2bAD80br80sP1WgD3i1f7zbr5qHz6sY76tZD7ybP+7uf7vp74lWP2dzT4nXD5r4b++PT5pnr2f0P2gkz1aBW6vmIYAAAAyElEQVR4AaXSRQKDQAxA0ZKgaabuuN7/hrhb7W8fjG/Wkxb7CKEf4gA3sqJqdaqi69BDMGjQlvt/gtjtiQ7HotOZLtfhgsSF6IbljOoEryVW3+3vY7zXCICPJ84jv56IpfXRrOYUlp0vdQYdTXU98ufR2lsBUYiz6LlR7C/9mc+JwnoNsb9aDB2UcGmfmJt3x6UTkq5787qErJPPPYSr2BK9RJli0QE7hOQcUFGQR3ky9NH2H2Hdw/dfSQ8lYMY2Zo...[truncated]"
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcBAMAAACAI8KnAAAALVBMVEVHcEwbGRoZFxgYFxcdGhsfHB0cGhsfGxwcGRofHB0hHR4dGhseGxwdGhsfHB1mE6NYAAAAD3RSTlMAJRkNXac+lzK9+090htLLgo6wAAAA9UlEQVR4AWMgBjAqIPMMWRyEkbgsooEOSFw28cIEJC7HrJUCSFzmbdkGcI4Bg0nk1DMbmKHcDYxRZbmvLnBDeBYXTJcaMHgd4G0Gc3sdvNYwMFgGs9wAG9PuMGs10PDNLBVg42obXi0D23YX7NydOquWKoC4swVAZK3iqjVg8aMCIPJkQ9QSIOXMNgfMvXth13IDBpaHvHdBXKZzFbzrBBhMi3vfKIAsaik1vvW6ZaZwuAfYGZlLCrlfrTog7jUDzGXKm3uQ2UDn5jMFCLf8XqkA4/S35QrQsJget1H6aWUCLBhbpmRvO+khAA+bBm...[truncated]"
     }
   ]
 }
