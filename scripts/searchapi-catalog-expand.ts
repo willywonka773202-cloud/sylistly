@@ -11,7 +11,7 @@ import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 
 type Frame = 'masc' | 'fem' | 'androgynous' | 'any';
-type ImageUrlType = 'merchantCdn' | 'googleThumbnailProxy' | 'searchIntent' | 'unsafe' | 'missing';
+type ImageUrlType = 'merchantCdn' | 'googleThumbnailProxy' | 'googleShoppingImage' | 'searchIntent' | 'unsafe' | 'missing';
 type LinkType = 'directProductUrl' | 'merchantUrl' | 'googleShoppingFallback' | 'missing';
 type CutoutReadiness = 'high' | 'medium' | 'low' | 'reviewOnly' | 'blocked';
 
@@ -19,6 +19,7 @@ interface QueryTemplate {
   frame: Frame;
   productType: string;
   tail: 'shop' | 'official';
+  query?: string;
 }
 
 interface CategoryPriority {
@@ -84,8 +85,11 @@ interface SearchApiCandidate {
   price: string;
   priceCents: number;
   imageUrl: string;
+  thumbnailUrl: string;
+  sourceUrl: string;
   imageUrlType: ImageUrlType;
   productUrl: string;
+  merchantUrl: string;
   googleShoppingUrl: string;
   linkType: LinkType;
   searchapiProductId: string;
@@ -172,18 +176,18 @@ const CATEGORY_MAX_QUERIES: Record<Category, number> = {
 
 const QUERY_TEMPLATES: Record<Category, QueryTemplate[]> = {
   shoes: [
-    { frame: 'masc', productType: 'white leather sneakers', tail: 'shop' },
-    { frame: 'fem', productType: 'black ankle boots', tail: 'shop' },
-    { frame: 'masc', productType: 'brown leather loafers', tail: 'official' },
-    { frame: 'fem', productType: 'running sneakers', tail: 'official' },
-    { frame: 'androgynous', productType: 'white canvas sneakers', tail: 'shop' },
+    { frame: 'masc', productType: 'white leather sneakers', tail: 'shop', query: "site:zappos.com men's white leather sneakers product image" },
+    { frame: 'fem', productType: 'black ankle boots', tail: 'shop', query: "site:zappos.com women's black ankle boots product image" },
+    { frame: 'masc', productType: 'brown leather loafers', tail: 'official', query: "site:nike.com men's white leather sneakers product image" },
+    { frame: 'fem', productType: 'running sneakers', tail: 'official', query: "site:adidas.com women's running sneakers product image" },
+    { frame: 'androgynous', productType: 'white canvas sneakers', tail: 'shop', query: "men's white leather sneakers official product page" },
     { frame: 'fem', productType: 'strappy sandals', tail: 'shop' },
   ],
   bottom: [
-    { frame: 'fem', productType: 'black trousers', tail: 'shop' },
-    { frame: 'masc', productType: 'cargo pants', tail: 'official' },
-    { frame: 'fem', productType: 'straight leg jeans', tail: 'shop' },
-    { frame: 'masc', productType: 'chino pants', tail: 'shop' },
+    { frame: 'fem', productType: 'black trousers', tail: 'shop', query: "site:nordstrom.com women's black trousers product image" },
+    { frame: 'masc', productType: 'cargo pants', tail: 'official', query: "site:gap.com men's cargo pants product image" },
+    { frame: 'fem', productType: 'straight leg jeans', tail: 'shop', query: "site:levi.com women's straight leg jeans product image" },
+    { frame: 'masc', productType: 'chino pants', tail: 'shop', query: "men's chino pants official product page" },
     { frame: 'fem', productType: 'wide leg pants', tail: 'official' },
     { frame: 'androgynous', productType: 'relaxed denim jeans', tail: 'shop' },
   ],
@@ -294,6 +298,60 @@ function isDirectProductPath(url: string): boolean {
   ].some((part) => lowered.includes(part));
 }
 
+function valueAtPath(source: unknown, path: string): unknown {
+  let current = source;
+  for (const part of path.split('.')) {
+    if (!current || typeof current !== 'object') return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return current;
+}
+
+function stringsAtPath(source: unknown, path: string): string[] {
+  const value = valueAtPath(source, path);
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  if (Array.isArray(value)) {
+    return value
+      .flatMap((item) => typeof item === 'string' ? [item.trim()] : [])
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function collectUrlStrings(source: unknown, keyHints: string[], maxDepth = 5): string[] {
+  const urls: string[] = [];
+  const seenObjects = new WeakSet<object>();
+  const seenUrls = new Set<string>();
+  const normalizedHints = keyHints.map((hint) => hint.toLowerCase());
+
+  function visit(value: unknown, key = '', depth = 0): void {
+    if (depth > maxDepth || value == null) return;
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      const keyMatches = normalizedHints.some((hint) => key.toLowerCase().includes(hint));
+      if (keyMatches && isUsableUrl(trimmed) && !seenUrls.has(trimmed)) {
+        seenUrls.add(trimmed);
+        urls.push(trimmed);
+      }
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, key, depth + 1);
+      return;
+    }
+    if (typeof value === 'object') {
+      if (seenObjects.has(value)) return;
+      seenObjects.add(value);
+      for (const [childKey, childValue] of Object.entries(value as Record<string, unknown>)) {
+        visit(childValue, childKey, depth + 1);
+      }
+    }
+  }
+
+  visit(source);
+  return urls;
+}
+
 function frameLabel(frame: Frame): string {
   if (frame === 'masc') return "men's";
   if (frame === 'fem') return "women's";
@@ -302,6 +360,7 @@ function frameLabel(frame: Frame): string {
 }
 
 function buildQuery(template: QueryTemplate): string {
+  if (template.query) return template.query.replace(/\s+/g, ' ').trim();
   const lead = `${frameLabel(template.frame)} ${template.productType}`.trim();
   return `${lead} product image white background ${template.tail}`.replace(/\s+/g, ' ').trim();
 }
@@ -434,6 +493,7 @@ function imageUrlType(imageUrl: string): ImageUrlType {
   if (lowered.includes('placeholder') || lowered.endsWith('.svg') || lowered.includes('/svg')) return 'unsafe';
   if (isSearchIntentUrl(imageUrl)) return 'searchIntent';
   const host = safeHostname(imageUrl);
+  if (host.includes('google.') && lowered.includes('oshopproduct')) return 'googleShoppingImage';
   if (host.includes('googleusercontent.com') || host.includes('gstatic.com') || host.includes('encrypted-tbn')) {
     return 'googleThumbnailProxy';
   }
@@ -456,20 +516,117 @@ function extractResults(payload: unknown): SearchApiRawResult[] {
   return results;
 }
 
-function resultProductUrls(result: SearchApiRawResult): { productUrl: string; googleShoppingUrl: string; linkType: LinkType } {
-  const candidates = [
-    firstString(result.source_link),
-    firstString(result.source_url, result.sourceUrl, result.merchant_link, result.seller_link),
-    firstString(result.link),
-    firstString(result.product_link),
+function resultProductUrls(result: SearchApiRawResult): { productUrl: string; merchantUrl: string; googleShoppingUrl: string; linkType: LinkType } {
+  const explicitProductUrls = [
+    ...stringsAtPath(result, 'product_link'),
+    ...stringsAtPath(result, 'product.url'),
+    ...stringsAtPath(result, 'product.link'),
+    ...stringsAtPath(result, 'offer.link'),
+    ...stringsAtPath(result, 'offers.0.link'),
+    ...collectUrlStrings(result, ['product_link', 'product_url', 'productUrl', 'offer_link', 'buy_link']),
   ].filter(isUsableUrl);
-  const nonGoogle = candidates.find((url) => !safeHostname(url).includes('google.') && !isSearchIntentUrl(url)) || '';
-  const googleShoppingUrl = candidates.find((url) => safeHostname(url).includes('google.')) || '';
-  const linkType: LinkType = nonGoogle
-    ? isDirectProductPath(nonGoogle) ? 'directProductUrl' : 'merchantUrl'
+  const explicitMerchantUrls = [
+    ...stringsAtPath(result, 'source_link'),
+    ...stringsAtPath(result, 'source_url'),
+    ...stringsAtPath(result, 'sourceUrl'),
+    ...stringsAtPath(result, 'merchant_link'),
+    ...stringsAtPath(result, 'seller_link'),
+    ...stringsAtPath(result, 'merchant.url'),
+    ...stringsAtPath(result, 'seller.url'),
+    ...collectUrlStrings(result, ['source', 'merchant', 'seller', 'retailer', 'store']),
+  ].filter(isUsableUrl);
+  const fallbackUrls = [
+    firstString(result.link),
+    firstString(result.url),
+    ...collectUrlStrings(result, ['link', 'url']),
+  ].filter(isUsableUrl);
+
+  const nonGoogleProduct = explicitProductUrls.find((url) => !safeHostname(url).includes('google.') && !isSearchIntentUrl(url)) || '';
+  const nonGoogleMerchant = explicitMerchantUrls.find((url) => !safeHostname(url).includes('google.') && !isSearchIntentUrl(url)) || '';
+  const nonGoogleFallback = fallbackUrls.find((url) => !safeHostname(url).includes('google.') && !isSearchIntentUrl(url)) || '';
+  const googleShoppingUrl = [...explicitProductUrls, ...explicitMerchantUrls, ...fallbackUrls].find((url) => safeHostname(url).includes('google.')) || '';
+  const productUrl = nonGoogleProduct || (isDirectProductPath(nonGoogleFallback) ? nonGoogleFallback : '');
+  const merchantUrl = productUrl ? '' : nonGoogleMerchant || nonGoogleFallback;
+  const linkType: LinkType = productUrl
+    ? 'directProductUrl'
+    : merchantUrl ? 'merchantUrl'
     : googleShoppingUrl ? 'googleShoppingFallback' : 'missing';
 
-  return { productUrl: nonGoogle, googleShoppingUrl, linkType };
+  return { productUrl, merchantUrl, googleShoppingUrl, linkType };
+}
+
+function resultImageUrls(result: SearchApiRawResult): { imageUrl: string; thumbnailUrl: string; sourceUrl: string; imageType: ImageUrlType } {
+  const directImages = [
+    firstString(result.image_url),
+    firstString(result.product_image),
+    firstString(result.original_image),
+    ...stringsAtPath(result, 'image.url'),
+    ...stringsAtPath(result, 'product.image'),
+    ...stringsAtPath(result, 'product.image_url'),
+    ...stringsAtPath(result, 'images.0'),
+    ...stringsAtPath(result, 'images.0.url'),
+    ...collectUrlStrings(result, ['image_url', 'imageUrl', 'product_image', 'original_image', 'source_image']),
+  ].filter(isUsableUrl);
+  const thumbnailImages = [
+    firstString(result.thumbnail),
+    firstString(result.image),
+    ...stringsAtPath(result, 'thumbnail.url'),
+    ...stringsAtPath(result, 'thumbnails.0'),
+    ...stringsAtPath(result, 'thumbnails.0.url'),
+    ...collectUrlStrings(result, ['thumbnail', 'thumb']),
+  ].filter(isUsableUrl);
+
+  const sourceUrl = directImages.find((url) => imageUrlType(url) === 'merchantCdn') || '';
+  const imageUrl = sourceUrl || directImages[0] || thumbnailImages[0] || '';
+  return {
+    imageUrl,
+    thumbnailUrl: thumbnailImages[0] || '',
+    sourceUrl,
+    imageType: imageUrlType(imageUrl),
+  };
+}
+
+function sanitizeRawValue(value: unknown, depth = 0): unknown {
+  if (depth > 4) return '[depth-limit]';
+  if (typeof value === 'string') {
+    if (value.length > 500) return `${value.slice(0, 500)}...[truncated]`;
+    return value;
+  }
+  if (Array.isArray(value)) return value.slice(0, 5).map((item) => sanitizeRawValue(item, depth + 1));
+  if (!value || typeof value !== 'object') return value;
+
+  const sanitized: Record<string, unknown> = {};
+  for (const [key, childValue] of Object.entries(value as Record<string, unknown>)) {
+    const lowered = key.toLowerCase();
+    if (lowered.includes('token') || lowered.includes('cookie') || lowered.includes('key') || lowered.includes('auth')) {
+      sanitized[key] = '[redacted]';
+      continue;
+    }
+    sanitized[key] = sanitizeRawValue(childValue, depth + 1);
+  }
+  return sanitized;
+}
+
+function maybeWriteDebugSample(plan: QueryCandidate, payload: unknown, results: SearchApiRawResult[]): void {
+  if (process.env.SEARCHAPI_DEBUG_SAMPLE !== 'true') return;
+  const outDir = join(process.cwd(), 'data', 'catalog', 'reports');
+  mkdirSync(outDir, { recursive: true });
+  const record = payload && typeof payload === 'object' ? payload as Record<string, unknown> : {};
+  const sample = {
+    generatedAt: new Date().toISOString(),
+    query: plan.query,
+    targetCategory: plan.targetCategory,
+    topLevelKeys: Object.keys(record),
+    resultCounts: {
+      shopping_results: Array.isArray(record.shopping_results) ? record.shopping_results.length : 0,
+      inline_shopping_results: Array.isArray(record.inline_shopping_results) ? record.inline_shopping_results.length : 0,
+      product_results: Array.isArray(record.product_results) ? record.product_results.length : 0,
+      organic_results: Array.isArray(record.organic_results) ? record.organic_results.length : 0,
+      extractedResults: results.length,
+    },
+    firstResults: results.slice(0, 3).map((result) => sanitizeRawValue(result)),
+  };
+  writeFileSync(join(outDir, 'searchapi-debug-sample.json'), `${JSON.stringify(sample, null, 2)}\n`, 'utf8');
 }
 
 function hasProductLikeTitle(title: string, category: Category): boolean {
@@ -492,8 +649,8 @@ function hasProductLikeTitle(title: string, category: Category): boolean {
 
 function classifyCandidate(result: SearchApiRawResult, plan: QueryCandidate): { readiness: CutoutReadiness; flags: string[]; imageType: ImageUrlType; linkType: LinkType } {
   const flags: string[] = [];
-  const imageUrl = firstString(result.image, result.thumbnail, result.image_url);
-  const imageType = imageUrlType(imageUrl);
+  const imageInfo = resultImageUrls(result);
+  const imageType = imageInfo.imageType;
   const urls = resultProductUrls(result);
   const title = firstString(result.title, result.name);
   const productLikeTitle = hasProductLikeTitle(title, plan.targetCategory);
@@ -501,12 +658,15 @@ function classifyCandidate(result: SearchApiRawResult, plan: QueryCandidate): { 
 
   if (!title) flags.push('missing-title');
   if (title && !productLikeTitle) flags.push('title-not-clearly-product-like');
-  if (!imageUrl) flags.push('missing-image');
+  if (!imageInfo.imageUrl) flags.push('missing-image');
+  if (imageInfo.sourceUrl) flags.push('merchant-image-source-found');
   if (imageType === 'unsafe') flags.push('unsafe-image-url');
   if (imageType === 'searchIntent') flags.push('search-intent-image-url');
   if (imageType === 'googleThumbnailProxy') flags.push('google-thumbnail-proxy-image');
+  if (imageType === 'googleShoppingImage') flags.push('google-shopping-image-url');
   if (urls.linkType === 'missing') flags.push('missing-product-url');
   if (urls.linkType === 'googleShoppingFallback') flags.push('google-shopping-fallback-only');
+  if (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl') flags.push('merchant-link-found');
   if (!targetWeakCategory) flags.push('not-priority-transparent-gap-category');
 
   if (!title || !productLikeTitle || imageType === 'unsafe' || imageType === 'missing' || imageType === 'searchIntent') {
@@ -515,7 +675,7 @@ function classifyCandidate(result: SearchApiRawResult, plan: QueryCandidate): { 
   if (targetWeakCategory && imageType === 'merchantCdn' && (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl')) {
     return { readiness: 'high', flags, imageType, linkType: urls.linkType };
   }
-  if (targetWeakCategory && imageType === 'googleThumbnailProxy' && (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl')) {
+  if (targetWeakCategory && (imageType === 'merchantCdn' || imageType === 'googleShoppingImage') && (urls.linkType === 'directProductUrl' || urls.linkType === 'merchantUrl')) {
     return { readiness: 'medium', flags, imageType, linkType: urls.linkType };
   }
   if (targetWeakCategory && imageType === 'merchantCdn' && urls.linkType === 'googleShoppingFallback') {
@@ -528,12 +688,12 @@ function classifyCandidate(result: SearchApiRawResult, plan: QueryCandidate): { 
 function toSearchApiCandidate(result: SearchApiRawResult, plan: QueryCandidate, queryIndex: number): SearchApiCandidate {
   const title = firstString(result.title, result.name);
   const retailer = firstString(result.source, result.merchant, result.seller);
-  const imageUrl = firstString(result.image, result.thumbnail, result.image_url);
+  const imageInfo = resultImageUrls(result);
   const urls = resultProductUrls(result);
   const priceText = firstString(result.price);
   const price = firstNumber(result.extracted_price, result.price);
   const classification = classifyCandidate(result, plan);
-  const idSeed = [plan.query, title, retailer, imageUrl, urls.productUrl, firstString(result.product_id)].join('|');
+  const idSeed = [plan.query, title, retailer, imageInfo.imageUrl, urls.productUrl || urls.merchantUrl, firstString(result.product_id)].join('|');
 
   return {
     id: `searchapi-${createHash('sha1').update(idSeed).digest('hex').slice(0, 16)}`,
@@ -552,9 +712,12 @@ function toSearchApiCandidate(result: SearchApiRawResult, plan: QueryCandidate, 
     retailer,
     price: priceText,
     priceCents: Math.round(price * 100),
-    imageUrl,
+    imageUrl: imageInfo.imageUrl,
+    thumbnailUrl: imageInfo.thumbnailUrl,
+    sourceUrl: imageInfo.sourceUrl,
     imageUrlType: classification.imageType,
     productUrl: urls.productUrl,
+    merchantUrl: urls.merchantUrl,
     googleShoppingUrl: urls.googleShoppingUrl,
     linkType: classification.linkType,
     searchapiProductId: firstString(result.product_id),
@@ -582,13 +745,22 @@ async function fetchSearchApiResults(plan: QueryCandidate): Promise<SearchApiRaw
   });
 
   if (!response.ok) throw new Error(`SearchAPI HTTP ${response.status}`);
-  return extractResults(await response.json());
+  const payload = await response.json();
+  const results = extractResults(payload);
+  maybeWriteDebugSample(plan, payload, results);
+  return results;
 }
 
 function makeLiveRecommendation(liveRun: Omit<LiveRunReport, 'recommendation' | 'recommendationReason'>): Pick<LiveRunReport, 'recommendation' | 'recommendationReason'> {
   const highMedium = liveRun.highOrMediumCandidates;
   const directLinks = liveRun.directOrMerchantLinkCandidates;
+  const merchantImages = liveRun.imageUrlTypeCounts.merchantCdn;
+  const totalImages = Object.values(liveRun.imageUrlTypeCounts).reduce((sum, count) => sum + count, 0);
+  const googleThumbnailShare = totalImages > 0 ? liveRun.imageUrlTypeCounts.googleThumbnailProxy / totalImages : 0;
   const coreImproved = ['shoes', 'bottom', 'outer', 'bag', 'hat'].some((category) => liveRun.candidatesByCategory[category as Category] > 0);
+  if (directLinks === 0 && merchantImages === 0 && highMedium === 0 && googleThumbnailShare > 0.8) {
+    return { recommendation: 'stop', recommendationReason: 'Quality gate failed: no merchant/product links, no merchant/CDN images, no high/medium candidates, and Google thumbnail proxies dominate.' };
+  }
   if (highMedium >= 15 && directLinks >= 15 && coreImproved) {
     return { recommendation: 'continue', recommendationReason: 'The batch produced enough high/medium candidates with merchant links in core weak categories.' };
   }
@@ -606,7 +778,7 @@ async function runLiveSearch(report: PlanReport): Promise<LiveRunReport> {
   const seen = new Set<string>();
   const queriesRunByCategory = countRecord(CATEGORY_ORDER);
   const candidatesByCategory = countRecord(CATEGORY_ORDER);
-  const imageUrlTypeCounts = countRecord(['merchantCdn', 'googleThumbnailProxy', 'searchIntent', 'unsafe', 'missing'] as const);
+  const imageUrlTypeCounts = countRecord(['merchantCdn', 'googleThumbnailProxy', 'googleShoppingImage', 'searchIntent', 'unsafe', 'missing'] as const);
   const linkTypeCounts = countRecord(['directProductUrl', 'merchantUrl', 'googleShoppingFallback', 'missing'] as const);
   const cutoutReadinessCounts = countRecord(['high', 'medium', 'low', 'reviewOnly', 'blocked'] as const);
 

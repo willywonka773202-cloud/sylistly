@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T22:56:37.829Z",
+  "generatedAt": "2026-05-17T04:12:49.951Z",
   "mode": "dry-run",
   "totalCandidates": 26,
   "emittedCount": 25,
@@ -118,7 +118,7 @@
   ],
   "candidates": [
     {
-      "query": "men's white leather sneakers product image white background shop",
+      "query": "site:zappos.com men's white leather sneakers product image",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetProductType": "white leather sneakers",
@@ -131,7 +131,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "women's black ankle boots product image white background shop",
+      "query": "site:zappos.com women's black ankle boots product image",
       "targetCategory": "shoes",
       "targetFrame": "fem",
       "targetProductType": "black ankle boots",
@@ -144,7 +144,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "women's black trousers product image white background shop",
+      "query": "site:nordstrom.com women's black trousers product image",
       "targetCategory": "bottom",
       "targetFrame": "fem",
       "targetProductType": "black trousers",
@@ -157,7 +157,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "men's brown leather loafers product image white background official",
+      "query": "site:nike.com men's white leather sneakers product image",
       "targetCategory": "shoes",
       "targetFrame": "masc",
       "targetProductType": "brown leather loafers",
@@ -170,7 +170,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "men's cargo pants product image white background official",
+      "query": "site:gap.com men's cargo pants product image",
       "targetCategory": "bottom",
       "targetFrame": "masc",
       "targetProductType": "cargo pants",
@@ -183,7 +183,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "women's running sneakers product image white background official",
+      "query": "site:adidas.com women's running sneakers product image",
       "targetCategory": "shoes",
       "targetFrame": "fem",
       "targetProductType": "running sneakers",
@@ -196,7 +196,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "women's straight leg jeans product image white background shop",
+      "query": "site:levi.com women's straight leg jeans product image",
       "targetCategory": "bottom",
       "targetFrame": "fem",
       "targetProductType": "straight leg jeans",
@@ -209,7 +209,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "unisex white canvas sneakers product image white background shop",
+      "query": "men's white leather sneakers official product page",
       "targetCategory": "shoes",
       "targetFrame": "androgynous",
       "targetProductType": "white canvas sneakers",
@@ -222,7 +222,7 @@
       "categoryMaxQueries": 5
     },
     {
-      "query": "men's chino pants product image white background shop",
+      "query": "men's chino pants official product page",
       "targetCategory": "bottom",
       "targetFrame": "masc",
       "targetProductType": "chino pants",
