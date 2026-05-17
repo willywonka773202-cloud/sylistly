@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T05:11:47Z",
+  "generatedAt": "2026-05-17T13:01:31Z",
   "mode": "apply",
   "limit": 30,
   "categoryFilter": [
@@ -23,304 +23,304 @@
   "outputDir": "public/assets/cutouts",
   "items": [
     {
-      "id": "generated-021735e8705aba59",
-      "brand": "eBay",
-      "name": "$395 NEW DKNY Mens 40R Solid Charcoal Gray 2 Piece Suit With Dress Pants 33x32",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTJnHeXJ2iLjchFupdfaZqWm6_hA03Xp_TzPIBmgRXo8IW6EVbdw2FDqGdGPvPENYYGuw1kQEftRfHcHrF3BydP7U2MG0JZkw",
-      "outputPath": "public/assets/cutouts/generated-021735e8705aba59.png",
-      "status": "generated",
-      "bytes": 28403
-    },
-    {
-      "id": "generated-035f9f9fc0f43cba",
-      "brand": "eBay",
-      "name": "Techwear Tactical Jacket & Cargo Pants Set Men's Utility Streetwear",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRiPSDXhuOiYFRISN-2wnpSZftTbTUq1MkS_WXHAAbmQolc4nR0CpUJWpmAKlV4XI7cLWfu4u74dF62UhctiCGF-rRB5U-6lUJRdEvKAjpGsHaXrpHnSb5G9g",
-      "outputPath": "public/assets/cutouts/generated-035f9f9fc0f43cba.png",
-      "status": "generated",
-      "bytes": 170783
-    },
-    {
-      "id": "generated-225686ca63c9d93c",
-      "brand": "Ecom Vision",
-      "name": "Techwear Cargo Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS4Q40MeaWcMoRpSAro5J2x-HHvV_0spxqfSerLJ_mzKcjMnBhiuJ-BKjhsSySLZ-YC_FZY0NpwXAFh6Shc2AmsbQg4lOME_w",
-      "outputPath": "public/assets/cutouts/generated-225686ca63c9d93c.png",
-      "status": "generated",
-      "bytes": 232074
-    },
-    {
-      "id": "generated-d64c113a09b624ae",
-      "brand": "Etsy - Seller",
-      "name": "Women's Tailored 2 Piece Pantsuit",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT7KRKCxx3kUI9yZw9RdpSqdsOCCuYSpfHUtVkHR_lvWKFVlUfTuOYarbBB0hrdvDx4lm_3tN-ZSQyZLfRhCLCxPbl5V3_6xRA_X6wpPuNUqfbIi8E8g4hmCw",
-      "outputPath": "public/assets/cutouts/generated-d64c113a09b624ae.png",
-      "status": "generated",
-      "bytes": 99150
-    },
-    {
-      "id": "generated-be3dae134bffe286",
-      "brand": "Express",
-      "name": "Express Women's Editor Studio Stretch Twill Mid Rise Trousers",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSsI32uI8eVxcaTuKtGQuhPa1jozHwxzbY9eNdaNVUiWFuNAkRX5o2kJIJO2xZ0SYnbYSfkvqm23URgi5f5NxdVPmJ7Dp6YSA",
-      "outputPath": "public/assets/cutouts/generated-be3dae134bffe286.png",
-      "status": "generated",
-      "bytes": 47069
-    },
-    {
-      "id": "generated-d040c1609028be81",
+      "id": "generated-ced193ac65308724",
       "brand": "Fashion Nova",
-      "name": "Fashion Nova Men's Bahamas Linen Shorts",
+      "name": "Fashion Nova Women's Sporty and Preppy Skirt Set",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQzTYP5wrYk3y0ZAiqIcTEO3OYs_VS7FJcgq0hbI0ALZYI9hg30l8xMUEGfj116uTrO_hNDpco0kLa4VvvHQ6Gv0KBKWn7mUU23Gg0VIAFiruRTinMJohzLnu8",
-      "outputPath": "public/assets/cutouts/generated-d040c1609028be81.png",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSbbVz4jFNDfucfN3F7hxhsUuY4B5Ku-PXFQIlLuCju6Yxg2yQ4uZbEHIldT-Irhc4CYiBzjFXgHCEJCotFbGKe0gRTofCSU1eY71uy2onG4QkQAsfwCF7EHw",
+      "outputPath": "public/assets/cutouts/generated-ced193ac65308724.png",
       "status": "generated",
-      "bytes": 349719
+      "bytes": 195696
     },
     {
-      "id": "generated-b0b6e135c92a2b63",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Men's Versatile Slim Cargo Pants",
+      "id": "generated-aadcd62d367dcfcb",
+      "brand": "French Connection US",
+      "name": "French Connection Women's Harrie Suiting Pants",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRS5hHrG00efvg55Rv7O9sQ_1j2LDp1XIYn1UCFw3ywc1SS8kUh28kTVCjzN_vIwvjD0MKsBL8qj40JW8p02uyrgD9I4lem2y80OjBbPmp0uguwuq4vTv1boA",
-      "outputPath": "public/assets/cutouts/generated-b0b6e135c92a2b63.png",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTs1ooxrIujZoZtFnOwQhSZoWJHzDVLxkoXv_t6YV4Uw5Fvmiz1LTqMh09QH__754gP7UizSer3F_jBvo8g_9jiaM_ZHGI5BnSxhehXbUTT3NU5vbPXEhQt7A",
+      "outputPath": "public/assets/cutouts/generated-aadcd62d367dcfcb.png",
       "status": "generated",
-      "bytes": 190738
+      "bytes": 95887
     },
     {
-      "id": "generated-bc055db1ce947a03",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Women's Linen Beach Walks Pants",
+      "id": "generated-a652be2c81696296",
+      "brand": "Gap",
+      "name": "Gap Women's 365 High Rise Linen-Blend Trousers",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSzaocfJXLviWVTKnuaHQiyDf1fmxuSAy_3QdO29UWaIHq9uKqvaXy0OyKwZNAeg4PtJ9z_LDQwq_i3JuWe5fMiISYEerWnMUWPFUsAwiD2WrRjW9VlXB1VBw",
-      "outputPath": "public/assets/cutouts/generated-bc055db1ce947a03.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRvuDX1jOrIv2Yyelg943346NeThaMoYN1gw8uqKB6kMOUkfujapd4_56WRXkBCmYGt3WVTwuHZdSyB71nuSq7nDKswS31Nm_YpKc921wYbE3ZeoZ3KGQkhusU",
+      "outputPath": "public/assets/cutouts/generated-a652be2c81696296.png",
       "status": "generated",
-      "bytes": 248156
+      "bytes": 176460
     },
     {
-      "id": "generated-337c9d9b715b6bc1",
-      "brand": "Boot Barn",
-      "name": "Dan Post Women's Denim Darlin' Snip Toe Western Boots",
+      "id": "generated-5a90055854903873",
+      "brand": "GustoNYC",
+      "name": "NY Street Tech V1 Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSvrGidxJhglqPd2aBy_Mr1k0k4t1ypIuDteso1-hgipyHjL__-RgbKUX8Jkto6XsIy4ayo4ZMrO87J7CEZf3f-jrb7X8MYbjafuAhmOCiJeINqw8hHau5x",
+      "outputPath": "public/assets/cutouts/generated-5a90055854903873.png",
+      "status": "generated",
+      "bytes": 98877
+    },
+    {
+      "id": "generated-4cef990da518596a",
+      "brand": "H&M",
+      "name": "Express Women's Editor Signature Stretch Mid Rise Trouser Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSEJjz27RBJ_BQFR222f91kKLsJF2IzTxZM3I3rNwud20pEqLvoDKmSZYOP-2bWkFkGoqkBmNvGTjtUG19XUp3IvvQEs1BL4A",
+      "outputPath": "public/assets/cutouts/generated-4cef990da518596a.png",
+      "status": "generated",
+      "bytes": 70937
+    },
+    {
+      "id": "generated-4e5b08cc31bf2b02",
+      "brand": "H&M",
+      "name": "H&M Ladies Linen-Blend Drawstring Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTVQoK1nMbllL8FHFK8WzKBKvxCh9_3KHOkZr6kl4xA-WgWzlPiqajeWJTNevph2aeLMQmMcRhfSEba5kS2rj4n_m3T9FWaEWwSVjqFCaxyZKY5IGh4CcBV6g",
+      "outputPath": "public/assets/cutouts/generated-4e5b08cc31bf2b02.png",
+      "status": "generated",
+      "bytes": 153827
+    },
+    {
+      "id": "generated-de7d7fa0912bedd2",
+      "brand": "H&M",
+      "name": "H&M Men's Loose Fit Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRnpF_LTUvjUMnA7CiEkzkTvlylhux3jhCvbudzOiMDfNXqTx0BEatWThRIqiOqaMF1obYD2GHViXqpGvtpNSuIraiHvfFCP9chELIQSbR32WuvBnziElDe",
+      "outputPath": "public/assets/cutouts/generated-de7d7fa0912bedd2.png",
+      "status": "generated",
+      "bytes": 120633
+    },
+    {
+      "id": "generated-efea7e82501f92dd",
+      "brand": "H&M",
+      "name": "H&M Men's Loose-Fit Tailored Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRJzr9brNISAJ4JBob3gjGgFuyl4lQ4dLDIfIyyN6WlZM3M5uak1T404s12yTlw1jdFyh6FIbYLKoDzi3CHRSLMLts0m0y2W7rP-mYmU8jcY_MrSREwRXi2pw",
+      "outputPath": "public/assets/cutouts/generated-efea7e82501f92dd.png",
+      "status": "generated",
+      "bytes": 96837
+    },
+    {
+      "id": "d855f06268e8998f",
+      "brand": "Adidas",
+      "name": "Black Campus 00s Mens",
       "category": "shoes",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSJRZrgQdju8Mbe5qGKrXmL4nKTu06maFYXefTZC8UQopAvMuj53IR6HhIwJKoGLOMFOkRtyTj05eSbUxhnrVQCVM44eqkqKl0QAmi4HCZBjvDdjRKuCbUmKQ",
-      "outputPath": "public/assets/cutouts/generated-337c9d9b715b6bc1.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSCOCSYcbcASrbw7GZ7ogXK_-SXbMagE5tQnb_1edMtYpWaot1yIxsPiivBv8RNYh5tmJmKNMczcLwF0xK44LmLSHbMIW_F4yfP5p1NtjjbR4WjgbqB5SfmEAQ",
+      "outputPath": "public/assets/cutouts/d855f06268e8998f.png",
       "status": "generated",
-      "bytes": 262067
+      "bytes": 288273
     },
     {
-      "id": "generated-ddc54504be20e392",
-      "brand": "Chuck's Boots",
-      "name": "Circle G Corral Women's Blue Jean Western Boots",
+      "id": "b65e8cd40ecfc8dc",
+      "brand": "Adidas",
+      "name": "Campus 00s Wonder White Gum",
       "category": "shoes",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSwOrS6q2r3dZ8uKG1xyE5M0upxAM1hEvhpSDljHMwQaTI4bD34D_ADutYBBXwOlVIUYCfwcZoUZtWwEYm4KSaCS0K-pTgRrT-c3gucIw1IaRYQW_TIwo4C",
-      "outputPath": "public/assets/cutouts/generated-ddc54504be20e392.png",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQEnxnBM0QHasiWMmuKFXGhqTYKNa6Kc9mqltmOeBzxNY-V81-jvFo-LiKpXw0hZeq9amQ9xbPpHIAKvEpr6GcSerfOoB-xVuheaSCJn6OVo2oSyHslLxUSgw",
+      "outputPath": "public/assets/cutouts/b65e8cd40ecfc8dc.png",
       "status": "generated",
-      "bytes": 332197
+      "bytes": 175493
     },
     {
-      "id": "generated-159e2aa9e34f2b1b",
+      "id": "ba6bc7345521288d",
+      "brand": "Adidas",
+      "name": "Men's adidas Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS78QS70gGxnSmIfRwSn-sOgsyBp45rZjnxW0LQ42PefFXRB0ZiW2g5X1Z4e9vn7q8OeUFvvSPzf69yzB4TPN4SF6vr15JGuVCcZ3GYyjY7D2cpevLUZzhHLc0",
+      "outputPath": "public/assets/cutouts/ba6bc7345521288d.png",
+      "status": "generated",
+      "bytes": 283852
+    },
+    {
+      "id": "4b3c4d4cbbdeeb49",
+      "brand": "Adidas",
+      "name": "Men's adidas Originals Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRnKoFAh1UBRmN2DdLxxzRQc63ZB8HftNdqKcY7rc3_jNNkJpaafu8VcWmv6HMT_9uPLWfkjWFR0uJM74AdVQPaepijjHt_YYWSDfGsRpS5vsLgPt3jeJTglg",
+      "outputPath": "public/assets/cutouts/4b3c4d4cbbdeeb49.png",
+      "status": "generated",
+      "bytes": 209179
+    },
+    {
+      "id": "a4818afdac3cab16",
+      "brand": "Adidas",
+      "name": "Men's Campus 00s",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRTMIMr41PwgKCV-Cmf_MEE2pDrZ_-IrUja42bdUxamD0JHuHE-9iZB8WwNNlAgazeYx9c-5hIXJoHBFATuJcbZTbMepwPBObmSHLLOTLjVr4hhFVkpsnItZYY",
+      "outputPath": "public/assets/cutouts/a4818afdac3cab16.png",
+      "status": "generated",
+      "bytes": 309053
+    },
+    {
+      "id": "f5186afd2ae75287",
+      "brand": "Adidas",
+      "name": "Men's Samba OG",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTLokWOSGdvDMGY5QTBTxKIt_rwKiK4Hqb_Mlk8QSvz39j0XJzlpZvlaDw5Lxy6oWuKfAIX0ynK26AxBc89WWUGhpcxzfRMPaMZ3Gn6yhqY2uEvrjqhjx-o",
+      "outputPath": "public/assets/cutouts/f5186afd2ae75287.png",
+      "status": "generated",
+      "bytes": 241356
+    },
+    {
+      "id": "ee1b0c35cccddadc",
+      "brand": "Adidas",
+      "name": "Mens adidas Originals Gazelle",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQsULdu_qmhBvOb9zTbM_bSGuLrZcPEOO2_J-XHju2vfkgXfNh_00tEqp2UiTMaRPBimifThRqkWQ6EXhMnUGOtxzuKLZ6Kq0gvpEhmckmqkmMwh-Dv8YpOWxA",
+      "outputPath": "public/assets/cutouts/ee1b0c35cccddadc.png",
+      "status": "generated",
+      "bytes": 232922
+    },
+    {
+      "id": "2eb1265214ad2ebf",
+      "brand": "Adidas",
+      "name": "Samba Indoor Soccer Shoes Black M 5.5 / W 6.5",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR0He9fmObR4yK6kqSPuBubFP_p1lmNfRO37_7M0M2NzbkiWjWVE_gf6XT8MENlbHc4i2Ti3nLNcLss7t5H0G7A3JEJHbhhd8_kbV6EAOlyx0aHmAvNVf6kBg",
+      "outputPath": "public/assets/cutouts/2eb1265214ad2ebf.png",
+      "status": "generated",
+      "bytes": 268019
+    },
+    {
+      "id": "generated-75790e3b8b9f7733",
+      "brand": "Boston Proper",
+      "name": "Boston Proper Cable Knit Puffer Coat",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcT8_VUWIzBCjCkYeC2LoLT4FxhSsn6DU9KpORAVD93ShOeC4P2rDGAQqb7wgUENxWVyFW6qmltSzbg2gHmFBNwVbXtKzotZ8_1OYgIx6dTe-IJNm1AVzh6ZUN0",
+      "outputPath": "public/assets/cutouts/generated-75790e3b8b9f7733.png",
+      "status": "generated",
+      "bytes": 480231
+    },
+    {
+      "id": "generated-c3564a6db0b7b1d0",
+      "brand": "Coofandy",
+      "name": "Modern Side Stripe Blazer Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSCVguh1Uajy8bou0woj_h4z4wbOpl6ZYq9QgiPZG1l7105Hhwq3JiLds8zqWXuBTe3tCHMrmrZJrVehdHuWc-VC8tRt_gJAAXRebQz1lK5",
+      "outputPath": "public/assets/cutouts/generated-c3564a6db0b7b1d0.png",
+      "status": "generated",
+      "bytes": 285720
+    },
+    {
+      "id": "generated-30526b6c04e69ac5",
+      "brand": "Cutely Covered",
+      "name": "Classic Chic Lapel Cardigan & Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQpr9N-tFdMtoJfMGRpiZaAYUjWH2_dX5XbLJEm8tX472N2nruLvEcIQKQ8W6OhADlh7SBfc04tcUx-sjiULl8EhB3owGaH_J7C_M5CDfg",
+      "outputPath": "public/assets/cutouts/generated-30526b6c04e69ac5.png",
+      "status": "generated",
+      "bytes": 166829
+    },
+    {
+      "id": "generated-9b9db014b2d9ed3b",
+      "brand": "DevilInspired",
+      "name": "Futuristic Techwear Open Shoulder Windbreaker Jacket + Shorts",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFY2t18ZrVTRWrvyZped8g-pcpp1vqqsnojDzdDo2NJtbhBQCi06zvH5ugQE0XFBhrkciEMH2JvBakG12RIXIxhnOkgopm_joeBia1hBw",
+      "outputPath": "public/assets/cutouts/generated-9b9db014b2d9ed3b.png",
+      "status": "generated",
+      "bytes": 179424
+    },
+    {
+      "id": "generated-e6b0808f98ef5088",
+      "brand": "Dillard's",
+      "name": "Donna Karan Women's One-Button Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS_FJSO06tRlYVKbiPDrUTemznplt-c2SBYrbhQw-91ZySDubBkUlcuW0cM3NMwu5G0yIvMFdIWqW4h2YHRXAzF5fw-puwRojErXUudQ878wNcoonCnqZuO",
+      "outputPath": "public/assets/cutouts/generated-e6b0808f98ef5088.png",
+      "status": "generated",
+      "bytes": 158102
+    },
+    {
+      "id": "generated-16a4517c50e5ee1d",
       "brand": "Etsy - Seller",
       "name": "Embroidered Western Outfit for Women, Luxury Handmade Complete Outfit with Coat, Hat & Boots",
-      "category": "shoes",
+      "category": "outer",
       "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQaV85Sv7VLjSZIJ8kpa92RoqghuiiMhAC87kUMysPzSrSALo1rCeIqryV_qG9zjIlbvsJxCu1emDrYVREEKz8Xcyg9X-5yoLVTBSm0JEbf1_R4pv0G1IKwDg",
-      "outputPath": "public/assets/cutouts/generated-159e2aa9e34f2b1b.png",
+      "outputPath": "public/assets/cutouts/generated-16a4517c50e5ee1d.png",
       "status": "generated",
       "bytes": 158152
     },
     {
-      "id": "generated-758ef28a0e13da4b",
-      "brand": "Wild Jolie",
-      "name": "Fashion Denim Buckled Belt Chain Knee High Cowgirl Boots",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSDNevcFfmyUHRhD8Jeh6IT1_1MXbZ8FFsGP_7wdqwh1dD5xxriMVHZiVWVmoUVzBakT2duEKZ9h4JQnFvUhZmm9oGpAOXikNSoBi7djTbk4Cqr2OPFWqgM-g",
-      "outputPath": "public/assets/cutouts/generated-758ef28a0e13da4b.png",
-      "status": "generated",
-      "bytes": 210813
-    },
-    {
-      "id": "generated-527df40db87c7c7a",
-      "brand": "Zazzle",
-      "name": "Country Western Cowgirl Denim Boots Hat Jacket",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQi-ilmg8NmxYQQvMVLDy03c66pJ_7Puu2mcM1r7F92gSyQbQ4ly5Z0sr2ub9CshHwVW7LxPAIOlrePRAVF4UTZY4bRVjjm45bJuEZnseqDuMeDZsCzJn9S",
-      "outputPath": "public/assets/cutouts/generated-527df40db87c7c7a.png",
-      "status": "generated",
-      "bytes": 618174
-    },
-    {
-      "id": "generated-03bf3dee802d4e4d",
-      "brand": "zazzle.com",
-      "name": "Western Cowboy Boots and Hat Denim Jacket",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRKDMx2QFj2fBZeLLsx_fGvdCgRBIWigTGiwizlbgVYcszqHkUvbjVr8SYIXdccXy7p8L4vm0sqGM0OpjPm3lY4slDmX5CR",
-      "outputPath": "public/assets/cutouts/generated-03bf3dee802d4e4d.png",
-      "status": "generated",
-      "bytes": 69548
-    },
-    {
-      "id": "catalog-shoes-nike-af1",
-      "brand": "Nike",
-      "name": "Air Force 1 '07",
-      "category": "shoes",
-      "imageUrl": "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/b7d9211c-26e7-431a-ac24-b0540fb3c00f/AIR+FORCE+1+%2707.png",
-      "outputPath": "public/assets/cutouts/catalog-shoes-nike-af1.png",
-      "status": "generated",
-      "bytes": 50303
-    },
-    {
-      "id": "cf644945808d11f8",
-      "brand": "Adidas",
-      "name": "'Campus 00s Beta' Sneakers",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQHzd1pHYjn_X8NHFO3kqvuuk8U4p64uacgh5T4yrtaKaQ8GzNqu_kv6k4bPLJGktK1XFlzyFTExiH33xWeWDvdqSohhw8RvA",
-      "outputPath": "public/assets/cutouts/cf644945808d11f8.png",
-      "status": "generated",
-      "bytes": 122643
-    },
-    {
-      "id": "generated-ab5e6d73176190dd",
-      "brand": "Ann Taylor",
-      "name": "Ann Taylor Women's Ann Cardigan",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRNCv55LkzD0h-ZorIOjiLS3c_HtAChiFuK9LWqsEJfjOZDGcUAxIbwVo3hUYFjYgwBj2FbvjuOR7yZk69ZNubShPb5HhacxUZLHTula8F3N4SbfkJGvkvV",
-      "outputPath": "public/assets/cutouts/generated-ab5e6d73176190dd.png",
-      "status": "generated",
-      "bytes": 227563
-    },
-    {
-      "id": "generated-8f03b87432cc3508",
-      "brand": "Ann Taylor",
-      "name": "Ann Taylor Women's Shorter One Button Blazer in Fluid Crepe",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTNAyKP0E3wb7TWqjNSd7rtcf9a3yGnChSYDgEAwUw-1iPQYLPCEgvPE3zwr4GbP8iNTtrrzekyV9t9MT4QpsFeNd1wqyMF23YgWvNRI3R4",
-      "outputPath": "public/assets/cutouts/generated-8f03b87432cc3508.png",
-      "status": "generated",
-      "bytes": 126665
-    },
-    {
-      "id": "generated-d888f3299a33a53c",
-      "brand": "Ann Taylor",
-      "name": "Ann Taylor Women's V-Neck Cardigan",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSH3H0eBuIwk6DLIRgyMDI98CrjmkQ91lylX0T-OgaXO2yddhqvoUdY39ue_X8x6VvdDCpIfo3FIa_cxAEORIzVbAUsLBYDBKavpdwWW47i9KMtzyZD9nUbfQ",
-      "outputPath": "public/assets/cutouts/generated-d888f3299a33a53c.png",
-      "status": "generated",
-      "bytes": 334182
-    },
-    {
-      "id": "generated-7c557ad32e2c12be",
-      "brand": "Aritzia",
-      "name": "The Super Puff Women's The Supersnug Puff Jacket in Modern Taupe | 2XS",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTrop_0mciR6SOnwpQ_PnkpaG1-Key38G7fqvKm4u30Lj42XrkkTbufNBmQCQZsVOm1x_D-IN5ghD8TQ4Z6ffE-PUJ4Tx_AAWtJvvCl5jxlbxGkmCA1LgJs",
-      "outputPath": "public/assets/cutouts/generated-7c557ad32e2c12be.png",
-      "status": "generated",
-      "bytes": 112942
-    },
-    {
-      "id": "generated-8c4ffd01ffe62765",
-      "brand": "Bloomingdale's",
-      "name": "Varley Women's Belinda Knit Puffer Coat",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQYXKXiyQwHsijsUdfzhfGOCRU46_6dFe4a_d3D6RWwaEN9EZPUSEfbpP8lQZBjmFaFFeHHh4wSbjNdy50F8CNCAJK98_vWRrTq4kC63M-3JfZLPy3x5yyaxw",
-      "outputPath": "public/assets/cutouts/generated-8c4ffd01ffe62765.png",
-      "status": "generated",
-      "bytes": 430384
-    },
-    {
-      "id": "generated-b96a8896c72f00bf",
-      "brand": "boohoo USA",
-      "name": "Boohoo Women's Crew Neck Knitted Boxy Cardigan & Wide Leg Trouser Co-",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTJLBrGQFsrQYJYbh2MSQbtSLmaWF6B6HbfS4Xw89cqSE8vAqQs66-JPRH-1PUaDD4FHAFNzOfjj_NITzeO1rEkVtTKJDWTITyb9sJ0aO8x4qLW3J8-zfouvw",
-      "outputPath": "public/assets/cutouts/generated-b96a8896c72f00bf.png",
-      "status": "generated",
-      "bytes": 137156
-    },
-    {
-      "id": "generated-a98fa786d3efb6f3",
-      "brand": "Anna-Kaci",
-      "name": "Anna-Kaci Women's Straw Sun Hat and Tote Bag Set",
-      "category": "bag",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcROjsWeXhJ-AKCCv3BpwjwRme1lLiSMHc3sZZBN_7mfw-0yM4FDbMWDfFhGDlK1KH9HF7QayQc3pEINUKLHoujsweaxiA0HYEPqOr6iX_0CFBkkmk7qPsAg",
-      "outputPath": "public/assets/cutouts/generated-a98fa786d3efb6f3.png",
-      "status": "generated",
-      "bytes": 339954
-    },
-    {
-      "id": "generated-45eb351ccebff462",
-      "brand": "eBay - vicky1870",
-      "name": "Ivory Linen Dress Size L With Tote, Hat And Jewelry Set",
-      "category": "bag",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTLVLzbncQnwmNvi_YB5YhorEF81LuIg8Rrd9DRV0PERM0HWVjgR5eI1vuaNDKoSkBXyUY37N1FqDFSHFK3tvX8T-0sMOSM4FjYfoyzptcQmTsLnf2MqioF",
-      "outputPath": "public/assets/cutouts/generated-45eb351ccebff462.png",
-      "status": "generated",
-      "bytes": 320778
-    },
-    {
-      "id": "generated-b72613e805c41cbc",
-      "brand": "Shiraleah",
-      "name": "Shiraleah Shelly Tote and Hat Set",
-      "category": "bag",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT5oUrAuN2BRmjmoWazivEm_h3tR0brfSbEcxHsw8PxmHsEKLpNFsc3Badrk4XCXDkzemGAQfZfgWG4mzB2Uwb41tzY4u42DN5DrwZ4I_xKMyBXWRwLrWws3kk",
-      "outputPath": "public/assets/cutouts/generated-b72613e805c41cbc.png",
-      "status": "generated",
-      "bytes": 296778
-    },
-    {
-      "id": "generated-e658d4d99d9e357d",
+      "id": "generated-698a8369c72174c3",
       "brand": "Techwearofficial",
-      "name": "Techwear Canvas Sling Backpack",
+      "name": "Techwear Men's Waterproof Oxford Sling Messenger Bag",
       "category": "bag",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSoUxBOE92yVOBOdSERJ2DsTqUrZI_F4EXw9aHZ3IwcgSvbRIUyVC75qwEcQFtMMac3VUGdQazWmKPXbvU7xCtGwGfIVZ889BPAO-bRGffw-tuA7YUPApM6",
-      "outputPath": "public/assets/cutouts/generated-e658d4d99d9e357d.png",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT1gR1HyO8y2cc4fh9p1prRLJRq5nJOmyHM58uk2-7Ob5y6obeCLJtW83D1XBoavUrgH51hpNlypBp33DFutZwvGYLt_tFdTIvCkZgoQZJ0t3PBCm_2mDhBgXo",
+      "outputPath": "public/assets/cutouts/generated-698a8369c72174c3.png",
       "status": "generated",
-      "bytes": 340218
+      "bytes": 251625
     },
     {
-      "id": "generated-7788ea56c2c2841a",
-      "brand": "Asatre",
-      "name": "Hemp Linen Striped Sun Hat",
+      "id": "generated-adc7c43cad42c4cb",
+      "brand": "Techwearofficial",
+      "name": "Techwear Waterproof Sling Backpack",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT-97bRsV4_OJ99P8qMxE7s1WK-pphrv56RSzC1Con2WGKyHHX9wDhKs9acEBYbOkN1y4VgDM36RLmlIoxCpJ7T8XJNO78vNlF9MDARl4iny80hm4F0E7HsnQ",
+      "outputPath": "public/assets/cutouts/generated-adc7c43cad42c4cb.png",
+      "status": "generated",
+      "bytes": 273412
+    },
+    {
+      "id": "597372a8b97e783f",
+      "brand": "Aritzia",
+      "name": "Awayday Tote Bag",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSx2MATdQs1pXDvgvbcxUVpWw7F8MfWKmg6Q3vFTcvjja3whlpcoARk_szmOtoHztnEuabBnlk3MkdJdnz2dCXrxlc1lbLcIo1u8GwP9JnfBK0bZnFXyKHhNg",
+      "outputPath": "public/assets/cutouts/597372a8b97e783f.png",
+      "status": "generated",
+      "bytes": 162014
+    },
+    {
+      "id": "9d9a77f2e03b6851",
+      "brand": "Aritzia",
+      "name": "Teddy Bear Awayday Tote Bag",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSa5bPooHD587CeCIJiZ_a5UlIieZmUSBneIvEmRjO4VOLH4LmykqXAD7H-ELcaDO3lPNZH58MmzeuAFEmz7Fub8-Womb634unuhbEaFixf2sOBoDYzNdssJQ",
+      "outputPath": "public/assets/cutouts/9d9a77f2e03b6851.png",
+      "status": "generated",
+      "bytes": 153037
+    },
+    {
+      "id": "generated-5587dad68bd0d169",
+      "brand": "coolibar.com",
+      "name": "Charlotte Linen Fringe Sun Hat",
       "category": "hat",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRLxB3cheZxYCP-nZJJk-PSPlrnYNMqAjRKI7uSRKOoW6QnAFW1P06flq1ze-V4WLS56VEqrsjxHfqe_f-Z2cNpi0aX8eGwJwFR-QeJXxCbCxtcXu54xaeB",
-      "outputPath": "public/assets/cutouts/generated-7788ea56c2c2841a.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRJAkMrNawcrX84uyWnW4eAwo6UgLaPvjWiSWNFYQlHoTfRyW5U6ZzEvAvRdEeiE7fFJa7ZlzijTKcceweow8Kxzb3yH_jCAii2qsCBfXapM6i8OgaqeqVeiA",
+      "outputPath": "public/assets/cutouts/generated-5587dad68bd0d169.png",
       "status": "generated",
-      "bytes": 383438
+      "bytes": 153161
     },
     {
-      "id": "generated-3224e7e823112440",
-      "brand": "Cider",
-      "name": "Women's Denim Cowboy Hat",
+      "id": "generated-a1a725bebf4d9a53",
+      "brand": "emilywantssummer.com",
+      "name": "Linen Cotton Sun Hat",
       "category": "hat",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTrm1DgcOY3NOrE2z9liIFG1_edYBXmMfQM1IYMNJQSjx0e6qosYfh-rMHwYRgwaxRdCkWxWtHu0PAQxCg_D1ylLyAVvUMDqJrlbIax3J_8KZ1xJIkJ_pGVbw",
-      "outputPath": "public/assets/cutouts/generated-3224e7e823112440.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTkAMtUmTD-YXjWwGo0CceNA8hm0btp7lg-4JkJo18p9cxzZOb-SGNEjNm5_u9De7zzIepk4SvQdcKEUUyvbkOrPmQIPcajuM89urAnnLxHLrcl01DqXynY-g",
+      "outputPath": "public/assets/cutouts/generated-a1a725bebf4d9a53.png",
       "status": "generated",
-      "bytes": 181884
+      "bytes": 342206
     },
     {
-      "id": "5f0c9a42e1eb6cd1",
-      "brand": "END. Clothing",
-      "name": "Missoma x Savi Triple Ridge Hoop Earrings in Silver",
-      "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS5qWyG_NKNF-8yLgktpGNFDmcG4i1cc9pEiBWvSo48F7erkyyJZCZzfh42H8VcsCxVHics6YLlKDKhQ040CfREHpMjpaAmEufOz0rexUpABaCUHvvZ7Yl4hWGN",
-      "outputPath": "public/assets/cutouts/5f0c9a42e1eb6cd1.png",
-      "status": "generated",
-      "bytes": 217392
-    },
-    {
-      "id": "1731e84aa0281ee4",
+      "id": "bc78a561ef3414cd",
       "brand": "endource",
-      "name": "Missoma 14ct Recycled",
+      "name": "MISSOMA Baroque Pearl Organic Drop Mini Hoop Earrings",
       "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR3j4T08aHOGOsx3YFgjo2weso-HLALaGtkSiyt54r_wbq4-dDPBTLrRTAHozdTw7jEFwrxTh1LE2lvD2lLkm9a3-ysQvBE4rorCGx7Wug0PVwdK61OpKBL0g",
-      "outputPath": "public/assets/cutouts/1731e84aa0281ee4.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRYOBm0nJ24DoZtu_leJmmNKHqZ1ah514vz8feMCHzt4BPaVHRlj-_wffvIN4oisy0PsRfzNRdJQYvw-SK3INk94XQeoUlV",
+      "outputPath": "public/assets/cutouts/bc78a561ef3414cd.png",
       "status": "generated",
-      "bytes": 46561
+      "bytes": 33470
+    },
+    {
+      "id": "ba8f3b445e60ac75",
+      "brand": "endource",
+      "name": "MISSOMA Harris Reed Moonlight Pearl Hoop Earrings",
+      "category": "jewelry",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTnSz0R4e4d25QEi-bgZWgii1T08Cb5UqJ5G7rk1IfkXFtzgKFhw-1gregeXvksX0GU1ffVMUrzYlKTxpND1I-kp2i8BAn7UQ",
+      "outputPath": "public/assets/cutouts/ba8f3b445e60ac75.png",
+      "status": "generated",
+      "bytes": 54430
     }
   ]
 }
