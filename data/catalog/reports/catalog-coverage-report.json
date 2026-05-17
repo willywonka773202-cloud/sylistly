@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T16:44:07.085Z",
+  "generatedAt": "2026-05-17T19:15:12.637Z",
   "total": 674,
   "byCategory": {
     "hat": 77,
@@ -250,15 +250,15 @@
     }
   ],
   "transparent": {
-    "withTransparent": 147,
-    "originalOnly": 438,
+    "withTransparent": 183,
+    "originalOnly": 402,
     "unsafeImages": 89,
-    "needsCutout": 438,
+    "needsCutout": 402,
     "transparentByCategory": {
       "hat": 10,
-      "outer": 22,
+      "outer": 45,
       "top": 39,
-      "bottom": 30,
+      "bottom": 43,
       "shoes": 20,
       "bag": 10,
       "eyewear": 8,
@@ -266,9 +266,9 @@
     },
     "needsCutoutByCategory": {
       "hat": 59,
-      "outer": 101,
+      "outer": 78,
       "top": 73,
-      "bottom": 72,
+      "bottom": 59,
       "shoes": 32,
       "bag": 39,
       "eyewear": 22,
@@ -399,8 +399,8 @@
     },
     {
       "category": "outer",
-      "priority": 33.7,
-      "reason": "136 runtime products, 101 still need transparent assets"
+      "priority": 26,
+      "reason": "136 runtime products, 78 still need transparent assets"
     }
   ]
 }

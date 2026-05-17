@@ -18,6 +18,7 @@ interface RequirementResult {
   actual: number;
   target: number;
   reason: string;
+  aliases?: string[];
 }
 
 interface ReadinessReport {
@@ -31,6 +32,9 @@ interface ReadinessReport {
   countsByCategory: Record<Category, number>;
   countsByFrame: Record<Frame, number>;
   countsByVibe: Record<string, number>;
+  countsByStyleFamily: Record<string, number>;
+  styleFamilyAliases: Record<string, string[]>;
+  exactVibeCounts: Record<string, number>;
   failedRequirements: RequirementResult[];
   passedRequirements: RequirementResult[];
   notes: string[];
@@ -49,6 +53,15 @@ const REQUIRED_CATEGORY_MINIMUMS: Record<Category, number> = {
 
 const KEY_VIBES = ['classic', 'street', 'date', 'work', 'vacation', 'cozy'];
 
+const STYLE_FAMILY_ALIASES: Record<string, string[]> = {
+  classic: ['classic', 'old money', 'preppy', 'business casual', 'clean', 'minimal'],
+  street: ['street', 'streetwear', 'y2k', 'edgy'],
+  work: ['work', 'workwear', 'office', 'business casual'],
+  date: ['date', 'night out', 'dressy'],
+  vacation: ['vacation', 'summer', 'beach', 'travel'],
+  cozy: ['cozy', 'winter'],
+};
+
 function emptyCategoryCounts(): Record<Category, number> {
   return Object.fromEntries(CATEGORY_ORDER.map((category) => [category, 0])) as Record<Category, number>;
 }
@@ -61,8 +74,20 @@ function classifyFrame(product: Product): Frame {
   return 'any';
 }
 
-function requirement(label: string, actual: number, target: number, reason: string): RequirementResult {
-  return { label, actual, target, passed: actual >= target, reason };
+function requirement(label: string, actual: number, target: number, reason: string, aliases?: string[]): RequirementResult {
+  return { label, actual, target, passed: actual >= target, reason, aliases };
+}
+
+function productVibes(product: Product): string[] {
+  return [...(product.vibes || []), ...(product.occasions || [])]
+    .filter((vibe): vibe is string => typeof vibe === 'string')
+    .map((vibe) => vibe.toLowerCase());
+}
+
+function matchesStyleFamily(product: Product, family: string): boolean {
+  const aliases = STYLE_FAMILY_ALIASES[family] || [family];
+  const vibes = productVibes(product);
+  return vibes.some((vibe) => aliases.includes(vibe));
 }
 
 function buildReport(): ReadinessReport {
@@ -71,12 +96,21 @@ function buildReport(): ReadinessReport {
   const countsByCategory = emptyCategoryCounts();
   const countsByFrame: Record<Frame, number> = { masc: 0, fem: 0, androgynous: 0, any: 0 };
   const countsByVibe: Record<string, number> = {};
+  const exactVibeCounts: Record<string, number> = {};
+  const countsByStyleFamily: Record<string, number> = {};
 
   for (const product of transparent) {
     countsByCategory[product.category] += 1;
     countsByFrame[classifyFrame(product)] += 1;
-    const vibes = Array.isArray(product.vibes) ? product.vibes : [];
-    for (const vibe of vibes) countsByVibe[vibe] = (countsByVibe[vibe] || 0) + 1;
+    for (const vibe of productVibes(product)) {
+      countsByVibe[vibe] = (countsByVibe[vibe] || 0) + 1;
+      exactVibeCounts[vibe] = (exactVibeCounts[vibe] || 0) + 1;
+    }
+    for (const family of KEY_VIBES) {
+      if (matchesStyleFamily(product, family)) {
+        countsByStyleFamily[family] = (countsByStyleFamily[family] || 0) + 1;
+      }
+    }
   }
 
   const requirements: RequirementResult[] = [];
@@ -97,11 +131,13 @@ function buildReport(): ReadinessReport {
     ));
   }
   for (const vibe of KEY_VIBES) {
+    const aliases = STYLE_FAMILY_ALIASES[vibe] || [vibe];
     requirements.push(requirement(
-      `${vibe} vibe coverage`,
-      countsByVibe[vibe] || 0,
+      `${vibe} style-family coverage`,
+      countsByStyleFamily[vibe] || 0,
       12,
-      `Transparent-only needs enough ${vibe} pieces for Feed and Build variety.`,
+      `Transparent-only needs enough ${vibe} pieces for Feed and Build variety. This counts the app's existing generator aliases: ${aliases.join(', ')}.`,
+      aliases,
     ));
   }
 
@@ -125,11 +161,15 @@ function buildReport(): ReadinessReport {
     countsByCategory,
     countsByFrame,
     countsByVibe: Object.fromEntries(Object.entries(countsByVibe).sort((a, b) => b[1] - a[1])),
+    countsByStyleFamily: Object.fromEntries(Object.entries(countsByStyleFamily).sort((a, b) => b[1] - a[1])),
+    styleFamilyAliases: STYLE_FAMILY_ALIASES,
+    exactVibeCounts: Object.fromEntries(Object.entries(exactVibeCounts).sort((a, b) => b[1] - a[1])),
     failedRequirements: requirements.filter((entry) => !entry.passed),
     passedRequirements: requirements.filter((entry) => entry.passed),
     notes: [
       'This report is read-only and does not change Feed or Build generation.',
-      'Transparent-only is not recommended until tops, bottoms, shoes, outerwear, frame coverage, and vibe coverage all pass.',
+      'Style-family readiness counts generator vocabulary aliases such as streetwear->street and office->work; exact raw vibe counts are preserved in exactVibeCounts.',
+      'Transparent-only is not recommended until tops, bottoms, shoes, outerwear, frame coverage, and style-family coverage all pass.',
       'Original-only products should remain available while transparent asset coverage is low.',
     ],
   };
@@ -157,6 +197,12 @@ function main(): void {
   console.log('--------------------------------');
   for (const category of CATEGORY_ORDER) {
     console.log(`  ${category}: ${report.countsByCategory[category]}`);
+  }
+  console.log('');
+  console.log('Transparent products by style family');
+  console.log('------------------------------------');
+  for (const vibe of KEY_VIBES) {
+    console.log(`  ${vibe}: ${report.countsByStyleFamily[vibe] || 0} (aliases: ${report.styleFamilyAliases[vibe].join(', ')})`);
   }
   console.log('');
   console.log('Failed requirements');

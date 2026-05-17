@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-17T16:41:28.180Z",
+  "generatedAt": "2026-05-17T19:12:33.918Z",
   "mode": "apply",
   "cutoutDir": "public/assets/cutouts",
   "overrideFile": "data/catalog-cutout-overrides.json",
-  "totalAssets": 147,
-  "matchedProducts": 147,
+  "totalAssets": 183,
+  "matchedProducts": 183,
   "unmatchedAssets": 0,
-  "appliedCount": 147,
+  "appliedCount": 183,
   "matches": [
     {
       "id": "0e0b0d3079442b71",
@@ -23,7 +23,7 @@
         "imageTransparentUrl": "/assets/cutouts/0e0b0d3079442b71.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/0e0b0d3079442b71.png by scripts/register-cutouts.ts."
       }
     },
@@ -42,7 +42,7 @@
         "imageTransparentUrl": "/assets/cutouts/1590fdbf9e938ba2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/1590fdbf9e938ba2.png by scripts/register-cutouts.ts."
       }
     },
@@ -61,7 +61,7 @@
         "imageTransparentUrl": "/assets/cutouts/1731e84aa0281ee4.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/1731e84aa0281ee4.png by scripts/register-cutouts.ts."
       }
     },
@@ -80,7 +80,7 @@
         "imageTransparentUrl": "/assets/cutouts/2eb1265214ad2ebf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/2eb1265214ad2ebf.png by scripts/register-cutouts.ts."
       }
     },
@@ -99,7 +99,7 @@
         "imageTransparentUrl": "/assets/cutouts/4b3c4d4cbbdeeb49.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/4b3c4d4cbbdeeb49.png by scripts/register-cutouts.ts."
       }
     },
@@ -118,7 +118,7 @@
         "imageTransparentUrl": "/assets/cutouts/4cea0af9fe25c369.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/4cea0af9fe25c369.png by scripts/register-cutouts.ts."
       }
     },
@@ -137,7 +137,7 @@
         "imageTransparentUrl": "/assets/cutouts/561d375c28389500.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/561d375c28389500.png by scripts/register-cutouts.ts."
       }
     },
@@ -156,7 +156,7 @@
         "imageTransparentUrl": "/assets/cutouts/597372a8b97e783f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/597372a8b97e783f.png by scripts/register-cutouts.ts."
       }
     },
@@ -175,7 +175,7 @@
         "imageTransparentUrl": "/assets/cutouts/5f0c9a42e1eb6cd1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/5f0c9a42e1eb6cd1.png by scripts/register-cutouts.ts."
       }
     },
@@ -194,7 +194,7 @@
         "imageTransparentUrl": "/assets/cutouts/624766d90d2add01.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/624766d90d2add01.png by scripts/register-cutouts.ts."
       }
     },
@@ -213,7 +213,7 @@
         "imageTransparentUrl": "/assets/cutouts/6db5a6fbfe73cdca.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/6db5a6fbfe73cdca.png by scripts/register-cutouts.ts."
       }
     },
@@ -232,7 +232,7 @@
         "imageTransparentUrl": "/assets/cutouts/742da04bcfe236fc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/742da04bcfe236fc.png by scripts/register-cutouts.ts."
       }
     },
@@ -251,7 +251,7 @@
         "imageTransparentUrl": "/assets/cutouts/74ec37a10152f779.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/74ec37a10152f779.png by scripts/register-cutouts.ts."
       }
     },
@@ -270,7 +270,7 @@
         "imageTransparentUrl": "/assets/cutouts/7fb598eee85fa4a6.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/7fb598eee85fa4a6.png by scripts/register-cutouts.ts."
       }
     },
@@ -289,7 +289,7 @@
         "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/85f6cb6cd1ec6df2.png by scripts/register-cutouts.ts."
       }
     },
@@ -308,7 +308,7 @@
         "imageTransparentUrl": "/assets/cutouts/8e7cc7e0fb50a507.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/8e7cc7e0fb50a507.png by scripts/register-cutouts.ts."
       }
     },
@@ -327,7 +327,7 @@
         "imageTransparentUrl": "/assets/cutouts/91d2606d3ed9958a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/91d2606d3ed9958a.png by scripts/register-cutouts.ts."
       }
     },
@@ -346,7 +346,7 @@
         "imageTransparentUrl": "/assets/cutouts/9d9a77f2e03b6851.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/9d9a77f2e03b6851.png by scripts/register-cutouts.ts."
       }
     },
@@ -365,7 +365,7 @@
         "imageTransparentUrl": "/assets/cutouts/a4818afdac3cab16.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/a4818afdac3cab16.png by scripts/register-cutouts.ts."
       }
     },
@@ -384,7 +384,7 @@
         "imageTransparentUrl": "/assets/cutouts/ac42819e80705c93.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ac42819e80705c93.png by scripts/register-cutouts.ts."
       }
     },
@@ -403,7 +403,7 @@
         "imageTransparentUrl": "/assets/cutouts/b65e8cd40ecfc8dc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/b65e8cd40ecfc8dc.png by scripts/register-cutouts.ts."
       }
     },
@@ -422,7 +422,7 @@
         "imageTransparentUrl": "/assets/cutouts/ba6bc7345521288d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ba6bc7345521288d.png by scripts/register-cutouts.ts."
       }
     },
@@ -441,7 +441,7 @@
         "imageTransparentUrl": "/assets/cutouts/ba8f3b445e60ac75.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ba8f3b445e60ac75.png by scripts/register-cutouts.ts."
       }
     },
@@ -460,7 +460,7 @@
         "imageTransparentUrl": "/assets/cutouts/bbb420fc033899ac.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bbb420fc033899ac.png by scripts/register-cutouts.ts."
       }
     },
@@ -479,7 +479,7 @@
         "imageTransparentUrl": "/assets/cutouts/bc78a561ef3414cd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bc78a561ef3414cd.png by scripts/register-cutouts.ts."
       }
     },
@@ -498,7 +498,7 @@
         "imageTransparentUrl": "/assets/cutouts/bd242062ee37feb6.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bd242062ee37feb6.png by scripts/register-cutouts.ts."
       }
     },
@@ -517,7 +517,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-bag-longchamp-lepliage.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-bag-longchamp-lepliage.png by scripts/register-cutouts.ts."
       }
     },
@@ -536,7 +536,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-shoes-nike-af1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-shoes-nike-af1.png by scripts/register-cutouts.ts."
       }
     },
@@ -555,7 +555,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-shoes-stevemadden-heel.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-shoes-stevemadden-heel.png by scripts/register-cutouts.ts."
       }
     },
@@ -574,7 +574,7 @@
         "imageTransparentUrl": "/assets/cutouts/cf644945808d11f8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/cf644945808d11f8.png by scripts/register-cutouts.ts."
       }
     },
@@ -593,7 +593,7 @@
         "imageTransparentUrl": "/assets/cutouts/d38b67ed2950fc95.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/d38b67ed2950fc95.png by scripts/register-cutouts.ts."
       }
     },
@@ -612,7 +612,7 @@
         "imageTransparentUrl": "/assets/cutouts/d855f06268e8998f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/d855f06268e8998f.png by scripts/register-cutouts.ts."
       }
     },
@@ -631,7 +631,7 @@
         "imageTransparentUrl": "/assets/cutouts/ee1b0c35cccddadc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ee1b0c35cccddadc.png by scripts/register-cutouts.ts."
       }
     },
@@ -650,7 +650,7 @@
         "imageTransparentUrl": "/assets/cutouts/ef88c5af4ab9f7f5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ef88c5af4ab9f7f5.png by scripts/register-cutouts.ts."
       }
     },
@@ -669,7 +669,7 @@
         "imageTransparentUrl": "/assets/cutouts/f2e4852913aacbdf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f2e4852913aacbdf.png by scripts/register-cutouts.ts."
       }
     },
@@ -688,7 +688,7 @@
         "imageTransparentUrl": "/assets/cutouts/f5186afd2ae75287.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f5186afd2ae75287.png by scripts/register-cutouts.ts."
       }
     },
@@ -707,7 +707,7 @@
         "imageTransparentUrl": "/assets/cutouts/f70fd86e50d9418c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f70fd86e50d9418c.png by scripts/register-cutouts.ts."
       }
     },
@@ -726,7 +726,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-021735e8705aba59.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-021735e8705aba59.png by scripts/register-cutouts.ts."
       }
     },
@@ -745,7 +745,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-035f9f9fc0f43cba.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-035f9f9fc0f43cba.png by scripts/register-cutouts.ts."
       }
     },
@@ -764,7 +764,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-03bf3dee802d4e4d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-03bf3dee802d4e4d.png by scripts/register-cutouts.ts."
       }
     },
@@ -783,8 +783,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-041da4cfe0a7056b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-041da4cfe0a7056b.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-0491e77adf091fc8",
+      "assetPath": "/assets/cutouts/generated-0491e77adf091fc8.png",
+      "matched": true,
+      "product": {
+        "id": "generated-0491e77adf091fc8",
+        "brand": "Techwearofficial",
+        "name": "Black Zip Pocket Cargo Pants for Men",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-0491e77adf091fc8.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-0491e77adf091fc8.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-07a062f2c9f7de29",
+      "assetPath": "/assets/cutouts/generated-07a062f2c9f7de29.png",
+      "matched": true,
+      "product": {
+        "id": "generated-07a062f2c9f7de29",
+        "brand": "Nordstrom",
+        "name": "Men Bonobos Stretch Weekday Warrior Slim Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-07a062f2c9f7de29.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-07a062f2c9f7de29.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -802,8 +838,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-0dd8cfe08bb7a011.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-0dd8cfe08bb7a011.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-0e18fa1391190bba",
+      "assetPath": "/assets/cutouts/generated-0e18fa1391190bba.png",
+      "matched": true,
+      "product": {
+        "id": "generated-0e18fa1391190bba",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Tweed Cardigan Flare Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-0e18fa1391190bba.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-0e18fa1391190bba.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-1008f102d799c90d",
+      "assetPath": "/assets/cutouts/generated-1008f102d799c90d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-1008f102d799c90d",
+        "brand": "Nordstrom",
+        "name": "Petal & Pup Women's Odell Knit Cardigan & Pants Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-1008f102d799c90d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-1008f102d799c90d.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -821,7 +893,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-11143191925fe4be.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-11143191925fe4be.png by scripts/register-cutouts.ts."
       }
     },
@@ -840,8 +912,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-130411501038e332.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-130411501038e332.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-130d1c8797765e26",
+      "assetPath": "/assets/cutouts/generated-130d1c8797765e26.png",
+      "matched": true,
+      "product": {
+        "id": "generated-130d1c8797765e26",
+        "brand": "H&M",
+        "name": "H&M Ladies Double-Breasted Blazer",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-130d1c8797765e26.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-130d1c8797765e26.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -859,7 +949,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-156d42979e60b705.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-156d42979e60b705.png by scripts/register-cutouts.ts."
       }
     },
@@ -878,8 +968,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-159e2aa9e34f2b1b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-159e2aa9e34f2b1b.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-16008bf3bb3a8476",
+      "assetPath": "/assets/cutouts/generated-16008bf3bb3a8476.png",
+      "matched": true,
+      "product": {
+        "id": "generated-16008bf3bb3a8476",
+        "brand": "Zara",
+        "name": "Zara Men's Comfort Suit Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-16008bf3bb3a8476.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-16008bf3bb3a8476.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -897,7 +1005,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-16a4517c50e5ee1d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-16a4517c50e5ee1d.png by scripts/register-cutouts.ts."
       }
     },
@@ -916,7 +1024,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-1f202726dff2f014.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-1f202726dff2f014.png by scripts/register-cutouts.ts."
       }
     },
@@ -935,7 +1043,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-225686ca63c9d93c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-225686ca63c9d93c.png by scripts/register-cutouts.ts."
       }
     },
@@ -947,13 +1055,14 @@
         "id": "generated-275150bce379b9a7",
         "brand": "UGG",
         "name": "Ugg Classic Women Sweatpants - Sand Heather",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-275150bce379b9a7.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-275150bce379b9a7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-275150bce379b9a7.png by scripts/register-cutouts.ts."
       }
     },
@@ -972,7 +1081,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2b668469c7d84f6e.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2b668469c7d84f6e.png by scripts/register-cutouts.ts."
       }
     },
@@ -991,8 +1100,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2e0beab658a1e16a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2e0beab658a1e16a.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-2e20fec284a6cd6b",
+      "assetPath": "/assets/cutouts/generated-2e20fec284a6cd6b.png",
+      "matched": true,
+      "product": {
+        "id": "generated-2e20fec284a6cd6b",
+        "brand": "Lands' End",
+        "name": "Lands' End Men's Travel Kit Chino Blazer",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-2e20fec284a6cd6b.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-2e20fec284a6cd6b.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1010,7 +1137,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2eeb9177b2a156a5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2eeb9177b2a156a5.png by scripts/register-cutouts.ts."
       }
     },
@@ -1022,13 +1149,14 @@
         "id": "generated-2f1bfa27a4583c16",
         "brand": "UGG",
         "name": "UGG Men's Tasman Hoodie",
-        "category": "outer"
+        "category": "outer",
+        "currentTransparentUrl": "/assets/cutouts/generated-2f1bfa27a4583c16.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-2f1bfa27a4583c16.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2f1bfa27a4583c16.png by scripts/register-cutouts.ts."
       }
     },
@@ -1047,7 +1175,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-30526b6c04e69ac5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-30526b6c04e69ac5.png by scripts/register-cutouts.ts."
       }
     },
@@ -1066,7 +1194,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3084801187d53eaa.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3084801187d53eaa.png by scripts/register-cutouts.ts."
       }
     },
@@ -1085,7 +1213,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3224e7e823112440.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3224e7e823112440.png by scripts/register-cutouts.ts."
       }
     },
@@ -1104,7 +1232,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-337c9d9b715b6bc1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-337c9d9b715b6bc1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1123,8 +1251,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-33973f1c68b0c2e0.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-33973f1c68b0c2e0.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-3475f4f3d7fe7731",
+      "assetPath": "/assets/cutouts/generated-3475f4f3d7fe7731.png",
+      "matched": true,
+      "product": {
+        "id": "generated-3475f4f3d7fe7731",
+        "brand": "Techwear Storm",
+        "name": "Techwear Kisuke Cargo Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-3475f4f3d7fe7731.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-3475f4f3d7fe7731.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1142,7 +1288,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-35f0341cafaf810d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-35f0341cafaf810d.png by scripts/register-cutouts.ts."
       }
     },
@@ -1161,7 +1307,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-361289fb3cdfa4c1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-361289fb3cdfa4c1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1180,8 +1326,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3869739e43797ced.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3869739e43797ced.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-38b88276652f406d",
+      "assetPath": "/assets/cutouts/generated-38b88276652f406d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-38b88276652f406d",
+        "brand": "Men's Wearhouse",
+        "name": "Haggar Classic Fit Men’s Suit in Oatmeal Tan – Notch Lapel 2-Button Jacket with Flat-Front Pants, Size 46 Short",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-38b88276652f406d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-38b88276652f406d.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-39cb3da53d56aafb",
+      "assetPath": "/assets/cutouts/generated-39cb3da53d56aafb.png",
+      "matched": true,
+      "product": {
+        "id": "generated-39cb3da53d56aafb",
+        "brand": "Men's Wearhouse",
+        "name": "Paisley & Gray Modern Fit Sage Green Men’s Suit – Two Button Notch Lapel Jacket with Flat Front Dress Pants",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-39cb3da53d56aafb.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-39cb3da53d56aafb.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1199,7 +1381,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3bd50b88a0cafbe5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3bd50b88a0cafbe5.png by scripts/register-cutouts.ts."
       }
     },
@@ -1218,7 +1400,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-45eb351ccebff462.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-45eb351ccebff462.png by scripts/register-cutouts.ts."
       }
     },
@@ -1237,7 +1419,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-487eeeb7ad2ed5b2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-487eeeb7ad2ed5b2.png by scripts/register-cutouts.ts."
       }
     },
@@ -1256,7 +1438,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4cef990da518596a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4cef990da518596a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1275,7 +1457,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4e43016dfc8eedee.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4e43016dfc8eedee.png by scripts/register-cutouts.ts."
       }
     },
@@ -1294,7 +1476,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4e5b08cc31bf2b02.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4e5b08cc31bf2b02.png by scripts/register-cutouts.ts."
       }
     },
@@ -1313,7 +1495,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-502841f449c32876.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-502841f449c32876.png by scripts/register-cutouts.ts."
       }
     },
@@ -1332,7 +1514,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-527df40db87c7c7a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-527df40db87c7c7a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1351,7 +1533,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5587dad68bd0d169.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5587dad68bd0d169.png by scripts/register-cutouts.ts."
       }
     },
@@ -1370,7 +1552,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5741f5f0220aecd3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5741f5f0220aecd3.png by scripts/register-cutouts.ts."
       }
     },
@@ -1389,7 +1571,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-589e8f931d3c29f7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-589e8f931d3c29f7.png by scripts/register-cutouts.ts."
       }
     },
@@ -1408,7 +1590,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5a90055854903873.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5a90055854903873.png by scripts/register-cutouts.ts."
       }
     },
@@ -1427,8 +1609,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5aefcd19a46a76a7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5aefcd19a46a76a7.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-61904954680f6ff8",
+      "assetPath": "/assets/cutouts/generated-61904954680f6ff8.png",
+      "matched": true,
+      "product": {
+        "id": "generated-61904954680f6ff8",
+        "brand": "H&M",
+        "name": "H&M Ladies Gathered-Sleeve Jacket",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-61904954680f6ff8.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-61904954680f6ff8.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1446,7 +1646,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-624a9117048c37d2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-624a9117048c37d2.png by scripts/register-cutouts.ts."
       }
     },
@@ -1465,7 +1665,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6256d844cd2f73bc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6256d844cd2f73bc.png by scripts/register-cutouts.ts."
       }
     },
@@ -1484,8 +1684,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-698a8369c72174c3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-698a8369c72174c3.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-6d3010389559c096",
+      "assetPath": "/assets/cutouts/generated-6d3010389559c096.png",
+      "matched": true,
+      "product": {
+        "id": "generated-6d3010389559c096",
+        "brand": "Macy's",
+        "name": "Tommy Hilfiger Men's Stretch Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-6d3010389559c096.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-6d3010389559c096.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1503,7 +1721,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6de0f25f66c00cb1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6de0f25f66c00cb1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1522,8 +1740,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6de1b00357f7dd68.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6de1b00357f7dd68.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-70b1660ec9405a6b",
+      "assetPath": "/assets/cutouts/generated-70b1660ec9405a6b.png",
+      "matched": true,
+      "product": {
+        "id": "generated-70b1660ec9405a6b",
+        "brand": "Walmart - UPPADA Fashion",
+        "name": "Women's Dressy Two Piece Set with Long Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-70b1660ec9405a6b.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-70b1660ec9405a6b.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-74fe933994f14082",
+      "assetPath": "/assets/cutouts/generated-74fe933994f14082.png",
+      "matched": true,
+      "product": {
+        "id": "generated-74fe933994f14082",
+        "brand": "Nordstrom",
+        "name": "Open Edit The Icon Trousers",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-74fe933994f14082.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-74fe933994f14082.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1541,7 +1795,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-75790e3b8b9f7733.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-75790e3b8b9f7733.png by scripts/register-cutouts.ts."
       }
     },
@@ -1560,8 +1814,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-758ef28a0e13da4b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-758ef28a0e13da4b.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-7709b5e5769a8e76",
+      "assetPath": "/assets/cutouts/generated-7709b5e5769a8e76.png",
+      "matched": true,
+      "product": {
+        "id": "generated-7709b5e5769a8e76",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Satin Blazer Straight Leg Pant Set in Black, Size",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-7709b5e5769a8e76.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-7709b5e5769a8e76.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1579,7 +1851,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7788ea56c2c2841a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7788ea56c2c2841a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1598,7 +1870,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7c557ad32e2c12be.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7c557ad32e2c12be.png by scripts/register-cutouts.ts."
       }
     },
@@ -1617,8 +1889,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7ca4be6cd09823e8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7ca4be6cd09823e8.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-7da43d666e4b7449",
+      "assetPath": "/assets/cutouts/generated-7da43d666e4b7449.png",
+      "matched": true,
+      "product": {
+        "id": "generated-7da43d666e4b7449",
+        "brand": "Men's Wearhouse",
+        "name": "Haggar Classic Fit Men’s Suit in Charcoal Gray – Two-Button Notch-Lapel Jacket and Flat-Front Pants, Size 46 Short",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-7da43d666e4b7449.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-7da43d666e4b7449.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1636,7 +1926,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7f325d10068cfc1d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7f325d10068cfc1d.png by scripts/register-cutouts.ts."
       }
     },
@@ -1655,8 +1945,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7fd5d321466f69e2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7fd5d321466f69e2.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-817a4ed69864f46a",
+      "assetPath": "/assets/cutouts/generated-817a4ed69864f46a.png",
+      "matched": true,
+      "product": {
+        "id": "generated-817a4ed69864f46a",
+        "brand": "Techwearofficial",
+        "name": "Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-817a4ed69864f46a.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-817a4ed69864f46a.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-81fe35b932b13d40",
+      "assetPath": "/assets/cutouts/generated-81fe35b932b13d40.png",
+      "matched": true,
+      "product": {
+        "id": "generated-81fe35b932b13d40",
+        "brand": "Techwear Storm",
+        "name": "Techwear cargo pants \"Shinji",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-81fe35b932b13d40.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-81fe35b932b13d40.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1674,8 +2000,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-837496a0a03041b8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-837496a0a03041b8.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-867a2968367d0d14",
+      "assetPath": "/assets/cutouts/generated-867a2968367d0d14.png",
+      "matched": true,
+      "product": {
+        "id": "generated-867a2968367d0d14",
+        "brand": "Walmart - DUDHUH-US",
+        "name": "Men's Techwear Hip Hop Streetwear Cargo Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-867a2968367d0d14.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-867a2968367d0d14.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1693,7 +2037,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-88f416d38d4962b4.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-88f416d38d4962b4.png by scripts/register-cutouts.ts."
       }
     },
@@ -1712,8 +2056,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-8c4ffd01ffe62765.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-8c4ffd01ffe62765.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-8d0a40412cd7c0af",
+      "assetPath": "/assets/cutouts/generated-8d0a40412cd7c0af.png",
+      "matched": true,
+      "product": {
+        "id": "generated-8d0a40412cd7c0af",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Tie Waist Long Sleeve Blazer and Wide Leg Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-8d0a40412cd7c0af.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-8d0a40412cd7c0af.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1724,13 +2086,14 @@
         "id": "generated-8d4e3bcd82077a3d",
         "brand": "UGG",
         "name": "UGG Joanne Bonded Fleece Hoodie & Bottoms - Women's",
-        "category": "outer"
+        "category": "outer",
+        "currentTransparentUrl": "/assets/cutouts/generated-8d4e3bcd82077a3d.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-8d4e3bcd82077a3d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-8d4e3bcd82077a3d.png by scripts/register-cutouts.ts."
       }
     },
@@ -1749,7 +2112,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-8f03b87432cc3508.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-8f03b87432cc3508.png by scripts/register-cutouts.ts."
       }
     },
@@ -1761,13 +2124,14 @@
         "id": "generated-91163af986a5b635",
         "brand": "UGG",
         "name": "UGG Women's Classic Cotton Blend Sweatpants",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-91163af986a5b635.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-91163af986a5b635.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-91163af986a5b635.png by scripts/register-cutouts.ts."
       }
     },
@@ -1786,7 +2150,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-958408328a58e8bb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-958408328a58e8bb.png by scripts/register-cutouts.ts."
       }
     },
@@ -1805,7 +2169,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-97051a7bc7c0221f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-97051a7bc7c0221f.png by scripts/register-cutouts.ts."
       }
     },
@@ -1824,8 +2188,62 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9745d91b67c10bb9.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9745d91b67c10bb9.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-99542fd664d775ef",
+      "assetPath": "/assets/cutouts/generated-99542fd664d775ef.png",
+      "matched": true,
+      "product": {
+        "id": "generated-99542fd664d775ef",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Tweed Blazer Straight Leg Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-99542fd664d775ef.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-99542fd664d775ef.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-99aeccf41750984d",
+      "assetPath": "/assets/cutouts/generated-99aeccf41750984d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-99aeccf41750984d",
+        "brand": "Kohl's",
+        "name": "Women Wide Leg Pants Dressy Business Casual High Waisted Straight Leg Work Office Trousers Slacks, Women's, Size: Small, Black",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-99aeccf41750984d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-99aeccf41750984d.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-99fdae77bcd417ac",
+      "assetPath": "/assets/cutouts/generated-99fdae77bcd417ac.png",
+      "matched": true,
+      "product": {
+        "id": "generated-99fdae77bcd417ac",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Men's Modern Stretch Suit Jacket",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-99fdae77bcd417ac.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-99fdae77bcd417ac.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1843,7 +2261,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9b9db014b2d9ed3b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9b9db014b2d9ed3b.png by scripts/register-cutouts.ts."
       }
     },
@@ -1862,8 +2280,44 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9bc59c9d7498e99f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9bc59c9d7498e99f.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-9f26b6fa3eaeecc1",
+      "assetPath": "/assets/cutouts/generated-9f26b6fa3eaeecc1.png",
+      "matched": true,
+      "product": {
+        "id": "generated-9f26b6fa3eaeecc1",
+        "brand": "missguided",
+        "name": "Modern Oversized Blazer Palazzo Pants Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-9f26b6fa3eaeecc1.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-9f26b6fa3eaeecc1.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-9f7712f662e0034d",
+      "assetPath": "/assets/cutouts/generated-9f7712f662e0034d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-9f7712f662e0034d",
+        "brand": "H&M",
+        "name": "H&M Men's Regular-Fit Single-Breasted Jacket",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-9f7712f662e0034d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-9f7712f662e0034d.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1881,7 +2335,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a1a725bebf4d9a53.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a1a725bebf4d9a53.png by scripts/register-cutouts.ts."
       }
     },
@@ -1900,8 +2354,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a40b4a1a792a2517.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a40b4a1a792a2517.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-a45af73010be409a",
+      "assetPath": "/assets/cutouts/generated-a45af73010be409a.png",
+      "matched": true,
+      "product": {
+        "id": "generated-a45af73010be409a",
+        "brand": "Men's Wearhouse",
+        "name": "Haggar Men's Active Series Tailored-Fit 4-Way Stretch Blazer",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-a45af73010be409a.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-a45af73010be409a.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1919,7 +2391,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a5801e98c45f1cbf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a5801e98c45f1cbf.png by scripts/register-cutouts.ts."
       }
     },
@@ -1938,7 +2410,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a652be2c81696296.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a652be2c81696296.png by scripts/register-cutouts.ts."
       }
     },
@@ -1957,8 +2429,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a98fa786d3efb6f3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a98fa786d3efb6f3.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-aa6cb4ece0190b0a",
+      "assetPath": "/assets/cutouts/generated-aa6cb4ece0190b0a.png",
+      "matched": true,
+      "product": {
+        "id": "generated-aa6cb4ece0190b0a",
+        "brand": "Nordstrom",
+        "name": "Rodd & Gunn Men's The Cascades Sport Fit Jacket",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-aa6cb4ece0190b0a.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-aa6cb4ece0190b0a.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1976,7 +2466,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-aadcd62d367dcfcb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-aadcd62d367dcfcb.png by scripts/register-cutouts.ts."
       }
     },
@@ -1995,7 +2485,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ab5e6d73176190dd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ab5e6d73176190dd.png by scripts/register-cutouts.ts."
       }
     },
@@ -2014,7 +2504,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-adc7c43cad42c4cb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-adc7c43cad42c4cb.png by scripts/register-cutouts.ts."
       }
     },
@@ -2033,7 +2523,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b0b6e135c92a2b63.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b0b6e135c92a2b63.png by scripts/register-cutouts.ts."
       }
     },
@@ -2052,7 +2542,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b18046b88d650cff.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b18046b88d650cff.png by scripts/register-cutouts.ts."
       }
     },
@@ -2071,7 +2561,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b72613e805c41cbc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b72613e805c41cbc.png by scripts/register-cutouts.ts."
       }
     },
@@ -2090,7 +2580,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b96a8896c72f00bf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b96a8896c72f00bf.png by scripts/register-cutouts.ts."
       }
     },
@@ -2109,7 +2599,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bb0fee93a3e25796.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bb0fee93a3e25796.png by scripts/register-cutouts.ts."
       }
     },
@@ -2128,7 +2618,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bc055db1ce947a03.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bc055db1ce947a03.png by scripts/register-cutouts.ts."
       }
     },
@@ -2140,13 +2630,14 @@
         "id": "generated-bdef400df8894d74",
         "brand": "UGG",
         "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-bdef400df8894d74.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-bdef400df8894d74.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bdef400df8894d74.png by scripts/register-cutouts.ts."
       }
     },
@@ -2165,7 +2656,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-be3dae134bffe286.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-be3dae134bffe286.png by scripts/register-cutouts.ts."
       }
     },
@@ -2184,7 +2675,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bf4f3fe2a92cf5a3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bf4f3fe2a92cf5a3.png by scripts/register-cutouts.ts."
       }
     },
@@ -2203,7 +2694,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c3564a6db0b7b1d0.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c3564a6db0b7b1d0.png by scripts/register-cutouts.ts."
       }
     },
@@ -2222,7 +2713,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c677c02745bffdd5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c677c02745bffdd5.png by scripts/register-cutouts.ts."
       }
     },
@@ -2241,7 +2732,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c8dab16c6c0f23f2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c8dab16c6c0f23f2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2260,7 +2751,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c9b5c3c789523ffc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c9b5c3c789523ffc.png by scripts/register-cutouts.ts."
       }
     },
@@ -2279,7 +2770,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ca938ba8cedc6c1f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ca938ba8cedc6c1f.png by scripts/register-cutouts.ts."
       }
     },
@@ -2298,8 +2789,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-cb9a8d25c4d3df34.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-cb9a8d25c4d3df34.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-ce58332aab800a94",
+      "assetPath": "/assets/cutouts/generated-ce58332aab800a94.png",
+      "matched": true,
+      "product": {
+        "id": "generated-ce58332aab800a94",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Blazer and Wide Leg Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-ce58332aab800a94.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-ce58332aab800a94.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2317,7 +2826,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ced193ac65308724.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ced193ac65308724.png by scripts/register-cutouts.ts."
       }
     },
@@ -2336,7 +2845,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d040c1609028be81.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d040c1609028be81.png by scripts/register-cutouts.ts."
       }
     },
@@ -2355,7 +2864,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d21d09ad6fd72b69.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d21d09ad6fd72b69.png by scripts/register-cutouts.ts."
       }
     },
@@ -2367,13 +2876,14 @@
         "id": "generated-d3d13a615df5b8b1",
         "brand": "UGG",
         "name": "Uggs Women's Sweatpants Set",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-d3d13a615df5b8b1.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-d3d13a615df5b8b1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d3d13a615df5b8b1.png by scripts/register-cutouts.ts."
       }
     },
@@ -2392,8 +2902,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d64c113a09b624ae.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d64c113a09b624ae.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d6b77dc008f90720",
+      "assetPath": "/assets/cutouts/generated-d6b77dc008f90720.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d6b77dc008f90720",
+        "brand": "Techwearofficial",
+        "name": "Techwear Heavyweight Cargo Pants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d6b77dc008f90720.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d6b77dc008f90720.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2411,7 +2939,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d7fe8cdb6fe638b2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d7fe8cdb6fe638b2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2430,7 +2958,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d846c2cc5d7d5160.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d846c2cc5d7d5160.png by scripts/register-cutouts.ts."
       }
     },
@@ -2449,7 +2977,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d888f3299a33a53c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d888f3299a33a53c.png by scripts/register-cutouts.ts."
       }
     },
@@ -2468,8 +2996,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d8f231535ba88b4a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d8f231535ba88b4a.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d91ad828ec14dafd",
+      "assetPath": "/assets/cutouts/generated-d91ad828ec14dafd.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d91ad828ec14dafd",
+        "brand": "Pegasi",
+        "name": "Carina Pleated Skirt & Cardigan Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d91ad828ec14dafd.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d91ad828ec14dafd.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2487,7 +3033,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-dc188b225d49fbd3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-dc188b225d49fbd3.png by scripts/register-cutouts.ts."
       }
     },
@@ -2506,7 +3052,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ddc54504be20e392.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ddc54504be20e392.png by scripts/register-cutouts.ts."
       }
     },
@@ -2525,7 +3071,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-de7d7fa0912bedd2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-de7d7fa0912bedd2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2544,7 +3090,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e0ad64fcd8e46714.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e0ad64fcd8e46714.png by scripts/register-cutouts.ts."
       }
     },
@@ -2563,8 +3109,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e190f85176ee9be5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e190f85176ee9be5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e4521506a432189e",
+      "assetPath": "/assets/cutouts/generated-e4521506a432189e.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e4521506a432189e",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Blazer Skinny Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e4521506a432189e.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e4521506a432189e.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2582,7 +3146,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e6454b5080145d0e.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e6454b5080145d0e.png by scripts/register-cutouts.ts."
       }
     },
@@ -2601,7 +3165,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e658d4d99d9e357d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e658d4d99d9e357d.png by scripts/register-cutouts.ts."
       }
     },
@@ -2620,7 +3184,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e6b0808f98ef5088.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e6b0808f98ef5088.png by scripts/register-cutouts.ts."
       }
     },
@@ -2632,13 +3196,14 @@
         "id": "generated-e83a5278351c8f78",
         "brand": "UGG",
         "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-e83a5278351c8f78.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-e83a5278351c8f78.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e83a5278351c8f78.png by scripts/register-cutouts.ts."
       }
     },
@@ -2657,7 +3222,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e946a57f141dc54c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e946a57f141dc54c.png by scripts/register-cutouts.ts."
       }
     },
@@ -2676,7 +3241,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-edc1856050584cdb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-edc1856050584cdb.png by scripts/register-cutouts.ts."
       }
     },
@@ -2695,7 +3260,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ef1ef5d28cfcf7d5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef1ef5d28cfcf7d5.png by scripts/register-cutouts.ts."
       }
     },
@@ -2714,7 +3279,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ef8c18a9ce9f8c03.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef8c18a9ce9f8c03.png by scripts/register-cutouts.ts."
       }
     },
@@ -2733,7 +3298,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-efe763d1bf479e59.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-efe763d1bf479e59.png by scripts/register-cutouts.ts."
       }
     },
@@ -2752,8 +3317,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-efea7e82501f92dd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-efea7e82501f92dd.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-f0e7bfe9cff043d9",
+      "assetPath": "/assets/cutouts/generated-f0e7bfe9cff043d9.png",
+      "matched": true,
+      "product": {
+        "id": "generated-f0e7bfe9cff043d9",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Cardigan Wide Leg Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-f0e7bfe9cff043d9.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-f0e7bfe9cff043d9.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2771,8 +3354,62 @@
         "imageTransparentUrl": "/assets/cutouts/generated-f1e5461b86e85cb7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-f1e5461b86e85cb7.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-f3212c62c5d40d22",
+      "assetPath": "/assets/cutouts/generated-f3212c62c5d40d22.png",
+      "matched": true,
+      "product": {
+        "id": "generated-f3212c62c5d40d22",
+        "brand": "Fashion Nova",
+        "name": "Fashion Nova Long Sleeve Twill Blazer and Wide Leg Pant Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-f3212c62c5d40d22.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-f3212c62c5d40d22.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-f403e370ccf52a12",
+      "assetPath": "/assets/cutouts/generated-f403e370ccf52a12.png",
+      "matched": true,
+      "product": {
+        "id": "generated-f403e370ccf52a12",
+        "brand": "LightInTheBox",
+        "name": "Men's Polyester Cloth Blazer",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-f403e370ccf52a12.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-f403e370ccf52a12.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-f7db09272e73cd2c",
+      "assetPath": "/assets/cutouts/generated-f7db09272e73cd2c.png",
+      "matched": true,
+      "product": {
+        "id": "generated-f7db09272e73cd2c",
+        "brand": "Techwear Storm",
+        "name": "Techwear Storm Techwear Cargo Pants Faux Two Piece",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-f7db09272e73cd2c.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-f7db09272e73cd2c.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2790,8 +3427,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-fc3ed530ee15b0e1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-fc3ed530ee15b0e1.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-fdb47b6778ec997e",
+      "assetPath": "/assets/cutouts/generated-fdb47b6778ec997e.png",
+      "matched": true,
+      "product": {
+        "id": "generated-fdb47b6778ec997e",
+        "brand": "Lovau",
+        "name": "Sakura Collection Pleated Cardigan & Trousers Set",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-fdb47b6778ec997e.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T19:12:33.918Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-fdb47b6778ec997e.png by scripts/register-cutouts.ts."
       }
     }
   ],

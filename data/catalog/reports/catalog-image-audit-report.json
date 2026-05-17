@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-17T16:44:07.156Z",
+  "generatedAt": "2026-05-17T19:15:12.657Z",
   "totals": {
     "products": 680,
-    "withTransparent": 149,
-    "withOriginalOnly": 441,
+    "withTransparent": 185,
+    "withOriginalOnly": 405,
     "withUnsafeImage": 90,
-    "needsCutoutPriority": 441
+    "needsCutoutPriority": 405
   },
   "bySource": [
     {
@@ -19,10 +19,10 @@
     {
       "label": "generated-catalog",
       "total": 175,
-      "withTransparent": 110,
-      "withOriginalOnly": 65,
+      "withTransparent": 146,
+      "withOriginalOnly": 29,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 65
+      "needsCutoutPriority": 29
     },
     {
       "label": "photo-catalog",
@@ -34,9 +34,9 @@
     }
   ],
   "byCategoryNeedingCutout": {
-    "outer": 101,
+    "outer": 78,
     "top": 74,
-    "bottom": 73,
+    "bottom": 60,
     "hat": 60,
     "jewelry": 40,
     "bag": 39,
@@ -1110,20 +1110,6 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-99aeccf41750984d",
-      "brand": "Kohl's",
-      "name": "Women Wide Leg Pants Dressy Business Casual High Waisted Straight Leg Work Office Trousers Slacks, Women's, Size: Small, Black",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRlTXfBUJhIykNqYdBNncpW9zPTPdtyD4mQfNFnfD4dQrEb5v8QG9OpKmrxuKkunaYRVFOf_kBLD_Wcg7nuFe6jPCXL6mJr-2BQ0q59GRbKI0otBAdue_-e",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
       "id": "generated-f7c73ba185c8e08c",
       "brand": "Lands' End",
       "name": "Lands' End Women's Linen High Rise Pull On 7\" Shorts",
@@ -1152,179 +1138,11 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-6d3010389559c096",
-      "brand": "Macy's",
-      "name": "Tommy Hilfiger Men's Stretch Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQhTEUh7CtJ1iQcwEniahBHIFCMq2moXfi-lLaFQsMSabSW5RoUtH8FjVV5FV7nlbwuMeaKmtm0FqYQqjZ02FQpspJqR1d97CfD55WWw1Twh1nJwfoR8ywu",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-07a062f2c9f7de29",
-      "brand": "Nordstrom",
-      "name": "Men Bonobos Stretch Weekday Warrior Slim Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ3QPw5HCBooXj6e6m1CBNlxwe3yPUR0XELO9J_iFhP9csW6fkvjP77zakGJOdVdcTmM9Qd07OxeSc2ua9j7TKRfeWHanFo11F-w8EoRrNQ9y_hsS49DmBcRQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-74fe933994f14082",
-      "brand": "Nordstrom",
-      "name": "Open Edit The Icon Trousers",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS6dcuLwrtDiAQaX8aMOkrUlPicj6tJ1D9A48JwjNIoiCuGDHSUkNMyWTy39CkHu6z36_h4VB7eaYAFJMmtah4zHhzZ1F71KQ0g6h2YahbWdOzQ3-YcDwPEWw",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
       "id": "generated-decef491b31eaba0",
       "brand": "Quince",
       "name": "Quince Women's European Linen Wide Leg Pants",
       "category": "bottom",
       "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRuK_hRPObUXvsl3knlReq_TOCayJr4ijqOB_dUT7QTQ633SXqTGEZpbBCHQu0UvYlbiQuT7J3Vxot7NqIuOmEOi54tReHX6ceu0jytIbh2onO1YXBfPp_7AeQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-81fe35b932b13d40",
-      "brand": "Techwear Storm",
-      "name": "Techwear cargo pants \"Shinji",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbc37DxDnm369p16P_uEc6DtS46DmJjnGqtxwmeCybk4hy8CGYvi6xo6XLfN9tJMzFtvF0NTSxOM5z18b2DlYlPJj7L-RU-n_VJ1didzk8L5ucf4Pa_b-NkQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-3475f4f3d7fe7731",
-      "brand": "Techwear Storm",
-      "name": "Techwear Kisuke Cargo Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRebt7VsrX8gOPrgHsgeRiYoGdcb6IHQRLOXkSfiBWwP1cpGFUkGIBlqDHNmWAqMOz8MThV1Pm0wwqOoscVLAVYRd5F7dnW-hW9eKU27aQfW-a1syCFgeFnhQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-f7db09272e73cd2c",
-      "brand": "Techwear Storm",
-      "name": "Techwear Storm Techwear Cargo Pants Faux Two Piece",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRrrsJPPsgNlVyG5f6fW8WiCwftbZUrlKULQSoGbtQrAzQTe9cePaWaTZdXYlPbhV4nchr529M35AsxnsOgxgyMxe3Xb4X4M9HgLUff4BqCd6-QXHQcqTHb",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-0491e77adf091fc8",
-      "brand": "Techwearofficial",
-      "name": "Black Zip Pocket Cargo Pants for Men",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQCTA1poXOow6Kjwat6lysGSTL0Cfqqwj6GuXoW2nSiRHnwgA3J1TG358FVlmwgLWm0dJ5O6o2sEY_GD8cIYBSHwBwbdQdPPPTg2mzdErykfCy2_5pNMD3J",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-d6b77dc008f90720",
-      "brand": "Techwearofficial",
-      "name": "Techwear Heavyweight Cargo Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSbkJnahErFqHe_sNIRI1pFoWHYHLBieHosFJmlhLZFLDtKPbdJNF6niP7Y4yhRqAjDUJ83ai9nk7zQdfG-z-aCS_qb2w6sDlyS9XTqmft-bgY8GGzGOAKY",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-817a4ed69864f46a",
-      "brand": "Techwearofficial",
-      "name": "Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTynUMOL6VQ8o3REEb9hv26nnYxce-Vv_RHKQ0bs8J-SMCY8d8LkBfoPQx0HYbjP3p44LpQ6_nk7xyHanlUPZzWL06VpJapEzmdqzs0rhocGGwGXutVoKdM5A",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-867a2968367d0d14",
-      "brand": "Walmart - DUDHUH-US",
-      "name": "Men's Techwear Hip Hop Streetwear Cargo Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRzzbxmH5NW98kZLieZ-02l5mRDJHOgPd5BSb8hyz6qiCH_Sj6eXnqlJss_oOcUKSLAVigXLjXVAXPo1lmjkq6KGBUi2RMKbw",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-70b1660ec9405a6b",
-      "brand": "Walmart - UPPADA Fashion",
-      "name": "Women's Dressy Two Piece Set with Long Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ2Fp6dNmyOSN9aaQV51_LaLunh43VT1dBx8jGG1_iiYpkqCACeHby7HIKydxhF4-LhT8sDdD2UBY14NY6Y1XVGvQSFaDZq",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-16008bf3bb3a8476",
-      "brand": "Zara",
-      "name": "Zara Men's Comfort Suit Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQMhpMzTa_ArYWTuRaCOxzK0d-_Sc7c00Fg-E9fqqlxXgwpDIryhjhz9A_6aGxHfqYKXwp3Q0LLUTWLjSXPSILwq6w_3gmPCDi8VC21iwuJpIuZrJrXMQyb7hY",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -2552,174 +2370,6 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-ce58332aab800a94",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Blazer and Wide Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT-9c_om1KWSF07PCwzUaG4Tr7Uc5OA4aoyF7AHQdFp5h2uE4CTjbK5KW9-nuL19x2TvGHaTCjPtBdMBlmSdRDpBGC-RkjK24e_1zHEB57VTIAoR0PCT51r",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-e4521506a432189e",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Blazer Skinny Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTl2WdDJ-3IMmWdigf_p6AuHNQvZxJzw_LiToZWGTeME0giqUjtH1kOSOMt_vmbcoNsdEElZrHoPH5lj8fV0PzEgUQNGGFet5S3Zvetj3YBuBKTEPZQ6335",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-f0e7bfe9cff043d9",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Cardigan Wide Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSnsHZVS6skPHDzptL7IXuXq5XBvf2D0T6J04V-s2ELji8rGLrJ9bPIZF4h1YVWHNBXOEiUR1bftfxFPpRBAiG-jBZNU4xp5Dec6YPfnDSDuGhdUsFJcvzK",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-7709b5e5769a8e76",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Satin Blazer Straight Leg Pant Set in Black, Size",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQgNea2BSByfh4vq1J77jJEERjxN7lkq3sQz4cdQEEoiiaxMqXXG02mg9RfKwdQdOp6POEe907sFMQ0TpU26-R6zy0-vnYNpfQ4FffTuxItB3NyyOziMtak",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-99542fd664d775ef",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Tweed Blazer Straight Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRokO8AWv805AKYGwzCp7rdHEF7f4TUnKvNMu_xpFECCE0QxujjZANcUlIHBn1nlodBWBkzRy-TZArJK9Q-X8_8qUm0KT3Ojje2K-xw9usZPUAgEM5FYkOo",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-0e18fa1391190bba",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Tweed Cardigan Flare Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSONhGEtf6LXb_tUMlJbU4vWTgVTOxcLeL81_rG2KiJMNAA2lSvBmLLghu2bz4HeAJK8mLGy1DuIDpvTXxgi0h1vjx8wstsvHQ2rxM3Gd41xWdItJhvl91l",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-f3212c62c5d40d22",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Twill Blazer and Wide Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQo3JryOGGWmwUQlN66UHnzmt3_cQB7LJQGUR4YhTY0sdEqdc61OoBtCma4KNRQATzxgOxk0Om7cRiPSy2awG_Ax8EP_IG6abHeWs0MllBqPAt-KQVwL8JvFA",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-99fdae77bcd417ac",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Men's Modern Stretch Suit Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTiQUncIhCtPIuMkO-L233ZP10WvFtodQ5xBa9gg-gyST-pwpZj_lRB8TsL9klkiTRiCloL73qSViZsmnWf8VMfkxdlMPHUlf_JmkTFMzkPJl7dtv4QfV_45kA",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-8d0a40412cd7c0af",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Tie Waist Long Sleeve Blazer and Wide Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQXuAL9Ue0dSSByvcaJN2i678z0PsN4oNCDrCPIyqtimLF2t9bkXmXQu0zMfNPvYlYoIRlyeUfTTyB9ZpuNktxJEjbGGWF9lJ3Xs_lG9wHJM9iMojejL816",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-130d1c8797765e26",
-      "brand": "H&M",
-      "name": "H&M Ladies Double-Breasted Blazer",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQmS0HcZTAYQ2ig5gHZEBSP4Dcl9hXbfrIfopcjdTPT65FSOv1fM7uiuzrfJBKcbxEbV47GRITp1j1qP6Xs6-rEkbj80XmYanD7eC0zrdVu4-0vMoOWsCRh",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-61904954680f6ff8",
-      "brand": "H&M",
-      "name": "H&M Ladies Gathered-Sleeve Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZF-0xrVzYznIdFflw1QQzMgTp3p7ILA3CCkKIqKOR7ZDnNe9Nn3KlSTigcWTPWZy4JY67iivvekpTsjPQPFT8OFnkcwsBejt1kAEvLxn7vFniHr9v5iMgeQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-9f7712f662e0034d",
-      "brand": "H&M",
-      "name": "H&M Men's Regular-Fit Single-Breasted Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS1rfp32yj067dfj7fwpn8VWogXP3hrnHaxX-JjrCjqVPi1WgPKOs3ux96wZtHI61p-VazCwFwwoBHbEjikOlx0qVk7u4fGvCe1cngtSZifgTm2f_OBwuEnmQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
       "id": "generated-3f53600f50b5ed48",
       "brand": "Kimes Ranch",
       "name": "Kimes Ranch Women's Becca Belted Denim Jacket",
@@ -2734,53 +2384,11 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-2e20fec284a6cd6b",
-      "brand": "Lands' End",
-      "name": "Lands' End Men's Travel Kit Chino Blazer",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQc2nLeV1HOxqx2bikGcdQ5Wd9SbAMIrvACwToajELDbW3eyvHFqXg0Y468pvhDxx7CozS5bQ9dKTvr8frxCbhbVTCpw4XBeEMtNf3kCDKJb1TI9pjtc9d6",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-f403e370ccf52a12",
-      "brand": "LightInTheBox",
-      "name": "Men's Polyester Cloth Blazer",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQR8zbLjfD0JPUBzSCgTHIL8QrVbsu-LowCGZds2FtziFSEaRMvCAGWZTv9rjeIbvUPrz5wTNk3yBMapsysePz16grDbGlSOZzh6VXUsrB6tejqdqEJJvoaQA",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
       "id": "generated-c9f89dd10953eeb0",
       "brand": "LightInTheBox",
       "name": "Men's Puffer Jacket with Pockets",
       "category": "outer",
       "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRPBnHrk4sorRHbaSbelcwoLyabgCCjLTyKDwcLf_fV7cN8LVhMQEAWQgC4LKT7J7ACpCdqj3sY1rKQH1piejSsg6JuoMQakKiyeds0TAwGbt6T028amOAlfg",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-fdb47b6778ec997e",
-      "brand": "Lovau",
-      "name": "Sakura Collection Pleated Cardigan & Trousers Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYk25knKKRESehaA4ls6d8cjMdOX2U8nvKLMyNe7XvvNkfsiUf1Of0FfcWF-mzZRPT7asQOiiizUlvjZhQyEIb7cqR98KDJi6Ehasdm_Mqws70a0-URyrG",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -2832,11 +2440,403 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-7da43d666e4b7449",
-      "brand": "Men's Wearhouse",
-      "name": "Haggar Classic Fit Men’s Suit in Charcoal Gray – Two-Button Notch-Lapel Jacket and Flat-Front Pants, Size 46 Short",
+      "id": "generated-3d5bb96e00091301",
+      "brand": "missguided",
+      "name": "Missguided Fitted Western Denim Jacket with Waist Belt",
       "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQxOAaddqh41F7gm0jC-zYjN9Q-eN2bB7Rp5hfT8Qpl5vI-LGUuZWO_OGBjX8vo1wcMQYF-hISusw8Q-apDyaoGvXAGB-ni",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQy0Iduh-Kiaf3gQ16mGFNWx_LIStE_KOCxT5Qus_4mn5cxQO-kxRW7HmxMCqRoZV-ciRtdPM0xU87ENpAx3Agd_8ro6_Dyws8b0_EmQNJu4zGiJuXBuv3z",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-074ee559d19be991",
+      "brand": "NVLT",
+      "name": "NVLT Women's Cable Stitch Quilted Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQR2OviIxi0KdUG9PlIWOux4yP9-Kj9Abh3XSqSTCJrEyMRtC7MrJYbBk7i_AorfrzaxSL5FfXnfuc7pkgfpo7KzBXPJB5UTnXTNF8jiIUnAQkMHbROJhpd1A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-9cfe289750174b1b",
+      "brand": "Petal & Pup USA",
+      "name": "Petal & Pup Women's Lumi Embellished Cardigan & Pleated Miniskirt Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcThbpK0Pa09EPXrb8dBXeDt92Pa9q9HgD3ssftE25U5C3knjeeSVuzX4aMQ0DueZwE_k55J4FURQNoDwVzMZZgF7hll9tC1QdnD4kBO0T4MkqGBGw6nI5_GBQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-053b411d631e3ab8",
+      "brand": "Pomuyoo",
+      "name": "Women's 3-Piece Casual Blazer and Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTOwclXI3CoDoynhdbD43vwu27E3wJps47b1_DXQOsSGvJfHGJyg43i7zodmXlDcTIswthYBqIbeNG942ARo-rc3B6lf5jAG03VwOycDoipaAZ_lHTJ9icr",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-a0e9083639443183",
+      "brand": "Sierra Darien",
+      "name": "Pleated Skirt and Structured Jacket Co-Ord Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ2GjRx-D6u7TwtxsRzaOesMdqjiZU5rddW_XwgMN6nuwslh7sEftoMf9BZPDtLohiTvQ3UlKjDA-hmHYFo80MpHA5TS9ax79cvZ9nHEQP3vjkdppxkf2oM",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-6d2dddc1735ff3f3",
+      "brand": "STS Ranchwear",
+      "name": "Women's STS Ranchwear Weston Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS7k3OalyYeRMG4Gq3k3juCmAp12VoGeSzKi-3sgsnTxb4aF1JGwfzY3Y6glExwabgZKopdLQSJeXPXOqv5tu6-u-5RlqRNRmGylsqerd_gkg8K17cl8ZvO",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-09e21da2b5304ea5",
+      "brand": "Temu",
+      "name": "Men's Baggy Lightweigh Pleated Blazer & Buttned Waist Trousers Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT_ZbFYIN4haB7xJnsPqn8I7yG_1jHuuqLGHK4wfu3HZaCV9cRmweSxyB6DifferGU0giQoRcwUwDJoz-j8B7tkyWrFmL_meR8Ex0fsbps",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-a492a5424eb3d1fd",
+      "brand": "TikTok Shop",
+      "name": "Korean Woman Preppy Pleated Cardigan Coat",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTj5pYOrQCskgpbuqvA-EdBXq9Z4bE2NljldqYl5bszcU3H4jpKx_O5vovYu0Xd7cMT6IET_FdRy0c1Sjdh8ndF3Z6kojiUe6LHv0qYWwv-",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-cc65eb4c58429dee",
+      "brand": "TikTok Shop",
+      "name": "Men's Fitted Down Hooded Jacket Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTtVkMa35AXwoTooDTtgHjZfxSE9JPoJzI5xlv-fM6GwCFIs5h_BFekTyzd_-VtZZ9_irgGsq2bTBZ0LKlWNxDoWzU2-sBFBxOKDnxct-0",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-fa4eca560a520933",
+      "brand": "TikTok Shop",
+      "name": "Men's Regular Fit Single Breasted Blazer & Pants Suit Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTLtJxv0Ppi0_IY6ouzFbArNdcW8btheinaHQlM2bLeAQxEJ9E42Qri-Ln1Ii2D5WJ4IDdBVrEfT8lmAnHCHozb40tx4RAfh1_6aK_aPVw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-6673c9b589bacdcf",
+      "brand": "TikTok Shop",
+      "name": "Men's Slim Fit Lapel Neck Blazer & Pants Suit Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5euPsCQioZbV76NrElmBtxehcwuJsnb77xYxGsAxeIL6nM5sU5HF9Dwl2-T38MjcNyMp2PAt0qGoNeHwzJ7sCf2SGr1Zy6zVSd4a9xff8",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-43056da00739fef4",
+      "brand": "TikTok Shop",
+      "name": "Men's Solid Color Button Front Blazer & Pants Two-piece Set, Slim Business Formal Suit Set for Work Office, Menswear for All Seasons, Long Sleeve",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQvDRw1iGC4M-nsLo2APNIPp2OVpqYu9U_1pPsom_daSM5Bz3hAR2jXhbNHplKEHwKDs-UgRk9z0sdOgelBfdJmlZXtmyaENuzl0Tv5Csk",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-a3080ea17a84509b",
+      "brand": "Treet",
+      "name": "Canada Weather Gear Men's Puffer Jacket with Sweater Sleeves",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcST4_O8UtT10zzOBCrBdQPHrDqLSBZ9lIg5o0kDVeJOwzWul10Mz-kTkMisiexxNl6iQc26LFtlCGaylYR2-qJmzv5-Yqsj6hxC2UEKU0QKijxS6cbZQ5iy",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-d216a488fcc912c1",
+      "brand": "Treet",
+      "name": "Canada Weather Gear Men's Puffer Vest with Removable Hood",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTmNVK-kmFb8m__Onzfp21bjOUEbugGSY7qqBO5XtBYUxHc5h9d5XG3nw8J6h7P0vsw9xTIUrgtyisI24oUx-7Nuf6BReLeFAkoY36m9b__xhqQdY9ITiKwCg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-b3702a79ca09cf9b",
+      "brand": "urbanoutfitters.com",
+      "name": "[BLANKNYC] Cable Knit Puffer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcR99iy_a48WWcH2J7O-b3s1AmjWwfCLyFat96T56fNZ9PaDLzvs249t1RHXZ17aUSjLCrp9BdAa4T8mgi1OAFp80Pdd0FRG4X0hHPucuGHNsl0dDsal3Qdj",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-0302e3dde659d5f5",
+      "brand": "Walmart - CozyBreeze",
+      "name": "Women's Two Piece Long Sleeve Blazer Outfit",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSL0shJHExtz1OxQVLEFd0y-z5AXR3ARh1d4JAPXyoVked4uO8RBZY6XvcVDDxgP0YyV75yQ9fCoQLFYLLjwwsEzxZppPm1",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-31d63975ca8fc6bb",
+      "brand": "Walmart - Sriper Clearance",
+      "name": "Sriper Women's Business Casual Long Sleeve Blazer & Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQl9hyuJFnx0S1Y1Q5h7jU1UiaRCXg972GPScfLtKKTgS1J9udStGjSQlnb8zyaxqwD9aDRGd46vTLuW8A6H2K1vv4TOM4p",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-bb261f936775a66b",
+      "brand": "Wantdo Outdoor",
+      "name": "Wantdo Men's Warm Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcStD2OIMhq2KGQ3m2CjSGizwKMvY3flcf8uQMB9yov1nrh323tz24gEJJ_KynubNHjD5vaHQKReUufhZNgieO7osy_Bpt999W0X4nqD85EEv40YOHhkPHpwhA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-606d2e7aed36ebe8",
+      "brand": "Wantdo Outdoor",
+      "name": "Wantdo Men's Warm Puffer Jacket with Removable Hood",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTd2cXior2AKIdMlCTSsmo0yepOZLLZxhkCjE5gjaSum1KkStkdQ5pwbTLNsjOpbxzER4Q4X-6xRs--gWsBH6KM8qTxR4tC0cMjpa5TZJuTn3Pl3089LEvbxg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-88dc523e76d66a1a",
+      "brand": "Zumiez",
+      "name": "Rebel Veil Cable Knit Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQplNPTBGTSeisXn48rWO0CktttgnRf44P8yB-JKDFhjz6tmigjVBMULBk7DGoSrESoEnnR6Ozg9KBknXlemZIfNWFBXcqs8Q",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "989b9ed658434f92",
+      "brand": "Adidas",
+      "name": "Jacket adidas Men's Adicolor Denim Firebird Track Top",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQKXwXWKUiSVPWFqaVstq1XCh32elT268HRAFQx57e2pBJsppqhUyiSYds-CToTrxW2YedPice2HKyy-radaL2H7vWuTidWHeUson1YmGO3P5N36yWd4fopIg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "cf2ee889657c0349",
+      "brand": "Adidas",
+      "name": "Men's Firebird Track Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSu3kW8L-Kryqnk8ctx3r-65T_eq-oODd_1YeMfr4VBZSghxv2F_HcGX3iTXTl8SgiXXqMAnCl080rRlF4j9MXSkgpl-EiLfs4GJe9zcuBuaxwePCRlU3I_fQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "374edefaf02f85f7",
+      "brand": "Adidas",
+      "name": "Mens Adidas Adicolor Classics Firebird Track Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSpQtjHrMvNsiTLnGljzKNqLP7sAaygANnA73nco8TfyTRriqmo3J6nIs5yXxKzq6IT2RkpiVaqHKAgcvQtKvKAuyk5p8w_933QA2UIT-ZPXNSQep_MK54L",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "838db5eeb8568f4d",
+      "brand": "Adidas",
+      "name": "Originals Men's Firebird Track",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSv4qA1zbagPZgkURoIbRmjSfPNJ_JX0O2IT12XzY7pzlGl7xW5OTFuWIhZfHIIYlb9Rm1DOBJXG6agWD6F_qLTRCUzR_G-0fXIpQ7RUXZkzfUoGqvJrXaH8A",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2b736343820465b2",
+      "brand": "Adidas",
+      "name": "Women's adidas Firebird Adilenium Track Top Denim",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSryIaBeputNBkVEw6tdrbrlICB8jx8a00LOLM9znDWrXCQPblG7J8RbxqeqyyqKyYF3a4sThtIY6cd0aYT1T1UxIrm27Q8pMFUDFuyXK7Tr3LbS2CXxGbGJUo",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "41a2d35f3d85dbee",
+      "brand": "Adidas",
+      "name": "Women's Firebird Classic Track Top",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSoX2KUN3brmxFncxIng24SQnepxs_yY7t9NkGYM3DK0ZBaDdESlII6OJxUNj-swESSJm67sJUY9XPJmJ4F4mSD7KzyekOJipxPatlhgwvPwiU3gg1WJpR-cZuV",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "02c5a8c219625209",
+      "brand": "Arc'teryx",
+      "name": "Atom Jacket Men's",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTyevH7BYRxjpSgcBUbbUDg_sGLSqNnjw2s5r4AZHAnt1U-p78Dna4W3-u5jtcN_9lQL-A0EEZtH5rhCLRedy9qmq1bTCcB9Z3KDufZbfyvzRy2cXqG6faklg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "0c153f1e31b307f2",
+      "brand": "Arc'teryx",
+      "name": "Women's Atom Hoody",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTzWNKt8Vita3kHJRbuZ7xHxRDzay7QMo0qgwNafjVrxySvCsLbkpGQvmvjoVjuy5Iinv6wu3ZlAfRa4m7jK6VtIoXAMELjViwFTpderpkTADhVBcrOXKD5Oos",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "photo-catalog",
+      "id": "2313331ba84b8520",
+      "brand": "Aritzia",
+      "name": "The Super Puff Women's The Super Puff Jacket in Black",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRCxsj-0_yi2zcVwLRuMZ66cYEVz5ZpP7328k6l5AKlwMFd4QENVY9AZPhST98GeeT7Uyo0Gq0-MMX3DWNO54FuWCKLbhgvKLOH-U8YtqIbmYDsPzBlZcBC",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -3144,6 +3144,24 @@
       "productImageShouldPrefer": true
     },
     {
+      "id": "generated-99aeccf41750984d",
+      "title": "Kohl's Women Wide Leg Pants Dressy Business Casual High Waisted Straight Leg Work Office Trousers Slacks, Women's, Size: Small, Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRlTXfBUJhIykNqYdBNncpW9zPTPdtyD4mQfNFnfD4dQrEb5v8QG9OpKmrxuKkunaYRVFOf_kBLD_Wcg7nuFe6jPCXL6mJr-2BQ0q59GRbKI0otBAdue_-e",
+      "imageTransparentUrl": "/assets/cutouts/generated-99aeccf41750984d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-6d3010389559c096",
+      "title": "Macy's Tommy Hilfiger Men's Stretch Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQhTEUh7CtJ1iQcwEniahBHIFCMq2moXfi-lLaFQsMSabSW5RoUtH8FjVV5FV7nlbwuMeaKmtm0FqYQqjZ02FQpspJqR1d97CfD55WWw1Twh1nJwfoR8ywu",
+      "imageTransparentUrl": "/assets/cutouts/generated-6d3010389559c096.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
       "id": "f2e4852913aacbdf",
       "title": "Nike Men's Oversized Cargo Shorts",
       "category": "bottom",
@@ -3158,6 +3176,78 @@
       "category": "bottom",
       "imageUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
       "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-07a062f2c9f7de29",
+      "title": "Nordstrom Men Bonobos Stretch Weekday Warrior Slim Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ3QPw5HCBooXj6e6m1CBNlxwe3yPUR0XELO9J_iFhP9csW6fkvjP77zakGJOdVdcTmM9Qd07OxeSc2ua9j7TKRfeWHanFo11F-w8EoRrNQ9y_hsS49DmBcRQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-07a062f2c9f7de29.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-74fe933994f14082",
+      "title": "Nordstrom Open Edit The Icon Trousers",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS6dcuLwrtDiAQaX8aMOkrUlPicj6tJ1D9A48JwjNIoiCuGDHSUkNMyWTy39CkHu6z36_h4VB7eaYAFJMmtah4zHhzZ1F71KQ0g6h2YahbWdOzQ3-YcDwPEWw",
+      "imageTransparentUrl": "/assets/cutouts/generated-74fe933994f14082.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-81fe35b932b13d40",
+      "title": "Techwear Storm Techwear cargo pants \"Shinji",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbc37DxDnm369p16P_uEc6DtS46DmJjnGqtxwmeCybk4hy8CGYvi6xo6XLfN9tJMzFtvF0NTSxOM5z18b2DlYlPJj7L-RU-n_VJ1didzk8L5ucf4Pa_b-NkQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-81fe35b932b13d40.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-3475f4f3d7fe7731",
+      "title": "Techwear Storm Techwear Kisuke Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRebt7VsrX8gOPrgHsgeRiYoGdcb6IHQRLOXkSfiBWwP1cpGFUkGIBlqDHNmWAqMOz8MThV1Pm0wwqOoscVLAVYRd5F7dnW-hW9eKU27aQfW-a1syCFgeFnhQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-3475f4f3d7fe7731.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-f7db09272e73cd2c",
+      "title": "Techwear Storm Techwear Storm Techwear Cargo Pants Faux Two Piece",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRrrsJPPsgNlVyG5f6fW8WiCwftbZUrlKULQSoGbtQrAzQTe9cePaWaTZdXYlPbhV4nchr529M35AsxnsOgxgyMxe3Xb4X4M9HgLUff4BqCd6-QXHQcqTHb",
+      "imageTransparentUrl": "/assets/cutouts/generated-f7db09272e73cd2c.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-0491e77adf091fc8",
+      "title": "Techwearofficial Black Zip Pocket Cargo Pants for Men",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQCTA1poXOow6Kjwat6lysGSTL0Cfqqwj6GuXoW2nSiRHnwgA3J1TG358FVlmwgLWm0dJ5O6o2sEY_GD8cIYBSHwBwbdQdPPPTg2mzdErykfCy2_5pNMD3J",
+      "imageTransparentUrl": "/assets/cutouts/generated-0491e77adf091fc8.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-d6b77dc008f90720",
+      "title": "Techwearofficial Techwear Heavyweight Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSbkJnahErFqHe_sNIRI1pFoWHYHLBieHosFJmlhLZFLDtKPbdJNF6niP7Y4yhRqAjDUJ83ai9nk7zQdfG-z-aCS_qb2w6sDlyS9XTqmft-bgY8GGzGOAKY",
+      "imageTransparentUrl": "/assets/cutouts/generated-d6b77dc008f90720.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-817a4ed69864f46a",
+      "title": "Techwearofficial Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTynUMOL6VQ8o3REEb9hv26nnYxce-Vv_RHKQ0bs8J-SMCY8d8LkBfoPQx0HYbjP3p44LpQ6_nk7xyHanlUPZzWL06VpJapEzmdqzs0rhocGGwGXutVoKdM5A",
+      "imageTransparentUrl": "/assets/cutouts/generated-817a4ed69864f46a.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3203,6 +3293,33 @@
       "category": "bottom",
       "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
       "imageTransparentUrl": "/assets/cutouts/generated-d3d13a615df5b8b1.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-867a2968367d0d14",
+      "title": "Walmart - DUDHUH-US Men's Techwear Hip Hop Streetwear Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRzzbxmH5NW98kZLieZ-02l5mRDJHOgPd5BSb8hyz6qiCH_Sj6eXnqlJss_oOcUKSLAVigXLjXVAXPo1lmjkq6KGBUi2RMKbw",
+      "imageTransparentUrl": "/assets/cutouts/generated-867a2968367d0d14.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-70b1660ec9405a6b",
+      "title": "Walmart - UPPADA Fashion Women's Dressy Two Piece Set with Long Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ2Fp6dNmyOSN9aaQV51_LaLunh43VT1dBx8jGG1_iiYpkqCACeHby7HIKydxhF4-LhT8sDdD2UBY14NY6Y1XVGvQSFaDZq",
+      "imageTransparentUrl": "/assets/cutouts/generated-70b1660ec9405a6b.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-16008bf3bb3a8476",
+      "title": "Zara Zara Men's Comfort Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQMhpMzTa_ArYWTuRaCOxzK0d-_Sc7c00Fg-E9fqqlxXgwpDIryhjhz9A_6aGxHfqYKXwp3Q0LLUTWLjSXPSILwq6w_3gmPCDi8VC21iwuJpIuZrJrXMQyb7hY",
+      "imageTransparentUrl": "/assets/cutouts/generated-16008bf3bb3a8476.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3617,6 +3734,213 @@
       "category": "outer",
       "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSKMm4Y-Kk5Hc0Z0AS-PTA-LmshTcGfrCzf2RUIZRCnX0q0eN0ju6cxkEZaeTwJ9M4ORcYFtKVYScdDYtVrGX0-8i6RE6MGXBudHCYuSokXceUvqWP7hTMO0A",
       "imageTransparentUrl": "/assets/cutouts/generated-0dd8cfe08bb7a011.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-ce58332aab800a94",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT-9c_om1KWSF07PCwzUaG4Tr7Uc5OA4aoyF7AHQdFp5h2uE4CTjbK5KW9-nuL19x2TvGHaTCjPtBdMBlmSdRDpBGC-RkjK24e_1zHEB57VTIAoR0PCT51r",
+      "imageTransparentUrl": "/assets/cutouts/generated-ce58332aab800a94.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-e4521506a432189e",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Blazer Skinny Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTl2WdDJ-3IMmWdigf_p6AuHNQvZxJzw_LiToZWGTeME0giqUjtH1kOSOMt_vmbcoNsdEElZrHoPH5lj8fV0PzEgUQNGGFet5S3Zvetj3YBuBKTEPZQ6335",
+      "imageTransparentUrl": "/assets/cutouts/generated-e4521506a432189e.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-f0e7bfe9cff043d9",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Cardigan Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSnsHZVS6skPHDzptL7IXuXq5XBvf2D0T6J04V-s2ELji8rGLrJ9bPIZF4h1YVWHNBXOEiUR1bftfxFPpRBAiG-jBZNU4xp5Dec6YPfnDSDuGhdUsFJcvzK",
+      "imageTransparentUrl": "/assets/cutouts/generated-f0e7bfe9cff043d9.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-7709b5e5769a8e76",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Satin Blazer Straight Leg Pant Set in Black, Size",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQgNea2BSByfh4vq1J77jJEERjxN7lkq3sQz4cdQEEoiiaxMqXXG02mg9RfKwdQdOp6POEe907sFMQ0TpU26-R6zy0-vnYNpfQ4FffTuxItB3NyyOziMtak",
+      "imageTransparentUrl": "/assets/cutouts/generated-7709b5e5769a8e76.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-99542fd664d775ef",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Tweed Blazer Straight Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRokO8AWv805AKYGwzCp7rdHEF7f4TUnKvNMu_xpFECCE0QxujjZANcUlIHBn1nlodBWBkzRy-TZArJK9Q-X8_8qUm0KT3Ojje2K-xw9usZPUAgEM5FYkOo",
+      "imageTransparentUrl": "/assets/cutouts/generated-99542fd664d775ef.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-0e18fa1391190bba",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Tweed Cardigan Flare Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSONhGEtf6LXb_tUMlJbU4vWTgVTOxcLeL81_rG2KiJMNAA2lSvBmLLghu2bz4HeAJK8mLGy1DuIDpvTXxgi0h1vjx8wstsvHQ2rxM3Gd41xWdItJhvl91l",
+      "imageTransparentUrl": "/assets/cutouts/generated-0e18fa1391190bba.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-f3212c62c5d40d22",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Twill Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQo3JryOGGWmwUQlN66UHnzmt3_cQB7LJQGUR4YhTY0sdEqdc61OoBtCma4KNRQATzxgOxk0Om7cRiPSy2awG_Ax8EP_IG6abHeWs0MllBqPAt-KQVwL8JvFA",
+      "imageTransparentUrl": "/assets/cutouts/generated-f3212c62c5d40d22.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-99fdae77bcd417ac",
+      "title": "Fashion Nova Fashion Nova Men's Modern Stretch Suit Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTiQUncIhCtPIuMkO-L233ZP10WvFtodQ5xBa9gg-gyST-pwpZj_lRB8TsL9klkiTRiCloL73qSViZsmnWf8VMfkxdlMPHUlf_JmkTFMzkPJl7dtv4QfV_45kA",
+      "imageTransparentUrl": "/assets/cutouts/generated-99fdae77bcd417ac.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-8d0a40412cd7c0af",
+      "title": "Fashion Nova Fashion Nova Tie Waist Long Sleeve Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQXuAL9Ue0dSSByvcaJN2i678z0PsN4oNCDrCPIyqtimLF2t9bkXmXQu0zMfNPvYlYoIRlyeUfTTyB9ZpuNktxJEjbGGWF9lJ3Xs_lG9wHJM9iMojejL816",
+      "imageTransparentUrl": "/assets/cutouts/generated-8d0a40412cd7c0af.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-130d1c8797765e26",
+      "title": "H&M H&M Ladies Double-Breasted Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQmS0HcZTAYQ2ig5gHZEBSP4Dcl9hXbfrIfopcjdTPT65FSOv1fM7uiuzrfJBKcbxEbV47GRITp1j1qP6Xs6-rEkbj80XmYanD7eC0zrdVu4-0vMoOWsCRh",
+      "imageTransparentUrl": "/assets/cutouts/generated-130d1c8797765e26.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-61904954680f6ff8",
+      "title": "H&M H&M Ladies Gathered-Sleeve Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZF-0xrVzYznIdFflw1QQzMgTp3p7ILA3CCkKIqKOR7ZDnNe9Nn3KlSTigcWTPWZy4JY67iivvekpTsjPQPFT8OFnkcwsBejt1kAEvLxn7vFniHr9v5iMgeQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-61904954680f6ff8.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-9f7712f662e0034d",
+      "title": "H&M H&M Men's Regular-Fit Single-Breasted Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS1rfp32yj067dfj7fwpn8VWogXP3hrnHaxX-JjrCjqVPi1WgPKOs3ux96wZtHI61p-VazCwFwwoBHbEjikOlx0qVk7u4fGvCe1cngtSZifgTm2f_OBwuEnmQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-9f7712f662e0034d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-2e20fec284a6cd6b",
+      "title": "Lands' End Lands' End Men's Travel Kit Chino Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQc2nLeV1HOxqx2bikGcdQ5Wd9SbAMIrvACwToajELDbW3eyvHFqXg0Y468pvhDxx7CozS5bQ9dKTvr8frxCbhbVTCpw4XBeEMtNf3kCDKJb1TI9pjtc9d6",
+      "imageTransparentUrl": "/assets/cutouts/generated-2e20fec284a6cd6b.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-f403e370ccf52a12",
+      "title": "LightInTheBox Men's Polyester Cloth Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQR8zbLjfD0JPUBzSCgTHIL8QrVbsu-LowCGZds2FtziFSEaRMvCAGWZTv9rjeIbvUPrz5wTNk3yBMapsysePz16grDbGlSOZzh6VXUsrB6tejqdqEJJvoaQA",
+      "imageTransparentUrl": "/assets/cutouts/generated-f403e370ccf52a12.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-fdb47b6778ec997e",
+      "title": "Lovau Sakura Collection Pleated Cardigan & Trousers Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYk25knKKRESehaA4ls6d8cjMdOX2U8nvKLMyNe7XvvNkfsiUf1Of0FfcWF-mzZRPT7asQOiiizUlvjZhQyEIb7cqR98KDJi6Ehasdm_Mqws70a0-URyrG",
+      "imageTransparentUrl": "/assets/cutouts/generated-fdb47b6778ec997e.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-7da43d666e4b7449",
+      "title": "Men's Wearhouse Haggar Classic Fit Men’s Suit in Charcoal Gray – Two-Button Notch-Lapel Jacket and Flat-Front Pants, Size 46 Short",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQxOAaddqh41F7gm0jC-zYjN9Q-eN2bB7Rp5hfT8Qpl5vI-LGUuZWO_OGBjX8vo1wcMQYF-hISusw8Q-apDyaoGvXAGB-ni",
+      "imageTransparentUrl": "/assets/cutouts/generated-7da43d666e4b7449.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-38b88276652f406d",
+      "title": "Men's Wearhouse Haggar Classic Fit Men’s Suit in Oatmeal Tan – Notch Lapel 2-Button Jacket with Flat-Front Pants, Size 46 Short",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTZSnUEEByMdEUo_wU63bjjP2vCZJyNOA6t7sNF-fSWxj0EA03LIWDH0WVUcXWqezRD5zmHpVwp9zH35LwbIc9Z4_Up6_S0",
+      "imageTransparentUrl": "/assets/cutouts/generated-38b88276652f406d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-a45af73010be409a",
+      "title": "Men's Wearhouse Haggar Men's Active Series Tailored-Fit 4-Way Stretch Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRDW_ZZOPZESP2SXWendToV_SsLY1ZLzJTodF-LAn93TYpSOQzW9XrV9TEha8M4573-es6W-miwF9PwRvG052tvt5o9cOHxuQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-a45af73010be409a.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-39cb3da53d56aafb",
+      "title": "Men's Wearhouse Paisley & Gray Modern Fit Sage Green Men’s Suit – Two Button Notch Lapel Jacket with Flat Front Dress Pants",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS6ugyMKPkFeKSGOaSy3oScEO_7grdtSGBSjetO0OvfdfVQWR09EQgVa9Zm6Pg4oOZXQI47yvBBO-WfRljkikj4UTEKkXg4FA",
+      "imageTransparentUrl": "/assets/cutouts/generated-39cb3da53d56aafb.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-9f26b6fa3eaeecc1",
+      "title": "missguided Modern Oversized Blazer Palazzo Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRgKtFaYYx2_O436TqeAlZ3CuXxQK0FXMTxEDCdnH2FgkF5Xu-9j5skW18u6e9fjbHY73SiNP7-a1fwvdKs0pHKyVvSKBmzA4frDY1cOp7cq2WkRJS3zBDZ",
+      "imageTransparentUrl": "/assets/cutouts/generated-9f26b6fa3eaeecc1.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-1008f102d799c90d",
+      "title": "Nordstrom Petal & Pup Women's Odell Knit Cardigan & Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcR2vLKxBnDAUBorSdQf1JEKYmomtdgElek36rrYumkVgOqVlxc8PErmxGG1VLJpPWb-Y8KeYzb4LeKItqCCCJ9OFSAVk1DrA8cXFY8jqE4",
+      "imageTransparentUrl": "/assets/cutouts/generated-1008f102d799c90d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-aa6cb4ece0190b0a",
+      "title": "Nordstrom Rodd & Gunn Men's The Cascades Sport Fit Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTL7AO-J2CCELAsppjyi6_1xdEvM5CDlK_EVNp6U5DNeAl5WQSEge_J4ItpO0k7xj1w6Klo5cpenTm3lJ7pPcKgbVdl-kduZqWP1wkC6gLbufz2GT4QRZ3C",
+      "imageTransparentUrl": "/assets/cutouts/generated-aa6cb4ece0190b0a.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-d91ad828ec14dafd",
+      "title": "Pegasi Carina Pleated Skirt & Cardigan Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRsrOa3AAXKxQ8IkYsHpXAGbeHcaQDr-vogCeAWkZxcC6ytkfc8zKmOxOX39uksFVwpztimkv7P9J83TW9yVjYXGn4NwebBxW7hgeimMuk",
+      "imageTransparentUrl": "/assets/cutouts/generated-d91ad828ec14dafd.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -4425,8 +4749,8 @@
   },
   "generatedAssets": {
     "cutoutDir": "public/assets/cutouts",
-    "totalFiles": 147,
-    "registeredFiles": 147,
+    "totalFiles": 183,
+    "registeredFiles": 183,
     "missingCatalogRegistration": [],
     "registeredLocalUrlsMissingFiles": []
   }

@@ -1,80 +1,139 @@
 {
-  "generatedAt": "2026-05-17T16:44:31.926Z",
+  "generatedAt": "2026-05-17T19:15:12.599Z",
   "totalRuntimeProducts": 674,
-  "transparentProducts": 147,
-  "transparentCoveragePercent": 21.8,
-  "transparentOnlySafe": false,
+  "transparentProducts": 183,
+  "transparentCoveragePercent": 27.2,
+  "transparentOnlySafe": true,
   "generatorTransparentSubsetReady": true,
-  "feedFirst50TransparentSubsetReady": false,
+  "feedFirst50TransparentSubsetReady": true,
   "countsByCategory": {
     "hat": 10,
-    "outer": 22,
+    "outer": 45,
     "top": 39,
-    "bottom": 30,
+    "bottom": 43,
     "shoes": 20,
     "bag": 10,
     "eyewear": 8,
     "jewelry": 8
   },
   "countsByFrame": {
-    "masc": 62,
-    "fem": 54,
-    "androgynous": 30,
+    "masc": 77,
+    "fem": 71,
+    "androgynous": 34,
     "any": 1
   },
   "countsByVibe": {
-    "old money": 64,
-    "preppy": 64,
-    "business casual": 64,
-    "night": 60,
-    "date": 60,
-    "office": 57,
-    "clean": 38,
-    "minimal": 38,
-    "casual": 36,
-    "gym": 26,
-    "athletic": 26,
-    "college": 24,
-    "streetwear": 24,
+    "date": 193,
+    "office": 179,
+    "everyday": 165,
+    "night out": 114,
+    "old money": 93,
+    "preppy": 93,
+    "business casual": 93,
+    "night": 85,
+    "clean": 70,
+    "minimal": 70,
+    "casual": 44,
+    "vacation": 40,
+    "beach": 40,
+    "gym": 33,
+    "athletic": 33,
+    "workout": 33,
+    "college": 32,
+    "streetwear": 32,
+    "school": 32,
+    "winter": 24,
     "y2k": 21,
     "summer": 20,
-    "vacation": 20,
-    "beach": 20,
+    "techwear": 16,
+    "edgy": 16,
     "luxury": 13,
     "cozy": 12,
-    "winter": 12,
     "western": 12,
-    "techwear": 9,
-    "edgy": 9,
     "travel": 1,
     "tote": 1,
-    "night out": 1,
     "dressy": 1,
     "heels": 1
   },
-  "failedRequirements": [
-    {
-      "label": "classic vibe coverage",
-      "actual": 0,
-      "target": 12,
-      "passed": false,
-      "reason": "Transparent-only needs enough classic pieces for Feed and Build variety."
-    },
-    {
-      "label": "street vibe coverage",
-      "actual": 0,
-      "target": 12,
-      "passed": false,
-      "reason": "Transparent-only needs enough street pieces for Feed and Build variety."
-    },
-    {
-      "label": "work vibe coverage",
-      "actual": 0,
-      "target": 12,
-      "passed": false,
-      "reason": "Transparent-only needs enough work pieces for Feed and Build variety."
-    }
-  ],
+  "countsByStyleFamily": {
+    "date": 128,
+    "classic": 113,
+    "work": 93,
+    "street": 53,
+    "vacation": 21,
+    "cozy": 12
+  },
+  "styleFamilyAliases": {
+    "classic": [
+      "classic",
+      "old money",
+      "preppy",
+      "business casual",
+      "clean",
+      "minimal"
+    ],
+    "street": [
+      "street",
+      "streetwear",
+      "y2k",
+      "edgy"
+    ],
+    "work": [
+      "work",
+      "workwear",
+      "office",
+      "business casual"
+    ],
+    "date": [
+      "date",
+      "night out",
+      "dressy"
+    ],
+    "vacation": [
+      "vacation",
+      "summer",
+      "beach",
+      "travel"
+    ],
+    "cozy": [
+      "cozy",
+      "winter"
+    ]
+  },
+  "exactVibeCounts": {
+    "date": 193,
+    "office": 179,
+    "everyday": 165,
+    "night out": 114,
+    "old money": 93,
+    "preppy": 93,
+    "business casual": 93,
+    "night": 85,
+    "clean": 70,
+    "minimal": 70,
+    "casual": 44,
+    "vacation": 40,
+    "beach": 40,
+    "gym": 33,
+    "athletic": 33,
+    "workout": 33,
+    "college": 32,
+    "streetwear": 32,
+    "school": 32,
+    "winter": 24,
+    "y2k": 21,
+    "summer": 20,
+    "techwear": 16,
+    "edgy": 16,
+    "luxury": 13,
+    "cozy": 12,
+    "western": 12,
+    "travel": 1,
+    "tote": 1,
+    "dressy": 1,
+    "heels": 1
+  },
+  "failedRequirements": [],
   "passedRequirements": [
     {
       "label": "hat transparent coverage",
@@ -85,7 +144,7 @@
     },
     {
       "label": "outer transparent coverage",
-      "actual": 22,
+      "actual": 45,
       "target": 20,
       "passed": true,
       "reason": "Transparent-only needs enough outer options for generation variety."
@@ -99,7 +158,7 @@
     },
     {
       "label": "bottom transparent coverage",
-      "actual": 30,
+      "actual": 43,
       "target": 25,
       "passed": true,
       "reason": "Transparent-only needs enough bottom options for generation variety."
@@ -134,50 +193,107 @@
     },
     {
       "label": "masc frame coverage",
-      "actual": 62,
+      "actual": 77,
       "target": 30,
       "passed": true,
       "reason": "Transparent-only should not collapse recommendations for masc users."
     },
     {
       "label": "fem frame coverage",
-      "actual": 54,
+      "actual": 71,
       "target": 30,
       "passed": true,
       "reason": "Transparent-only should not collapse recommendations for fem users."
     },
     {
       "label": "androgynous frame coverage",
-      "actual": 30,
+      "actual": 34,
       "target": 30,
       "passed": true,
       "reason": "Transparent-only should not collapse recommendations for androgynous users."
     },
     {
-      "label": "date vibe coverage",
-      "actual": 60,
+      "label": "classic style-family coverage",
+      "actual": 113,
       "target": 12,
       "passed": true,
-      "reason": "Transparent-only needs enough date pieces for Feed and Build variety."
+      "reason": "Transparent-only needs enough classic pieces for Feed and Build variety. This counts the app's existing generator aliases: classic, old money, preppy, business casual, clean, minimal.",
+      "aliases": [
+        "classic",
+        "old money",
+        "preppy",
+        "business casual",
+        "clean",
+        "minimal"
+      ]
     },
     {
-      "label": "vacation vibe coverage",
-      "actual": 20,
+      "label": "street style-family coverage",
+      "actual": 53,
       "target": 12,
       "passed": true,
-      "reason": "Transparent-only needs enough vacation pieces for Feed and Build variety."
+      "reason": "Transparent-only needs enough street pieces for Feed and Build variety. This counts the app's existing generator aliases: street, streetwear, y2k, edgy.",
+      "aliases": [
+        "street",
+        "streetwear",
+        "y2k",
+        "edgy"
+      ]
     },
     {
-      "label": "cozy vibe coverage",
+      "label": "date style-family coverage",
+      "actual": 128,
+      "target": 12,
+      "passed": true,
+      "reason": "Transparent-only needs enough date pieces for Feed and Build variety. This counts the app's existing generator aliases: date, night out, dressy.",
+      "aliases": [
+        "date",
+        "night out",
+        "dressy"
+      ]
+    },
+    {
+      "label": "work style-family coverage",
+      "actual": 93,
+      "target": 12,
+      "passed": true,
+      "reason": "Transparent-only needs enough work pieces for Feed and Build variety. This counts the app's existing generator aliases: work, workwear, office, business casual.",
+      "aliases": [
+        "work",
+        "workwear",
+        "office",
+        "business casual"
+      ]
+    },
+    {
+      "label": "vacation style-family coverage",
+      "actual": 21,
+      "target": 12,
+      "passed": true,
+      "reason": "Transparent-only needs enough vacation pieces for Feed and Build variety. This counts the app's existing generator aliases: vacation, summer, beach, travel.",
+      "aliases": [
+        "vacation",
+        "summer",
+        "beach",
+        "travel"
+      ]
+    },
+    {
+      "label": "cozy style-family coverage",
       "actual": 12,
       "target": 12,
       "passed": true,
-      "reason": "Transparent-only needs enough cozy pieces for Feed and Build variety."
+      "reason": "Transparent-only needs enough cozy pieces for Feed and Build variety. This counts the app's existing generator aliases: cozy, winter.",
+      "aliases": [
+        "cozy",
+        "winter"
+      ]
     }
   ],
   "notes": [
     "This report is read-only and does not change Feed or Build generation.",
-    "Transparent-only is not recommended until tops, bottoms, shoes, outerwear, frame coverage, and vibe coverage all pass.",
+    "Style-family readiness counts generator vocabulary aliases such as streetwear->street and office->work; exact raw vibe counts are preserved in exactVibeCounts.",
+    "Transparent-only is not recommended until tops, bottoms, shoes, outerwear, frame coverage, and style-family coverage all pass.",
     "Original-only products should remain available while transparent asset coverage is low."
   ]
 }

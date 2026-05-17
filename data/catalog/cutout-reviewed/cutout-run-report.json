@@ -1,89 +1,384 @@
 {
-  "generatedAt": "2026-05-17T16:41:11Z",
+  "generatedAt": "2026-05-17T19:11:38Z",
   "mode": "apply",
-  "limit": 30,
+  "limit": 36,
   "categoryFilter": [],
   "categoryQuotas": {},
   "targetVibes": [
     "classic",
     "street",
-    "work",
-    "cozy"
+    "work"
   ],
-  "targetFrame": "androgynous",
+  "vibeQuotas": {
+    "classic": 12,
+    "street": 12,
+    "work": 12
+  },
+  "targetFrame": "",
+  "preferFeedFirst": 50,
   "rembgAvailable": true,
   "rembgError": null,
   "outputDir": "public/assets/cutouts",
   "items": [
     {
-      "id": "generated-bdef400df8894d74",
-      "brand": "UGG",
-      "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
+      "id": "generated-99aeccf41750984d",
+      "brand": "Kohl's",
+      "name": "Women Wide Leg Pants Dressy Business Casual High Waisted Straight Leg Work Office Trousers Slacks, Women's, Size: Small, Black",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROjezAPRefJrgk-5_8wVXpXOyhum0krtVJd2Q1k5hQTKq0-DDUoTFl6sh2eESnocigBV_dQeZ1A7rbJX4dNRv72ksvcHyaF9Ac2U4dNmZkbBFglunGyREY",
-      "outputPath": "public/assets/cutouts/generated-bdef400df8894d74.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRlTXfBUJhIykNqYdBNncpW9zPTPdtyD4mQfNFnfD4dQrEb5v8QG9OpKmrxuKkunaYRVFOf_kBLD_Wcg7nuFe6jPCXL6mJr-2BQ0q59GRbKI0otBAdue_-e",
+      "outputPath": "public/assets/cutouts/generated-99aeccf41750984d.png",
       "status": "generated",
-      "bytes": 165627
+      "bytes": 151543
     },
     {
-      "id": "generated-e83a5278351c8f78",
-      "brand": "UGG",
-      "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
+      "id": "generated-6d3010389559c096",
+      "brand": "Macy's",
+      "name": "Tommy Hilfiger Men's Stretch Pants",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZ5fDVVS1uZFTAkD5ffyjKg5sfC6EYQ36cwYmcMMSepWZOMcGWZe6nrCK8gOqsZXghfpWAzErXfVNcva3zqkv7d5-quKAD",
-      "outputPath": "public/assets/cutouts/generated-e83a5278351c8f78.png",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQhTEUh7CtJ1iQcwEniahBHIFCMq2moXfi-lLaFQsMSabSW5RoUtH8FjVV5FV7nlbwuMeaKmtm0FqYQqjZ02FQpspJqR1d97CfD55WWw1Twh1nJwfoR8ywu",
+      "outputPath": "public/assets/cutouts/generated-6d3010389559c096.png",
       "status": "generated",
-      "bytes": 16995
+      "bytes": 162100
     },
     {
-      "id": "generated-275150bce379b9a7",
-      "brand": "UGG",
-      "name": "Ugg Classic Women Sweatpants - Sand Heather",
+      "id": "generated-07a062f2c9f7de29",
+      "brand": "Nordstrom",
+      "name": "Men Bonobos Stretch Weekday Warrior Slim Pants",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRT8aHLepMiPugzN2vhiG70FmpxwxI9pjIMuHaRYzOrZ9vwU14F_sO-VXyO_gahNu6BmnFkiEdx9tSOW0VkM1-HHNR6dGjfNTj-PHXQpd2m7GJ_ZOYusdF7vP0",
-      "outputPath": "public/assets/cutouts/generated-275150bce379b9a7.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ3QPw5HCBooXj6e6m1CBNlxwe3yPUR0XELO9J_iFhP9csW6fkvjP77zakGJOdVdcTmM9Qd07OxeSc2ua9j7TKRfeWHanFo11F-w8EoRrNQ9y_hsS49DmBcRQ",
+      "outputPath": "public/assets/cutouts/generated-07a062f2c9f7de29.png",
       "status": "generated",
-      "bytes": 198625
+      "bytes": 122917
     },
     {
-      "id": "generated-91163af986a5b635",
-      "brand": "UGG",
-      "name": "UGG Women's Classic Cotton Blend Sweatpants",
+      "id": "generated-74fe933994f14082",
+      "brand": "Nordstrom",
+      "name": "Open Edit The Icon Trousers",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT2WZCd8wYvCKeXQXkH2FQ2ahYsElemzQX7uTf7VL5gqBQ03UmQwIDiHMJcR1s-loVSsL33tHg3Mac8uPgan3P6lJUwBHEliMMffTh1X5HlX7uzGQxNWiSRWOI",
-      "outputPath": "public/assets/cutouts/generated-91163af986a5b635.png",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS6dcuLwrtDiAQaX8aMOkrUlPicj6tJ1D9A48JwjNIoiCuGDHSUkNMyWTy39CkHu6z36_h4VB7eaYAFJMmtah4zHhzZ1F71KQ0g6h2YahbWdOzQ3-YcDwPEWw",
+      "outputPath": "public/assets/cutouts/generated-74fe933994f14082.png",
       "status": "generated",
-      "bytes": 177750
+      "bytes": 102464
     },
     {
-      "id": "generated-d3d13a615df5b8b1",
-      "brand": "UGG",
-      "name": "Uggs Women's Sweatpants Set",
+      "id": "generated-70b1660ec9405a6b",
+      "brand": "Walmart - UPPADA Fashion",
+      "name": "Women's Dressy Two Piece Set with Long Pants",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
-      "outputPath": "public/assets/cutouts/generated-d3d13a615df5b8b1.png",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ2Fp6dNmyOSN9aaQV51_LaLunh43VT1dBx8jGG1_iiYpkqCACeHby7HIKydxhF4-LhT8sDdD2UBY14NY6Y1XVGvQSFaDZq",
+      "outputPath": "public/assets/cutouts/generated-70b1660ec9405a6b.png",
       "status": "generated",
-      "bytes": 28546
+      "bytes": 87501
     },
     {
-      "id": "generated-8d4e3bcd82077a3d",
-      "brand": "UGG",
-      "name": "UGG Joanne Bonded Fleece Hoodie & Bottoms - Women's",
+      "id": "generated-16008bf3bb3a8476",
+      "brand": "Zara",
+      "name": "Zara Men's Comfort Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQMhpMzTa_ArYWTuRaCOxzK0d-_Sc7c00Fg-E9fqqlxXgwpDIryhjhz9A_6aGxHfqYKXwp3Q0LLUTWLjSXPSILwq6w_3gmPCDi8VC21iwuJpIuZrJrXMQyb7hY",
+      "outputPath": "public/assets/cutouts/generated-16008bf3bb3a8476.png",
+      "status": "generated",
+      "bytes": 144704
+    },
+    {
+      "id": "generated-ce58332aab800a94",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Blazer and Wide Leg Pant Set",
       "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS9zclJU3P30WlEtN_gCj2jrYPFTARu9upTog5OsywY3-o4cG9rPp1a6VnDFico186E9A0oNdL-QBcbdPkh2OeAuKaWtuWrKQ",
-      "outputPath": "public/assets/cutouts/generated-8d4e3bcd82077a3d.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT-9c_om1KWSF07PCwzUaG4Tr7Uc5OA4aoyF7AHQdFp5h2uE4CTjbK5KW9-nuL19x2TvGHaTCjPtBdMBlmSdRDpBGC-RkjK24e_1zHEB57VTIAoR0PCT51r",
+      "outputPath": "public/assets/cutouts/generated-ce58332aab800a94.png",
       "status": "generated",
-      "bytes": 29321
+      "bytes": 93699
     },
     {
-      "id": "generated-2f1bfa27a4583c16",
-      "brand": "UGG",
-      "name": "UGG Men's Tasman Hoodie",
+      "id": "generated-e4521506a432189e",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Blazer Skinny Pant Set",
       "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTTDhykrnj6ZqonQZPfm9AOzcmEaFb6HyIC0YOEFlKDKr1KS_PKozUyY9aIW0ZVVdd56Z0rWiFXNvDIewdvG2AMhOoNQPqWwE_Mf_rPnNxmW9UgU9rN3JG2xA",
-      "outputPath": "public/assets/cutouts/generated-2f1bfa27a4583c16.png",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTl2WdDJ-3IMmWdigf_p6AuHNQvZxJzw_LiToZWGTeME0giqUjtH1kOSOMt_vmbcoNsdEElZrHoPH5lj8fV0PzEgUQNGGFet5S3Zvetj3YBuBKTEPZQ6335",
+      "outputPath": "public/assets/cutouts/generated-e4521506a432189e.png",
       "status": "generated",
-      "bytes": 242821
+      "bytes": 134513
+    },
+    {
+      "id": "generated-f0e7bfe9cff043d9",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Cardigan Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSnsHZVS6skPHDzptL7IXuXq5XBvf2D0T6J04V-s2ELji8rGLrJ9bPIZF4h1YVWHNBXOEiUR1bftfxFPpRBAiG-jBZNU4xp5Dec6YPfnDSDuGhdUsFJcvzK",
+      "outputPath": "public/assets/cutouts/generated-f0e7bfe9cff043d9.png",
+      "status": "generated",
+      "bytes": 114195
+    },
+    {
+      "id": "generated-7709b5e5769a8e76",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Satin Blazer Straight Leg Pant Set in Black, Size",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQgNea2BSByfh4vq1J77jJEERjxN7lkq3sQz4cdQEEoiiaxMqXXG02mg9RfKwdQdOp6POEe907sFMQ0TpU26-R6zy0-vnYNpfQ4FffTuxItB3NyyOziMtak",
+      "outputPath": "public/assets/cutouts/generated-7709b5e5769a8e76.png",
+      "status": "generated",
+      "bytes": 226657
+    },
+    {
+      "id": "generated-99542fd664d775ef",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Tweed Blazer Straight Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRokO8AWv805AKYGwzCp7rdHEF7f4TUnKvNMu_xpFECCE0QxujjZANcUlIHBn1nlodBWBkzRy-TZArJK9Q-X8_8qUm0KT3Ojje2K-xw9usZPUAgEM5FYkOo",
+      "outputPath": "public/assets/cutouts/generated-99542fd664d775ef.png",
+      "status": "generated",
+      "bytes": 198574
+    },
+    {
+      "id": "generated-0e18fa1391190bba",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Tweed Cardigan Flare Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSONhGEtf6LXb_tUMlJbU4vWTgVTOxcLeL81_rG2KiJMNAA2lSvBmLLghu2bz4HeAJK8mLGy1DuIDpvTXxgi0h1vjx8wstsvHQ2rxM3Gd41xWdItJhvl91l",
+      "outputPath": "public/assets/cutouts/generated-0e18fa1391190bba.png",
+      "status": "generated",
+      "bytes": 199038
+    },
+    {
+      "id": "generated-81fe35b932b13d40",
+      "brand": "Techwear Storm",
+      "name": "Techwear cargo pants \"Shinji",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbc37DxDnm369p16P_uEc6DtS46DmJjnGqtxwmeCybk4hy8CGYvi6xo6XLfN9tJMzFtvF0NTSxOM5z18b2DlYlPJj7L-RU-n_VJ1didzk8L5ucf4Pa_b-NkQ",
+      "outputPath": "public/assets/cutouts/generated-81fe35b932b13d40.png",
+      "status": "generated",
+      "bytes": 176278
+    },
+    {
+      "id": "generated-3475f4f3d7fe7731",
+      "brand": "Techwear Storm",
+      "name": "Techwear Kisuke Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRebt7VsrX8gOPrgHsgeRiYoGdcb6IHQRLOXkSfiBWwP1cpGFUkGIBlqDHNmWAqMOz8MThV1Pm0wwqOoscVLAVYRd5F7dnW-hW9eKU27aQfW-a1syCFgeFnhQ",
+      "outputPath": "public/assets/cutouts/generated-3475f4f3d7fe7731.png",
+      "status": "generated",
+      "bytes": 158493
+    },
+    {
+      "id": "generated-f7db09272e73cd2c",
+      "brand": "Techwear Storm",
+      "name": "Techwear Storm Techwear Cargo Pants Faux Two Piece",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRrrsJPPsgNlVyG5f6fW8WiCwftbZUrlKULQSoGbtQrAzQTe9cePaWaTZdXYlPbhV4nchr529M35AsxnsOgxgyMxe3Xb4X4M9HgLUff4BqCd6-QXHQcqTHb",
+      "outputPath": "public/assets/cutouts/generated-f7db09272e73cd2c.png",
+      "status": "generated",
+      "bytes": 225958
+    },
+    {
+      "id": "generated-0491e77adf091fc8",
+      "brand": "Techwearofficial",
+      "name": "Black Zip Pocket Cargo Pants for Men",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQCTA1poXOow6Kjwat6lysGSTL0Cfqqwj6GuXoW2nSiRHnwgA3J1TG358FVlmwgLWm0dJ5O6o2sEY_GD8cIYBSHwBwbdQdPPPTg2mzdErykfCy2_5pNMD3J",
+      "outputPath": "public/assets/cutouts/generated-0491e77adf091fc8.png",
+      "status": "generated",
+      "bytes": 218762
+    },
+    {
+      "id": "generated-d6b77dc008f90720",
+      "brand": "Techwearofficial",
+      "name": "Techwear Heavyweight Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSbkJnahErFqHe_sNIRI1pFoWHYHLBieHosFJmlhLZFLDtKPbdJNF6niP7Y4yhRqAjDUJ83ai9nk7zQdfG-z-aCS_qb2w6sDlyS9XTqmft-bgY8GGzGOAKY",
+      "outputPath": "public/assets/cutouts/generated-d6b77dc008f90720.png",
+      "status": "generated",
+      "bytes": 182213
+    },
+    {
+      "id": "generated-817a4ed69864f46a",
+      "brand": "Techwearofficial",
+      "name": "Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTynUMOL6VQ8o3REEb9hv26nnYxce-Vv_RHKQ0bs8J-SMCY8d8LkBfoPQx0HYbjP3p44LpQ6_nk7xyHanlUPZzWL06VpJapEzmdqzs0rhocGGwGXutVoKdM5A",
+      "outputPath": "public/assets/cutouts/generated-817a4ed69864f46a.png",
+      "status": "generated",
+      "bytes": 185803
+    },
+    {
+      "id": "generated-867a2968367d0d14",
+      "brand": "Walmart - DUDHUH-US",
+      "name": "Men's Techwear Hip Hop Streetwear Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRzzbxmH5NW98kZLieZ-02l5mRDJHOgPd5BSb8hyz6qiCH_Sj6eXnqlJss_oOcUKSLAVigXLjXVAXPo1lmjkq6KGBUi2RMKbw",
+      "outputPath": "public/assets/cutouts/generated-867a2968367d0d14.png",
+      "status": "generated",
+      "bytes": 86584
+    },
+    {
+      "id": "generated-f3212c62c5d40d22",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Twill Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQo3JryOGGWmwUQlN66UHnzmt3_cQB7LJQGUR4YhTY0sdEqdc61OoBtCma4KNRQATzxgOxk0Om7cRiPSy2awG_Ax8EP_IG6abHeWs0MllBqPAt-KQVwL8JvFA",
+      "outputPath": "public/assets/cutouts/generated-f3212c62c5d40d22.png",
+      "status": "generated",
+      "bytes": 157696
+    },
+    {
+      "id": "generated-99fdae77bcd417ac",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Men's Modern Stretch Suit Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTiQUncIhCtPIuMkO-L233ZP10WvFtodQ5xBa9gg-gyST-pwpZj_lRB8TsL9klkiTRiCloL73qSViZsmnWf8VMfkxdlMPHUlf_JmkTFMzkPJl7dtv4QfV_45kA",
+      "outputPath": "public/assets/cutouts/generated-99fdae77bcd417ac.png",
+      "status": "generated",
+      "bytes": 273357
+    },
+    {
+      "id": "generated-8d0a40412cd7c0af",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Tie Waist Long Sleeve Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQXuAL9Ue0dSSByvcaJN2i678z0PsN4oNCDrCPIyqtimLF2t9bkXmXQu0zMfNPvYlYoIRlyeUfTTyB9ZpuNktxJEjbGGWF9lJ3Xs_lG9wHJM9iMojejL816",
+      "outputPath": "public/assets/cutouts/generated-8d0a40412cd7c0af.png",
+      "status": "generated",
+      "bytes": 149222
+    },
+    {
+      "id": "generated-130d1c8797765e26",
+      "brand": "H&M",
+      "name": "H&M Ladies Double-Breasted Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQmS0HcZTAYQ2ig5gHZEBSP4Dcl9hXbfrIfopcjdTPT65FSOv1fM7uiuzrfJBKcbxEbV47GRITp1j1qP6Xs6-rEkbj80XmYanD7eC0zrdVu4-0vMoOWsCRh",
+      "outputPath": "public/assets/cutouts/generated-130d1c8797765e26.png",
+      "status": "generated",
+      "bytes": 143421
+    },
+    {
+      "id": "generated-61904954680f6ff8",
+      "brand": "H&M",
+      "name": "H&M Ladies Gathered-Sleeve Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZF-0xrVzYznIdFflw1QQzMgTp3p7ILA3CCkKIqKOR7ZDnNe9Nn3KlSTigcWTPWZy4JY67iivvekpTsjPQPFT8OFnkcwsBejt1kAEvLxn7vFniHr9v5iMgeQ",
+      "outputPath": "public/assets/cutouts/generated-61904954680f6ff8.png",
+      "status": "generated",
+      "bytes": 85051
+    },
+    {
+      "id": "generated-9f7712f662e0034d",
+      "brand": "H&M",
+      "name": "H&M Men's Regular-Fit Single-Breasted Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS1rfp32yj067dfj7fwpn8VWogXP3hrnHaxX-JjrCjqVPi1WgPKOs3ux96wZtHI61p-VazCwFwwoBHbEjikOlx0qVk7u4fGvCe1cngtSZifgTm2f_OBwuEnmQ",
+      "outputPath": "public/assets/cutouts/generated-9f7712f662e0034d.png",
+      "status": "generated",
+      "bytes": 229667
+    },
+    {
+      "id": "generated-2e20fec284a6cd6b",
+      "brand": "Lands' End",
+      "name": "Lands' End Men's Travel Kit Chino Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQc2nLeV1HOxqx2bikGcdQ5Wd9SbAMIrvACwToajELDbW3eyvHFqXg0Y468pvhDxx7CozS5bQ9dKTvr8frxCbhbVTCpw4XBeEMtNf3kCDKJb1TI9pjtc9d6",
+      "outputPath": "public/assets/cutouts/generated-2e20fec284a6cd6b.png",
+      "status": "generated",
+      "bytes": 187843
+    },
+    {
+      "id": "generated-f403e370ccf52a12",
+      "brand": "LightInTheBox",
+      "name": "Men's Polyester Cloth Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQR8zbLjfD0JPUBzSCgTHIL8QrVbsu-LowCGZds2FtziFSEaRMvCAGWZTv9rjeIbvUPrz5wTNk3yBMapsysePz16grDbGlSOZzh6VXUsrB6tejqdqEJJvoaQA",
+      "outputPath": "public/assets/cutouts/generated-f403e370ccf52a12.png",
+      "status": "generated",
+      "bytes": 213247
+    },
+    {
+      "id": "generated-fdb47b6778ec997e",
+      "brand": "Lovau",
+      "name": "Sakura Collection Pleated Cardigan & Trousers Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYk25knKKRESehaA4ls6d8cjMdOX2U8nvKLMyNe7XvvNkfsiUf1Of0FfcWF-mzZRPT7asQOiiizUlvjZhQyEIb7cqR98KDJi6Ehasdm_Mqws70a0-URyrG",
+      "outputPath": "public/assets/cutouts/generated-fdb47b6778ec997e.png",
+      "status": "generated",
+      "bytes": 156598
+    },
+    {
+      "id": "generated-7da43d666e4b7449",
+      "brand": "Men's Wearhouse",
+      "name": "Haggar Classic Fit Men\u2019s Suit in Charcoal Gray \u2013 Two-Button Notch-Lapel Jacket and Flat-Front Pants, Size 46 Short",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQxOAaddqh41F7gm0jC-zYjN9Q-eN2bB7Rp5hfT8Qpl5vI-LGUuZWO_OGBjX8vo1wcMQYF-hISusw8Q-apDyaoGvXAGB-ni",
+      "outputPath": "public/assets/cutouts/generated-7da43d666e4b7449.png",
+      "status": "generated",
+      "bytes": 154175
+    },
+    {
+      "id": "generated-38b88276652f406d",
+      "brand": "Men's Wearhouse",
+      "name": "Haggar Classic Fit Men\u2019s Suit in Oatmeal Tan \u2013 Notch Lapel 2-Button Jacket with Flat-Front Pants, Size 46 Short",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTZSnUEEByMdEUo_wU63bjjP2vCZJyNOA6t7sNF-fSWxj0EA03LIWDH0WVUcXWqezRD5zmHpVwp9zH35LwbIc9Z4_Up6_S0",
+      "outputPath": "public/assets/cutouts/generated-38b88276652f406d.png",
+      "status": "generated",
+      "bytes": 163757
+    },
+    {
+      "id": "generated-a45af73010be409a",
+      "brand": "Men's Wearhouse",
+      "name": "Haggar Men's Active Series Tailored-Fit 4-Way Stretch Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRDW_ZZOPZESP2SXWendToV_SsLY1ZLzJTodF-LAn93TYpSOQzW9XrV9TEha8M4573-es6W-miwF9PwRvG052tvt5o9cOHxuQ",
+      "outputPath": "public/assets/cutouts/generated-a45af73010be409a.png",
+      "status": "generated",
+      "bytes": 144147
+    },
+    {
+      "id": "generated-39cb3da53d56aafb",
+      "brand": "Men's Wearhouse",
+      "name": "Paisley & Gray Modern Fit Sage Green Men\u2019s Suit \u2013 Two Button Notch Lapel Jacket with Flat Front Dress Pants",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS6ugyMKPkFeKSGOaSy3oScEO_7grdtSGBSjetO0OvfdfVQWR09EQgVa9Zm6Pg4oOZXQI47yvBBO-WfRljkikj4UTEKkXg4FA",
+      "outputPath": "public/assets/cutouts/generated-39cb3da53d56aafb.png",
+      "status": "generated",
+      "bytes": 251485
+    },
+    {
+      "id": "generated-9f26b6fa3eaeecc1",
+      "brand": "missguided",
+      "name": "Modern Oversized Blazer Palazzo Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRgKtFaYYx2_O436TqeAlZ3CuXxQK0FXMTxEDCdnH2FgkF5Xu-9j5skW18u6e9fjbHY73SiNP7-a1fwvdKs0pHKyVvSKBmzA4frDY1cOp7cq2WkRJS3zBDZ",
+      "outputPath": "public/assets/cutouts/generated-9f26b6fa3eaeecc1.png",
+      "status": "generated",
+      "bytes": 142323
+    },
+    {
+      "id": "generated-1008f102d799c90d",
+      "brand": "Nordstrom",
+      "name": "Petal & Pup Women's Odell Knit Cardigan & Pants Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcR2vLKxBnDAUBorSdQf1JEKYmomtdgElek36rrYumkVgOqVlxc8PErmxGG1VLJpPWb-Y8KeYzb4LeKItqCCCJ9OFSAVk1DrA8cXFY8jqE4",
+      "outputPath": "public/assets/cutouts/generated-1008f102d799c90d.png",
+      "status": "generated",
+      "bytes": 136759
+    },
+    {
+      "id": "generated-aa6cb4ece0190b0a",
+      "brand": "Nordstrom",
+      "name": "Rodd & Gunn Men's The Cascades Sport Fit Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTL7AO-J2CCELAsppjyi6_1xdEvM5CDlK_EVNp6U5DNeAl5WQSEge_J4ItpO0k7xj1w6Klo5cpenTm3lJ7pPcKgbVdl-kduZqWP1wkC6gLbufz2GT4QRZ3C",
+      "outputPath": "public/assets/cutouts/generated-aa6cb4ece0190b0a.png",
+      "status": "generated",
+      "bytes": 306751
+    },
+    {
+      "id": "generated-d91ad828ec14dafd",
+      "brand": "Pegasi",
+      "name": "Carina Pleated Skirt & Cardigan Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRsrOa3AAXKxQ8IkYsHpXAGbeHcaQDr-vogCeAWkZxcC6ytkfc8zKmOxOX39uksFVwpztimkv7P9J83TW9yVjYXGn4NwebBxW7hgeimMuk",
+      "outputPath": "public/assets/cutouts/generated-d91ad828ec14dafd.png",
+      "status": "generated",
+      "bytes": 240082
     }
   ]
 }

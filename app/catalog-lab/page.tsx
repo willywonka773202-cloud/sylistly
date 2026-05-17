@@ -77,6 +77,27 @@ const transparentTargets: Record<Category, number> = {
 
 const nextBatchCategories: Category[] = ['eyewear', 'hat', 'jewelry', 'outer', 'shoes', 'bottom', 'bag'];
 
+const styleFamilyTargets: Record<string, { target: number; aliases: string[] }> = {
+  classic: { target: 12, aliases: ['classic', 'old money', 'preppy', 'business casual', 'clean', 'minimal'] },
+  street: { target: 12, aliases: ['street', 'streetwear', 'y2k', 'edgy'] },
+  work: { target: 12, aliases: ['work', 'workwear', 'office', 'business casual'] },
+  date: { target: 12, aliases: ['date', 'night out', 'dressy'] },
+  vacation: { target: 12, aliases: ['vacation', 'summer', 'beach', 'travel'] },
+  cozy: { target: 12, aliases: ['cozy', 'winter'] },
+};
+
+function productVibes(product: Product): string[] {
+  return [...(product.vibes || []), ...(product.occasions || [])]
+    .filter((vibe): vibe is string => typeof vibe === 'string')
+    .map((vibe) => vibe.toLowerCase());
+}
+
+function matchesStyleFamily(product: Product, family: string): boolean {
+  const aliases = styleFamilyTargets[family]?.aliases || [family];
+  const vibes = productVibes(product);
+  return vibes.some((vibe) => aliases.includes(vibe));
+}
+
 export default function CatalogLabPage() {
   const products = ALL_CATALOG_PRODUCTS as Product[];
   const safeProducts = products.filter((product) => !isUnsafeImage(product));
@@ -87,11 +108,17 @@ export default function CatalogLabPage() {
   const transparentByCategory = emptyCategoryRecord();
   const originalOnlyByCategory = emptyCategoryRecord();
   const unsafeByCategory = emptyCategoryRecord();
+  const transparentByStyleFamily = Object.fromEntries(Object.keys(styleFamilyTargets).map((family) => [family, 0])) as Record<string, number>;
   for (const product of products) {
     const category = product.category as Category;
     if (product.imageTransparentUrl) transparentByCategory[category] += 1;
     else if (isUnsafeImage(product)) unsafeByCategory[category] += 1;
     else originalOnlyByCategory[category] += 1;
+    if (product.imageTransparentUrl) {
+      for (const family of Object.keys(styleFamilyTargets)) {
+        if (matchesStyleFamily(product, family)) transparentByStyleFamily[family] += 1;
+      }
+    }
   }
   const brandCounts = countBy(products.map((product) => product.brand || 'Unknown'));
   const thinCategories = CATEGORY_ORDER
@@ -146,7 +173,7 @@ export default function CatalogLabPage() {
             <div className="h-full rounded-full bg-[#2f5d50]" style={{ width: `${progress}%` }} />
           </div>
           <div className="mt-4 rounded-2xl border border-[#f0d5c4] bg-[#fff7ef] p-3 text-sm font-black text-[#7a3f22]">
-            Do not enable transparent-only until readiness passes.
+            Do not enable transparent-only until readiness passes. Style readiness uses explicit generator aliases, not unreviewed live metadata edits.
           </div>
         </section>
 
@@ -164,6 +191,34 @@ export default function CatalogLabPage() {
           <Panel title="Original-only by category">
             {CATEGORY_ORDER.map((category) => (
               <MetricRow key={category} label={category} value={originalOnlyByCategory[category]} />
+            ))}
+          </Panel>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-3">
+          <Panel title="Style readiness">
+            {Object.entries(styleFamilyTargets).map(([family, config]) => (
+              <ProgressRow
+                key={family}
+                label={`${family} (${config.aliases.slice(0, 3).join(', ')})`}
+                value={transparentByStyleFamily[family] || 0}
+                target={config.target}
+              />
+            ))}
+          </Panel>
+          <Panel title="Feed-first readiness">
+            <MetricRow label="Transparent products" value={transparentProducts.length} />
+            <MetricRow label="Style families passing" value={Object.keys(styleFamilyTargets).filter((family) => (transparentByStyleFamily[family] || 0) >= styleFamilyTargets[family].target).length} />
+            <MetricRow label="Category families passing" value={CATEGORY_ORDER.filter((category) => transparentByCategory[category] >= transparentTargets[category]).length} />
+          </Panel>
+          <Panel title="Latest style blockers">
+            {['classic', 'street', 'work'].map((family) => (
+              <ProgressRow
+                key={family}
+                label={family}
+                value={transparentByStyleFamily[family] || 0}
+                target={styleFamilyTargets[family].target}
+              />
             ))}
           </Panel>
         </section>

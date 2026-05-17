@@ -59,6 +59,17 @@ def parse_args() -> argparse.Namespace:
         help="Comma-separated vibe filter forwarded to prepare-cutout-candidates, e.g. classic,street,work,cozy.",
     )
     parser.add_argument(
+        "--vibe-quotas",
+        default="",
+        help="Comma-separated per-vibe quotas, e.g. classic:12,street:12,work:12.",
+    )
+    parser.add_argument(
+        "--prefer-feed-first",
+        type=int,
+        default=0,
+        help="Hint candidate planning toward products likely to help the first N feed posts.",
+    )
+    parser.add_argument(
         "--target-frame",
         default="",
         help="Frame filter forwarded to prepare-cutout-candidates, e.g. androgynous.",
@@ -126,6 +137,23 @@ def parse_category_quotas(value: str) -> dict[str, int]:
     return quotas
 
 
+def parse_vibe_quotas(value: str) -> dict[str, int]:
+    quotas: dict[str, int] = {}
+    for raw in value.split(","):
+        if ":" not in raw:
+            continue
+        vibe_raw, quota_raw = raw.split(":", 1)
+        vibe = vibe_raw.strip().lower()
+        if not vibe:
+            continue
+        try:
+            quota = int(quota_raw.strip())
+        except ValueError:
+            continue
+        quotas[vibe] = max(0, quota)
+    return quotas
+
+
 def select_category_batch(
     candidates: list[dict[str, Any]],
     limit: int,
@@ -187,7 +215,9 @@ def load_candidates(
     categories: list[str],
     category_quotas: dict[str, int] | None = None,
     target_vibes: list[str] | None = None,
+    vibe_quotas: dict[str, int] | None = None,
     target_frame: str = "",
+    prefer_feed_first: int = 0,
 ) -> list[dict[str, Any]]:
     if candidate_json:
         payload = json.loads(candidate_json.read_text(encoding="utf-8"))
@@ -202,8 +232,12 @@ def load_candidates(
             command.append(f"--categories={','.join(categories)}")
         if target_vibes:
             command.append(f"--target-vibes={','.join(target_vibes)}")
+        if vibe_quotas:
+            command.append("--vibe-quotas=" + ",".join(f"{vibe}:{quota}" for vibe, quota in vibe_quotas.items()))
         if target_frame:
             command.append(f"--target-frame={target_frame}")
+        if prefer_feed_first > 0:
+            command.append(f"--prefer-feed-first={prefer_feed_first}")
         raw = subprocess.check_output(
             command,
             cwd=ROOT,
@@ -255,6 +289,7 @@ def main() -> int:
     args = parse_args()
     categories = parse_categories(args.categories)
     target_vibes = parse_csv(args.target_vibes)
+    vibe_quotas = parse_vibe_quotas(args.vibe_quotas)
     target_frame = args.target_frame.strip().lower()
     category_quotas = parse_category_quotas(args.category_quotas)
     if category_quotas:
@@ -265,7 +300,16 @@ def main() -> int:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     has_rembg, rembg_error = rembg_available()
-    candidates = load_candidates(args.limit, args.candidate_json, categories, category_quotas or None, target_vibes, target_frame)
+    candidates = load_candidates(
+        args.limit,
+        args.candidate_json,
+        categories,
+        category_quotas or None,
+        target_vibes,
+        vibe_quotas or None,
+        target_frame,
+        args.prefer_feed_first,
+    )
     report: dict[str, Any] = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "mode": "apply" if args.apply else "dry-run",
@@ -273,7 +317,9 @@ def main() -> int:
         "categoryFilter": categories,
         "categoryQuotas": {category: (category_quotas or DEFAULT_CATEGORY_QUOTAS).get(category, 0) for category in categories},
         "targetVibes": target_vibes,
+        "vibeQuotas": vibe_quotas,
         "targetFrame": target_frame,
+        "preferFeedFirst": args.prefer_feed_first,
         "rembgAvailable": has_rembg,
         "rembgError": rembg_error,
         "outputDir": str(CUTOUT_DIR.relative_to(ROOT)).replace(os.sep, "/"),
