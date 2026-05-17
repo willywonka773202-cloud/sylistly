@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-05-17T14:39:07.842Z",
+  "query": "androgynous cozy cardigan product page official",
+  "planType": "vibe-category-expansion",
+  "mode": "vibe-expansion",
+  "engine": "google",
+  "targetCategory": "outer",
+  "targetVibe": "cozy",
+  "topLevelKeys": [
+    "search_metadata",
+    "search_parameters",
+    "search_information",
+    "organic_results",
+    "related_questions",
+    "related_searches",
+    "pagination"
+  ],
+  "resultCounts": {
+    "shopping_results": 0,
+    "inline_shopping_results": 0,
+    "product_results": 0,
+    "organic_results": 4,
+    "extractedResults": 4
+  },
+  "firstResults": [
+    {
+      "position": 1,
+      "title": "Kirrin Finch | Non-Binary and Androgynous Clothing",
+      "link": "https://kirrinfinch.com/?srsltid=AfmBOopLi5Z1uO7fAsITg5SXnArJoFGaknHrqhVkMFviTHx_V2TpvaPo",
+      "source": "Kirrin Finch",
+      "domain": "kirrinfinch.com",
+      "displayed_link": "https://kirrinfinch.com",
+      "snippet": "Kirrin Finch challenges fashion norms with menswear-inspired apparel for women, trans, and non-binary folks. From dress shirts to suits, express your true ...",
+      "snippet_highlighted_words": [
+        "menswear-inspired apparel for women, trans, and non-binary folks"
+      ],
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAe1BMVEX+/v79/f3///+5x8xQb3t8kpvj6Orn7O6ywcaktLsAABwAHjQAECpFXWrW3eBMZG8AIDSbrbQAJzkAMUIKN0dWbXhec31le4UINEQAJDjO1dcAJTh6j5cALkAVP1CUpq0sUWHz9fYzV2TEzdCImJ4iSFc3UmDS2NoAGTC89I4sAAABA0lEQVR4AWIYQMAI4IossCMIgSDK1rgLJPi63f+E6SECmX5WvN9aUOxUZKD4lpsimrIsL0oEVhV5jX+sabt+GEFsnPq5XZCweuVCzB8VY9XnLARf67/OgFyFUlwbwFiulFgl/mrhtFDCH0dgPHqSukBsWw6d8nw5kD55r7qpim1pxXNPDBSXk++vF7DY9oDLbQxvgI23Cw6kE5psgD0ra8oP+nKryY6UjufO3y9h5p13jzE1YRy04htll2...[truncated]"
+    },
+    {
+      "position": 2,
+      "title": "WILDFANG | BEST SELF GUARANTEED – Wildfang",
+      "link": "https://www.wildfang.com/?srsltid=AfmBOooz720kukrAYkkhgiglCsCKSHPlaakL-SJ6Fz75Hn25gK33NzQV",
+      "source": "Wildfang",
+      "domain": "www.wildfang.com",
+      "displayed_link": "https://www.wildfang.com",
+      "snippet": "Women Founded & Run. We create bold suiting, reimagined workwear, and statement staples in sizes XS–4X, made to give you the confidence to walk into any ...",
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAABvklEQVR4AU3RIey8IBQHcPoIbI5NwtuAarNcNNqMRov1kvEqfcweLtpnvmQ3XzaRiW7C/+F/7H7f8nj78F4AEnOuK6QSsORkDCF6d2Ccx2PGTG6zfV3yqjOfA/sf4vEzScJKAFFQPqxnDBlDPN8VBaUVRitgpfVJEZNZDkrJHOSXS3qvXUr4UVLJ7BkThrjVAg3ghrsqKNcbo3/RZI/mvzWpKjYcN+5pENpt74WUotv2Tigc/cRAwrlQvMnH83wVUvKnj89CS0WMv8iFWzVuq61tIG239oFVF73DSTcwRAkCQN5VpKrK+ogkui5tSZ6TOiU0YrhRlH8RCqFEhXj5J9XQT1zmaN6YTheNw0lvCYzvFYTKj0ftudTk6QMJ8VMWozFGg5JKasWrxh5jQd9nwqMv+GP9jsAkSMbbxvZTxR77/b...[truncated]"
+    },
+    {
+      "position": 3,
+      "title": "Androgynous Cardigan",
+      "link": "https://www.etsy.com/market/androgynous_cardigan",
+      "source": "Etsy",
+      "domain": "www.etsy.com",
+      "displayed_link": "https://www.etsy.com › market › androgynous_cardigan",
+      "snippet": "Explore unique androgynous cardigans, from vintage finds to handwoven wool. Discover cozy knits, celestial prints, and statement pieces for every style.",
+      "snippet_highlighted_words": [
+        "Explore unique androgynous cardigans"
+      ],
+      "rich_snippet": {
+        "detected_extensions": {
+          "rating": 4.5,
+          "reviews": 1200
+        },
+        "extensions": [
+          "4.5 store rating",
+          "(1.2K)",
+          "$6 to $213"
+        ]
+      },
+      "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAdVBMVEXzZAP1ZAD1YgD1XgD3gz32fDL2dij2cSP4kFT1bSL////83M31XQD0VgD2eyz+6+L4kVv2agD2bAD80br80sP1WgD3i1f7zbr5qHz6sY76tZD7ybP+7uf7vp74lWP2dzT4nXD5r4b++PT5pnr2f0P2gkz1aBW6vmIYAAAAyElEQVR4AaXSRQKDQAxA0ZKgaabuuN7/hrhb7W8fjG/Wkxb7CKEf4gA3sqJqdaqi69BDMGjQlvt/gtjtiQ7HotOZLtfhgsSF6IbljOoEryVW3+3vY7zXCICPJ84jv56IpfXRrOYUlp0vdQYdTXU98ufR2lsBUYiz6LlR7C/9mc+JwnoNsb9aDB2UcGmfmJt3x6UTkq5787qErJPPPYSr2BK9RJli0QE7hOQcUFGQR3ky9NH2H2Hdw/dfSQ8lYMY2Zo...[truncated]"
+    }
+  ]
+}
