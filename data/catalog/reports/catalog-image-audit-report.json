@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-17T15:24:52.804Z",
+  "generatedAt": "2026-05-17T16:44:07.156Z",
   "totals": {
     "products": 680,
-    "withTransparent": 142,
-    "withOriginalOnly": 448,
+    "withTransparent": 149,
+    "withOriginalOnly": 441,
     "withUnsafeImage": 90,
-    "needsCutoutPriority": 448
+    "needsCutoutPriority": 441
   },
   "bySource": [
     {
@@ -19,10 +19,10 @@
     {
       "label": "generated-catalog",
       "total": 175,
-      "withTransparent": 103,
-      "withOriginalOnly": 72,
+      "withTransparent": 110,
+      "withOriginalOnly": 65,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 72
+      "needsCutoutPriority": 65
     },
     {
       "label": "photo-catalog",
@@ -34,9 +34,9 @@
     }
   ],
   "byCategoryNeedingCutout": {
-    "outer": 103,
-    "bottom": 78,
+    "outer": 101,
     "top": 74,
+    "bottom": 73,
     "hat": 60,
     "jewelry": 40,
     "bag": 39,
@@ -1283,76 +1283,6 @@
       "name": "Techwear Men's Slim Fit Polyester Cotton Cargo Pants",
       "category": "bottom",
       "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTynUMOL6VQ8o3REEb9hv26nnYxce-Vv_RHKQ0bs8J-SMCY8d8LkBfoPQx0HYbjP3p44LpQ6_nk7xyHanlUPZzWL06VpJapEzmdqzs0rhocGGwGXutVoKdM5A",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-bdef400df8894d74",
-      "brand": "UGG",
-      "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROjezAPRefJrgk-5_8wVXpXOyhum0krtVJd2Q1k5hQTKq0-DDUoTFl6sh2eESnocigBV_dQeZ1A7rbJX4dNRv72ksvcHyaF9Ac2U4dNmZkbBFglunGyREY",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-e83a5278351c8f78",
-      "brand": "UGG",
-      "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZ5fDVVS1uZFTAkD5ffyjKg5sfC6EYQ36cwYmcMMSepWZOMcGWZe6nrCK8gOqsZXghfpWAzErXfVNcva3zqkv7d5-quKAD",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-275150bce379b9a7",
-      "brand": "UGG",
-      "name": "Ugg Classic Women Sweatpants - Sand Heather",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRT8aHLepMiPugzN2vhiG70FmpxwxI9pjIMuHaRYzOrZ9vwU14F_sO-VXyO_gahNu6BmnFkiEdx9tSOW0VkM1-HHNR6dGjfNTj-PHXQpd2m7GJ_ZOYusdF7vP0",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-91163af986a5b635",
-      "brand": "UGG",
-      "name": "UGG Women's Classic Cotton Blend Sweatpants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT2WZCd8wYvCKeXQXkH2FQ2ahYsElemzQX7uTf7VL5gqBQ03UmQwIDiHMJcR1s-loVSsL33tHg3Mac8uPgan3P6lJUwBHEliMMffTh1X5HlX7uzGQxNWiSRWOI",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-d3d13a615df5b8b1",
-      "brand": "UGG",
-      "name": "Uggs Women's Sweatpants Set",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -2843,6 +2773,76 @@
       "signals": [
         "needs-cutout"
       ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-fdb47b6778ec997e",
+      "brand": "Lovau",
+      "name": "Sakura Collection Pleated Cardigan & Trousers Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYk25knKKRESehaA4ls6d8cjMdOX2U8nvKLMyNe7XvvNkfsiUf1Of0FfcWF-mzZRPT7asQOiiizUlvjZhQyEIb7cqR98KDJi6Ehasdm_Mqws70a0-URyrG",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-bcff618d44ae68a0",
+      "brand": "Lyst",
+      "name": "Boohoo Women's Western Buckle Denim Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRkOREjYN2YiLc1iDwzcAFRMhNEI0MshHe1JHEgWYbakesKXTXQq2aN705RwEqie_N67eh0yEms6h7nWaaLPXZLQb0nojZ5abV1397-L7r4pFDgFZlcl7SX",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-1359856a681f24bc",
+      "brand": "Macy's",
+      "name": "Calvin Klein Men's Chevron Stretch Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQNy-QUAVBAGcVgIgj0wW09giMkP0Y8UKBoN9I7py7js5av55vdTYMxF-_VaiL1FBPb0eXggM_3TBBlPJH16Pn6tT9XHat1KYTkYirdL6_qAblh4oaWVcL5mQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-6533d81545d3fb00",
+      "brand": "Marine Layer",
+      "name": "Marine Layer Women's Alba Cable Cotton Blend Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROsAoiZ_FI-4Nf0FDjZjccyVnrdDZK8LXf3XUmrEz25gUkKqL8eiJsyrYEHASG731rWrVUgbkcm-2TZLO69As2rqSzXwDs6n4Px5wRXvPLJNBrRrZxEbv5",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-7da43d666e4b7449",
+      "brand": "Men's Wearhouse",
+      "name": "Haggar Classic Fit Men’s Suit in Charcoal Gray – Two-Button Notch-Lapel Jacket and Flat-Front Pants, Size 46 Short",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQxOAaddqh41F7gm0jC-zYjN9Q-eN2bB7Rp5hfT8Qpl5vI-LGUuZWO_OGBjX8vo1wcMQYF-hISusw8Q-apDyaoGvXAGB-ni",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
     }
   ],
   "runtimeTransparentProducts": [
@@ -3158,6 +3158,51 @@
       "category": "bottom",
       "imageUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
       "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-bdef400df8894d74",
+      "title": "UGG 11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROjezAPRefJrgk-5_8wVXpXOyhum0krtVJd2Q1k5hQTKq0-DDUoTFl6sh2eESnocigBV_dQeZ1A7rbJX4dNRv72ksvcHyaF9Ac2U4dNmZkbBFglunGyREY",
+      "imageTransparentUrl": "/assets/cutouts/generated-bdef400df8894d74.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-e83a5278351c8f78",
+      "title": "UGG UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZ5fDVVS1uZFTAkD5ffyjKg5sfC6EYQ36cwYmcMMSepWZOMcGWZe6nrCK8gOqsZXghfpWAzErXfVNcva3zqkv7d5-quKAD",
+      "imageTransparentUrl": "/assets/cutouts/generated-e83a5278351c8f78.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-275150bce379b9a7",
+      "title": "UGG Ugg Classic Women Sweatpants - Sand Heather",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRT8aHLepMiPugzN2vhiG70FmpxwxI9pjIMuHaRYzOrZ9vwU14F_sO-VXyO_gahNu6BmnFkiEdx9tSOW0VkM1-HHNR6dGjfNTj-PHXQpd2m7GJ_ZOYusdF7vP0",
+      "imageTransparentUrl": "/assets/cutouts/generated-275150bce379b9a7.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-91163af986a5b635",
+      "title": "UGG UGG Women's Classic Cotton Blend Sweatpants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT2WZCd8wYvCKeXQXkH2FQ2ahYsElemzQX7uTf7VL5gqBQ03UmQwIDiHMJcR1s-loVSsL33tHg3Mac8uPgan3P6lJUwBHEliMMffTh1X5HlX7uzGQxNWiSRWOI",
+      "imageTransparentUrl": "/assets/cutouts/generated-91163af986a5b635.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-d3d13a615df5b8b1",
+      "title": "UGG Uggs Women's Sweatpants Set",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
+      "imageTransparentUrl": "/assets/cutouts/generated-d3d13a615df5b8b1.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3572,6 +3617,24 @@
       "category": "outer",
       "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSKMm4Y-Kk5Hc0Z0AS-PTA-LmshTcGfrCzf2RUIZRCnX0q0eN0ju6cxkEZaeTwJ9M4ORcYFtKVYScdDYtVrGX0-8i6RE6MGXBudHCYuSokXceUvqWP7hTMO0A",
       "imageTransparentUrl": "/assets/cutouts/generated-0dd8cfe08bb7a011.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-8d4e3bcd82077a3d",
+      "title": "UGG UGG Joanne Bonded Fleece Hoodie & Bottoms - Women's",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS9zclJU3P30WlEtN_gCj2jrYPFTARu9upTog5OsywY3-o4cG9rPp1a6VnDFico186E9A0oNdL-QBcbdPkh2OeAuKaWtuWrKQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-8d4e3bcd82077a3d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-2f1bfa27a4583c16",
+      "title": "UGG UGG Men's Tasman Hoodie",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTTDhykrnj6ZqonQZPfm9AOzcmEaFb6HyIC0YOEFlKDKr1KS_PKozUyY9aIW0ZVVdd56Z0rWiFXNvDIewdvG2AMhOoNQPqWwE_Mf_rPnNxmW9UgU9rN3JG2xA",
+      "imageTransparentUrl": "/assets/cutouts/generated-2f1bfa27a4583c16.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -4362,8 +4425,8 @@
   },
   "generatedAssets": {
     "cutoutDir": "public/assets/cutouts",
-    "totalFiles": 140,
-    "registeredFiles": 140,
+    "totalFiles": 147,
+    "registeredFiles": 147,
     "missingCatalogRegistration": [],
     "registeredLocalUrlsMissingFiles": []
   }

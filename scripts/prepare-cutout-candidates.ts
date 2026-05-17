@@ -35,6 +35,8 @@ interface CutoutCandidate {
   brand: string;
   name: string;
   category: Category | 'unknown';
+  vibes: string[];
+  gender: string[];
   imageUrl: string;
   productUrl?: string;
   priority: number;
@@ -46,10 +48,12 @@ interface CliFlags {
   limit: number;
   write: boolean;
   categories: Array<Category | 'unknown'>;
+  targetVibes: string[];
+  targetFrame: string;
 }
 
 function parseFlags(argv: string[]): CliFlags {
-  const flags: CliFlags = { json: false, limit: 100, write: false, categories: [] };
+  const flags: CliFlags = { json: false, limit: 100, write: false, categories: [], targetVibes: [], targetFrame: '' };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--json') flags.json = true;
@@ -59,6 +63,17 @@ function parseFlags(argv: string[]): CliFlags {
       index += 1;
     } else if (arg.startsWith('--categories=')) {
       flags.categories = parseCategories(arg.slice('--categories='.length));
+    }
+    else if (arg === '--target-vibes' && argv[index + 1]) {
+      flags.targetVibes = parseCsv(argv[index + 1]);
+      index += 1;
+    } else if (arg.startsWith('--target-vibes=')) {
+      flags.targetVibes = parseCsv(arg.slice('--target-vibes='.length));
+    } else if (arg === '--target-frame' && argv[index + 1]) {
+      flags.targetFrame = argv[index + 1].trim().toLowerCase();
+      index += 1;
+    } else if (arg.startsWith('--target-frame=')) {
+      flags.targetFrame = arg.slice('--target-frame='.length).trim().toLowerCase();
     }
     else if (arg.startsWith('--limit=')) {
       const n = Number.parseInt(arg.slice('--limit='.length), 10);
@@ -82,6 +97,15 @@ function parseCategories(value: string): Array<Category | 'unknown'> {
     if (!categories.includes(category)) categories.push(category);
   }
   return categories;
+}
+
+function parseCsv(value: string): string[] {
+  const out: string[] = [];
+  for (const raw of value.split(',')) {
+    const normalized = raw.trim().toLowerCase();
+    if (normalized && !out.includes(normalized)) out.push(normalized);
+  }
+  return out;
 }
 
 const RETAIL_WHITE_BG_HINTS = [
@@ -129,6 +153,12 @@ function buildCandidate(product: unknown, source: SourceLabel): CutoutCandidate 
   const name = typeof p.name === 'string' ? p.name : '<missing>';
   const category = (typeof p.category === 'string' ? p.category : 'unknown') as Category | 'unknown';
   const productUrl = typeof p.productUrl === 'string' ? p.productUrl : undefined;
+  const vibes = [...(Array.isArray(p.vibes) ? p.vibes : []), ...(Array.isArray(p.occasions) ? p.occasions : [])]
+    .filter((vibe): vibe is string => typeof vibe === 'string')
+    .map((vibe) => vibe.toLowerCase());
+  const gender = (Array.isArray(p.gender) ? p.gender : [])
+    .filter((frame) => typeof frame === 'string')
+    .map((frame) => frame.toLowerCase());
 
   const reasons: string[] = [];
   let priority = 0;
@@ -160,6 +190,8 @@ function buildCandidate(product: unknown, source: SourceLabel): CutoutCandidate 
     brand,
     name,
     category,
+    vibes,
+    gender,
     imageUrl: imageUrl.slice(0, 300),
     productUrl: productUrl?.slice(0, 300),
     priority,
@@ -171,10 +203,14 @@ interface CutoutReport {
   generatedAt: string;
   totalCatalogProducts: number;
   categoryFilter: Array<Category | 'unknown'>;
+  targetVibes: string[];
+  targetFrame: string;
   candidateCount: number;
   emittedCount: number;
   byCategory: Record<string, number>;
   bySource: Record<string, number>;
+  byVibe: Record<string, number>;
+  byFrame: Record<string, number>;
   candidates: CutoutCandidate[];
   // Honest notes that ride with the report so any downstream user
   // immediately understands the report's scope and limits.
@@ -217,7 +253,10 @@ function build(flags: CliFlags): CutoutReport {
   const candidates: CutoutCandidate[] = [];
   const bySource: Record<string, number> = {};
   const byCategory: Record<string, number> = {};
+  const byVibe: Record<string, number> = {};
+  const byFrame: Record<string, number> = {};
   const categoryFilter = new Set<Category | 'unknown'>(flags.categories);
+  const targetVibeSet = new Set(flags.targetVibes);
 
   for (const { label, products } of sources) {
     totalCatalog += products.length;
@@ -226,6 +265,19 @@ function build(flags: CliFlags): CutoutReport {
       const candidate = buildCandidate(product, label);
       if (!candidate) continue;
       if (categoryFilter.size > 0 && !categoryFilter.has(candidate.category)) continue;
+      if (targetVibeSet.size > 0 && !candidate.vibes.some((vibe) => targetVibeSet.has(vibe))) continue;
+      if (flags.targetFrame && !candidate.gender.includes(flags.targetFrame)) continue;
+      const matchedVibes = flags.targetVibes.filter((vibe) => candidate.vibes.includes(vibe));
+      if (matchedVibes.length) {
+        candidate.priority += matchedVibes.length * 45;
+        candidate.reasons.push(`target vibe match: ${matchedVibes.join(', ')}`);
+        for (const vibe of matchedVibes) byVibe[vibe] = (byVibe[vibe] || 0) + 1;
+      }
+      if (flags.targetFrame && candidate.gender.includes(flags.targetFrame)) {
+        candidate.priority += 35;
+        candidate.reasons.push(`target frame match: ${flags.targetFrame}`);
+        byFrame[flags.targetFrame] = (byFrame[flags.targetFrame] || 0) + 1;
+      }
       candidates.push(candidate);
       kept += 1;
       byCategory[candidate.category] = (byCategory[candidate.category] || 0) + 1;
@@ -239,10 +291,14 @@ function build(flags: CliFlags): CutoutReport {
     generatedAt: new Date().toISOString(),
     totalCatalogProducts: totalCatalog,
     categoryFilter: flags.categories,
+    targetVibes: flags.targetVibes,
+    targetFrame: flags.targetFrame,
     candidateCount: orderedCandidates.length,
     emittedCount: 0,
     byCategory,
     bySource,
+    byVibe,
+    byFrame,
     candidates: orderedCandidates,
     notes: [
       'This report is read-only and does NOT perform background removal.',

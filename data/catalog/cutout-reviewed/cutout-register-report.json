@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-17T15:24:43.509Z",
+  "generatedAt": "2026-05-17T16:41:28.180Z",
   "mode": "apply",
   "cutoutDir": "public/assets/cutouts",
   "overrideFile": "data/catalog-cutout-overrides.json",
-  "totalAssets": 140,
-  "matchedProducts": 140,
+  "totalAssets": 147,
+  "matchedProducts": 147,
   "unmatchedAssets": 0,
-  "appliedCount": 140,
+  "appliedCount": 147,
   "matches": [
     {
       "id": "0e0b0d3079442b71",
@@ -23,7 +23,7 @@
         "imageTransparentUrl": "/assets/cutouts/0e0b0d3079442b71.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/0e0b0d3079442b71.png by scripts/register-cutouts.ts."
       }
     },
@@ -42,7 +42,7 @@
         "imageTransparentUrl": "/assets/cutouts/1590fdbf9e938ba2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/1590fdbf9e938ba2.png by scripts/register-cutouts.ts."
       }
     },
@@ -61,7 +61,7 @@
         "imageTransparentUrl": "/assets/cutouts/1731e84aa0281ee4.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/1731e84aa0281ee4.png by scripts/register-cutouts.ts."
       }
     },
@@ -80,7 +80,7 @@
         "imageTransparentUrl": "/assets/cutouts/2eb1265214ad2ebf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/2eb1265214ad2ebf.png by scripts/register-cutouts.ts."
       }
     },
@@ -99,7 +99,7 @@
         "imageTransparentUrl": "/assets/cutouts/4b3c4d4cbbdeeb49.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/4b3c4d4cbbdeeb49.png by scripts/register-cutouts.ts."
       }
     },
@@ -118,7 +118,7 @@
         "imageTransparentUrl": "/assets/cutouts/4cea0af9fe25c369.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/4cea0af9fe25c369.png by scripts/register-cutouts.ts."
       }
     },
@@ -137,7 +137,7 @@
         "imageTransparentUrl": "/assets/cutouts/561d375c28389500.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/561d375c28389500.png by scripts/register-cutouts.ts."
       }
     },
@@ -156,7 +156,7 @@
         "imageTransparentUrl": "/assets/cutouts/597372a8b97e783f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/597372a8b97e783f.png by scripts/register-cutouts.ts."
       }
     },
@@ -175,7 +175,7 @@
         "imageTransparentUrl": "/assets/cutouts/5f0c9a42e1eb6cd1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/5f0c9a42e1eb6cd1.png by scripts/register-cutouts.ts."
       }
     },
@@ -194,7 +194,7 @@
         "imageTransparentUrl": "/assets/cutouts/624766d90d2add01.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/624766d90d2add01.png by scripts/register-cutouts.ts."
       }
     },
@@ -213,7 +213,7 @@
         "imageTransparentUrl": "/assets/cutouts/6db5a6fbfe73cdca.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/6db5a6fbfe73cdca.png by scripts/register-cutouts.ts."
       }
     },
@@ -232,7 +232,7 @@
         "imageTransparentUrl": "/assets/cutouts/742da04bcfe236fc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/742da04bcfe236fc.png by scripts/register-cutouts.ts."
       }
     },
@@ -251,7 +251,7 @@
         "imageTransparentUrl": "/assets/cutouts/74ec37a10152f779.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/74ec37a10152f779.png by scripts/register-cutouts.ts."
       }
     },
@@ -270,7 +270,7 @@
         "imageTransparentUrl": "/assets/cutouts/7fb598eee85fa4a6.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/7fb598eee85fa4a6.png by scripts/register-cutouts.ts."
       }
     },
@@ -289,7 +289,7 @@
         "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/85f6cb6cd1ec6df2.png by scripts/register-cutouts.ts."
       }
     },
@@ -308,7 +308,7 @@
         "imageTransparentUrl": "/assets/cutouts/8e7cc7e0fb50a507.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/8e7cc7e0fb50a507.png by scripts/register-cutouts.ts."
       }
     },
@@ -320,13 +320,14 @@
         "id": "91d2606d3ed9958a",
         "brand": "Aritzia",
         "name": "The Super Puff The Super Puff Tote Bag in Black",
-        "category": "bag"
+        "category": "bag",
+        "currentTransparentUrl": "/assets/cutouts/91d2606d3ed9958a.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/91d2606d3ed9958a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/91d2606d3ed9958a.png by scripts/register-cutouts.ts."
       }
     },
@@ -345,7 +346,7 @@
         "imageTransparentUrl": "/assets/cutouts/9d9a77f2e03b6851.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/9d9a77f2e03b6851.png by scripts/register-cutouts.ts."
       }
     },
@@ -364,7 +365,7 @@
         "imageTransparentUrl": "/assets/cutouts/a4818afdac3cab16.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/a4818afdac3cab16.png by scripts/register-cutouts.ts."
       }
     },
@@ -383,7 +384,7 @@
         "imageTransparentUrl": "/assets/cutouts/ac42819e80705c93.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ac42819e80705c93.png by scripts/register-cutouts.ts."
       }
     },
@@ -402,7 +403,7 @@
         "imageTransparentUrl": "/assets/cutouts/b65e8cd40ecfc8dc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/b65e8cd40ecfc8dc.png by scripts/register-cutouts.ts."
       }
     },
@@ -421,7 +422,7 @@
         "imageTransparentUrl": "/assets/cutouts/ba6bc7345521288d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ba6bc7345521288d.png by scripts/register-cutouts.ts."
       }
     },
@@ -440,7 +441,7 @@
         "imageTransparentUrl": "/assets/cutouts/ba8f3b445e60ac75.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ba8f3b445e60ac75.png by scripts/register-cutouts.ts."
       }
     },
@@ -459,7 +460,7 @@
         "imageTransparentUrl": "/assets/cutouts/bbb420fc033899ac.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bbb420fc033899ac.png by scripts/register-cutouts.ts."
       }
     },
@@ -478,7 +479,7 @@
         "imageTransparentUrl": "/assets/cutouts/bc78a561ef3414cd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bc78a561ef3414cd.png by scripts/register-cutouts.ts."
       }
     },
@@ -497,7 +498,7 @@
         "imageTransparentUrl": "/assets/cutouts/bd242062ee37feb6.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/bd242062ee37feb6.png by scripts/register-cutouts.ts."
       }
     },
@@ -516,7 +517,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-bag-longchamp-lepliage.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-bag-longchamp-lepliage.png by scripts/register-cutouts.ts."
       }
     },
@@ -535,7 +536,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-shoes-nike-af1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-shoes-nike-af1.png by scripts/register-cutouts.ts."
       }
     },
@@ -554,7 +555,7 @@
         "imageTransparentUrl": "/assets/cutouts/catalog-shoes-stevemadden-heel.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/catalog-shoes-stevemadden-heel.png by scripts/register-cutouts.ts."
       }
     },
@@ -573,7 +574,7 @@
         "imageTransparentUrl": "/assets/cutouts/cf644945808d11f8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/cf644945808d11f8.png by scripts/register-cutouts.ts."
       }
     },
@@ -592,7 +593,7 @@
         "imageTransparentUrl": "/assets/cutouts/d38b67ed2950fc95.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/d38b67ed2950fc95.png by scripts/register-cutouts.ts."
       }
     },
@@ -611,7 +612,7 @@
         "imageTransparentUrl": "/assets/cutouts/d855f06268e8998f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/d855f06268e8998f.png by scripts/register-cutouts.ts."
       }
     },
@@ -630,7 +631,7 @@
         "imageTransparentUrl": "/assets/cutouts/ee1b0c35cccddadc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ee1b0c35cccddadc.png by scripts/register-cutouts.ts."
       }
     },
@@ -649,7 +650,7 @@
         "imageTransparentUrl": "/assets/cutouts/ef88c5af4ab9f7f5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/ef88c5af4ab9f7f5.png by scripts/register-cutouts.ts."
       }
     },
@@ -668,7 +669,7 @@
         "imageTransparentUrl": "/assets/cutouts/f2e4852913aacbdf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f2e4852913aacbdf.png by scripts/register-cutouts.ts."
       }
     },
@@ -687,7 +688,7 @@
         "imageTransparentUrl": "/assets/cutouts/f5186afd2ae75287.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f5186afd2ae75287.png by scripts/register-cutouts.ts."
       }
     },
@@ -706,7 +707,7 @@
         "imageTransparentUrl": "/assets/cutouts/f70fd86e50d9418c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/f70fd86e50d9418c.png by scripts/register-cutouts.ts."
       }
     },
@@ -725,7 +726,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-021735e8705aba59.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-021735e8705aba59.png by scripts/register-cutouts.ts."
       }
     },
@@ -744,7 +745,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-035f9f9fc0f43cba.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-035f9f9fc0f43cba.png by scripts/register-cutouts.ts."
       }
     },
@@ -763,7 +764,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-03bf3dee802d4e4d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-03bf3dee802d4e4d.png by scripts/register-cutouts.ts."
       }
     },
@@ -782,7 +783,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-041da4cfe0a7056b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-041da4cfe0a7056b.png by scripts/register-cutouts.ts."
       }
     },
@@ -801,7 +802,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-0dd8cfe08bb7a011.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-0dd8cfe08bb7a011.png by scripts/register-cutouts.ts."
       }
     },
@@ -820,7 +821,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-11143191925fe4be.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-11143191925fe4be.png by scripts/register-cutouts.ts."
       }
     },
@@ -839,7 +840,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-130411501038e332.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-130411501038e332.png by scripts/register-cutouts.ts."
       }
     },
@@ -858,7 +859,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-156d42979e60b705.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-156d42979e60b705.png by scripts/register-cutouts.ts."
       }
     },
@@ -877,7 +878,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-159e2aa9e34f2b1b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-159e2aa9e34f2b1b.png by scripts/register-cutouts.ts."
       }
     },
@@ -896,7 +897,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-16a4517c50e5ee1d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-16a4517c50e5ee1d.png by scripts/register-cutouts.ts."
       }
     },
@@ -915,7 +916,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-1f202726dff2f014.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-1f202726dff2f014.png by scripts/register-cutouts.ts."
       }
     },
@@ -934,8 +935,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-225686ca63c9d93c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-225686ca63c9d93c.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-275150bce379b9a7",
+      "assetPath": "/assets/cutouts/generated-275150bce379b9a7.png",
+      "matched": true,
+      "product": {
+        "id": "generated-275150bce379b9a7",
+        "brand": "UGG",
+        "name": "Ugg Classic Women Sweatpants - Sand Heather",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-275150bce379b9a7.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-275150bce379b9a7.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -953,7 +972,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2b668469c7d84f6e.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2b668469c7d84f6e.png by scripts/register-cutouts.ts."
       }
     },
@@ -972,7 +991,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2e0beab658a1e16a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2e0beab658a1e16a.png by scripts/register-cutouts.ts."
       }
     },
@@ -991,8 +1010,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-2eeb9177b2a156a5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-2eeb9177b2a156a5.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-2f1bfa27a4583c16",
+      "assetPath": "/assets/cutouts/generated-2f1bfa27a4583c16.png",
+      "matched": true,
+      "product": {
+        "id": "generated-2f1bfa27a4583c16",
+        "brand": "UGG",
+        "name": "UGG Men's Tasman Hoodie",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-2f1bfa27a4583c16.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-2f1bfa27a4583c16.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1010,7 +1047,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-30526b6c04e69ac5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-30526b6c04e69ac5.png by scripts/register-cutouts.ts."
       }
     },
@@ -1029,7 +1066,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3084801187d53eaa.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3084801187d53eaa.png by scripts/register-cutouts.ts."
       }
     },
@@ -1048,7 +1085,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3224e7e823112440.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3224e7e823112440.png by scripts/register-cutouts.ts."
       }
     },
@@ -1067,7 +1104,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-337c9d9b715b6bc1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-337c9d9b715b6bc1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1086,7 +1123,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-33973f1c68b0c2e0.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-33973f1c68b0c2e0.png by scripts/register-cutouts.ts."
       }
     },
@@ -1105,7 +1142,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-35f0341cafaf810d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-35f0341cafaf810d.png by scripts/register-cutouts.ts."
       }
     },
@@ -1124,7 +1161,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-361289fb3cdfa4c1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-361289fb3cdfa4c1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1143,7 +1180,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3869739e43797ced.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3869739e43797ced.png by scripts/register-cutouts.ts."
       }
     },
@@ -1162,7 +1199,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-3bd50b88a0cafbe5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-3bd50b88a0cafbe5.png by scripts/register-cutouts.ts."
       }
     },
@@ -1181,7 +1218,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-45eb351ccebff462.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-45eb351ccebff462.png by scripts/register-cutouts.ts."
       }
     },
@@ -1200,7 +1237,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-487eeeb7ad2ed5b2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-487eeeb7ad2ed5b2.png by scripts/register-cutouts.ts."
       }
     },
@@ -1219,7 +1256,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4cef990da518596a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4cef990da518596a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1238,7 +1275,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4e43016dfc8eedee.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4e43016dfc8eedee.png by scripts/register-cutouts.ts."
       }
     },
@@ -1257,7 +1294,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-4e5b08cc31bf2b02.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-4e5b08cc31bf2b02.png by scripts/register-cutouts.ts."
       }
     },
@@ -1276,7 +1313,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-502841f449c32876.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-502841f449c32876.png by scripts/register-cutouts.ts."
       }
     },
@@ -1295,7 +1332,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-527df40db87c7c7a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-527df40db87c7c7a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1314,7 +1351,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5587dad68bd0d169.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5587dad68bd0d169.png by scripts/register-cutouts.ts."
       }
     },
@@ -1333,7 +1370,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5741f5f0220aecd3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5741f5f0220aecd3.png by scripts/register-cutouts.ts."
       }
     },
@@ -1352,7 +1389,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-589e8f931d3c29f7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-589e8f931d3c29f7.png by scripts/register-cutouts.ts."
       }
     },
@@ -1371,7 +1408,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5a90055854903873.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5a90055854903873.png by scripts/register-cutouts.ts."
       }
     },
@@ -1390,7 +1427,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-5aefcd19a46a76a7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-5aefcd19a46a76a7.png by scripts/register-cutouts.ts."
       }
     },
@@ -1409,7 +1446,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-624a9117048c37d2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-624a9117048c37d2.png by scripts/register-cutouts.ts."
       }
     },
@@ -1428,7 +1465,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6256d844cd2f73bc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6256d844cd2f73bc.png by scripts/register-cutouts.ts."
       }
     },
@@ -1447,7 +1484,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-698a8369c72174c3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-698a8369c72174c3.png by scripts/register-cutouts.ts."
       }
     },
@@ -1466,7 +1503,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6de0f25f66c00cb1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6de0f25f66c00cb1.png by scripts/register-cutouts.ts."
       }
     },
@@ -1485,7 +1522,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-6de1b00357f7dd68.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-6de1b00357f7dd68.png by scripts/register-cutouts.ts."
       }
     },
@@ -1504,7 +1541,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-75790e3b8b9f7733.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-75790e3b8b9f7733.png by scripts/register-cutouts.ts."
       }
     },
@@ -1523,7 +1560,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-758ef28a0e13da4b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-758ef28a0e13da4b.png by scripts/register-cutouts.ts."
       }
     },
@@ -1542,7 +1579,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7788ea56c2c2841a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7788ea56c2c2841a.png by scripts/register-cutouts.ts."
       }
     },
@@ -1561,7 +1598,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7c557ad32e2c12be.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7c557ad32e2c12be.png by scripts/register-cutouts.ts."
       }
     },
@@ -1580,7 +1617,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7ca4be6cd09823e8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7ca4be6cd09823e8.png by scripts/register-cutouts.ts."
       }
     },
@@ -1599,7 +1636,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7f325d10068cfc1d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7f325d10068cfc1d.png by scripts/register-cutouts.ts."
       }
     },
@@ -1618,7 +1655,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-7fd5d321466f69e2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-7fd5d321466f69e2.png by scripts/register-cutouts.ts."
       }
     },
@@ -1630,13 +1667,14 @@
         "id": "generated-837496a0a03041b8",
         "brand": "Kohl's",
         "name": "Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
-        "category": "bottom"
+        "category": "bottom",
+        "currentTransparentUrl": "/assets/cutouts/generated-837496a0a03041b8.png"
       },
       "proposedPatch": {
         "imageTransparentUrl": "/assets/cutouts/generated-837496a0a03041b8.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-837496a0a03041b8.png by scripts/register-cutouts.ts."
       }
     },
@@ -1655,7 +1693,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-88f416d38d4962b4.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-88f416d38d4962b4.png by scripts/register-cutouts.ts."
       }
     },
@@ -1674,8 +1712,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-8c4ffd01ffe62765.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-8c4ffd01ffe62765.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-8d4e3bcd82077a3d",
+      "assetPath": "/assets/cutouts/generated-8d4e3bcd82077a3d.png",
+      "matched": true,
+      "product": {
+        "id": "generated-8d4e3bcd82077a3d",
+        "brand": "UGG",
+        "name": "UGG Joanne Bonded Fleece Hoodie & Bottoms - Women's",
+        "category": "outer"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-8d4e3bcd82077a3d.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-8d4e3bcd82077a3d.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1693,8 +1749,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-8f03b87432cc3508.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-8f03b87432cc3508.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-91163af986a5b635",
+      "assetPath": "/assets/cutouts/generated-91163af986a5b635.png",
+      "matched": true,
+      "product": {
+        "id": "generated-91163af986a5b635",
+        "brand": "UGG",
+        "name": "UGG Women's Classic Cotton Blend Sweatpants",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-91163af986a5b635.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-91163af986a5b635.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -1712,7 +1786,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-958408328a58e8bb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-958408328a58e8bb.png by scripts/register-cutouts.ts."
       }
     },
@@ -1731,7 +1805,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-97051a7bc7c0221f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-97051a7bc7c0221f.png by scripts/register-cutouts.ts."
       }
     },
@@ -1750,7 +1824,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9745d91b67c10bb9.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9745d91b67c10bb9.png by scripts/register-cutouts.ts."
       }
     },
@@ -1769,7 +1843,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9b9db014b2d9ed3b.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9b9db014b2d9ed3b.png by scripts/register-cutouts.ts."
       }
     },
@@ -1788,7 +1862,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-9bc59c9d7498e99f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-9bc59c9d7498e99f.png by scripts/register-cutouts.ts."
       }
     },
@@ -1807,7 +1881,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a1a725bebf4d9a53.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a1a725bebf4d9a53.png by scripts/register-cutouts.ts."
       }
     },
@@ -1826,7 +1900,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a40b4a1a792a2517.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a40b4a1a792a2517.png by scripts/register-cutouts.ts."
       }
     },
@@ -1845,7 +1919,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a5801e98c45f1cbf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a5801e98c45f1cbf.png by scripts/register-cutouts.ts."
       }
     },
@@ -1864,7 +1938,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a652be2c81696296.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a652be2c81696296.png by scripts/register-cutouts.ts."
       }
     },
@@ -1883,7 +1957,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-a98fa786d3efb6f3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-a98fa786d3efb6f3.png by scripts/register-cutouts.ts."
       }
     },
@@ -1902,7 +1976,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-aadcd62d367dcfcb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-aadcd62d367dcfcb.png by scripts/register-cutouts.ts."
       }
     },
@@ -1921,7 +1995,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ab5e6d73176190dd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ab5e6d73176190dd.png by scripts/register-cutouts.ts."
       }
     },
@@ -1940,7 +2014,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-adc7c43cad42c4cb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-adc7c43cad42c4cb.png by scripts/register-cutouts.ts."
       }
     },
@@ -1959,7 +2033,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b0b6e135c92a2b63.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b0b6e135c92a2b63.png by scripts/register-cutouts.ts."
       }
     },
@@ -1978,7 +2052,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b18046b88d650cff.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b18046b88d650cff.png by scripts/register-cutouts.ts."
       }
     },
@@ -1997,7 +2071,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b72613e805c41cbc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b72613e805c41cbc.png by scripts/register-cutouts.ts."
       }
     },
@@ -2016,7 +2090,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-b96a8896c72f00bf.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-b96a8896c72f00bf.png by scripts/register-cutouts.ts."
       }
     },
@@ -2035,7 +2109,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bb0fee93a3e25796.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bb0fee93a3e25796.png by scripts/register-cutouts.ts."
       }
     },
@@ -2054,8 +2128,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bc055db1ce947a03.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bc055db1ce947a03.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-bdef400df8894d74",
+      "assetPath": "/assets/cutouts/generated-bdef400df8894d74.png",
+      "matched": true,
+      "product": {
+        "id": "generated-bdef400df8894d74",
+        "brand": "UGG",
+        "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-bdef400df8894d74.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-bdef400df8894d74.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2073,7 +2165,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-be3dae134bffe286.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-be3dae134bffe286.png by scripts/register-cutouts.ts."
       }
     },
@@ -2092,7 +2184,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-bf4f3fe2a92cf5a3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-bf4f3fe2a92cf5a3.png by scripts/register-cutouts.ts."
       }
     },
@@ -2111,7 +2203,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c3564a6db0b7b1d0.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c3564a6db0b7b1d0.png by scripts/register-cutouts.ts."
       }
     },
@@ -2130,7 +2222,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c677c02745bffdd5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c677c02745bffdd5.png by scripts/register-cutouts.ts."
       }
     },
@@ -2149,7 +2241,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c8dab16c6c0f23f2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c8dab16c6c0f23f2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2168,7 +2260,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-c9b5c3c789523ffc.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-c9b5c3c789523ffc.png by scripts/register-cutouts.ts."
       }
     },
@@ -2187,7 +2279,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ca938ba8cedc6c1f.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ca938ba8cedc6c1f.png by scripts/register-cutouts.ts."
       }
     },
@@ -2206,7 +2298,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-cb9a8d25c4d3df34.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-cb9a8d25c4d3df34.png by scripts/register-cutouts.ts."
       }
     },
@@ -2225,7 +2317,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ced193ac65308724.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ced193ac65308724.png by scripts/register-cutouts.ts."
       }
     },
@@ -2244,7 +2336,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d040c1609028be81.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d040c1609028be81.png by scripts/register-cutouts.ts."
       }
     },
@@ -2263,8 +2355,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d21d09ad6fd72b69.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d21d09ad6fd72b69.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-d3d13a615df5b8b1",
+      "assetPath": "/assets/cutouts/generated-d3d13a615df5b8b1.png",
+      "matched": true,
+      "product": {
+        "id": "generated-d3d13a615df5b8b1",
+        "brand": "UGG",
+        "name": "Uggs Women's Sweatpants Set",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-d3d13a615df5b8b1.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-d3d13a615df5b8b1.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2282,7 +2392,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d64c113a09b624ae.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d64c113a09b624ae.png by scripts/register-cutouts.ts."
       }
     },
@@ -2301,7 +2411,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d7fe8cdb6fe638b2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d7fe8cdb6fe638b2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2320,7 +2430,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d846c2cc5d7d5160.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d846c2cc5d7d5160.png by scripts/register-cutouts.ts."
       }
     },
@@ -2339,7 +2449,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d888f3299a33a53c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d888f3299a33a53c.png by scripts/register-cutouts.ts."
       }
     },
@@ -2358,7 +2468,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-d8f231535ba88b4a.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-d8f231535ba88b4a.png by scripts/register-cutouts.ts."
       }
     },
@@ -2377,7 +2487,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-dc188b225d49fbd3.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-dc188b225d49fbd3.png by scripts/register-cutouts.ts."
       }
     },
@@ -2396,7 +2506,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ddc54504be20e392.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ddc54504be20e392.png by scripts/register-cutouts.ts."
       }
     },
@@ -2415,7 +2525,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-de7d7fa0912bedd2.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-de7d7fa0912bedd2.png by scripts/register-cutouts.ts."
       }
     },
@@ -2434,7 +2544,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e0ad64fcd8e46714.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e0ad64fcd8e46714.png by scripts/register-cutouts.ts."
       }
     },
@@ -2453,7 +2563,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e190f85176ee9be5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e190f85176ee9be5.png by scripts/register-cutouts.ts."
       }
     },
@@ -2472,7 +2582,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e6454b5080145d0e.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e6454b5080145d0e.png by scripts/register-cutouts.ts."
       }
     },
@@ -2491,7 +2601,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e658d4d99d9e357d.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e658d4d99d9e357d.png by scripts/register-cutouts.ts."
       }
     },
@@ -2510,8 +2620,26 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e6b0808f98ef5088.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e6b0808f98ef5088.png by scripts/register-cutouts.ts."
+      }
+    },
+    {
+      "id": "generated-e83a5278351c8f78",
+      "assetPath": "/assets/cutouts/generated-e83a5278351c8f78.png",
+      "matched": true,
+      "product": {
+        "id": "generated-e83a5278351c8f78",
+        "brand": "UGG",
+        "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
+        "category": "bottom"
+      },
+      "proposedPatch": {
+        "imageTransparentUrl": "/assets/cutouts/generated-e83a5278351c8f78.png",
+        "imageSource": "transparent-pipeline",
+        "imageStatus": "cutout-ready",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
+        "imageReviewNotes": "Registered from public/assets/cutouts/generated-e83a5278351c8f78.png by scripts/register-cutouts.ts."
       }
     },
     {
@@ -2529,7 +2657,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-e946a57f141dc54c.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-e946a57f141dc54c.png by scripts/register-cutouts.ts."
       }
     },
@@ -2548,7 +2676,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-edc1856050584cdb.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-edc1856050584cdb.png by scripts/register-cutouts.ts."
       }
     },
@@ -2567,7 +2695,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ef1ef5d28cfcf7d5.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef1ef5d28cfcf7d5.png by scripts/register-cutouts.ts."
       }
     },
@@ -2586,7 +2714,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-ef8c18a9ce9f8c03.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-ef8c18a9ce9f8c03.png by scripts/register-cutouts.ts."
       }
     },
@@ -2605,7 +2733,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-efe763d1bf479e59.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-efe763d1bf479e59.png by scripts/register-cutouts.ts."
       }
     },
@@ -2624,7 +2752,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-efea7e82501f92dd.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-efea7e82501f92dd.png by scripts/register-cutouts.ts."
       }
     },
@@ -2643,7 +2771,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-f1e5461b86e85cb7.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-f1e5461b86e85cb7.png by scripts/register-cutouts.ts."
       }
     },
@@ -2662,7 +2790,7 @@
         "imageTransparentUrl": "/assets/cutouts/generated-fc3ed530ee15b0e1.png",
         "imageSource": "transparent-pipeline",
         "imageStatus": "cutout-ready",
-        "imageUpdatedAt": "2026-05-17T15:24:43.509Z",
+        "imageUpdatedAt": "2026-05-17T16:41:28.180Z",
         "imageReviewNotes": "Registered from public/assets/cutouts/generated-fc3ed530ee15b0e1.png by scripts/register-cutouts.ts."
       }
     }

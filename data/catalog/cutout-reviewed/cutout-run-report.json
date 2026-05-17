@@ -1,38 +1,89 @@
 {
-  "generatedAt": "2026-05-17T15:24:28Z",
+  "generatedAt": "2026-05-17T16:41:11Z",
   "mode": "apply",
-  "limit": 2,
-  "categoryFilter": [
-    "bottom",
-    "bag"
+  "limit": 30,
+  "categoryFilter": [],
+  "categoryQuotas": {},
+  "targetVibes": [
+    "classic",
+    "street",
+    "work",
+    "cozy"
   ],
-  "categoryQuotas": {
-    "bottom": 1,
-    "bag": 1
-  },
+  "targetFrame": "androgynous",
   "rembgAvailable": true,
   "rembgError": null,
   "outputDir": "public/assets/cutouts",
   "items": [
     {
-      "id": "generated-837496a0a03041b8",
-      "brand": "Kohl's",
-      "name": "Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
+      "id": "generated-bdef400df8894d74",
+      "brand": "UGG",
+      "name": "11. XS/S Cozy Ugg Pullover and Olive pants 3 Piece Bundle with new satin olive baseball cap1",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8VQJ84SYOsty71kt2-Njf5Fpgu0opRdO2iTauBt2W3aPz8ysq77bQNcvt1T6XTPP73NdOm3u0ZvmY5dRRJkp9lLt_jkiTu2QViAtEF2o9kScbszO6OJs2mA",
-      "outputPath": "public/assets/cutouts/generated-837496a0a03041b8.png",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROjezAPRefJrgk-5_8wVXpXOyhum0krtVJd2Q1k5hQTKq0-DDUoTFl6sh2eESnocigBV_dQeZ1A7rbJX4dNRv72ksvcHyaF9Ac2U4dNmZkbBFglunGyREY",
+      "outputPath": "public/assets/cutouts/generated-bdef400df8894d74.png",
       "status": "generated",
-      "bytes": 135803
+      "bytes": 165627
     },
     {
-      "id": "91d2606d3ed9958a",
-      "brand": "Aritzia",
-      "name": "The Super Puff The Super Puff Tote Bag in Black",
-      "category": "bag",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcReIHF3ai_iq90QVZ8hpb8Tat8aTnaoOiAV2Yy2dLeVRxJp3cTbKtQ-oenoF0HL6QLmn0WO6qzP3JaYnzXoZUugvUdH6BelsJkCAAHgiVsqEO635DlU3OoL",
-      "outputPath": "public/assets/cutouts/91d2606d3ed9958a.png",
+      "id": "generated-e83a5278351c8f78",
+      "brand": "UGG",
+      "name": "UGG Australia. Women's Penny Fleece Port Lounge Sweat Pants /3X",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZ5fDVVS1uZFTAkD5ffyjKg5sfC6EYQ36cwYmcMMSepWZOMcGWZe6nrCK8gOqsZXghfpWAzErXfVNcva3zqkv7d5-quKAD",
+      "outputPath": "public/assets/cutouts/generated-e83a5278351c8f78.png",
       "status": "generated",
-      "bytes": 160955
+      "bytes": 16995
+    },
+    {
+      "id": "generated-275150bce379b9a7",
+      "brand": "UGG",
+      "name": "Ugg Classic Women Sweatpants - Sand Heather",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRT8aHLepMiPugzN2vhiG70FmpxwxI9pjIMuHaRYzOrZ9vwU14F_sO-VXyO_gahNu6BmnFkiEdx9tSOW0VkM1-HHNR6dGjfNTj-PHXQpd2m7GJ_ZOYusdF7vP0",
+      "outputPath": "public/assets/cutouts/generated-275150bce379b9a7.png",
+      "status": "generated",
+      "bytes": 198625
+    },
+    {
+      "id": "generated-91163af986a5b635",
+      "brand": "UGG",
+      "name": "UGG Women's Classic Cotton Blend Sweatpants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT2WZCd8wYvCKeXQXkH2FQ2ahYsElemzQX7uTf7VL5gqBQ03UmQwIDiHMJcR1s-loVSsL33tHg3Mac8uPgan3P6lJUwBHEliMMffTh1X5HlX7uzGQxNWiSRWOI",
+      "outputPath": "public/assets/cutouts/generated-91163af986a5b635.png",
+      "status": "generated",
+      "bytes": 177750
+    },
+    {
+      "id": "generated-d3d13a615df5b8b1",
+      "brand": "UGG",
+      "name": "Uggs Women's Sweatpants Set",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRf9PHWbHz5SBhPe4-6jWYi4wn-TLQF-sDN7cs2U5CeQFe_X8K1wR-dywwrNss6EvZQ3FizCl0N8tKctaGr6Zl3TizUNB8VXA",
+      "outputPath": "public/assets/cutouts/generated-d3d13a615df5b8b1.png",
+      "status": "generated",
+      "bytes": 28546
+    },
+    {
+      "id": "generated-8d4e3bcd82077a3d",
+      "brand": "UGG",
+      "name": "UGG Joanne Bonded Fleece Hoodie & Bottoms - Women's",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS9zclJU3P30WlEtN_gCj2jrYPFTARu9upTog5OsywY3-o4cG9rPp1a6VnDFico186E9A0oNdL-QBcbdPkh2OeAuKaWtuWrKQ",
+      "outputPath": "public/assets/cutouts/generated-8d4e3bcd82077a3d.png",
+      "status": "generated",
+      "bytes": 29321
+    },
+    {
+      "id": "generated-2f1bfa27a4583c16",
+      "brand": "UGG",
+      "name": "UGG Men's Tasman Hoodie",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTTDhykrnj6ZqonQZPfm9AOzcmEaFb6HyIC0YOEFlKDKr1KS_PKozUyY9aIW0ZVVdd56Z0rWiFXNvDIewdvG2AMhOoNQPqWwE_Mf_rPnNxmW9UgU9rN3JG2xA",
+      "outputPath": "public/assets/cutouts/generated-2f1bfa27a4583c16.png",
+      "status": "generated",
+      "bytes": 242821
     }
   ]
 }

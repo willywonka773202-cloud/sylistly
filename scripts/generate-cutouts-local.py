@@ -53,6 +53,16 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Comma-separated per-category quotas, e.g. eyewear:7,hat:6,jewelry:4,outer:7,shoes:3,bottom:3,bag:0.",
     )
+    parser.add_argument(
+        "--target-vibes",
+        default="",
+        help="Comma-separated vibe filter forwarded to prepare-cutout-candidates, e.g. classic,street,work,cozy.",
+    )
+    parser.add_argument(
+        "--target-frame",
+        default="",
+        help="Frame filter forwarded to prepare-cutout-candidates, e.g. androgynous.",
+    )
     return parser.parse_args()
 
 
@@ -87,6 +97,15 @@ def parse_categories(value: str) -> list[str]:
         if category in allowed and category not in categories:
             categories.append(category)
     return categories
+
+
+def parse_csv(value: str) -> list[str]:
+    values: list[str] = []
+    for raw in value.split(","):
+        normalized = raw.strip().lower()
+        if normalized and normalized not in values:
+            values.append(normalized)
+    return values
 
 
 def parse_category_quotas(value: str) -> dict[str, int]:
@@ -167,6 +186,8 @@ def load_candidates(
     candidate_json: Path | None,
     categories: list[str],
     category_quotas: dict[str, int] | None = None,
+    target_vibes: list[str] | None = None,
+    target_frame: str = "",
 ) -> list[dict[str, Any]]:
     if candidate_json:
         payload = json.loads(candidate_json.read_text(encoding="utf-8"))
@@ -175,10 +196,14 @@ def load_candidates(
         if not npx:
             raise RuntimeError("npx was not found on PATH; pass --candidate-json with a prepared report instead.")
         requested_quota_total = sum(category_quotas.values()) if category_quotas else 0
-        planner_limit = max(limit, requested_quota_total * 2, 60) if categories else limit
+        planner_limit = max(limit, requested_quota_total * 2, 60) if (categories or target_vibes or target_frame) else limit
         command = [npx, "jiti", "scripts/prepare-cutout-candidates.ts", f"--limit={planner_limit}", "--json"]
         if categories:
             command.append(f"--categories={','.join(categories)}")
+        if target_vibes:
+            command.append(f"--target-vibes={','.join(target_vibes)}")
+        if target_frame:
+            command.append(f"--target-frame={target_frame}")
         raw = subprocess.check_output(
             command,
             cwd=ROOT,
@@ -229,6 +254,8 @@ def write_report(report: dict[str, Any]) -> None:
 def main() -> int:
     args = parse_args()
     categories = parse_categories(args.categories)
+    target_vibes = parse_csv(args.target_vibes)
+    target_frame = args.target_frame.strip().lower()
     category_quotas = parse_category_quotas(args.category_quotas)
     if category_quotas:
         for category in category_quotas:
@@ -238,13 +265,15 @@ def main() -> int:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     has_rembg, rembg_error = rembg_available()
-    candidates = load_candidates(args.limit, args.candidate_json, categories, category_quotas or None)
+    candidates = load_candidates(args.limit, args.candidate_json, categories, category_quotas or None, target_vibes, target_frame)
     report: dict[str, Any] = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "mode": "apply" if args.apply else "dry-run",
         "limit": args.limit,
         "categoryFilter": categories,
         "categoryQuotas": {category: (category_quotas or DEFAULT_CATEGORY_QUOTAS).get(category, 0) for category in categories},
+        "targetVibes": target_vibes,
+        "targetFrame": target_frame,
         "rembgAvailable": has_rembg,
         "rembgError": rembg_error,
         "outputDir": str(CUTOUT_DIR.relative_to(ROOT)).replace(os.sep, "/"),
