@@ -71,7 +71,7 @@ function parseFlags(argv: string[]): CliFlags {
     else if (arg.startsWith('--input=')) flags.input = arg.slice('--input='.length);
     else if (arg.startsWith('--limit=')) {
       const n = Number.parseInt(arg.slice('--limit='.length), 10);
-      if (Number.isFinite(n) && n > 0) flags.limit = Math.min(n, 50);
+      if (Number.isFinite(n) && n > 0) flags.limit = Math.min(n, 200);
     } else if (arg.startsWith('--timeout-ms=')) {
       const n = Number.parseInt(arg.slice('--timeout-ms='.length), 10);
       if (Number.isFinite(n) && n >= 1000) flags.timeoutMs = Math.min(n, 30000);
@@ -118,6 +118,9 @@ function isUnsafeImageUrl(url: string): boolean {
   const lowered = url.toLowerCase();
   return !/^https?:\/\//i.test(url)
     || lowered.startsWith('data:')
+    || lowered.includes('${')
+    || lowered.includes('%7b')
+    || lowered.includes('%7d')
     || lowered.includes('placeholder')
     || lowered.includes('/logo')
     || lowered.includes('logo_')
