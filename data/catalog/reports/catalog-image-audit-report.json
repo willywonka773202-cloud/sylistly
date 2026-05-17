@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-17T13:02:45.307Z",
+  "generatedAt": "2026-05-17T14:18:10.354Z",
   "totals": {
     "products": 680,
-    "withTransparent": 110,
-    "withOriginalOnly": 480,
+    "withTransparent": 140,
+    "withOriginalOnly": 450,
     "withUnsafeImage": 90,
-    "needsCutoutPriority": 480
+    "needsCutoutPriority": 450
   },
   "bySource": [
     {
@@ -19,29 +19,29 @@
     {
       "label": "generated-catalog",
       "total": 175,
-      "withTransparent": 86,
-      "withOriginalOnly": 89,
+      "withTransparent": 102,
+      "withOriginalOnly": 73,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 89
+      "needsCutoutPriority": 73
     },
     {
       "label": "photo-catalog",
       "total": 410,
-      "withTransparent": 21,
-      "withOriginalOnly": 389,
+      "withTransparent": 35,
+      "withOriginalOnly": 375,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 389
+      "needsCutoutPriority": 375
     }
   ],
   "byCategoryNeedingCutout": {
-    "outer": 110,
-    "bottom": 82,
+    "outer": 103,
+    "bottom": 79,
     "top": 74,
-    "hat": 66,
-    "jewelry": 44,
+    "hat": 60,
     "bag": 40,
-    "shoes": 35,
-    "eyewear": 29
+    "jewelry": 40,
+    "shoes": 32,
+    "eyewear": 22
   },
   "topCutoutCandidates": [
     {
@@ -1087,48 +1087,6 @@
       "name": "The Effortless Pant",
       "category": "bottom",
       "imageUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-d846c2cc5d7d5160",
-      "brand": "H&M",
-      "name": "H&M Men's Regular-Fit Suit Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRD_5_2qwifxbWG1wKcS6tJz0hPqw7BnOP1rN9UYR_mR9b8CJLJLZALfOwAk78DmV2IbMwEcUnYawJPcQOSg_-oJDF5LI0jOYYQEnYCCm8qStWEb_CsWi2A",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-5741f5f0220aecd3",
-      "brand": "J.Crew",
-      "name": "J.Crew Women's Hampton Linen-Blend Beach Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYd_YeYVOzhUWiC2-ulE5bowDIs1zLMJFHE0yze1mX5pJ1z0gY-IhPlZRL-wIAeBK8oNCcPY5sCkVdxcsg4xPaeM91jGe5olDPHhq9iFgSH8bmPc0Q1SDu",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-4e43016dfc8eedee",
-      "brand": "Jos. A. Bank",
-      "name": "Jos. A. Bank Men's Tailored Fit Comfort Stretch Dress Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFD95xhndVCT7Nb-bqvbU0RFydDFGhFYEi2ULnB7sBDGXaHikCvvPLF1l6ojepn5vFQyKALAHq96ovPhKxxBzbVNp9r4qSS5EQ5kyvHM9qOPi2Ea0ThoUqcw",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -2230,48 +2188,6 @@
     },
     {
       "source": "photo-catalog",
-      "id": "1590fdbf9e938ba2",
-      "brand": "Adidas",
-      "name": "Women's Campus 00s",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTObA8jOIfY8phCvB9K7SywGyC64HJ-Qyev3RK5c76LLExrnuV62VWtLgIZ2ByPGIFOqXNCt18NRVgumCRhPZc-yfqFfKz3790jacPz9RomQtcu8yfziKb-ZQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "photo-catalog",
-      "id": "624766d90d2add01",
-      "brand": "Adidas",
-      "name": "Women's Campus 00s Low",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRWXJWHO72Q_Eoj6_zxXXwInUi06ENJKhpKuHC6fg059ULqDDEz1l2h3n21v5xqaE_Rtwh20Nz9VxT9MbyyB5VI6UfznhmvwomtLFp1t3zV-RK--L7G6JbKsg",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "photo-catalog",
-      "id": "74ec37a10152f779",
-      "brand": "Adidas",
-      "name": "Women's Originals Gazelle Bold",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ-aCNdmNYbN-5lb_mkq2CEeMNi-tSs72sYZeCkcJAF9xozUxMsw4Wf1oqszXb9Enfbw4fdh8PqxO0kQOqGN2zqZV9mVpiMQMFG99YRVgrd0FdU3fBLgeEaRA",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "photo-catalog",
       "id": "308ab130cf25efc7",
       "brand": "Adidas",
       "name": "Women's Originals Gazelle Indoor Casual Shoes",
@@ -2720,104 +2636,6 @@
     },
     {
       "source": "generated-catalog",
-      "id": "generated-502841f449c32876",
-      "brand": "Etsy - Seller",
-      "name": "Men's Modern Tailored Fit Blazer and Trouser Outfit",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSa2j1EvdToVsyQ5WLY9jdJgzPk7nXJlm3n_3jAwVvw_8bq00Qvdk9sP5-nqDs_7rklL_a3KBWEPa4DWclS7_RfXxQyLt5suMo6PIeROZ2L",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-361289fb3cdfa4c1",
-      "brand": "Etsy - Seller",
-      "name": "Men's Stylish Quilted Fur Puffer Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQq_ZadBBUAyRwilLeAybbcud1mn_lRUvy-o2gIc2trHBOrujLeG6jLLqrL9OQ5zniJ5VSsGp7zu2RhEk1QQwid-ZBib4AnZVV6RPnU4FY",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-c8dab16c6c0f23f2",
-      "brand": "Etsy - Seller",
-      "name": "Preppy Knit Pleated Skirt and Cardigan Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQIn3vIhxIIqd1tqufiOuM9mhdougV8lo0Wio-iCvlsmDg7x495cXIi314w_MgM9PlciaA_8LJ4j15Mga82CeF3qwzf61E-9cR1x1MLIKc",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-a5801e98c45f1cbf",
-      "brand": "Etsy - Seller",
-      "name": "Women's Tailored Blazer Pant Suit",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS3RkY_Goim-QV0KwAqwOyaHhGM_7at4F7XfkMOJiADsP0loJdzcEo53DzojYnlaDPGnFNR5ebN3ZIdJTTF-YiOuin_mTdTRt28mlFFkgU",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-edc1856050584cdb",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova 3 Piece Long Sleeve Sweater Cardigan Mini Skirt Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQiMnlg1Niu_-k-cfGOyencOaWhSCuP3BzCMtnvUFMk0SeMWxT_qyJw_IVk5uJzIJf2yPA3x-665A4U7kAZbS9WWpdD6AXbWK2CkDFQjQ2qW9f5GHVHnpNLzg",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-9745d91b67c10bb9",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Alessia Cable Knit Puffer Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTSDaAwItnMOYpTlgqeumkj1a1TtZXp5YYnn9axuLC40Ur0lHn-q1UMjKLu65TOS1Ce6wErYvZNQOma7K1Sso3HfRmVKXwxEyBmp5CkbuEjM0mXfwlYZVMYiQ",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-0dd8cfe08bb7a011",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Blazer and Straight Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSKMm4Y-Kk5Hc0Z0AS-PTA-LmshTcGfrCzf2RUIZRCnX0q0eN0ju6cxkEZaeTwJ9M4ORcYFtKVYScdDYtVrGX0-8i6RE6MGXBudHCYuSokXceUvqWP7hTMO0A",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
       "id": "generated-ce58332aab800a94",
       "brand": "Fashion Nova",
       "name": "Fashion Nova Long Sleeve Blazer and Wide Leg Pant Set",
@@ -2837,6 +2655,188 @@
       "name": "Fashion Nova Long Sleeve Blazer Skinny Pant Set",
       "category": "outer",
       "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTl2WdDJ-3IMmWdigf_p6AuHNQvZxJzw_LiToZWGTeME0giqUjtH1kOSOMt_vmbcoNsdEElZrHoPH5lj8fV0PzEgUQNGGFet5S3Zvetj3YBuBKTEPZQ6335",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-f0e7bfe9cff043d9",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Cardigan Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSnsHZVS6skPHDzptL7IXuXq5XBvf2D0T6J04V-s2ELji8rGLrJ9bPIZF4h1YVWHNBXOEiUR1bftfxFPpRBAiG-jBZNU4xp5Dec6YPfnDSDuGhdUsFJcvzK",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-7709b5e5769a8e76",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Satin Blazer Straight Leg Pant Set in Black, Size",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQgNea2BSByfh4vq1J77jJEERjxN7lkq3sQz4cdQEEoiiaxMqXXG02mg9RfKwdQdOp6POEe907sFMQ0TpU26-R6zy0-vnYNpfQ4FffTuxItB3NyyOziMtak",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-99542fd664d775ef",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Tweed Blazer Straight Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRokO8AWv805AKYGwzCp7rdHEF7f4TUnKvNMu_xpFECCE0QxujjZANcUlIHBn1nlodBWBkzRy-TZArJK9Q-X8_8qUm0KT3Ojje2K-xw9usZPUAgEM5FYkOo",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-0e18fa1391190bba",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Tweed Cardigan Flare Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSONhGEtf6LXb_tUMlJbU4vWTgVTOxcLeL81_rG2KiJMNAA2lSvBmLLghu2bz4HeAJK8mLGy1DuIDpvTXxgi0h1vjx8wstsvHQ2rxM3Gd41xWdItJhvl91l",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-f3212c62c5d40d22",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Long Sleeve Twill Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQo3JryOGGWmwUQlN66UHnzmt3_cQB7LJQGUR4YhTY0sdEqdc61OoBtCma4KNRQATzxgOxk0Om7cRiPSy2awG_Ax8EP_IG6abHeWs0MllBqPAt-KQVwL8JvFA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-99fdae77bcd417ac",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Men's Modern Stretch Suit Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTiQUncIhCtPIuMkO-L233ZP10WvFtodQ5xBa9gg-gyST-pwpZj_lRB8TsL9klkiTRiCloL73qSViZsmnWf8VMfkxdlMPHUlf_JmkTFMzkPJl7dtv4QfV_45kA",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-8d0a40412cd7c0af",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Tie Waist Long Sleeve Blazer and Wide Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQXuAL9Ue0dSSByvcaJN2i678z0PsN4oNCDrCPIyqtimLF2t9bkXmXQu0zMfNPvYlYoIRlyeUfTTyB9ZpuNktxJEjbGGWF9lJ3Xs_lG9wHJM9iMojejL816",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-130d1c8797765e26",
+      "brand": "H&M",
+      "name": "H&M Ladies Double-Breasted Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQmS0HcZTAYQ2ig5gHZEBSP4Dcl9hXbfrIfopcjdTPT65FSOv1fM7uiuzrfJBKcbxEbV47GRITp1j1qP6Xs6-rEkbj80XmYanD7eC0zrdVu4-0vMoOWsCRh",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-61904954680f6ff8",
+      "brand": "H&M",
+      "name": "H&M Ladies Gathered-Sleeve Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTZF-0xrVzYznIdFflw1QQzMgTp3p7ILA3CCkKIqKOR7ZDnNe9Nn3KlSTigcWTPWZy4JY67iivvekpTsjPQPFT8OFnkcwsBejt1kAEvLxn7vFniHr9v5iMgeQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-9f7712f662e0034d",
+      "brand": "H&M",
+      "name": "H&M Men's Regular-Fit Single-Breasted Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS1rfp32yj067dfj7fwpn8VWogXP3hrnHaxX-JjrCjqVPi1WgPKOs3ux96wZtHI61p-VazCwFwwoBHbEjikOlx0qVk7u4fGvCe1cngtSZifgTm2f_OBwuEnmQ",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-3f53600f50b5ed48",
+      "brand": "Kimes Ranch",
+      "name": "Kimes Ranch Women's Becca Belted Denim Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRqoQEUyEKXGRWZEjnLIXD4ZEhkkqwWBYy5Q-wfNjJTOqMvJV3gsp7_6wVG8GB-aRlrv8i9Lm10ZcTOG0GA7gqhTulOFkBnYUsnQblotFCvc7JwcOFBkTdfJw",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-2e20fec284a6cd6b",
+      "brand": "Lands' End",
+      "name": "Lands' End Men's Travel Kit Chino Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQc2nLeV1HOxqx2bikGcdQ5Wd9SbAMIrvACwToajELDbW3eyvHFqXg0Y468pvhDxx7CozS5bQ9dKTvr8frxCbhbVTCpw4XBeEMtNf3kCDKJb1TI9pjtc9d6",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-f403e370ccf52a12",
+      "brand": "LightInTheBox",
+      "name": "Men's Polyester Cloth Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQR8zbLjfD0JPUBzSCgTHIL8QrVbsu-LowCGZds2FtziFSEaRMvCAGWZTv9rjeIbvUPrz5wTNk3yBMapsysePz16grDbGlSOZzh6VXUsrB6tejqdqEJJvoaQA",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -3099,6 +3099,33 @@
       "productImageShouldPrefer": true
     },
     {
+      "id": "generated-d846c2cc5d7d5160",
+      "title": "H&M H&M Men's Regular-Fit Suit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRD_5_2qwifxbWG1wKcS6tJz0hPqw7BnOP1rN9UYR_mR9b8CJLJLZALfOwAk78DmV2IbMwEcUnYawJPcQOSg_-oJDF5LI0jOYYQEnYCCm8qStWEb_CsWi2A",
+      "imageTransparentUrl": "/assets/cutouts/generated-d846c2cc5d7d5160.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-5741f5f0220aecd3",
+      "title": "J.Crew J.Crew Women's Hampton Linen-Blend Beach Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYd_YeYVOzhUWiC2-ulE5bowDIs1zLMJFHE0yze1mX5pJ1z0gY-IhPlZRL-wIAeBK8oNCcPY5sCkVdxcsg4xPaeM91jGe5olDPHhq9iFgSH8bmPc0Q1SDu",
+      "imageTransparentUrl": "/assets/cutouts/generated-5741f5f0220aecd3.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-4e43016dfc8eedee",
+      "title": "Jos. A. Bank Jos. A. Bank Men's Tailored Fit Comfort Stretch Dress Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFD95xhndVCT7Nb-bqvbU0RFydDFGhFYEi2ULnB7sBDGXaHikCvvPLF1l6ojepn5vFQyKALAHq96ovPhKxxBzbVNp9r4qSS5EQ5kyvHM9qOPi2Ea0ThoUqcw",
+      "imageTransparentUrl": "/assets/cutouts/generated-4e43016dfc8eedee.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
       "id": "f2e4852913aacbdf",
       "title": "Nike Men's Oversized Cargo Shorts",
       "category": "bottom",
@@ -3113,6 +3140,69 @@
       "category": "bottom",
       "imageUrl": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/405c6ae0-927f-4876-ba0a-24fdb36752ff/M%2BNK%2BCLUB%2BWVN%2BCARGO%2BPANT%2BCLCTN.png",
       "imageTransparentUrl": "/assets/cutouts/85f6cb6cd1ec6df2.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "ef88c5af4ab9f7f5",
+      "title": "END. Clothing Gentle Monster Lamda Cat",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTZC-TleFb5NKYfBhSV3vU7Ju1wCY6IF-9ihdwXIJHS212iVwOIsA69qNWaoKeDpvWi-zobJEQmItOgNedQqgT3SiyesNHpBwE62LJCfbiM1JV1dKSwHq1g_w",
+      "imageTransparentUrl": "/assets/cutouts/ef88c5af4ab9f7f5.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "6db5a6fbfe73cdca",
+      "title": "farfetch.com Gentle Monster Alan K2 Square Sunglasses in Khaki Acetate",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSPuIzu0bId7gVe4ox3gOS3y9nXAB-XTl3pzPHxDlFw9aYfTYd8GqjVRMat6TnruitPGsSrp4XRLAaO9cTJhnaeL_VM5jsay0H3CHscUwiDbBatGPSM5t6c1_s",
+      "imageTransparentUrl": "/assets/cutouts/6db5a6fbfe73cdca.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "bbb420fc033899ac",
+      "title": "farfetch.com Gentle Monster By Row 01 Classic Square Sunglasses",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS4i3o0tvjIVU9EyZ5t4DBXxmewIUgT71Z_j8ZUfcdjdAREsMzno2-_JD8kXSLacaOcyhU_JIyrcqI6gKeW-ILPCpPoUkDFk2rqOCBjfxe9xg3VeGhiYTKh",
+      "imageTransparentUrl": "/assets/cutouts/bbb420fc033899ac.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "d38b67ed2950fc95",
+      "title": "farfetch.com Gentle Monster Panini 01 Square Acetate Glasses",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSdYhrs9PJ9aFWyUY-w11rrm4OZoJfIhItIEkWRbDYabHQPa0YukbdIBS8mA8IuidYvYAv8X_jyhI5TWTPQkO1lL0Ocum7XrUwjVN34urx0kJ5L3JAHiBueTMg",
+      "imageTransparentUrl": "/assets/cutouts/d38b67ed2950fc95.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "8e7cc7e0fb50a507",
+      "title": "farfetch.com Versace Eyewear - Medusa Biggie sunglasses - women - Acetate - 40",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTJv6EC-jh5-7H7wKd4Q2LcPiJ0lbv0GTOST25dAwOy3viw_sF_WHjVhh5Dajct5HrxA8774kbDMnWmxNz85hpsNIZJlJGMmDuUTsnVshQOW-GtwhpwJTEqqcQ",
+      "imageTransparentUrl": "/assets/cutouts/8e7cc7e0fb50a507.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "4cea0af9fe25c369",
+      "title": "farfetch.com Versace Medusa Biggie Pilot",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS8jO84ghmylEfHU5oTnmE8CI0oggJeTM0q8sa7B3s-kFH7NBFsYNeba0VpekR3b-j05WEqZNEtIbaAs2MSzs3feP5EGGDvRBofXux_f-kv4R6WVUUcSPQ2bVI",
+      "imageTransparentUrl": "/assets/cutouts/4cea0af9fe25c369.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "bd242062ee37feb6",
+      "title": "Gucci Cat",
+      "category": "eyewear",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR5iRWM85GX84hoWy62Aq1XDd_3g25PNYHp6FVE2FZSjNcZRz7EtO4JvTSX6ZRfwizsI1c8E8we53BIu76Vj_CXOi65wNsBSQ",
+      "imageTransparentUrl": "/assets/cutouts/bd242062ee37feb6.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3162,6 +3252,60 @@
       "productImageShouldPrefer": true
     },
     {
+      "id": "generated-97051a7bc7c0221f",
+      "title": "Etsy - AsatreCo Hemp Linen Wide Brim Stripe Sun Hat",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ0yUvg3E57M-gQ__jhI6hyMRL9tvVYwBEVW2gPAzLVBBGuLAoSA70lZjTFXa0oU6MfIvcDJJXwnl4Oc3kl8uykHN9EOF15e4niS75njEXK",
+      "imageTransparentUrl": "/assets/cutouts/generated-97051a7bc7c0221f.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-11143191925fe4be",
+      "title": "Etsy - LGlinen Foldable Linen Wide Brim Hat",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSUjX77tKADFpzJgzyOBsV50VKcpW6qp6f6WKgzO6iJankPB6f8INic1P0fx5DV7rhRT4qDlrIQ62ri9O5U4J4Lbzlaclt62myjPlxpqTZmNE0scZx_GWWp",
+      "imageTransparentUrl": "/assets/cutouts/generated-11143191925fe4be.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-c9b5c3c789523ffc",
+      "title": "Etsy - Seller Stylish Western Denim Hat with Embroidery",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQAx__g-IHprQp2a_lPNgdW11YjIH9BGl93B1iN6rR-zbpxYGqxpGHqgfey2nryFxpo1sYyk4GtLUqQ_fIHYl9AnLPhYfGZ0EMOPjrgeV-b3cPLlRBa8bLVchaw",
+      "imageTransparentUrl": "/assets/cutouts/generated-c9b5c3c789523ffc.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-fc3ed530ee15b0e1",
+      "title": "HSN Vince Camuto Western Belted Felt Cowboy Hat",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTyQ3VWGj6jptzNcpi94G9qsJCYYze7LkvUihnQQa0LEJmNdwxaC63a43J-rD8LF_83EwwMCP8akdqWAHJlmyNhi55YzG44Hhq0YZNLCyaXqmbX3oxi0ISA",
+      "imageTransparentUrl": "/assets/cutouts/generated-fc3ed530ee15b0e1.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-7f325d10068cfc1d",
+      "title": "Temu 3pcs Women's Western Denim Costume Set Includes Cowboy Hat, Bandana, Cowboy outfit for women, Western outfits women, Cowboy clothes for women, Belt",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTW6MkE_b_SWAGU6zpIb1zxyezDejQRNU1EwLh0lttCNfP_848ftFs94bO6AWR_MWr0arhfSPbOkyQnYaqIJuEZkXbZ7AKPrCJSWBQATRib6SpCfW52-S2DmA",
+      "imageTransparentUrl": "/assets/cutouts/generated-7f325d10068cfc1d.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-6de0f25f66c00cb1",
+      "title": "Walmart - Comdrip Denim Cowgirl Hat! Comdrip Western Cowboy Hat for Women Man Wide Brim Cowboy Hat for Costume Dress Up Cosplay Cowboy Hat Jean Cowboy Hat Blue M, Adult",
+      "category": "hat",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTzIgtwZwkUIph874MYoJ1jUwaXXrPolMx5C2ts6dmiRFjn7zXUKpFpRyZvdzT2MNvhWRFtW3t7mLyI4x9jBsf3VdV5-k4i",
+      "imageTransparentUrl": "/assets/cutouts/generated-6de0f25f66c00cb1.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
       "id": "5f0c9a42e1eb6cd1",
       "title": "END. Clothing Missoma x Savi Triple Ridge Hoop Earrings in Silver",
       "category": "jewelry",
@@ -3194,6 +3338,42 @@
       "category": "jewelry",
       "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTnSz0R4e4d25QEi-bgZWgii1T08Cb5UqJ5G7rk1IfkXFtzgKFhw-1gregeXvksX0GU1ffVMUrzYlKTxpND1I-kp2i8BAn7UQ",
       "imageTransparentUrl": "/assets/cutouts/ba8f3b445e60ac75.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "0e0b0d3079442b71",
+      "title": "Mejuri 14K Yellow Gold Thin Dome Statement Ring",
+      "category": "jewelry",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSSyDnW861JYyzNQc4U_NlQg5l_G21dEr1uGANhyLN-8Bj2sV4knRghRHb3Ybtp8matR9a0K4QO7Zm-dWFr_M6XJA8dja2Pobsao4kWqWZSsZYnNMgBzGJs0c-j",
+      "imageTransparentUrl": "/assets/cutouts/0e0b0d3079442b71.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "561d375c28389500",
+      "title": "Mejuri Dome Silver Statement Ring",
+      "category": "jewelry",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTE0NWV-3iinmDg5XL-yb_1zxW44S6uLP9OlfbDE8ui3FBCTwelF5FGLoO1ousQX9a38t2bBTtNBcS4IFY-3dYII4j59kMw7eLsHCWeCx-MtsH1jpPNo0Ma52g",
+      "imageTransparentUrl": "/assets/cutouts/561d375c28389500.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "742da04bcfe236fc",
+      "title": "Mejuri Gold Vermeil",
+      "category": "jewelry",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSvMcCIQG1vsnrWax_FGjcYM5s0gbxWIoFUY9MD3Nnck28_1ajOM4Hib46IyflGAL4iBXbH9FmLdW60TYB-MHn9l7CtMjHDoX6CSRud4e2OSBD-G-hsI783yDQU",
+      "imageTransparentUrl": "/assets/cutouts/742da04bcfe236fc.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "7fb598eee85fa4a6",
+      "title": "Mejuri Gold Vermeil Dome Ring",
+      "category": "jewelry",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ3bmtBiE5K_TNk5I4YubZnps_Krad-IvKN-i2MfvJ1JPZNMTvgnudVunEqS0i4RUAO_QTfIwky1x5SiNEeeRWX8TxgCkKX5PtFeq-nPBRWZJ2r9Kv8EnlGgTE",
+      "imageTransparentUrl": "/assets/cutouts/7fb598eee85fa4a6.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3315,6 +3495,69 @@
       "productImageShouldPrefer": true
     },
     {
+      "id": "generated-502841f449c32876",
+      "title": "Etsy - Seller Men's Modern Tailored Fit Blazer and Trouser Outfit",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSa2j1EvdToVsyQ5WLY9jdJgzPk7nXJlm3n_3jAwVvw_8bq00Qvdk9sP5-nqDs_7rklL_a3KBWEPa4DWclS7_RfXxQyLt5suMo6PIeROZ2L",
+      "imageTransparentUrl": "/assets/cutouts/generated-502841f449c32876.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-361289fb3cdfa4c1",
+      "title": "Etsy - Seller Men's Stylish Quilted Fur Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQq_ZadBBUAyRwilLeAybbcud1mn_lRUvy-o2gIc2trHBOrujLeG6jLLqrL9OQ5zniJ5VSsGp7zu2RhEk1QQwid-ZBib4AnZVV6RPnU4FY",
+      "imageTransparentUrl": "/assets/cutouts/generated-361289fb3cdfa4c1.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-c8dab16c6c0f23f2",
+      "title": "Etsy - Seller Preppy Knit Pleated Skirt and Cardigan Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQIn3vIhxIIqd1tqufiOuM9mhdougV8lo0Wio-iCvlsmDg7x495cXIi314w_MgM9PlciaA_8LJ4j15Mga82CeF3qwzf61E-9cR1x1MLIKc",
+      "imageTransparentUrl": "/assets/cutouts/generated-c8dab16c6c0f23f2.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-a5801e98c45f1cbf",
+      "title": "Etsy - Seller Women's Tailored Blazer Pant Suit",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS3RkY_Goim-QV0KwAqwOyaHhGM_7at4F7XfkMOJiADsP0loJdzcEo53DzojYnlaDPGnFNR5ebN3ZIdJTTF-YiOuin_mTdTRt28mlFFkgU",
+      "imageTransparentUrl": "/assets/cutouts/generated-a5801e98c45f1cbf.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-edc1856050584cdb",
+      "title": "Fashion Nova Fashion Nova 3 Piece Long Sleeve Sweater Cardigan Mini Skirt Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQiMnlg1Niu_-k-cfGOyencOaWhSCuP3BzCMtnvUFMk0SeMWxT_qyJw_IVk5uJzIJf2yPA3x-665A4U7kAZbS9WWpdD6AXbWK2CkDFQjQ2qW9f5GHVHnpNLzg",
+      "imageTransparentUrl": "/assets/cutouts/generated-edc1856050584cdb.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-9745d91b67c10bb9",
+      "title": "Fashion Nova Fashion Nova Alessia Cable Knit Puffer Jacket",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTSDaAwItnMOYpTlgqeumkj1a1TtZXp5YYnn9axuLC40Ur0lHn-q1UMjKLu65TOS1Ce6wErYvZNQOma7K1Sso3HfRmVKXwxEyBmp5CkbuEjM0mXfwlYZVMYiQ",
+      "imageTransparentUrl": "/assets/cutouts/generated-9745d91b67c10bb9.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-0dd8cfe08bb7a011",
+      "title": "Fashion Nova Fashion Nova Long Sleeve Blazer and Straight Leg Pant Set",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSKMm4Y-Kk5Hc0Z0AS-PTA-LmshTcGfrCzf2RUIZRCnX0q0eN0ju6cxkEZaeTwJ9M4ORcYFtKVYScdDYtVrGX0-8i6RE6MGXBudHCYuSokXceUvqWP7hTMO0A",
+      "imageTransparentUrl": "/assets/cutouts/generated-0dd8cfe08bb7a011.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
       "id": "cf644945808d11f8",
       "title": "Adidas 'Campus 00s Beta' Sneakers",
       "category": "shoes",
@@ -3392,6 +3635,33 @@
       "category": "shoes",
       "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR0He9fmObR4yK6kqSPuBubFP_p1lmNfRO37_7M0M2NzbkiWjWVE_gf6XT8MENlbHc4i2Ti3nLNcLss7t5H0G7A3JEJHbhhd8_kbV6EAOlyx0aHmAvNVf6kBg",
       "imageTransparentUrl": "/assets/cutouts/2eb1265214ad2ebf.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "1590fdbf9e938ba2",
+      "title": "Adidas Women's Campus 00s",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTObA8jOIfY8phCvB9K7SywGyC64HJ-Qyev3RK5c76LLExrnuV62VWtLgIZ2ByPGIFOqXNCt18NRVgumCRhPZc-yfqFfKz3790jacPz9RomQtcu8yfziKb-ZQ",
+      "imageTransparentUrl": "/assets/cutouts/1590fdbf9e938ba2.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "624766d90d2add01",
+      "title": "Adidas Women's Campus 00s Low",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRWXJWHO72Q_Eoj6_zxXXwInUi06ENJKhpKuHC6fg059ULqDDEz1l2h3n21v5xqaE_Rtwh20Nz9VxT9MbyyB5VI6UfznhmvwomtLFp1t3zV-RK--L7G6JbKsg",
+      "imageTransparentUrl": "/assets/cutouts/624766d90d2add01.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "74ec37a10152f779",
+      "title": "Adidas Women's Originals Gazelle Bold",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ-aCNdmNYbN-5lb_mkq2CEeMNi-tSs72sYZeCkcJAF9xozUxMsw4Wf1oqszXb9Enfbw4fdh8PqxO0kQOqGN2zqZV9mVpiMQMFG99YRVgrd0FdU3fBLgeEaRA",
+      "imageTransparentUrl": "/assets/cutouts/74ec37a10152f779.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -4074,8 +4344,8 @@
   },
   "generatedAssets": {
     "cutoutDir": "public/assets/cutouts",
-    "totalFiles": 108,
-    "registeredFiles": 108,
+    "totalFiles": 138,
+    "registeredFiles": 138,
     "missingCatalogRegistration": [],
     "registeredLocalUrlsMissingFiles": []
   }

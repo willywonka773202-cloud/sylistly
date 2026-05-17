@@ -75,7 +75,7 @@ const transparentTargets: Record<Category, number> = {
   jewelry: 8,
 };
 
-const nextBatchCategories: Category[] = ['bottom', 'shoes', 'outer', 'bag', 'hat', 'jewelry'];
+const nextBatchCategories: Category[] = ['eyewear', 'hat', 'jewelry', 'outer', 'shoes', 'bottom', 'bag'];
 
 export default function CatalogLabPage() {
   const products = ALL_CATALOG_PRODUCTS as Product[];
