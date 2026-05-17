@@ -1,328 +1,38 @@
 {
-  "generatedAt": "2026-05-17T14:15:52Z",
+  "generatedAt": "2026-05-17T15:24:28Z",
   "mode": "apply",
-  "limit": 30,
+  "limit": 2,
   "categoryFilter": [
-    "eyewear",
-    "hat",
-    "jewelry",
-    "outer",
-    "shoes",
     "bottom",
     "bag"
   ],
   "categoryQuotas": {
-    "eyewear": 7,
-    "hat": 6,
-    "jewelry": 4,
-    "outer": 7,
-    "shoes": 3,
-    "bottom": 3,
-    "bag": 0
+    "bottom": 1,
+    "bag": 1
   },
   "rembgAvailable": true,
   "rembgError": null,
   "outputDir": "public/assets/cutouts",
   "items": [
     {
-      "id": "ef88c5af4ab9f7f5",
-      "brand": "END. Clothing",
-      "name": "Gentle Monster Lamda Cat",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTZC-TleFb5NKYfBhSV3vU7Ju1wCY6IF-9ihdwXIJHS212iVwOIsA69qNWaoKeDpvWi-zobJEQmItOgNedQqgT3SiyesNHpBwE62LJCfbiM1JV1dKSwHq1g_w",
-      "outputPath": "public/assets/cutouts/ef88c5af4ab9f7f5.png",
-      "status": "generated",
-      "bytes": 152877
-    },
-    {
-      "id": "6db5a6fbfe73cdca",
-      "brand": "farfetch.com",
-      "name": "Gentle Monster Alan K2 Square Sunglasses in Khaki Acetate",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSPuIzu0bId7gVe4ox3gOS3y9nXAB-XTl3pzPHxDlFw9aYfTYd8GqjVRMat6TnruitPGsSrp4XRLAaO9cTJhnaeL_VM5jsay0H3CHscUwiDbBatGPSM5t6c1_s",
-      "outputPath": "public/assets/cutouts/6db5a6fbfe73cdca.png",
-      "status": "generated",
-      "bytes": 57710
-    },
-    {
-      "id": "bbb420fc033899ac",
-      "brand": "farfetch.com",
-      "name": "Gentle Monster By Row 01 Classic Square Sunglasses",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS4i3o0tvjIVU9EyZ5t4DBXxmewIUgT71Z_j8ZUfcdjdAREsMzno2-_JD8kXSLacaOcyhU_JIyrcqI6gKeW-ILPCpPoUkDFk2rqOCBjfxe9xg3VeGhiYTKh",
-      "outputPath": "public/assets/cutouts/bbb420fc033899ac.png",
-      "status": "generated",
-      "bytes": 67094
-    },
-    {
-      "id": "d38b67ed2950fc95",
-      "brand": "farfetch.com",
-      "name": "Gentle Monster Panini 01 Square Acetate Glasses",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSdYhrs9PJ9aFWyUY-w11rrm4OZoJfIhItIEkWRbDYabHQPa0YukbdIBS8mA8IuidYvYAv8X_jyhI5TWTPQkO1lL0Ocum7XrUwjVN34urx0kJ5L3JAHiBueTMg",
-      "outputPath": "public/assets/cutouts/d38b67ed2950fc95.png",
-      "status": "generated",
-      "bytes": 44831
-    },
-    {
-      "id": "8e7cc7e0fb50a507",
-      "brand": "farfetch.com",
-      "name": "Versace Eyewear - Medusa Biggie sunglasses - women - Acetate - 40",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTJv6EC-jh5-7H7wKd4Q2LcPiJ0lbv0GTOST25dAwOy3viw_sF_WHjVhh5Dajct5HrxA8774kbDMnWmxNz85hpsNIZJlJGMmDuUTsnVshQOW-GtwhpwJTEqqcQ",
-      "outputPath": "public/assets/cutouts/8e7cc7e0fb50a507.png",
-      "status": "generated",
-      "bytes": 52177
-    },
-    {
-      "id": "4cea0af9fe25c369",
-      "brand": "farfetch.com",
-      "name": "Versace Medusa Biggie Pilot",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS8jO84ghmylEfHU5oTnmE8CI0oggJeTM0q8sa7B3s-kFH7NBFsYNeba0VpekR3b-j05WEqZNEtIbaAs2MSzs3feP5EGGDvRBofXux_f-kv4R6WVUUcSPQ2bVI",
-      "outputPath": "public/assets/cutouts/4cea0af9fe25c369.png",
-      "status": "generated",
-      "bytes": 91635
-    },
-    {
-      "id": "bd242062ee37feb6",
-      "brand": "Gucci",
-      "name": "Cat",
-      "category": "eyewear",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR5iRWM85GX84hoWy62Aq1XDd_3g25PNYHp6FVE2FZSjNcZRz7EtO4JvTSX6ZRfwizsI1c8E8we53BIu76Vj_CXOi65wNsBSQ",
-      "outputPath": "public/assets/cutouts/bd242062ee37feb6.png",
-      "status": "generated",
-      "bytes": 37436
-    },
-    {
-      "id": "generated-97051a7bc7c0221f",
-      "brand": "Etsy - AsatreCo",
-      "name": "Hemp Linen Wide Brim Stripe Sun Hat",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ0yUvg3E57M-gQ__jhI6hyMRL9tvVYwBEVW2gPAzLVBBGuLAoSA70lZjTFXa0oU6MfIvcDJJXwnl4Oc3kl8uykHN9EOF15e4niS75njEXK",
-      "outputPath": "public/assets/cutouts/generated-97051a7bc7c0221f.png",
-      "status": "generated",
-      "bytes": 172274
-    },
-    {
-      "id": "generated-11143191925fe4be",
-      "brand": "Etsy - LGlinen",
-      "name": "Foldable Linen Wide Brim Hat",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSUjX77tKADFpzJgzyOBsV50VKcpW6qp6f6WKgzO6iJankPB6f8INic1P0fx5DV7rhRT4qDlrIQ62ri9O5U4J4Lbzlaclt62myjPlxpqTZmNE0scZx_GWWp",
-      "outputPath": "public/assets/cutouts/generated-11143191925fe4be.png",
-      "status": "generated",
-      "bytes": 386102
-    },
-    {
-      "id": "generated-c9b5c3c789523ffc",
-      "brand": "Etsy - Seller",
-      "name": "Stylish Western Denim Hat with Embroidery",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQAx__g-IHprQp2a_lPNgdW11YjIH9BGl93B1iN6rR-zbpxYGqxpGHqgfey2nryFxpo1sYyk4GtLUqQ_fIHYl9AnLPhYfGZ0EMOPjrgeV-b3cPLlRBa8bLVchaw",
-      "outputPath": "public/assets/cutouts/generated-c9b5c3c789523ffc.png",
-      "status": "generated",
-      "bytes": 649159
-    },
-    {
-      "id": "generated-fc3ed530ee15b0e1",
-      "brand": "HSN",
-      "name": "Vince Camuto Western Belted Felt Cowboy Hat",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTyQ3VWGj6jptzNcpi94G9qsJCYYze7LkvUihnQQa0LEJmNdwxaC63a43J-rD8LF_83EwwMCP8akdqWAHJlmyNhi55YzG44Hhq0YZNLCyaXqmbX3oxi0ISA",
-      "outputPath": "public/assets/cutouts/generated-fc3ed530ee15b0e1.png",
-      "status": "generated",
-      "bytes": 299587
-    },
-    {
-      "id": "generated-7f325d10068cfc1d",
-      "brand": "Temu",
-      "name": "3pcs Women's Western Denim Costume Set Includes Cowboy Hat, Bandana, Cowboy outfit for women, Western outfits women, Cowboy clothes for women, Belt",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTW6MkE_b_SWAGU6zpIb1zxyezDejQRNU1EwLh0lttCNfP_848ftFs94bO6AWR_MWr0arhfSPbOkyQnYaqIJuEZkXbZ7AKPrCJSWBQATRib6SpCfW52-S2DmA",
-      "outputPath": "public/assets/cutouts/generated-7f325d10068cfc1d.png",
-      "status": "generated",
-      "bytes": 428399
-    },
-    {
-      "id": "generated-6de0f25f66c00cb1",
-      "brand": "Walmart - Comdrip",
-      "name": "Denim Cowgirl Hat! Comdrip Western Cowboy Hat for Women Man Wide Brim Cowboy Hat for Costume Dress Up Cosplay Cowboy Hat Jean Cowboy Hat Blue M, Adult",
-      "category": "hat",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTzIgtwZwkUIph874MYoJ1jUwaXXrPolMx5C2ts6dmiRFjn7zXUKpFpRyZvdzT2MNvhWRFtW3t7mLyI4x9jBsf3VdV5-k4i",
-      "outputPath": "public/assets/cutouts/generated-6de0f25f66c00cb1.png",
-      "status": "generated",
-      "bytes": 217342
-    },
-    {
-      "id": "0e0b0d3079442b71",
-      "brand": "Mejuri",
-      "name": "14K Yellow Gold Thin Dome Statement Ring",
-      "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSSyDnW861JYyzNQc4U_NlQg5l_G21dEr1uGANhyLN-8Bj2sV4knRghRHb3Ybtp8matR9a0K4QO7Zm-dWFr_M6XJA8dja2Pobsao4kWqWZSsZYnNMgBzGJs0c-j",
-      "outputPath": "public/assets/cutouts/0e0b0d3079442b71.png",
-      "status": "generated",
-      "bytes": 74602
-    },
-    {
-      "id": "561d375c28389500",
-      "brand": "Mejuri",
-      "name": "Dome Silver Statement Ring",
-      "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTE0NWV-3iinmDg5XL-yb_1zxW44S6uLP9OlfbDE8ui3FBCTwelF5FGLoO1ousQX9a38t2bBTtNBcS4IFY-3dYII4j59kMw7eLsHCWeCx-MtsH1jpPNo0Ma52g",
-      "outputPath": "public/assets/cutouts/561d375c28389500.png",
-      "status": "generated",
-      "bytes": 217436
-    },
-    {
-      "id": "742da04bcfe236fc",
-      "brand": "Mejuri",
-      "name": "Gold Vermeil",
-      "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSvMcCIQG1vsnrWax_FGjcYM5s0gbxWIoFUY9MD3Nnck28_1ajOM4Hib46IyflGAL4iBXbH9FmLdW60TYB-MHn9l7CtMjHDoX6CSRud4e2OSBD-G-hsI783yDQU",
-      "outputPath": "public/assets/cutouts/742da04bcfe236fc.png",
-      "status": "generated",
-      "bytes": 165310
-    },
-    {
-      "id": "7fb598eee85fa4a6",
-      "brand": "Mejuri",
-      "name": "Gold Vermeil Dome Ring",
-      "category": "jewelry",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ3bmtBiE5K_TNk5I4YubZnps_Krad-IvKN-i2MfvJ1JPZNMTvgnudVunEqS0i4RUAO_QTfIwky1x5SiNEeeRWX8TxgCkKX5PtFeq-nPBRWZJ2r9Kv8EnlGgTE",
-      "outputPath": "public/assets/cutouts/7fb598eee85fa4a6.png",
-      "status": "generated",
-      "bytes": 226484
-    },
-    {
-      "id": "generated-502841f449c32876",
-      "brand": "Etsy - Seller",
-      "name": "Men's Modern Tailored Fit Blazer and Trouser Outfit",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSa2j1EvdToVsyQ5WLY9jdJgzPk7nXJlm3n_3jAwVvw_8bq00Qvdk9sP5-nqDs_7rklL_a3KBWEPa4DWclS7_RfXxQyLt5suMo6PIeROZ2L",
-      "outputPath": "public/assets/cutouts/generated-502841f449c32876.png",
-      "status": "generated",
-      "bytes": 189341
-    },
-    {
-      "id": "generated-361289fb3cdfa4c1",
-      "brand": "Etsy - Seller",
-      "name": "Men's Stylish Quilted Fur Puffer Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQq_ZadBBUAyRwilLeAybbcud1mn_lRUvy-o2gIc2trHBOrujLeG6jLLqrL9OQ5zniJ5VSsGp7zu2RhEk1QQwid-ZBib4AnZVV6RPnU4FY",
-      "outputPath": "public/assets/cutouts/generated-361289fb3cdfa4c1.png",
-      "status": "generated",
-      "bytes": 361958
-    },
-    {
-      "id": "generated-c8dab16c6c0f23f2",
-      "brand": "Etsy - Seller",
-      "name": "Preppy Knit Pleated Skirt and Cardigan Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQIn3vIhxIIqd1tqufiOuM9mhdougV8lo0Wio-iCvlsmDg7x495cXIi314w_MgM9PlciaA_8LJ4j15Mga82CeF3qwzf61E-9cR1x1MLIKc",
-      "outputPath": "public/assets/cutouts/generated-c8dab16c6c0f23f2.png",
-      "status": "generated",
-      "bytes": 89168
-    },
-    {
-      "id": "generated-a5801e98c45f1cbf",
-      "brand": "Etsy - Seller",
-      "name": "Women's Tailored Blazer Pant Suit",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS3RkY_Goim-QV0KwAqwOyaHhGM_7at4F7XfkMOJiADsP0loJdzcEo53DzojYnlaDPGnFNR5ebN3ZIdJTTF-YiOuin_mTdTRt28mlFFkgU",
-      "outputPath": "public/assets/cutouts/generated-a5801e98c45f1cbf.png",
-      "status": "generated",
-      "bytes": 288706
-    },
-    {
-      "id": "generated-edc1856050584cdb",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova 3 Piece Long Sleeve Sweater Cardigan Mini Skirt Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQiMnlg1Niu_-k-cfGOyencOaWhSCuP3BzCMtnvUFMk0SeMWxT_qyJw_IVk5uJzIJf2yPA3x-665A4U7kAZbS9WWpdD6AXbWK2CkDFQjQ2qW9f5GHVHnpNLzg",
-      "outputPath": "public/assets/cutouts/generated-edc1856050584cdb.png",
-      "status": "generated",
-      "bytes": 168200
-    },
-    {
-      "id": "generated-9745d91b67c10bb9",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Alessia Cable Knit Puffer Jacket",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTSDaAwItnMOYpTlgqeumkj1a1TtZXp5YYnn9axuLC40Ur0lHn-q1UMjKLu65TOS1Ce6wErYvZNQOma7K1Sso3HfRmVKXwxEyBmp5CkbuEjM0mXfwlYZVMYiQ",
-      "outputPath": "public/assets/cutouts/generated-9745d91b67c10bb9.png",
-      "status": "generated",
-      "bytes": 469415
-    },
-    {
-      "id": "generated-0dd8cfe08bb7a011",
-      "brand": "Fashion Nova",
-      "name": "Fashion Nova Long Sleeve Blazer and Straight Leg Pant Set",
-      "category": "outer",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSKMm4Y-Kk5Hc0Z0AS-PTA-LmshTcGfrCzf2RUIZRCnX0q0eN0ju6cxkEZaeTwJ9M4ORcYFtKVYScdDYtVrGX0-8i6RE6MGXBudHCYuSokXceUvqWP7hTMO0A",
-      "outputPath": "public/assets/cutouts/generated-0dd8cfe08bb7a011.png",
-      "status": "generated",
-      "bytes": 100784
-    },
-    {
-      "id": "1590fdbf9e938ba2",
-      "brand": "Adidas",
-      "name": "Women's Campus 00s",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTObA8jOIfY8phCvB9K7SywGyC64HJ-Qyev3RK5c76LLExrnuV62VWtLgIZ2ByPGIFOqXNCt18NRVgumCRhPZc-yfqFfKz3790jacPz9RomQtcu8yfziKb-ZQ",
-      "outputPath": "public/assets/cutouts/1590fdbf9e938ba2.png",
-      "status": "generated",
-      "bytes": 347619
-    },
-    {
-      "id": "624766d90d2add01",
-      "brand": "Adidas",
-      "name": "Women's Campus 00s Low",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRWXJWHO72Q_Eoj6_zxXXwInUi06ENJKhpKuHC6fg059ULqDDEz1l2h3n21v5xqaE_Rtwh20Nz9VxT9MbyyB5VI6UfznhmvwomtLFp1t3zV-RK--L7G6JbKsg",
-      "outputPath": "public/assets/cutouts/624766d90d2add01.png",
-      "status": "generated",
-      "bytes": 323722
-    },
-    {
-      "id": "74ec37a10152f779",
-      "brand": "Adidas",
-      "name": "Women's Originals Gazelle Bold",
-      "category": "shoes",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ-aCNdmNYbN-5lb_mkq2CEeMNi-tSs72sYZeCkcJAF9xozUxMsw4Wf1oqszXb9Enfbw4fdh8PqxO0kQOqGN2zqZV9mVpiMQMFG99YRVgrd0FdU3fBLgeEaRA",
-      "outputPath": "public/assets/cutouts/74ec37a10152f779.png",
-      "status": "generated",
-      "bytes": 373105
-    },
-    {
-      "id": "generated-d846c2cc5d7d5160",
-      "brand": "H&M",
-      "name": "H&M Men's Regular-Fit Suit Pants",
+      "id": "generated-837496a0a03041b8",
+      "brand": "Kohl's",
+      "name": "Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
       "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRD_5_2qwifxbWG1wKcS6tJz0hPqw7BnOP1rN9UYR_mR9b8CJLJLZALfOwAk78DmV2IbMwEcUnYawJPcQOSg_-oJDF5LI0jOYYQEnYCCm8qStWEb_CsWi2A",
-      "outputPath": "public/assets/cutouts/generated-d846c2cc5d7d5160.png",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8VQJ84SYOsty71kt2-Njf5Fpgu0opRdO2iTauBt2W3aPz8ysq77bQNcvt1T6XTPP73NdOm3u0ZvmY5dRRJkp9lLt_jkiTu2QViAtEF2o9kScbszO6OJs2mA",
+      "outputPath": "public/assets/cutouts/generated-837496a0a03041b8.png",
       "status": "generated",
-      "bytes": 131721
+      "bytes": 135803
     },
     {
-      "id": "generated-5741f5f0220aecd3",
-      "brand": "J.Crew",
-      "name": "J.Crew Women's Hampton Linen-Blend Beach Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTYd_YeYVOzhUWiC2-ulE5bowDIs1zLMJFHE0yze1mX5pJ1z0gY-IhPlZRL-wIAeBK8oNCcPY5sCkVdxcsg4xPaeM91jGe5olDPHhq9iFgSH8bmPc0Q1SDu",
-      "outputPath": "public/assets/cutouts/generated-5741f5f0220aecd3.png",
+      "id": "91d2606d3ed9958a",
+      "brand": "Aritzia",
+      "name": "The Super Puff The Super Puff Tote Bag in Black",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcReIHF3ai_iq90QVZ8hpb8Tat8aTnaoOiAV2Yy2dLeVRxJp3cTbKtQ-oenoF0HL6QLmn0WO6qzP3JaYnzXoZUugvUdH6BelsJkCAAHgiVsqEO635DlU3OoL",
+      "outputPath": "public/assets/cutouts/91d2606d3ed9958a.png",
       "status": "generated",
-      "bytes": 164952
-    },
-    {
-      "id": "generated-4e43016dfc8eedee",
-      "brand": "Jos. A. Bank",
-      "name": "Jos. A. Bank Men's Tailored Fit Comfort Stretch Dress Pants",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFD95xhndVCT7Nb-bqvbU0RFydDFGhFYEi2ULnB7sBDGXaHikCvvPLF1l6ojepn5vFQyKALAHq96ovPhKxxBzbVNp9r4qSS5EQ5kyvHM9qOPi2Ea0ThoUqcw",
-      "outputPath": "public/assets/cutouts/generated-4e43016dfc8eedee.png",
-      "status": "generated",
-      "bytes": 126062
+      "bytes": 160955
     }
   ]
 }

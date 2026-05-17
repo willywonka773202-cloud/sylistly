@@ -1,36 +1,36 @@
 {
-  "generatedAt": "2026-05-17T14:18:10.308Z",
+  "generatedAt": "2026-05-17T15:24:52.678Z",
   "totalRuntimeProducts": 674,
-  "transparentProducts": 138,
-  "transparentCoveragePercent": 20.5,
+  "transparentProducts": 140,
+  "transparentCoveragePercent": 20.8,
   "transparentOnlySafe": false,
-  "generatorTransparentSubsetReady": false,
+  "generatorTransparentSubsetReady": true,
   "feedFirst50TransparentSubsetReady": false,
   "countsByCategory": {
     "hat": 10,
     "outer": 20,
     "top": 39,
-    "bottom": 24,
+    "bottom": 25,
     "shoes": 20,
-    "bag": 9,
+    "bag": 10,
     "eyewear": 8,
     "jewelry": 8
   },
   "countsByFrame": {
-    "masc": 60,
+    "masc": 61,
     "fem": 49,
-    "androgynous": 28,
+    "androgynous": 29,
     "any": 1
   },
   "countsByVibe": {
-    "old money": 63,
-    "preppy": 63,
-    "business casual": 63,
-    "night": 58,
-    "date": 58,
-    "office": 56,
-    "clean": 36,
-    "minimal": 36,
+    "old money": 64,
+    "preppy": 64,
+    "business casual": 64,
+    "night": 59,
+    "date": 59,
+    "office": 57,
+    "clean": 38,
+    "minimal": 38,
     "casual": 29,
     "gym": 26,
     "athletic": 26,
@@ -54,22 +54,8 @@
   },
   "failedRequirements": [
     {
-      "label": "bottom transparent coverage",
-      "actual": 24,
-      "target": 25,
-      "passed": false,
-      "reason": "Transparent-only needs enough bottom options for generation variety."
-    },
-    {
-      "label": "bag transparent coverage",
-      "actual": 9,
-      "target": 10,
-      "passed": false,
-      "reason": "Transparent-only needs enough bag options for generation variety."
-    },
-    {
       "label": "androgynous frame coverage",
-      "actual": 28,
+      "actual": 29,
       "target": 30,
       "passed": false,
       "reason": "Transparent-only should not collapse recommendations for androgynous users."
@@ -126,11 +112,25 @@
       "reason": "Transparent-only needs enough top options for generation variety."
     },
     {
+      "label": "bottom transparent coverage",
+      "actual": 25,
+      "target": 25,
+      "passed": true,
+      "reason": "Transparent-only needs enough bottom options for generation variety."
+    },
+    {
       "label": "shoes transparent coverage",
       "actual": 20,
       "target": 20,
       "passed": true,
       "reason": "Transparent-only needs enough shoes options for generation variety."
+    },
+    {
+      "label": "bag transparent coverage",
+      "actual": 10,
+      "target": 10,
+      "passed": true,
+      "reason": "Transparent-only needs enough bag options for generation variety."
     },
     {
       "label": "eyewear transparent coverage",
@@ -148,7 +148,7 @@
     },
     {
       "label": "masc frame coverage",
-      "actual": 60,
+      "actual": 61,
       "target": 30,
       "passed": true,
       "reason": "Transparent-only should not collapse recommendations for masc users."
@@ -162,7 +162,7 @@
     },
     {
       "label": "date vibe coverage",
-      "actual": 58,
+      "actual": 59,
       "target": 12,
       "passed": true,
       "reason": "Transparent-only needs enough date pieces for Feed and Build variety."

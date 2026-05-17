@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-17T14:18:10.354Z",
+  "generatedAt": "2026-05-17T15:24:52.804Z",
   "totals": {
     "products": 680,
-    "withTransparent": 140,
-    "withOriginalOnly": 450,
+    "withTransparent": 142,
+    "withOriginalOnly": 448,
     "withUnsafeImage": 90,
-    "needsCutoutPriority": 450
+    "needsCutoutPriority": 448
   },
   "bySource": [
     {
@@ -19,27 +19,27 @@
     {
       "label": "generated-catalog",
       "total": 175,
-      "withTransparent": 102,
-      "withOriginalOnly": 73,
+      "withTransparent": 103,
+      "withOriginalOnly": 72,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 73
+      "needsCutoutPriority": 72
     },
     {
       "label": "photo-catalog",
       "total": 410,
-      "withTransparent": 35,
-      "withOriginalOnly": 375,
+      "withTransparent": 36,
+      "withOriginalOnly": 374,
       "withUnsafeImage": 0,
-      "needsCutoutPriority": 375
+      "needsCutoutPriority": 374
     }
   ],
   "byCategoryNeedingCutout": {
     "outer": 103,
-    "bottom": 79,
+    "bottom": 78,
     "top": 74,
     "hat": 60,
-    "bag": 40,
     "jewelry": 40,
+    "bag": 39,
     "shoes": 32,
     "eyewear": 22
   },
@@ -1087,20 +1087,6 @@
       "name": "The Effortless Pant",
       "category": "bottom",
       "imageUrl": "https://assets.aritzia.com/image/upload/c_crop%2Car_1920%3A2623%2Cg_south/q_auto%2Cf_auto%2Cdpr_auto/s22_04_a06_91837_19451_on_a",
-      "hasTransparent": false,
-      "isSafe": true,
-      "needsCutout": true,
-      "signals": [
-        "needs-cutout"
-      ]
-    },
-    {
-      "source": "generated-catalog",
-      "id": "generated-837496a0a03041b8",
-      "brand": "Kohl's",
-      "name": "Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
-      "category": "bottom",
-      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8VQJ84SYOsty71kt2-Njf5Fpgu0opRdO2iTauBt2W3aPz8ysq77bQNcvt1T6XTPP73NdOm3u0ZvmY5dRRJkp9lLt_jkiTu2QViAtEF2o9kScbszO6OJs2mA",
       "hasTransparent": false,
       "isSafe": true,
       "needsCutout": true,
@@ -2843,6 +2829,20 @@
       "signals": [
         "needs-cutout"
       ]
+    },
+    {
+      "source": "generated-catalog",
+      "id": "generated-c9f89dd10953eeb0",
+      "brand": "LightInTheBox",
+      "name": "Men's Puffer Jacket with Pockets",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRPBnHrk4sorRHbaSbelcwoLyabgCCjLTyKDwcLf_fV7cN8LVhMQEAWQgC4LKT7J7ACpCdqj3sY1rKQH1piejSsg6JuoMQakKiyeds0TAwGbt6T028amOAlfg",
+      "hasTransparent": false,
+      "isSafe": true,
+      "needsCutout": true,
+      "signals": [
+        "needs-cutout"
+      ]
     }
   ],
   "runtimeTransparentProducts": [
@@ -2870,6 +2870,15 @@
       "category": "bag",
       "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSa5bPooHD587CeCIJiZ_a5UlIieZmUSBneIvEmRjO4VOLH4LmykqXAD7H-ELcaDO3lPNZH58MmzeuAFEmz7Fub8-Womb634unuhbEaFixf2sOBoDYzNdssJQ",
       "imageTransparentUrl": "/assets/cutouts/9d9a77f2e03b6851.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "91d2606d3ed9958a",
+      "title": "Aritzia The Super Puff The Super Puff Tote Bag in Black",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcReIHF3ai_iq90QVZ8hpb8Tat8aTnaoOiAV2Yy2dLeVRxJp3cTbKtQ-oenoF0HL6QLmn0WO6qzP3JaYnzXoZUugvUdH6BelsJkCAAHgiVsqEO635DlU3OoL",
+      "imageTransparentUrl": "/assets/cutouts/91d2606d3ed9958a.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -3122,6 +3131,15 @@
       "category": "bottom",
       "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRFD95xhndVCT7Nb-bqvbU0RFydDFGhFYEi2ULnB7sBDGXaHikCvvPLF1l6ojepn5vFQyKALAHq96ovPhKxxBzbVNp9r4qSS5EQ5kyvHM9qOPi2Ea0ThoUqcw",
       "imageTransparentUrl": "/assets/cutouts/generated-4e43016dfc8eedee.png",
+      "publicFileExists": true,
+      "productImageShouldPrefer": true
+    },
+    {
+      "id": "generated-837496a0a03041b8",
+      "title": "Kohl's Dockers Men's Classic Fit Workday Khaki Pants with Smart 360 Flex",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8VQJ84SYOsty71kt2-Njf5Fpgu0opRdO2iTauBt2W3aPz8ysq77bQNcvt1T6XTPP73NdOm3u0ZvmY5dRRJkp9lLt_jkiTu2QViAtEF2o9kScbszO6OJs2mA",
+      "imageTransparentUrl": "/assets/cutouts/generated-837496a0a03041b8.png",
       "publicFileExists": true,
       "productImageShouldPrefer": true
     },
@@ -4110,6 +4128,12 @@
         "section": "Discover: Transparent-ready pieces rail"
       },
       {
+        "id": "91d2606d3ed9958a",
+        "title": "Aritzia The Super Puff The Super Puff Tote Bag in Black",
+        "category": "bag",
+        "section": "Discover: Transparent-ready pieces rail"
+      },
+      {
         "id": "generated-45eb351ccebff462",
         "title": "eBay - vicky1870 Ivory Linen Dress Size L With Tote, Hat And Jewelry Set",
         "category": "bag",
@@ -4228,12 +4252,6 @@
         "title": "Gap Gap Women's 365 High Rise Linen-Blend Trousers",
         "category": "bottom",
         "section": "Discover: Transparent-ready pieces rail"
-      },
-      {
-        "id": "generated-5a90055854903873",
-        "title": "GustoNYC NY Street Tech V1 Cargo Pants",
-        "category": "bottom",
-        "section": "Discover: Transparent-ready pieces rail"
       }
     ],
     "feedFirst50": [
@@ -4250,6 +4268,11 @@
       {
         "id": "9d9a77f2e03b6851",
         "title": "Aritzia Teddy Bear Awayday Tote Bag",
+        "category": "bag"
+      },
+      {
+        "id": "91d2606d3ed9958a",
+        "title": "Aritzia The Super Puff The Super Puff Tote Bag in Black",
         "category": "bag"
       },
       {
@@ -4331,11 +4354,6 @@
         "id": "generated-b0b6e135c92a2b63",
         "title": "Fashion Nova Fashion Nova Men's Versatile Slim Cargo Pants",
         "category": "bottom"
-      },
-      {
-        "id": "generated-bc055db1ce947a03",
-        "title": "Fashion Nova Fashion Nova Women's Linen Beach Walks Pants",
-        "category": "bottom"
       }
     ],
     "wardrobe": "Visible after the user adds a transparent-ready product to closet or wishlist.",
@@ -4344,8 +4362,8 @@
   },
   "generatedAssets": {
     "cutoutDir": "public/assets/cutouts",
-    "totalFiles": 138,
-    "registeredFiles": 138,
+    "totalFiles": 140,
+    "registeredFiles": 140,
     "missingCatalogRegistration": [],
     "registeredLocalUrlsMissingFiles": []
   }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T14:18:10.355Z",
+  "generatedAt": "2026-05-17T15:24:52.778Z",
   "total": 674,
   "byCategory": {
     "hat": 77,
@@ -250,17 +250,17 @@
     }
   ],
   "transparent": {
-    "withTransparent": 138,
-    "originalOnly": 447,
+    "withTransparent": 140,
+    "originalOnly": 445,
     "unsafeImages": 89,
-    "needsCutout": 447,
+    "needsCutout": 445,
     "transparentByCategory": {
       "hat": 10,
       "outer": 20,
       "top": 39,
-      "bottom": 24,
+      "bottom": 25,
       "shoes": 20,
-      "bag": 9,
+      "bag": 10,
       "eyewear": 8,
       "jewelry": 8
     },
@@ -268,9 +268,9 @@
       "hat": 59,
       "outer": 103,
       "top": 73,
-      "bottom": 78,
+      "bottom": 77,
       "shoes": 32,
-      "bag": 40,
+      "bag": 39,
       "eyewear": 22,
       "jewelry": 40
     }
@@ -384,8 +384,8 @@
     },
     {
       "category": "bag",
-      "priority": 81.3,
-      "reason": "60 runtime products, 40 still need transparent assets"
+      "priority": 81,
+      "reason": "60 runtime products, 39 still need transparent assets"
     },
     {
       "category": "shoes",
