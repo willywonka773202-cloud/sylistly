@@ -176,55 +176,55 @@ const CATEGORY_MAX_QUERIES: Record<Category, number> = {
 
 const QUERY_TEMPLATES: Record<Category, QueryTemplate[]> = {
   shoes: [
-    { frame: 'masc', productType: 'white leather sneakers', tail: 'shop', query: "site:zappos.com men's white leather sneakers product image" },
-    { frame: 'fem', productType: 'black ankle boots', tail: 'shop', query: "site:zappos.com women's black ankle boots product image" },
-    { frame: 'masc', productType: 'brown leather loafers', tail: 'official', query: "site:nike.com men's white leather sneakers product image" },
-    { frame: 'fem', productType: 'running sneakers', tail: 'official', query: "site:adidas.com women's running sneakers product image" },
-    { frame: 'androgynous', productType: 'white canvas sneakers', tail: 'shop', query: "men's white leather sneakers official product page" },
-    { frame: 'fem', productType: 'strappy sandals', tail: 'shop' },
+    { frame: 'masc', productType: 'white leather sneakers', tail: 'shop', query: "Zappos men's white leather sneakers product page" },
+    { frame: 'masc', productType: 'white sneakers', tail: 'official', query: "Nike white leather sneakers official product page" },
+    { frame: 'masc', productType: 'white sneakers', tail: 'official', query: "Adidas men's white sneakers product page" },
+    { frame: 'fem', productType: 'black ankle boots', tail: 'shop', query: "Nordstrom women's black ankle boots product page" },
+    { frame: 'masc', productType: 'brown leather loafers', tail: 'shop', query: "Cole Haan men's brown leather loafers product page" },
+    { frame: 'fem', productType: 'strappy sandals', tail: 'shop', query: "Steve Madden women's strappy sandals product page" },
   ],
   bottom: [
-    { frame: 'fem', productType: 'black trousers', tail: 'shop', query: "site:nordstrom.com women's black trousers product image" },
-    { frame: 'masc', productType: 'cargo pants', tail: 'official', query: "site:gap.com men's cargo pants product image" },
-    { frame: 'fem', productType: 'straight leg jeans', tail: 'shop', query: "site:levi.com women's straight leg jeans product image" },
-    { frame: 'masc', productType: 'chino pants', tail: 'shop', query: "men's chino pants official product page" },
-    { frame: 'fem', productType: 'wide leg pants', tail: 'official' },
-    { frame: 'androgynous', productType: 'relaxed denim jeans', tail: 'shop' },
+    { frame: 'fem', productType: 'black trousers', tail: 'shop', query: "Nordstrom women's black trousers product page" },
+    { frame: 'masc', productType: 'cargo pants', tail: 'official', query: "Gap men's cargo pants product page" },
+    { frame: 'masc', productType: 'straight jeans', tail: 'shop', query: "Levi's men's straight jeans product page" },
+    { frame: 'fem', productType: 'tailored trousers', tail: 'shop', query: "H&M women's tailored trousers product page" },
+    { frame: 'fem', productType: 'wide leg pants', tail: 'official', query: "Uniqlo women's wide leg pants product page" },
+    { frame: 'androgynous', productType: 'relaxed denim jeans', tail: 'shop', query: "Madewell relaxed denim jeans product page" },
   ],
   outer: [
-    { frame: 'masc', productType: 'bomber jacket', tail: 'official' },
-    { frame: 'fem', productType: 'trench coat', tail: 'shop' },
-    { frame: 'masc', productType: 'puffer jacket', tail: 'official' },
-    { frame: 'fem', productType: 'tailored blazer', tail: 'shop' },
-    { frame: 'androgynous', productType: 'denim jacket', tail: 'official' },
-    { frame: 'fem', productType: 'leather jacket', tail: 'shop' },
+    { frame: 'fem', productType: 'black blazer', tail: 'shop', query: "Zara women's black blazer product page" },
+    { frame: 'masc', productType: 'bomber jacket', tail: 'official', query: "Alpha Industries men's bomber jacket official product page" },
+    { frame: 'masc', productType: 'puffer jacket', tail: 'official', query: "The North Face men's puffer jacket product page" },
+    { frame: 'fem', productType: 'trench coat', tail: 'shop', query: "Banana Republic women's trench coat product page" },
+    { frame: 'androgynous', productType: 'denim jacket', tail: 'official', query: "Levi's denim trucker jacket product page" },
+    { frame: 'fem', productType: 'leather jacket', tail: 'shop', query: "AllSaints women's leather jacket product page" },
   ],
   bag: [
-    { frame: 'fem', productType: 'tote bag', tail: 'shop' },
-    { frame: 'masc', productType: 'crossbody bag', tail: 'official' },
-    { frame: 'androgynous', productType: 'backpack', tail: 'shop' },
-    { frame: 'fem', productType: 'shoulder bag', tail: 'official' },
-    { frame: 'masc', productType: 'messenger bag', tail: 'shop' },
+    { frame: 'androgynous', productType: 'belt bag', tail: 'official', query: "Lululemon belt bag product page" },
+    { frame: 'fem', productType: 'leather tote', tail: 'shop', query: "Coach leather tote product page" },
+    { frame: 'androgynous', productType: 'backpack', tail: 'shop', query: "Herschel backpack product page" },
+    { frame: 'fem', productType: 'shoulder bag', tail: 'official', query: "Kate Spade shoulder bag product page" },
+    { frame: 'masc', productType: 'messenger bag', tail: 'shop', query: "Fossil messenger bag product page" },
   ],
   hat: [
-    { frame: 'androgynous', productType: 'baseball cap', tail: 'official' },
-    { frame: 'androgynous', productType: 'beanie hat', tail: 'shop' },
-    { frame: 'androgynous', productType: 'bucket hat', tail: 'official' },
-    { frame: 'fem', productType: 'sun hat', tail: 'shop' },
+    { frame: 'androgynous', productType: 'baseball cap', tail: 'official', query: "New Era black baseball cap product page" },
+    { frame: 'androgynous', productType: 'beanie hat', tail: 'shop', query: "Carhartt beanie hat product page" },
+    { frame: 'androgynous', productType: 'bucket hat', tail: 'official', query: "Nike bucket hat official product page" },
+    { frame: 'fem', productType: 'sun hat', tail: 'shop', query: "Madewell straw sun hat product page" },
   ],
   jewelry: [
-    { frame: 'fem', productType: 'gold hoop earrings', tail: 'shop' },
-    { frame: 'masc', productType: 'silver chain necklace', tail: 'official' },
-    { frame: 'androgynous', productType: 'silver signet ring', tail: 'shop' },
+    { frame: 'fem', productType: 'gold hoop earrings', tail: 'shop', query: "Mejuri gold hoop earrings product page" },
+    { frame: 'masc', productType: 'silver chain necklace', tail: 'official', query: "Tiffany silver chain necklace product page" },
+    { frame: 'androgynous', productType: 'silver signet ring', tail: 'shop', query: "David Yurman silver signet ring product page" },
   ],
   top: [
-    { frame: 'fem', productType: 'white button down shirt', tail: 'official' },
-    { frame: 'masc', productType: 'knit polo shirt', tail: 'shop' },
-    { frame: 'fem', productType: 'black tank top', tail: 'shop' },
+    { frame: 'fem', productType: 'white button down shirt', tail: 'official', query: "Everlane women's white button down shirt product page" },
+    { frame: 'masc', productType: 'knit polo shirt', tail: 'shop', query: "J.Crew men's knit polo shirt product page" },
+    { frame: 'fem', productType: 'black tank top', tail: 'shop', query: "Aritzia black tank top product page" },
   ],
   eyewear: [
-    { frame: 'masc', productType: 'aviator sunglasses', tail: 'official' },
-    { frame: 'fem', productType: 'cat eye sunglasses', tail: 'shop' },
+    { frame: 'masc', productType: 'aviator sunglasses', tail: 'official', query: "Ray-Ban aviator sunglasses product page" },
+    { frame: 'fem', productType: 'cat eye sunglasses', tail: 'shop', query: "Warby Parker cat eye sunglasses product page" },
   ],
 };
 
@@ -362,7 +362,8 @@ function frameLabel(frame: Frame): string {
 function buildQuery(template: QueryTemplate): string {
   if (template.query) return template.query.replace(/\s+/g, ' ').trim();
   const lead = `${frameLabel(template.frame)} ${template.productType}`.trim();
-  return `${lead} product image white background ${template.tail}`.replace(/\s+/g, ' ').trim();
+  const suffix = template.tail === 'official' ? 'official product page' : 'product page';
+  return `${lead} ${suffix}`.replace(/\s+/g, ' ').trim();
 }
 
 function countRecord<K extends string>(keys: readonly K[]): Record<K, number> {
@@ -409,7 +410,7 @@ function buildPlan(): { priorities: CategoryPriority[]; candidates: QueryCandida
         targetFrame: template.frame,
         targetProductType: template.productType,
         maxResults: 20,
-        reason: `${priority.reason} Query uses product-image/white-background terms to avoid outfit/editorial results.`,
+        reason: `${priority.reason} Query uses merchant-intent product page terms to avoid strict site filters and broad outfit/editorial results.`,
         priority: Number((priority.priority - index).toFixed(1)),
         transparentCount: priority.transparentCount,
         transparentTarget: priority.transparentTarget,
