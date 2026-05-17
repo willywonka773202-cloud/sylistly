@@ -1,7 +1,7 @@
 import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { validateProduct } from '@/lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ReactNode } from 'react';
 
@@ -30,10 +30,52 @@ function topEntries(record: Record<string, number>, limit: number) {
   return Object.entries(record).sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+function emptyCategoryRecord() {
+  return Object.fromEntries(CATEGORY_ORDER.map((category) => [category, 0])) as Record<Category, number>;
+}
+
 function transparentFileExists(product: Product): boolean {
   if (!product.imageTransparentUrl?.startsWith('/assets/')) return false;
   return existsSync(join(process.cwd(), 'public', product.imageTransparentUrl.replace(/^\//, '')));
 }
+
+type CutoutRunItem = {
+  id: string;
+  brand?: string;
+  name?: string;
+  category?: Category;
+  status?: string;
+  outputPath?: string;
+  reason?: string;
+};
+
+function latestCutoutRun(): { generated: CutoutRunItem[]; failed: CutoutRunItem[] } {
+  const reportPath = join(process.cwd(), 'data', 'catalog', 'cutout-reviewed', 'cutout-run-report.json');
+  if (!existsSync(reportPath)) return { generated: [], failed: [] };
+  try {
+    const parsed = JSON.parse(readFileSync(reportPath, 'utf8')) as { items?: CutoutRunItem[] };
+    const items = Array.isArray(parsed.items) ? parsed.items : [];
+    return {
+      generated: items.filter((item) => item.status === 'generated').slice(0, 30),
+      failed: items.filter((item) => item.status === 'failed' || item.status === 'blocked').slice(0, 12),
+    };
+  } catch {
+    return { generated: [], failed: [] };
+  }
+}
+
+const transparentTargets: Record<Category, number> = {
+  hat: 10,
+  outer: 20,
+  top: 25,
+  bottom: 25,
+  shoes: 20,
+  bag: 10,
+  eyewear: 8,
+  jewelry: 8,
+};
+
+const nextBatchCategories: Category[] = ['bottom', 'shoes', 'outer', 'bag', 'hat', 'jewelry'];
 
 export default function CatalogLabPage() {
   const products = ALL_CATALOG_PRODUCTS as Product[];
@@ -42,6 +84,15 @@ export default function CatalogLabPage() {
   const needsCutout = safeProducts.filter((product) => !product.imageTransparentUrl);
   const unsafeImages = products.length - safeProducts.length;
   const categoryCounts = countBy(products.map((product) => product.category as Category));
+  const transparentByCategory = emptyCategoryRecord();
+  const originalOnlyByCategory = emptyCategoryRecord();
+  const unsafeByCategory = emptyCategoryRecord();
+  for (const product of products) {
+    const category = product.category as Category;
+    if (product.imageTransparentUrl) transparentByCategory[category] += 1;
+    else if (isUnsafeImage(product)) unsafeByCategory[category] += 1;
+    else originalOnlyByCategory[category] += 1;
+  }
   const brandCounts = countBy(products.map((product) => product.brand || 'Unknown'));
   const thinCategories = CATEGORY_ORDER
     .map((category) => ({ category, count: categoryCounts[category] || 0 }))
@@ -53,6 +104,17 @@ export default function CatalogLabPage() {
     .slice(0, 20);
   const readyProducts = transparentProducts.slice(0, 20);
   const transparentPreviewProducts = transparentProducts.slice(0, 48);
+  const latestRun = latestCutoutRun();
+  const nextBatch = nextBatchCategories
+    .map((category) => ({
+      category,
+      transparent: transparentByCategory[category],
+      target: transparentTargets[category],
+      originalOnly: originalOnlyByCategory[category],
+      priority: Math.max(0, transparentTargets[category] - transparentByCategory[category]),
+    }))
+    .filter((row) => row.originalOnly > 0)
+    .sort((a, b) => b.priority - a.priority || b.originalOnly - a.originalOnly);
 
   return (
     <main className="min-h-screen bg-[#f7efe6] px-4 pb-24 pt-6 text-[#2c2118]">
@@ -82,6 +144,70 @@ export default function CatalogLabPage() {
           </div>
           <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#eadfd3]">
             <div className="h-full rounded-full bg-[#2f5d50]" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="mt-4 rounded-2xl border border-[#f0d5c4] bg-[#fff7ef] p-3 text-sm font-black text-[#7a3f22]">
+            Do not enable transparent-only until readiness passes.
+          </div>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-2">
+          <Panel title="Transparent by category">
+            {CATEGORY_ORDER.map((category) => (
+              <ProgressRow
+                key={category}
+                label={category}
+                value={transparentByCategory[category]}
+                target={transparentTargets[category]}
+              />
+            ))}
+          </Panel>
+          <Panel title="Original-only by category">
+            {CATEGORY_ORDER.map((category) => (
+              <MetricRow key={category} label={category} value={originalOnlyByCategory[category]} />
+            ))}
+          </Panel>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-3">
+          <Panel title="Weak category progress">
+            {nextBatchCategories.map((category) => (
+              <ProgressRow
+                key={category}
+                label={category}
+                value={transparentByCategory[category]}
+                target={transparentTargets[category]}
+              />
+            ))}
+          </Panel>
+          <Panel title="Latest generated cutouts">
+            {latestRun.generated.length === 0 ? (
+              <p className="text-sm font-semibold text-[#7d6755]">No recent generated cutout report found.</p>
+            ) : (
+              latestRun.generated.slice(0, 8).map((item) => (
+                <MetricRow key={item.id} label={`${item.category || 'item'} - ${item.name || item.id}`} value={1} />
+              ))
+            )}
+          </Panel>
+          <Panel title="Next recommended batch">
+            {nextBatch.slice(0, 6).map((row) => (
+              <MetricRow key={row.category} label={`${row.category} gap ${row.transparent}/${row.target}`} value={Math.min(row.originalOnly, row.priority)} />
+            ))}
+          </Panel>
+        </section>
+
+        <section className="rounded-[24px] border border-[#eadfd3] bg-white/78 p-5">
+          <h2 className="text-lg font-black">Failed cutouts</h2>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {latestRun.failed.length === 0 ? (
+              <p className="text-sm font-semibold text-[#7d6755]">Latest run reported no failed or blocked cutouts.</p>
+            ) : (
+              latestRun.failed.map((item) => (
+                <div key={item.id} className="rounded-2xl bg-[#fff0ec] p-3 text-sm font-semibold text-[#763b2c]">
+                  <div className="font-black">{item.name || item.id}</div>
+                  <div>{item.category || 'unknown'} - {item.reason || item.status}</div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 
@@ -220,6 +346,21 @@ function MetricRow({ label, value }: { label: string; value: number }) {
     <div className="flex items-center justify-between gap-4 rounded-2xl bg-[#f8f1e9] px-3 py-2 text-sm font-bold">
       <span className="truncate capitalize text-[#5d4b3d]">{label}</span>
       <span>{value}</span>
+    </div>
+  );
+}
+
+function ProgressRow({ label, value, target }: { label: string; value: number; target: number }) {
+  const width = `${Math.min(100, Math.round((value / Math.max(1, target)) * 100))}%`;
+  return (
+    <div className="rounded-2xl bg-[#f8f1e9] px-3 py-2">
+      <div className="flex items-center justify-between gap-4 text-sm font-bold">
+        <span className="truncate capitalize text-[#5d4b3d]">{label}</span>
+        <span>{value}/{target}</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eadfd3]">
+        <div className="h-full rounded-full bg-[#2f5d50]" style={{ width }} />
+      </div>
     </div>
   );
 }

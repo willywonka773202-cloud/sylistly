@@ -1,86 +1,89 @@
 {
-  "generatedAt": "2026-05-16T22:26:45.064Z",
+  "generatedAt": "2026-05-17T05:14:52.764Z",
   "totalRuntimeProducts": 674,
-  "transparentProducts": 48,
-  "transparentCoveragePercent": 7.1,
+  "transparentProducts": 78,
+  "transparentCoveragePercent": 11.6,
   "transparentOnlySafe": false,
   "generatorTransparentSubsetReady": false,
   "feedFirst50TransparentSubsetReady": false,
   "countsByCategory": {
-    "hat": 0,
-    "outer": 1,
+    "hat": 2,
+    "outer": 7,
     "top": 39,
-    "bottom": 5,
-    "shoes": 1,
-    "bag": 1,
+    "bottom": 13,
+    "shoes": 9,
+    "bag": 5,
     "eyewear": 1,
-    "jewelry": 0
+    "jewelry": 2
   },
   "countsByFrame": {
-    "masc": 42,
-    "fem": 3,
-    "androgynous": 3,
-    "any": 0
+    "masc": 46,
+    "fem": 20,
+    "androgynous": 11,
+    "any": 1
   },
   "countsByVibe": {
-    "night": 35,
-    "date": 35,
-    "office": 34,
-    "business casual": 34,
-    "old money": 34,
-    "preppy": 34,
-    "y2k": 8,
-    "clean": 7,
-    "minimal": 7,
-    "vacation": 7,
-    "beach": 7,
-    "summer": 7,
-    "gym": 6,
-    "athletic": 6,
-    "college": 3,
-    "casual": 3,
-    "streetwear": 3,
-    "luxury": 2,
+    "business casual": 43,
+    "old money": 43,
+    "preppy": 43,
+    "night": 41,
+    "date": 41,
+    "office": 41,
+    "clean": 16,
+    "minimal": 16,
+    "casual": 15,
+    "y2k": 13,
+    "summer": 13,
+    "vacation": 13,
+    "beach": 13,
+    "gym": 11,
+    "athletic": 11,
+    "college": 8,
+    "streetwear": 8,
+    "western": 7,
+    "techwear": 5,
+    "edgy": 5,
+    "luxury": 4,
+    "winter": 2,
+    "cozy": 2,
     "travel": 1,
     "tote": 1,
     "night out": 1,
     "dressy": 1,
-    "heels": 1,
-    "techwear": 1,
-    "edgy": 1
+    "heels": 1
   },
   "failedRequirements": [
     {
       "label": "hat transparent coverage",
-      "actual": 0,
+      "actual": 2,
       "target": 10,
       "passed": false,
       "reason": "Transparent-only needs enough hat options for generation variety."
     },
     {
       "label": "outer transparent coverage",
-      "actual": 1,
+      "actual": 7,
       "target": 20,
       "passed": false,
       "reason": "Transparent-only needs enough outer options for generation variety."
     },
     {
       "label": "bottom transparent coverage",
-      "actual": 5,
+      "actual": 13,
       "target": 25,
       "passed": false,
       "reason": "Transparent-only needs enough bottom options for generation variety."
     },
     {
       "label": "shoes transparent coverage",
-      "actual": 1,
+      "actual": 9,
       "target": 20,
       "passed": false,
       "reason": "Transparent-only needs enough shoes options for generation variety."
     },
     {
       "label": "bag transparent coverage",
-      "actual": 1,
+      "actual": 5,
       "target": 10,
       "passed": false,
       "reason": "Transparent-only needs enough bag options for generation variety."
@@ -94,21 +97,21 @@
     },
     {
       "label": "jewelry transparent coverage",
-      "actual": 0,
+      "actual": 2,
       "target": 8,
       "passed": false,
       "reason": "Transparent-only needs enough jewelry options for generation variety."
     },
     {
       "label": "fem frame coverage",
-      "actual": 3,
+      "actual": 20,
       "target": 30,
       "passed": false,
       "reason": "Transparent-only should not collapse recommendations for fem users."
     },
     {
       "label": "androgynous frame coverage",
-      "actual": 3,
+      "actual": 11,
       "target": 30,
       "passed": false,
       "reason": "Transparent-only should not collapse recommendations for androgynous users."
@@ -135,15 +138,8 @@
       "reason": "Transparent-only needs enough work pieces for Feed and Build variety."
     },
     {
-      "label": "vacation vibe coverage",
-      "actual": 7,
-      "target": 12,
-      "passed": false,
-      "reason": "Transparent-only needs enough vacation pieces for Feed and Build variety."
-    },
-    {
       "label": "cozy vibe coverage",
-      "actual": 0,
+      "actual": 2,
       "target": 12,
       "passed": false,
       "reason": "Transparent-only needs enough cozy pieces for Feed and Build variety."
@@ -159,17 +155,24 @@
     },
     {
       "label": "masc frame coverage",
-      "actual": 42,
+      "actual": 46,
       "target": 30,
       "passed": true,
       "reason": "Transparent-only should not collapse recommendations for masc users."
     },
     {
       "label": "date vibe coverage",
-      "actual": 35,
+      "actual": 41,
       "target": 12,
       "passed": true,
       "reason": "Transparent-only needs enough date pieces for Feed and Build variety."
+    },
+    {
+      "label": "vacation vibe coverage",
+      "actual": 13,
+      "target": 12,
+      "passed": true,
+      "reason": "Transparent-only needs enough vacation pieces for Feed and Build variety."
     }
   ],
   "notes": [

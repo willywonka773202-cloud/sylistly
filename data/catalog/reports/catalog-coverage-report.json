@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T21:49:28.342Z",
+  "generatedAt": "2026-05-17T05:14:16.071Z",
   "total": 674,
   "byCategory": {
     "hat": 77,
@@ -250,29 +250,29 @@
     }
   ],
   "transparent": {
-    "withTransparent": 48,
-    "originalOnly": 537,
+    "withTransparent": 78,
+    "originalOnly": 507,
     "unsafeImages": 89,
-    "needsCutout": 537,
+    "needsCutout": 507,
     "transparentByCategory": {
-      "hat": 0,
-      "outer": 1,
+      "hat": 2,
+      "outer": 7,
       "top": 39,
-      "bottom": 5,
-      "shoes": 1,
-      "bag": 1,
+      "bottom": 13,
+      "shoes": 9,
+      "bag": 5,
       "eyewear": 1,
-      "jewelry": 0
+      "jewelry": 2
     },
     "needsCutoutByCategory": {
-      "hat": 69,
-      "outer": 122,
+      "hat": 67,
+      "outer": 116,
       "top": 73,
-      "bottom": 97,
-      "shoes": 51,
-      "bag": 48,
+      "bottom": 89,
+      "shoes": 43,
+      "bag": 44,
       "eyewear": 29,
-      "jewelry": 48
+      "jewelry": 46
     }
   },
   "missingAssets": {
@@ -379,28 +379,28 @@
     },
     {
       "category": "jewelry",
-      "priority": 95,
-      "reason": "57 runtime products, 48 still need transparent assets"
+      "priority": 94.3,
+      "reason": "57 runtime products, 46 still need transparent assets"
     },
     {
       "category": "bag",
-      "priority": 84,
-      "reason": "60 runtime products, 48 still need transparent assets"
+      "priority": 82.7,
+      "reason": "60 runtime products, 44 still need transparent assets"
     },
     {
       "category": "shoes",
-      "priority": 74,
-      "reason": "63 runtime products, 51 still need transparent assets"
+      "priority": 71.3,
+      "reason": "63 runtime products, 43 still need transparent assets"
     },
     {
       "category": "hat",
-      "priority": 66,
-      "reason": "77 runtime products, 69 still need transparent assets"
+      "priority": 65.3,
+      "reason": "77 runtime products, 67 still need transparent assets"
     },
     {
       "category": "outer",
-      "priority": 40,
-      "reason": "136 runtime products, 122 still need transparent assets"
+      "priority": 38.7,
+      "reason": "136 runtime products, 116 still need transparent assets"
     }
   ]
 }

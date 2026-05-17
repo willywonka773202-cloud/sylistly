@@ -43,6 +43,11 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional candidate JSON file. Defaults to invoking scripts/prepare-cutout-candidates.ts.",
     )
+    parser.add_argument(
+        "--categories",
+        default="",
+        help="Comma-separated category filter, e.g. bottom,shoes,outer,bag,hat,jewelry.",
+    )
     return parser.parse_args()
 
 
@@ -59,22 +64,93 @@ def rembg_available() -> tuple[bool, str | None]:
         return False, str(exc)
 
 
-def load_candidates(limit: int, candidate_json: Path | None) -> list[dict[str, Any]]:
+DEFAULT_CATEGORY_QUOTAS = {
+    "bottom": 8,
+    "shoes": 8,
+    "outer": 6,
+    "bag": 4,
+    "hat": 2,
+    "jewelry": 2,
+}
+
+
+def parse_categories(value: str) -> list[str]:
+    allowed = {"hat", "outer", "top", "bottom", "shoes", "bag", "eyewear", "jewelry"}
+    categories: list[str] = []
+    for raw in value.split(","):
+        category = raw.strip().lower()
+        if category in allowed and category not in categories:
+            categories.append(category)
+    return categories
+
+
+def select_category_batch(candidates: list[dict[str, Any]], limit: int, categories: list[str]) -> list[dict[str, Any]]:
+    if not categories:
+        return candidates[: max(0, limit)]
+
+    category_set = set(categories)
+    grouped: dict[str, list[dict[str, Any]]] = {category: [] for category in categories}
+    for candidate in candidates:
+        category = str(candidate.get("category", "")).strip().lower()
+        if category in category_set:
+            grouped.setdefault(category, []).append(candidate)
+
+    selected: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    for category in categories:
+        quota = DEFAULT_CATEGORY_QUOTAS.get(category, 0)
+        if quota <= 0:
+            quota = max(1, limit // max(1, len(categories)))
+        for candidate in grouped.get(category, [])[:quota]:
+            product_id = str(candidate.get("id", ""))
+            if product_id in seen_ids:
+                continue
+            selected.append(candidate)
+            seen_ids.add(product_id)
+            if len(selected) >= limit:
+                return selected
+
+    # Redistribute remaining slots to the requested weak categories, but never
+    # add categories outside the explicit filter.
+    while len(selected) < limit:
+        added = False
+        for category in categories:
+            for candidate in grouped.get(category, []):
+                product_id = str(candidate.get("id", ""))
+                if product_id in seen_ids:
+                    continue
+                selected.append(candidate)
+                seen_ids.add(product_id)
+                added = True
+                break
+            if len(selected) >= limit:
+                return selected
+        if not added:
+            break
+
+    return selected
+
+
+def load_candidates(limit: int, candidate_json: Path | None, categories: list[str]) -> list[dict[str, Any]]:
     if candidate_json:
         payload = json.loads(candidate_json.read_text(encoding="utf-8"))
     else:
         npx = shutil.which("npx") or shutil.which("npx.cmd")
         if not npx:
             raise RuntimeError("npx was not found on PATH; pass --candidate-json with a prepared report instead.")
+        planner_limit = max(limit, 60) if categories else limit
+        command = [npx, "jiti", "scripts/prepare-cutout-candidates.ts", f"--limit={planner_limit}", "--json"]
+        if categories:
+            command.append(f"--categories={','.join(categories)}")
         raw = subprocess.check_output(
-            [npx, "jiti", "scripts/prepare-cutout-candidates.ts", f"--limit={limit}", "--json"],
+            command,
             cwd=ROOT,
             text=True,
             encoding="utf-8",
         )
         payload = json.loads(raw)
     candidates = payload.get("candidates", [])
-    return candidates[: max(0, limit)]
+    return select_category_batch(candidates, limit, categories)
 
 
 def is_safe_image_url(url: str) -> bool:
@@ -115,15 +191,18 @@ def write_report(report: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    categories = parse_categories(args.categories)
     CUTOUT_DIR.mkdir(parents=True, exist_ok=True)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     has_rembg, rembg_error = rembg_available()
-    candidates = load_candidates(args.limit, args.candidate_json)
+    candidates = load_candidates(args.limit, args.candidate_json, categories)
     report: dict[str, Any] = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "mode": "apply" if args.apply else "dry-run",
         "limit": args.limit,
+        "categoryFilter": categories,
+        "categoryQuotas": {category: DEFAULT_CATEGORY_QUOTAS.get(category) for category in categories},
         "rembgAvailable": has_rembg,
         "rembgError": rembg_error,
         "outputDir": str(CUTOUT_DIR.relative_to(ROOT)).replace(os.sep, "/"),

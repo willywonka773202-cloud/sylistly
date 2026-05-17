@@ -45,13 +45,21 @@ interface CliFlags {
   json: boolean;
   limit: number;
   write: boolean;
+  categories: Array<Category | 'unknown'>;
 }
 
 function parseFlags(argv: string[]): CliFlags {
-  const flags: CliFlags = { json: false, limit: 100, write: false };
-  for (const arg of argv) {
+  const flags: CliFlags = { json: false, limit: 100, write: false, categories: [] };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
     if (arg === '--json') flags.json = true;
     else if (arg === '--write') flags.write = true;
+    else if (arg === '--categories' && argv[index + 1]) {
+      flags.categories = parseCategories(argv[index + 1]);
+      index += 1;
+    } else if (arg.startsWith('--categories=')) {
+      flags.categories = parseCategories(arg.slice('--categories='.length));
+    }
     else if (arg.startsWith('--limit=')) {
       const n = Number.parseInt(arg.slice('--limit='.length), 10);
       if (Number.isFinite(n) && n > 0) flags.limit = Math.min(n, 1000);
@@ -63,6 +71,18 @@ function parseFlags(argv: string[]): CliFlags {
 const PRIORITY_CATEGORIES: Array<Category | 'unknown'> = [
   'top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry',
 ];
+
+function parseCategories(value: string): Array<Category | 'unknown'> {
+  const valid = new Set<string>(PRIORITY_CATEGORIES);
+  const categories: Array<Category | 'unknown'> = [];
+  for (const raw of value.split(',')) {
+    const normalized = raw.trim().toLowerCase();
+    if (!valid.has(normalized)) continue;
+    const category = normalized as Category | 'unknown';
+    if (!categories.includes(category)) categories.push(category);
+  }
+  return categories;
+}
 
 const RETAIL_WHITE_BG_HINTS = [
   '/product/', '/shop/', '_white', 'white-bg', 'pdp', 'productimage',
@@ -150,6 +170,7 @@ function buildCandidate(product: unknown, source: SourceLabel): CutoutCandidate 
 interface CutoutReport {
   generatedAt: string;
   totalCatalogProducts: number;
+  categoryFilter: Array<Category | 'unknown'>;
   candidateCount: number;
   emittedCount: number;
   byCategory: Record<string, number>;
@@ -160,7 +181,32 @@ interface CutoutReport {
   notes: string[];
 }
 
-function build(): CutoutReport {
+function orderCandidates(candidates: CutoutCandidate[], categories: Array<Category | 'unknown'>): CutoutCandidate[] {
+  const sorted = [...candidates].sort((a, b) => b.priority - a.priority);
+  if (categories.length === 0) return sorted;
+
+  const groups = new Map<Category | 'unknown', CutoutCandidate[]>();
+  for (const category of categories) groups.set(category, []);
+  for (const candidate of sorted) {
+    const group = groups.get(candidate.category);
+    if (group) group.push(candidate);
+  }
+
+  const ordered: CutoutCandidate[] = [];
+  let added = true;
+  while (added) {
+    added = false;
+    for (const category of categories) {
+      const next = groups.get(category)?.shift();
+      if (!next) continue;
+      ordered.push(next);
+      added = true;
+    }
+  }
+  return ordered;
+}
+
+function build(flags: CliFlags): CutoutReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
     { label: 'brand-catalog', products: applyCatalogCutoutOverridesToProducts(BRAND_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'generated-catalog', products: applyCatalogCutoutOverridesToProducts(GENERATED_CATALOG_PRODUCTS as Product[]) as unknown[] },
@@ -171,6 +217,7 @@ function build(): CutoutReport {
   const candidates: CutoutCandidate[] = [];
   const bySource: Record<string, number> = {};
   const byCategory: Record<string, number> = {};
+  const categoryFilter = new Set<Category | 'unknown'>(flags.categories);
 
   for (const { label, products } of sources) {
     totalCatalog += products.length;
@@ -178,6 +225,7 @@ function build(): CutoutReport {
     for (const product of products) {
       const candidate = buildCandidate(product, label);
       if (!candidate) continue;
+      if (categoryFilter.size > 0 && !categoryFilter.has(candidate.category)) continue;
       candidates.push(candidate);
       kept += 1;
       byCategory[candidate.category] = (byCategory[candidate.category] || 0) + 1;
@@ -185,20 +233,23 @@ function build(): CutoutReport {
     bySource[label] = kept;
   }
 
-  candidates.sort((a, b) => b.priority - a.priority);
+  const orderedCandidates = orderCandidates(candidates, flags.categories);
 
   return {
     generatedAt: new Date().toISOString(),
     totalCatalogProducts: totalCatalog,
-    candidateCount: candidates.length,
+    categoryFilter: flags.categories,
+    candidateCount: orderedCandidates.length,
     emittedCount: 0,
     byCategory,
     bySource,
-    candidates,
+    candidates: orderedCandidates,
     notes: [
       'This report is read-only and does NOT perform background removal.',
       'A "candidate" is a product with a safe original image and no transparent asset.',
-      'Priority weighs feed-critical category, retail-white-bg hint, and presence of productUrl.',
+      flags.categories.length
+        ? 'Category filtering is active; emitted candidates are balanced by requested category where possible.'
+        : 'Priority weighs feed-critical category, retail-white-bg hint, and presence of productUrl.',
       'Background removal still requires an external tool (e.g. remove.bg, Photoroom, local rembg).',
       'After a real cutout pipeline runs, register reviewed assets with scripts/register-cutouts.ts.',
     ],
@@ -215,6 +266,7 @@ function printHuman(report: CutoutReport, flags: CliFlags): void {
   console.log('=====================');
   console.log(`Generated: ${report.generatedAt}`);
   console.log(`Catalog total: ${report.totalCatalogProducts}`);
+  if (report.categoryFilter.length) console.log(`Category filter: ${report.categoryFilter.join(', ')}`);
   console.log(`Candidate count (no transparent asset, safe image): ${report.candidateCount}`);
   console.log('');
   console.log('By category');
@@ -242,7 +294,7 @@ function printHuman(report: CutoutReport, flags: CliFlags): void {
 
 function main(): void {
   const flags = parseFlags(process.argv.slice(2));
-  const report = build();
+  const report = build(flags);
   report.emittedCount = Math.min(flags.limit, report.candidates.length);
   if (flags.json) {
     console.log(JSON.stringify({ ...report, candidates: report.candidates.slice(0, flags.limit) }, null, 2));
