@@ -55,7 +55,12 @@ function classifyImageUrl(url: string): ImageUrlSource {
   if (!url) return 'invalid';
   const normalized = url.trim().toLowerCase();
   if (normalized.startsWith('data:')) return 'dataUrl';
-  if (normalized.includes('google.com/search') || normalized.includes('shopping.google')) return 'searchIntent';
+  if (
+    normalized.includes('google.com/search')
+    || normalized.includes('google.com/shopping')
+    || normalized.includes('shopping.google')
+    || normalized.includes('#oshopproduct')
+  ) return 'searchIntent';
   if (normalized.includes('encrypted-tbn') || normalized.includes('gstatic.com') || normalized.includes('google.com')) return 'googleThumbnailProxy';
   if (normalized.startsWith('https://')) return 'merchantCdn';
   return 'invalid';
@@ -158,6 +163,7 @@ async function main() {
 
   const resultsByPack: Record<string, { total: number; valid: number; needsResolution: number }> = {};
   const resultsByCategory: Record<string, { total: number; valid: number; needsResolution: number }> = {};
+  const resultsByMerchant: Record<string, { total: number; valid: number; needsResolution: number }> = {};
   const exampleMerchantCdn: Candidate[] = [];
   const exampleGoogleThumbnail: Candidate[] = [];
   const exampleBlocked: Candidate[] = [];
@@ -187,6 +193,11 @@ async function main() {
         resultsByCategory[candidate.category] = { total: 0, valid: 0, needsResolution: 0 };
       }
       resultsByCategory[candidate.category].total++;
+      const merchantKey = candidate.merchant?.trim() || 'unknown';
+      if (!resultsByMerchant[merchantKey]) {
+        resultsByMerchant[merchantKey] = { total: 0, valid: 0, needsResolution: 0 };
+      }
+      resultsByMerchant[merchantKey].total++;
 
       let currentSource = classifyImageUrl(candidate.imageUrl);
       
@@ -195,14 +206,17 @@ async function main() {
         skippedValid++;
         resultsByPack[packKey].valid++;
         resultsByCategory[candidate.category].valid++;
+        resultsByMerchant[merchantKey].valid++;
       } else if (attempted >= MAX_QUERIES) {
         resultsByPack[packKey].needsResolution++;
         resultsByCategory[candidate.category].needsResolution++;
+        resultsByMerchant[merchantKey].needsResolution++;
       } else {
         willAttempt = true;
         attempted++;
         resultsByPack[packKey].needsResolution++;
         resultsByCategory[candidate.category].needsResolution++;
+        resultsByMerchant[merchantKey].needsResolution++;
       }
 
       if (willAttempt) {
@@ -283,6 +297,7 @@ async function main() {
     },
     resultsByPack,
     resultsByCategory,
+    resultsByMerchant,
     examples: {
       liveMergeReady: exampleMerchantCdn.slice(0, 2).map(c => ({ id: c.id, imageUrlSource: c.imageUrlSource, productUrl: c.productUrl })),
       reviewOnly: exampleGoogleThumbnail.slice(0, 2).map(c => ({ id: c.id, imageUrlSource: c.imageUrlSource, productUrl: c.productUrl })),
@@ -305,7 +320,7 @@ async function main() {
   console.log(`Blocked: ${blockedCount}`);
   
   if (DRY_RUN) {
-      console.log('\nThis was a DRY RUN. No files were modified and no real API calls were made.');
+      console.log('\nThis was a DRY RUN. No pack files were modified and no real API calls were made.');
   } else {
       console.log('\nNOTE: Run `npm run typecheck` and `npm run qa` to ensure pack integrity.');
   }
