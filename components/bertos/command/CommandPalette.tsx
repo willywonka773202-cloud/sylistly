@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   MessageSquare, GitCompare, Code2, Bot, Brain, Settings, Plus,
-  Trash2, Cpu, Globe, Zap, Sparkles, Search, ArrowRight
+  Trash2, Cpu, Globe, Zap, Sparkles, Search, ArrowRight, Keyboard
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -93,6 +93,15 @@ export function CommandPalette() {
       category: 'Navigate',
       keywords: ['settings', 'config', 'preferences'],
       action: () => navigate('settings', '/settings'),
+    },
+    {
+      id: 'keyboard-shortcuts',
+      label: 'Keyboard Shortcuts',
+      description: 'View all keyboard shortcuts',
+      icon: <Keyboard className="w-4 h-4" />,
+      category: 'Navigate',
+      keywords: ['keyboard', 'shortcuts', 'hotkeys', 'keybindings'],
+      action: () => { setCommandPaletteOpen(false); setTimeout(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '?', metaKey: true, ctrlKey: false })), 50) },
     },
     {
       id: 'use-claude',
