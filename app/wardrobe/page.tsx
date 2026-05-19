@@ -7,6 +7,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
 import { ALL_CATALOG_PRODUCTS, buildCatalogLook } from '@/lib/catalog';
 import { repairOrRegenerateOutfit } from '@/lib/catalog-health';
+import { getProductOutboundUrl } from '@/lib/product-links';
 import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
@@ -142,6 +143,7 @@ export default function WardrobePage() {
   const setItemStatus = useWardrobe((state) => state.setItemStatus);
   const removeItem = useWardrobe((state) => state.removeItem);
   const [activeStatus, setActiveStatus] = useState<WardrobeStatus>('owned');
+  const [toast, setToast] = useState<string | null>(null);
 
   const renderableProducts = useMemo(
     () => ALL_CATALOG_PRODUCTS.filter(isHighConfidenceRenderableProduct),
@@ -174,6 +176,30 @@ export default function WardrobePage() {
     if (!Object.keys(nextFit).length) return;
     replaceItems(nextFit);
     router.push(`/build?slots=${Object.keys(nextFit).join(',')}`);
+  }
+
+  function showToast(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 1800);
+  }
+
+  function buildAroundProduct(product: Product) {
+    replaceItems({ [product.category]: product });
+    router.push(`/build?slots=${product.category}`);
+  }
+
+  function shopProduct(product: Product) {
+    window.open(getProductOutboundUrl(product), '_blank', 'noopener,noreferrer');
+  }
+
+  function removeWardrobeItem(productId: string) {
+    removeItem(productId);
+    showToast('Removed from wardrobe');
+  }
+
+  function setWardrobeStatus(product: Product, status: WardrobeStatus) {
+    setItemStatus(product, status);
+    showToast(status === 'owned' ? 'Added to closet' : status === 'wishlist' ? 'Added to wishlist' : 'Marked as similar');
   }
 
   return (
@@ -276,14 +302,19 @@ export default function WardrobePage() {
                 Generate
               </button>
             </div>
-            <WardrobeShelf title="Owned pieces" products={ownedShelf} onRemove={removeItem} />
-            <WardrobeShelf title="Similar items I have" products={similarShelf} onRemove={removeItem} />
-            <WardrobeShelf title="Wishlist" products={wishlistShelf} onRemove={removeItem} />
+            <WardrobeShelf title="Owned pieces" products={ownedShelf} onRemove={removeWardrobeItem} />
+            <WardrobeShelf title="Similar items I have" products={similarShelf} onRemove={removeWardrobeItem} />
+            <WardrobeShelf title="Wishlist" products={wishlistShelf} onRemove={removeWardrobeItem} />
           </section>
         ) : null}
 
         {wardrobeGaps.length ? (
-          <WardrobeGapAssistant gaps={wardrobeGaps} onAdd={(product) => setItemStatus(product, 'wishlist')} />
+          <WardrobeGapAssistant
+            gaps={wardrobeGaps}
+            onAdd={(product) => setWardrobeStatus(product, 'wishlist')}
+            onBuild={buildAroundProduct}
+            onShop={shopProduct}
+          />
         ) : null}
 
         {recentProducts.length ? (
@@ -307,7 +338,7 @@ export default function WardrobePage() {
                 <button
                   key={`recent-${product.id}`}
                   type="button"
-                  onClick={() => router.push('/build')}
+                  onClick={() => buildAroundProduct(product)}
                   className="w-[118px] flex-none overflow-hidden rounded-[22px] border border-[#eadfd5] bg-[#fff7ef] p-2 text-left shadow-[0_14px_28px_rgba(0,0,0,.18)]"
                 >
                   <div className="grid h-[104px] place-items-center rounded-[16px] bg-white">
@@ -350,7 +381,10 @@ export default function WardrobePage() {
                 >
                   <button
                     type="button"
-                    onClick={() => toggleItemStatus(product, activeStatus)}
+                    onClick={() => {
+                      toggleItemStatus(product, activeStatus);
+                      showToast(selected ? 'Updated wardrobe' : `Added as ${WARDROBE_STATUS_LABELS[activeStatus].toLowerCase()}`);
+                    }}
                     className={`absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full border ${
                       selected ? 'border-accent bg-accent text-white' : 'border-[#d8cec7] bg-white/82 text-[#9f938b]'
                     }`}
@@ -383,7 +417,7 @@ export default function WardrobePage() {
                       <button
                         key={`${product.id}-${option.value}`}
                         type="button"
-                        onClick={() => setItemStatus(product, option.value)}
+                        onClick={() => setWardrobeStatus(product, option.value)}
                         className={`rounded-full px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.08em] ${
                           entry?.status === option.value
                             ? 'bg-accent text-white'
@@ -397,7 +431,7 @@ export default function WardrobePage() {
                   {entry ? (
                     <button
                       type="button"
-                      onClick={() => removeItem(product.id)}
+                      onClick={() => removeWardrobeItem(product.id)}
                       className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-full border border-[#e3d6cb] bg-white px-3 py-2 text-[9px] font-bold uppercase tracking-[.12em] text-[#7a6b62]"
                     >
                       <X size={11} />
@@ -410,6 +444,13 @@ export default function WardrobePage() {
           </div>
         </section>
       </div>
+
+      {toast ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-[142px] z-40 mx-auto flex w-fit max-w-[calc(100%-32px)] items-center gap-2 rounded-full border border-accent/30 bg-[#171311]/95 px-3 py-2 text-[11px] font-semibold text-white shadow-pink-glow backdrop-blur">
+          <Check size={13} className="text-accent" />
+          {toast}
+        </div>
+      ) : null}
 
       <div className="pointer-events-none fixed inset-x-0 bottom-[68px] z-30 mx-auto max-w-[480px] px-4 pb-3">
         <div className="pointer-events-auto grid grid-cols-[1fr_.8fr] gap-2 rounded-[28px] border border-white/12 bg-[#11100f]/92 p-2 shadow-[0_-18px_48px_rgba(0,0,0,.38)] backdrop-blur-xl">
@@ -486,9 +527,13 @@ function WardrobeShelf({
 function WardrobeGapAssistant({
   gaps,
   onAdd,
+  onBuild,
+  onShop,
 }: {
   gaps: Array<{ title: string; helper: string; product: Product }>;
   onAdd: (product: Product) => void;
+  onBuild: (product: Product) => void;
+  onShop: (product: Product) => void;
 }) {
   return (
     <section className="mt-5 rounded-[28px] border border-accent/20 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.16),transparent_34%),linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] p-4">
@@ -512,13 +557,29 @@ function WardrobeGapAssistant({
               <div className="text-[9px] font-black uppercase tracking-[.15em] text-accent">{gap.title}</div>
               <div className="mt-1 truncate font-serif text-[16px] font-semibold text-ink">{gap.product.brand} {gap.product.name}</div>
               <p className="mt-1 text-[11px] leading-relaxed text-muted-2">{gap.helper}</p>
-              <button
-                type="button"
-                onClick={() => onAdd(gap.product)}
-                className="mt-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-accent"
-              >
-                Add to wishlist
-              </button>
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onAdd(gap.product)}
+                  className="rounded-full border border-accent/40 bg-accent/12 px-2 py-1.5 text-[8px] font-black uppercase tracking-[.1em] text-accent"
+                >
+                  Wishlist
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onBuild(gap.product)}
+                  className="rounded-full bg-accent px-2 py-1.5 text-[8px] font-black uppercase tracking-[.1em] text-white shadow-pink-glow"
+                >
+                  Build
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onShop(gap.product)}
+                  className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-black uppercase tracking-[.1em] text-muted-2"
+                >
+                  Shop
+                </button>
+              </div>
             </div>
           </article>
         ))}
