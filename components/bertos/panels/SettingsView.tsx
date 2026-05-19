@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Settings, Key, Cpu, Globe, Zap, Sparkles, Monitor, Database,
-  Shield, Sliders, Check, Eye, EyeOff, ChevronRight
+  Shield, Sliders, Check, Eye, EyeOff, ChevronRight, Bot
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -62,10 +62,11 @@ export function SettingsView() {
   const [anthropicKey, setAnthropicKey] = useState(settings.apiKeys.anthropic ?? '')
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
   const [googleKey, setGoogleKey] = useState(settings.apiKeys.google ?? '')
+  const [ollamaKey, setOllamaKey] = useState(settings.apiKeys.ollama ?? '')
 
   const saveSettings = () => {
     updateSettings({
-      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey }
+      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey, ollama: ollamaKey }
     })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -104,12 +105,12 @@ export function SettingsView() {
               </div>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Primary Model</h4>
+                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Cloud Models</h4>
                 {([
-                  { value: 'auto', label: 'Auto Router', desc: 'Intelligently selects the best model for each task', icon: <Sparkles className="w-4 h-4 text-amber-400" />, color: '#F59E0B' },
-                  { value: 'claude', label: 'Claude (Anthropic)', desc: 'Best for reasoning, writing, and complex analysis', icon: <Cpu className="w-4 h-4 text-violet-400" />, color: '#8B5CF6' },
-                  { value: 'codex', label: 'Codex (OpenAI)', desc: 'Best for code generation and technical tasks', icon: <Zap className="w-4 h-4 text-emerald-400" />, color: '#10B981' },
-                  { value: 'gemini', label: 'Gemini (Google)', desc: 'Best for research and large context tasks', icon: <Globe className="w-4 h-4 text-blue-400" />, color: '#3B82F6' },
+                  { value: 'auto',   label: 'Auto Router',      desc: 'Intelligently selects the best model for each task', icon: <Sparkles className="w-4 h-4 text-amber-400" />,  color: '#F59E0B' },
+                  { value: 'claude', label: 'Claude (Anthropic)', desc: 'Best for reasoning, writing, and complex analysis', icon: <Cpu className="w-4 h-4 text-violet-400" />,      color: '#8B5CF6' },
+                  { value: 'codex',  label: 'Codex (OpenAI)',    desc: 'Best for code generation and technical tasks',      icon: <Zap className="w-4 h-4 text-emerald-400" />,     color: '#10B981' },
+                  { value: 'gemini', label: 'Gemini (Google)',   desc: 'Best for research and large context tasks',         icon: <Globe className="w-4 h-4 text-blue-400" />,      color: '#3B82F6' },
                 ] as const).map(m => (
                   <button
                     key={m.value}
@@ -122,6 +123,37 @@ export function SettingsView() {
                     )}
                   >
                     {m.icon}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-zinc-200">{m.label}</p>
+                      <p className="text-xs text-zinc-500">{m.desc}</p>
+                    </div>
+                    {settings.primaryModel === m.value && (
+                      <div className="w-5 h-5 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-violet-400" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Open Source · Ollama Cloud</h4>
+                {([
+                  { value: 'llama3.2',       label: 'Llama 3.2',      desc: 'Meta · Fast general-purpose open-source model',       color: '#F97316' },
+                  { value: 'mistral',        label: 'Mistral',         desc: 'Mistral AI · Excellent reasoning at low latency',      color: '#EC4899' },
+                  { value: 'deepseek-coder', label: 'DeepSeek Coder',  desc: 'DeepSeek · Top-ranked open-source coding model',       color: '#06B6D4' },
+                ] as const).map(m => (
+                  <button
+                    key={m.value}
+                    onClick={() => updateSettings({ primaryModel: m.value })}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left',
+                      settings.primaryModel === m.value
+                        ? 'border-violet-500/30 bg-violet-500/5'
+                        : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                    )}
+                  >
+                    <Bot className="w-4 h-4 flex-shrink-0" style={{ color: m.color }} />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-zinc-200">{m.label}</p>
                       <p className="text-xs text-zinc-500">{m.desc}</p>
@@ -182,9 +214,10 @@ export function SettingsView() {
 
               <div className="space-y-5">
                 {[
-                  { label: 'Anthropic API Key', placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'Claude', color: '#8B5CF6', icon: <Cpu className="w-4 h-4" /> },
-                  { label: 'OpenAI API Key', placeholder: 'sk-...', value: openaiKey, setter: setOpenaiKey, model: 'Codex/GPT', color: '#10B981', icon: <Zap className="w-4 h-4" /> },
-                  { label: 'Google AI API Key', placeholder: 'AIza...', value: googleKey, setter: setGoogleKey, model: 'Gemini', color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
+                  { label: 'Anthropic API Key',  placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'Claude',              color: '#8B5CF6', icon: <Cpu className="w-4 h-4" />  },
+                  { label: 'OpenAI API Key',      placeholder: 'sk-...',     value: openaiKey,    setter: setOpenaiKey,    model: 'Codex / GPT-4o',       color: '#10B981', icon: <Zap className="w-4 h-4" />  },
+                  { label: 'Google AI API Key',   placeholder: 'AIza...',    value: googleKey,    setter: setGoogleKey,    model: 'Gemini',                color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
+                  { label: 'Ollama Cloud API Key', placeholder: 'ollama_...',value: ollamaKey,    setter: setOllamaKey,    model: 'Llama · Mistral · DeepSeek', color: '#F97316', icon: <Bot className="w-4 h-4" />  },
                 ].map(field => (
                   <div key={field.label} className="space-y-2">
                     <div className="flex items-center gap-2">

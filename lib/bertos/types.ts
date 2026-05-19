@@ -1,4 +1,5 @@
-export type AIModel = 'claude' | 'codex' | 'gemini' | 'auto'
+export type OllamaModel = 'llama3.2' | 'mistral' | 'deepseek-coder'
+export type AIModel = 'claude' | 'codex' | 'gemini' | 'auto' | OllamaModel
 
 export type MessageRole = 'user' | 'assistant' | 'system'
 
@@ -146,6 +147,7 @@ export interface BertOSSettings {
     anthropic?: string
     openai?: string
     google?: string
+    ollama?: string
   }
   modelPriority: AIModel[]
   tokenBudget: number

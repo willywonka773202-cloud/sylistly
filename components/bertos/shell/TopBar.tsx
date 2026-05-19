@@ -1,6 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Cpu, Globe, Sparkles, ChevronDown, PanelRight, PanelRightClose, Command } from 'lucide-react'
+import { Zap, Cpu, Globe, Sparkles, ChevronDown, PanelRight, PanelRightClose, Command, Bot } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { useChatStore } from '@/store/bertos/chat'
@@ -9,43 +9,29 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-const MODEL_OPTIONS: { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }[] = [
-  {
-    value: 'auto',
-    label: 'Auto',
-    description: 'Intelligent routing',
-    icon: <Sparkles className="w-3.5 h-3.5" />,
-    color: '#F59E0B',
-  },
-  {
-    value: 'claude',
-    label: 'Claude',
-    description: 'Anthropic · Best for reasoning',
-    icon: <Cpu className="w-3.5 h-3.5" />,
-    color: '#8B5CF6',
-  },
-  {
-    value: 'codex',
-    label: 'Codex',
-    description: 'OpenAI · Best for coding',
-    icon: <Zap className="w-3.5 h-3.5" />,
-    color: '#10B981',
-  },
-  {
-    value: 'gemini',
-    label: 'Gemini',
-    description: 'Google · Best for research',
-    icon: <Globe className="w-3.5 h-3.5" />,
-    color: '#3B82F6',
-  },
+type ModelOption = { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }
+
+const CLOUD_MODELS: ModelOption[] = [
+  { value: 'auto',   label: 'Auto',   description: 'Intelligent routing',         icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B' },
+  { value: 'claude', label: 'Claude', description: 'Anthropic · Best for reasoning', icon: <Cpu className="w-3.5 h-3.5" />,      color: '#8B5CF6' },
+  { value: 'codex',  label: 'Codex',  description: 'OpenAI · Best for coding',    icon: <Zap className="w-3.5 h-3.5" />,      color: '#10B981' },
+  { value: 'gemini', label: 'Gemini', description: 'Google · Best for research',  icon: <Globe className="w-3.5 h-3.5" />,    color: '#3B82F6' },
 ]
+
+const OLLAMA_MODELS: ModelOption[] = [
+  { value: 'llama3.2',       label: 'Llama 3.2',       description: 'Meta · Ollama Cloud',     icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
+  { value: 'mistral',        label: 'Mistral',          description: 'Mistral AI · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#EC4899' },
+  { value: 'deepseek-coder', label: 'DeepSeek Coder',  description: 'DeepSeek · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#06B6D4' },
+]
+
+const ALL_MODEL_OPTIONS: ModelOption[] = [...CLOUD_MODELS, ...OLLAMA_MODELS]
 
 export function TopBar() {
   const { selectedModel, setSelectedModel, activeView, rightPanelOpen, setRightPanelOpen, setCommandPaletteOpen } = useUIStore()
   const { isStreaming } = useChatStore()
   const [modelMenuOpen, setModelMenuOpen] = useState(false)
 
-  const activeModel = MODEL_OPTIONS.find(m => m.value === selectedModel) ?? MODEL_OPTIONS[0]
+  const activeModel = ALL_MODEL_OPTIONS.find(m => m.value === selectedModel) ?? ALL_MODEL_OPTIONS[0]
 
   const viewLabels: Record<string, string> = {
     chat: 'Chat',
@@ -125,9 +111,35 @@ export function TopBar() {
               >
                 <div className="p-1.5 space-y-0.5">
                   <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
-                    Select Model
+                    Cloud Models
                   </p>
-                  {MODEL_OPTIONS.map(option => (
+                  {CLOUD_MODELS.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => { setSelectedModel(option.value); setModelMenuOpen(false) }}
+                      className={cn(
+                        'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-100',
+                        selectedModel === option.value
+                          ? 'bg-white/10 text-zinc-100'
+                          : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+                      )}
+                    >
+                      <span style={{ color: option.color }}>{option.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium">{option.label}</p>
+                        <p className="text-[10px] text-zinc-600 truncate">{option.description}</p>
+                      </div>
+                      {selectedModel === option.value && (
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: option.color }} />
+                      )}
+                    </button>
+                  ))}
+
+                  <div className="my-1 border-t border-zinc-800/80" />
+                  <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    Open Source · Ollama Cloud
+                  </p>
+                  {OLLAMA_MODELS.map(option => (
                     <button
                       key={option.value}
                       onClick={() => { setSelectedModel(option.value); setModelMenuOpen(false) }}

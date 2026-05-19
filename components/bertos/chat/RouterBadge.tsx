@@ -1,16 +1,20 @@
 'use client'
+import React from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, Cpu, Zap, Globe, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { Sparkles, Cpu, Zap, Globe, ArrowRight, ChevronDown, ChevronUp, Bot } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/bertos/cn'
 import type { RouterDecision } from '@/lib/bertos/types'
 import { getModelColor, getModelLabel } from '@/lib/bertos/router'
 
-const MODEL_ICONS = {
-  claude: <Cpu className="w-3 h-3" />,
-  codex: <Zap className="w-3 h-3" />,
-  gemini: <Globe className="w-3 h-3" />,
-  auto: <Sparkles className="w-3 h-3" />,
+const MODEL_ICONS: Record<string, React.ReactNode> = {
+  claude:          <Cpu     className="w-3 h-3" />,
+  codex:           <Zap     className="w-3 h-3" />,
+  gemini:          <Globe   className="w-3 h-3" />,
+  auto:            <Sparkles className="w-3 h-3" />,
+  'llama3.2':      <Bot     className="w-3 h-3" />,
+  mistral:         <Bot     className="w-3 h-3" />,
+  'deepseek-coder':<Bot     className="w-3 h-3" />,
 }
 
 interface RouterBadgeProps {

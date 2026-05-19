@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Paperclip, Mic, Sparkles, Cpu, Globe, Zap,
-  StopCircle, Image, FileText, X
+  StopCircle, Image, FileText, X, Bot
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -17,11 +17,14 @@ interface InputBarProps {
   disabled?: boolean
 }
 
-const MODEL_HINTS = {
-  auto: { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', label: 'Auto' },
-  claude: { icon: <Cpu className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Claude' },
-  codex: { icon: <Zap className="w-3.5 h-3.5" />, color: '#10B981', label: 'Codex' },
-  gemini: { icon: <Globe className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini' },
+const MODEL_HINTS: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
+  auto:            { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', label: 'Auto'           },
+  claude:          { icon: <Cpu     className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Claude'          },
+  codex:           { icon: <Zap     className="w-3.5 h-3.5" />, color: '#10B981', label: 'Codex'           },
+  gemini:          { icon: <Globe   className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini'          },
+  'llama3.2':      { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3.2'       },
+  mistral:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#EC4899', label: 'Mistral'         },
+  'deepseek-coder':{ icon: <Bot     className="w-3.5 h-3.5" />, color: '#06B6D4', label: 'DeepSeek Coder'  },
 }
 
 const SLASH_COMMANDS = [
@@ -42,7 +45,7 @@ export function InputBar({ onSubmit, onStop, isStreaming, disabled }: InputBarPr
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { selectedModel } = useUIStore()
 
-  const model = MODEL_HINTS[selectedModel]
+  const model = MODEL_HINTS[selectedModel] ?? MODEL_HINTS.auto
 
   const adjustHeight = useCallback(() => {
     const ta = textareaRef.current

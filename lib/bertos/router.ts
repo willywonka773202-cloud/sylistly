@@ -150,20 +150,26 @@ export function routePrompt(prompt: string, preferredModel: AIModel): RouterDeci
 
 export function getModelColor(model: AIModel): string {
   switch (model) {
-    case 'claude': return '#8B5CF6'
-    case 'codex': return '#10B981'
-    case 'gemini': return '#3B82F6'
-    case 'auto': return '#F59E0B'
-    default: return '#6B7280'
+    case 'claude':         return '#8B5CF6'
+    case 'codex':          return '#10B981'
+    case 'gemini':         return '#3B82F6'
+    case 'auto':           return '#F59E0B'
+    case 'llama3.2':       return '#F97316'
+    case 'mistral':        return '#EC4899'
+    case 'deepseek-coder': return '#06B6D4'
+    default:               return '#6B7280'
   }
 }
 
 export function getModelLabel(model: AIModel): string {
   switch (model) {
-    case 'claude': return 'Claude'
-    case 'codex': return 'Codex'
-    case 'gemini': return 'Gemini'
-    case 'auto': return 'Auto'
-    default: return model
+    case 'claude':         return 'Claude'
+    case 'codex':          return 'Codex'
+    case 'gemini':         return 'Gemini'
+    case 'auto':           return 'Auto'
+    case 'llama3.2':       return 'Llama 3.2'
+    case 'mistral':        return 'Mistral'
+    case 'deepseek-coder': return 'DeepSeek Coder'
+    default:               return model
   }
 }

@@ -1,7 +1,8 @@
 'use client'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Copy, Check, Cpu, Globe, Zap, Sparkles, User, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { Copy, Check, Cpu, Globe, Zap, Sparkles, User, ChevronDown, ChevronUp, Info, Bot } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/bertos/cn'
@@ -14,11 +15,14 @@ interface MessageBubbleProps {
   isStreaming?: boolean
 }
 
-const MODEL_ICONS = {
-  claude: <Cpu className="w-3.5 h-3.5" />,
-  codex: <Zap className="w-3.5 h-3.5" />,
-  gemini: <Globe className="w-3.5 h-3.5" />,
-  auto: <Sparkles className="w-3.5 h-3.5" />,
+const MODEL_ICONS: Record<string, React.ReactNode> = {
+  claude:          <Cpu     className="w-3.5 h-3.5" />,
+  codex:           <Zap     className="w-3.5 h-3.5" />,
+  gemini:          <Globe   className="w-3.5 h-3.5" />,
+  auto:            <Sparkles className="w-3.5 h-3.5" />,
+  'llama3.2':      <Bot     className="w-3.5 h-3.5" />,
+  mistral:         <Bot     className="w-3.5 h-3.5" />,
+  'deepseek-coder':<Bot     className="w-3.5 h-3.5" />,
 }
 
 function CodeBlock({ code, language }: { code: string; language?: string }) {
@@ -80,7 +84,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         {/* Model badge for AI messages */}
         {!isUser && message.model && (
           <div className="flex items-center gap-2">
-            <Badge variant={message.model as 'claude' | 'codex' | 'gemini' | 'auto'} className="text-[10px]">
+            <Badge variant={(['claude','codex','gemini','auto'].includes(message.model) ? message.model : 'default') as 'claude' | 'codex' | 'gemini' | 'auto' | 'default'} className="text-[10px]">
               {MODEL_ICONS[message.model]}
               {getModelLabel(message.model)}
             </Badge>
