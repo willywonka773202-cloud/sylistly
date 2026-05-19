@@ -65,7 +65,7 @@ export const useSavedFits = create<SavedFitsState>()(
     }),
     {
       name: 'sylistly.saved-fits.v1',
-      version: 2,
+      version: 3,
       migrate: (persistedState) => {
         const state = persistedState as SavedFitsState | undefined;
         if (!state?.fits) return state as SavedFitsState;
@@ -77,6 +77,13 @@ export const useSavedFits = create<SavedFitsState>()(
             items: hydrateItemsFromCatalog(fit.items),
           })),
         };
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state?.fits) return;
+        state.fits = state.fits.map((fit) => ({
+          ...fit,
+          items: hydrateItemsFromCatalog(fit.items),
+        }));
       },
     },
   ),

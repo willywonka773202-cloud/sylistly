@@ -1297,6 +1297,24 @@ export function getCatalogProductById(id: string): Product | null {
   return PRODUCTS_BY_ID.get(id) || null;
 }
 
+export function hydrateProductFromCatalog(product: Product): Product {
+  const catalogProduct = getCatalogProductById(product.id);
+  const currentIsPlaceholder = String(product.imageUrl || '').startsWith('data:image/svg+xml');
+
+  if (catalogProduct) {
+    return {
+      ...product,
+      ...catalogProduct,
+    };
+  }
+
+  if (currentIsPlaceholder) {
+    return findRealPhotoReplacement(product) || product;
+  }
+
+  return product;
+}
+
 function findRealPhotoReplacement(
   product: Product,
   budget?: GeneratorBudget,
@@ -1343,26 +1361,7 @@ export function hydrateItemsFromCatalog(
 
   for (const [slot, product] of Object.entries(items) as Array<[Category, Product | undefined]>) {
     if (!product) continue;
-    const catalogProduct = getCatalogProductById(product.id);
-    const currentIsPlaceholder = String(product.imageUrl || '').startsWith('data:image/svg+xml');
-
-    if (catalogProduct) {
-      const catalogHasRealPhoto = hasRealPhoto(catalogProduct);
-      if (currentIsPlaceholder && catalogHasRealPhoto) {
-        nextItems[slot] = {
-          ...product,
-          ...catalogProduct,
-        };
-        continue;
-      }
-    }
-
-    if (currentIsPlaceholder) {
-      nextItems[slot] = findRealPhotoReplacement(product) || product;
-      continue;
-    }
-
-    nextItems[slot] = product;
+    nextItems[slot] = hydrateProductFromCatalog(product);
   }
 
   return nextItems;

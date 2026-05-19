@@ -241,6 +241,11 @@ export function hasUsableImageUrl(imageUrl?: string | null): boolean {
     || normalized.startsWith('/');
 }
 
+export function hasUsableTransparentImage(product?: Product | null): boolean {
+  if (!product) return false;
+  return hasUsableImageUrl(product.imageTransparentUrl || product.imageCutoutUrl);
+}
+
 function productImageContext(product: Product): string {
   return [
     product.id,
@@ -498,9 +503,10 @@ export function hasFeedCategoryMismatch(product: Product): boolean {
 
 export function hasUsableProductImage(product?: Product | null): product is Product {
   if (!product) return false;
-  if (product.imageQuality === 'missing') return false;
-  if (isBlockedProductImage(product)) return false;
-  return hasUsableImageUrl(product.imageUrl);
+  const hasTransparent = hasUsableTransparentImage(product);
+  if (product.imageQuality === 'missing' && !hasTransparent) return false;
+  if (isBlockedProductImage(product) && !hasTransparent) return false;
+  return hasTransparent || hasUsableImageUrl(product.imageUrl);
 }
 
 export function isRenderableProduct(product?: Product | null): product is Product {

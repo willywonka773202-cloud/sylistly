@@ -31,7 +31,7 @@ export const useFit = create<FitState>()(
     }),
     {
       name: 'sylistly.fit.v1',
-      version: 2,
+      version: 3,
       migrate: (persistedState) => {
         const state = persistedState as FitState | undefined;
         if (!state?.items) return state as FitState;
@@ -40,6 +40,10 @@ export const useFit = create<FitState>()(
           ...state,
           items: hydrateItemsFromCatalog(state.items),
         };
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state?.items) return;
+        state.items = hydrateItemsFromCatalog(state.items);
       },
     },
   ),

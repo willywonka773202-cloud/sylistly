@@ -5,6 +5,7 @@ import {
   getBrandOrMerchant,
   getCollectionProducts,
   getShoeId,
+  hydrateItemsFromCatalog,
   LAUNCH_COLLECTIONS,
   outfitCategorySignature,
   outfitFullSignature,
@@ -64,8 +65,9 @@ interface SocialFeedState {
 }
 
 function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
+  const hydratedItems = hydrateItemsFromCatalog(items);
   const products = sortFeedRenderableProducts(
-    Object.values(items).filter((product): product is Product => Boolean(product)),
+    Object.values(hydratedItems).filter((product): product is Product => Boolean(product)),
   );
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
@@ -591,7 +593,7 @@ export const useSocialFeed = create<SocialFeedState>()(
       // `feed-plan-X` id format.)
       // Current v6 restores generated seeds first, then merges persisted
       // interactions, so old localStorage cannot keep a stale first screen.
-      version: 6,
+      version: 7,
       migrate: (persistedState) => {
         const state = persistedState as Partial<SocialFeedState> | undefined;
         const posts = mergePersistedPostsWithSeeds(state?.posts);
@@ -601,6 +603,11 @@ export const useSocialFeed = create<SocialFeedState>()(
           posts: posts.length >= 8 ? posts : SEED_POSTS,
           generationCursor,
         } as SocialFeedState;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state?.posts) return;
+        const posts = mergePersistedPostsWithSeeds(state.posts);
+        state.posts = posts.length >= 8 ? posts : SEED_POSTS;
       },
     },
   ),

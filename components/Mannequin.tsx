@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Check, Layers3, Lock, Radar, Sparkles, Wand2 } from 'lucide-react';
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { proxiedImageUrl } from '@/lib/image-url';
+import { ProductImage } from '@/components/ProductImage';
 import { hasUsableProductImage } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
@@ -482,35 +482,14 @@ function PreviewImage({
   blend: boolean;
   onUnavailable?: (product: Product) => void;
 }) {
-  const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
-
-  const src = imageOk && hasUsableProductImage(product) ? proxiedImageUrl(product.imageUrl) : '';
-
-  useEffect(() => {
-    setImageOk(hasUsableProductImage(product));
-  }, [product.id, product.imageUrl]);
-
-  if (!src) return null;
-
   return (
-    <div className={wrapperClassName}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={`${product.brand} ${product.name}`}
-        className={modeClassName}
-        style={{
-          mixBlendMode: blend ? 'multiply' : 'normal',
-          filter: blend ? 'drop-shadow(0 14px 22px rgba(0,0,0,.16))' : 'drop-shadow(0 10px 18px rgba(0,0,0,.08))',
-        }}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        onError={() => {
-          setImageOk(false);
-          onUnavailable?.(product);
-        }}
-      />
-    </div>
+    <ProductImage
+      product={product}
+      wrapperClassName={wrapperClassName}
+      className={`${modeClassName} ${blend ? 'mix-blend-multiply' : ''}`}
+      displayMode="cutout"
+      onUnavailable={onUnavailable}
+    />
   );
 }
 

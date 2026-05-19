@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { hydrateProductFromCatalog } from '@/lib/catalog';
 import type { Category, Product } from '@/lib/types';
 
 /**
@@ -57,10 +58,11 @@ function makeItem(
   status: WardrobeStatus,
   source: WardrobeItem['source'],
 ): WardrobeItem {
+  const hydratedProduct = hydrateProductFromCatalog(product);
   return {
-    id: makeItemId(product.id),
-    productId: product.id,
-    product,
+    id: makeItemId(hydratedProduct.id),
+    productId: hydratedProduct.id,
+    product: hydratedProduct,
     status,
     addedAt: new Date().toISOString(),
     source,
@@ -74,10 +76,25 @@ function upsertItem(
   source: WardrobeItem['source'],
 ): WardrobeItem[] {
   const existingIndex = current.findIndex((entry) => entry.productId === product.id);
+  const hydratedProduct = hydrateProductFromCatalog(product);
   if (existingIndex >= 0) {
     const existing = current[existingIndex];
-    if (existing.status === status) return current; // no-op
-    const updated: WardrobeItem = { ...existing, status, addedAt: new Date().toISOString() };
+    const updated: WardrobeItem = {
+      ...existing,
+      id: makeItemId(hydratedProduct.id),
+      productId: hydratedProduct.id,
+      product: hydratedProduct,
+      status,
+      addedAt: existing.status === status ? existing.addedAt : new Date().toISOString(),
+    };
+    if (
+      existing.status === updated.status
+      && existing.product.imageUrl === updated.product.imageUrl
+      && existing.product.imageTransparentUrl === updated.product.imageTransparentUrl
+      && existing.product.imageCutoutUrl === updated.product.imageCutoutUrl
+    ) {
+      return current; // no-op
+    }
     const next = current.slice();
     next[existingIndex] = updated;
     return next;
@@ -93,10 +110,11 @@ function upsertItem(
 // caused the .filter-is-not-a-function crash.
 function normalizeItems(value: unknown): WardrobeItem[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((entry): entry is WardrobeItem => {
-    if (!entry || typeof entry !== 'object') return false;
+  const out: WardrobeItem[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue;
     const candidate = entry as Partial<WardrobeItem>;
-    return (
+    const valid = (
       typeof candidate.id === 'string'
       && typeof candidate.productId === 'string'
       && (candidate.status === 'closet' || candidate.status === 'wishlist')
@@ -104,7 +122,19 @@ function normalizeItems(value: unknown): WardrobeItem[] {
       && candidate.product !== null
       && typeof (candidate.product as Product).id === 'string'
     );
-  });
+    if (!valid) continue;
+    const status = candidate.status === 'closet' || candidate.status === 'wishlist' ? candidate.status : 'wishlist';
+    const product = hydrateProductFromCatalog(candidate.product as Product);
+    out.push({
+      id: makeItemId(product.id),
+      productId: product.id,
+      product,
+      status,
+      addedAt: typeof candidate.addedAt === 'string' ? candidate.addedAt : new Date().toISOString(),
+      source: candidate.source || 'manual',
+    });
+  }
+  return out;
 }
 
 export const useWardrobe = create<WardrobeState>()(
@@ -166,7 +196,7 @@ export const useWardrobe = create<WardrobeState>()(
       // from a malformed v1 shape (e.g. items persisted as an object
       // map, or a future schema we don't yet recognize).
       name: 'sylistly.wardrobe.v1',
-      version: 2,
+      version: 3,
       migrate: (persistedState, fromVersion) => {
         // Accept anything, normalize to a known-good array. Earlier
         // drafts of this store had a different shape; this migrate
@@ -183,7 +213,7 @@ export const useWardrobe = create<WardrobeState>()(
       // items to an array. The state arg can be undefined on
       // hydration error, hence the guard.
       onRehydrateStorage: () => (state) => {
-        if (state && !Array.isArray(state.items)) {
+        if (state) {
           state.items = normalizeItems(state.items);
         }
       },
@@ -202,5 +232,5 @@ export const useWardrobe = create<WardrobeState>()(
  *   const closet = wardrobeItems.filter((i) => i.status === 'closet');
  */
 export function selectWardrobeItems(state: WardrobeState): WardrobeItem[] {
-  return Array.isArray(state.items) ? state.items : [];
+  return normalizeItems(state.items);
 }

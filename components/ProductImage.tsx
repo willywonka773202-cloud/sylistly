@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Footprints, Gem, Glasses, Layers, Shirt, ShoppingBag, Sparkles } from 'lucide-react';
+import { ImageOff } from 'lucide-react';
 import { proxiedImageUrl } from '@/lib/image-url';
-import { hasUsableProductImage } from '@/lib/product-image-quality';
+import { hasUsableImageUrl, hasUsableProductImage } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
 /**
@@ -162,7 +162,7 @@ const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle>
 };
 
 export function getCleanProductImageUrl(product: Product, cutout = false): string {
-  if (!hasUsableProductImage(product)) return '';
+  if (!hasUsableImageUrl(product.imageUrl)) return '';
   return cutout
     ? proxiedImageUrl(product.imageUrl, { cutout: true, category: product.category })
     : proxiedImageUrl(product.imageUrl);
@@ -188,6 +188,14 @@ function pickTransparentUrl(product: Product): string | null {
   return trimmed;
 }
 
+function hasDisplayableImage(product: Product): boolean {
+  return Boolean(pickTransparentUrl(product) || hasUsableProductImage(product));
+}
+
+function joinClasses(...classes: Array<string | false | null | undefined>): string {
+  return classes.filter(Boolean).join(' ');
+}
+
 export function ProductImage({
   product,
   className,
@@ -208,8 +216,7 @@ export function ProductImage({
   onAvailable?: (product: Product) => void;
   onUnavailable?: (product: Product) => void;
 }) {
-  const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
-  const [cutoutTried, setCutoutTried] = useState(false);
+  const [imageOk, setImageOk] = useState(hasDisplayableImage(product));
   const [transparentFailed, setTransparentFailed] = useState(false);
 
   // Resolve which URL to actually fetch this render. We honestly prefer
@@ -219,27 +226,28 @@ export function ProductImage({
   // original (one-shot, tracked via state) so a broken cutout never
   // breaks the entire tile.
   const transparentUrl = !transparentFailed ? pickTransparentUrl(product) : null;
-  const originalSrc = getCleanProductImageUrl(product, cutoutTried);
+  const originalSrc = hasUsableProductImage(product) ? getCleanProductImageUrl(product) : '';
   const src = transparentUrl ?? originalSrc;
-  const imageKind: 'transparent' | 'original' = transparentUrl ? 'transparent' : 'original';
+  const imageKind: 'transparent' | 'original' | 'missing' = transparentUrl ? 'transparent' : originalSrc ? 'original' : 'missing';
 
   useEffect(() => {
-    setImageOk(hasUsableProductImage(product));
-    setCutoutTried(false);
+    setImageOk(hasDisplayableImage(product));
     setTransparentFailed(false);
-  }, [product.id, product.imageUrl]);
+  }, [product.id, product.imageUrl, product.imageTransparentUrl, product.imageCutoutUrl]);
 
   const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
   const transparentMode = TRANSPARENT_MODE_STYLES[displayMode] ?? TRANSPARENT_MODE_STYLES.default;
   const activeMode = imageKind === 'transparent' ? transparentMode : mode;
-  const resolvedWrapperClass = wrapperClassName || activeMode.wrapper;
+  const resolvedWrapperClass = joinClasses(activeMode.wrapper, wrapperClassName);
   const resolvedImageClass =
-    className || activeMode.paddingByCategory?.[product.category] || activeMode.image;
+    className
+      ? joinClasses(activeMode.image, className)
+      : activeMode.paddingByCategory?.[product.category] || activeMode.image;
 
   if (!imageOk || !src) {
     return (
       <div className={resolvedWrapperClass} data-image-kind={imageKind} data-display-mode={displayMode}>
-        <CategoryFallback product={product} className={className} />
+        <ImageMissingState product={product} className={className} />
       </div>
     );
   }
@@ -260,7 +268,12 @@ export function ProductImage({
         onLoad={(event) => {
           const image = event.currentTarget;
           if (image.naturalWidth < 32 || image.naturalHeight < 32) {
+            if (imageKind === 'transparent' && originalSrc) {
+              setTransparentFailed(true);
+              return;
+            }
             setImageOk(false);
+            onUnavailable?.(product);
             return;
           }
           onAvailable?.(product);
@@ -273,10 +286,6 @@ export function ProductImage({
             setTransparentFailed(true);
             return;
           }
-          if (cutoutTried) {
-            setCutoutTried(false);
-            return;
-          }
           setImageOk(false);
           onUnavailable?.(product);
         }}
@@ -285,61 +294,16 @@ export function ProductImage({
   );
 }
 
-const FALLBACK_COPY: Record<Category, { label: string; className: string; icon: typeof Shirt }> = {
-  top: {
-    label: 'Top',
-    className: 'from-[#fff4ef] via-[#f9d8d0] to-[#d88b83] text-[#7d2d34]',
-    icon: Shirt,
-  },
-  bottom: {
-    label: 'Bottom',
-    className: 'from-[#f4f7fb] via-[#d7e1ee] to-[#8ea2bd] text-[#223a55]',
-    icon: Layers,
-  },
-  shoes: {
-    label: 'Shoes',
-    className: 'from-[#faf7f2] via-[#ded5c9] to-[#9b9285] text-[#3f3933]',
-    icon: Footprints,
-  },
-  outer: {
-    label: 'Outer',
-    className: 'from-[#f7f1e8] via-[#ccd0cf] to-[#687277] text-[#273033]',
-    icon: Layers,
-  },
-  bag: {
-    label: 'Bag',
-    className: 'from-[#fff5db] via-[#f1c983] to-[#b9792e] text-[#603814]',
-    icon: ShoppingBag,
-  },
-  jewelry: {
-    label: 'Jewelry',
-    className: 'from-[#fff0f7] via-[#eab8d4] to-[#9a6390] text-[#56264d]',
-    icon: Gem,
-  },
-  eyewear: {
-    label: 'Eyewear',
-    className: 'from-[#f7f4ef] via-[#d9d4ca] to-[#8b8275] text-[#332e29]',
-    icon: Glasses,
-  },
-  hat: {
-    label: 'Hat',
-    className: 'from-[#f9f0df] via-[#dfc499] to-[#a56d36] text-[#563311]',
-    icon: Sparkles,
-  },
-};
-
-function CategoryFallback({ product, className }: { product: Product; className?: string }) {
-  const fallback = FALLBACK_COPY[product.category] || FALLBACK_COPY.top;
-  const Icon = fallback.icon;
+function ImageMissingState({ product, className }: { product: Product; className?: string }) {
   return (
-    <div className={`grid h-full w-full place-items-center bg-gradient-to-br ${fallback.className} ${className || ''}`}>
+    <div className={`grid h-full w-full place-items-center bg-[linear-gradient(180deg,#fffaf2_0%,#eee3d6_100%)] text-[#7a6657] ${className || ''}`}>
       <div className="flex max-w-full flex-col items-center justify-center gap-2 px-2 text-center">
-        <div className="grid h-10 w-10 place-items-center rounded-full border border-current/20 bg-white/38 shadow-[0_10px_30px_rgba(0,0,0,.12)]">
-          <Icon size={21} strokeWidth={1.8} />
+        <div className="grid h-10 w-10 place-items-center rounded-full border border-[#d9cbbd] bg-white/72 shadow-[0_10px_24px_rgba(72,47,30,.1)]">
+          <ImageOff size={19} strokeWidth={1.9} />
         </div>
-        <div className="text-[10px] font-black uppercase tracking-[.18em]">{fallback.label}</div>
-        <div className="line-clamp-2 max-w-[13ch] text-[9px] font-semibold leading-tight opacity-78">
-          Image unavailable
+        <div className="text-[9px] font-black uppercase tracking-[.16em]">Image unavailable</div>
+        <div className="line-clamp-2 max-w-[15ch] text-[9px] font-semibold leading-tight opacity-75">
+          {product.brand}
         </div>
       </div>
     </div>

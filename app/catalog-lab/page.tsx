@@ -1,6 +1,7 @@
 import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { validateProduct } from '@/lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
+import { CatalogRuntimeProof, type TransparentProofProduct } from '@/components/CatalogRuntimeProof';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ReactNode } from 'react';
@@ -131,6 +132,10 @@ export default function CatalogLabPage() {
     .slice(0, 20);
   const readyProducts = transparentProducts.slice(0, 20);
   const transparentPreviewProducts = transparentProducts.slice(0, 48);
+  const runtimeProofProducts: TransparentProofProduct[] = transparentProducts.slice(0, 50).map((product) => ({
+    product,
+    publicFileExists: transparentFileExists(product),
+  }));
   const latestRun = latestCutoutRun();
   const nextBatch = nextBatchCategories
     .map((category) => ({
@@ -285,6 +290,8 @@ export default function CatalogLabPage() {
             ))}
           </div>
         </section>
+
+        <CatalogRuntimeProof proofProducts={runtimeProofProducts} />
 
         <section className="grid gap-4 lg:grid-cols-3">
           <Panel title="Top categories">
