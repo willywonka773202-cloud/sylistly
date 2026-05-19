@@ -9,25 +9,6 @@ export const runtime = 'edge'
 
 const OLLAMA_BASE = 'https://ollama.com/api/chat'
 
-// Lazy-init clients — only instantiate if the key is present so the route
-// can still handle models that ARE configured even if others are not.
-const getAnthropic = () =>
-  process.env.ANTHROPIC_API_KEY
-    ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-    : null
-
-const getOpenAI = () =>
-  process.env.OPENAI_API_KEY
-    ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-    : null
-
-const getGoogle = () =>
-  process.env.GEMINI_API_KEY
-    ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-    : null
-
-const getOllamaKey = () => process.env.OLLAMA_API_KEY ?? ''
-
 // Map BertOS model aliases → concrete model IDs
 const MODEL_IDS: Record<string, string> = {
   claude:           'claude-opus-4-5',
@@ -44,8 +25,19 @@ function resolveTarget(alias: string): BertosTarget {
   if (alias === 'claude' || alias.startsWith('claude'))  return 'claude'
   if (alias === 'codex'  || alias.startsWith('gpt') || alias.startsWith('o1') || alias.startsWith('o3')) return 'codex'
   if (alias === 'gemini' || alias.startsWith('gemini'))  return 'gemini'
-  // Anything else (llama, mistral, deepseek-coder, …) → Ollama Cloud
   return 'ollama'
+}
+
+interface ClientKeys {
+  anthropic?: string
+  openai?: string
+  google?: string
+  ollama?: string
+}
+
+// Resolve a key: Vercel env var takes priority, then client-supplied key from Settings.
+function resolveKey(envKey: string | undefined, clientKey: string | undefined): string {
+  return envKey?.trim() || clientKey?.trim() || ''
 }
 
 export async function POST(req: NextRequest) {
@@ -54,7 +46,15 @@ export async function POST(req: NextRequest) {
     prompt?: string
     model: string
     systemPrompt?: string
+    clientKeys?: ClientKeys
   }
+
+  // Per-request key resolution: env first, Settings UI second
+  const ck = body.clientKeys ?? {}
+  const anthropicKey = resolveKey(process.env.ANTHROPIC_API_KEY, ck.anthropic)
+  const openaiKey    = resolveKey(process.env.OPENAI_API_KEY,    ck.openai)
+  const geminiKey    = resolveKey(process.env.GEMINI_API_KEY,    ck.google)
+  const ollamaKey    = resolveKey(process.env.OLLAMA_API_KEY,    ck.ollama)
 
   const encoder = new TextEncoder()
   const ts = new TransformStream<Uint8Array, Uint8Array>()
@@ -88,7 +88,6 @@ export async function POST(req: NextRequest) {
     : body.model
   const target = resolveTarget(modelAlias)
 
-  // Emit router decision immediately so the UI can show it before first chunk
   const routerDecision = body.model === 'auto'
     ? routePrompt(conversationMessages[conversationMessages.length - 1]?.content ?? '', 'auto')
     : { primary: modelAlias, reasoning: `Routed to ${modelAlias} as selected.`, confidence: 1, taskType: 'general', strategy: 'single' }
@@ -98,8 +97,8 @@ export async function POST(req: NextRequest) {
       await send({ routerDecision })
 
       if (target === 'claude') {
-        const client = getAnthropic()
-        if (!client) throw new Error('ANTHROPIC_API_KEY is not configured.')
+        if (!anthropicKey) throw new Error('ANTHROPIC_API_KEY is not configured. Add it in Settings → API Keys.')
+        const client = new Anthropic({ apiKey: anthropicKey })
 
         const apiMessages = conversationMessages.map(m => ({
           role: m.role as 'user' | 'assistant',
@@ -121,8 +120,8 @@ export async function POST(req: NextRequest) {
         }
 
       } else if (target === 'codex') {
-        const client = getOpenAI()
-        if (!client) throw new Error('OPENAI_API_KEY is not configured.')
+        if (!openaiKey) throw new Error('OPENAI_API_KEY is not configured. Add it in Settings → API Keys.')
+        const client = new OpenAI({ apiKey: openaiKey })
 
         const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
           ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
@@ -145,8 +144,8 @@ export async function POST(req: NextRequest) {
         }
 
       } else if (target === 'gemini') {
-        const client = getGoogle()
-        if (!client) throw new Error('GEMINI_API_KEY is not configured.')
+        if (!geminiKey) throw new Error('GEMINI_API_KEY is not configured. Add it in Settings → API Keys.')
+        const client = new GoogleGenAI({ apiKey: geminiKey })
 
         const contents = conversationMessages.map(m => ({
           role: m.role === 'user' ? 'user' : 'model',
@@ -166,8 +165,7 @@ export async function POST(req: NextRequest) {
 
       } else {
         // ── Hybrid fallback: Ollama Cloud for all open-source models ─────────
-        const ollamaKey = getOllamaKey()
-        if (!ollamaKey) throw new Error('OLLAMA_API_KEY is not configured — add it in Settings.')
+        if (!ollamaKey) throw new Error('OLLAMA_API_KEY is not configured. Add it in Settings → API Keys.')
 
         const ollamaMessages = [
           ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
@@ -217,9 +215,7 @@ export async function POST(req: NextRequest) {
       try {
         await send({ error: message })
         await done()
-      } catch {
-        // writer already closed
-      }
+      } catch { /* writer already closed */ }
     }
   })()
 

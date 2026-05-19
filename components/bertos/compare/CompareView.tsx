@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { readAIStream } from '@/lib/bertos/stream-utils'
+import { useUIStore } from '@/store/bertos/ui'
 import type { AIModel } from '@/lib/bertos/types'
 
 interface ModelResponse {
@@ -59,6 +60,7 @@ export function CompareView() {
   const [copiedModel, setCopiedModel] = useState<ModelId | null>(null)
   const [activeTab, setActiveTab] = useState<ModelId>('claude')
   const abortRefs = useRef<Map<ModelId, AbortController>>(new Map())
+  const { settings } = useUIStore()
 
   const patchResponse = useCallback((model: ModelId, patch: Partial<ModelResponse>) => {
     setResponses(prev => prev.map(r => r.model === model ? { ...r, ...patch } : r))
@@ -89,6 +91,7 @@ export function CompareView() {
             messages: [{ id: '1', role: 'user', content: prompt, timestamp: Date.now() }],
             model,
             systemPrompt: 'You are a helpful AI assistant. Be concise but complete.',
+            clientKeys: settings.apiKeys,
           }),
           signal: ctrl.signal,
         })
@@ -244,7 +247,8 @@ export function CompareView() {
               })}
             </div>
 
-            <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-3 md:divide-x divide-zinc-800/50">
+            {/* Desktop: 3 fixed-height columns. Mobile: full-width vertical stack. */}
+            <div className="flex-1 md:overflow-hidden flex flex-col md:grid md:grid-cols-3 md:divide-x divide-zinc-800/50 overflow-y-auto">
             {responses.map(response => {
               const meta = MODEL_META[response.model as ModelId]
               const isWinner = winner === response.model
@@ -252,9 +256,11 @@ export function CompareView() {
                 <div
                   key={response.model}
                   className={cn(
-                    'flex flex-col h-full overflow-hidden',
-                    // On mobile, only show the active tab
-                    response.model !== activeTab && 'hidden md:flex'
+                    'flex flex-col md:h-full md:overflow-hidden',
+                    // On mobile, only show the active tab; on desktop show all
+                    response.model !== activeTab && 'hidden md:flex',
+                    // Mobile: give each card a min height so content is readable
+                    'min-h-[60vh] md:min-h-0 border-b border-zinc-800/50 md:border-b-0'
                   )}
                 >
                   {/* Column header */}

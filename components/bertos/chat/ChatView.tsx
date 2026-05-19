@@ -42,7 +42,7 @@ export function ChatView() {
     createSession, addMessage, appendToMessage, updateMessage,
     setStreaming, updateSessionTitle, getActiveSession,
   } = useChatStore()
-  const { selectedModel } = useUIStore()
+  const { selectedModel, settings } = useUIStore()
   const { getActiveProject } = useProjectStore()
   const bottomRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -137,6 +137,7 @@ export function ChatView() {
           messages: allMessages,
           model: resolvedModel,
           systemPrompt,
+          clientKeys: settings.apiKeys,
         }),
         signal: abortRef.current.signal,
       })
@@ -215,7 +216,7 @@ export function ChatView() {
       setPendingDecision(null)
     }
   }, [
-    activeSessionId, selectedModel, messages.length,
+    activeSessionId, selectedModel, messages.length, settings.apiKeys,
     addMessage, appendToMessage, updateMessage, setStreaming,
     createSession, updateSessionTitle, getActiveProject,
   ])
