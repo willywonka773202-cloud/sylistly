@@ -194,14 +194,14 @@ function FrontCanvas({
   const _heatmap = heatmapMode;
   const _magnet = magnetMode;
   const zoneStyle: Record<Category, CSSProperties> = {
-    hat: { gridColumn: '1', gridRow: '1 / span 2' },
-    outer: { gridColumn: '1', gridRow: '3 / span 6' },
-    top: { gridColumn: '2', gridRow: '1 / span 4' },
-    bottom: { gridColumn: '2', gridRow: '5 / span 4' },
-    eyewear: { gridColumn: '3', gridRow: '1 / span 2' },
-    jewelry: { gridColumn: '3', gridRow: '3 / span 2' },
-    bag: { gridColumn: '3', gridRow: '5 / span 2' },
-    shoes: { gridColumn: '3', gridRow: '7 / span 2' },
+    hat: { gridColumn: '1', gridRow: '1 / span 2', minWidth: 0, minHeight: 0 },
+    outer: { gridColumn: '1', gridRow: '3 / span 6', minWidth: 0, minHeight: 0 },
+    top: { gridColumn: '2', gridRow: '1 / span 4', minWidth: 0, minHeight: 0 },
+    bottom: { gridColumn: '2', gridRow: '5 / span 4', minWidth: 0, minHeight: 0 },
+    eyewear: { gridColumn: '3', gridRow: '1 / span 2', minWidth: 0, minHeight: 0 },
+    jewelry: { gridColumn: '3', gridRow: '3 / span 2', minWidth: 0, minHeight: 0 },
+    bag: { gridColumn: '3', gridRow: '5 / span 2', minWidth: 0, minHeight: 0 },
+    shoes: { gridColumn: '3', gridRow: '7 / span 2', minWidth: 0, minHeight: 0 },
   };
 
   const renderZone = (category: Category, prominent = false) => {
@@ -224,7 +224,7 @@ function FrontCanvas({
       : selected
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
       : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
-    const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
+    const wrapperClassName = `relative h-full w-full min-w-0 min-h-0 overflow-hidden rounded-[18px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
       <span className="absolute right-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-accent text-white shadow-[0_4px_12px_rgba(232,54,93,.42)]">
         {locked ? <Lock size={10} strokeWidth={3} /> : <Check size={11} strokeWidth={3} />}
@@ -242,7 +242,7 @@ function FrontCanvas({
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
           {selectionBadge}
-          <span className={`text-[8px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          <span className={`max-w-full truncate text-[7px] font-bold uppercase tracking-[.14em] min-[390px]:text-[8px] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
           <span className={`mt-0.5 text-[15px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
         </button>
       );
@@ -312,11 +312,11 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[430px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[470px]">
+    <div className="relative h-[410px] w-full max-w-full overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[438px]">
       <div
-        className="grid h-full gap-2"
+        className="grid h-full min-w-0 gap-2"
         style={{
-          gridTemplateColumns: '0.92fr 1.55fr 0.92fr',
+          gridTemplateColumns: 'minmax(0, 0.86fr) minmax(0, 1.42fr) minmax(0, 0.86fr)',
           gridTemplateRows: 'repeat(8, minmax(0, 1fr))',
         }}
       >

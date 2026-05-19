@@ -934,7 +934,7 @@ function BuilderPageContent({
   const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
 
   return (
-    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
+    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <header className="flex items-center justify-between px-4 pb-2.5 pt-10">
         <button
           type="button"
@@ -963,8 +963,8 @@ function BuilderPageContent({
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pb-56 pt-2">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="flex min-w-0 flex-col gap-4 px-4 pb-56 pt-2">
           <section className="flex flex-col gap-3">
             <div className="relative">
               {saveBurst ? (
@@ -990,7 +990,7 @@ function BuilderPageContent({
               </div>
               <motion.div
                 animate={boardControls}
-                className="relative z-10 touch-pan-y"
+                className="relative z-10 min-w-0 touch-pan-y"
                 drag="x"
                 dragConstraints={{ left: -220, right: 220 }}
                 dragElastic={0.12}
@@ -1039,11 +1039,11 @@ function BuilderPageContent({
               </motion.div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5 px-0.5">
+            <div className="grid min-w-0 grid-cols-3 gap-2.5 px-0.5">
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('settings')}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98]"
+                className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/18 bg-black/58 px-2.5 py-3.5 text-[9px] font-black uppercase tracking-[.1em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98] min-[390px]:gap-1.5 min-[390px]:px-3 min-[390px]:text-[10px]"
               >
                 <SlidersHorizontal size={13} />
                 Controls
@@ -1051,7 +1051,7 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={seedFromWardrobe}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/18 bg-black/58 px-3 py-3.5 text-[10px] font-black uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98]"
+                className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/18 bg-black/58 px-2.5 py-3.5 text-[9px] font-black uppercase tracking-[.1em] text-white shadow-[0_14px_34px_rgba(0,0,0,.3)] backdrop-blur-md transition active:scale-[.98] min-[390px]:gap-1.5 min-[390px]:px-3 min-[390px]:text-[10px]"
               >
                 <Shirt size={13} />
                 Closet
@@ -1060,7 +1060,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Board controls.' })}
                 disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-3.5 text-[11px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[.98] disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none"
+                className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-accent px-2.5 py-3.5 text-[9px] font-black uppercase tracking-[.1em] text-white shadow-pink-glow transition active:scale-[.98] disabled:bg-black/45 disabled:text-white/45 disabled:shadow-none min-[390px]:gap-1.5 min-[390px]:px-3 min-[390px]:text-[11px]"
               >
                 {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Generate
