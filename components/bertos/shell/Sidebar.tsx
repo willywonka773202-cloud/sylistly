@@ -3,8 +3,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   MessageSquare, GitCompare, Code2, Bot, Brain, Settings,
-  Plus, ChevronLeft, ChevronRight, Hash, Zap, Command,
-  Trash2, MoreHorizontal, Pin
+  Plus, ChevronLeft, ChevronRight, Hash, Zap, Command, Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -15,33 +14,36 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRouter } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { id: 'chat', icon: MessageSquare, label: 'Chat', href: '/chat' },
-  { id: 'compare', icon: GitCompare, label: 'Compare', href: '/compare' },
-  { id: 'workspace', icon: Code2, label: 'Workspace', href: '/workspace' },
-  { id: 'agents', icon: Bot, label: 'Agents', href: '/agents' },
-  { id: 'memory', icon: Brain, label: 'Memory', href: '/memory' },
+  { id: 'chat',      icon: MessageSquare, label: 'Chat',      href: '/chat'      },
+  { id: 'compare',   icon: GitCompare,    label: 'Compare',   href: '/compare'   },
+  { id: 'workspace', icon: Code2,         label: 'Workspace', href: '/workspace' },
+  { id: 'agents',    icon: Bot,           label: 'Agents',    href: '/agents'    },
+  { id: 'memory',    icon: Brain,         label: 'Memory',    href: '/memory'    },
 ] as const
 
-export function Sidebar() {
+interface SidebarProps {
+  isMobile?: boolean
+  onMobileClose?: () => void
+}
+
+export function Sidebar({ isMobile = false, onMobileClose }: SidebarProps) {
   const { sidebarCollapsed, setSidebarCollapsed, activeView, setActiveView, setCommandPaletteOpen } = useUIStore()
   const { sessions, activeSessionId, setActiveSession, createSession, deleteSession } = useChatStore()
   const { projects, activeProjectId, setActiveProject } = useProjectStore()
   const router = useRouter()
   const [hoveredSession, setHoveredSession] = useState<string | null>(null)
 
-  const recentSessions = sessions.slice(0, 10)
+  // On mobile the sidebar is always expanded (never icon-only)
+  const collapsed = isMobile ? false : sidebarCollapsed
 
   const navigate = (id: typeof NAV_ITEMS[number]['id'], href: string) => {
     setActiveView(id)
     router.push(href)
+    onMobileClose?.()
   }
 
-  return (
-    <motion.aside
-      animate={{ width: sidebarCollapsed ? 56 : 220 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
-      className="relative flex h-full flex-col bg-[#0D0D0F] border-r border-zinc-800/50 overflow-hidden z-10 flex-shrink-0"
-    >
+  const inner = (
+    <>
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-3 py-4 border-b border-zinc-800/50 flex-shrink-0">
         <div className="relative flex-shrink-0">
@@ -55,7 +57,7 @@ export function Sidebar() {
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0D0D0F]" />
         </div>
         <AnimatePresence>
-          {!sidebarCollapsed && (
+          {!collapsed && (
             <motion.div
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
@@ -79,11 +81,11 @@ export function Sidebar() {
                 onClick={() => setCommandPaletteOpen(true)}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-xs text-zinc-600 hover:text-zinc-300 hover:bg-white/5 transition-all duration-150 border border-zinc-800/50 hover:border-zinc-700/50',
-                  sidebarCollapsed && 'justify-center'
+                  collapsed && 'justify-center'
                 )}
               >
                 <Command className="w-3.5 h-3.5 flex-shrink-0" />
-                {!sidebarCollapsed && (
+                {!collapsed && (
                   <>
                     <span className="flex-1 text-left">Search & commands</span>
                     <kbd className="text-[9px] bg-zinc-900 text-zinc-600 px-1 py-0.5 rounded border border-zinc-800">⌘K</kbd>
@@ -91,38 +93,34 @@ export function Sidebar() {
                 )}
               </button>
             </TooltipTrigger>
-            {sidebarCollapsed && <TooltipContent side="right">Command Palette (⌘K)</TooltipContent>}
+            {collapsed && <TooltipContent side="right">Command Palette (⌘K)</TooltipContent>}
           </Tooltip>
 
           {/* New chat */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => {
-                  createSession()
-                  setActiveView('chat')
-                  router.push('/chat')
-                }}
+                onClick={() => { createSession(); setActiveView('chat'); router.push('/chat'); onMobileClose?.() }}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-xs text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 transition-all duration-150 border border-violet-500/20 hover:border-violet-500/40',
-                  sidebarCollapsed && 'justify-center'
+                  collapsed && 'justify-center'
                 )}
               >
                 <Plus className="w-3.5 h-3.5 flex-shrink-0" />
-                {!sidebarCollapsed && <span className="font-medium">New Chat</span>}
+                {!collapsed && <span className="font-medium">New Chat</span>}
               </button>
             </TooltipTrigger>
-            {sidebarCollapsed && <TooltipContent side="right">New Chat</TooltipContent>}
+            {collapsed && <TooltipContent side="right">New Chat</TooltipContent>}
           </Tooltip>
 
           {/* Nav items */}
           <div className="pt-3 space-y-0.5">
-            {!sidebarCollapsed && (
+            {!collapsed && (
               <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-700">
                 Navigation
               </p>
             )}
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS.map(item => {
               const isActive = activeView === item.id
               return (
                 <Tooltip key={item.id}>
@@ -134,30 +132,24 @@ export function Sidebar() {
                         isActive
                           ? 'bg-violet-500/12 text-violet-300 shadow-[inset_0_0_0_1px_rgba(139,92,246,0.15)]'
                           : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/4',
-                        sidebarCollapsed && 'justify-center'
+                        collapsed && 'justify-center'
                       )}
                     >
                       <item.icon className={cn('w-4 h-4 flex-shrink-0', isActive && 'text-violet-400')} />
-                      {!sidebarCollapsed && (
-                        <span className="text-xs font-medium">{item.label}</span>
-                      )}
-                      {isActive && !sidebarCollapsed && (
-                        <div className="ml-auto w-1 h-1 rounded-full bg-violet-400" />
-                      )}
+                      {!collapsed && <span className="text-xs font-medium">{item.label}</span>}
+                      {isActive && !collapsed && <div className="ml-auto w-1 h-1 rounded-full bg-violet-400" />}
                     </button>
                   </TooltipTrigger>
-                  {sidebarCollapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
+                  {collapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
                 </Tooltip>
               )
             })}
           </div>
 
           {/* Projects */}
-          {!sidebarCollapsed && (
+          {!collapsed && (
             <div className="pt-3">
-              <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-700">
-                Projects
-              </p>
+              <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-700">Projects</p>
               <div className="space-y-0.5">
                 {projects.slice(0, 5).map(project => (
                   <button
@@ -165,16 +157,12 @@ export function Sidebar() {
                     onClick={() => setActiveProject(project.id)}
                     className={cn(
                       'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all duration-150',
-                      activeProjectId === project.id
-                        ? 'bg-white/6 text-zinc-200'
-                        : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/4'
+                      activeProjectId === project.id ? 'bg-white/6 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/4'
                     )}
                   >
                     <span className="text-sm leading-none">{project.icon}</span>
                     <span className="flex-1 text-left truncate font-medium">{project.name}</span>
-                    {activeProjectId === project.id && (
-                      <div className="w-1 h-1 rounded-full" style={{ background: project.color }} />
-                    )}
+                    {activeProjectId === project.id && <div className="w-1 h-1 rounded-full" style={{ background: project.color }} />}
                   </button>
                 ))}
               </div>
@@ -182,13 +170,11 @@ export function Sidebar() {
           )}
 
           {/* Recent chats */}
-          {!sidebarCollapsed && recentSessions.length > 0 && (
+          {!collapsed && sessions.length > 0 && (
             <div className="pt-3">
-              <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-700">
-                Recent chats
-              </p>
+              <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-700">Recent chats</p>
               <div className="space-y-0.5">
-                {recentSessions.map(session => (
+                {sessions.slice(0, 10).map(session => (
                   <div
                     key={session.id}
                     className="relative group"
@@ -196,16 +182,10 @@ export function Sidebar() {
                     onMouseLeave={() => setHoveredSession(null)}
                   >
                     <button
-                      onClick={() => {
-                        setActiveSession(session.id)
-                        setActiveView('chat')
-                        router.push('/chat')
-                      }}
+                      onClick={() => { setActiveSession(session.id); setActiveView('chat'); router.push('/chat'); onMobileClose?.() }}
                       className={cn(
                         'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all duration-150 pr-8',
-                        activeSessionId === session.id
-                          ? 'bg-white/6 text-zinc-200'
-                          : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/4'
+                        activeSessionId === session.id ? 'bg-white/6 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/4'
                       )}
                     >
                       <Hash className="w-3 h-3 flex-shrink-0 opacity-40" />
@@ -213,10 +193,7 @@ export function Sidebar() {
                     </button>
                     {hoveredSession === session.id && (
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          deleteSession(session.id)
-                        }}
+                        onClick={e => { e.stopPropagation(); deleteSession(session.id) }}
                         className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded text-zinc-700 hover:text-red-400 hover:bg-red-500/10 transition-all"
                       >
                         <Trash2 className="w-3 h-3" />
@@ -235,39 +212,54 @@ export function Sidebar() {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              onClick={() => {
-                setActiveView('settings')
-                router.push('/settings')
-              }}
+              onClick={() => { setActiveView('settings'); router.push('/settings'); onMobileClose?.() }}
               className={cn(
                 'w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-xs transition-all duration-150',
-                activeView === 'settings'
-                  ? 'text-violet-300 bg-violet-500/10'
-                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5',
-                sidebarCollapsed && 'justify-center'
+                activeView === 'settings' ? 'text-violet-300 bg-violet-500/10' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5',
+                collapsed && 'justify-center'
               )}
             >
               <Settings className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Settings</span>}
+              {!collapsed && <span>Settings</span>}
             </button>
           </TooltipTrigger>
-          {sidebarCollapsed && <TooltipContent side="right">Settings</TooltipContent>}
+          {collapsed && <TooltipContent side="right">Settings</TooltipContent>}
         </Tooltip>
 
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className={cn(
-            'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[10px] text-zinc-700 hover:text-zinc-500 hover:bg-white/5 transition-all duration-150',
-            sidebarCollapsed ? 'justify-center' : 'justify-between'
-          )}
-        >
-          {!sidebarCollapsed && <span>Collapse</span>}
-          {sidebarCollapsed
-            ? <ChevronRight className="w-3.5 h-3.5" />
-            : <ChevronLeft className="w-3.5 h-3.5" />
-          }
-        </button>
+        {/* Collapse button — desktop only */}
+        {!isMobile && (
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className={cn(
+              'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[10px] text-zinc-700 hover:text-zinc-500 hover:bg-white/5 transition-all duration-150',
+              collapsed ? 'justify-center' : 'justify-between'
+            )}
+          >
+            {!collapsed && <span>Collapse</span>}
+            {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+          </button>
+        )}
       </div>
+    </>
+  )
+
+  // Mobile: plain div (width controlled by the parent drawer)
+  if (isMobile) {
+    return (
+      <div className="relative flex h-full w-full flex-col bg-[#0D0D0F] border-r border-zinc-800/50 overflow-hidden">
+        {inner}
+      </div>
+    )
+  }
+
+  // Desktop: animated width
+  return (
+    <motion.aside
+      animate={{ width: sidebarCollapsed ? 56 : 220 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      className="relative flex h-full flex-col bg-[#0D0D0F] border-r border-zinc-800/50 overflow-hidden z-10 flex-shrink-0"
+    >
+      {inner}
     </motion.aside>
   )
 }

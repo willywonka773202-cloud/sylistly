@@ -57,6 +57,7 @@ export function CompareView() {
   const [isRunning, setIsRunning] = useState(false)
   const [winner, setWinner] = useState<ModelId | null>(null)
   const [copiedModel, setCopiedModel] = useState<ModelId | null>(null)
+  const [activeTab, setActiveTab] = useState<ModelId>('claude')
   const abortRefs = useRef<Map<ModelId, AbortController>>(new Map())
 
   const patchResponse = useCallback((model: ModelId, patch: Partial<ModelResponse>) => {
@@ -207,7 +208,7 @@ export function CompareView() {
       </div>
 
       {/* Columns */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {responses.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
             <div className="flex items-center gap-3">
@@ -220,12 +221,42 @@ export function CompareView() {
             <p className="text-zinc-600 text-sm">Ask a question to stream all models simultaneously</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 h-full divide-x divide-zinc-800/50">
+          <>
+            {/* Mobile tab bar */}
+            <div className="md:hidden flex-shrink-0 flex border-b border-zinc-800/50 bg-zinc-950/60">
+              {MODELS.map(m => {
+                const meta = MODEL_META[m]
+                const isActive = activeTab === m
+                const resp = responses.find(r => r.model === m)
+                return (
+                  <button
+                    key={m}
+                    onClick={() => setActiveTab(m)}
+                    className="flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-all relative"
+                    style={{ color: isActive ? meta.color : undefined }}
+                  >
+                    <span className={cn('transition-colors', isActive ? '' : 'text-zinc-600')}>{meta.icon}</span>
+                    <span className="text-[10px] font-semibold">{meta.label}</span>
+                    {resp?.streaming && <div className="absolute top-1.5 right-3 w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: meta.color }} />}
+                    {isActive && <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 rounded-full" style={{ background: meta.color }} />}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-3 md:divide-x divide-zinc-800/50">
             {responses.map(response => {
               const meta = MODEL_META[response.model as ModelId]
               const isWinner = winner === response.model
               return (
-                <div key={response.model} className="flex flex-col h-full overflow-hidden">
+                <div
+                  key={response.model}
+                  className={cn(
+                    'flex flex-col h-full overflow-hidden',
+                    // On mobile, only show the active tab
+                    response.model !== activeTab && 'hidden md:flex'
+                  )}
+                >
                   {/* Column header */}
                   <div
                     className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0"
@@ -312,7 +343,8 @@ export function CompareView() {
                 </div>
               )
             })}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

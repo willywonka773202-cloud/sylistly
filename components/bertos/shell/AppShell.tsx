@@ -1,10 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Toaster } from 'sonner'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { RightPanel } from './RightPanel'
+import { BottomNav } from './BottomNav'
 import { CommandPalette } from '../command/CommandPalette'
 import { OnboardingModal, useOnboarding } from './OnboardingModal'
 import { DemoBanner } from './DemoBanner'
@@ -20,12 +21,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { createSession } = useChatStore()
   const { showOnboarding, complete } = useOnboarding()
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const router = useRouter()
+
+  // Close mobile sidebar on route change
+  useEffect(() => { setMobileSidebarOpen(false) }, [router])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey
-
       if (mod && e.key === 'k') { e.preventDefault(); setCommandPaletteOpen(true) }
       if (mod && e.key === 'b') { e.preventDefault(); setSidebarCollapsed(!sidebarCollapsed) }
       if (mod && e.key === 'p') { e.preventDefault(); setRightPanelOpen(!rightPanelOpen) }
@@ -43,23 +47,60 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <TooltipProvider delayDuration={400}>
-      <div className="flex h-screen bg-[#0A0A0B] overflow-hidden text-zinc-100">
-        {/* Sidebar */}
-        <Sidebar />
+      <div className="flex h-dvh bg-[#0A0A0B] overflow-hidden text-zinc-100">
+
+        {/* Desktop sidebar — hidden on mobile */}
+        <div className="hidden md:flex flex-shrink-0 h-full">
+          <Sidebar />
+        </div>
+
+        {/* Mobile sidebar overlay */}
+        <AnimatePresence>
+          {mobileSidebarOpen && (
+            <>
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40 bg-black/70 md:hidden"
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+              <motion.div
+                key="drawer"
+                initial={{ x: -280 }}
+                animate={{ x: 0 }}
+                exit={{ x: -280 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="fixed inset-y-0 left-0 z-50 w-72 md:hidden"
+              >
+                <Sidebar isMobile onMobileClose={() => setMobileSidebarOpen(false)} />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <DemoBanner />
-          <TopBar />
+          <TopBar onMobileMenuToggle={() => setMobileSidebarOpen(true)} />
           <main className="flex-1 overflow-hidden">
             {children}
           </main>
         </div>
 
-        {/* Right panel */}
+        {/* Right panel — desktop only */}
         <AnimatePresence>
-          {rightPanelOpen && <RightPanel />}
+          {rightPanelOpen && (
+            <div className="hidden md:block">
+              <RightPanel />
+            </div>
+          )}
         </AnimatePresence>
+
+        {/* Mobile bottom navigation */}
+        <BottomNav />
 
         {/* Overlays */}
         <CommandPalette />

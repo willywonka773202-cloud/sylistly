@@ -334,7 +334,8 @@ export function ChatView() {
         </AnimatePresence>
       </div>
 
-      <div className="flex-shrink-0">
+      {/* Extra bottom padding on mobile so the fixed bottom nav doesn't cover the input */}
+      <div className="flex-shrink-0 mb-16 md:mb-0">
         <InputBar onSubmit={sendMessage} onStop={handleStop} isStreaming={isStreaming} />
       </div>
     </div>

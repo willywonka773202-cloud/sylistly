@@ -96,7 +96,7 @@ export function InputBar({ onSubmit, onStop, isStreaming, disabled }: InputBarPr
   )
 
   return (
-    <div className="relative px-4 pb-4 pt-2">
+    <div className="relative px-3 pb-3 pt-2 md:px-4 md:pb-4">
       {/* Slash command menu */}
       <AnimatePresence>
         {showSlash && filteredCommands.length > 0 && (

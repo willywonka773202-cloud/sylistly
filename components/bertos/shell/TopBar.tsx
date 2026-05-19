@@ -1,6 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Cpu, Globe, Sparkles, ChevronDown, PanelRight, PanelRightClose, Command, Bot } from 'lucide-react'
+import { Zap, Cpu, Globe, Sparkles, ChevronDown, PanelRight, PanelRightClose, Command, Bot, Menu } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { useChatStore } from '@/store/bertos/chat'
@@ -26,7 +26,7 @@ const OLLAMA_MODELS: ModelOption[] = [
 
 const ALL_MODEL_OPTIONS: ModelOption[] = [...CLOUD_MODELS, ...OLLAMA_MODELS]
 
-export function TopBar() {
+export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void }) {
   const { selectedModel, setSelectedModel, activeView, rightPanelOpen, setRightPanelOpen, setCommandPaletteOpen } = useUIStore()
   const { isStreaming } = useChatStore()
   const [modelMenuOpen, setModelMenuOpen] = useState(false)
@@ -44,6 +44,13 @@ export function TopBar() {
 
   return (
     <div className="relative flex items-center gap-3 px-4 h-12 border-b border-zinc-800/50 bg-[#0A0A0B]/80 backdrop-blur-sm flex-shrink-0">
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onMobileMenuToggle}
+        className="md:hidden flex-shrink-0 p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-all"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
       {/* View title */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <span className="text-sm font-semibold text-zinc-200">
