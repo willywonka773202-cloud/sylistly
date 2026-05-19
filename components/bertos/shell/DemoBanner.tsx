@@ -5,28 +5,32 @@ import { Sparkles, X, Key } from 'lucide-react'
 import { useUIStore } from '@/store/bertos/ui'
 import { useRouter } from 'next/navigation'
 
-type HealthStatus = { claude: boolean; codex: boolean; gemini: boolean; ollama: boolean }
+type HealthStatus = { claude: boolean; codex: boolean; gemini: boolean }
 
-const OLLAMA_MODELS = new Set(['llama3.2', 'mistral', 'deepseek-coder'])
+// All models that run on the private VPS via /api/generate
+const VPS_MODELS = new Set(['llama3', 'llama3.2', 'mistral', 'deepseek-coder', 'hermes3'])
 
 function isModelConfigured(
   model: string,
   health: HealthStatus,
   apiKeys: Record<string, string | undefined>,
+  ollamaEndpoint: string | undefined,
 ): boolean {
-  if (OLLAMA_MODELS.has(model)) return health.ollama || !!apiKeys.ollama
-  if (model === 'claude')       return health.claude || !!apiKeys.anthropic
-  if (model === 'codex')        return health.codex  || !!apiKeys.openai
-  if (model === 'gemini')       return health.gemini || !!apiKeys.google
-  // 'auto' — configured if any provider is available
-  return health.claude || health.codex || health.gemini || health.ollama ||
-    !!apiKeys.anthropic || !!apiKeys.openai || !!apiKeys.google || !!apiKeys.ollama
+  if (VPS_MODELS.has(model)) return !!ollamaEndpoint?.trim()
+  if (model === 'claude')    return health.claude || !!apiKeys.anthropic
+  if (model === 'codex')     return health.codex  || !!apiKeys.openai
+  if (model === 'gemini')    return health.gemini || !!apiKeys.google
+  // 'auto' — configured if any cloud provider is available, or VPS endpoint is set
+  return health.claude || health.codex || health.gemini ||
+    !!apiKeys.anthropic || !!apiKeys.openai || !!apiKeys.google || !!ollamaEndpoint?.trim()
 }
 
 const PROVIDER_LABEL: Record<string, string> = {
-  'llama3.2':       'Ollama Cloud',
-  mistral:          'Ollama Cloud',
-  'deepseek-coder': 'Ollama Cloud',
+  llama3:           'private Ollama VPS',
+  'llama3.2':       'private Ollama VPS',
+  mistral:          'private Ollama VPS',
+  'deepseek-coder': 'private Ollama VPS',
+  hermes3:          'private Ollama VPS',
   claude:           'Anthropic',
   codex:            'OpenAI',
   gemini:           'Google AI',
@@ -43,7 +47,7 @@ export function DemoBanner() {
     fetch('/api/health')
       .then(r => r.json() as Promise<HealthStatus>)
       .then(setHealth)
-      .catch(() => setHealth({ claude: false, codex: false, gemini: false, ollama: false }))
+      .catch(() => setHealth({ claude: false, codex: false, gemini: false }))
   }, [])
 
   // Don't render until health check resolves (avoids flash)
@@ -53,6 +57,7 @@ export function DemoBanner() {
     selectedModel,
     health,
     settings.apiKeys as Record<string, string | undefined>,
+    settings.ollamaEndpoint,
   )
   if (configured) return null
 
@@ -71,8 +76,10 @@ export function DemoBanner() {
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
             <p className="text-xs text-amber-300/90 truncate">
-              <span className="font-semibold">No API key for {providerLabel}</span>
-              {' — '}Add it in Settings or set the matching Vercel environment variable.
+              {VPS_MODELS.has(selectedModel)
+                ? <><span className="font-semibold">No private endpoint configured</span>{' — '}Set your VPS URL in Settings → API Keys → Custom Ollama Endpoint.</>
+                : <><span className="font-semibold">No API key for {providerLabel}</span>{' — '}Add it in Settings or set the matching Vercel environment variable.</>
+              }
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">

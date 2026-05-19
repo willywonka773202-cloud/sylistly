@@ -62,12 +62,11 @@ export function SettingsView() {
   const [anthropicKey, setAnthropicKey] = useState(settings.apiKeys.anthropic ?? '')
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
   const [googleKey, setGoogleKey] = useState(settings.apiKeys.google ?? '')
-  const [ollamaKey, setOllamaKey] = useState(settings.apiKeys.ollama ?? '')
   const [ollamaEndpoint, setOllamaEndpoint] = useState(settings.ollamaEndpoint ?? '')
 
   const saveSettings = () => {
     updateSettings({
-      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey, ollama: ollamaKey },
+      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey },
       ollamaEndpoint: ollamaEndpoint.trim() || undefined,
     })
     setSaved(true)
@@ -218,10 +217,9 @@ export function SettingsView() {
 
               <div className="space-y-5">
                 {[
-                  { label: 'Anthropic API Key',  placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'Claude',              color: '#8B5CF6', icon: <Cpu className="w-4 h-4" />  },
-                  { label: 'OpenAI API Key',      placeholder: 'sk-...',     value: openaiKey,    setter: setOpenaiKey,    model: 'Codex / GPT-4o',       color: '#10B981', icon: <Zap className="w-4 h-4" />  },
-                  { label: 'Google AI API Key',   placeholder: 'AIza...',    value: googleKey,    setter: setGoogleKey,    model: 'Gemini',                color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
-                  { label: 'Ollama Cloud API Key', placeholder: 'ollama_...',value: ollamaKey,    setter: setOllamaKey,    model: 'Llama · Mistral · DeepSeek', color: '#F97316', icon: <Bot className="w-4 h-4" />  },
+                  { label: 'Anthropic API Key', placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'Claude',         color: '#8B5CF6', icon: <Cpu className="w-4 h-4" />  },
+                  { label: 'OpenAI API Key',     placeholder: 'sk-...',     value: openaiKey,    setter: setOpenaiKey,    model: 'Codex / GPT-4o', color: '#10B981', icon: <Zap className="w-4 h-4" />  },
+                  { label: 'Google AI API Key',  placeholder: 'AIza...',    value: googleKey,    setter: setGoogleKey,    model: 'Gemini',         color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
                 ].map(field => (
                   <div key={field.label} className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -242,6 +240,17 @@ export function SettingsView() {
                     <p className="text-[11px] text-zinc-700">Used for {field.model} API calls</p>
                   </div>
                 ))}
+              </div>
+
+              {/* VPS info — replaces the old Ollama Cloud API key field */}
+              <div className="flex items-start gap-2.5 rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
+                <Bot className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-orange-300 mb-1">Open-Source Models · Private VPS</p>
+                  <p className="text-[11px] text-orange-400/70 leading-relaxed">
+                    Llama 3, Mistral, DeepSeek, and Hermes route exclusively to your private Ollama instance — never to a public cloud. No API key required. Configure the endpoint URL below.
+                  </p>
+                </div>
               </div>
 
               {/* Custom Ollama endpoint */}

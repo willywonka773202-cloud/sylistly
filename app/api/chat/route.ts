@@ -7,8 +7,6 @@ import type { Message } from '@/lib/bertos/types'
 
 export const runtime = 'edge'
 
-const OLLAMA_CLOUD = 'https://ollama.com/api/chat' // kept only for reference; never used as default
-
 // Map BertOS model aliases → concrete model IDs
 const MODEL_IDS: Record<string, string> = {
   claude:           'claude-opus-4-5',
@@ -34,7 +32,6 @@ interface ClientKeys {
   anthropic?: string
   openai?: string
   google?: string
-  ollama?: string
 }
 
 // Resolve a key: Vercel env var takes priority, then client-supplied key from Settings.
@@ -57,7 +54,7 @@ export async function POST(req: NextRequest) {
   const anthropicKey = resolveKey(process.env.ANTHROPIC_API_KEY, ck.anthropic)
   const openaiKey    = resolveKey(process.env.OPENAI_API_KEY,    ck.openai)
   const geminiKey    = resolveKey(process.env.GEMINI_API_KEY,    ck.google)
-  const ollamaKey    = resolveKey(process.env.OLLAMA_API_KEY,    ck.ollama)
+  // NOTE: No Ollama key — private VPS instances do not use API key auth
 
   const encoder = new TextEncoder()
   const ts = new TransformStream<Uint8Array, Uint8Array>()
