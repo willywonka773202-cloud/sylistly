@@ -1,0 +1,153 @@
+'use client'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Zap, Cpu, Globe, Sparkles, ChevronDown, Activity, Wifi } from 'lucide-react'
+import { cn } from '@/lib/bertos/cn'
+import { useUIStore } from '@/store/bertos/ui'
+import { useChatStore } from '@/store/bertos/chat'
+import { getModelColor, getModelLabel } from '@/lib/bertos/router'
+import type { AIModel } from '@/lib/bertos/types'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+
+const MODEL_OPTIONS: { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }[] = [
+  {
+    value: 'auto',
+    label: 'Auto',
+    description: 'Intelligent routing',
+    icon: <Sparkles className="w-3.5 h-3.5" />,
+    color: '#F59E0B',
+  },
+  {
+    value: 'claude',
+    label: 'Claude',
+    description: 'Anthropic · Best for reasoning',
+    icon: <Cpu className="w-3.5 h-3.5" />,
+    color: '#8B5CF6',
+  },
+  {
+    value: 'codex',
+    label: 'Codex',
+    description: 'OpenAI · Best for coding',
+    icon: <Zap className="w-3.5 h-3.5" />,
+    color: '#10B981',
+  },
+  {
+    value: 'gemini',
+    label: 'Gemini',
+    description: 'Google · Best for research',
+    icon: <Globe className="w-3.5 h-3.5" />,
+    color: '#3B82F6',
+  },
+]
+
+export function TopBar() {
+  const { selectedModel, setSelectedModel, activeView } = useUIStore()
+  const { isStreaming } = useChatStore()
+  const [modelMenuOpen, setModelMenuOpen] = useState(false)
+
+  const activeModel = MODEL_OPTIONS.find(m => m.value === selectedModel) ?? MODEL_OPTIONS[0]
+
+  const viewLabels: Record<string, string> = {
+    chat: 'Chat',
+    compare: 'Multi-AI Compare',
+    workspace: 'Coding Workspace',
+    agents: 'Agent Tasks',
+    memory: 'Project Memory',
+    settings: 'Settings',
+  }
+
+  return (
+    <div className="relative flex items-center gap-3 px-4 h-12 border-b border-zinc-800/50 bg-[#0A0A0B]/80 backdrop-blur-sm flex-shrink-0">
+      {/* View title */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <span className="text-sm font-semibold text-zinc-200">
+          {viewLabels[activeView] ?? 'BertOS'}
+        </span>
+        {isStreaming && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-1.5"
+          >
+            <div className="flex gap-0.5">
+              {[0, 1, 2].map(i => (
+                <motion.div
+                  key={i}
+                  animate={{ scaleY: [1, 2, 1] }}
+                  transition={{ duration: 0.6, delay: i * 0.1, repeat: Infinity }}
+                  className="w-0.5 h-2.5 rounded-full bg-violet-400"
+                />
+              ))}
+            </div>
+            <span className="text-xs text-violet-400">Generating</span>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Model selector */}
+      <div className="relative">
+        <button
+          onClick={() => setModelMenuOpen(!modelMenuOpen)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-150 text-sm"
+        >
+          <span style={{ color: activeModel.color }}>{activeModel.icon}</span>
+          <span className="text-zinc-200 font-medium text-xs">{activeModel.label}</span>
+          <ChevronDown className={cn('w-3 h-3 text-zinc-500 transition-transform', modelMenuOpen && 'rotate-180')} />
+        </button>
+
+        <AnimatePresence>
+          {modelMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/50 overflow-hidden z-50"
+              >
+                <div className="p-1.5 space-y-0.5">
+                  <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    Select Model
+                  </p>
+                  {MODEL_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedModel(option.value)
+                        setModelMenuOpen(false)
+                      }}
+                      className={cn(
+                        'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-100',
+                        selectedModel === option.value
+                          ? 'bg-white/10 text-zinc-100'
+                          : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+                      )}
+                    >
+                      <span style={{ color: option.color }}>{option.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium">{option.label}</p>
+                        <p className="text-[10px] text-zinc-600 truncate">{option.description}</p>
+                      </div>
+                      {selectedModel === option.value && (
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: option.color }} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Status indicators */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-900/50 border border-zinc-800/50">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[10px] text-zinc-500">Live</span>
+        </div>
+      </div>
+    </div>
+  )
+}
