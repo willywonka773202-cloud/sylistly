@@ -1795,6 +1795,30 @@ function isAdultCatalogCandidate(product: Product): boolean {
   );
 }
 
+const GENERATOR_BLOCKED_MERCHANT_TERMS = [
+  'boohoo',
+  'ebay',
+  'etsy',
+  'fashion nova',
+  'lightinthebox',
+  'poshmark',
+  'temu',
+  'tiktok',
+  'walmart',
+  'zazzle',
+];
+
+function isGeneratorGradeMerchant(product: Product): boolean {
+  const merchantText = normalize([
+    product.brand,
+    product.retailer,
+    product.productUrl,
+    product.retailerUrl,
+  ].filter(Boolean).join(' '));
+
+  return !GENERATOR_BLOCKED_MERCHANT_TERMS.some((term) => merchantText.includes(term));
+}
+
 function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProducts: Product[]): number {
   if (!selectedProducts.length) return 0;
   const haystack = searchHaystack(product);
@@ -1905,6 +1929,7 @@ function getSlotCandidates({
     .filter((product) => product.category === slot)
     .filter(isRenderableProduct)
     .filter(isAdultCatalogCandidate)
+    .filter(isGeneratorGradeMerchant)
     .filter((product) => !hasCategoryMismatch(product))
     .filter((product) => isUnderBudget(product, budget, customMaxCents))
     .filter((product) => !usedIds.has(product.id));
