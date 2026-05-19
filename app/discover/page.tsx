@@ -1,6 +1,6 @@
 import { Sparkles } from 'lucide-react';
+import { DiscoverRail } from '@/components/DiscoverRail';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
-import { ProductImage } from '@/components/ProductImage';
 import { BottomNav } from '@/components/BottomNav';
 import {
   ALL_CATALOG_PRODUCTS,
@@ -357,38 +357,3 @@ export default function DiscoverPage() {
   );
 }
 
-function DiscoverRail({ title, looks }: { title: string; looks: DiscoverLookCardData[] }) {
-  if (!looks.length) return null;
-
-  return (
-    <section className="mt-6">
-      <div className="flex items-end justify-between gap-3 px-1">
-        <div>
-          <h2 className="font-serif text-[20px] font-semibold text-ink">{title}</h2>
-        </div>
-      </div>
-      <div className="mt-3 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {looks.map((look) => (
-          <div key={`${title}-${look.id}`} className="w-[176px] flex-none rounded-[24px] border border-white/10 bg-[#151311] p-3 shadow-[0_16px_34px_rgba(0,0,0,.24)]">
-            <div className="grid h-[116px] grid-cols-2 gap-1.5 overflow-hidden rounded-[18px] border border-[#eadfd5] bg-[#fff7ef] p-1.5">
-              {look.products.slice(0, 4).map((product) => (
-                <div key={`${look.id}-${product.id}`} className="overflow-hidden rounded-xl bg-white/80">
-                  <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1" />
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 line-clamp-1 font-serif text-[17px] font-semibold text-ink">{look.title}</div>
-            <div className="mt-1 flex flex-wrap gap-1.5">
-              <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[8px] font-bold uppercase tracking-[.1em] text-muted">
-                {look.vibe}
-              </span>
-              <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[8px] font-bold uppercase tracking-[.1em] text-muted">
-                ${Math.round(look.estimatedTotal / 100).toLocaleString('en-US')}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
