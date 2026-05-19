@@ -22,13 +22,16 @@ interface UIStore {
 
 const DEFAULT_SETTINGS: BertOSSettings = {
   theme: 'dark',
-  primaryModel: 'auto',
+  primaryModel: 'ollama-pro',
   routingEnabled: true,
   streamingEnabled: true,
   memoryEnabled: true,
+  enableApiProviders: false,
   cliPaths: {},
   apiKeys: {},
-  modelPriority: ['claude', 'codex', 'gemini'],
+  ollamaCloudModel: 'gpt-oss:120b-cloud',
+  ollamaLocalFallback: 'qwen2.5-coder:latest',
+  modelPriority: ['ollama-pro', 'claude-code', 'gemini-cli', 'codex-cli', 'qwen2.5-coder'],
   tokenBudget: 100000,
   animationsEnabled: true,
 }
@@ -41,7 +44,7 @@ export const useUIStore = create<UIStore>()(
       rightPanelTab: 'memory',
       sidebarCollapsed: false,
       activeView: 'chat',
-      selectedModel: 'auto',
+      selectedModel: 'ollama-pro',
       settings: DEFAULT_SETTINGS,
 
       setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),

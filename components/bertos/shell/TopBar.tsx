@@ -11,22 +11,24 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 type ModelOption = { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }
 
-const CLOUD_MODELS: ModelOption[] = [
-  { value: 'auto',   label: 'Auto',   description: 'Intelligent routing',         icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B' },
-  { value: 'claude', label: 'Claude', description: 'Anthropic · Best for reasoning', icon: <Cpu className="w-3.5 h-3.5" />,      color: '#8B5CF6' },
-  { value: 'codex',  label: 'Codex',  description: 'OpenAI · Best for coding',    icon: <Zap className="w-3.5 h-3.5" />,      color: '#10B981' },
-  { value: 'gemini', label: 'Gemini', description: 'Google · Best for research',  icon: <Globe className="w-3.5 h-3.5" />,    color: '#3B82F6' },
+const SUBSCRIPTION_MODELS: ModelOption[] = [
+  { value: 'auto',        label: 'Auto',        description: 'Smart routing · Subscription only',      icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B' },
+  { value: 'ollama-pro',  label: 'Ollama Pro',  description: 'Ollama · gpt-oss:120b-cloud · Default',  icon: <Bot className="w-3.5 h-3.5" />,      color: '#F97316' },
+  { value: 'claude-code', label: 'Claude Code', description: 'Anthropic · Claude Code CLI',            icon: <Cpu className="w-3.5 h-3.5" />,      color: '#8B5CF6' },
+  { value: 'gemini-cli',  label: 'Gemini CLI',  description: 'Google · Gemini CLI',                    icon: <Globe className="w-3.5 h-3.5" />,    color: '#3B82F6' },
+  { value: 'codex-cli',   label: 'Codex CLI',   description: 'OpenAI · Codex CLI',                     icon: <Zap className="w-3.5 h-3.5" />,      color: '#10B981' },
 ]
 
-const OLLAMA_MODELS: ModelOption[] = [
-  { value: 'llama3',         label: 'Llama 3',          description: 'Meta · Ollama / VPS',     icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
-  { value: 'llama3.2',       label: 'Llama 3.2',       description: 'Meta · Ollama / VPS',     icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
-  { value: 'mistral',        label: 'Mistral',          description: 'Mistral AI · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#EC4899' },
-  { value: 'deepseek-coder', label: 'DeepSeek Coder',  description: 'DeepSeek · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#06B6D4' },
-  { value: 'hermes3',        label: 'Hermes 3',         description: 'NousResearch · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#A855F7' },
+const LOCAL_MODELS: ModelOption[] = [
+  { value: 'qwen2.5-coder',  label: 'Qwen 2.5 Coder', description: 'Alibaba · Local Ollama fallback',  icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
+  { value: 'llama3',         label: 'Llama 3',         description: 'Meta · Local Ollama',              icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
+  { value: 'llama3.2',       label: 'Llama 3.2',       description: 'Meta · Local Ollama',              icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
+  { value: 'mistral',        label: 'Mistral',          description: 'Mistral AI · Local Ollama',        icon: <Bot className="w-3.5 h-3.5" />, color: '#EC4899' },
+  { value: 'deepseek-coder', label: 'DeepSeek Coder',  description: 'DeepSeek · Local Ollama',          icon: <Bot className="w-3.5 h-3.5" />, color: '#06B6D4' },
+  { value: 'hermes3',        label: 'Hermes 3',         description: 'NousResearch · Local Ollama',      icon: <Bot className="w-3.5 h-3.5" />, color: '#A855F7' },
 ]
 
-const ALL_MODEL_OPTIONS: ModelOption[] = [...CLOUD_MODELS, ...OLLAMA_MODELS]
+const ALL_MODEL_OPTIONS: ModelOption[] = [...SUBSCRIPTION_MODELS, ...LOCAL_MODELS]
 
 export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void }) {
   const { selectedModel, setSelectedModel, activeView, rightPanelOpen, setRightPanelOpen, setCommandPaletteOpen } = useUIStore()
@@ -120,9 +122,9 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
               >
                 <div className="p-1.5 space-y-0.5">
                   <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
-                    Cloud Models
+                    Subscription Providers
                   </p>
-                  {CLOUD_MODELS.map(option => (
+                  {SUBSCRIPTION_MODELS.map(option => (
                     <button
                       key={option.value}
                       onClick={() => { setSelectedModel(option.value); setModelMenuOpen(false) }}
@@ -146,9 +148,9 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
 
                   <div className="my-1 border-t border-zinc-800/80" />
                   <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
-                    Open Source · Ollama Cloud
+                    Local Ollama
                   </p>
-                  {OLLAMA_MODELS.map(option => (
+                  {LOCAL_MODELS.map(option => (
                     <button
                       key={option.value}
                       onClick={() => { setSelectedModel(option.value); setModelMenuOpen(false) }}

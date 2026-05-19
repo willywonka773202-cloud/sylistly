@@ -4,31 +4,30 @@ import { routePrompt } from '@/lib/bertos/router'
 
 export const runtime = 'edge'
 
-const SYSTEM = `You are an AI routing specialist. Analyze the user's prompt and return ONLY a JSON object with:
+const SYSTEM = `You are an AI routing specialist for BertOS. Analyze the user's prompt and return ONLY a JSON object with:
 - "reasoning": one sentence explaining why you chose this model
-- "recommendedModel": exactly one of "claude-opus-4-5", "gpt-4o", "gemini-2.0-flash"
+- "recommendedModel": exactly one of "ollama-pro", "claude-code", "codex-cli", "gemini-cli"
 - "taskType": one of "coding", "writing", "research", "analysis", "math", "brainstorming", "debugging", "general"
 - "confidence": number 0-1
 
 Rules:
-- coding / debugging / technical implementation → "gpt-4o"
-- long research / massive documents / web knowledge → "gemini-2.0-flash"
-- writing / reasoning / analysis / math / nuanced thinking → "claude-opus-4-5"
-- default → "claude-opus-4-5"`
+- Default is always "ollama-pro" (always-on subscription provider, no extra billing)
+- Heavy coding / debugging / implementation → "codex-cli" (OpenAI Codex via CLI subscription)
+- Long-form writing / reasoning / nuanced analysis → "claude-code" (Claude via CLI subscription)
+- Research / large documents / web knowledge → "gemini-cli" (Gemini via CLI subscription)
+- Math / general → "ollama-pro"`
 
 const MODEL_TO_ALIAS: Record<string, string> = {
-  'claude-opus-4-5': 'claude',
-  'claude-3-5-sonnet-latest': 'claude',
-  'gpt-4o': 'codex',
-  'gpt-4': 'codex',
-  'gemini-2.0-flash': 'gemini',
-  'gemini-1.5-pro': 'gemini',
+  'ollama-pro':  'ollama-pro',
+  'claude-code': 'claude-code',
+  'codex-cli':   'codex-cli',
+  'gemini-cli':  'gemini-cli',
 }
 
 export async function POST(req: NextRequest) {
   const { prompt } = await req.json() as { prompt: string }
 
-  // Try GPT-4o-mini first (cheap, fast classifier)
+  // Try GPT-4o-mini as smart classifier (cheap, fast)
   if (process.env.OPENAI_API_KEY) {
     try {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
         confidence?: number
       }
 
-      const alias = MODEL_TO_ALIAS[raw.recommendedModel ?? ''] ?? 'claude'
+      const alias = MODEL_TO_ALIAS[raw.recommendedModel ?? ''] ?? 'ollama-pro'
 
       return NextResponse.json({
         primary: alias,
@@ -65,12 +64,12 @@ export async function POST(req: NextRequest) {
       const isQuota = msg.includes('429') || msg.includes('quota') || msg.includes('billing') || msg.includes('rate limit')
       if (isQuota) {
         return NextResponse.json({
-          primary: 'llama3',
-          reasoning: 'OpenAI unavailable — quota exceeded. Routing to Llama 3 on private endpoint.',
+          primary: 'ollama-pro',
+          reasoning: 'OpenAI quota exceeded — routing to Ollama Pro (default subscription provider).',
           confidence: 0.9,
           taskType: 'general',
           strategy: 'single',
-          recommendedModel: 'llama3',
+          recommendedModel: 'ollama-pro',
         })
       }
       // fall through to rule-based

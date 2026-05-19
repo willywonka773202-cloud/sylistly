@@ -121,6 +121,7 @@ export function ChatView() {
           systemPrompt,
           clientKeys: settings.apiKeys,
           ollamaEndpoint: settings.ollamaEndpoint,
+          enableApiProviders: settings.enableApiProviders ?? false,
         }),
         signal: abortRef.current?.signal,
       })
@@ -177,20 +178,9 @@ export function ChatView() {
       return routerDecision
     }
 
-    const OLLAMA_MODEL_IDS = new Set(['llama3', 'llama3.2', 'mistral', 'deepseek-coder', 'hermes3'])
-
     const isQuotaError = (err: Error) => {
       const m = err.message.toLowerCase()
       return m.includes('429') || m.includes('quota') || m.includes('billing') || m.includes('rate limit')
-    }
-
-    // Pre-flight: Ollama models MUST use a private endpoint — never hit public cloud
-    const requirePrivateEndpoint = (modelId: string) => {
-      if (OLLAMA_MODEL_IDS.has(modelId) && !settings.ollamaEndpoint?.trim()) {
-        throw new Error(
-          `No private endpoint configured. Set your VPS URL in Settings → API Keys → Custom Ollama Endpoint to use ${modelId}.`
-        )
-      }
     }
 
     try {
@@ -208,11 +198,10 @@ export function ChatView() {
           setPendingDecision(decision)
           updateMessage(sessionId, aiMsg.id, { model: decision.primary as AIModel })
         } catch {
-          resolvedModel = 'claude'
+          resolvedModel = 'ollama-pro'
         }
       }
 
-      requirePrivateEndpoint(resolvedModel)
       const routerDecision = await doStream(resolvedModel)
       updateMessage(sessionId!, aiMsg.id, {
         streaming: false,
@@ -225,41 +214,29 @@ export function ChatView() {
       if ((err as Error).name === 'AbortError') {
         // user cancelled — leave partial content, just stop streaming
         updateMessage(sessionId!, aiMsg.id, { streaming: false })
-      } else if (isQuotaError(err as Error) && resolvedModel !== 'llama3') {
-        // Waterfall: quota exceeded → retry with Llama 3 on the private VPS
-        if (!settings.ollamaEndpoint?.trim()) {
-          updateMessage(sessionId!, aiMsg.id, {
-            content: `**Quota exceeded.** Set your private Ollama endpoint in **Settings → API Keys → Custom Ollama Endpoint** to enable auto-fallback to Llama 3.`,
-            streaming: false,
-          })
-        } else {
-          const modelLabel = resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'
-          appendToMessage(sessionId!, aiMsg.id,
-            `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Llama 3 on your private VPS...\n\n`)
-          updateMessage(sessionId!, aiMsg.id, { model: 'llama3' as AIModel, streaming: true })
-          setStreaming(true, aiMsg.id)
+      } else if (isQuotaError(err as Error) && resolvedModel !== 'qwen2.5-coder') {
+        // Waterfall: quota exceeded → retry with local Ollama fallback
+        appendToMessage(sessionId!, aiMsg.id,
+          `\n\n> ⚠️ **Quota exceeded for ${resolvedModel}.** Auto-routing to Qwen 2.5 Coder (local Ollama fallback)...\n\n`)
+        updateMessage(sessionId!, aiMsg.id, { model: 'qwen2.5-coder' as AIModel, streaming: true })
+        setStreaming(true, aiMsg.id)
 
-          try {
-            // requirePrivateEndpoint already checked above — endpoint is confirmed set
-            await doStream('llama3')
-            updateMessage(sessionId!, aiMsg.id, {
-              streaming: false,
-              metadata: { latency: Date.now() - startTime },
-            })
-          } catch (fallbackErr) {
-            if ((fallbackErr as Error).name !== 'AbortError') {
-              appendToMessage(sessionId!, aiMsg.id,
-                `\n\n**VPS fallback error:** ${(fallbackErr as Error).message}`)
-            }
-            updateMessage(sessionId!, aiMsg.id, { streaming: false })
+        try {
+          await doStream('qwen2.5-coder')
+          updateMessage(sessionId!, aiMsg.id, {
+            streaming: false,
+            metadata: { latency: Date.now() - startTime },
+          })
+        } catch (fallbackErr) {
+          if ((fallbackErr as Error).name !== 'AbortError') {
+            appendToMessage(sessionId!, aiMsg.id,
+              `\n\n**Fallback error:** ${(fallbackErr as Error).message}`)
           }
+          updateMessage(sessionId!, aiMsg.id, { streaming: false })
         }
       } else {
-        const isConfig = (err as Error).message?.includes('not configured') || (err as Error).message?.includes('API key')
         updateMessage(sessionId!, aiMsg.id, {
-          content: isConfig
-            ? `**API key not configured.** Go to **Settings → API Keys** to add your ${resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'} key.`
-            : `Stream error: ${(err as Error).message}`,
+          content: `Stream error: ${(err as Error).message}`,
           streaming: false,
         })
       }

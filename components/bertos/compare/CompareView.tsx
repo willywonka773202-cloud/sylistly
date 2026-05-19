@@ -12,7 +12,7 @@ import { useUIStore } from '@/store/bertos/ui'
 import type { AIModel } from '@/lib/bertos/types'
 
 interface ModelResponse {
-  model: AIModel
+  model: string
   content: string
   streaming: boolean
   done: boolean
@@ -20,13 +20,13 @@ interface ModelResponse {
   error?: string
 }
 
-type ModelId = 'claude' | 'codex' | 'gemini'
-const MODELS: ModelId[] = ['claude', 'codex', 'gemini']
+type ModelId = 'claude-code' | 'codex-cli' | 'gemini-cli'
+const MODELS: ModelId[] = ['claude-code', 'codex-cli', 'gemini-cli']
 
 const MODEL_META: Record<ModelId, { label: string; icon: React.ReactNode; color: string; desc: string }> = {
-  claude: { label: 'Claude',  icon: <Cpu className="w-4 h-4" />,  color: '#8B5CF6', desc: 'Anthropic · Opus' },
-  codex:  { label: 'Codex',   icon: <Zap className="w-4 h-4" />,  color: '#10B981', desc: 'OpenAI · GPT-4o' },
-  gemini: { label: 'Gemini',  icon: <Globe className="w-4 h-4" />, color: '#3B82F6', desc: 'Google · Flash' },
+  'claude-code': { label: 'Claude Code', icon: <Cpu className="w-4 h-4" />,  color: '#8B5CF6', desc: 'Anthropic · CLI subscription' },
+  'codex-cli':   { label: 'Codex CLI',   icon: <Zap className="w-4 h-4" />,  color: '#10B981', desc: 'OpenAI · CLI subscription'    },
+  'gemini-cli':  { label: 'Gemini CLI',  icon: <Globe className="w-4 h-4" />, color: '#3B82F6', desc: 'Google · CLI subscription'    },
 }
 
 const COMPARE_PROMPTS = [
@@ -58,7 +58,7 @@ export function CompareView() {
   const [isRunning, setIsRunning] = useState(false)
   const [winner, setWinner] = useState<ModelId | null>(null)
   const [copiedModel, setCopiedModel] = useState<ModelId | null>(null)
-  const [activeTab, setActiveTab] = useState<ModelId>('claude')
+  const [activeTab, setActiveTab] = useState<ModelId>('claude-code')
   const abortRefs = useRef<Map<ModelId, AbortController>>(new Map())
   const { settings } = useUIStore()
 
@@ -169,7 +169,7 @@ export function CompareView() {
             </div>
             <div>
               <h2 className="text-sm font-semibold text-zinc-200">Multi-AI Compare</h2>
-              <p className="text-[11px] text-zinc-500">Stream all three models in parallel — pick the best answer</p>
+              <p className="text-[11px] text-zinc-500">Stream all three CLI subscription providers in parallel — pick the best answer</p>
             </div>
             {responses.length > 0 && !isRunning && (
               <button

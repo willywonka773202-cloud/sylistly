@@ -24,7 +24,7 @@ export const useAgentStore = create<AgentStore>()(
       tasks: [],
       activeTaskId: null,
 
-      createTask: ({ title, description, model = 'claude', projectId }) => {
+      createTask: ({ title, description, model = 'ollama-pro', projectId }) => {
         const task: AgentTask = {
           id: uuidv4(),
           title,

@@ -14,19 +14,21 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 const TASK_TEMPLATES = [
-  { title: 'Refactor Frontend', description: 'Analyze and modernize all React components, extract reusable logic, improve TypeScript types', model: 'codex' as AIModel, estimatedTime: '~8 min' },
-  { title: 'Fix TypeScript Errors', description: 'Scan codebase for type errors and fix them systematically', model: 'codex' as AIModel, estimatedTime: '~3 min' },
-  { title: 'Generate Documentation', description: 'Write comprehensive JSDoc comments for all exported functions', model: 'claude' as AIModel, estimatedTime: '~5 min' },
-  { title: 'Research Architecture', description: 'Research best practices for the current tech stack and write recommendations', model: 'gemini' as AIModel, estimatedTime: '~4 min' },
-  { title: 'Improve UI Components', description: 'Review all UI components and suggest accessibility and UX improvements', model: 'claude' as AIModel, estimatedTime: '~6 min' },
-  { title: 'Generate Test Suite', description: 'Create comprehensive unit and integration tests for the entire codebase', model: 'codex' as AIModel, estimatedTime: '~10 min' },
+  { title: 'Refactor Frontend',       description: 'Analyze and modernize all React components, extract reusable logic, improve TypeScript types', model: 'ollama-pro' as AIModel,  estimatedTime: '~8 min' },
+  { title: 'Fix TypeScript Errors',   description: 'Scan codebase for type errors and fix them systematically',                                     model: 'ollama-pro' as AIModel,  estimatedTime: '~3 min' },
+  { title: 'Generate Documentation',  description: 'Write comprehensive JSDoc comments for all exported functions',                                   model: 'claude-code' as AIModel, estimatedTime: '~5 min' },
+  { title: 'Research Architecture',   description: 'Research best practices for the current tech stack and write recommendations',                     model: 'gemini-cli' as AIModel,  estimatedTime: '~4 min' },
+  { title: 'Improve UI Components',   description: 'Review all UI components and suggest accessibility and UX improvements',                           model: 'claude-code' as AIModel, estimatedTime: '~6 min' },
+  { title: 'Generate Test Suite',     description: 'Create comprehensive unit and integration tests for the entire codebase',                          model: 'codex-cli' as AIModel,   estimatedTime: '~10 min' },
 ]
 
-const MODEL_META = {
-  claude: { icon: <Cpu className="w-3.5 h-3.5" />, color: '#8B5CF6', variant: 'claude' as const },
-  codex: { icon: <Zap className="w-3.5 h-3.5" />, color: '#10B981', variant: 'codex' as const },
-  gemini: { icon: <Globe className="w-3.5 h-3.5" />, color: '#3B82F6', variant: 'gemini' as const },
-  auto: { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', variant: 'auto' as const },
+const MODEL_META: Record<string, { icon: React.ReactNode; color: string; variant: 'ollama-pro' | 'claude-code' | 'gemini-cli' | 'codex-cli' | 'auto' | 'default' }> = {
+  'ollama-pro':   { icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', variant: 'ollama-pro'  },
+  'qwen2.5-coder':{ icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', variant: 'ollama-pro'  },
+  'claude-code':  { icon: <Cpu      className="w-3.5 h-3.5" />, color: '#8B5CF6', variant: 'claude-code' },
+  'gemini-cli':   { icon: <Globe    className="w-3.5 h-3.5" />, color: '#3B82F6', variant: 'gemini-cli'  },
+  'codex-cli':    { icon: <Zap      className="w-3.5 h-3.5" />, color: '#10B981', variant: 'codex-cli'   },
+  auto:           { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', variant: 'auto'        },
 }
 
 const STATUS_CONFIG: Record<AgentTask['status'], { icon: React.ReactNode; color: string; bgColor: string; label: string }> = {
@@ -40,7 +42,7 @@ const STATUS_CONFIG: Record<AgentTask['status'], { icon: React.ReactNode; color:
 function TaskCard({ task }: { task: AgentTask }) {
   const { deleteTask, setStatus, addLog, setProgress } = useAgentStore()
   const [expanded, setExpanded] = useState(false)
-  const meta = MODEL_META[task.model as keyof typeof MODEL_META] ?? MODEL_META.auto
+  const meta = MODEL_META[task.model] ?? MODEL_META['ollama-pro']
   const status = STATUS_CONFIG[task.status]
 
   const simulate = async () => {
@@ -280,7 +282,7 @@ export function AgentsView() {
                       >
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-xs font-medium text-zinc-300">{t.title}</p>
-                          <Badge variant={t.model as 'claude' | 'codex' | 'gemini'} className="text-[9px] h-4">{t.model}</Badge>
+                          <Badge variant={(MODEL_META[t.model]?.variant ?? 'default') as 'ollama-pro' | 'claude-code' | 'gemini-cli' | 'codex-cli' | 'auto' | 'default'} className="text-[9px] h-4">{t.model}</Badge>
                         </div>
                         <p className="text-[11px] text-zinc-600 line-clamp-2">{t.description}</p>
                         <p className="text-[10px] text-zinc-700 mt-1">{t.estimatedTime}</p>

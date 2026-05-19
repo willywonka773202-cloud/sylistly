@@ -8,15 +8,20 @@ import type { RouterDecision } from '@/lib/bertos/types'
 import { getModelColor, getModelLabel } from '@/lib/bertos/router'
 
 const MODEL_ICONS: Record<string, React.ReactNode> = {
-  claude:          <Cpu     className="w-3 h-3" />,
-  codex:           <Zap     className="w-3 h-3" />,
-  gemini:          <Globe   className="w-3 h-3" />,
+  'ollama-pro':    <Bot      className="w-3 h-3" />,
+  'claude-code':   <Cpu      className="w-3 h-3" />,
+  'gemini-cli':    <Globe    className="w-3 h-3" />,
+  'codex-cli':     <Zap      className="w-3 h-3" />,
+  'claude-api':    <Cpu      className="w-3 h-3" />,
+  'openai-api':    <Zap      className="w-3 h-3" />,
+  'gemini-api':    <Globe    className="w-3 h-3" />,
   auto:            <Sparkles className="w-3 h-3" />,
-  llama3:          <Bot     className="w-3 h-3" />,
-  'llama3.2':      <Bot     className="w-3 h-3" />,
-  mistral:         <Bot     className="w-3 h-3" />,
-  'deepseek-coder':<Bot     className="w-3 h-3" />,
-  hermes3:         <Bot     className="w-3 h-3" />,
+  'qwen2.5-coder': <Bot      className="w-3 h-3" />,
+  llama3:          <Bot      className="w-3 h-3" />,
+  'llama3.2':      <Bot      className="w-3 h-3" />,
+  mistral:         <Bot      className="w-3 h-3" />,
+  'deepseek-coder':<Bot      className="w-3 h-3" />,
+  hermes3:         <Bot      className="w-3 h-3" />,
 }
 
 interface RouterBadgeProps {

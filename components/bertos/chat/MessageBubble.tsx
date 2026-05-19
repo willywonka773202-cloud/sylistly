@@ -16,15 +16,24 @@ interface MessageBubbleProps {
 }
 
 const MODEL_ICONS: Record<string, React.ReactNode> = {
-  claude:          <Cpu     className="w-3.5 h-3.5" />,
-  codex:           <Zap     className="w-3.5 h-3.5" />,
-  gemini:          <Globe   className="w-3.5 h-3.5" />,
+  // Subscription providers
+  'ollama-pro':    <Bot      className="w-3.5 h-3.5" />,
+  'claude-code':   <Cpu      className="w-3.5 h-3.5" />,
+  'gemini-cli':    <Globe    className="w-3.5 h-3.5" />,
+  'codex-cli':     <Zap      className="w-3.5 h-3.5" />,
+  // Optional API providers
+  'claude-api':    <Cpu      className="w-3.5 h-3.5" />,
+  'openai-api':    <Zap      className="w-3.5 h-3.5" />,
+  'gemini-api':    <Globe    className="w-3.5 h-3.5" />,
+  // Auto
   auto:            <Sparkles className="w-3.5 h-3.5" />,
-  llama3:          <Bot     className="w-3.5 h-3.5" />,
-  'llama3.2':      <Bot     className="w-3.5 h-3.5" />,
-  mistral:         <Bot     className="w-3.5 h-3.5" />,
-  'deepseek-coder':<Bot     className="w-3.5 h-3.5" />,
-  hermes3:         <Bot     className="w-3.5 h-3.5" />,
+  // Local Ollama models
+  'qwen2.5-coder': <Bot      className="w-3.5 h-3.5" />,
+  llama3:          <Bot      className="w-3.5 h-3.5" />,
+  'llama3.2':      <Bot      className="w-3.5 h-3.5" />,
+  mistral:         <Bot      className="w-3.5 h-3.5" />,
+  'deepseek-coder':<Bot      className="w-3.5 h-3.5" />,
+  hermes3:         <Bot      className="w-3.5 h-3.5" />,
 }
 
 function CodeBlock({ code, language }: { code: string; language?: string }) {
@@ -86,7 +95,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         {/* Model badge for AI messages */}
         {!isUser && message.model && (
           <div className="flex items-center gap-2">
-            <Badge variant={(['claude','codex','gemini','auto'].includes(message.model) ? message.model : 'default') as 'claude' | 'codex' | 'gemini' | 'auto' | 'default'} className="text-[10px]">
+            <Badge variant={(['ollama-pro','claude-code','gemini-cli','codex-cli','claude-api','openai-api','gemini-api','auto'].includes(message.model ?? '') ? message.model : 'default') as 'ollama-pro' | 'claude-code' | 'gemini-cli' | 'codex-cli' | 'claude-api' | 'openai-api' | 'gemini-api' | 'auto' | 'default'} className="text-[10px]">
               {MODEL_ICONS[message.model]}
               {getModelLabel(message.model)}
             </Badge>

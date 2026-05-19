@@ -1,5 +1,7 @@
-export type OllamaModel = 'llama3' | 'llama3.2' | 'mistral' | 'deepseek-coder' | 'hermes3'
-export type AIModel = 'claude' | 'codex' | 'gemini' | 'auto' | OllamaModel
+export type OllamaModel = 'ollama-pro' | 'qwen2.5-coder' | 'llama3' | 'llama3.2' | 'mistral' | 'deepseek-coder' | 'hermes3'
+export type CLIModel = 'claude-code' | 'gemini-cli' | 'codex-cli'
+export type APIModel = 'claude-api' | 'openai-api' | 'gemini-api'
+export type AIModel = 'auto' | OllamaModel | CLIModel | APIModel
 
 export type MessageRole = 'user' | 'assistant' | 'system'
 
@@ -126,7 +128,7 @@ export interface CompareResponse {
 }
 
 export interface CLIStatus {
-  name: 'claude' | 'codex' | 'gemini'
+  name: CLIModel
   available: boolean
   version?: string
   path?: string
@@ -138,18 +140,20 @@ export interface BertOSSettings {
   routingEnabled: boolean
   streamingEnabled: boolean
   memoryEnabled: boolean
+  enableApiProviders: boolean
   cliPaths: {
-    claude?: string
-    codex?: string
-    gemini?: string
+    'claude-code'?: string
+    'gemini-cli'?: string
+    'codex-cli'?: string
   }
   apiKeys: {
     anthropic?: string
     openai?: string
     google?: string
-    ollama?: string
   }
   ollamaEndpoint?: string
+  ollamaCloudModel?: string
+  ollamaLocalFallback?: string
   modelPriority: AIModel[]
   tokenBudget: number
   animationsEnabled: boolean

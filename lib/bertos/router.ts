@@ -17,29 +17,30 @@ const ROUTING_RULES: RoutingRule[] = [
       /\b(debug|stack trace|undefined|null|exception|compile)\b/i,
     ],
     taskType: 'coding',
-    primary: 'codex',
-    secondary: ['claude'],
-    strategy: 'sequential',
-    reasoning: 'Coding tasks route to Codex for implementation, with Claude for architecture review.',
+    primary: 'ollama-pro',
+    secondary: ['codex-cli', 'claude-code'],
+    strategy: 'single',
+    reasoning: 'Coding tasks route to Ollama Pro (gpt-oss:120b-cloud). Enable Codex CLI for OpenAI-grade code generation.',
   },
   {
     patterns: [
       /\b(debug|why (is|does|did|won't|can't)|trace|fix this|what's wrong|broken)\b/i,
     ],
     taskType: 'debugging',
-    primary: 'codex',
-    secondary: ['claude', 'gemini'],
-    strategy: 'parallel',
-    reasoning: 'Complex debugging benefits from multiple AI perspectives simultaneously.',
+    primary: 'ollama-pro',
+    secondary: ['codex-cli', 'claude-code'],
+    strategy: 'single',
+    reasoning: 'Debugging routes to Ollama Pro. Enable Codex CLI or Claude Code for additional model perspectives.',
   },
   {
     patterns: [
       /\b(write|essay|article|blog|story|summarize|explain|describe|draft)\b/i,
     ],
     taskType: 'writing',
-    primary: 'claude',
+    primary: 'ollama-pro',
+    secondary: ['claude-code'],
     strategy: 'single',
-    reasoning: 'Claude excels at long-form writing, nuanced explanation, and structured content.',
+    reasoning: 'Writing tasks route to Ollama Pro. Enable Claude Code CLI for Anthropic-quality prose.',
   },
   {
     patterns: [
@@ -47,40 +48,40 @@ const ROUTING_RULES: RoutingRule[] = [
       /\b(analyze this|process this|go through)\b/i,
     ],
     taskType: 'analysis',
-    primary: 'gemini',
-    secondary: ['claude'],
-    strategy: 'sequential',
-    reasoning: 'Gemini handles massive context windows best for document analysis.',
+    primary: 'ollama-pro',
+    secondary: ['gemini-cli'],
+    strategy: 'single',
+    reasoning: 'Analysis routes to Ollama Pro. Enable Gemini CLI for large-context document analysis.',
   },
   {
     patterns: [
       /\b(brainstorm|ideas|creative|options|alternatives|what if|possibilities|suggest)\b/i,
     ],
     taskType: 'brainstorming',
-    primary: 'gemini',
-    secondary: ['claude'],
-    strategy: 'parallel',
-    reasoning: 'Parallel brainstorming from Gemini + Claude yields the widest ideation.',
+    primary: 'ollama-pro',
+    secondary: ['claude-code', 'gemini-cli'],
+    strategy: 'single',
+    reasoning: 'Brainstorming routes to Ollama Pro. Enable CLI providers for additional creative perspectives.',
   },
   {
     patterns: [
       /\b(research|find|search|information about|tell me about|what is|who is|when did|history)\b/i,
     ],
     taskType: 'research',
-    primary: 'gemini',
-    secondary: ['claude'],
-    strategy: 'sequential',
-    reasoning: 'Gemini has strong web-grounded knowledge for research tasks.',
+    primary: 'ollama-pro',
+    secondary: ['gemini-cli'],
+    strategy: 'single',
+    reasoning: 'Research routes to Ollama Pro. Enable Gemini CLI for web-grounded knowledge.',
   },
   {
     patterns: [
       /\b(calculate|math|equation|formula|solve|compute|integral|derivative|probability)\b/i,
     ],
     taskType: 'math',
-    primary: 'claude',
-    secondary: ['codex'],
+    primary: 'ollama-pro',
+    secondary: ['claude-code'],
     strategy: 'single',
-    reasoning: 'Claude has strong mathematical reasoning with clear step-by-step solutions.',
+    reasoning: 'Math problems route to Ollama Pro. Enable Claude Code CLI for complex step-by-step solutions.',
   },
 ]
 
@@ -130,8 +131,8 @@ export function routePrompt(prompt: string, preferredModel: AIModel): RouterDeci
 
   if (!rule) {
     return {
-      primary: 'claude',
-      reasoning: 'General task — Claude is the default for balanced, high-quality responses.',
+      primary: 'ollama-pro',
+      reasoning: 'General task — Ollama Pro is the default always-on subscription provider.',
       confidence: 0.5,
       taskType: 'general',
       strategy: 'single',
@@ -148,32 +149,42 @@ export function routePrompt(prompt: string, preferredModel: AIModel): RouterDeci
   }
 }
 
-export function getModelColor(model: AIModel): string {
+export function getModelColor(model: string): string {
   switch (model) {
-    case 'claude':         return '#8B5CF6'
-    case 'codex':          return '#10B981'
-    case 'gemini':         return '#3B82F6'
-    case 'auto':           return '#F59E0B'
-    case 'llama3':         return '#F97316'
-    case 'llama3.2':       return '#F97316'
-    case 'mistral':        return '#EC4899'
-    case 'deepseek-coder': return '#06B6D4'
-    case 'hermes3':        return '#A855F7'
-    default:               return '#6B7280'
+    case 'ollama-pro':      return '#F97316'
+    case 'qwen2.5-coder':   return '#F97316'
+    case 'llama3':          return '#F97316'
+    case 'llama3.2':        return '#F97316'
+    case 'mistral':         return '#EC4899'
+    case 'deepseek-coder':  return '#06B6D4'
+    case 'hermes3':         return '#A855F7'
+    case 'claude-code':     return '#8B5CF6'
+    case 'gemini-cli':      return '#3B82F6'
+    case 'codex-cli':       return '#10B981'
+    case 'claude-api':      return '#8B5CF6'
+    case 'openai-api':      return '#10B981'
+    case 'gemini-api':      return '#3B82F6'
+    case 'auto':            return '#F59E0B'
+    default:                return '#6B7280'
   }
 }
 
-export function getModelLabel(model: AIModel): string {
+export function getModelLabel(model: string): string {
   switch (model) {
-    case 'claude':         return 'Claude'
-    case 'codex':          return 'Codex'
-    case 'gemini':         return 'Gemini'
-    case 'auto':           return 'Auto'
-    case 'llama3':         return 'Llama 3'
-    case 'llama3.2':       return 'Llama 3.2'
-    case 'mistral':        return 'Mistral'
-    case 'deepseek-coder': return 'DeepSeek Coder'
-    case 'hermes3':        return 'Hermes 3'
-    default:               return model
+    case 'ollama-pro':      return 'Ollama Pro'
+    case 'qwen2.5-coder':   return 'Qwen 2.5 Coder'
+    case 'llama3':          return 'Llama 3'
+    case 'llama3.2':        return 'Llama 3.2'
+    case 'mistral':         return 'Mistral'
+    case 'deepseek-coder':  return 'DeepSeek Coder'
+    case 'hermes3':         return 'Hermes 3'
+    case 'claude-code':     return 'Claude Code'
+    case 'gemini-cli':      return 'Gemini CLI'
+    case 'codex-cli':       return 'Codex CLI'
+    case 'claude-api':      return 'Anthropic API'
+    case 'openai-api':      return 'OpenAI API'
+    case 'gemini-api':      return 'Gemini API'
+    case 'auto':            return 'Auto'
+    default:                return model
   }
 }

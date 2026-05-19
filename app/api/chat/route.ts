@@ -4,28 +4,19 @@ import OpenAI from 'openai'
 import { GoogleGenAI } from '@google/genai'
 import { routePrompt } from '@/lib/bertos/router'
 import type { Message } from '@/lib/bertos/types'
+import {
+  resolveOllamaModel,
+  resolveOllamaBase,
+  CLI_MODEL_ALIASES,
+  API_MODEL_ALIASES,
+} from '@/lib/bertos/providers'
 
 export const runtime = 'edge'
 
-// Map BertOS model aliases → concrete model IDs
-const MODEL_IDS: Record<string, string> = {
-  claude:           'claude-opus-4-5',
-  codex:            'gpt-4o',
-  gemini:           'gemini-2.0-flash',
-  'llama3':         'llama3',
-  'llama3.2':       'llama3.2',
-  mistral:          'mistral',
-  'deepseek-coder': 'deepseek-coder',
-  'hermes3':        'hermes3',
-}
-
-type BertosTarget = 'claude' | 'codex' | 'gemini' | 'ollama'
-
-function resolveTarget(alias: string): BertosTarget {
-  if (alias === 'claude' || alias.startsWith('claude'))  return 'claude'
-  if (alias === 'codex'  || alias.startsWith('gpt') || alias.startsWith('o1') || alias.startsWith('o3')) return 'codex'
-  if (alias === 'gemini' || alias.startsWith('gemini'))  return 'gemini'
-  return 'ollama'
+const API_MODEL_IDS: Record<string, string> = {
+  'claude-api':  'claude-opus-4-5',
+  'openai-api':  'gpt-4o',
+  'gemini-api':  'gemini-2.0-flash',
 }
 
 interface ClientKeys {
@@ -34,7 +25,6 @@ interface ClientKeys {
   google?: string
 }
 
-// Resolve a key: Vercel env var takes priority, then client-supplied key from Settings.
 function resolveKey(envKey: string | undefined, clientKey: string | undefined): string {
   return envKey?.trim() || clientKey?.trim() || ''
 }
@@ -47,14 +37,13 @@ export async function POST(req: NextRequest) {
     systemPrompt?: string
     clientKeys?: ClientKeys
     ollamaEndpoint?: string
+    enableApiProviders?: boolean
   }
 
-  // Per-request key resolution: env first, Settings UI second
   const ck = body.clientKeys ?? {}
   const anthropicKey = resolveKey(process.env.ANTHROPIC_API_KEY, ck.anthropic)
   const openaiKey    = resolveKey(process.env.OPENAI_API_KEY,    ck.openai)
   const geminiKey    = resolveKey(process.env.GEMINI_API_KEY,    ck.google)
-  // NOTE: No Ollama key — private VPS instances do not use API key auth
 
   const encoder = new TextEncoder()
   const ts = new TransformStream<Uint8Array, Uint8Array>()
@@ -68,7 +57,6 @@ export async function POST(req: NextRequest) {
     await writer.close()
   }
 
-  // Resolve messages array / raw prompt
   const messages: Message[] = body.messages ?? [{
     id: '1',
     role: 'user',
@@ -82,11 +70,9 @@ export async function POST(req: NextRequest) {
     ?? systemMessages.map(m => m.content).join('\n')
     ?? 'You are BertOS, an advanced AI assistant. Be precise, thorough, and helpful.'
 
-  // Resolve target — handle 'auto' with local classifier
   const modelAlias = body.model === 'auto'
     ? routePrompt(conversationMessages[conversationMessages.length - 1]?.content ?? '', 'auto').primary
     : body.model
-  const target = resolveTarget(modelAlias)
 
   const routerDecision = body.model === 'auto'
     ? routePrompt(conversationMessages[conversationMessages.length - 1]?.content ?? '', 'auto')
@@ -96,88 +82,102 @@ export async function POST(req: NextRequest) {
     try {
       await send({ routerDecision })
 
-      if (target === 'claude') {
-        if (!anthropicKey) throw new Error('ANTHROPIC_API_KEY is not configured. Add it in Settings → API Keys.')
-        const client = new Anthropic({ apiKey: anthropicKey })
-
-        const apiMessages = conversationMessages.map(m => ({
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-        }))
-
-        const stream = await client.messages.create({
-          model: MODEL_IDS.claude,
-          max_tokens: 4096,
-          system: systemPrompt,
-          messages: apiMessages,
-          stream: true,
-        })
-
-        for await (const event of stream) {
-          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            await send({ text: event.delta.text })
-          }
+      // ── CLI subscription providers (require local process spawning) ──────────
+      if (CLI_MODEL_ALIASES.has(modelAlias)) {
+        const cliLabels: Record<string, string> = {
+          'claude-code': 'Claude Code CLI',
+          'gemini-cli':  'Gemini CLI',
+          'codex-cli':   'Codex CLI',
         }
-
-      } else if (target === 'codex') {
-        if (!openaiKey) throw new Error('OPENAI_API_KEY is not configured. Add it in Settings → API Keys.')
-        const client = new OpenAI({ apiKey: openaiKey })
-
-        const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
-          ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
-          ...conversationMessages.map(m => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-          })),
-        ]
-
-        const stream = await client.chat.completions.create({
-          model: MODEL_IDS.codex,
-          messages: openaiMessages,
-          stream: true,
-          max_tokens: 4096,
-        })
-
-        for await (const chunk of stream) {
-          const text = chunk.choices[0]?.delta?.content
-          if (text) await send({ text })
+        const installHints: Record<string, string> = {
+          'claude-code': 'npm install -g @anthropic-ai/claude-code && claude login',
+          'gemini-cli':  'npm install -g @google/gemini-cli && gemini auth login',
+          'codex-cli':   'npm install -g @openai/codex && codex login',
         }
+        throw new Error(
+          `${cliLabels[modelAlias] ?? modelAlias} requires local CLI process spawning — ` +
+          `not yet available in the web interface. ` +
+          `Run BertOS locally and install the CLI: ${installHints[modelAlias] ?? ''}`
+        )
+      }
 
-      } else if (target === 'gemini') {
-        if (!geminiKey) throw new Error('GEMINI_API_KEY is not configured. Add it in Settings → API Keys.')
-        const client = new GoogleGenAI({ apiKey: geminiKey })
-
-        const contents = conversationMessages.map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.content }],
-        }))
-
-        const stream = await client.models.generateContentStream({
-          model: MODEL_IDS.gemini,
-          contents,
-          config: { systemInstruction: systemPrompt },
-        })
-
-        for await (const chunk of stream) {
-          const text = chunk.text
-          if (text) await send({ text })
-        }
-
-      } else {
-        // ── Private Ollama (VPS or local) — /api/generate, no cloud fallback ──
-        const baseUrl = body.ollamaEndpoint?.trim()
-        if (!baseUrl) {
+      // ── Optional API providers (disabled by default) ─────────────────────────
+      if (API_MODEL_ALIASES.has(modelAlias)) {
+        const enableApi = body.enableApiProviders ?? (process.env.ENABLE_API_PROVIDERS === 'true')
+        if (!enableApi) {
           throw new Error(
-            'No private Ollama endpoint configured. ' +
-            'Set your VPS URL in Settings → API Keys → Custom Ollama Endpoint ' +
-            '(e.g. http://your-vps-ip:11434).'
+            `API providers are disabled by default. ` +
+            `Enable them in Settings → Providers → Enable API Providers. ` +
+            `Note: ${modelAlias} creates a separate metered API bill and is NOT included in any subscription.`
           )
         }
 
-        // Build the /api/generate URL regardless of what the user pasted
+        if (modelAlias === 'claude-api') {
+          if (!anthropicKey) throw new Error('ANTHROPIC_API_KEY is not configured. Add it in Settings → API Keys.')
+          const client = new Anthropic({ apiKey: anthropicKey })
+          const apiMessages = conversationMessages.map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          }))
+          const stream = await client.messages.create({
+            model: API_MODEL_IDS['claude-api'],
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: apiMessages,
+            stream: true,
+          })
+          for await (const event of stream) {
+            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+              await send({ text: event.delta.text })
+            }
+          }
+
+        } else if (modelAlias === 'openai-api') {
+          if (!openaiKey) throw new Error('OPENAI_API_KEY is not configured. Add it in Settings → API Keys.')
+          const client = new OpenAI({ apiKey: openaiKey })
+          const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
+            ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
+            ...conversationMessages.map(m => ({
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+            })),
+          ]
+          const stream = await client.chat.completions.create({
+            model: API_MODEL_IDS['openai-api'],
+            messages: openaiMessages,
+            stream: true,
+            max_tokens: 4096,
+          })
+          for await (const chunk of stream) {
+            const text = chunk.choices[0]?.delta?.content
+            if (text) await send({ text })
+          }
+
+        } else if (modelAlias === 'gemini-api') {
+          if (!geminiKey) throw new Error('GEMINI_API_KEY is not configured. Add it in Settings → API Keys.')
+          const client = new GoogleGenAI({ apiKey: geminiKey })
+          const contents = conversationMessages.map(m => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: [{ text: m.content }],
+          }))
+          const stream = await client.models.generateContentStream({
+            model: API_MODEL_IDS['gemini-api'],
+            contents,
+            config: { systemInstruction: systemPrompt },
+          })
+          for await (const chunk of stream) {
+            const text = chunk.text
+            if (text) await send({ text })
+          }
+        }
+
+      } else {
+        // ── Ollama (default subscription provider, no API billing) ─────────────
+        // Defaults to http://127.0.0.1:11434 — override in Settings → Ollama Endpoint
+        const baseUrl = resolveOllamaBase(body.ollamaEndpoint)
+        const ollamaModel = resolveOllamaModel(modelAlias)
         const generateUrl = baseUrl.replace(/\/(api\/(generate|chat))?\/?$/, '') + '/api/generate'
 
-        // Format conversation history as a single prompt string for /api/generate
         const prompt = conversationMessages
           .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
           .join('\n\n') + '\n\nAssistant:'
@@ -185,9 +185,9 @@ export async function POST(req: NextRequest) {
         const res = await fetch(generateUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          // No Authorization header — private Ollama instances don't require auth
+          // No Authorization header — private Ollama instances do not require auth
           body: JSON.stringify({
-            model: MODEL_IDS[modelAlias] ?? modelAlias,
+            model: ollamaModel,
             system: systemPrompt || undefined,
             prompt,
             stream: true,
@@ -218,10 +218,9 @@ export async function POST(req: NextRequest) {
           for (const line of lines) {
             if (!line.trim()) continue
             try {
-              // /api/generate streams {response: "..."} NDJSON
               const data = JSON.parse(line) as { response?: string; done?: boolean }
               if (data.response) await send({ text: data.response })
-            } catch { /* skip malformed NDJSON chunk */ }
+            } catch { /* skip malformed NDJSON */ }
           }
         }
       }

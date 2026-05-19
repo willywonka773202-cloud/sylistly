@@ -18,15 +18,23 @@ interface InputBarProps {
 }
 
 const MODEL_HINTS: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
-  auto:            { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', label: 'Auto'           },
-  claude:          { icon: <Cpu     className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Claude'          },
-  codex:           { icon: <Zap     className="w-3.5 h-3.5" />, color: '#10B981', label: 'Codex'           },
-  gemini:          { icon: <Globe   className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini'          },
-  llama3:          { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3'         },
-  'llama3.2':      { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3.2'       },
-  mistral:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#EC4899', label: 'Mistral'         },
-  'deepseek-coder':{ icon: <Bot     className="w-3.5 h-3.5" />, color: '#06B6D4', label: 'DeepSeek Coder'  },
-  hermes3:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#A855F7', label: 'Hermes 3'         },
+  auto:             { icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B', label: 'Auto'            },
+  // Subscription providers
+  'ollama-pro':     { icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', label: 'Ollama Pro'      },
+  'claude-code':    { icon: <Cpu      className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Claude Code'     },
+  'gemini-cli':     { icon: <Globe    className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini CLI'      },
+  'codex-cli':      { icon: <Zap      className="w-3.5 h-3.5" />, color: '#10B981', label: 'Codex CLI'       },
+  // Optional API providers
+  'claude-api':     { icon: <Cpu      className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Anthropic API'   },
+  'openai-api':     { icon: <Zap      className="w-3.5 h-3.5" />, color: '#10B981', label: 'OpenAI API'      },
+  'gemini-api':     { icon: <Globe    className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini API'      },
+  // Local Ollama models
+  'qwen2.5-coder':  { icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', label: 'Qwen 2.5 Coder'  },
+  llama3:           { icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3'          },
+  'llama3.2':       { icon: <Bot      className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3.2'        },
+  mistral:          { icon: <Bot      className="w-3.5 h-3.5" />, color: '#EC4899', label: 'Mistral'          },
+  'deepseek-coder': { icon: <Bot      className="w-3.5 h-3.5" />, color: '#06B6D4', label: 'DeepSeek Coder'   },
+  hermes3:          { icon: <Bot      className="w-3.5 h-3.5" />, color: '#A855F7', label: 'Hermes 3'         },
 }
 
 const SLASH_COMMANDS = [

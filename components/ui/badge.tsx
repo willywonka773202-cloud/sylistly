@@ -7,15 +7,23 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-zinc-700 bg-zinc-800 text-zinc-300',
-        claude: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
-        codex: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
-        gemini: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
-        auto: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-        success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
-        warning: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-        error: 'border-red-500/30 bg-red-500/10 text-red-300',
-        info: 'border-blue-500/30 bg-blue-500/10 text-blue-300',
+        default:        'border-zinc-700 bg-zinc-800 text-zinc-300',
+        // Subscription providers
+        'ollama-pro':   'border-orange-500/30 bg-orange-500/10 text-orange-300',
+        'claude-code':  'border-violet-500/30 bg-violet-500/10 text-violet-300',
+        'gemini-cli':   'border-blue-500/30 bg-blue-500/10 text-blue-300',
+        'codex-cli':    'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+        // Optional API providers
+        'claude-api':   'border-violet-500/30 bg-violet-500/10 text-violet-300',
+        'openai-api':   'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+        'gemini-api':   'border-blue-500/30 bg-blue-500/10 text-blue-300',
+        // Auto routing
+        auto:           'border-amber-500/30 bg-amber-500/10 text-amber-300',
+        // Status
+        success:        'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+        warning:        'border-amber-500/30 bg-amber-500/10 text-amber-300',
+        error:          'border-red-500/30 bg-red-500/10 text-red-300',
+        info:           'border-blue-500/30 bg-blue-500/10 text-blue-300',
       },
     },
     defaultVariants: { variant: 'default' },

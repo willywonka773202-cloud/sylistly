@@ -2,8 +2,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Settings, Key, Cpu, Globe, Zap, Sparkles, Monitor, Database,
-  Shield, Sliders, Check, Eye, EyeOff, ChevronRight, Bot, Server
+  Settings, Key, Globe, Zap, Sparkles, Monitor, Database,
+  Shield, Sliders, Check, Eye, EyeOff, Bot, Server, Cpu, Terminal
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -12,12 +12,12 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 const SECTIONS = [
-  { id: 'models', icon: Sparkles, label: 'AI Models' },
-  { id: 'api-keys', icon: Key, label: 'API Keys' },
-  { id: 'appearance', icon: Monitor, label: 'Appearance' },
-  { id: 'memory', icon: Database, label: 'Memory' },
-  { id: 'performance', icon: Sliders, label: 'Performance' },
-  { id: 'security', icon: Shield, label: 'Security' },
+  { id: 'providers', icon: Bot,      label: 'Providers'   },
+  { id: 'api-keys',  icon: Key,      label: 'API Keys'    },
+  { id: 'appearance',icon: Monitor,  label: 'Appearance'  },
+  { id: 'memory',    icon: Database, label: 'Memory'      },
+  { id: 'performance',icon: Sliders, label: 'Performance' },
+  { id: 'security',  icon: Shield,   label: 'Security'    },
 ]
 
 function ToggleSwitch({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
@@ -57,7 +57,7 @@ function SecretInput({ value, onChange, placeholder }: { value: string; onChange
 
 export function SettingsView() {
   const { settings, updateSettings } = useUIStore()
-  const [activeSection, setActiveSection] = useState('models')
+  const [activeSection, setActiveSection] = useState('providers')
   const [saved, setSaved] = useState(false)
   const [anthropicKey, setAnthropicKey] = useState(settings.apiKeys.anthropic ?? '')
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
@@ -98,85 +98,112 @@ export function SettingsView() {
       {/* Settings content */}
       <ScrollArea className="flex-1">
         <div className="max-w-2xl mx-auto px-6 py-6 space-y-6">
-          {activeSection === 'models' && (
+
+          {/* ── Providers ─────────────────────────────────────────────────── */}
+          {activeSection === 'providers' && (
             <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <div>
-                <h3 className="text-base font-semibold text-zinc-200 mb-1">AI Model Configuration</h3>
-                <p className="text-xs text-zinc-500">Configure how BertOS selects and routes to AI models.</p>
+                <h3 className="text-base font-semibold text-zinc-200 mb-1">Subscription Providers</h3>
+                <p className="text-xs text-zinc-500">BertOS routes through providers you already subscribe to — no separate API billing required.</p>
               </div>
 
+              {/* Always-on: Ollama Pro */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Cloud Models</h4>
+                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Always-On Default</h4>
+                <div className="flex items-center gap-3 p-3.5 rounded-xl border border-orange-500/20 bg-orange-500/5">
+                  <Bot className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-zinc-200">Ollama Pro</p>
+                    <p className="text-xs text-zinc-500">gpt-oss:120b-cloud · No API billing · Works at localhost:11434 by default</p>
+                  </div>
+                  <Badge variant="success" className="text-[9px] h-4">Active</Badge>
+                </div>
+
+                {/* Ollama endpoint config */}
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Server className="w-4 h-4 text-orange-400" />
+                    <p className="text-sm font-medium text-zinc-300">Ollama Endpoint</p>
+                    <Badge variant={ollamaEndpoint ? 'success' : 'default'} className="text-[9px] h-4 ml-auto">
+                      {ollamaEndpoint ? 'Custom' : 'localhost:11434'}
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-zinc-600 leading-relaxed">
+                    Override the default local Ollama URL. Leave blank to use <code className="text-zinc-500">http://127.0.0.1:11434</code>.
+                  </p>
+                  <input
+                    type="url"
+                    value={ollamaEndpoint}
+                    onChange={e => setOllamaEndpoint(e.target.value)}
+                    placeholder="http://your-server:11434"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none focus:border-zinc-700 font-mono"
+                  />
+                  {ollamaEndpoint && (
+                    <button
+                      onClick={() => setOllamaEndpoint('')}
+                      className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors"
+                    >
+                      Clear — revert to localhost:11434
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* CLI subscription providers */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">CLI Subscription Providers</h4>
+                <p className="text-[11px] text-zinc-600">These use your existing AI subscriptions via local CLI tools. No API billing.</p>
                 {([
-                  { value: 'auto',   label: 'Auto Router',      desc: 'Intelligently selects the best model for each task', icon: <Sparkles className="w-4 h-4 text-amber-400" />,  color: '#F59E0B' },
-                  { value: 'claude', label: 'Claude (Anthropic)', desc: 'Best for reasoning, writing, and complex analysis', icon: <Cpu className="w-4 h-4 text-violet-400" />,      color: '#8B5CF6' },
-                  { value: 'codex',  label: 'Codex (OpenAI)',    desc: 'Best for code generation and technical tasks',      icon: <Zap className="w-4 h-4 text-emerald-400" />,     color: '#10B981' },
-                  { value: 'gemini', label: 'Gemini (Google)',   desc: 'Best for research and large context tasks',         icon: <Globe className="w-4 h-4 text-blue-400" />,      color: '#3B82F6' },
-                ] as const).map(m => (
-                  <button
-                    key={m.value}
-                    onClick={() => updateSettings({ primaryModel: m.value })}
-                    className={cn(
-                      'w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left',
-                      settings.primaryModel === m.value
-                        ? 'border-violet-500/30 bg-violet-500/5'
-                        : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
-                    )}
-                  >
-                    {m.icon}
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-zinc-200">{m.label}</p>
-                      <p className="text-xs text-zinc-500">{m.desc}</p>
-                    </div>
-                    {settings.primaryModel === m.value && (
-                      <div className="w-5 h-5 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-violet-400" />
+                  {
+                    id: 'claude-code', label: 'Claude Code', color: '#8B5CF6',
+                    icon: <Cpu className="w-4 h-4 text-violet-400" />,
+                    desc: 'Anthropic Pro subscription · Claude Code CLI',
+                    install: 'npm install -g @anthropic-ai/claude-code',
+                    login: 'claude login',
+                  },
+                  {
+                    id: 'gemini-cli', label: 'Gemini CLI', color: '#3B82F6',
+                    icon: <Globe className="w-4 h-4 text-blue-400" />,
+                    desc: 'Google One AI Premium · Gemini CLI',
+                    install: 'npm install -g @google/gemini-cli',
+                    login: 'gemini auth login',
+                  },
+                  {
+                    id: 'codex-cli', label: 'Codex CLI', color: '#10B981',
+                    icon: <Zap className="w-4 h-4 text-emerald-400" />,
+                    desc: 'ChatGPT Plus subscription · OpenAI Codex CLI',
+                    install: 'npm install -g @openai/codex',
+                    login: 'codex login',
+                  },
+                ]).map(p => (
+                  <div key={p.id} className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/30 space-y-2">
+                    <div className="flex items-center gap-3">
+                      {p.icon}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-zinc-200">{p.label}</p>
+                        <p className="text-xs text-zinc-500">{p.desc}</p>
                       </div>
-                    )}
-                  </button>
+                      <Badge variant="warning" className="text-[9px] h-4">CLI Only</Badge>
+                    </div>
+                    <div className="flex items-start gap-2 rounded-lg bg-zinc-950/60 p-2.5 border border-zinc-800">
+                      <Terminal className="w-3 h-3 text-zinc-600 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-zinc-600 font-mono">{p.install}</p>
+                        <p className="text-[10px] text-zinc-600 font-mono">{p.login}</p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Open Source · Ollama Cloud</h4>
-                {([
-                  { value: 'llama3',         label: 'Llama 3',         desc: 'Meta · Reliable default for private VPS instances',   color: '#F97316' },
-                  { value: 'llama3.2',       label: 'Llama 3.2',      desc: 'Meta · Fast general-purpose open-source model',       color: '#F97316' },
-                  { value: 'mistral',        label: 'Mistral',         desc: 'Mistral AI · Excellent reasoning at low latency',      color: '#EC4899' },
-                  { value: 'deepseek-coder', label: 'DeepSeek Coder',  desc: 'DeepSeek · Top-ranked open-source coding model',       color: '#06B6D4' },
-                  { value: 'hermes3',        label: 'Hermes 3',         desc: 'NousResearch · Balanced open-source model via Ollama', color: '#A855F7' },
-                ] as const).map(m => (
-                  <button
-                    key={m.value}
-                    onClick={() => updateSettings({ primaryModel: m.value })}
-                    className={cn(
-                      'w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left',
-                      settings.primaryModel === m.value
-                        ? 'border-violet-500/30 bg-violet-500/5'
-                        : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
-                    )}
-                  >
-                    <Bot className="w-4 h-4 flex-shrink-0" style={{ color: m.color }} />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-zinc-200">{m.label}</p>
-                      <p className="text-xs text-zinc-500">{m.desc}</p>
-                    </div>
-                    {settings.primaryModel === m.value && (
-                      <div className="w-5 h-5 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-violet-400" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-
+              {/* Routing options */}
               <div className="space-y-3">
                 <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Routing Options</h4>
                 {[
-                  { key: 'routingEnabled', label: 'Smart Routing', desc: 'Automatically route prompts to the best model' },
-                  { key: 'streamingEnabled', label: 'Streaming Responses', desc: 'Show responses as they are generated in real-time' },
-                  { key: 'memoryEnabled', label: 'Project Memory', desc: 'Include project context in all conversations' },
-                  { key: 'animationsEnabled', label: 'Animations', desc: 'Enable smooth transitions and motion effects' },
+                  { key: 'routingEnabled',    label: 'Smart Routing',       desc: 'Auto-select the best provider for each task' },
+                  { key: 'streamingEnabled',  label: 'Streaming Responses', desc: 'Show responses as they are generated' },
+                  { key: 'memoryEnabled',     label: 'Project Memory',      desc: 'Include project context in conversations' },
+                  { key: 'animationsEnabled', label: 'Animations',          desc: 'Enable smooth transitions and motion effects' },
                 ].map(option => (
                   <div key={option.key} className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/30">
                     <div>
@@ -190,107 +217,87 @@ export function SettingsView() {
                   </div>
                 ))}
               </div>
+
+              <Button onClick={saveSettings} className="w-full">
+                {saved ? <><Check className="w-4 h-4" /> Saved</> : 'Save Settings'}
+              </Button>
             </motion.div>
           )}
 
+          {/* ── API Keys ──────────────────────────────────────────────────── */}
           {activeSection === 'api-keys' && (
             <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <div>
-                <h3 className="text-base font-semibold text-zinc-200 mb-1">API Keys</h3>
+                <h3 className="text-base font-semibold text-zinc-200 mb-1">Optional API Providers</h3>
                 <p className="text-xs text-zinc-500">
-                  Configure API keys for direct API access. Keys are stored locally and never sent to any server.
+                  These create a separate metered bill. They are <strong className="text-zinc-400">NOT</strong> included in ChatGPT Plus, Claude Pro, or Google One subscriptions.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+              {/* Billing warning */}
+              <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
                 <div className="flex items-start gap-2.5">
-                  <Shield className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <Shield className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs font-semibold text-amber-300 mb-1">Local Storage Only</p>
-                    <p className="text-xs text-amber-400/70 leading-relaxed">
-                      API keys are stored in your browser's local storage and are never transmitted to BertOS servers.
-                      They are only sent directly to the respective AI provider APIs.
+                    <p className="text-xs font-semibold text-red-300 mb-1">Separate API billing — disabled by default</p>
+                    <p className="text-xs text-red-400/70 leading-relaxed">
+                      ChatGPT Plus does NOT include OpenAI API credits. Claude Pro does NOT include Anthropic API credits.
+                      Google One AI Premium does NOT include Gemini API credits. Enabling these will charge your API account separately.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-5">
-                {[
-                  { label: 'Anthropic API Key', placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'Claude',         color: '#8B5CF6', icon: <Cpu className="w-4 h-4" />  },
-                  { label: 'OpenAI API Key',     placeholder: 'sk-...',     value: openaiKey,    setter: setOpenaiKey,    model: 'Codex / GPT-4o', color: '#10B981', icon: <Zap className="w-4 h-4" />  },
-                  { label: 'Google AI API Key',  placeholder: 'AIza...',    value: googleKey,    setter: setGoogleKey,    model: 'Gemini',         color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
-                ].map(field => (
-                  <div key={field.label} className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span style={{ color: field.color }}>{field.icon}</span>
-                      <label className="text-sm font-medium text-zinc-300">{field.label}</label>
-                      <Badge
-                        variant={field.value ? 'success' : 'default'}
-                        className="text-[9px] h-4 ml-auto"
-                      >
-                        {field.value ? 'Connected' : 'Not Set'}
-                      </Badge>
-                    </div>
-                    <SecretInput
-                      value={field.value}
-                      onChange={field.setter}
-                      placeholder={field.placeholder}
-                    />
-                    <p className="text-[11px] text-zinc-700">Used for {field.model} API calls</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* VPS info — replaces the old Ollama Cloud API key field */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
-                <Bot className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+              {/* Enable API providers toggle */}
+              <div className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/30">
                 <div>
-                  <p className="text-xs font-semibold text-orange-300 mb-1">Open-Source Models · Private VPS</p>
-                  <p className="text-[11px] text-orange-400/70 leading-relaxed">
-                    Llama 3, Mistral, DeepSeek, and Hermes route exclusively to your private Ollama instance — never to a public cloud. No API key required. Configure the endpoint URL below.
-                  </p>
+                  <p className="text-sm font-medium text-zinc-300">Enable API Providers</p>
+                  <p className="text-xs text-zinc-600">Allow claude-api, openai-api, gemini-api models</p>
                 </div>
+                <ToggleSwitch
+                  value={settings.enableApiProviders ?? false}
+                  onChange={v => updateSettings({ enableApiProviders: v })}
+                />
               </div>
 
-              {/* Custom Ollama endpoint */}
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Server className="w-4 h-4 text-orange-400" />
-                  <p className="text-sm font-medium text-zinc-300">Custom Ollama Endpoint</p>
-                  <Badge
-                    variant={ollamaEndpoint ? 'success' : 'default'}
-                    className="text-[9px] h-4 ml-auto"
-                  >
-                    {ollamaEndpoint ? 'Custom' : 'Ollama Cloud'}
-                  </Badge>
-                </div>
-                <p className="text-[11px] text-zinc-600 leading-relaxed">
-                  Override the default Ollama Cloud URL with your own VPS or local instance. No API key needed for local endpoints.
-                </p>
-                <input
-                  type="url"
-                  value={ollamaEndpoint}
-                  onChange={e => setOllamaEndpoint(e.target.value)}
-                  placeholder="http://your-vps-ip:11434/api/chat"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none focus:border-zinc-700 font-mono"
-                />
-                {ollamaEndpoint && (
-                  <button
-                    onClick={() => setOllamaEndpoint('')}
-                    className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors"
-                  >
-                    Clear · revert to Ollama Cloud
-                  </button>
-                )}
-              </div>
+              {(settings.enableApiProviders ?? false) && (
+                <>
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                    <div className="flex items-start gap-2.5">
+                      <Key className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-semibold text-amber-300 mb-1">Local Storage Only</p>
+                        <p className="text-xs text-amber-400/70 leading-relaxed">
+                          API keys are stored in your browser's local storage and are never sent to BertOS servers.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {[
+                      { label: 'Anthropic API Key',  placeholder: 'sk-ant-...', value: anthropicKey, setter: setAnthropicKey, model: 'claude-api',  color: '#8B5CF6', icon: <Cpu className="w-4 h-4" />   },
+                      { label: 'OpenAI API Key',      placeholder: 'sk-...',     value: openaiKey,    setter: setOpenaiKey,    model: 'openai-api',  color: '#10B981', icon: <Zap className="w-4 h-4" />   },
+                      { label: 'Google AI API Key',   placeholder: 'AIza...',    value: googleKey,    setter: setGoogleKey,    model: 'gemini-api',  color: '#3B82F6', icon: <Globe className="w-4 h-4" /> },
+                    ].map(field => (
+                      <div key={field.label} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: field.color }}>{field.icon}</span>
+                          <label className="text-sm font-medium text-zinc-300">{field.label}</label>
+                          <Badge variant={field.value ? 'success' : 'default'} className="text-[9px] h-4 ml-auto">
+                            {field.value ? 'Connected' : 'Not Set'}
+                          </Badge>
+                        </div>
+                        <SecretInput value={field.value} onChange={field.setter} placeholder={field.placeholder} />
+                        <p className="text-[11px] text-zinc-700">Used for {field.model} calls</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
 
               <Button onClick={saveSettings} className="w-full">
-                {saved ? (
-                  <><Check className="w-4 h-4" /> Saved Successfully</>
-                ) : (
-                  'Save API Keys'
-                )}
+                {saved ? <><Check className="w-4 h-4" /> Saved Successfully</> : 'Save Settings'}
               </Button>
             </motion.div>
           )}
@@ -303,9 +310,9 @@ export function SettingsView() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { value: 'dark', label: 'Dark', preview: 'bg-zinc-900' },
-                  { value: 'darker', label: 'Darker', preview: 'bg-zinc-950' },
-                  { value: 'midnight', label: 'Midnight', preview: 'bg-[#05050A]' },
+                  { value: 'dark',     label: 'Dark',     preview: 'bg-zinc-900'    },
+                  { value: 'darker',   label: 'Darker',   preview: 'bg-zinc-950'    },
+                  { value: 'midnight', label: 'Midnight', preview: 'bg-[#05050A]'   },
                 ].map(t => (
                   <button
                     key={t.value}
