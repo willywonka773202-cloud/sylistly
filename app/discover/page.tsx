@@ -276,10 +276,17 @@ function buildDiscoverLooks(): DiscoverLookCardData[] {
   return looks.slice(0, 8);
 }
 
+function transparentDisplayScore(product: Product): number {
+  return (product.imageTransparentUrl ? 1_000 : 0)
+    + (product.imageQuality === 'good' ? 80 : 0)
+    + (product.metadata?.featured ? 24 : 0)
+    + (product.priceCents > 0 ? 4 : 0);
+}
+
 function uniqueProducts(products: Product[], limit: number, excludedIds = new Set<string>()): Product[] {
   const seen = new Set<string>();
   const out: Product[] = [];
-  for (const product of products) {
+  for (const product of [...products].sort((left, right) => transparentDisplayScore(right) - transparentDisplayScore(left))) {
     if (!isRenderableProduct(product)) continue;
     if (seen.has(product.id) || excludedIds.has(product.id)) continue;
     seen.add(product.id);
