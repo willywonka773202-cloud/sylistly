@@ -149,6 +149,7 @@ export interface BertOSSettings {
     google?: string
     ollama?: string
   }
+  ollamaEndpoint?: string
   modelPriority: AIModel[]
   tokenBudget: number
   animationsEnabled: boolean

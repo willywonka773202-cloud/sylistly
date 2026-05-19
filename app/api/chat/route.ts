@@ -7,7 +7,7 @@ import type { Message } from '@/lib/bertos/types'
 
 export const runtime = 'edge'
 
-const OLLAMA_BASE = 'https://ollama.com/api/chat'
+const OLLAMA_CLOUD = 'https://ollama.com/api/chat'
 
 // Map BertOS model aliases → concrete model IDs
 const MODEL_IDS: Record<string, string> = {
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
     model: string
     systemPrompt?: string
     clientKeys?: ClientKeys
+    ollamaEndpoint?: string
   }
 
   // Per-request key resolution: env first, Settings UI second
@@ -165,20 +166,26 @@ export async function POST(req: NextRequest) {
         }
 
       } else {
-        // ── Hybrid fallback: Ollama Cloud for all open-source models ─────────
-        if (!ollamaKey) throw new Error('OLLAMA_API_KEY is not configured. Add it in Settings → API Keys.')
+        // ── Hybrid: custom VPS endpoint OR Ollama Cloud for open-source models ─
+        const ollamaUrl = body.ollamaEndpoint?.trim() || OLLAMA_CLOUD
+        const isCustomEndpoint = !!body.ollamaEndpoint?.trim()
+
+        // Cloud requires a key; local/VPS endpoints work without one
+        if (!isCustomEndpoint && !ollamaKey) {
+          throw new Error('OLLAMA_API_KEY is not configured. Add it in Settings → API Keys, or set a custom Ollama endpoint.')
+        }
 
         const ollamaMessages = [
           ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
           ...conversationMessages.map(m => ({ role: m.role as string, content: m.content })),
         ]
 
-        const res = await fetch(OLLAMA_BASE, {
+        const ollamaHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
+        if (ollamaKey) ollamaHeaders['Authorization'] = `Bearer ${ollamaKey}`
+
+        const res = await fetch(ollamaUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${ollamaKey}`,
-          },
+          headers: ollamaHeaders,
           body: JSON.stringify({
             model: MODEL_IDS[modelAlias] ?? modelAlias,
             messages: ollamaMessages,

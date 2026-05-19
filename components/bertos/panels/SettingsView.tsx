@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Settings, Key, Cpu, Globe, Zap, Sparkles, Monitor, Database,
-  Shield, Sliders, Check, Eye, EyeOff, ChevronRight, Bot
+  Shield, Sliders, Check, Eye, EyeOff, ChevronRight, Bot, Server
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -63,10 +63,12 @@ export function SettingsView() {
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
   const [googleKey, setGoogleKey] = useState(settings.apiKeys.google ?? '')
   const [ollamaKey, setOllamaKey] = useState(settings.apiKeys.ollama ?? '')
+  const [ollamaEndpoint, setOllamaEndpoint] = useState(settings.ollamaEndpoint ?? '')
 
   const saveSettings = () => {
     updateSettings({
-      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey, ollama: ollamaKey }
+      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey, ollama: ollamaKey },
+      ollamaEndpoint: ollamaEndpoint.trim() || undefined,
     })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -239,6 +241,38 @@ export function SettingsView() {
                     <p className="text-[11px] text-zinc-700">Used for {field.model} API calls</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Custom Ollama endpoint */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-orange-400" />
+                  <p className="text-sm font-medium text-zinc-300">Custom Ollama Endpoint</p>
+                  <Badge
+                    variant={ollamaEndpoint ? 'success' : 'default'}
+                    className="text-[9px] h-4 ml-auto"
+                  >
+                    {ollamaEndpoint ? 'Custom' : 'Ollama Cloud'}
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-zinc-600 leading-relaxed">
+                  Override the default Ollama Cloud URL with your own VPS or local instance. No API key needed for local endpoints.
+                </p>
+                <input
+                  type="url"
+                  value={ollamaEndpoint}
+                  onChange={e => setOllamaEndpoint(e.target.value)}
+                  placeholder="http://your-vps-ip:11434/api/chat"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none focus:border-zinc-700 font-mono"
+                />
+                {ollamaEndpoint && (
+                  <button
+                    onClick={() => setOllamaEndpoint('')}
+                    className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors"
+                  >
+                    Clear · revert to Ollama Cloud
+                  </button>
+                )}
               </div>
 
               <Button onClick={saveSettings} className="w-full">

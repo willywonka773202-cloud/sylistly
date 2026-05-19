@@ -120,6 +120,7 @@ export function ChatView() {
           model: modelId,
           systemPrompt,
           clientKeys: settings.apiKeys,
+          ollamaEndpoint: settings.ollamaEndpoint,
         }),
         signal: abortRef.current?.signal,
       })

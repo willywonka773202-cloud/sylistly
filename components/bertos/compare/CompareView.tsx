@@ -92,6 +92,7 @@ export function CompareView() {
             model,
             systemPrompt: 'You are a helpful AI assistant. Be concise but complete.',
             clientKeys: settings.apiKeys,
+            ollamaEndpoint: settings.ollamaEndpoint,
           }),
           signal: ctrl.signal,
         })
