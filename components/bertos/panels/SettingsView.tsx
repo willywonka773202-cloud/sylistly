@@ -141,6 +141,7 @@ export function SettingsView() {
               <div className="space-y-3">
                 <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Open Source · Ollama Cloud</h4>
                 {([
+                  { value: 'llama3',         label: 'Llama 3',         desc: 'Meta · Reliable default for private VPS instances',   color: '#F97316' },
                   { value: 'llama3.2',       label: 'Llama 3.2',      desc: 'Meta · Fast general-purpose open-source model',       color: '#F97316' },
                   { value: 'mistral',        label: 'Mistral',         desc: 'Mistral AI · Excellent reasoning at low latency',      color: '#EC4899' },
                   { value: 'deepseek-coder', label: 'DeepSeek Coder',  desc: 'DeepSeek · Top-ranked open-source coding model',       color: '#06B6D4' },

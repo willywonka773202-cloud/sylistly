@@ -65,12 +65,12 @@ export async function POST(req: NextRequest) {
       const isQuota = msg.includes('429') || msg.includes('quota') || msg.includes('billing') || msg.includes('rate limit')
       if (isQuota) {
         return NextResponse.json({
-          primary: 'llama3.2',
-          reasoning: 'OpenAI unavailable — quota exceeded. Defaulting to Llama 3.2 via Ollama Cloud.',
+          primary: 'llama3',
+          reasoning: 'OpenAI unavailable — quota exceeded. Routing to Llama 3 on private endpoint.',
           confidence: 0.9,
           taskType: 'general',
           strategy: 'single',
-          recommendedModel: 'llama3.2',
+          recommendedModel: 'llama3',
         })
       }
       // fall through to rule-based

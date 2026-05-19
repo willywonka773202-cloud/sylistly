@@ -213,29 +213,34 @@ export function ChatView() {
       if ((err as Error).name === 'AbortError') {
         // user cancelled — leave partial content, just stop streaming
         updateMessage(sessionId!, aiMsg.id, { streaming: false })
-      } else if (isQuotaError(err as Error) && resolvedModel !== 'llama3.2') {
-        // Waterfall: quota exceeded → retry with Llama 3.2 (guaranteed on Ollama Cloud)
-        const modelLabel = resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'
-        appendToMessage(sessionId!, aiMsg.id,
-          `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Llama 3.2...\n\n`)
-        updateMessage(sessionId!, aiMsg.id, { model: 'llama3.2' as AIModel, streaming: true })
-        setStreaming(true, aiMsg.id)
-
-        try {
-          await doStream('llama3.2')
+      } else if (isQuotaError(err as Error) && resolvedModel !== 'llama3') {
+        // Waterfall: quota exceeded → retry with Llama 3 on the private VPS
+        if (!settings.ollamaEndpoint?.trim()) {
+          // No private endpoint configured — don't hit Ollama Cloud, just explain
           updateMessage(sessionId!, aiMsg.id, {
+            content: `**Quota exceeded.** Set your private Ollama endpoint in **Settings → API Keys** to enable auto-fallback to Llama 3.`,
             streaming: false,
-            metadata: { latency: Date.now() - startTime },
           })
-        } catch (fallbackErr) {
-          if ((fallbackErr as Error).name !== 'AbortError') {
-            const isConfig = (fallbackErr as Error).message?.includes('not configured') || (fallbackErr as Error).message?.includes('API key')
-            appendToMessage(sessionId!, aiMsg.id,
-              isConfig
-                ? '\n\n**Hermes 3 not configured.** Add your Ollama API key in **Settings → API Keys**.'
-                : `\n\nFallback error: ${(fallbackErr as Error).message}`)
+        } else {
+          const modelLabel = resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'
+          appendToMessage(sessionId!, aiMsg.id,
+            `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Llama 3 on your private VPS...\n\n`)
+          updateMessage(sessionId!, aiMsg.id, { model: 'llama3' as AIModel, streaming: true })
+          setStreaming(true, aiMsg.id)
+
+          try {
+            await doStream('llama3')
+            updateMessage(sessionId!, aiMsg.id, {
+              streaming: false,
+              metadata: { latency: Date.now() - startTime },
+            })
+          } catch (fallbackErr) {
+            if ((fallbackErr as Error).name !== 'AbortError') {
+              appendToMessage(sessionId!, aiMsg.id,
+                `\n\n**VPS fallback error:** ${(fallbackErr as Error).message}`)
+            }
+            updateMessage(sessionId!, aiMsg.id, { streaming: false })
           }
-          updateMessage(sessionId!, aiMsg.id, { streaming: false })
         }
       } else {
         const isConfig = (err as Error).message?.includes('not configured') || (err as Error).message?.includes('API key')

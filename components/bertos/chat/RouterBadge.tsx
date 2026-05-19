@@ -12,6 +12,7 @@ const MODEL_ICONS: Record<string, React.ReactNode> = {
   codex:           <Zap     className="w-3 h-3" />,
   gemini:          <Globe   className="w-3 h-3" />,
   auto:            <Sparkles className="w-3 h-3" />,
+  llama3:          <Bot     className="w-3 h-3" />,
   'llama3.2':      <Bot     className="w-3 h-3" />,
   mistral:         <Bot     className="w-3 h-3" />,
   'deepseek-coder':<Bot     className="w-3 h-3" />,

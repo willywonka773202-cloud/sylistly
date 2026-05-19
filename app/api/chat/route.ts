@@ -14,6 +14,7 @@ const MODEL_IDS: Record<string, string> = {
   claude:           'claude-opus-4-5',
   codex:            'gpt-4o',
   gemini:           'gemini-2.0-flash',
+  'llama3':         'llama3',
   'llama3.2':       'llama3.2',
   mistral:          'mistral',
   'deepseek-coder': 'deepseek-coder',
@@ -181,7 +182,8 @@ export async function POST(req: NextRequest) {
         ]
 
         const ollamaHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
-        if (ollamaKey) ollamaHeaders['Authorization'] = `Bearer ${ollamaKey}`
+        // Only attach Bearer auth for Ollama Cloud — private/VPS instances don't require it
+        if (!isCustomEndpoint && ollamaKey) ollamaHeaders['Authorization'] = `Bearer ${ollamaKey}`
 
         const res = await fetch(ollamaUrl, {
           method: 'POST',

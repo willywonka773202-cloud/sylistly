@@ -22,6 +22,7 @@ const MODEL_HINTS: Record<string, { icon: React.ReactNode; color: string; label:
   claude:          { icon: <Cpu     className="w-3.5 h-3.5" />, color: '#8B5CF6', label: 'Claude'          },
   codex:           { icon: <Zap     className="w-3.5 h-3.5" />, color: '#10B981', label: 'Codex'           },
   gemini:          { icon: <Globe   className="w-3.5 h-3.5" />, color: '#3B82F6', label: 'Gemini'          },
+  llama3:          { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3'         },
   'llama3.2':      { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3.2'       },
   mistral:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#EC4899', label: 'Mistral'         },
   'deepseek-coder':{ icon: <Bot     className="w-3.5 h-3.5" />, color: '#06B6D4', label: 'DeepSeek Coder'  },
