@@ -16,7 +16,21 @@ import { type FeedPost, useSocialFeed } from '@/store/social-feed';
 import { useWardrobe, WARDROBE_STATUS_LABELS } from '@/store/wardrobe';
 
 const PRIMARY_FILTERS = ['For You', 'Women', 'Men', 'Clean', 'Streetwear'];
-const SECONDARY_FILTERS = ['Campus', 'Gym', 'Date', 'Work', 'Travel', 'Old Money', 'Techwear', 'Budget'];
+const SECONDARY_FILTERS = [
+  'Androgynous',
+  'Campus',
+  'Gym',
+  'Date',
+  'Vacation',
+  'Travel',
+  'Work',
+  'Old Money',
+  'Techwear',
+  'Premium',
+  'Budget',
+  'Under $150',
+  'Closet',
+];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
 
 function formatPrice(cents: number): string {
@@ -44,6 +58,11 @@ function normalizedTags(post: FeedPost) {
   return [post.vibe, ...post.tags].map((tag) => tag.toLowerCase());
 }
 
+function postHasAnyTag(post: FeedPost, terms: string[]): boolean {
+  const tags = normalizedTags(post);
+  return terms.some((term) => tags.some((tag) => tag.includes(term)));
+}
+
 function postMatches(
   post: FeedPost,
   filter: string,
@@ -51,11 +70,23 @@ function postMatches(
   visibleProductsMap?: Map<string, Product[]>,
 ): boolean {
   if (filter === 'For You') return true;
-  if (filter === 'Trending') return post.likeCount >= 250 || normalizedTags(post).some((tag) => tag.includes('trend'));
+  if (filter === 'Trending') return postHasAnyTag(post, ['trend', 'trending']);
   if (filter === 'Men') return post.frameBias === 'masc';
   if (filter === 'Women') return post.frameBias === 'fem';
-  if (filter === 'Budget') return post.totalCents <= 25000 || normalizedTags(post).some((tag) => tag.includes('budget'));
+  if (filter === 'Androgynous') return post.frameBias === 'androgynous' || post.frameBias === 'any';
+  if (filter === 'Budget') return post.totalCents <= 25000 || postHasAnyTag(post, ['budget', 'under 150', 'under 250', 'affordable']);
   if (filter === 'Under $150') return post.totalCents <= 15000;
+  if (filter === 'Premium') return post.totalCents >= 50000 || postHasAnyTag(post, ['premium', 'luxury', 'designer', 'quiet luxury', 'splurge']);
+  if (filter === 'Clean') return postHasAnyTag(post, ['clean', 'minimal', 'neutral']);
+  if (filter === 'Streetwear') return postHasAnyTag(post, ['streetwear', 'street', 'downtown', 'sneaker']);
+  if (filter === 'Campus') return postHasAnyTag(post, ['campus', 'college', 'class']);
+  if (filter === 'Gym') return postHasAnyTag(post, ['gym', 'athletic', 'training', 'pilates', 'workout']);
+  if (filter === 'Date') return postHasAnyTag(post, ['date', 'date night', 'dinner']);
+  if (filter === 'Vacation') return postHasAnyTag(post, ['vacation', 'resort', 'beach', 'summer', 'linen']);
+  if (filter === 'Travel') return postHasAnyTag(post, ['travel', 'airport', 'trip', 'capsule']);
+  if (filter === 'Work') return postHasAnyTag(post, ['work', 'office', 'business casual', 'tailored', 'interview']);
+  if (filter === 'Old Money') return postHasAnyTag(post, ['old money', 'preppy', 'quiet luxury', 'heritage']);
+  if (filter === 'Techwear') return postHasAnyTag(post, ['techwear', 'technical', 'utility']);
   if (filter === 'Closet') {
     const products = visibleProductsMap?.get(post.id) ?? visibleProducts(post);
     return products.some((product) => Boolean(wardrobeItems[product.id]));
@@ -161,6 +192,7 @@ export default function FitFeedPage() {
 
   function selectFilter(filter: string) {
     setActiveFilter(filter);
+    setActivePostId(null);
     setShowFilters(false);
     if (feedRef.current) {
       feedRef.current.scrollTo({ top: 0, behavior: 'auto' });
@@ -264,7 +296,10 @@ export default function FitFeedPage() {
           <button className="absolute inset-0" aria-label="Close filters" onClick={() => setShowFilters(false)} />
           <div className="relative z-10 w-full rounded-t-[32px] border-t border-white/10 bg-[#141211] p-6 pb-[calc(env(safe-area-inset-bottom)+24px)] shadow-[0_-20px_60px_rgba(0,0,0,.6)]">
             <div className="flex items-center justify-between">
-              <h2 className="font-serif text-[22px] font-semibold text-white">More Filters</h2>
+              <div>
+                <h2 className="font-serif text-[22px] font-semibold text-white">More Filters</h2>
+                <p className="mt-1 text-[12px] text-white/52">Every lane maps to catalog-backed outfits.</p>
+              </div>
               <button onClick={() => setShowFilters(false)} className="rounded-full bg-white/10 p-2 text-white/70 hover:text-white"><X size={18} /></button>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">

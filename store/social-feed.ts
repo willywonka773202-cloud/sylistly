@@ -93,7 +93,6 @@ function seedPost(
   title: string,
   vibe: string,
   tags: string[],
-  likeCount: number,
   caption: string,
   frameBias: FeedPost['frameBias'] = 'any',
   sourceType: FeedPost['sourceType'] = 'catalog',
@@ -114,13 +113,10 @@ function seedPost(
     totalCents: totals.totalCents,
     itemCount: totals.itemCount,
     items,
-    likeCount,
+    likeCount: 0,
     liked: false,
     saved: false,
-    comments: [
-      { id: `${id}-c1`, user: '@maisonmira', text: 'Clean fit.', createdAt: new Date().toISOString() },
-      { id: `${id}-c2`, user: '@closetlab', text: 'Would remix the shoes.', createdAt: new Date().toISOString() },
-    ],
+    comments: [],
   };
 }
 
@@ -134,12 +130,11 @@ const COLLECTION_POSTS = LAUNCH_COLLECTIONS.map((collection, index) => seedPost(
   itemsFromCollection(index),
   index,
   `feed-launch-${collection.id}`,
-  ['@selene.studio', '@downtown.dia', '@neutralindex', '@studioafter', '@workwearweek', '@resortfile', '@clubroom'][index % 7] || '@sylistly',
-  collection.label.slice(0, 1).toUpperCase(),
+  '@sylistly.editorial',
+  'S',
   collection.label,
   collection.vibe === 'street' ? 'Streetwear' : collection.vibe.charAt(0).toUpperCase() + collection.vibe.slice(1),
   [collection.vibe, collection.queryHint, collection.frame === 'all' ? 'any frame' : `${collection.frame} bias`],
-  420 - index * 9,
   collection.blurb,
   collection.frame === 'all' ? 'any' : collection.frame,
   'discover',
@@ -253,12 +248,11 @@ function buildGeneratedPosts(): FeedPost[] {
       // with `feed-launch-*` collection posts even when both lists share an
       // id like `vacation-masc-resort`. See COLLECTION_POSTS for context.
       `feed-plan-${plan.id}`,
-      ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
-      plan.title.slice(0, 1).toUpperCase(),
+      '@sylistly.editorial',
+      'S',
       plan.title,
       plan.label,
       plan.tags,
-      360 - index * 7,
       plan.caption,
       plan.frame,
       'catalog',
@@ -289,11 +283,12 @@ function dedupeFeedPostsById(posts: FeedPost[]): FeedPost[] {
 const SEED_POSTS: FeedPost[] = dedupeFeedPostsById(
   [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 4),
 );
-// Bumped from 3 to 4 because the seed-post id format changed
+// Version 5 removes synthetic social counts/comments from catalog-backed seed posts.
+// Version 4 fixed the seed-post id format
 // (`feed-X` → `feed-launch-X` / `feed-plan-X`). Persisted state from earlier
 // builds references the old ids and would render with stale or duplicate
 // keys after merge; resetting on bump is the safe path.
-const FEED_STORAGE_VERSION = 4;
+const FEED_STORAGE_VERSION = 5;
 const MAX_PERSISTED_COMMUNITY_POSTS = 12;
 const FEED_CATEGORY_ORDER: Category[] = ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry'];
 const SEED_POSTS_BY_ID = new Map(SEED_POSTS.map((post) => [post.id, post]));
@@ -425,12 +420,13 @@ function normalizePersistedState(persistedState: unknown): Pick<SocialFeedState,
   const mergedSeedPosts = SEED_POSTS.map((seedPost) => {
     const persistedPost = persistedById.get(seedPost.id);
     if (!persistedPost) return seedPost;
+    const localComments = persistedPost.comments.filter((comment) => comment.user === '@you');
     return {
       ...seedPost,
       liked: persistedPost.liked,
       saved: persistedPost.saved,
-      likeCount: Math.max(seedPost.likeCount, persistedPost.likeCount),
-      comments: persistedPost.comments.length ? persistedPost.comments : seedPost.comments,
+      likeCount: persistedPost.liked ? 1 : 0,
+      comments: localComments,
     };
   });
   const communityPosts = persistedPosts

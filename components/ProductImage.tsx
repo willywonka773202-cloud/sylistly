@@ -121,7 +121,7 @@ export function ProductFallbackTile({
       className={`relative grid h-full w-full place-items-center overflow-hidden bg-[#fdfaf8] ${className || ''}`}
       aria-label={`${displayBrand} ${getDisplayName(product, name)} image unavailable`}
     >
-      <div className="flex flex-col items-center gap-1.5 opacity-20 grayscale">
+      <div className="flex flex-col items-center gap-1.5 text-[#7d665b] opacity-35 grayscale">
         <Icon size={ICON_SIZES[size] * 0.8} strokeWidth={1.5} />
         <span className="text-[9px] font-bold uppercase tracking-widest">{label}</span>
       </div>
@@ -166,6 +166,7 @@ function SafeProductImageBase({
     [product?.id, rawImageUrl, cutout],
   );
   const [imageOk, setImageOk] = useState(() => Boolean(rawImageUrl) && renderable && !failedImageKeys.has(failureKey));
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const src = imageOk && rawImageUrl
     ? (cutout && product
@@ -176,11 +177,13 @@ function SafeProductImageBase({
   useEffect(() => {
     const nextKey = imageFailureKey(product, rawImageUrl, cutout);
     setImageOk(Boolean(rawImageUrl) && isRenderableProduct(product) && !failedImageKeys.has(nextKey));
+    setImageLoaded(false);
   }, [product?.id, rawImageUrl, cutout, product]);
 
   function markUnavailable() {
     failedImageKeys.add(failureKey);
     setImageOk(false);
+    setImageLoaded(false);
     if (product) onUnavailable?.(product);
   }
 
@@ -198,21 +201,36 @@ function SafeProductImageBase({
     );
   }
 
+  const wrapperClasses = wrapperClassName
+    ? `relative overflow-hidden ${wrapperClassName}`
+    : 'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]';
+  const imageClasses = className || `h-full w-full ${mode === 'cover' ? 'object-cover' : 'object-contain'} p-2.5`;
+
   return (
-    <div className={wrapperClassName || 'relative h-full w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fffdfa_0%,#f6efe8_100%)]'}>
+    <div className={wrapperClasses}>
+      <div className={`absolute inset-0 transition-opacity duration-200 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}>
+        <ProductFallbackTile
+          product={product}
+          category={normalizedCategory}
+          name={name}
+          brand={brand}
+          size={size}
+        />
+      </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={`${product?.brand || brand || 'Sylistly'} ${product?.name || name || 'product'}`}
         loading={loading}
         referrerPolicy="no-referrer"
-        className={className || `h-full w-full ${mode === 'cover' ? 'object-cover' : 'object-contain'} p-2.5`}
+        className={`absolute inset-0 text-transparent transition-opacity duration-200 ${imageClasses} ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
         onLoad={(event) => {
           const image = event.currentTarget;
           if (image.naturalWidth < 32 || image.naturalHeight < 32) {
             markUnavailable();
             return;
           }
+          setImageLoaded(true);
           if (product) onAvailable?.(product);
         }}
         onError={markUnavailable}
