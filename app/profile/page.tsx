@@ -78,6 +78,36 @@ export default function ProfilePage() {
     .filter(isHighConfidenceRenderableProduct);
   const likedCount = posts.filter((post) => post.liked).length;
   const closetCount = Object.keys(wardrobeItems).length;
+  const wishlistCount = Object.values(wardrobeItems).filter((item) => item.status === 'wishlist').length;
+  const collectionSummaries = [
+    {
+      title: 'Clean rotation',
+      count: gridPosts.filter((post) => [post.vibe, ...post.tags].some((tag) => tag?.toLowerCase().includes('clean'))).length,
+      unit: 'fits',
+      products: postProducts(gridPosts.find((post) => [post.vibe, ...post.tags].some((tag) => tag?.toLowerCase().includes('clean'))) || gridPosts[0]),
+    },
+    {
+      title: 'Night looks',
+      count: gridPosts.filter((post) => [post.vibe, post.occasion, ...post.tags].some((tag) => tag?.toLowerCase().includes('night') || tag?.toLowerCase().includes('date'))).length,
+      unit: 'fits',
+      products: postProducts(gridPosts.find((post) => [post.vibe, post.occasion, ...post.tags].some((tag) => tag?.toLowerCase().includes('night') || tag?.toLowerCase().includes('date'))) || gridPosts[1]),
+    },
+    {
+      title: 'Wardrobe core',
+      count: wardrobeProducts.length,
+      unit: 'pieces',
+      products: wardrobeProducts,
+    },
+    {
+      title: 'Wishlist',
+      count: wishlistCount,
+      unit: 'pieces',
+      products: Object.values(wardrobeItems)
+        .filter((item) => item.status === 'wishlist')
+        .map((item) => item.product)
+        .filter(isHighConfidenceRenderableProduct),
+    },
+  ];
   const styleBadges = useMemo(() => {
     const text = [
       ...(profile.stylePrefs.vibes || []),
@@ -147,8 +177,8 @@ export default function ProfilePage() {
                 Building swipeable fits around clean layers, sharp night pieces, and image-backed shopping picks.
               </p>
               <div className="mt-4 flex gap-5 text-[11px] uppercase tracking-[.12em] text-muted-2">
-                <span><strong className="text-white">0</strong> followers</span>
-                <span><strong className="text-white">0</strong> following</span>
+                <span>Local profile</span>
+                <span>Private beta</span>
               </div>
             </div>
           </div>
@@ -156,13 +186,16 @@ export default function ProfilePage() {
           <div className="relative z-10 mt-6 grid grid-cols-3 gap-2.5">
             <button
               type="button"
+              onClick={() => document.getElementById('style-dna')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-white transition active:scale-[.98]"
             >
               Edit profile
             </button>
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-white transition active:scale-[.98]"
+              disabled
+              title="Public profile sharing will require auth and a cloud profile."
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-bold uppercase tracking-[.12em] text-white transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-45"
             >
               <Share2 size={13} />
               Share
@@ -300,23 +333,28 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-3">
-              {['Clean rotation', 'Night looks', 'Wardrobe core', 'Wishlist'].map((collection, index) => (
+              {collectionSummaries.map((collection) => (
                 <button
-                  key={collection}
+                  key={collection.title}
                   type="button"
                   onClick={() => setActiveProfileTab('outfits')}
                   className="rounded-[28px] border border-[#eadfd5] bg-[#fff7ef] p-2 text-left shadow-[0_16px_34px_rgba(0,0,0,.22)] transition active:scale-95"
                 >
                   <div className="grid h-[140px] grid-cols-2 grid-rows-2 gap-1.5 overflow-hidden rounded-[22px] bg-[#fffaf5] p-2">
-                    {(gridPosts[index]?.items ? postProducts(gridPosts[index]).slice(0, 4) : []).map((product, i) => (
-                      <div key={`${collection}-${product.id}`} className={`overflow-hidden rounded-xl bg-white ring-1 ring-[#eadfd5] ${i === 0 && postProducts(gridPosts[index]).length < 4 ? 'row-span-2' : ''}`}>
+                    {collection.products.slice(0, 4).map((product, i) => (
+                      <div key={`${collection.title}-${product.id}`} className={`overflow-hidden rounded-xl bg-white ring-1 ring-[#eadfd5] ${i === 0 && collection.products.length < 4 ? 'row-span-2' : ''}`}>
                         <ProductImage product={product} wrapperClassName="h-full w-full" className="h-full w-full object-contain p-1.5" />
                       </div>
                     ))}
+                    {!collection.products.length ? (
+                      <div className="col-span-2 row-span-2 grid place-items-center rounded-xl bg-white px-3 text-center text-[11px] font-semibold text-[#8a7a70]">
+                        Add real items to fill this collection.
+                      </div>
+                    ) : null}
                   </div>
                   <div className="px-2 pb-2 pt-3">
-                     <div className="font-serif text-[18px] font-semibold text-[#221d19]">{collection}</div>
-                     <div className="mt-1 text-[9px] font-bold uppercase tracking-[.14em] text-[#8e7d73]">{Math.max(1, index + userPosts.length)} fits</div>
+                     <div className="font-serif text-[18px] font-semibold text-[#221d19]">{collection.title}</div>
+                     <div className="mt-1 text-[9px] font-bold uppercase tracking-[.14em] text-[#8e7d73]">{collection.count} {collection.unit}</div>
                   </div>
                 </button>
               ))}
@@ -324,7 +362,7 @@ export default function ProfilePage() {
           )}
         </section>
 
-        <section className="mt-10 rounded-[32px] border border-white/10 bg-[#12100f] p-5">
+        <section id="style-dna" className="mt-10 rounded-[32px] border border-white/10 bg-[#12100f] p-5 scroll-mt-6">
           <div className="flex items-center gap-3">
             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-accent/10 text-accent">
               <WandSparkles size={20} />
@@ -336,7 +374,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            {(styleBadges.length ? styleBadges : ['Catalog Explorer', 'Closet Builder']).map((badge) => (
+            {(styleBadges.length ? styleBadges : ['Building Style DNA']).map((badge) => (
               <span
                 key={badge}
                 className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[.14em] text-accent"

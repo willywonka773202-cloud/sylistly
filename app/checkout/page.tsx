@@ -20,8 +20,9 @@ export default function CheckoutPage() {
 
     try {
       await navigator.clipboard.writeText(text);
+      setBatchMessage(`Copied ${products.length} retailer link${products.length !== 1 ? 's' : ''}.`);
     } catch {
-      // Ignore clipboard failures.
+      setBatchMessage('Clipboard access was blocked. Open each retailer link below.');
     }
   }
 

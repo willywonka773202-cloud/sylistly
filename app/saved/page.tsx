@@ -79,10 +79,10 @@ export default function SavedPage() {
                 <button
                   type="button"
                   onClick={() => setActiveFit({ fit, visualItems, visualProducts })}
-                  className="grid h-[128px] grid-cols-2 grid-rows-2 gap-2 rounded-[16px] text-left transition active:scale-[.98] min-[390px]:h-[144px]"
+                  className="grid h-[144px] grid-cols-2 grid-rows-3 gap-1.5 rounded-[16px] text-left transition active:scale-[.98] min-[390px]:h-[156px]"
                   aria-label={`Open ${fit.title}`}
                 >
-                  {visualProducts.slice(0,4).map((product) => (
+                  {visualProducts.slice(0, 6).map((product) => (
                     <div
                       key={`${fit.id}-${product.id}`}
                       className="overflow-hidden rounded-[12px] border border-[#e9ddd3] bg-[#faf6f1] shadow-[0_8px_16px_rgba(0,0,0,.14)]"

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Camera, Check, Download, Image as ImageIcon, LoaderCircle, Lock, Sparkles, UserRound } from 'lucide-react';
+import { ArrowLeft, Camera, Check, Download, Image as ImageIcon, Lock, Sparkles, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, type ReactNode } from 'react';
 import { BottomNav } from '@/components/BottomNav';
@@ -28,7 +28,7 @@ export default function TryOnPage() {
   const setBodyType = useProfile((state) => state.setBodyType);
   const [selfieReady, setSelfieReady] = useState(false);
   const [bodyPhotoReady, setBodyPhotoReady] = useState(false);
-  const [previewState, setPreviewState] = useState<'idle' | 'queued'>('idle');
+  const [previewState, setPreviewState] = useState<'idle' | 'ready'>('idle');
   const products = useMemo(() => fitProducts(items), [items]);
   const totalCents = products.reduce((sum, product) => sum + product.priceCents, 0);
   const frame = bodyType === 'custom' ? 'androgynous' : bodyType;
@@ -43,7 +43,7 @@ export default function TryOnPage() {
       avoidProductIds: products.map((product) => product.id),
     });
     replaceItems(next.products);
-    setPreviewState('queued');
+    setPreviewState('ready');
   }
 
   return (
@@ -70,7 +70,13 @@ export default function TryOnPage() {
         <section className="mt-5 overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,#f8f3ed_0%,#eee2d7_100%)] p-3 text-[#211b17] shadow-[0_28px_64px_rgba(0,0,0,.34)]">
           <div className="relative grid min-h-[430px] place-items-center overflow-hidden rounded-[28px] bg-[#fffaf5]">
             <div className="absolute right-3 top-3 z-10 flex gap-2">
-              <button className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]" aria-label="Download preview">
+              <button
+                type="button"
+                disabled
+                title="Export will be enabled when share cards are connected."
+                className="grid h-11 w-11 cursor-not-allowed place-items-center rounded-full border border-[#e4d8cf] bg-white/70 text-[#9c8f86] opacity-55"
+                aria-label="Download preview coming soon"
+              >
                 <Download size={18} />
               </button>
               <button
@@ -79,7 +85,7 @@ export default function TryOnPage() {
                 className="grid h-11 w-11 place-items-center rounded-full border border-[#e4d8cf] bg-white/86 text-[#231d19]"
                 aria-label="Generate catalog preview"
               >
-                {previewState === 'queued' ? <LoaderCircle size={18} className="animate-spin" /> : <Sparkles size={18} />}
+                {previewState === 'ready' ? <Check size={18} /> : <Sparkles size={18} />}
               </button>
             </div>
 
@@ -184,11 +190,11 @@ export default function TryOnPage() {
           <div className="mt-4 grid grid-cols-[1fr_.9fr] gap-2">
             <button
               type="button"
-              onClick={products.length ? () => setPreviewState('queued') : regeneratePreviewFit}
+              onClick={products.length ? () => setPreviewState('ready') : regeneratePreviewFit}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow disabled:bg-white/[0.06] disabled:text-muted disabled:shadow-none"
             >
               <Sparkles size={14} />
-              Preview try-on
+              {previewState === 'ready' ? 'Preview ready' : 'Preview try-on'}
             </button>
             <button
               type="button"
