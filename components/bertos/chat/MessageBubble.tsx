@@ -23,6 +23,7 @@ const MODEL_ICONS: Record<string, React.ReactNode> = {
   'llama3.2':      <Bot     className="w-3.5 h-3.5" />,
   mistral:         <Bot     className="w-3.5 h-3.5" />,
   'deepseek-coder':<Bot     className="w-3.5 h-3.5" />,
+  hermes3:         <Bot     className="w-3.5 h-3.5" />,
 }
 
 function CodeBlock({ code, language }: { code: string; language?: string }) {

@@ -157,6 +157,7 @@ export function getModelColor(model: AIModel): string {
     case 'llama3.2':       return '#F97316'
     case 'mistral':        return '#EC4899'
     case 'deepseek-coder': return '#06B6D4'
+    case 'hermes3':        return '#A855F7'
     default:               return '#6B7280'
   }
 }
@@ -170,6 +171,7 @@ export function getModelLabel(model: AIModel): string {
     case 'llama3.2':       return 'Llama 3.2'
     case 'mistral':        return 'Mistral'
     case 'deepseek-coder': return 'DeepSeek Coder'
+    case 'hermes3':        return 'Hermes 3'
     default:               return model
   }
 }

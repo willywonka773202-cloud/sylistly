@@ -110,36 +110,18 @@ export function ChatView() {
     const startTime = Date.now()
     let resolvedModel = selectedModel as string
 
-    try {
-      // For 'auto' mode, call the router first to get model + show badge
-      if (selectedModel === 'auto') {
-        try {
-          const routerRes = await fetch('/api/router', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: content }),
-            signal: abortRef.current.signal,
-          })
-          const decision: RouterDecision = await routerRes.json()
-          resolvedModel = decision.primary
-          setPendingDecision(decision)
-          // Update the placeholder message's model
-          updateMessage(sessionId, aiMsg.id, { model: decision.primary as AIModel })
-        } catch {
-          resolvedModel = 'claude'
-        }
-      }
-
+    // Inner helper: stream a single model into the existing aiMsg bubble
+    const doStream = async (modelId: string): Promise<RouterDecision | null> => {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: allMessages,
-          model: resolvedModel,
+          model: modelId,
           systemPrompt,
           clientKeys: settings.apiKeys,
         }),
-        signal: abortRef.current.signal,
+        signal: abortRef.current?.signal,
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -147,7 +129,6 @@ export function ChatView() {
       let routerDecision: RouterDecision | null = null
       let hasFirstChunk = false
 
-      // Parse the mixed SSE stream (routerDecision event + text chunks)
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
@@ -177,9 +158,7 @@ export function ChatView() {
               if (selectedModel === 'auto') setPendingDecision(parsed.routerDecision)
             }
 
-            if (parsed.error) {
-              throw new Error(parsed.error)
-            }
+            if (parsed.error) throw new Error(parsed.error)
 
             if (parsed.text) {
               if (!hasFirstChunk) {
@@ -194,6 +173,34 @@ export function ChatView() {
         }
       }
 
+      return routerDecision
+    }
+
+    const isQuotaError = (err: Error) => {
+      const m = err.message.toLowerCase()
+      return m.includes('429') || m.includes('quota') || m.includes('billing') || m.includes('rate limit')
+    }
+
+    try {
+      // For 'auto' mode, call the router first to get model + show badge
+      if (selectedModel === 'auto') {
+        try {
+          const routerRes = await fetch('/api/router', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: content }),
+            signal: abortRef.current.signal,
+          })
+          const decision: RouterDecision = await routerRes.json()
+          resolvedModel = decision.primary
+          setPendingDecision(decision)
+          updateMessage(sessionId, aiMsg.id, { model: decision.primary as AIModel })
+        } catch {
+          resolvedModel = 'claude'
+        }
+      }
+
+      const routerDecision = await doStream(resolvedModel)
       updateMessage(sessionId!, aiMsg.id, {
         streaming: false,
         routerDecision: routerDecision ?? undefined,
@@ -202,7 +209,34 @@ export function ChatView() {
       })
     } catch (err) {
       setPendingDecision(null)
-      if ((err as Error).name !== 'AbortError') {
+      if ((err as Error).name === 'AbortError') {
+        // user cancelled — leave partial content, just stop streaming
+        updateMessage(sessionId!, aiMsg.id, { streaming: false })
+      } else if (isQuotaError(err as Error) && resolvedModel !== 'hermes3') {
+        // Waterfall: quota exceeded → retry with Hermes 3
+        const modelLabel = resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'
+        appendToMessage(sessionId!, aiMsg.id,
+          `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Hermes 3...\n\n`)
+        updateMessage(sessionId!, aiMsg.id, { model: 'hermes3' as AIModel, streaming: true })
+        setStreaming(true, aiMsg.id)
+
+        try {
+          await doStream('hermes3')
+          updateMessage(sessionId!, aiMsg.id, {
+            streaming: false,
+            metadata: { latency: Date.now() - startTime },
+          })
+        } catch (fallbackErr) {
+          if ((fallbackErr as Error).name !== 'AbortError') {
+            const isConfig = (fallbackErr as Error).message?.includes('not configured') || (fallbackErr as Error).message?.includes('API key')
+            appendToMessage(sessionId!, aiMsg.id,
+              isConfig
+                ? '\n\n**Hermes 3 not configured.** Add your Ollama API key in **Settings → API Keys**.'
+                : `\n\nFallback error: ${(fallbackErr as Error).message}`)
+          }
+          updateMessage(sessionId!, aiMsg.id, { streaming: false })
+        }
+      } else {
         const isConfig = (err as Error).message?.includes('not configured') || (err as Error).message?.includes('API key')
         updateMessage(sessionId!, aiMsg.id, {
           content: isConfig

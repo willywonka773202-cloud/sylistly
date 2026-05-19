@@ -60,7 +60,19 @@ export async function POST(req: NextRequest) {
         strategy: 'single',
         recommendedModel: raw.recommendedModel,
       })
-    } catch {
+    } catch (err) {
+      const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
+      const isQuota = msg.includes('429') || msg.includes('quota') || msg.includes('billing') || msg.includes('rate limit')
+      if (isQuota) {
+        return NextResponse.json({
+          primary: 'hermes3',
+          reasoning: 'OpenAI unavailable — quota exceeded. Defaulting to Hermes 3 via Ollama Cloud.',
+          confidence: 0.9,
+          taskType: 'general',
+          strategy: 'single',
+          recommendedModel: 'hermes3',
+        })
+      }
       // fall through to rule-based
     }
   }

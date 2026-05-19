@@ -17,6 +17,7 @@ const MODEL_IDS: Record<string, string> = {
   'llama3.2':       'llama3.2',
   mistral:          'mistral',
   'deepseek-coder': 'deepseek-coder',
+  'hermes3':        'hermes3',
 }
 
 type BertosTarget = 'claude' | 'codex' | 'gemini' | 'ollama'

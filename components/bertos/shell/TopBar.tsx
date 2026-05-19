@@ -22,6 +22,7 @@ const OLLAMA_MODELS: ModelOption[] = [
   { value: 'llama3.2',       label: 'Llama 3.2',       description: 'Meta · Ollama Cloud',     icon: <Bot className="w-3.5 h-3.5" />, color: '#F97316' },
   { value: 'mistral',        label: 'Mistral',          description: 'Mistral AI · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#EC4899' },
   { value: 'deepseek-coder', label: 'DeepSeek Coder',  description: 'DeepSeek · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#06B6D4' },
+  { value: 'hermes3',        label: 'Hermes 3',         description: 'NousResearch · Ollama Cloud', icon: <Bot className="w-3.5 h-3.5" />, color: '#A855F7' },
 ]
 
 const ALL_MODEL_OPTIONS: ModelOption[] = [...CLOUD_MODELS, ...OLLAMA_MODELS]

@@ -25,6 +25,7 @@ const MODEL_HINTS: Record<string, { icon: React.ReactNode; color: string; label:
   'llama3.2':      { icon: <Bot     className="w-3.5 h-3.5" />, color: '#F97316', label: 'Llama 3.2'       },
   mistral:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#EC4899', label: 'Mistral'         },
   'deepseek-coder':{ icon: <Bot     className="w-3.5 h-3.5" />, color: '#06B6D4', label: 'DeepSeek Coder'  },
+  hermes3:         { icon: <Bot     className="w-3.5 h-3.5" />, color: '#A855F7', label: 'Hermes 3'         },
 }
 
 const SLASH_COMMANDS = [

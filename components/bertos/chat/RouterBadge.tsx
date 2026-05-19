@@ -15,6 +15,7 @@ const MODEL_ICONS: Record<string, React.ReactNode> = {
   'llama3.2':      <Bot     className="w-3 h-3" />,
   mistral:         <Bot     className="w-3 h-3" />,
   'deepseek-coder':<Bot     className="w-3 h-3" />,
+  hermes3:         <Bot     className="w-3 h-3" />,
 }
 
 interface RouterBadgeProps {

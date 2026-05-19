@@ -142,6 +142,7 @@ export function SettingsView() {
                   { value: 'llama3.2',       label: 'Llama 3.2',      desc: 'Meta · Fast general-purpose open-source model',       color: '#F97316' },
                   { value: 'mistral',        label: 'Mistral',         desc: 'Mistral AI · Excellent reasoning at low latency',      color: '#EC4899' },
                   { value: 'deepseek-coder', label: 'DeepSeek Coder',  desc: 'DeepSeek · Top-ranked open-source coding model',       color: '#06B6D4' },
+                  { value: 'hermes3',        label: 'Hermes 3',         desc: 'NousResearch · Balanced open-source model via Ollama', color: '#A855F7' },
                 ] as const).map(m => (
                   <button
                     key={m.value}

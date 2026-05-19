@@ -1,4 +1,4 @@
-export type OllamaModel = 'llama3.2' | 'mistral' | 'deepseek-coder'
+export type OllamaModel = 'llama3.2' | 'mistral' | 'deepseek-coder' | 'hermes3'
 export type AIModel = 'claude' | 'codex' | 'gemini' | 'auto' | OllamaModel
 
 export type MessageRole = 'user' | 'assistant' | 'system'
