@@ -177,9 +177,20 @@ export function ChatView() {
       return routerDecision
     }
 
+    const OLLAMA_MODEL_IDS = new Set(['llama3', 'llama3.2', 'mistral', 'deepseek-coder', 'hermes3'])
+
     const isQuotaError = (err: Error) => {
       const m = err.message.toLowerCase()
       return m.includes('429') || m.includes('quota') || m.includes('billing') || m.includes('rate limit')
+    }
+
+    // Pre-flight: Ollama models MUST use a private endpoint — never hit public cloud
+    const requirePrivateEndpoint = (modelId: string) => {
+      if (OLLAMA_MODEL_IDS.has(modelId) && !settings.ollamaEndpoint?.trim()) {
+        throw new Error(
+          `No private endpoint configured. Set your VPS URL in Settings → API Keys → Custom Ollama Endpoint to use ${modelId}.`
+        )
+      }
     }
 
     try {
@@ -201,6 +212,7 @@ export function ChatView() {
         }
       }
 
+      requirePrivateEndpoint(resolvedModel)
       const routerDecision = await doStream(resolvedModel)
       updateMessage(sessionId!, aiMsg.id, {
         streaming: false,
@@ -216,9 +228,8 @@ export function ChatView() {
       } else if (isQuotaError(err as Error) && resolvedModel !== 'llama3') {
         // Waterfall: quota exceeded → retry with Llama 3 on the private VPS
         if (!settings.ollamaEndpoint?.trim()) {
-          // No private endpoint configured — don't hit Ollama Cloud, just explain
           updateMessage(sessionId!, aiMsg.id, {
-            content: `**Quota exceeded.** Set your private Ollama endpoint in **Settings → API Keys** to enable auto-fallback to Llama 3.`,
+            content: `**Quota exceeded.** Set your private Ollama endpoint in **Settings → API Keys → Custom Ollama Endpoint** to enable auto-fallback to Llama 3.`,
             streaming: false,
           })
         } else {
@@ -229,6 +240,7 @@ export function ChatView() {
           setStreaming(true, aiMsg.id)
 
           try {
+            // requirePrivateEndpoint already checked above — endpoint is confirmed set
             await doStream('llama3')
             updateMessage(sessionId!, aiMsg.id, {
               streaming: false,

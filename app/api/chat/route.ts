@@ -7,7 +7,7 @@ import type { Message } from '@/lib/bertos/types'
 
 export const runtime = 'edge'
 
-const OLLAMA_CLOUD = 'https://ollama.com/api/chat'
+const OLLAMA_CLOUD = 'https://ollama.com/api/chat' // kept only for reference; never used as default
 
 // Map BertOS model aliases → concrete model IDs
 const MODEL_IDS: Record<string, string> = {
@@ -167,44 +167,45 @@ export async function POST(req: NextRequest) {
         }
 
       } else {
-        // ── Hybrid: custom VPS endpoint OR Ollama Cloud for open-source models ─
-        const ollamaUrl = body.ollamaEndpoint?.trim() || OLLAMA_CLOUD
-        const isCustomEndpoint = !!body.ollamaEndpoint?.trim()
-
-        // Cloud requires a key; local/VPS endpoints work without one
-        if (!isCustomEndpoint && !ollamaKey) {
-          throw new Error('OLLAMA_API_KEY is not configured. Add it in Settings → API Keys, or set a custom Ollama endpoint.')
+        // ── Private Ollama (VPS or local) — /api/generate, no cloud fallback ──
+        const baseUrl = body.ollamaEndpoint?.trim()
+        if (!baseUrl) {
+          throw new Error(
+            'No private Ollama endpoint configured. ' +
+            'Set your VPS URL in Settings → API Keys → Custom Ollama Endpoint ' +
+            '(e.g. http://your-vps-ip:11434).'
+          )
         }
 
-        const ollamaMessages = [
-          ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
-          ...conversationMessages.map(m => ({ role: m.role as string, content: m.content })),
-        ]
+        // Build the /api/generate URL regardless of what the user pasted
+        const generateUrl = baseUrl.replace(/\/(api\/(generate|chat))?\/?$/, '') + '/api/generate'
 
-        const ollamaHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
-        // Only attach Bearer auth for Ollama Cloud — private/VPS instances don't require it
-        if (!isCustomEndpoint && ollamaKey) ollamaHeaders['Authorization'] = `Bearer ${ollamaKey}`
+        // Format conversation history as a single prompt string for /api/generate
+        const prompt = conversationMessages
+          .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+          .join('\n\n') + '\n\nAssistant:'
 
-        const res = await fetch(ollamaUrl, {
+        const res = await fetch(generateUrl, {
           method: 'POST',
-          headers: ollamaHeaders,
+          headers: { 'Content-Type': 'application/json' },
+          // No Authorization header — private Ollama instances don't require auth
           body: JSON.stringify({
             model: MODEL_IDS[modelAlias] ?? modelAlias,
-            messages: ollamaMessages,
+            system: systemPrompt || undefined,
+            prompt,
             stream: true,
           }),
         })
 
         if (!res.ok) {
-          // Try to extract the exact error message from Ollama's JSON response
           let detail = `HTTP ${res.status}`
           try {
             const errBody = await res.json() as { error?: string }
             if (errBody.error) detail = errBody.error
-          } catch { /* body not JSON, use status code */ }
-          throw new Error(`Ollama Cloud: ${detail}`)
+          } catch { /* body not JSON */ }
+          throw new Error(`Ollama: ${detail}`)
         }
-        if (!res.body) throw new Error('No response body from Ollama Cloud.')
+        if (!res.body) throw new Error('No response body from Ollama.')
 
         const reader  = res.body.getReader()
         const decoder = new TextDecoder()
@@ -220,8 +221,9 @@ export async function POST(req: NextRequest) {
           for (const line of lines) {
             if (!line.trim()) continue
             try {
-              const data = JSON.parse(line) as { message?: { content?: string }; done?: boolean }
-              if (data.message?.content) await send({ text: data.message.content })
+              // /api/generate streams {response: "..."} NDJSON
+              const data = JSON.parse(line) as { response?: string; done?: boolean }
+              if (data.response) await send({ text: data.response })
             } catch { /* skip malformed NDJSON chunk */ }
           }
         }
