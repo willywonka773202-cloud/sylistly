@@ -212,16 +212,16 @@ export function ChatView() {
       if ((err as Error).name === 'AbortError') {
         // user cancelled — leave partial content, just stop streaming
         updateMessage(sessionId!, aiMsg.id, { streaming: false })
-      } else if (isQuotaError(err as Error) && resolvedModel !== 'hermes3') {
-        // Waterfall: quota exceeded → retry with Hermes 3
+      } else if (isQuotaError(err as Error) && resolvedModel !== 'llama3.2') {
+        // Waterfall: quota exceeded → retry with Llama 3.2 (guaranteed on Ollama Cloud)
         const modelLabel = resolvedModel === 'codex' ? 'OpenAI' : resolvedModel === 'gemini' ? 'Google' : 'Anthropic'
         appendToMessage(sessionId!, aiMsg.id,
-          `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Hermes 3...\n\n`)
-        updateMessage(sessionId!, aiMsg.id, { model: 'hermes3' as AIModel, streaming: true })
+          `\n\n> ⚠️ **${modelLabel} quota exceeded.** Auto-routing to Llama 3.2...\n\n`)
+        updateMessage(sessionId!, aiMsg.id, { model: 'llama3.2' as AIModel, streaming: true })
         setStreaming(true, aiMsg.id)
 
         try {
-          await doStream('hermes3')
+          await doStream('llama3.2')
           updateMessage(sessionId!, aiMsg.id, {
             streaming: false,
             metadata: { latency: Date.now() - startTime },

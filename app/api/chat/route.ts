@@ -186,7 +186,15 @@ export async function POST(req: NextRequest) {
           }),
         })
 
-        if (!res.ok) throw new Error(`Ollama Cloud error: HTTP ${res.status}`)
+        if (!res.ok) {
+          // Try to extract the exact error message from Ollama's JSON response
+          let detail = `HTTP ${res.status}`
+          try {
+            const errBody = await res.json() as { error?: string }
+            if (errBody.error) detail = errBody.error
+          } catch { /* body not JSON, use status code */ }
+          throw new Error(`Ollama Cloud: ${detail}`)
+        }
         if (!res.body) throw new Error('No response body from Ollama Cloud.')
 
         const reader  = res.body.getReader()
