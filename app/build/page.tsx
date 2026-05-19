@@ -4,6 +4,7 @@ import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, Layers, Loade
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin, type FitVariant } from '@/components/Mannequin';
+import { ProductImage } from '@/components/ProductImage';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
@@ -14,6 +15,7 @@ import { useSocialFeed } from '@/store/social-feed';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
   collectOutfitProductIds,
+  ALL_CATALOG_PRODUCTS,
   getOutfitBrandCounts,
   getShoeId,
   hydrateItemsFromCatalog,
@@ -152,7 +154,7 @@ const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
 function itemSignature(items: Partial<Record<Category, Product>>): string {
   return Object.entries(items)
     .sort(([leftCat], [rightCat]) => leftCat.localeCompare(rightCat))
-    .map(([cat, product]) => `${cat}:${product?.id ?? ''}`)
+    .map(([cat, product]) => `${cat}:${product?.id ?? ''}:${product?.imageUrl ?? ''}:${product?.imageTransparentUrl ?? ''}:${product?.imageCutoutUrl ?? ''}`)
     .join('|');
 }
 
@@ -325,6 +327,7 @@ function BuilderPageContent({
   quickFrame,
   quickSlots,
   quickLock,
+  transparentExperiment,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
@@ -332,6 +335,7 @@ function BuilderPageContent({
   quickFrame: string | null;
   quickSlots: string | null;
   quickLock: string | null;
+  transparentExperiment: boolean;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -400,6 +404,27 @@ function BuilderPageContent({
     CATEGORY_ORDER.find((category) => renderItems[category]) ||
     analysis.primaryGap ||
     'top';
+  const transparentReadyProducts = useMemo(
+    () =>
+      ALL_CATALOG_PRODUCTS
+        .filter((product) => product.imageTransparentUrl)
+        .filter(isRenderableProduct)
+        .sort((left, right) => {
+          const leftCategory = CATEGORY_ORDER.indexOf(left.category);
+          const rightCategory = CATEGORY_ORDER.indexOf(right.category);
+          if (leftCategory !== rightCategory) return leftCategory - rightCategory;
+          return `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`);
+        })
+        .slice(0, 32),
+    [],
+  );
+  const transparentSlotAlternatives = useMemo(
+    () =>
+      transparentReadyProducts
+        .filter((product) => product.category === refineFocusCategory)
+        .slice(0, 10),
+    [refineFocusCategory, transparentReadyProducts],
+  );
   const lockedSlotSet = useMemo(() => new Set(lockedSlots), [lockedSlots]);
 
   useBodyScrollLock(Boolean(activeBuildOverlay || checkoutProducts));
@@ -988,6 +1013,20 @@ function BuilderPageContent({
     setStatusMessage(saved ? `Saved "${saved.title}".` : 'Saved this fit.');
   }
 
+  function addTransparentPiece(product: Product) {
+    replaceItems(hydrateItemsFromCatalog({
+      ...items,
+      [product.category]: product,
+    }));
+    setActiveEditSlot(product.category);
+    setSelectedGenerationSlots((current) =>
+      current.includes(product.category)
+        ? current
+        : CATEGORY_ORDER.filter((category) => category === product.category || current.includes(category)),
+    );
+    setStatusMessage(`Added transparent-ready ${CATEGORY_LABELS[product.category].toLowerCase()} to the current build.`);
+  }
+
   const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
 
   return (
@@ -1185,6 +1224,82 @@ function BuilderPageContent({
               </button>
             </div>
           </section>
+
+          {transparentExperiment ? (
+            <section className="rounded-[28px] border border-[#8ff0be]/30 bg-[radial-gradient(circle_at_20%_0%,rgba(143,240,190,.18),transparent_42%),linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025))] p-4 shadow-[0_22px_56px_rgba(0,0,0,.26)]">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-[.2em] text-[#8ff0be]">Transparent experiment mode - preview only</div>
+                  <h2 className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">Transparent-ready pieces</h2>
+                  <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+                    Normal generation is unchanged. Use this panel to build around reviewed cutout assets or replace the focused slot with a transparent alternative.
+                  </p>
+                </div>
+                <a href="/build" className="rounded-full border border-white/14 bg-white/[0.06] px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-white">
+                  Normal mode
+                </a>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+                  <div className="text-[8px] font-black uppercase tracking-[.16em] text-muted">Ready</div>
+                  <div className="mt-1 font-serif text-[20px] font-semibold text-ink">{transparentReadyProducts.length}</div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+                  <div className="text-[8px] font-black uppercase tracking-[.16em] text-muted">Current fit</div>
+                  <div className="mt-1 font-serif text-[20px] font-semibold text-ink">{Object.values(renderItems).filter((product) => Boolean(product?.imageTransparentUrl)).length}</div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-2">
+                  <div className="text-[8px] font-black uppercase tracking-[.16em] text-muted">Focus</div>
+                  <div className="mt-1 truncate font-serif text-[20px] font-semibold capitalize text-ink">{refineFocusCategory}</div>
+                </div>
+              </div>
+
+              {transparentSlotAlternatives.length ? (
+                <div className="mt-4">
+                  <div className="mb-2 text-[8px] font-bold uppercase tracking-[.2em] text-[#8ff0be]">
+                    Transparent alternatives for {refineFocusCategory}
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {transparentSlotAlternatives.map((product) => (
+                      <button
+                        key={`transparent-alt-${product.id}`}
+                        type="button"
+                        onClick={() => addTransparentPiece(product)}
+                        className="w-[122px] flex-none rounded-[18px] border border-white/12 bg-white/[0.055] p-2 text-left shadow-[0_12px_28px_rgba(0,0,0,.22)] transition active:scale-[0.97] hover:border-[#8ff0be]/55"
+                      >
+                        <div className="h-[112px]">
+                          <ProductImage product={product} displayMode="cutout" />
+                        </div>
+                        <div className="mt-2 truncate text-[8px] font-black uppercase tracking-[.14em] text-[#8ff0be]">{product.brand}</div>
+                        <div className="mt-0.5 line-clamp-2 text-[10px] font-semibold leading-tight text-ink">{product.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-4">
+                <div className="mb-2 text-[8px] font-bold uppercase tracking-[.2em] text-[#8ff0be]">Build around transparent piece</div>
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {transparentReadyProducts.slice(0, 16).map((product) => (
+                    <button
+                      key={`transparent-ready-${product.id}`}
+                      type="button"
+                      onClick={() => addTransparentPiece(product)}
+                      className="w-[112px] flex-none rounded-[18px] border border-white/12 bg-white/[0.045] p-2 text-left transition active:scale-[0.97] hover:border-[#8ff0be]/55"
+                    >
+                      <div className="h-[96px]">
+                        <ProductImage product={product} displayMode="cutout" />
+                      </div>
+                      <div className="mt-2 truncate text-[8px] font-black uppercase tracking-[.14em] text-[#8ff0be]">{product.category}</div>
+                      <div className="mt-0.5 truncate text-[10px] font-semibold text-ink">{product.brand}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+          ) : null}
 
           {/* AI Stylist Command Center — live state, next-best-action, mode pills */}
           <section className="flex flex-col gap-3">
@@ -2338,13 +2453,14 @@ function BuilderPageWithSearchParams() {
       quickFrame={searchParams.get('frame')}
       quickSlots={searchParams.get('slots')}
       quickLock={searchParams.get('lock')}
+      transparentExperiment={searchParams.get('transparentExperiment') === '1'}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} transparentExperiment={false} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

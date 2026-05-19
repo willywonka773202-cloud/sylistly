@@ -56,6 +56,10 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   // ── Cutout / transparent-image architecture ──────────────────────
   { file: 'components/ProductImage.tsx', text: 'imageTransparentUrl', label: 'ProductImage supports transparent image variant' },
   { file: 'components/ProductImage.tsx', text: 'data-image-kind', label: 'ProductImage tags image kind for observability' },
+  { file: 'components/ProductImage.tsx', text: "'missing'", label: 'ProductImage exposes missing image state' },
+  { file: 'components/CatalogRuntimeProof.tsx', text: 'Transparent Runtime Proof', label: 'Catalog Lab has runtime transparent proof panel' },
+  { file: 'app/feed/page.tsx', text: 'transparentExperiment', label: 'Feed transparent experiment flag exists' },
+  { file: 'app/build/page.tsx', text: 'transparentExperiment', label: 'Build transparent experiment flag exists' },
   { file: 'lib/catalog-schemas/product.v2.ts', text: 'TRANSPARENT_URL_NOT_STRING', label: 'Product schema validates transparent URL' },
   { file: 'scripts/catalog-image-audit.ts', text: 'needs-cutout', label: 'Catalog image audit script exists' },
   { file: 'scripts/prepare-cutout-candidates.ts', text: 'Cutout candidate plan', label: 'Cutout candidate prep script exists' },

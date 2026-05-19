@@ -7,15 +7,17 @@ import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { OutfitBoard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
+import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { filterFeedRenderableProducts } from '@/lib/product-image-quality';
-import type { Category, Product } from '@/lib/types';
+import { filterFeedRenderableProducts, isRenderableProduct } from '@/lib/product-image-quality';
+import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
 
 const FILTERS = ['For You', 'Trending', 'Following', 'Under $100', 'Night Out', 'Streetwear', 'Clean', 'Gym'];
 const QUICK_REACTIONS = ['Fire', 'Swap shoes', 'Too expensive', 'Clean fit', 'Better without hat'];
+const TRANSPARENT_EXPERIMENT_MIN_ITEMS = 5;
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
@@ -30,6 +32,95 @@ function visibleProducts(post: FeedPost): Product[] {
 
 function itemsFromProducts(products: Product[]): Partial<Record<Category, Product>> {
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
+}
+
+const TRANSPARENT_PRODUCTS_BY_CATEGORY: Record<Category, Product[]> = Object.fromEntries(
+  CATEGORY_ORDER.map((category) => [
+    category,
+    ALL_CATALOG_PRODUCTS
+      .filter((product) => product.category === category && product.imageTransparentUrl)
+      .filter(isRenderableProduct),
+  ]),
+) as Record<Category, Product[]>;
+
+function totalCentsFor(items: Partial<Record<Category, Product>>): number {
+  return Object.values(items).reduce((sum, product) => sum + (product?.priceCents || 0), 0);
+}
+
+function transparentCountFor(items: Partial<Record<Category, Product>>): number {
+  return Object.values(items).filter((product) => Boolean(product?.imageTransparentUrl)).length;
+}
+
+function buildTransparentExperimentPost(post: FeedPost, index: number): FeedPost | null {
+  const usedIds = new Set<string>();
+  const originalCategories = CATEGORY_ORDER.filter((category) => Boolean(post.items[category]));
+  const targetCategories = Array.from(new Set<Category>([
+    ...originalCategories,
+    'top',
+    'bottom',
+    'shoes',
+    'outer',
+    'bag',
+    'eyewear',
+    'jewelry',
+    'hat',
+  ])).slice(0, Math.max(TRANSPARENT_EXPERIMENT_MIN_ITEMS, originalCategories.length));
+  const items: Partial<Record<Category, Product>> = {};
+
+  targetCategories.forEach((category, categoryIndex) => {
+    const existing = post.items[category];
+    if (existing?.imageTransparentUrl && isRenderableProduct(existing) && !usedIds.has(existing.id)) {
+      items[category] = existing;
+      usedIds.add(existing.id);
+      return;
+    }
+
+    const pool = TRANSPARENT_PRODUCTS_BY_CATEGORY[category] || [];
+    if (!pool.length) return;
+    for (let offset = 0; offset < pool.length; offset += 1) {
+      const candidate = pool[(index + categoryIndex + offset) % pool.length];
+      if (!candidate || usedIds.has(candidate.id)) continue;
+      items[category] = candidate;
+      usedIds.add(candidate.id);
+      return;
+    }
+  });
+
+  const products = visibleProducts({ ...post, items } as FeedPost);
+  if (products.length < TRANSPARENT_EXPERIMENT_MIN_ITEMS) return null;
+  if (!items.top || !items.bottom || !items.shoes) return null;
+
+  return {
+    ...post,
+    id: `${post.id}-transparent-preview`,
+    title: `${post.title}`,
+    caption: post.caption || 'Transparent experiment preview using reviewed cutout assets.',
+    source: 'repaired',
+    tags: Array.from(new Set([...post.tags, 'transparent experiment'])),
+    items,
+    itemCount: products.length,
+    totalCents: totalCentsFor(items),
+  };
+}
+
+function buildTransparentExperiment(posts: FeedPost[]) {
+  const originalOnlySkipped = posts.filter((post) => transparentCountFor(post.items) < TRANSPARENT_EXPERIMENT_MIN_ITEMS).length;
+  const previewPosts = posts
+    .map(buildTransparentExperimentPost)
+    .filter((post): post is FeedPost => Boolean(post));
+  const transparentProductsUsed = new Set(
+    previewPosts.flatMap((post) =>
+      Object.values(post.items)
+        .filter((product): product is Product => Boolean(product?.imageTransparentUrl))
+        .map((product) => product.id),
+    ),
+  ).size;
+
+  return {
+    posts: previewPosts,
+    transparentProductsUsed,
+    skippedOriginalOnlyPosts: originalOnlySkipped,
+  };
 }
 
 function postMatches(post: FeedPost, filter: string): boolean {
@@ -110,22 +201,33 @@ export default function FitFeedPage() {
   const [savedPulsePostId, setSavedPulsePostId] = useState<string | null>(null);
   const [whyPostId, setWhyPostId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [transparentExperiment, setTransparentExperiment] = useState(false);
+  const [experimentReady, setExperimentReady] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const transparentExperimentData = useMemo(() => buildTransparentExperiment(posts), [posts]);
+  const displayPosts = transparentExperiment ? transparentExperimentData.posts : posts;
   const filteredPosts = useMemo(
     // Require ≥ 5 visible (post-image-failure-filter) products so every feed
     // card fills enough of OutfitBoard's 8 fixed slot positions to avoid the
     // "broken-looking" empty-board appearance. The store-level filters
     // (SEED_POSTS, normalizeFeedPost, makeGeneratedPost) already enforce 5+
     // pre-render; this final UI guard catches images that fail at runtime.
-    () => posts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 5),
-    [posts, activeFilter],
+    () => displayPosts.filter((post) => postMatches(post, activeFilter) && visibleProducts(post).length >= 5),
+    [displayPosts, activeFilter],
   );
 
   useEffect(() => {
-    if (posts.length < 24) generateMorePosts(18);
-  }, [generateMorePosts, posts.length]);
+    setTransparentExperiment(new URLSearchParams(window.location.search).get('transparentExperiment') === '1');
+    setExperimentReady(true);
+  }, []);
 
   useEffect(() => {
+    if (!experimentReady || transparentExperiment) return;
+    if (posts.length < 24) generateMorePosts(18);
+  }, [experimentReady, generateMorePosts, posts.length, transparentExperiment]);
+
+  useEffect(() => {
+    if (transparentExperiment) return;
     const node = sentinelRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -139,7 +241,7 @@ export default function FitFeedPage() {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [generateMorePosts, filteredPosts.length]);
+  }, [generateMorePosts, filteredPosts.length, transparentExperiment]);
 
   function remix(post: FeedPost) {
     const products = visibleProducts(post);
@@ -272,7 +374,34 @@ export default function FitFeedPage() {
           </div>
         </header>
 
+        {transparentExperiment ? (
+          <div className="absolute inset-x-3 top-[calc(env(safe-area-inset-top)+92px)] z-30 rounded-[20px] border border-[#8ff0be]/35 bg-[#0b1711]/88 p-3 text-white shadow-[0_18px_44px_rgba(0,0,0,.36)] backdrop-blur-md">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="text-[9px] font-black uppercase tracking-[.2em] text-[#8ff0be]">Transparent experiment mode - preview only</div>
+                <div className="mt-1 text-[11px] leading-relaxed text-white/78">
+                  {transparentExperimentData.transparentProductsUsed} transparent products used · {transparentExperimentData.posts.length} posts shown · {transparentExperimentData.skippedOriginalOnlyPosts} original-heavy posts bypassed.
+                </div>
+              </div>
+              <a href="/feed" className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-white">
+                Normal mode
+              </a>
+            </div>
+          </div>
+        ) : null}
+
         <div className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scroll-smooth">
+          {filteredPosts.length === 0 ? (
+            <div className="grid h-full snap-start place-items-center bg-bg px-6 text-center">
+              <div>
+                <div className="font-serif text-[24px] text-ink">No transparent preview fits yet</div>
+                <p className="mt-2 text-sm text-muted-2">Open Catalog Lab to inspect available cutout assets, or switch back to normal Feed.</p>
+                <a href="/feed" className="mt-4 inline-flex rounded-full bg-accent px-4 py-2.5 text-[11px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow">
+                  Normal Feed
+                </a>
+              </div>
+            </div>
+          ) : null}
           {filteredPosts.map((post) => {
             const products = visibleProducts(post);
             const formulaLabel = post.formulaLabel || [post.tags[0], post.tags[1]].filter(Boolean).join(' / ');
