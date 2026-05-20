@@ -1,22 +1,25 @@
-import { DEFAULT_OLLAMA_ENDPOINT, DEFAULT_PROVIDER_MODEL, LOCAL_FALLBACK_MODEL } from './registry'
-
-/** Returns the Ollama base URL to use for a request. */
-export function resolveOllamaBase(customEndpoint?: string): string {
-  return customEndpoint?.trim() || DEFAULT_OLLAMA_ENDPOINT
-}
+import { getOllamaConfig } from '../runtime'
+import { DEFAULT_PROVIDER_MODEL, LOCAL_FALLBACK_MODEL } from './registry'
 
 /** Maps BertOS model aliases to the actual Ollama model tag. */
 export function resolveOllamaModel(alias: string): string {
   const map: Record<string, string> = {
-    'ollama-pro':      DEFAULT_PROVIDER_MODEL,
-    'qwen2.5-coder':   LOCAL_FALLBACK_MODEL,
-    'llama3':          'llama3',
-    'llama3.2':        'llama3.2',
-    'mistral':         'mistral',
-    'deepseek-coder':  'deepseek-coder',
-    'hermes3':         'hermes3',
+    'ollama-pro':     DEFAULT_PROVIDER_MODEL,
+    'qwen2.5-coder':  LOCAL_FALLBACK_MODEL,
+    'llama3':         'llama3',
+    'llama3.2':       'llama3.2',
+    'mistral':        'mistral',
+    'deepseek-coder': 'deepseek-coder',
+    'hermes3':        'hermes3',
   }
   return map[alias] ?? alias
+}
+
+/** Returns the Ollama base URL (reads runtime config — safe for server-side use only). */
+export function resolveOllamaBase(customEndpoint?: string): string {
+  if (customEndpoint?.trim()) return customEndpoint.trim()
+  const cfg = getOllamaConfig()
+  return cfg.baseUrl
 }
 
 /** All model aliases that resolve to the Ollama provider. */

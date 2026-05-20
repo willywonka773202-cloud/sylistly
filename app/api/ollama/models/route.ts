@@ -1,25 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { resolveOllamaBase } from '@/lib/bertos/providers'
+import { getOllamaConfig } from '@/lib/bertos/runtime'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
-export async function GET(req: NextRequest) {
-  const endpoint = req.nextUrl.searchParams.get('endpoint') ?? undefined
-  const baseUrl = resolveOllamaBase(endpoint)
-  const tagsUrl = baseUrl.replace(/\/(api\/(generate|chat|tags))?\/?$/, '') + '/api/tags'
+export async function GET(_req: NextRequest) {
+  const cfg = getOllamaConfig()
+
+  if (cfg.mode === 'cloud') {
+    return NextResponse.json({
+      models: [{ name: cfg.defaultModel, type: 'cloud', recommended: true }],
+      mode: 'cloud',
+    })
+  }
 
   try {
-    const res = await fetch(tagsUrl, {
+    const res = await fetch(cfg.tagsUrl!, {
       method: 'GET',
       signal: AbortSignal.timeout(3000),
     })
     if (!res.ok) {
-      return NextResponse.json({ models: [], error: `HTTP ${res.status}` }, { status: res.status })
+      return NextResponse.json({ models: [], mode: 'local', error: `HTTP ${res.status}` }, { status: res.status })
     }
     const data = await res.json() as { models?: Array<{ name: string; size?: number; modified_at?: string }> }
-    return NextResponse.json({ models: data.models ?? [] })
+    return NextResponse.json({ models: data.models ?? [], mode: 'local' })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Connection failed'
-    return NextResponse.json({ models: [], error: message }, { status: 503 })
+    return NextResponse.json({ models: [], mode: 'local', error: message }, { status: 503 })
   }
 }

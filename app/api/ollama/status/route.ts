@@ -1,29 +1,100 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { resolveOllamaBase } from '@/lib/bertos/providers'
+import { getOllamaConfig } from '@/lib/bertos/runtime'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
-  const endpoint = req.nextUrl.searchParams.get('endpoint') ?? undefined
-  const baseUrl = resolveOllamaBase(endpoint)
-  const tagsUrl = baseUrl.replace(/\/(api\/(generate|chat|tags))?\/?$/, '') + '/api/tags'
+  const cfg = getOllamaConfig()
+  const testCloud = req.nextUrl.searchParams.get('testCloud') === 'true'
 
+  if (cfg.mode === 'cloud') {
+    // In cloud mode, we cannot ping tagsUrl (it's null).
+    // Base availability on API key presence.
+    const online = Boolean(cfg.apiKey)
+
+    let testResult: { success: boolean; error?: string } | undefined
+
+    if (testCloud && cfg.apiKey) {
+      try {
+        const res = await fetch(cfg.chatUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cfg.apiKey}`,
+          },
+          body: JSON.stringify({
+            model: cfg.defaultModel,
+            messages: [{ role: 'user', content: 'Reply with only the word OK' }],
+            stream: false,
+          }),
+          signal: AbortSignal.timeout(10000),
+        })
+        if (res.ok) {
+          testResult = { success: true }
+        } else {
+          const body = await res.text()
+          testResult = { success: false, error: `HTTP ${res.status}: ${body.slice(0, 200)}` }
+        }
+      } catch (err) {
+        testResult = { success: false, error: err instanceof Error ? err.message : String(err) }
+      }
+    }
+
+    return NextResponse.json({
+      online,
+      mode: 'cloud',
+      provider: 'Ollama Cloud',
+      baseUrl: cfg.baseUrl,
+      chatUrl: cfg.chatUrl,
+      defaultModel: cfg.defaultModel,
+      models: [{ name: cfg.defaultModel, type: 'cloud', recommended: true }],
+      error: !online ? 'OLLAMA_API_KEY is missing. Add it in Vercel Project Settings → Environment Variables.' : undefined,
+      testResult,
+    })
+  }
+
+  // Local mode: try to reach the local Ollama instance
+  const tagsUrl = cfg.tagsUrl!
   try {
     const res = await fetch(tagsUrl, {
       method: 'GET',
       signal: AbortSignal.timeout(3000),
     })
+
     if (!res.ok) {
-      return NextResponse.json({ available: false, error: `HTTP ${res.status}` })
+      return NextResponse.json({
+        online: false,
+        mode: 'local',
+        provider: 'Ollama Local',
+        baseUrl: cfg.baseUrl,
+        chatUrl: cfg.chatUrl,
+        defaultModel: cfg.defaultModel,
+        models: [],
+        error: `Ollama returned HTTP ${res.status}. Is Ollama running?`,
+      })
     }
-    const data = await res.json() as { models?: Array<{ name: string }> }
+
+    const data = await res.json() as { models?: Array<{ name: string; size?: number }> }
     return NextResponse.json({
-      available: true,
-      endpoint: baseUrl,
-      models: data.models?.map(m => m.name) ?? [],
+      online: true,
+      mode: 'local',
+      provider: 'Ollama Local',
+      baseUrl: cfg.baseUrl,
+      chatUrl: cfg.chatUrl,
+      defaultModel: cfg.defaultModel,
+      models: data.models ?? [],
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Connection failed'
-    return NextResponse.json({ available: false, error: message })
+    return NextResponse.json({
+      online: false,
+      mode: 'local',
+      provider: 'Ollama Local',
+      baseUrl: cfg.baseUrl,
+      chatUrl: cfg.chatUrl,
+      defaultModel: cfg.defaultModel,
+      models: [],
+      error: `Local Ollama is offline: ${message}. Run: ollama serve`,
+    })
   }
 }
