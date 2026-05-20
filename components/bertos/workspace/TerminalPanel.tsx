@@ -9,14 +9,14 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 const DAEMON = 'http://localhost:3001'
 
 const SAFE_COMMANDS = [
-  { label: 'git status',          cmd: 'git status'            },
-  { label: 'git diff',            cmd: 'git diff'              },
-  { label: 'git diff --staged',   cmd: 'git diff --staged'     },
-  { label: 'git log (20)',        cmd: 'git log --oneline -20' },
-  { label: 'git branch',         cmd: 'git branch'            },
-  { label: 'npm run typecheck',   cmd: 'npm run typecheck'     },
-  { label: 'npm run build',       cmd: 'npm run build'         },
-  { label: 'npm run lint',        cmd: 'npm run lint'          },
+  { label: 'git status',          cmd: 'git status'                        },
+  { label: 'git diff',            cmd: 'git --no-pager diff'               },
+  { label: 'git diff --staged',   cmd: 'git --no-pager diff --staged'      },
+  { label: 'git log (5)',         cmd: 'git --no-pager log --oneline -5'   },
+  { label: 'git branch',         cmd: 'git branch'                        },
+  { label: 'npm run typecheck',   cmd: 'npm run typecheck'                 },
+  { label: 'npm run build',       cmd: 'npm run build'                     },
+  { label: 'npm run lint',        cmd: 'npm run lint'                      },
 ]
 
 interface OutputLine {

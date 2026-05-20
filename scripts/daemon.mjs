@@ -253,9 +253,10 @@ const ALLOWED_COMMANDS = new Set([
   'npm run lint',
   'npm test',
   'git status',
-  'git diff',
-  'git diff --staged',
-  'git log --oneline -20',
+  'git --no-pager diff',
+  'git --no-pager diff --staged',
+  'git --no-pager log --oneline -5',
+  'git --no-pager log --oneline -20',
   'git branch',
 ])
 
