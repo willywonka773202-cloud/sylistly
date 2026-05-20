@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GitCompare, Send, Cpu, Globe, Zap, Trophy, Copy, Check, Loader2, RotateCcw } from 'lucide-react'
+import { GitCompare, Send, Cpu, Globe, Zap, Trophy, Copy, Check, Loader2, RotateCcw, Bot } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { readAIStream } from '@/lib/bertos/stream-utils'
 import { useUIStore } from '@/store/bertos/ui'
-import type { AIModel } from '@/lib/bertos/types'
 
 interface ModelResponse {
   model: string
@@ -20,12 +19,12 @@ interface ModelResponse {
   error?: string
 }
 
-type ModelId = 'claude-code' | 'codex-cli' | 'gemini-cli'
-const MODELS: ModelId[] = ['claude-code', 'codex-cli', 'gemini-cli']
+type ModelId = 'ollama-pro' | 'claude-code' | 'gemini-cli'
+const MODELS: ModelId[] = ['ollama-pro', 'claude-code', 'gemini-cli']
 
 const MODEL_META: Record<ModelId, { label: string; icon: React.ReactNode; color: string; desc: string }> = {
+  'ollama-pro':  { label: 'Ollama Pro',  icon: <Bot className="w-4 h-4" />,  color: '#F97316', desc: 'Ollama · Always-on default'    },
   'claude-code': { label: 'Claude Code', icon: <Cpu className="w-4 h-4" />,  color: '#8B5CF6', desc: 'Anthropic · CLI subscription' },
-  'codex-cli':   { label: 'Codex CLI',   icon: <Zap className="w-4 h-4" />,  color: '#10B981', desc: 'OpenAI · CLI subscription'    },
   'gemini-cli':  { label: 'Gemini CLI',  icon: <Globe className="w-4 h-4" />, color: '#3B82F6', desc: 'Google · CLI subscription'    },
 }
 
@@ -58,7 +57,7 @@ export function CompareView() {
   const [isRunning, setIsRunning] = useState(false)
   const [winner, setWinner] = useState<ModelId | null>(null)
   const [copiedModel, setCopiedModel] = useState<ModelId | null>(null)
-  const [activeTab, setActiveTab] = useState<ModelId>('claude-code')
+  const [activeTab, setActiveTab] = useState<ModelId>('ollama-pro')
   const abortRefs = useRef<Map<ModelId, AbortController>>(new Map())
   const { settings } = useUIStore()
 
@@ -169,7 +168,7 @@ export function CompareView() {
             </div>
             <div>
               <h2 className="text-sm font-semibold text-zinc-200">Multi-AI Compare</h2>
-              <p className="text-[11px] text-zinc-500">Stream all three CLI subscription providers in parallel — pick the best answer</p>
+              <p className="text-[11px] text-zinc-500">Stream multiple AI providers in parallel — Ollama Pro always works, CLI providers require local setup</p>
             </div>
             {responses.length > 0 && !isRunning && (
               <button

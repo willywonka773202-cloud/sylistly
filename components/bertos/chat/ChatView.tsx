@@ -112,21 +112,37 @@ export function ChatView() {
 
     // Inner helper: stream a single model into the existing aiMsg bubble
     const doStream = async (modelId: string): Promise<RouterDecision | null> => {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: allMessages,
-          model: modelId,
-          systemPrompt,
-          clientKeys: settings.apiKeys,
-          ollamaEndpoint: settings.ollamaEndpoint,
-          enableApiProviders: settings.enableApiProviders ?? false,
-        }),
-        signal: abortRef.current?.signal,
-      })
+      let res: Response
+      try {
+        res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: allMessages,
+            model: modelId,
+            systemPrompt,
+            clientKeys: settings.apiKeys,
+            ollamaEndpoint: settings.ollamaEndpoint,
+            enableApiProviders: settings.enableApiProviders ?? false,
+          }),
+          signal: abortRef.current?.signal,
+        })
+      } catch (fetchErr) {
+        // True network failure before any response arrived
+        const msg = (fetchErr as Error).name === 'AbortError'
+          ? 'AbortError'
+          : 'Network connection lost. Check your internet connection and try again.'
+        throw Object.assign(new Error(msg), { name: (fetchErr as Error).name })
+      }
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      if (!res.ok) {
+        let errorMsg = `Server error: HTTP ${res.status}`
+        try {
+          const errBody = await res.json() as { error?: string }
+          if (errBody.error) errorMsg = errBody.error
+        } catch { /* body not JSON */ }
+        throw new Error(errorMsg)
+      }
 
       let routerDecision: RouterDecision | null = null
       let hasFirstChunk = false
@@ -236,7 +252,7 @@ export function ChatView() {
         }
       } else {
         updateMessage(sessionId!, aiMsg.id, {
-          content: `Stream error: ${(err as Error).message}`,
+          content: `**Error:** ${(err as Error).message}`,
           streaming: false,
         })
       }

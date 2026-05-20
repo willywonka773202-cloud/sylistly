@@ -5,18 +5,18 @@ import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { useChatStore } from '@/store/bertos/chat'
 import type { AIModel } from '@/lib/bertos/types'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 type ModelOption = { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }
 
-const SUBSCRIPTION_MODELS: ModelOption[] = [
-  { value: 'auto',        label: 'Auto',        description: 'Smart routing · Subscription only',      icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B' },
-  { value: 'ollama-pro',  label: 'Ollama Pro',  description: 'Ollama · gpt-oss:120b-cloud · Default',  icon: <Bot className="w-3.5 h-3.5" />,      color: '#F97316' },
-  { value: 'claude-code', label: 'Claude Code', description: 'Anthropic · Claude Code CLI',            icon: <Cpu className="w-3.5 h-3.5" />,      color: '#8B5CF6' },
-  { value: 'gemini-cli',  label: 'Gemini CLI',  description: 'Google · Gemini CLI',                    icon: <Globe className="w-3.5 h-3.5" />,    color: '#3B82F6' },
-  { value: 'codex-cli',   label: 'Codex CLI',   description: 'OpenAI · Codex CLI',                     icon: <Zap className="w-3.5 h-3.5" />,      color: '#10B981' },
+const BASE_SUBSCRIPTION_MODELS: ModelOption[] = [
+  { value: 'auto',        label: 'Auto',        description: 'Smart routing · Subscription only',          icon: <Sparkles className="w-3.5 h-3.5" />, color: '#F59E0B' },
+  { value: 'ollama-pro',  label: 'Ollama Pro',  description: 'Ollama · gpt-oss:120b-cloud · Default',      icon: <Bot className="w-3.5 h-3.5" />,      color: '#F97316' },
+  { value: 'claude-code', label: 'Claude Code', description: 'Anthropic · Claude Code CLI',                icon: <Cpu className="w-3.5 h-3.5" />,      color: '#8B5CF6' },
+  { value: 'gemini-cli',  label: 'Gemini CLI',  description: 'Google · Gemini CLI',                        icon: <Globe className="w-3.5 h-3.5" />,    color: '#3B82F6' },
+  { value: 'codex-cli',   label: 'Codex CLI',   description: 'OpenAI · Codex CLI',                         icon: <Zap className="w-3.5 h-3.5" />,      color: '#10B981' },
 ]
 
 const LOCAL_MODELS: ModelOption[] = [
@@ -28,14 +28,33 @@ const LOCAL_MODELS: ModelOption[] = [
   { value: 'hermes3',        label: 'Hermes 3',         description: 'NousResearch · Local Ollama',      icon: <Bot className="w-3.5 h-3.5" />, color: '#A855F7' },
 ]
 
-const ALL_MODEL_OPTIONS: ModelOption[] = [...SUBSCRIPTION_MODELS, ...LOCAL_MODELS]
+const ALL_MODEL_OPTIONS: ModelOption[] = [...BASE_SUBSCRIPTION_MODELS, ...LOCAL_MODELS]
 
 export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void }) {
   const { selectedModel, setSelectedModel, activeView, rightPanelOpen, setRightPanelOpen, setCommandPaletteOpen } = useUIStore()
   const { isStreaming } = useChatStore()
   const [modelMenuOpen, setModelMenuOpen] = useState(false)
+  const [subscriptionModels, setSubscriptionModels] = useState<ModelOption[]>(BASE_SUBSCRIPTION_MODELS)
 
-  const activeModel = ALL_MODEL_OPTIONS.find(m => m.value === selectedModel) ?? ALL_MODEL_OPTIONS[0]
+  // Fetch deployment mode once on mount to update ollama-pro description
+  useEffect(() => {
+    fetch('/api/bertos/mode')
+      .then(r => r.json())
+      .then((data: { mode: string; provider: string; defaultModel: string }) => {
+        const modeLabel = data.mode === 'cloud' ? 'Cloud' : 'Local'
+        setSubscriptionModels(prev =>
+          prev.map(m =>
+            m.value === 'ollama-pro'
+              ? { ...m, description: `Ollama · ${data.defaultModel} · ${modeLabel}` }
+              : m
+          )
+        )
+      })
+      .catch(() => { /* keep defaults */ })
+  }, [])
+
+  const allModelOptions: ModelOption[] = [...subscriptionModels, ...LOCAL_MODELS]
+  const activeModel = allModelOptions.find(m => m.value === selectedModel) ?? allModelOptions[0]
 
   const viewLabels: Record<string, string> = {
     chat: 'Chat',
@@ -124,7 +143,7 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
                   <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
                     Subscription Providers
                   </p>
-                  {SUBSCRIPTION_MODELS.map(option => (
+                  {subscriptionModels.map(option => (
                     <button
                       key={option.value}
                       onClick={() => { setSelectedModel(option.value); setModelMenuOpen(false) }}

@@ -1,15 +1,28 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   Settings, Key, Globe, Zap, Sparkles, Monitor, Database,
-  Shield, Sliders, Check, Eye, EyeOff, Bot, Server, Cpu, Terminal
+  Shield, Sliders, Check, Eye, EyeOff, Bot, Server, Cpu, Terminal,
+  RefreshCw, Wifi, WifiOff
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+
+interface OllamaStatus {
+  online: boolean
+  mode: 'local' | 'cloud'
+  provider: string
+  baseUrl: string
+  chatUrl: string
+  defaultModel: string
+  models: Array<{ name: string; type?: string; recommended?: boolean }>
+  error?: string
+  testResult?: { success: boolean; error?: string }
+}
 
 const SECTIONS = [
   { id: 'providers', icon: Bot,      label: 'Providers'   },
@@ -63,6 +76,32 @@ export function SettingsView() {
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
   const [googleKey, setGoogleKey] = useState(settings.apiKeys.google ?? '')
   const [ollamaEndpoint, setOllamaEndpoint] = useState(settings.ollamaEndpoint ?? '')
+  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null)
+  const [ollamaLoading, setOllamaLoading] = useState(false)
+  const [testingCloud, setTestingCloud] = useState(false)
+
+  const fetchOllamaStatus = async (testCloud = false) => {
+    setOllamaLoading(true)
+    if (testCloud) setTestingCloud(true)
+    try {
+      const url = testCloud ? '/api/ollama/status?testCloud=true' : '/api/ollama/status'
+      const res = await fetch(url)
+      const data = await res.json() as OllamaStatus
+      setOllamaStatus(data)
+    } catch {
+      setOllamaStatus(null)
+    } finally {
+      setOllamaLoading(false)
+      setTestingCloud(false)
+    }
+  }
+
+  useEffect(() => {
+    if (activeSection === 'providers') {
+      fetchOllamaStatus()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection])
 
   const saveSettings = () => {
     updateSettings({
@@ -110,26 +149,95 @@ export function SettingsView() {
               {/* Always-on: Ollama Pro */}
               <div className="space-y-3">
                 <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Always-On Default</h4>
-                <div className="flex items-center gap-3 p-3.5 rounded-xl border border-orange-500/20 bg-orange-500/5">
-                  <Bot className="w-4 h-4 text-orange-400 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-zinc-200">Ollama Pro</p>
-                    <p className="text-xs text-zinc-500">gpt-oss:120b-cloud · No API billing · Works at localhost:11434 by default</p>
+
+                {/* Live Ollama status card */}
+                <div className={cn(
+                  'flex items-start gap-3 p-3.5 rounded-xl border',
+                  ollamaStatus?.online
+                    ? 'border-orange-500/20 bg-orange-500/5'
+                    : ollamaStatus
+                      ? 'border-red-500/20 bg-red-500/5'
+                      : 'border-zinc-800 bg-zinc-900/30'
+                )}>
+                  <Bot className={cn('w-4 h-4 flex-shrink-0 mt-0.5', ollamaStatus?.online ? 'text-orange-400' : ollamaStatus ? 'text-red-400' : 'text-zinc-600')} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-medium text-zinc-200">Ollama Pro</p>
+                      <span className="text-[10px] text-zinc-600">
+                        {ollamaStatus ? `${ollamaStatus.provider} · ${ollamaStatus.mode}` : 'Checking…'}
+                      </span>
+                    </div>
+                    {ollamaStatus ? (
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        {ollamaStatus.defaultModel} · No API billing ·{' '}
+                        <code className="text-zinc-600 text-[10px]">{ollamaStatus.chatUrl}</code>
+                      </p>
+                    ) : (
+                      <p className="text-xs text-zinc-600 mt-0.5">Loading status…</p>
+                    )}
+                    {ollamaStatus?.mode === 'cloud' && (
+                      <p className="text-[11px] text-zinc-600 mt-1">
+                        Used for deployed BertOS on Vercel. Requires <code className="text-zinc-500">OLLAMA_API_KEY</code> in Vercel environment variables.
+                      </p>
+                    )}
+                    {ollamaStatus?.mode === 'local' && (
+                      <p className="text-[11px] text-zinc-600 mt-1">
+                        Used for local development. Requires Ollama running on this computer (<code className="text-zinc-500">ollama serve</code>).
+                      </p>
+                    )}
+                    {ollamaStatus?.error && (
+                      <p className="text-[11px] text-red-400/80 mt-1">{ollamaStatus.error}</p>
+                    )}
+                    {ollamaStatus?.testResult && (
+                      <p className={cn('text-[11px] mt-1', ollamaStatus.testResult.success ? 'text-emerald-400' : 'text-red-400')}>
+                        {ollamaStatus.testResult.success
+                          ? 'Connection test passed'
+                          : `Connection test failed: ${ollamaStatus.testResult.error}`}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        onClick={() => fetchOllamaStatus(false)}
+                        disabled={ollamaLoading}
+                        className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors disabled:opacity-50"
+                      >
+                        <RefreshCw className={cn('w-3 h-3', ollamaLoading && !testingCloud && 'animate-spin')} />
+                        Refresh
+                      </button>
+                      {ollamaStatus?.mode === 'cloud' && (
+                        <button
+                          onClick={() => fetchOllamaStatus(true)}
+                          disabled={ollamaLoading}
+                          className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors disabled:opacity-50"
+                        >
+                          <Wifi className={cn('w-3 h-3', testingCloud && 'animate-pulse')} />
+                          Test Connection
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <Badge variant="success" className="text-[9px] h-4">Active</Badge>
+                  {ollamaLoading && !testingCloud ? (
+                    <RefreshCw className="w-3.5 h-3.5 text-zinc-600 animate-spin flex-shrink-0" />
+                  ) : ollamaStatus?.online ? (
+                    <Badge variant="success" className="text-[9px] h-4 flex-shrink-0">Connected</Badge>
+                  ) : ollamaStatus ? (
+                    <Badge variant="error" className="text-[9px] h-4 flex-shrink-0">Offline</Badge>
+                  ) : (
+                    <Badge variant="default" className="text-[9px] h-4 flex-shrink-0">Checking</Badge>
+                  )}
                 </div>
 
-                {/* Ollama endpoint config */}
+                {/* Ollama endpoint config (local mode only, or for override) */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <Server className="w-4 h-4 text-orange-400" />
-                    <p className="text-sm font-medium text-zinc-300">Ollama Endpoint</p>
+                    <p className="text-sm font-medium text-zinc-300">Custom Ollama Endpoint</p>
                     <Badge variant={ollamaEndpoint ? 'success' : 'default'} className="text-[9px] h-4 ml-auto">
-                      {ollamaEndpoint ? 'Custom' : 'localhost:11434'}
+                      {ollamaEndpoint ? 'Custom' : 'Auto-detected'}
                     </Badge>
                   </div>
                   <p className="text-[11px] text-zinc-600 leading-relaxed">
-                    Override the default local Ollama URL. Leave blank to use <code className="text-zinc-500">http://127.0.0.1:11434</code>.
+                    Override the Ollama endpoint. Leave blank to use auto-detection (cloud or local based on deployment mode).
                   </p>
                   <input
                     type="url"
@@ -143,7 +251,7 @@ export function SettingsView() {
                       onClick={() => setOllamaEndpoint('')}
                       className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors"
                     >
-                      Clear — revert to localhost:11434
+                      Clear — revert to auto-detected endpoint
                     </button>
                   )}
                 </div>
