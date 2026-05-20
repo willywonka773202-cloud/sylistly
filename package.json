@@ -22,7 +22,8 @@
     "catalog:test-generator": "jiti scripts/test-generator-variety.ts",
     "seed:catalog": "node --experimental-strip-types --env-file=.env.local scripts/seed-brand-catalog.mts",
     "smoke:search": "node --env-file=.env.local scripts/smoke-search.mjs",
-    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs"
+    "smoke:search:direct": "node --experimental-strip-types --env-file=.env.local scripts/direct-search-smoke.mjs",
+    "bertos:safety": "node -e \"const {execSync}=require('child_process');const r=execSync('git remote get-url origin',{encoding:'utf8'}).trim();if(r.toLowerCase().includes('sylistly')){console.error('SAFETY FAIL: repo remote contains sylistly:',r);process.exit(1);}console.log('Safety OK: remote is',r);\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

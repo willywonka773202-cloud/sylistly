@@ -327,28 +327,51 @@ export function PatchWorkflow({ activeFile, fileContent, repoContext }: PatchWor
 
   // ── Apply patch ─────────────────────────────────────────────────────────────
   const handleApply = useCallback(async () => {
-    if (!parsedDiff) return
+    if (!parsedDiff || !rawResponse) return
     setState('applying')
     try {
-      const res = await fetch('http://localhost:3001/repo/apply-patch', {
+      const applyRes = await fetch('http://localhost:3001/repo/apply-patch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file: activeFile, patch: rawResponse }),
-        signal: AbortSignal.timeout(10000),
+        body: JSON.stringify({ diff: rawResponse }),
+        signal: AbortSignal.timeout(15000),
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(body.error ?? `Apply failed: HTTP ${res.status}`)
+      if (!applyRes.ok) {
+        const body = await applyRes.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `Apply failed: HTTP ${applyRes.status}`)
       }
 
-      // Auto-run typecheck
+      // Run typecheck via daemon NDJSON stream
       try {
-        const tcRes = await fetch('http://localhost:3001/repo/typecheck', {
-          method: 'POST',
-          signal: AbortSignal.timeout(30000),
-        })
-        const tcData = await tcRes.json() as { pass: boolean; output: string }
-        setTypecheckResult(tcData)
+        const tcRes = await fetch(
+          'http://localhost:3001/repo/run?cmd=npm+run+typecheck',
+          { signal: AbortSignal.timeout(60000) },
+        )
+        if (tcRes.ok && tcRes.body) {
+          const reader = tcRes.body.getReader()
+          const dec = new TextDecoder()
+          let buf = ''
+          let output = ''
+          let exitCode = 0
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buf += dec.decode(value, { stream: true })
+            const lines = buf.split('\n')
+            buf = lines.pop() ?? ''
+            for (const line of lines) {
+              if (!line.trim()) continue
+              try {
+                const parsed = JSON.parse(line) as { type: string; text?: string; code?: number }
+                if (parsed.type === 'stdout' || parsed.type === 'stderr') output += parsed.text ?? ''
+                if (parsed.type === 'exit') exitCode = parsed.code ?? 0
+              } catch { /* skip */ }
+            }
+          }
+          setTypecheckResult({ pass: exitCode === 0, output })
+        } else {
+          setTypecheckResult({ pass: true, output: '(typecheck unavailable)' })
+        }
       } catch {
         setTypecheckResult({ pass: true, output: '(typecheck skipped — daemon unavailable)' })
       }
@@ -357,13 +380,13 @@ export function PatchWorkflow({ activeFile, fileContent, repoContext }: PatchWor
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Apply failed'
       if (msg.includes('fetch') || msg.includes('ECONNREFUSED') || msg.includes('Failed to fetch')) {
-        setError('Apply requires local daemon — review the diff and apply manually.')
+        setError('Daemon offline — start with: npm run bertos:daemon')
       } else {
         setError(msg)
       }
       setState('error')
     }
-  }, [parsedDiff, rawResponse, activeFile])
+  }, [parsedDiff, rawResponse])
 
   // ── Ask AI to fix typecheck errors ──────────────────────────────────────────
   const handleAskAIToFix = useCallback(() => {

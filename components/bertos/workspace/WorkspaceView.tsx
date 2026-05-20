@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Code2, GitBranch, Users, Zap, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Code2, GitBranch, Users, Zap, Terminal, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { FileExplorer } from './FileExplorer'
@@ -9,14 +9,16 @@ import { CodeEditor } from './CodeEditor'
 import { PatchWorkflow } from './PatchWorkflow'
 import { GitPanel } from './GitPanel'
 import { TeamMode } from './TeamMode'
+import { TerminalPanel } from './TerminalPanel'
 
-type WorkspaceTab = 'editor' | 'patch' | 'git' | 'team'
+type WorkspaceTab = 'editor' | 'patch' | 'git' | 'team' | 'terminal'
 
 const TABS: { id: WorkspaceTab; icon: typeof Code2; label: string }[] = [
-  { id: 'editor', icon: Code2,      label: 'Editor'    },
-  { id: 'patch',  icon: Zap,        label: 'AI Patch'  },
-  { id: 'git',    icon: GitBranch,  label: 'Git'       },
-  { id: 'team',   icon: Users,      label: 'Team Mode' },
+  { id: 'editor',   icon: Code2,      label: 'Editor'    },
+  { id: 'patch',    icon: Zap,        label: 'AI Patch'  },
+  { id: 'git',      icon: GitBranch,  label: 'Git'       },
+  { id: 'team',     icon: Users,      label: 'Team Mode' },
+  { id: 'terminal', icon: Terminal,   label: 'Terminal'  },
 ]
 
 const DAEMON = 'http://localhost:3001'
@@ -163,6 +165,9 @@ export function WorkspaceView() {
               fileContext={selectedFile ?? undefined}
               onPatchReady={() => setActiveTab('patch')}
             />
+          )}
+          {activeTab === 'terminal' && (
+            <TerminalPanel />
           )}
         </div>
       </div>

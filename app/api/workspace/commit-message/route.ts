@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   const prompt =
     `Generate a concise git commit message (imperative mood, under 72 chars) for these changed files: ` +
-    `${changes.join(', ')}. Return ONLY the commit message, nothing else.`
+    `${changes.join(', ')}. Reply with ONLY the commit message on a single line. No explanation. No prefix. No quotes.`
 
   const cfg = getOllamaConfig()
   const model = resolveOllamaModel(cfg.defaultModel)
@@ -57,16 +57,20 @@ export async function POST(req: NextRequest) {
       response?: string
     }
 
-    const message = (data.message?.content ?? data.response ?? '').trim()
+    const rawMessage = (data.message?.content ?? data.response ?? '').trim()
 
-    if (!message) {
+    if (!rawMessage) {
       return NextResponse.json({ error: 'Empty response from model' }, { status: 502 })
     }
 
-    // Strip surrounding quotes if the model returned them
-    const cleaned = message.replace(/^["']|["']$/g, '').trim()
+    // Take only the first non-blank line that looks like a commit message
+    const cleanMessage = rawMessage
+      .split('\n')
+      .map(l => l.trim().replace(/^["'`]|["'`]$/g, ''))
+      .filter(l => l.length > 0 && !l.match(/^(here|this|the following|note:|explanation:|commit message:)/i))
+      [0] ?? rawMessage.trim()
 
-    return NextResponse.json({ message: cleaned })
+    return NextResponse.json({ message: cleanMessage })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Request failed'
     return NextResponse.json({ error: message }, { status: 502 })

@@ -206,6 +206,45 @@ function getGitStatus() {
   return { branch, remote, modified, untracked, staged, ahead, behind }
 }
 
+// ── Patch applier ─────────────────────────────────────────────────────────────
+
+function applyPatch(originalContent, diff) {
+  const origLines = originalContent.split('\n')
+  const diffLines = diff.split('\n')
+  const result = [...origLines]
+  let offset = 0  // tracks how many lines have been added/removed so far
+  let i = 0
+  while (i < diffLines.length) {
+    const line = diffLines[i]
+    if (line.startsWith('@@ ')) {
+      const m = line.match(/@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/)
+      if (!m) { i++; continue }
+      const origStart = parseInt(m[1], 10) - 1  // 0-indexed
+      let pos = origStart + offset
+      i++
+      while (i < diffLines.length && !diffLines[i].startsWith('@@ ') && !diffLines[i].startsWith('diff ')) {
+        const dl = diffLines[i]
+        if (dl.startsWith('-')) {
+          result.splice(pos, 1)
+          offset--
+        } else if (dl.startsWith('+')) {
+          result.splice(pos, 0, dl.slice(1))
+          pos++
+          offset++
+        } else if (dl.startsWith(' ') || dl === '') {
+          pos++
+        } else if (dl.startsWith('\\')) {
+          // no newline at end of file marker — skip
+        }
+        i++
+      }
+    } else {
+      i++
+    }
+  }
+  return result.join('\n')
+}
+
 // ── Allowed commands ──────────────────────────────────────────────────────────
 
 const ALLOWED_COMMANDS = new Set([
@@ -215,6 +254,7 @@ const ALLOWED_COMMANDS = new Set([
   'npm test',
   'git status',
   'git diff',
+  'git diff --staged',
   'git log --oneline -20',
   'git branch',
 ])
@@ -279,11 +319,15 @@ async function handleRequest(req, res) {
   try {
     // ── GET /health ───────────────────────────────────────────────────────────
     if (method === 'GET' && pathname === '/health') {
+      const repoRemote = gitExec('git remote get-url origin')
+      const repoSafe = !repoRemote.toLowerCase().includes('sylistly')
       return jsonResponse(res, {
         status:  'ok',
         version: '1.0.0',
         cwd:     REPO_ROOT,
         pid:     process.pid,
+        repoRemote,
+        repoSafe,
       })
     }
 
@@ -344,6 +388,82 @@ async function handleRequest(req, res) {
       return jsonResponse(res, { ok: true })
     }
 
+    // ── POST /repo/apply-patch ────────────────────────────────────────────────
+    if (method === 'POST' && pathname === '/repo/apply-patch') {
+      const body = await parseBody(req)
+      if (!body.diff || typeof body.diff !== 'string') {
+        return jsonResponse(res, { error: 'diff is required' }, 400)
+      }
+
+      const diff = body.diff
+      const diffLines = diff.split('\n')
+
+      // Collect per-file diffs by splitting on `diff --git` or `--- a/` boundaries
+      // We detect file boundaries by `--- a/path` lines
+      const filePatches = []
+      let currentFilePath = null
+      let currentDiffLines = []
+
+      for (let i = 0; i < diffLines.length; i++) {
+        const line = diffLines[i]
+        if (line.startsWith('--- ')) {
+          // Save previous file patch if any
+          if (currentFilePath !== null) {
+            filePatches.push({ filePath: currentFilePath, diffText: currentDiffLines.join('\n') })
+          }
+          // Parse path from `--- a/path` or `--- path`
+          const rawPath = line.slice(4).trim()
+          currentFilePath = rawPath.startsWith('a/') ? rawPath.slice(2) : rawPath
+          currentDiffLines = [line]
+        } else if (currentFilePath !== null) {
+          currentDiffLines.push(line)
+        }
+      }
+      // Push last collected patch
+      if (currentFilePath !== null) {
+        filePatches.push({ filePath: currentFilePath, diffText: currentDiffLines.join('\n') })
+      }
+
+      if (filePatches.length === 0) {
+        return jsonResponse(res, { error: 'No file patches found in diff' }, 400)
+      }
+
+      let totalLinesChanged = 0
+
+      for (const { filePath, diffText } of filePatches) {
+        // Validate path
+        const abs = validatePath(filePath)
+
+        // Read current content
+        let originalContent = ''
+        if (existsSync(abs)) {
+          originalContent = readFileSync(abs, 'utf8')
+        }
+
+        // Count lines before
+        const linesBefore = originalContent.split('\n').length
+
+        // Apply the patch
+        const patched = applyPatch(originalContent, diffText)
+
+        // Count lines after
+        const linesAfter = patched.split('\n').length
+        totalLinesChanged += Math.abs(linesAfter - linesBefore)
+
+        // Write result
+        mkdirSync(dirname(abs), { recursive: true })
+        writeFileSync(abs, patched, 'utf8')
+      }
+
+      const singleFile = filePatches.length === 1 ? filePatches[0].filePath : null
+      return jsonResponse(res, {
+        ok: true,
+        file: singleFile,
+        files: filePatches.map(p => p.filePath),
+        linesChanged: totalLinesChanged,
+      })
+    }
+
     // ── GET /repo/status ──────────────────────────────────────────────────────
     if (method === 'GET' && pathname === '/repo/status') {
       const status = getGitStatus()
@@ -361,11 +481,23 @@ async function handleRequest(req, res) {
       return jsonResponse(res, { diff })
     }
 
+    // ── GET /repo/diff/staged ─────────────────────────────────────────────────
+    if (method === 'GET' && pathname === '/repo/diff/staged') {
+      const diff = gitExec('git diff --staged')
+      return jsonResponse(res, { diff })
+    }
+
     // ── POST /repo/git/commit ─────────────────────────────────────────────────
     if (method === 'POST' && pathname === '/repo/git/commit') {
       const body = await parseBody(req)
       if (!body.message || typeof body.message !== 'string') {
         return jsonResponse(res, { error: 'message is required' }, 400)
+      }
+
+      // Check if there is anything to commit
+      const porcelain = gitExec('git status --porcelain')
+      if (!porcelain.trim()) {
+        return jsonResponse(res, { error: 'Nothing to commit — working tree is clean' }, 400)
       }
 
       // Stage all tracked changes
@@ -444,6 +576,13 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`[BertOS Daemon] Running on port ${PORT}`)
   console.log(`[BertOS Daemon] Repo root: ${REPO_ROOT}`)
   console.log(`[BertOS Daemon] Safe mode: ON — blocks paths outside repo`)
+
+  // Repo safety check
+  const repoRemote = gitExec('git remote get-url origin')
+  console.log(`[BertOS Daemon] Repo remote: ${repoRemote || '(none)'}`)
+  if (repoRemote.toLowerCase().includes('sylistly')) {
+    console.log('[BertOS Daemon] WARNING: Repo remote appears to be sylistly! Safety rules are still enforced.')
+  }
 })
 
 server.on('error', err => {
