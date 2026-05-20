@@ -6,21 +6,24 @@ export const runtime = 'nodejs'
 export async function GET(req: NextRequest) {
   const cfg = getOllamaConfig()
   const testCloud = req.nextUrl.searchParams.get('testCloud') === 'true'
+  // Accept client-supplied key so the in-app key can be tested without Vercel env vars
+  const clientKey = req.nextUrl.searchParams.get('key')?.trim() || undefined
+  const effectiveKey = clientKey || cfg.apiKey
 
   if (cfg.mode === 'cloud') {
     // In cloud mode, we cannot ping tagsUrl (it's null).
-    // Base availability on API key presence.
-    const online = Boolean(cfg.apiKey)
+    // Base availability on API key presence (env var or client-supplied).
+    const online = Boolean(effectiveKey)
 
     let testResult: { success: boolean; error?: string } | undefined
 
-    if (testCloud && cfg.apiKey) {
+    if (testCloud && effectiveKey) {
       try {
         const res = await fetch(cfg.chatUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${cfg.apiKey}`,
+            'Authorization': `Bearer ${effectiveKey}`,
           },
           body: JSON.stringify({
             model: cfg.defaultModel,
@@ -48,7 +51,7 @@ export async function GET(req: NextRequest) {
       chatUrl: cfg.chatUrl,
       defaultModel: cfg.defaultModel,
       models: [{ name: cfg.defaultModel, type: 'cloud', recommended: true }],
-      error: !online ? 'OLLAMA_API_KEY is missing. Add it in Vercel Project Settings → Environment Variables.' : undefined,
+      error: !online ? 'No Ollama API key found. Enter it in Settings → Providers → Ollama Cloud API Key, or add OLLAMA_API_KEY in Vercel env vars.' : undefined,
       testResult,
     })
   }

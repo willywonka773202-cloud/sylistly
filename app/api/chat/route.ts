@@ -22,6 +22,7 @@ interface ClientKeys {
   anthropic?: string
   openai?: string
   google?: string
+  ollamaCloud?: string
 }
 
 function resolveKey(envKey: string | undefined, clientKey: string | undefined): string {
@@ -195,10 +196,14 @@ export async function POST(req: NextRequest) {
           console.log(`[BertOS] mode=${cfg.mode} provider=${cfg.providerName} model=${ollamaModel} endpoint=${new URL(effectiveChatUrl).origin}`)
         }
 
-        if (cfg.requiresApiKey && !cfg.apiKey) {
+        // Client-supplied key (from Settings → Providers) overrides env var
+        const effectiveOllamaKey = ck.ollamaCloud?.trim() || cfg.apiKey
+
+        if (cfg.requiresApiKey && !effectiveOllamaKey) {
           throw new Error(
-            `Ollama Cloud mode is enabled, but OLLAMA_API_KEY is missing. ` +
-            `Add it in Vercel Project Settings → Environment Variables → OLLAMA_API_KEY and redeploy.`
+            `Ollama Cloud mode is enabled, but no API key found. ` +
+            `Enter your key in Settings → Providers → Ollama Cloud API Key, ` +
+            `or add OLLAMA_API_KEY in Vercel Project Settings → Environment Variables.`
           )
         }
 
@@ -208,7 +213,7 @@ export async function POST(req: NextRequest) {
         ]
 
         const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-        if (cfg.apiKey) headers['Authorization'] = `Bearer ${cfg.apiKey}`
+        if (effectiveOllamaKey) headers['Authorization'] = `Bearer ${effectiveOllamaKey}`
 
         const res = await fetch(effectiveChatUrl, {
           method: 'POST',
@@ -231,7 +236,7 @@ export async function POST(req: NextRequest) {
             throw new Error(
               `Ollama ${cfg.mode === 'cloud' ? 'Cloud' : 'Local'} auth failed (${res.status}). ` +
               (cfg.mode === 'cloud'
-                ? 'Check OLLAMA_API_KEY in Vercel environment variables.'
+                ? 'Check your Ollama API key in Settings → Providers, or set OLLAMA_API_KEY in Vercel env vars.'
                 : 'Run: ollama signin')
             )
           }

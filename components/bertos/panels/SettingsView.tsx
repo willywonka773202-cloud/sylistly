@@ -72,9 +72,10 @@ export function SettingsView() {
   const { settings, updateSettings } = useUIStore()
   const [activeSection, setActiveSection] = useState('providers')
   const [saved, setSaved] = useState(false)
-  const [anthropicKey, setAnthropicKey] = useState(settings.apiKeys.anthropic ?? '')
-  const [openaiKey, setOpenaiKey] = useState(settings.apiKeys.openai ?? '')
-  const [googleKey, setGoogleKey] = useState(settings.apiKeys.google ?? '')
+  const [anthropicKey, setAnthropicKey] = useState((settings.apiKeys ?? {}).anthropic ?? '')
+  const [openaiKey, setOpenaiKey] = useState((settings.apiKeys ?? {}).openai ?? '')
+  const [googleKey, setGoogleKey] = useState((settings.apiKeys ?? {}).google ?? '')
+  const [ollamaCloudKey, setOllamaCloudKey] = useState((settings.apiKeys ?? {}).ollamaCloud ?? '')
   const [ollamaEndpoint, setOllamaEndpoint] = useState(settings.ollamaEndpoint ?? '')
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null)
   const [ollamaLoading, setOllamaLoading] = useState(false)
@@ -84,7 +85,10 @@ export function SettingsView() {
     setOllamaLoading(true)
     if (testCloud) setTestingCloud(true)
     try {
-      const url = testCloud ? '/api/ollama/status?testCloud=true' : '/api/ollama/status'
+      const params = new URLSearchParams()
+      if (testCloud) params.set('testCloud', 'true')
+      if (ollamaCloudKey) params.set('key', ollamaCloudKey)
+      const url = `/api/ollama/status${params.size ? '?' + params.toString() : ''}`
       const res = await fetch(url)
       const data = await res.json() as OllamaStatus
       setOllamaStatus(data)
@@ -105,7 +109,12 @@ export function SettingsView() {
 
   const saveSettings = () => {
     updateSettings({
-      apiKeys: { anthropic: anthropicKey, openai: openaiKey, google: googleKey },
+      apiKeys: {
+        anthropic: anthropicKey,
+        openai: openaiKey,
+        google: googleKey,
+        ollamaCloud: ollamaCloudKey,
+      },
       ollamaEndpoint: ollamaEndpoint.trim() || undefined,
     })
     setSaved(true)
@@ -226,6 +235,33 @@ export function SettingsView() {
                     <Badge variant="default" className="text-[9px] h-4 flex-shrink-0">Checking</Badge>
                   )}
                 </div>
+
+                {/* Ollama Cloud API key (shown in cloud mode or always as optional override) */}
+                {ollamaStatus?.mode === 'cloud' || !ollamaStatus?.online ? (
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Key className="w-4 h-4 text-orange-400" />
+                      <p className="text-sm font-medium text-zinc-300">Ollama Cloud API Key</p>
+                      <Badge variant={ollamaCloudKey ? 'success' : 'warning'} className="text-[9px] h-4 ml-auto">
+                        {ollamaCloudKey ? 'Set' : 'Required'}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-zinc-600 leading-relaxed">
+                      Your Ollama API key from{' '}
+                      <span className="text-zinc-500 font-mono">ollama.com/settings/api-keys</span>.
+                      Saved locally in your browser — never sent to BertOS servers.
+                      You can also set <code className="text-zinc-500">OLLAMA_API_KEY</code> in Vercel environment variables.
+                    </p>
+                    <SecretInput
+                      value={ollamaCloudKey}
+                      onChange={setOllamaCloudKey}
+                      placeholder="ollama_..."
+                    />
+                    <Button onClick={saveSettings} size="sm" variant="outline" className="h-7 text-xs">
+                      {saved ? <><Check className="w-3 h-3" /> Saved</> : 'Save Key'}
+                    </Button>
+                  </div>
+                ) : null}
 
                 {/* Ollama endpoint config (local mode only, or for override) */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">

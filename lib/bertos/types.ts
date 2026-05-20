@@ -150,6 +150,7 @@ export interface BertOSSettings {
     anthropic?: string
     openai?: string
     google?: string
+    ollamaCloud?: string
   }
   ollamaEndpoint?: string
   ollamaCloudModel?: string
