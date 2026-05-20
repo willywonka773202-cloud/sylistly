@@ -11,6 +11,7 @@ import { useUIStore } from '@/store/bertos/ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import type { BertOSSettings } from '@/lib/bertos/types'
 
 interface OllamaStatus {
   online: boolean
@@ -25,12 +26,14 @@ interface OllamaStatus {
 }
 
 const SECTIONS = [
-  { id: 'providers', icon: Bot,      label: 'Providers'   },
-  { id: 'api-keys',  icon: Key,      label: 'API Keys'    },
-  { id: 'appearance',icon: Monitor,  label: 'Appearance'  },
-  { id: 'memory',    icon: Database, label: 'Memory'      },
-  { id: 'performance',icon: Sliders, label: 'Performance' },
-  { id: 'security',  icon: Shield,   label: 'Security'    },
+  { id: 'providers',  icon: Bot,      label: 'Providers'     },
+  { id: 'api-keys',   icon: Key,      label: 'API Keys'      },
+  { id: 'appearance', icon: Monitor,  label: 'Appearance'    },
+  { id: 'memory',     icon: Database, label: 'Memory'        },
+  { id: 'performance',icon: Sliders,  label: 'Performance'   },
+  { id: 'security',   icon: Shield,   label: 'Security'      },
+  { id: 'hermes',     icon: Bot,      label: 'Hermes Agent'  },
+  { id: 'composio',   icon: Globe,    label: 'Composio'      },
 ]
 
 function ToggleSwitch({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
@@ -68,6 +71,18 @@ function SecretInput({ value, onChange, placeholder }: { value: string; onChange
   )
 }
 
+interface HermesConnectionResult {
+  online: boolean
+  version?: string
+  error?: string
+}
+
+interface ComposioConnectionResult {
+  connected: boolean
+  apps?: string[]
+  error?: string
+}
+
 export function SettingsView() {
   const { settings, updateSettings } = useUIStore()
   const [activeSection, setActiveSection] = useState('providers')
@@ -80,6 +95,17 @@ export function SettingsView() {
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null)
   const [ollamaLoading, setOllamaLoading] = useState(false)
   const [testingCloud, setTestingCloud] = useState(false)
+
+  // Hermes
+  const [hermesUrl, setHermesUrl] = useState(settings.hermesUrl ?? '')
+  const [hermesApiKey, setHermesApiKey] = useState(settings.hermesApiKey ?? '')
+  const [hermesStatus, setHermesStatus] = useState<HermesConnectionResult | null>(null)
+  const [hermesLoading, setHermesLoading] = useState(false)
+
+  // Composio
+  const [composioKey, setComposioKey] = useState((settings.apiKeys as Record<string, string | undefined>).composio ?? '')
+  const [composioStatus, setComposioStatus] = useState<ComposioConnectionResult | null>(null)
+  const [composioLoading, setComposioLoading] = useState(false)
 
   const fetchOllamaStatus = async (testCloud = false) => {
     setOllamaLoading(true)
@@ -114,11 +140,47 @@ export function SettingsView() {
         openai: openaiKey,
         google: googleKey,
         ollamaCloud: ollamaCloudKey,
-      },
+        ...(composioKey ? { composio: composioKey } : {}),
+      } as BertOSSettings['apiKeys'],
       ollamaEndpoint: ollamaEndpoint.trim() || undefined,
+      hermesUrl: hermesUrl.trim() || undefined,
+      hermesApiKey: hermesApiKey.trim() || undefined,
     })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const testHermesConnection = async () => {
+    setHermesLoading(true)
+    setHermesStatus(null)
+    try {
+      const params = new URLSearchParams()
+      if (hermesUrl) params.set('url', hermesUrl)
+      if (hermesApiKey) params.set('key', hermesApiKey)
+      const res = await fetch(`/api/hermes/status?${params}`)
+      const data = await res.json() as HermesConnectionResult
+      setHermesStatus(data)
+    } catch (err) {
+      setHermesStatus({ online: false, error: err instanceof Error ? err.message : 'Connection failed' })
+    } finally {
+      setHermesLoading(false)
+    }
+  }
+
+  const testComposioConnection = async () => {
+    setComposioLoading(true)
+    setComposioStatus(null)
+    try {
+      const params = new URLSearchParams()
+      if (composioKey) params.set('key', composioKey)
+      const res = await fetch(`/api/composio/status?${params}`)
+      const data = await res.json() as ComposioConnectionResult
+      setComposioStatus(data)
+    } catch (err) {
+      setComposioStatus({ connected: false, error: err instanceof Error ? err.message : 'Connection failed' })
+    } finally {
+      setComposioLoading(false)
+    }
   }
 
   return (
@@ -488,6 +550,202 @@ export function SettingsView() {
                 <p className="text-sm text-zinc-600">Advanced settings coming soon</p>
                 <p className="text-xs text-zinc-700 mt-1">These controls are being built into BertOS</p>
               </div>
+            </motion.div>
+          )}
+
+          {/* ── Hermes Agent ──────────────────────────────────────────────── */}
+          {activeSection === 'hermes' && (
+            <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+              <div>
+                <h3 className="text-base font-semibold text-zinc-200 mb-1">Hermes Agent Integration</h3>
+                <p className="text-xs text-zinc-500">
+                  Connect to an always-running Hermes agent server for long-running tasks and memory.
+                </p>
+              </div>
+
+              {/* URL input */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-violet-400" />
+                  <p className="text-sm font-medium text-zinc-300">Server URL</p>
+                </div>
+                <input
+                  type="url"
+                  value={hermesUrl}
+                  onChange={e => setHermesUrl(e.target.value)}
+                  placeholder="https://your-hermes-server.com"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none focus:border-zinc-700 font-mono"
+                />
+              </div>
+
+              {/* API key */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Key className="w-4 h-4 text-violet-400" />
+                  <p className="text-sm font-medium text-zinc-300">API Key</p>
+                  <Badge variant={hermesApiKey ? 'success' : 'default'} className="text-[9px] h-4 ml-auto">
+                    {hermesApiKey ? 'Set' : 'Not set'}
+                  </Badge>
+                </div>
+                <SecretInput
+                  value={hermesApiKey}
+                  onChange={setHermesApiKey}
+                  placeholder="hermes_..."
+                />
+              </div>
+
+              {/* Test connection */}
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={testHermesConnection}
+                  disabled={hermesLoading || !hermesUrl}
+                  className="h-7 text-xs"
+                >
+                  {hermesLoading
+                    ? <><RefreshCw className="w-3 h-3 animate-spin" /> Testing…</>
+                    : <><Wifi className="w-3 h-3" /> Test Connection</>}
+                </Button>
+                {hermesStatus && (
+                  <Badge variant={hermesStatus.online ? 'success' : 'error'} className="text-[9px] h-5">
+                    {hermesStatus.online
+                      ? `Connected${hermesStatus.version ? ` · v${hermesStatus.version}` : ''}`
+                      : hermesStatus.error ?? 'Offline'}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Status card */}
+              {hermesStatus && (
+                <div className={cn(
+                  'rounded-xl border p-4',
+                  hermesStatus.online
+                    ? 'border-emerald-500/20 bg-emerald-500/5'
+                    : 'border-red-500/20 bg-red-500/5'
+                )}>
+                  <div className="flex items-center gap-2">
+                    {hermesStatus.online
+                      ? <Wifi className="w-4 h-4 text-emerald-400" />
+                      : <WifiOff className="w-4 h-4 text-red-400" />}
+                    <p className={cn(
+                      'text-sm font-medium',
+                      hermesStatus.online ? 'text-emerald-300' : 'text-red-300'
+                    )}>
+                      {hermesStatus.online ? 'Hermes agent is reachable' : 'Could not reach Hermes server'}
+                    </p>
+                  </div>
+                  {hermesStatus.error && (
+                    <p className="text-xs text-red-400/70 mt-1.5 ml-6">{hermesStatus.error}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Note */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/20 p-3">
+                <p className="text-[11px] text-zinc-600 leading-relaxed">
+                  Self-hosted only. See{' '}
+                  <span className="text-zinc-500 font-mono">Hermes docs</span>{' '}
+                  for setup instructions.
+                </p>
+              </div>
+
+              <Button onClick={saveSettings} className="w-full">
+                {saved ? <><Check className="w-4 h-4" /> Saved</> : 'Save Settings'}
+              </Button>
+            </motion.div>
+          )}
+
+          {/* ── Composio ──────────────────────────────────────────────────── */}
+          {activeSection === 'composio' && (
+            <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+              <div>
+                <h3 className="text-base font-semibold text-zinc-200 mb-1">Composio Tool Integration</h3>
+                <p className="text-xs text-zinc-500">
+                  Connect Composio to give BertOS access to external tools: GitHub, Slack, Notion, Gmail, Calendar, and more.
+                </p>
+              </div>
+
+              {/* API key */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Key className="w-4 h-4 text-blue-400" />
+                  <p className="text-sm font-medium text-zinc-300">Composio API Key</p>
+                  <Badge variant={composioKey ? 'success' : 'default'} className="text-[9px] h-4 ml-auto">
+                    {composioKey ? 'Set' : 'Not set'}
+                  </Badge>
+                </div>
+                <SecretInput
+                  value={composioKey}
+                  onChange={setComposioKey}
+                  placeholder="comp_..."
+                />
+              </div>
+
+              {/* Check status button */}
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={testComposioConnection}
+                  disabled={composioLoading || !composioKey}
+                  className="h-7 text-xs"
+                >
+                  {composioLoading
+                    ? <><RefreshCw className="w-3 h-3 animate-spin" /> Checking…</>
+                    : <><Globe className="w-3 h-3" /> Check Status</>}
+                </Button>
+                {composioStatus && (
+                  <Badge
+                    variant={composioStatus.connected ? 'success' : composioStatus.error?.includes('Invalid') ? 'error' : 'default'}
+                    className="text-[9px] h-5"
+                  >
+                    {composioStatus.connected
+                      ? 'Connected'
+                      : composioStatus.error?.includes('Invalid')
+                        ? 'Invalid Key'
+                        : 'Not Connected'}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Connected apps list */}
+              {composioStatus?.connected && (composioStatus.apps?.length ?? 0) > 0 && (
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-2">
+                  <p className="text-xs font-semibold text-emerald-300">Connected Apps</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {composioStatus.apps!.map(app => (
+                      <Badge key={app} variant="success" className="text-[10px]">{app}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Not connected: install instructions */}
+              {composioStatus && !composioStatus.connected && (
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-2">
+                  <p className="text-xs font-semibold text-zinc-400">Install Composio</p>
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-3 space-y-1.5 font-mono text-[11px] text-zinc-500">
+                    <p>pip install composio-core</p>
+                    <p className="text-zinc-700">— or —</p>
+                    <p>npm install composio-core</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Billing note */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/20 p-3 flex items-start gap-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <p className="text-[11px] text-zinc-600 leading-relaxed">
+                  Composio has a free tier. Check{' '}
+                  <span className="text-zinc-500 font-mono">composio.dev</span>{' '}
+                  for pricing and available integrations.
+                </p>
+              </div>
+
+              <Button onClick={saveSettings} className="w-full">
+                {saved ? <><Check className="w-4 h-4" /> Saved</> : 'Save Settings'}
+              </Button>
             </motion.div>
           )}
         </div>

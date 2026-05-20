@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   MessageSquare, GitCompare, Code2, Bot, Brain, Settings,
-  Plus, ChevronLeft, ChevronRight, Hash, Zap, Command, Trash2,
+  Plus, ChevronLeft, ChevronRight, Hash, Zap, Command, Trash2, LayoutDashboard,
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
@@ -14,11 +14,12 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRouter } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { id: 'chat',      icon: MessageSquare, label: 'Chat',      href: '/chat'      },
-  { id: 'compare',   icon: GitCompare,    label: 'Compare',   href: '/compare'   },
-  { id: 'workspace', icon: Code2,         label: 'Workspace', href: '/workspace' },
-  { id: 'agents',    icon: Bot,           label: 'Agents',    href: '/agents'    },
-  { id: 'memory',    icon: Brain,         label: 'Memory',    href: '/memory'    },
+  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+  { id: 'chat',      icon: MessageSquare,   label: 'Chat',      href: '/chat'      },
+  { id: 'compare',   icon: GitCompare,      label: 'Compare',   href: '/compare'   },
+  { id: 'workspace', icon: Code2,           label: 'Workspace', href: '/workspace' },
+  { id: 'agents',    icon: Bot,             label: 'Agents',    href: '/agents'    },
+  { id: 'memory',    icon: Brain,           label: 'Memory',    href: '/memory'    },
 ] as const
 
 interface SidebarProps {

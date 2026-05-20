@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bot, Plus, Play, Pause, CheckCircle2, XCircle,
   Clock, Activity, ChevronDown, ChevronUp, Cpu, Globe, Zap, Sparkles,
-  Trash2
+  Trash2, FlaskConical,
 } from 'lucide-react'
 import { cn } from '@/lib/bertos/cn'
 import { useAgentStore } from '@/store/bertos/agents'
@@ -13,6 +13,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { EvolutionLab } from './EvolutionLab'
+
+type AgentsTab = 'tasks' | 'evolution'
 const TASK_TEMPLATES = [
   { title: 'Refactor Frontend',       description: 'Analyze and modernize all React components, extract reusable logic, improve TypeScript types', model: 'ollama-pro' as AIModel,  estimatedTime: '~8 min' },
   { title: 'Fix TypeScript Errors',   description: 'Scan codebase for type errors and fix them systematically',                                     model: 'ollama-pro' as AIModel,  estimatedTime: '~3 min' },
@@ -174,6 +177,7 @@ function TaskCard({ task }: { task: AgentTask }) {
 
 export function AgentsView() {
   const { tasks, createTask } = useAgentStore()
+  const [activeTab, setActiveTab] = useState<AgentsTab>('tasks')
   const [showTemplates, setShowTemplates] = useState(false)
   const [customTitle, setCustomTitle] = useState('')
   const [customDesc, setCustomDesc] = useState('')
@@ -196,6 +200,43 @@ export function AgentsView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      {/* Tab strip */}
+      <div className="flex-shrink-0 flex items-center gap-0.5 px-4 pt-3 pb-0 border-b border-zinc-800/50 bg-zinc-950/30">
+        <button
+          onClick={() => setActiveTab('tasks')}
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-2 rounded-t-md text-xs font-medium border-b-2 -mb-px transition-all',
+            activeTab === 'tasks'
+              ? 'border-violet-500 text-zinc-100 bg-zinc-800/50'
+              : 'border-transparent text-zinc-600 hover:text-zinc-400',
+          )}
+        >
+          <Bot className="w-3.5 h-3.5" />
+          Agent Tasks
+        </button>
+        <button
+          onClick={() => setActiveTab('evolution')}
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-2 rounded-t-md text-xs font-medium border-b-2 -mb-px transition-all',
+            activeTab === 'evolution'
+              ? 'border-violet-500 text-zinc-100 bg-zinc-800/50'
+              : 'border-transparent text-zinc-600 hover:text-zinc-400',
+          )}
+        >
+          <FlaskConical className="w-3.5 h-3.5" />
+          Evolution Lab
+        </button>
+      </div>
+
+      {/* Evolution Lab */}
+      {activeTab === 'evolution' && (
+        <div className="flex-1 overflow-hidden">
+          <EvolutionLab />
+        </div>
+      )}
+
+      {/* Agent Tasks */}
+      {activeTab === 'tasks' && <>
       {/* Header */}
       <div className="flex-shrink-0 px-6 py-4 border-b border-zinc-800/50">
         <div className="max-w-3xl mx-auto">
@@ -314,6 +355,7 @@ export function AgentsView() {
           )}
         </div>
       </ScrollArea>
+      </>}
     </div>
   )
 }

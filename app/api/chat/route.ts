@@ -91,6 +91,56 @@ export async function POST(req: NextRequest) {
       try {
         send({ routerDecision })
 
+        // ── Hermes Agent provider ───────────────────────────────────────
+        if (modelAlias === 'hermes-agent') {
+          const hermesUrl = process.env.HERMES_API_URL?.trim()
+          if (!hermesUrl) {
+            throw new Error(
+              'Hermes Agent is not configured. Set HERMES_API_URL in your environment variables or in Settings → Hermes Agent.'
+            )
+          }
+          const hermesKey = process.env.HERMES_API_KEY?.trim() || ck.ollamaCloud?.trim()
+          const lastMsg = conversationMessages[conversationMessages.length - 1]?.content ?? ''
+          const hermesRes = await fetch(`${hermesUrl}/chat`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(hermesKey ? { 'Authorization': `Bearer ${hermesKey}` } : {}),
+            },
+            body: JSON.stringify({ message: lastMsg, stream: true }),
+          })
+          if (!hermesRes.ok) {
+            const err = await hermesRes.text().catch(() => `HTTP ${hermesRes.status}`)
+            throw new Error(`Hermes Agent error: ${err}`)
+          }
+          if (hermesRes.body) {
+            const reader = hermesRes.body.getReader()
+            const decoder = new TextDecoder()
+            let buf = ''
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+              buf += decoder.decode(value, { stream: true })
+              const lines = buf.split('\n'); buf = lines.pop() ?? ''
+              for (const line of lines) {
+                const t = line.trim()
+                if (!t || t === '[DONE]') continue
+                if (t.startsWith('data: ')) {
+                  try {
+                    const p = JSON.parse(t.slice(6)) as { text?: string; content?: string }
+                    const text = p.text ?? p.content
+                    if (text) send({ text })
+                  } catch { if (t.slice(6) !== '[DONE]') send({ text: t.slice(6) }) }
+                } else {
+                  try { const p = JSON.parse(t) as { text?: string }; if (p.text) send({ text: p.text }) } catch {}
+                }
+              }
+            }
+          }
+          done()
+          return
+        }
+
         // ── CLI subscription providers ──────────────────────────────────
         if (CLI_MODEL_ALIASES.has(modelAlias)) {
           const cliLabels: Record<string, string> = {

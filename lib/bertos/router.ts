@@ -164,6 +164,7 @@ export function getModelColor(model: string): string {
     case 'claude-api':      return '#8B5CF6'
     case 'openai-api':      return '#10B981'
     case 'gemini-api':      return '#3B82F6'
+    case 'hermes-agent':    return '#A855F7'
     case 'auto':            return '#F59E0B'
     default:                return '#6B7280'
   }
@@ -184,6 +185,7 @@ export function getModelLabel(model: string): string {
     case 'claude-api':      return 'Anthropic API'
     case 'openai-api':      return 'OpenAI API'
     case 'gemini-api':      return 'Gemini API'
+    case 'hermes-agent':    return 'Hermes Agent'
     case 'auto':            return 'Auto'
     default:                return model
   }
