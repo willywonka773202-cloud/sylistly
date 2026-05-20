@@ -1,8 +1,11 @@
+// ── Model types ───────────────────────────────────────────────────
 export type OllamaModel = 'ollama-pro' | 'qwen2.5-coder' | 'llama3' | 'llama3.2' | 'mistral' | 'deepseek-coder' | 'hermes3'
 export type CLIModel = 'claude-code' | 'gemini-cli' | 'codex-cli'
 export type APIModel = 'claude-api' | 'openai-api' | 'gemini-api'
-export type AIModel = 'auto' | OllamaModel | CLIModel | APIModel
+export type AgentModel = 'hermes-agent'
+export type AIModel = 'auto' | OllamaModel | CLIModel | APIModel | AgentModel
 
+// ── Message / chat types ──────────────────────────────────────────
 export type MessageRole = 'user' | 'assistant' | 'system'
 
 export interface Message {
@@ -38,6 +41,7 @@ export type TaskType =
   | 'research'
   | 'math'
   | 'general'
+  | 'agent-task'
 
 export type RoutingStrategy = 'single' | 'parallel' | 'sequential' | 'best-of'
 
@@ -52,6 +56,7 @@ export interface ChatSession {
   pinned?: boolean
 }
 
+// ── Project / workspace types ─────────────────────────────────────
 export interface Project {
   id: string
   name: string
@@ -65,6 +70,8 @@ export interface Project {
   todos: Todo[]
   pinned: boolean
   context: string
+  repoUrl?: string
+  preferredProvider?: AIModel
 }
 
 export interface ProjectFile {
@@ -83,6 +90,7 @@ export interface Todo {
   createdAt: number
 }
 
+// ── Agent / task types ────────────────────────────────────────────
 export interface AgentTask {
   id: string
   title: string
@@ -111,6 +119,7 @@ export interface AgentCheckpoint {
   state: Record<string, unknown>
 }
 
+// ── Compare types ─────────────────────────────────────────────────
 export interface CompareSession {
   id: string
   prompt: string
@@ -134,6 +143,34 @@ export interface CLIStatus {
   path?: string
 }
 
+// ── Hermes Agent types ────────────────────────────────────────────
+export interface HermesWorkspace {
+  id: string
+  name: string
+  description?: string
+  status: 'active' | 'idle' | 'error'
+  createdAt: string
+}
+
+export interface HermesTask {
+  id: string
+  title: string
+  status: 'pending' | 'running' | 'done' | 'failed'
+  progress?: number
+  logs?: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface HermesStatus {
+  online: boolean
+  version?: string
+  workspaces?: HermesWorkspace[]
+  activeTasks?: number
+  error?: string
+}
+
+// ── Settings ──────────────────────────────────────────────────────
 export interface BertOSSettings {
   theme: 'dark' | 'darker' | 'midnight'
   primaryModel: AIModel
@@ -155,6 +192,8 @@ export interface BertOSSettings {
   ollamaEndpoint?: string
   ollamaCloudModel?: string
   ollamaLocalFallback?: string
+  hermesUrl?: string
+  hermesApiKey?: string
   modelPriority: AIModel[]
   tokenBudget: number
   animationsEnabled: boolean
