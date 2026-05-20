@@ -531,7 +531,16 @@ async function handleRequest(req, res) {
       })
 
       const [bin, ...args] = cmd.split(' ')
-      const child = spawn(bin, args, { cwd: REPO_ROOT, shell: true })
+      // Disable any interactive pager (git diff / git log would otherwise
+      // spawn `less` and block forever waiting for keyboard input).
+      const childEnv = {
+        ...process.env,
+        GIT_PAGER: 'cat',
+        PAGER: 'cat',
+        GIT_TERMINAL_PROMPT: '0',
+        NO_COLOR: '1',
+      }
+      const child = spawn(bin, args, { cwd: REPO_ROOT, shell: true, env: childEnv })
 
       const sendLine = (type, text) => {
         try {
@@ -539,17 +548,30 @@ async function handleRequest(req, res) {
         } catch { /* stream closed */ }
       }
 
-      child.stdout.on('data', data => sendLine('stdout', data.toString()))
-      child.stderr.on('data', data => sendLine('stderr', data.toString()))
-
-      child.on('close', code => {
+      const finish = (code) => {
         try {
           res.write(JSON.stringify({ type: 'exit', code }) + '\n')
           res.end()
         } catch { /* stream closed */ }
+      }
+
+      // Safety: kill child and close response after 60 seconds
+      const timeout = setTimeout(() => {
+        try { child.kill() } catch { /* already dead */ }
+        sendLine('error', 'Command timed out after 60 seconds')
+        finish(124)
+      }, 60_000)
+
+      child.stdout.on('data', data => sendLine('stdout', data.toString()))
+      child.stderr.on('data', data => sendLine('stderr', data.toString()))
+
+      child.on('close', code => {
+        clearTimeout(timeout)
+        finish(code ?? 0)
       })
 
       child.on('error', err => {
+        clearTimeout(timeout)
         try {
           res.write(JSON.stringify({ type: 'error', text: err.message }) + '\n')
           res.end()

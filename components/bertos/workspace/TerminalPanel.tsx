@@ -55,6 +55,29 @@ export function TerminalPanel() {
 
     addLine('info', `$ ${selectedCmd}`)
 
+    // Client-side safety timeout — 65 s (daemon kills at 60 s)
+    const timeoutId = setTimeout(() => {
+      abortRef.current?.abort()
+    }, 65_000)
+
+    const processNdjsonLine = (line: string) => {
+      if (!line.trim()) return
+      try {
+        const parsed = JSON.parse(line) as { type: string; text?: string; code?: number }
+        if (parsed.type === 'stdout' || parsed.type === 'stderr') {
+          const textLines = (parsed.text ?? '').split('\n')
+          for (const tl of textLines) {
+            if (tl !== '' || textLines.length === 1) addLine(parsed.type as 'stdout' | 'stderr', tl)
+          }
+        } else if (parsed.type === 'exit') {
+          setExitCode(parsed.code ?? 0)
+          addLine('exit', `Exit: ${parsed.code ?? 0}`, parsed.code ?? 0)
+        } else if (parsed.type === 'error') {
+          addLine('error', parsed.text ?? 'Unknown error')
+        }
+      } catch { /* skip malformed */ }
+    }
+
     try {
       const res = await fetch(
         `${DAEMON}/repo/run?cmd=${encodeURIComponent(selectedCmd)}`,
@@ -62,6 +85,7 @@ export function TerminalPanel() {
       )
 
       if (!res.ok) {
+        // Non-200: daemon returned a JSON error object, not a stream
         const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? `HTTP ${res.status}`)
       }
@@ -78,27 +102,12 @@ export function TerminalPanel() {
         buf += dec.decode(value, { stream: true })
         const parts = buf.split('\n')
         buf = parts.pop() ?? ''
-        for (const part of parts) {
-          if (!part.trim()) continue
-          try {
-            const parsed = JSON.parse(part) as { type: string; text?: string; code?: number }
-            if (parsed.type === 'stdout' || parsed.type === 'stderr') {
-              // Split multi-line chunks into individual lines
-              const textLines = (parsed.text ?? '').split('\n')
-              for (const tl of textLines) {
-                if (tl !== '' || textLines.length === 1) {
-                  addLine(parsed.type, tl)
-                }
-              }
-            } else if (parsed.type === 'exit') {
-              setExitCode(parsed.code ?? 0)
-              addLine('exit', `Exit: ${parsed.code ?? 0}`, parsed.code ?? 0)
-            } else if (parsed.type === 'error') {
-              addLine('error', parsed.text ?? 'Unknown error')
-            }
-          } catch { /* skip malformed */ }
-        }
+        for (const part of parts) processNdjsonLine(part)
       }
+
+      // Flush anything left in the buffer that had no trailing newline
+      if (buf.trim()) processNdjsonLine(buf)
+
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         addLine('info', '(cancelled)')
@@ -111,6 +120,7 @@ export function TerminalPanel() {
         }
       }
     } finally {
+      clearTimeout(timeoutId)
       setRunning(false)
     }
   }, [selectedCmd, running, addLine])
