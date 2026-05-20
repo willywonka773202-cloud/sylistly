@@ -91,7 +91,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         </div>
       )}
 
-      <div className={cn('group max-w-[78%] space-y-1.5', isUser && 'items-end flex flex-col')}>
+      <div className={cn('group max-w-[78%] min-w-0 space-y-1.5', isUser && 'items-end flex flex-col')}>
         {/* Model badge for AI messages */}
         {!isUser && message.model && (
           <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         {/* Message content */}
         <div
           className={cn(
-            'rounded-2xl px-4 py-3 text-sm leading-relaxed',
+            'rounded-2xl px-4 py-3 text-sm leading-relaxed overflow-hidden',
             isUser
               ? 'bg-violet-600 text-white rounded-br-sm'
               : 'bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-bl-sm',

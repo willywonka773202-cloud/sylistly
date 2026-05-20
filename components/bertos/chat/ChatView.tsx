@@ -80,20 +80,24 @@ export function ChatView() {
   }, [])
 
   const sendMessage = useCallback(async (content: string) => {
-    // Ensure active session
-    let sessionId = activeSessionId
-    if (!sessionId) {
-      const s = createSession(selectedModel)
-      sessionId = s.id
+    // Read from store at call time — never rely on stale reactive closure
+    const storeState = useChatStore.getState()
+    let targetId = storeState.activeSessionId
+    if (!targetId) {
+      const s = storeState.createSession(selectedModel)
+      targetId = s.id
     }
 
-    addMessage(sessionId, { role: 'user', content })
-    if (messages.length === 0) {
-      updateSessionTitle(sessionId, content.length > 50 ? content.slice(0, 50) + '…' : content)
+    // Check message count directly from store (not reactive `messages` variable)
+    const isFirstInSession = (storeState.sessions.find(s => s.id === targetId)?.messages.length ?? 0) === 0
+
+    addMessage(targetId, { role: 'user', content })
+    if (isFirstInSession) {
+      updateSessionTitle(targetId, content.length > 50 ? content.slice(0, 50) + '…' : content)
     }
 
     // Create the streaming placeholder
-    const aiMsg = addMessage(sessionId, { role: 'assistant', content: '', model: selectedModel, streaming: true })
+    const aiMsg = addMessage(targetId, { role: 'assistant', content: '', model: selectedModel, streaming: true })
     setStreaming(true, aiMsg.id)
     abortRef.current = new AbortController()
 
@@ -104,7 +108,7 @@ export function ChatView() {
     ].filter(Boolean).join('\n\n')
 
     const allMessages = useChatStore.getState()
-      .sessions.find(s => s.id === sessionId)
+      .sessions.find(s => s.id === targetId)
       ?.messages.filter(m => m.id !== aiMsg.id) ?? []
 
     const startTime = Date.now()
@@ -183,7 +187,7 @@ export function ChatView() {
                 hasFirstChunk = true
                 setPendingDecision(null)
               }
-              appendToMessage(sessionId!, aiMsg.id, parsed.text)
+              appendToMessage(targetId, aiMsg.id, parsed.text)
             }
           } catch (parseErr) {
             if (parseErr instanceof Error && parseErr.message !== 'Unexpected end of JSON input') throw parseErr
@@ -212,14 +216,14 @@ export function ChatView() {
           const decision: RouterDecision = await routerRes.json()
           resolvedModel = decision.primary
           setPendingDecision(decision)
-          updateMessage(sessionId, aiMsg.id, { model: decision.primary as AIModel })
+          updateMessage(targetId, aiMsg.id, { model: decision.primary as AIModel })
         } catch {
           resolvedModel = 'ollama-pro'
         }
       }
 
       const routerDecision = await doStream(resolvedModel)
-      updateMessage(sessionId!, aiMsg.id, {
+      updateMessage(targetId, aiMsg.id, {
         streaming: false,
         routerDecision: routerDecision ?? undefined,
         model: (routerDecision?.primary ?? resolvedModel) as AIModel,
@@ -228,30 +232,28 @@ export function ChatView() {
     } catch (err) {
       setPendingDecision(null)
       if ((err as Error).name === 'AbortError') {
-        // user cancelled — leave partial content, just stop streaming
-        updateMessage(sessionId!, aiMsg.id, { streaming: false })
+        updateMessage(targetId, aiMsg.id, { streaming: false })
       } else if (isQuotaError(err as Error) && resolvedModel !== 'qwen2.5-coder') {
-        // Waterfall: quota exceeded → retry with local Ollama fallback
-        appendToMessage(sessionId!, aiMsg.id,
+        appendToMessage(targetId, aiMsg.id,
           `\n\n> ⚠️ **Quota exceeded for ${resolvedModel}.** Auto-routing to Qwen 2.5 Coder (local Ollama fallback)...\n\n`)
-        updateMessage(sessionId!, aiMsg.id, { model: 'qwen2.5-coder' as AIModel, streaming: true })
+        updateMessage(targetId, aiMsg.id, { model: 'qwen2.5-coder' as AIModel, streaming: true })
         setStreaming(true, aiMsg.id)
 
         try {
           await doStream('qwen2.5-coder')
-          updateMessage(sessionId!, aiMsg.id, {
+          updateMessage(targetId, aiMsg.id, {
             streaming: false,
             metadata: { latency: Date.now() - startTime },
           })
         } catch (fallbackErr) {
           if ((fallbackErr as Error).name !== 'AbortError') {
-            appendToMessage(sessionId!, aiMsg.id,
+            appendToMessage(targetId, aiMsg.id,
               `\n\n**Fallback error:** ${(fallbackErr as Error).message}`)
           }
-          updateMessage(sessionId!, aiMsg.id, { streaming: false })
+          updateMessage(targetId, aiMsg.id, { streaming: false })
         }
       } else {
-        updateMessage(sessionId!, aiMsg.id, {
+        updateMessage(targetId, aiMsg.id, {
           content: `**Error:** ${(err as Error).message}`,
           streaming: false,
         })
@@ -261,7 +263,7 @@ export function ChatView() {
       setPendingDecision(null)
     }
   }, [
-    activeSessionId, selectedModel, messages.length, settings.apiKeys,
+    selectedModel, settings.apiKeys, settings.ollamaEndpoint, settings.enableApiProviders,
     addMessage, appendToMessage, updateMessage, setStreaming,
     createSession, updateSessionTitle, getActiveProject,
   ])
@@ -278,7 +280,7 @@ export function ChatView() {
   }, [setStreaming, getActiveSession, updateMessage])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto relative" ref={scrollRef}>
         <div className="max-w-3xl mx-auto px-4">
@@ -338,7 +340,7 @@ export function ChatView() {
               </div>
             </motion.div>
           ) : (
-            <div className="py-6 space-y-1">
+            <div className="py-6 pb-32 md:pb-8 space-y-1">
               <AnimatePresence initial={false}>
                 {messages.map(msg => (
                   <div key={msg.id}>
@@ -372,7 +374,7 @@ export function ChatView() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => scrollToBottom()}
-              className="fixed bottom-28 right-72 z-10 w-8 h-8 rounded-full bg-zinc-900 border border-zinc-700 shadow-lg flex items-center justify-center text-zinc-400 hover:text-zinc-200 transition-all"
+              className="absolute bottom-6 right-4 z-10 w-8 h-8 rounded-full bg-zinc-900 border border-zinc-700 shadow-lg flex items-center justify-center text-zinc-400 hover:text-zinc-200 transition-all"
             >
               <ArrowDown className="w-4 h-4" />
             </motion.button>
@@ -380,8 +382,7 @@ export function ChatView() {
         </AnimatePresence>
       </div>
 
-      {/* Extra bottom padding on mobile so the fixed bottom nav doesn't cover the input */}
-      <div className="flex-shrink-0 mb-16 md:mb-0">
+      <div className="flex-shrink-0 pb-16 md:pb-0">
         <InputBar onSubmit={sendMessage} onStop={handleStop} isStreaming={isStreaming} />
       </div>
     </div>

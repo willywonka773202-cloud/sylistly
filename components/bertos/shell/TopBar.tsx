@@ -5,7 +5,7 @@ import { cn } from '@/lib/bertos/cn'
 import { useUIStore } from '@/store/bertos/ui'
 import { useChatStore } from '@/store/bertos/chat'
 import type { AIModel } from '@/lib/bertos/types'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 type ModelOption = { value: AIModel; label: string; description: string; icon: React.ReactNode; color: string }
@@ -42,6 +42,8 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
   const { selectedModel, setSelectedModel, activeView, rightPanelOpen, setRightPanelOpen, setCommandPaletteOpen, teamModeActive, setTeamModeActive } = useUIStore()
   const { isStreaming } = useChatStore()
   const [modelMenuOpen, setModelMenuOpen] = useState(false)
+  const [dropdownPos, setDropdownPos] = useState({ top: 56, right: 12 })
+  const modelBtnRef = useRef<HTMLButtonElement>(null)
   const [subscriptionModels, setSubscriptionModels] = useState<ModelOption[]>(BASE_SUBSCRIPTION_MODELS)
 
   useEffect(() => {
@@ -140,7 +142,14 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
       {/* Model selector */}
       <div className="relative">
         <button
-          onClick={() => setModelMenuOpen(!modelMenuOpen)}
+          ref={modelBtnRef}
+          onClick={() => {
+            if (!modelMenuOpen && modelBtnRef.current) {
+              const r = modelBtnRef.current.getBoundingClientRect()
+              setDropdownPos({ top: r.bottom + 6, right: window.innerWidth - r.right })
+            }
+            setModelMenuOpen(v => !v)
+          }}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-150 text-sm"
         >
           <span style={{ color: activeModel.color }}>{activeModel.icon}</span>
@@ -153,11 +162,12 @@ export function TopBar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
             <>
               <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
               <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                initial={{ opacity: 0, y: -6, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                exit={{ opacity: 0, y: -6, scale: 0.97 }}
                 transition={{ duration: 0.12 }}
-                className="absolute right-0 top-full mt-2 w-60 rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/60 overflow-hidden z-50"
+                style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
+                className="w-64 max-h-[min(480px,calc(100vh-80px))] overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/60 z-50"
               >
                 <div className="p-1.5 space-y-0.5">
                   <p className="px-2 py-1 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
