@@ -50,10 +50,10 @@ const ICONS = {
 };
 
 const STYLES = {
-  success: 'bg-emerald/20 border-emerald text-emerald',
-  error: 'bg-red-500/20 border-red-500 text-red-500',
-  info: 'bg-accent/20 border-accent text-accent',
-  loading: 'bg-surface-2 border-hairline text-muted',
+  success: 'bg-white border-hairline text-emerald shadow-card',
+  error: 'bg-white border-hairline text-accent shadow-card',
+  info: 'bg-ink border-ink text-cream shadow-card',
+  loading: 'bg-white border-hairline text-ink-soft shadow-card',
 };
 
 export function ToastContainer() {

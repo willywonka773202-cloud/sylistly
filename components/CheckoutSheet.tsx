@@ -27,10 +27,10 @@ function openUrls(urls: string[]) {
 }
 
 export function CheckoutSheet({ open, title = 'Checkout helper', products, onClose }: Props) {
-  if (!open) return null;
-
   const router = useRouter();
   const setCheckout = useCheckout((state) => state.setCheckout);
+  if (!open) return null;
+
   const validProducts = products.filter((product) => Boolean(product.url));
   const retailerGroups = buildRetailerGroups(validProducts);
   const totalCents = validProducts.reduce((sum, product) => sum + (product.priceCents || 0), 0);

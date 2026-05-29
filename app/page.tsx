@@ -1,400 +1,246 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Bookmark, ExternalLink, LoaderCircle, Sparkles, 
-  RefreshCw, ChevronDown, Plus, X, Share2
-} from 'lucide-react';
-import { Mannequin } from '@/components/Mannequin';
-import { SearchSheet } from '@/components/SearchSheet';
-import { BottomNav } from '@/components/BottomNav';
-import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
-import { useFit } from '@/store/fit';
-import { useProfile } from '@/store/profile';
-import { useSavedFits } from '@/store/saved-fits';
-import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
-import { hydrateItemsFromCatalog } from '@/lib/catalog';
-import { 
-  OCCASIONS,
-  type OccasionId, 
-  type GeneratorBudget, type GeneratorFrame,
-} from '@/lib/occasions';
-import { DripMeter } from '@/components/DripMeter';
-import { GenderSelector } from '@/components/GenderSelector';
+import { motion } from 'framer-motion';
+import { Search, Sparkles, CalendarDays, Shirt, Flame, Wand2, ArrowRight } from 'lucide-react';
+import { AppShell, AppHeader } from '@/components/AppShell';
+import { StoryRail } from '@/components/StoryRail';
+import { AIStylistCard } from '@/components/AIStylistCard';
+import { OutfitCard } from '@/components/OutfitCard';
+import { ClothingCard } from '@/components/ClothingCard';
+import { OutfitCollage } from '@/components/OutfitCollage';
+import { SectionHeader, Avatar, PremiumButton, Chip } from '@/components/Primitives';
+import { successToast } from '@/components/Toast';
+import { useMe } from '@/store/me';
+import { useStyleDNA } from '@/store/style-dna';
+import { useMyOutfits } from '@/store/outfits';
+import { useMyClosetItems, useCloset } from '@/store/closet';
+import { usePlanner } from '@/store/planner';
+import { publicOutfits, trendingPosts, getOutfit, getItem } from '@/lib/data';
+import { rankOutfits, dnaInsights, BASIC_ITEM_IDS } from '@/lib/recommend';
+import { STYLIST_ACTIONS } from '@/lib/stylist';
+import { occasionLabel, aestheticLabel } from '@/lib/style';
+import { useMounted } from '@/lib/use-mounted';
 
-const BUDGETS: { value: GeneratorBudget; label: string; max: number }[] = [
-  { value: 'any', label: 'Any', max: 0 },
-  { value: 'under100', label: '$100', max: 100 },
-  { value: 'under250', label: '$250', max: 250 },
-  { value: 'under500', label: '$500', max: 500 },
+const SHORTCUTS = [
+  { label: 'Planner', icon: CalendarDays, href: '/planner' },
+  { label: 'Dressing Room', icon: Shirt, href: '/dressing-room' },
+  { label: 'AI Stylist', icon: Wand2, href: '/stylist' },
+  { label: 'Swipe', icon: Flame, href: '/swipe' },
 ];
 
-function BuilderPageContent({
-  quickOccasion,
-}: {
-  quickOccasion: string | null;
-}) {
-  const { items, totalCents, count, clear, replaceItems } = useFit();
-  const skinTone = useProfile((state) => state.profile.skinTone);
-  const bodyType = useProfile((state) => state.profile.bodyType);
-  const saveLocalFit = useSavedFits((state) => state.saveFit);
-  const [searchFor, setSearchFor] = useState<Category | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
-  const [selectedOccasion, setSelectedOccasion] = useState<OccasionId>('night');
-  const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
-  const [generatorLoading, setGeneratorLoading] = useState(false);
-  const [showOccasionPicker, setShowOccasionPicker] = useState(false);
+export default function HomePage() {
   const router = useRouter();
+  const mounted = useMounted();
+  const name = useMe((s) => s.name);
+  const onboarded = useMe((s) => s.onboarded);
+  const dna = useStyleDNA((s) => s.dna);
+  const myOutfits = useMyOutfits();
+  const myItems = useMyClosetItems();
+  const addItem = useCloset((s) => s.addItem);
+  const schedule = usePlanner((s) => s.schedule);
 
-  const total = totalCents();
-  const n = count();
-  const activeOccasion = OCCASIONS.find((o) => o.id === selectedOccasion) || OCCASIONS[0];
-  const generatorFrame: GeneratorFrame = bodyType === 'custom' ? 'androgynous' : bodyType;
-
-  useEffect(() => {
-    if (!statusMessage) return;
-    const timeout = window.setTimeout(() => setStatusMessage(null), 3500);
-    return () => window.clearTimeout(timeout);
-  }, [statusMessage]);
-
-  useEffect(() => {
-    const hydrated = hydrateItemsFromCatalog(items);
-    const changed = Object.entries(hydrated).some(([slot, product]) => product !== items[slot as Category]);
-    if (changed) replaceItems(hydrated);
-  }, [items, replaceItems]);
+  const insights = dnaInsights(dna);
+  const todaysPick = useMemo(() => rankOutfits(publicOutfits(), dna)[0], [dna]);
+  const trending = useMemo(() => trendingPosts(10), []);
+  const basics = useMemo(() => BASIC_ITEM_IDS.map((id) => getItem(id)).filter(Boolean), []);
 
   useEffect(() => {
-    if (!quickOccasion) return;
-    if (OCCASIONS.some((o) => o.id === quickOccasion)) {
-      setSelectedOccasion(quickOccasion as OccasionId);
-    }
-  }, [quickOccasion]);
+    if (mounted && !onboarded) router.replace('/onboarding');
+  }, [mounted, onboarded, router]);
 
-  async function runCategorySearch(category: Category, query: string): Promise<Product | null> {
-    const response = await fetch('/api/search', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ query, category }),
+  function addBasic(id: string) {
+    const item = getItem(id);
+    if (!item) return;
+    addItem({
+      name: item.name,
+      brand: item.brand,
+      category: item.category,
+      shape: item.shape,
+      color: item.color,
+      colorName: item.colorName,
+      tags: item.tags,
+      formality: item.formality,
+      season: item.season,
+      warmth: item.warmth,
+      priceCents: item.priceCents,
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Search failed.');
-    const [firstProduct] = Array.isArray(data.products) ? data.products : [];
-    return firstProduct || null;
+    successToast(`Added ${item.name} to your closet`);
   }
 
-  async function generateLook() {
-    if (generatorLoading) return;
-    const targetSlots = activeOccasion.slots;
-    if (!targetSlots.length) return;
-
-    setGeneratorLoading(true);
-    setStatusMessage(null);
-
-    try {
-      const nextItems = { ...items };
-      let addedCount = 0;
-
-      const lookResponse = await fetch('/api/look', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          vibe: selectedOccasion,
-          frame: generatorFrame,
-          budget: generatorBudget,
-          mode: 'starter',
-          currentItems: items,
-        }),
-      });
-      const lookData = await lookResponse.json();
-
-      if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
-        for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
-          if (!product) continue;
-          nextItems[slot] = product;
-          addedCount += 1;
-        }
-      }
-
-      if (addedCount === 0) {
-        setStatusMessage('No pieces generated. Try another occasion.');
-        return;
-      }
-
-      replaceItems(nextItems);
-      setStatusMessage(`Generated ${addedCount} pieces for ${activeOccasion.label.toLowerCase()}`);
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Error generating');
-    } finally {
-      setGeneratorLoading(false);
-    }
-  }
-
-  async function saveFit() {
-    if (!n) return;
-    const localFit = saveLocalFit(items);
-    const ids = Object.fromEntries(
-      Object.entries(items).map(([k, v]) => [k, v?.id]).filter(([, id]) => id),
-    );
-    try {
-      const res = await fetch('/api/fit', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ items: ids }),
-      });
-      const d = await res.json();
-      if (!res.ok) {
-        setStatusMessage(localFit ? `Saved locally` : 'Save unavailable');
-        return;
-      }
-      if (d.id) {
-        setStatusMessage(localFit ? `Saved locally & synced` : 'Fit saved');
-      }
-    } catch {
-      setStatusMessage(localFit ? 'Saved locally' : 'Save failed');
-    }
-  }
-
-  async function shopAll() {
-    if (!n) return;
-    const selectedProducts = Object.values(items).filter((product): product is Product => Boolean(product));
-    const links = selectedProducts
-      .map((product) => ({
-        id: product.id,
-        brand: product.brand,
-        name: product.name,
-        retailer: product.retailer,
-        url: product.affiliateUrl || product.retailerUrl,
-        priceCents: product.priceCents,
-      }))
-      .filter((product) => Boolean(product.url));
-
-    if (!links.length) {
-      setStatusMessage('Add pieces first');
-      return;
-    }
-    setCheckoutProducts(links);
-  }
-
-  function handleSlotClick(slot: Category) {
-    setSearchFor(slot);
-  }
-
-  function handleRemoveSlot(slot: Category) {
-    replaceItems({ ...items, [slot]: undefined });
+  if (mounted && !onboarded) {
+    return <div className="mx-auto w-full max-w-[440px] min-h-[100dvh] bg-bg" />;
   }
 
   return (
-    <main className="flex flex-col h-[100dvh] max-w-[440px] mx-auto bg-bg overflow-hidden">
-      <header className="flex items-center justify-between px-4 py-3 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-serif font-bold text-lg">sylistly</span>
-        </div>
-        <div className="flex items-center gap-3">
-          {n > 0 && (
-            <span className="font-serif text-lg text-emerald">${(total / 100).toFixed(0)}</span>
-          )}
-          <button
-            onClick={saveFit}
-            disabled={n === 0}
-            className={`p-2 rounded-full border ${n > 0 ? 'border-accent text-accent' : 'border-hairline text-muted'}`}
-          >
-            <Bookmark size={16} />
-          </button>
-        </div>
-      </header>
-
-      <div className="flex-1 overflow-y-auto px-4 pb-32">
-        <AnimatePresence mode="wait">
-          {n === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="py-8"
-            >
-              <div className="rounded-2xl bg-surface-2 border border-hairline p-6 text-center">
-                <Sparkles className="w-10 h-10 text-accent mx-auto mb-3" />
-                <div className="font-serif text-xl font-semibold">
-                  Build Your <span className="text-accent italic">Vibe</span>
-                </div>
-                <p className="text-sm text-muted mt-2">Select occasion & generate</p>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="filled"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="py-4"
-            >
-              <div className="flex gap-4 items-start">
-                <Mannequin items={items} skinTone={skinTone} bodyType={generatorFrame} />
-                <div className="flex-1 space-y-1.5">
-                  {CATEGORY_ORDER.map((cat) => {
-                    const product = items[cat];
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => handleSlotClick(cat)}
-                        className={`w-full h-9 rounded-lg border flex items-center justify-between px-2 transition-colors ${
-                          product 
-                            ? 'bg-black/40 border-accent/30 hover:border-accent/60' 
-                            : 'bg-surface-2 border-hairline hover:border-hairline-2'
-                        }`}
-                      >
-                        {product ? (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={product.imageUrl}
-                                alt=""
-                                className="w-6 h-6 object-contain"
-                              />
-                              <span className="text-[10px] text-muted uppercase tracking-wide">{cat}</span>
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleRemoveSlot(cat); }}
-                              className="w-5 h-5 rounded-full bg-surface-3 text-[10px] flex items-center justify-center hover:bg-accent hover:text-white"
-                            >
-                              <X size={10} />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-[10px] text-muted/60 capitalize">+ {cat}</span>
-                            <Plus className="w-3 h-3 text-muted/40" />
-                          </>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <DripMeter items={items} />
-
-        <div className="space-y-3 mt-4">
-          <button
-            onClick={() => setShowOccasionPicker(!showOccasionPicker)}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-hairline"
-          >
-            <div className="flex items-center gap-2">
-              <activeOccasion.icon className="w-5 h-5 text-accent" />
-              <span className="font-semibold">{activeOccasion.label}</span>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-muted transition ${showOccasionPicker ? 'rotate-180' : ''}`} />
-          </button>
-
-          <AnimatePresence>
-            {showOccasionPicker && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="grid grid-cols-4 gap-2"
-              >
-                {OCCASIONS.map((occasion) => (
-                  <button
-                    key={occasion.id}
-                    onClick={() => { setSelectedOccasion(occasion.id); setShowOccasionPicker(false); }}
-                    className={`p-2 rounded-xl border text-center ${
-                      selectedOccasion === occasion.id
-                        ? 'bg-accent border-accent text-white'
-                        : 'bg-surface-2 border-hairline text-muted'
-                    }`}
-                  >
-                    <occasion.icon className="w-5 h-5 mx-auto" />
-                    <span className="text-[10px] block mt-1">{occasion.label}</span>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex gap-2">
-            <button
-              onClick={generateLook}
-              disabled={generatorLoading}
-              className="flex-1 py-3 rounded-xl bg-accent text-white font-semibold text-sm flex items-center justify-center gap-2"
-            >
-              {generatorLoading ? <LoaderCircle size={16} className="animate-spin" /> : <Sparkles size={16} />}
-              Generate
-            </button>
-            <button
-              onClick={clear}
-              disabled={n === 0}
-              className="px-4 py-3 rounded-xl bg-surface-2 border border-hairline text-muted"
-            >
-              <RefreshCw size={16} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-4 gap-2">
-            {BUDGETS.map((budget) => (
-              <button
-                key={budget.value}
-                onClick={() => setGeneratorBudget(budget.value)}
-                className={`py-2 rounded-lg text-xs font-medium ${
-                  generatorBudget === budget.value
-                    ? 'bg-white text-black'
-                    : 'bg-surface-2 text-muted border border-hairline'
-                }`}
-              >
-                {budget.label}
+    <AppShell
+      header={
+        <AppHeader
+          brand
+          right={
+            <>
+              <button onClick={() => router.push('/community')} className="grid place-items-center w-10 h-10 rounded-full bg-surface-1 border border-hairline text-ink btn-press" aria-label="Search">
+                <Search size={18} />
               </button>
-            ))}
-          </div>
-
-          <GenderSelector />
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-hairline">
-          <div className="text-[10px] uppercase tracking-widest text-muted mb-3">Quick add</div>
-          <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-            {CATEGORY_ORDER.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleSlotClick(cat)}
-                className="shrink-0 w-20 h-20 rounded-xl border border-hairline flex flex-col items-center justify-center gap-1 bg-surface-2 hover:border-accent/50 transition-colors"
-              >
-                <span className="text-lg text-accent">+</span>
-                <span className="text-[10px] text-muted capitalize">{cat}</span>
+              <button onClick={() => router.push('/profile')} aria-label="Profile" className="btn-press">
+                <Avatar name={name} color="#c2554e" size={40} />
               </button>
-            ))}
-          </div>
-        </div>
-      </div>
+            </>
+          }
+        />
+      }
+    >
+      {/* greeting + DNA nudge */}
+      <section className="px-5 pt-3">
+        <p className="text-sm text-muted">{greeting()}, {name.split(' ')[0]}.</p>
+        <h2 className="font-display text-2xl text-ink mt-0.5">Let’s build something good.</h2>
 
-      <div className="absolute bottom-[68px] left-0 right-0 p-4 bg-gradient-to-t from-bg via-bg to-transparent">
-        {statusMessage && (
-          <div className="mb-2 text-center text-xs text-muted">{statusMessage}</div>
-        )}
         <button
-          onClick={shopAll}
-          disabled={n === 0}
-          className="w-full py-3.5 rounded-xl bg-emerald text-bg font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+          onClick={() => router.push('/swipe')}
+          className="w-full mt-3 rounded-3xl bg-ink text-cream p-4 text-left flex items-center gap-3 btn-press"
         >
-          Shop full look ({n}) <ExternalLink size={16} />
+          <div className="grid place-items-center w-11 h-11 rounded-2xl bg-cream/15">
+            <Sparkles size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">
+              {mounted && insights.swipes > 0 ? insights.messages[0] : 'Discover your Style DNA'}
+            </div>
+            <div className="h-1.5 mt-2 rounded-full bg-cream/20 overflow-hidden">
+              <div className="h-full bg-cream rounded-full" style={{ width: `${Math.max(8, (mounted ? insights.progress : 0) * 100)}%` }} />
+            </div>
+          </div>
+          <ArrowRight size={18} className="opacity-80" />
         </button>
-      </div>
+      </section>
 
-      <BottomNav />
-      <SearchSheet open={!!searchFor} category={searchFor} onClose={() => setSearchFor(null)} />
-      <CheckoutSheet open={Boolean(checkoutProducts)} title="Your fit" products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
-    </main>
+      {/* stories */}
+      <section className="mt-5">
+        <StoryRail />
+      </section>
+
+      {/* AI stylist hero cards */}
+      <section className="px-5 mt-6">
+        <SectionHeader title="AI Stylist" kicker="Ask me anything" action="Open" onAction={() => router.push('/stylist')} />
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {STYLIST_ACTIONS.slice(0, 4).map((a) => (
+            <AIStylistCard
+              key={a.id}
+              title={a.title}
+              subtitle={a.subtitle}
+              tone={a.tone}
+              icon={<a.icon size={20} />}
+              onClick={() => router.push(`/stylist?action=${a.id}`)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* shortcuts */}
+      <section className="px-5 mt-6">
+        <div className="grid grid-cols-4 gap-2.5">
+          {SHORTCUTS.map((s) => (
+            <button
+              key={s.label}
+              onClick={() => router.push(s.href)}
+              className="flex flex-col items-center gap-2 py-3.5 rounded-2xl bg-surface-1 border border-hairline btn-press"
+            >
+              <s.icon size={22} className="text-ink" strokeWidth={1.8} />
+              <span className="text-[11px] font-medium text-ink-soft text-center leading-tight">{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* today's pick */}
+      {todaysPick && (
+        <section className="px-5 mt-7">
+          <SectionHeader title="Today’s pick" kicker="Styled for you" />
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="relative rounded-3xl overflow-hidden border border-hairline">
+            <OutfitCollage outfit={todaysPick} className="w-full aspect-[5/6]" rounded="rounded-none" />
+            <div className="absolute inset-x-0 bottom-0 pt-20 pb-4 px-4 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent">
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {todaysPick.occasion && (
+                  <span className="px-2.5 h-7 inline-flex items-center rounded-full bg-white/18 backdrop-blur text-[11px] font-medium text-white">{occasionLabel(todaysPick.occasion)}</span>
+                )}
+                {todaysPick.aesthetics.slice(0, 2).map((a) => (
+                  <span key={a} className="px-2.5 h-7 inline-flex items-center rounded-full bg-white/18 backdrop-blur text-[11px] font-medium text-white">{aestheticLabel(a)}</span>
+                ))}
+              </div>
+              <div className="font-display text-xl text-white">{todaysPick.title}</div>
+              <div className="flex gap-2 mt-3">
+                <PremiumButton variant="secondary" size="sm" className="flex-1" onClick={() => router.push(`/create?remix=${todaysPick.id}`)} icon={<Wand2 size={15} />}>
+                  Remix
+                </PremiumButton>
+                <PremiumButton
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    schedule(new Date().toISOString().slice(0, 10), todaysPick.id, todaysPick.occasion);
+                    successToast('Added to today’s planner');
+                  }}
+                >
+                  Wear today
+                </PremiumButton>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+      )}
+
+      {/* recent outfits */}
+      <section className="px-5 mt-7">
+        <SectionHeader title="Your recent looks" action="All" onAction={() => router.push('/profile')} />
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {myOutfits.slice(0, 8).map((o) => (
+            <OutfitCard key={o.id} outfit={o} className="w-[150px] shrink-0" onClick={() => router.push(`/create?edit=${o.id}`)} />
+          ))}
+        </div>
+      </section>
+
+      {/* recently added items */}
+      <section className="px-5 mt-7">
+        <SectionHeader title="Recently added" action="Closet" onAction={() => router.push('/profile')} />
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {myItems.slice(0, 10).map((i) => (
+            <ClothingCard key={i.id} item={i} className="w-[124px] shrink-0" />
+          ))}
+        </div>
+      </section>
+
+      {/* basics */}
+      <section className="px-5 mt-7">
+        <SectionHeader title="Wardrobe basics" kicker="Tap to add" />
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {basics.map((i) => (
+            <ClothingCard key={i!.id} item={i!} className="w-[124px] shrink-0" onClick={() => addBasic(i!.id)} />
+          ))}
+        </div>
+      </section>
+
+      {/* trending */}
+      <section className="px-5 mt-7">
+        <SectionHeader title="Trending now" kicker="From the community" action="Explore" onAction={() => router.push('/community')} />
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {trending.map((p) => {
+            const o = getOutfit(p.outfitId);
+            if (!o) return null;
+            return (
+              <OutfitCard key={p.id} outfit={o} showCreator showLikes className="w-[160px] shrink-0" onClick={() => router.push(`/community/${p.id}`)} />
+            );
+          })}
+        </div>
+        <div className="mt-3 flex items-center gap-1.5 text-2xs text-muted">
+          <Chip>Pinterest × Polyvore × your closet</Chip>
+        </div>
+      </section>
+    </AppShell>
   );
 }
 
-export const dynamic = 'force-dynamic';
-
-export default function HomePage() {
-  return <BuilderPageContent quickOccasion={null} />;
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
 }
