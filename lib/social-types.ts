@@ -57,9 +57,11 @@ export interface ClosetItem {
   category: Category;
   subcategory: string;
   shape: GarmentShape;
-  color: string; // primary hex
+  color: string; // primary hex (drives the SVG fallback art)
   colorName: string;
   secondaryColor?: string;
+  imageUrl?: string; // real product photo when available; falls back to garment art
+  retailerUrl?: string;
   tags: AestheticId[];
   formality: Formality;
   season: Season;

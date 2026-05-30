@@ -33,9 +33,9 @@ export function FloatingTabBar() {
                   whileTap={{ scale: 0.9 }}
                   onClick={() => router.push(href)}
                   aria-label={label}
-                  className="grid place-items-center w-[52px] h-[52px] rounded-full bg-ink text-cream shadow-float -mt-1"
+                  className="grid place-items-center w-[52px] h-[52px] rounded-full brand-gradient text-white glow-pink -mt-1"
                 >
-                  <Icon size={24} strokeWidth={2.2} />
+                  <Icon size={24} strokeWidth={2.4} />
                 </motion.button>
               );
             }

@@ -1,0 +1,207 @@
+[
+  {
+    "id": "night-femme",
+    "slotRecipes": {
+      "top": { "keywords": ["black", "silk", "satin", "cami", "fitted", "going out", "tank"], "colors": ["black"], "avoidKeywords": ["hoodie", "graphic", "gym", "tee"] },
+      "bottom": { "keywords": ["black", "tailored", "trouser", "wide leg", "pant"], "colors": ["black"], "avoidKeywords": ["cargo", "sweatpants", "leggings", "shorts"] },
+      "shoes": { "keywords": ["black", "heel", "strappy", "ankle boot", "pump"], "colors": ["black"], "avoidKeywords": ["sneaker", "running", "uggs", "sandal"] },
+      "bag": { "keywords": ["black", "mini", "shoulder", "clutch", "evening"], "colors": ["black"], "avoidKeywords": ["backpack", "duffel", "straw"] },
+      "jewelry": { "keywords": ["gold", "necklace", "hoop", "earrings", "chain"], "colors": ["gold"], "avoidKeywords": ["sport", "watch"] },
+      "eyewear": { "keywords": ["black", "sunglasses", "cat eye", "oval"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "street-masc",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "technical", "jacket", "bomber", "parka", "puffer"], "colors": ["black"], "avoidKeywords": ["blazer", "trench", "cream"] },
+      "top": { "keywords": ["black", "hoodie", "sweatshirt", "tee"], "colors": ["black", "charcoal"], "avoidKeywords": ["polo", "button down"] },
+      "bottom": { "keywords": ["black", "cargo", "baggy", "utility", "pant"], "colors": ["black", "charcoal"], "avoidKeywords": ["trouser", "shorts", "linen"] },
+      "shoes": { "keywords": ["black", "white", "sneaker", "dunk", "jordan"], "colors": ["black", "white"], "avoidKeywords": ["loafer", "heel", "boot"] },
+      "bag": { "keywords": ["black", "crossbody", "sling", "belt bag"], "colors": ["black"], "avoidKeywords": ["tote", "straw"] },
+      "hat": { "keywords": ["black", "beanie", "cap"], "colors": ["black"], "avoidKeywords": ["straw"] },
+      "eyewear": { "keywords": ["black", "sunglasses", "shield"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "clean-all",
+    "slotRecipes": {
+      "outer": { "keywords": ["cream", "cardigan", "beige", "neutral", "zip"], "colors": ["cream", "beige"], "avoidKeywords": ["leather", "black", "graphic"] },
+      "top": { "keywords": ["white", "cream", "tee", "tank", "minimal"], "colors": ["white", "cream"], "avoidKeywords": ["graphic", "black"] },
+      "bottom": { "keywords": ["beige", "taupe", "jogger", "trouser", "sweatpant"], "colors": ["beige", "taupe", "cream"], "avoidKeywords": ["black", "cargo", "skirt"] },
+      "shoes": { "keywords": ["white", "sneaker", "minimal"], "colors": ["white"], "avoidKeywords": ["boot", "heel"] },
+      "bag": { "keywords": ["cream", "canvas", "tote", "travel"], "colors": ["cream", "white", "beige"], "avoidKeywords": ["mini", "evening"] },
+      "eyewear": { "keywords": ["black", "sunglasses", "oval", "wayfarer"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "office-femme",
+    "slotRecipes": {
+      "outer": { "keywords": ["cream", "blazer", "tailored", "coat"], "colors": ["cream", "ivory", "beige"], "avoidKeywords": ["hoodie", "puffer"] },
+      "top": { "keywords": ["cream", "white", "knit", "sweater", "top"], "colors": ["cream", "white"], "avoidKeywords": ["graphic", "sports bra"] },
+      "bottom": { "keywords": ["cream", "tailored", "trouser", "wide leg"], "colors": ["cream", "beige"], "avoidKeywords": ["jeans", "cargo", "legging"] },
+      "shoes": { "keywords": ["cream", "pump", "loafer", "flat", "heel"], "colors": ["cream", "black"], "avoidKeywords": ["running", "boot"] },
+      "bag": { "keywords": ["cream", "structured", "work", "tote", "top handle"], "colors": ["cream", "ivory", "black"], "avoidKeywords": ["duffel", "backpack"] },
+      "jewelry": { "keywords": ["gold", "necklace", "hoop", "bracelet"], "colors": ["gold"], "avoidKeywords": ["silver chain"] },
+      "eyewear": { "keywords": ["black", "sunglasses"], "colors": ["black"], "avoidKeywords": ["sport"] }
+    }
+  },
+  {
+    "id": "vacation-femme",
+    "slotRecipes": {
+      "outer": { "keywords": ["white", "linen", "shirt", "overshirt"], "colors": ["white", "cream"], "avoidKeywords": ["puffer", "leather"] },
+      "top": { "keywords": ["white", "tank", "linen", "bikini", "resort"], "colors": ["white", "cream"], "avoidKeywords": ["hoodie", "black"] },
+      "bottom": { "keywords": ["white", "linen", "short", "pant", "drawstring"], "colors": ["white", "cream"], "avoidKeywords": ["jeans", "wool"] },
+      "shoes": { "keywords": ["brown", "sandal", "slide", "leather"], "colors": ["brown", "tan"], "avoidKeywords": ["boot", "sneaker"] },
+      "bag": { "keywords": ["straw", "raffia", "tote", "woven"], "colors": ["tan", "natural"], "avoidKeywords": ["black leather"] },
+      "eyewear": { "keywords": ["brown", "tortoise", "sunglasses"], "colors": ["brown", "tortoise"], "avoidKeywords": ["clear"] },
+      "jewelry": { "keywords": ["gold", "hoop", "necklace"], "colors": ["gold"], "avoidKeywords": ["silver"] }
+    }
+  },
+  {
+    "id": "preppy-masc",
+    "slotRecipes": {
+      "top": { "keywords": ["cream", "polo", "sweater", "knit"], "colors": ["cream", "ivory"], "avoidKeywords": ["hoodie", "graphic"] },
+      "bottom": { "keywords": ["cream", "chino", "trouser", "pleated"], "colors": ["cream", "beige"], "avoidKeywords": ["cargo", "sweatpant"] },
+      "shoes": { "keywords": ["brown", "loafer", "suede"], "colors": ["brown", "tan"], "avoidKeywords": ["running", "heel"] },
+      "bag": { "keywords": ["brown", "leather", "duffel", "weekender"], "colors": ["brown"], "avoidKeywords": ["backpack"] },
+      "eyewear": { "keywords": ["tortoise", "sunglasses"], "colors": ["brown"], "avoidKeywords": ["shield"] },
+      "jewelry": { "keywords": ["watch", "leather", "gold"], "colors": ["gold", "brown"], "avoidKeywords": ["hoop"] }
+    }
+  },
+  {
+    "id": "clean-femme-soft",
+    "slotRecipes": {
+      "outer": { "keywords": ["cream", "cardigan", "soft", "knit"], "colors": ["cream", "beige"], "avoidKeywords": ["black", "leather"] },
+      "top": { "keywords": ["white", "tee", "tank", "fitted"], "colors": ["white"], "avoidKeywords": ["graphic"] },
+      "bottom": { "keywords": ["beige", "taupe", "trouser", "sweatpant", "straight"], "colors": ["beige", "taupe"], "avoidKeywords": ["cargo", "black"] },
+      "shoes": { "keywords": ["white", "sneaker", "minimal"], "colors": ["white"], "avoidKeywords": ["boot", "heel"] },
+      "bag": { "keywords": ["cream", "canvas", "tote"], "colors": ["cream", "white"], "avoidKeywords": ["clutch"] },
+      "eyewear": { "keywords": ["black", "sunglasses"], "colors": ["black"], "avoidKeywords": ["sport"] }
+    }
+  },
+  {
+    "id": "clean-masc-smart",
+    "slotRecipes": {
+      "outer": { "keywords": ["cream", "coat", "blazer", "tailored"], "colors": ["cream", "ivory"], "avoidKeywords": ["hoodie"] },
+      "top": { "keywords": ["cream", "knit", "sweater"], "colors": ["cream"], "avoidKeywords": ["graphic"] },
+      "bottom": { "keywords": ["cream", "trouser", "tailored"], "colors": ["cream"], "avoidKeywords": ["cargo", "sweatpants"] },
+      "shoes": { "keywords": ["cream", "pump", "loafer", "flat"], "colors": ["cream", "black"], "avoidKeywords": ["running"] },
+      "bag": { "keywords": ["cream", "structured", "top handle"], "colors": ["cream"], "avoidKeywords": ["backpack"] },
+      "jewelry": { "keywords": ["gold", "necklace", "earrings"], "colors": ["gold"], "avoidKeywords": ["sport"] },
+      "eyewear": { "keywords": ["black", "sunglasses"], "colors": ["black"], "avoidKeywords": ["sport"] }
+    }
+  },
+  {
+    "id": "date-femme-afterdark",
+    "slotRecipes": {
+      "top": { "keywords": ["black", "drape", "cowl", "fitted", "date"], "colors": ["black"], "avoidKeywords": ["hoodie", "tee"] },
+      "bottom": { "keywords": ["black", "tailored", "trouser", "wide leg"], "colors": ["black"], "avoidKeywords": ["cargo", "legging"] },
+      "shoes": { "keywords": ["black", "heel", "ankle boot"], "colors": ["black"], "avoidKeywords": ["sneaker", "uggs"] },
+      "bag": { "keywords": ["black", "shoulder", "mini"], "colors": ["black"], "avoidKeywords": ["backpack"] },
+      "jewelry": { "keywords": ["gold", "necklace", "hoop", "bracelet"], "colors": ["gold"], "avoidKeywords": ["sport"] }
+    }
+  },
+  {
+    "id": "date-masc-polished",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "leather", "jacket"], "colors": ["black"], "avoidKeywords": ["puffer", "hoodie"] },
+      "top": { "keywords": ["black", "knit", "polo", "shirt"], "colors": ["black"], "avoidKeywords": ["graphic"] },
+      "bottom": { "keywords": ["black", "tailored", "trouser"], "colors": ["black"], "avoidKeywords": ["cargo", "sweatpant"] },
+      "shoes": { "keywords": ["black", "chelsea", "boot", "loafer"], "colors": ["black"], "avoidKeywords": ["running", "sandal"] },
+      "bag": { "keywords": ["black", "leather", "crossbody", "clutch"], "colors": ["black"], "avoidKeywords": ["backpack"] },
+      "jewelry": { "keywords": ["silver", "chain", "watch"], "colors": ["silver"], "avoidKeywords": ["pearl"] },
+      "eyewear": { "keywords": ["black", "sunglasses"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "edgy-femme-night",
+    "slotRecipes": {
+      "outer": { "keywords": ["burgundy", "black", "leather", "moto", "jacket"], "colors": ["black", "burgundy"], "avoidKeywords": ["blazer", "puffer"] },
+      "top": { "keywords": ["black", "mesh", "corset", "baby tee", "fitted"], "colors": ["black"], "avoidKeywords": ["hoodie"] },
+      "bottom": { "keywords": ["black", "mini", "skirt", "denim"], "colors": ["black"], "avoidKeywords": ["trouser", "sweatpant"] },
+      "shoes": { "keywords": ["black", "platform", "boot", "combat"], "colors": ["black"], "avoidKeywords": ["sneaker", "loafer"] },
+      "bag": { "keywords": ["black", "burgundy", "shoulder", "buckle"], "colors": ["black", "burgundy"], "avoidKeywords": ["tote"] },
+      "jewelry": { "keywords": ["silver", "chain", "ring", "hoop"], "colors": ["silver"], "avoidKeywords": ["pearl"] },
+      "eyewear": { "keywords": ["black", "sunglasses", "oval"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "edgy-masc-core",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "shell", "technical", "utility", "jacket"], "colors": ["black"], "avoidKeywords": ["blazer", "linen"] },
+      "top": { "keywords": ["black", "technical", "base layer", "tee"], "colors": ["black"], "avoidKeywords": ["polo"] },
+      "bottom": { "keywords": ["black", "cargo", "utility", "pant"], "colors": ["black"], "avoidKeywords": ["trouser", "shorts"] },
+      "shoes": { "keywords": ["black", "technical", "sneaker"], "colors": ["black"], "avoidKeywords": ["loafer", "sandal"] },
+      "bag": { "keywords": ["black", "crossbody", "sling", "utility"], "colors": ["black"], "avoidKeywords": ["tote"] },
+      "hat": { "keywords": ["black", "beanie"], "colors": ["black"], "avoidKeywords": ["straw"] },
+      "eyewear": { "keywords": ["black", "shield", "sunglasses"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "office-masc-refined",
+    "slotRecipes": {
+      "outer": { "keywords": ["olive", "puffer", "parka", "coat"], "colors": ["olive", "green"], "avoidKeywords": ["leather"] },
+      "top": { "keywords": ["cream", "quarter zip", "sweater", "knit"], "colors": ["cream"], "avoidKeywords": ["graphic"] },
+      "bottom": { "keywords": ["cream", "jean", "straight", "trouser"], "colors": ["cream", "white"], "avoidKeywords": ["cargo", "shorts"] },
+      "shoes": { "keywords": ["brown", "boot", "lace up"], "colors": ["brown"], "avoidKeywords": ["sandal", "heel"] },
+      "bag": { "keywords": ["brown", "duffel", "leather", "weekender"], "colors": ["brown"], "avoidKeywords": ["mini"] },
+      "hat": { "keywords": ["olive", "beanie"], "colors": ["olive", "green"], "avoidKeywords": ["cap"] }
+    }
+  },
+  {
+    "id": "vacation-masc-resort",
+    "slotRecipes": {
+      "top": { "keywords": ["cream", "linen", "shirt"], "colors": ["cream", "white"], "avoidKeywords": ["hoodie"] },
+      "bottom": { "keywords": ["cream", "linen", "trouser"], "colors": ["cream", "white"], "avoidKeywords": ["cargo", "jeans"] },
+      "shoes": { "keywords": ["brown", "loafer", "sandal"], "colors": ["brown", "tan"], "avoidKeywords": ["boot"] },
+      "bag": { "keywords": ["straw", "woven", "tote"], "colors": ["tan", "natural"], "avoidKeywords": ["black"] },
+      "eyewear": { "keywords": ["brown", "tortoise", "sunglasses"], "colors": ["brown"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "gym-femme-studio",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "zip", "hoodie", "performance"], "colors": ["black"], "avoidKeywords": ["blazer", "leather"] },
+      "top": { "keywords": ["black", "sports bra", "tank", "training"], "colors": ["black"], "avoidKeywords": ["satin", "silk"] },
+      "bottom": { "keywords": ["black", "jogger", "legging", "training"], "colors": ["black"], "avoidKeywords": ["trouser", "jeans"] },
+      "shoes": { "keywords": ["white", "running", "training", "sneaker"], "colors": ["white"], "avoidKeywords": ["heel", "loafer"] },
+      "bag": { "keywords": ["black", "tote", "duffel", "gym"], "colors": ["black"], "avoidKeywords": ["mini"] },
+      "hat": { "keywords": ["black", "cap"], "colors": ["black"], "avoidKeywords": ["straw"] }
+    }
+  },
+  {
+    "id": "gym-masc-training",
+    "slotRecipes": {
+      "top": { "keywords": ["black", "hoodie", "sweatshirt", "graphic"], "colors": ["black"], "avoidKeywords": ["shirt"] },
+      "bottom": { "keywords": ["black", "cargo", "jean", "baggy"], "colors": ["black"], "avoidKeywords": ["trouser"] },
+      "shoes": { "keywords": ["black", "white", "sneaker", "dunk"], "colors": ["black", "white"], "avoidKeywords": ["loafer"] },
+      "bag": { "keywords": ["black", "crossbody", "sling"], "colors": ["black"], "avoidKeywords": ["tote"] },
+      "hat": { "keywords": ["black", "beanie"], "colors": ["black"], "avoidKeywords": ["straw"] },
+      "jewelry": { "keywords": ["silver", "chain"], "colors": ["silver"], "avoidKeywords": ["gold hoop"] }
+    }
+  },
+  {
+    "id": "cozy-femme-weekend",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "cardigan", "blazer", "coat"], "colors": ["black"], "avoidKeywords": ["puffer"] },
+      "top": { "keywords": ["black", "square neck", "fitted", "top"], "colors": ["black"], "avoidKeywords": ["hoodie"] },
+      "bottom": { "keywords": ["black", "wide leg", "trouser"], "colors": ["black"], "avoidKeywords": ["cargo"] },
+      "shoes": { "keywords": ["black", "ankle boot", "heel"], "colors": ["black"], "avoidKeywords": ["sneaker"] },
+      "bag": { "keywords": ["black", "shoulder", "mini"], "colors": ["black"], "avoidKeywords": ["backpack"] },
+      "jewelry": { "keywords": ["gold", "necklace", "hoop", "bracelet"], "colors": ["gold"], "avoidKeywords": ["sport"] },
+      "eyewear": { "keywords": ["black", "sunglasses"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  },
+  {
+    "id": "street-femme-downtown",
+    "slotRecipes": {
+      "outer": { "keywords": ["black", "leather", "cropped", "jacket"], "colors": ["black"], "avoidKeywords": ["blazer"] },
+      "top": { "keywords": ["black", "baby tee", "graphic", "crop"], "colors": ["black"], "avoidKeywords": ["button down"] },
+      "bottom": { "keywords": ["black", "cargo", "mini skirt", "denim"], "colors": ["black"], "avoidKeywords": ["trouser"] },
+      "shoes": { "keywords": ["black", "platform", "boot"], "colors": ["black"], "avoidKeywords": ["loafer"] },
+      "bag": { "keywords": ["silver", "black", "shoulder", "buckle"], "colors": ["silver", "black"], "avoidKeywords": ["tote"] },
+      "jewelry": { "keywords": ["silver", "chain", "hoop", "ring"], "colors": ["silver"], "avoidKeywords": ["pearl"] },
+      "eyewear": { "keywords": ["black", "sunglasses", "oval"], "colors": ["black"], "avoidKeywords": ["clear"] }
+    }
+  }
+]

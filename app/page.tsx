@@ -2,7 +2,7 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Search, Sparkles, CalendarDays, Shirt, Flame, Wand2, ArrowRight } from 'lucide-react';
+import { Search, Sparkles, CalendarDays, Shirt, Flame, Wand2, ArrowRight, Bookmark } from 'lucide-react';
 import { AppShell, AppHeader } from '@/components/AppShell';
 import { StoryRail } from '@/components/StoryRail';
 import { AIStylistCard } from '@/components/AIStylistCard';
@@ -13,12 +13,14 @@ import { SectionHeader, Avatar, PremiumButton, Chip } from '@/components/Primiti
 import { successToast } from '@/components/Toast';
 import { useMe } from '@/store/me';
 import { useStyleDNA } from '@/store/style-dna';
-import { useMyOutfits } from '@/store/outfits';
+import { useMyOutfits, useOutfits, useResolveOutfit } from '@/store/outfits';
 import { useMyClosetItems, useCloset } from '@/store/closet';
 import { usePlanner } from '@/store/planner';
-import { publicOutfits, trendingPosts, getOutfit, getItem } from '@/lib/data';
-import { rankOutfits, dnaInsights, BASIC_ITEM_IDS } from '@/lib/recommend';
+import { publicOutfits, trendingPosts, getOutfit } from '@/lib/data';
+import { rankOutfits, dnaInsights } from '@/lib/recommend';
+import { realBasics } from '@/lib/real-catalog';
 import { STYLIST_ACTIONS } from '@/lib/stylist';
+import type { ClosetItem } from '@/lib/social-types';
 import { occasionLabel, aestheticLabel } from '@/lib/style';
 import { useMounted } from '@/lib/use-mounted';
 
@@ -39,19 +41,25 @@ export default function HomePage() {
   const myItems = useMyClosetItems();
   const addItem = useCloset((s) => s.addItem);
   const schedule = usePlanner((s) => s.schedule);
+  const plannerEntries = usePlanner((s) => s.entries);
+  const toggleSaveOutfit = useOutfits((s) => s.toggleSaveOutfit);
+  const resolveOutfit = useResolveOutfit();
 
   const insights = dnaInsights(dna);
   const todaysPick = useMemo(() => rankOutfits(publicOutfits(), dna)[0], [dna]);
   const trending = useMemo(() => trendingPosts(10), []);
-  const basics = useMemo(() => BASIC_ITEM_IDS.map((id) => getItem(id)).filter(Boolean), []);
+  const basics = useMemo(() => realBasics(8), []);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const upcoming = useMemo(
+    () => plannerEntries.filter((e) => e.date >= todayKey).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5),
+    [plannerEntries, todayKey],
+  );
 
   useEffect(() => {
     if (mounted && !onboarded) router.replace('/onboarding');
   }, [mounted, onboarded, router]);
 
-  function addBasic(id: string) {
-    const item = getItem(id);
-    if (!item) return;
+  function addBasic(item: ClosetItem) {
     addItem({
       name: item.name,
       brand: item.brand,
@@ -64,8 +72,18 @@ export default function HomePage() {
       season: item.season,
       warmth: item.warmth,
       priceCents: item.priceCents,
+      imageUrl: item.imageUrl,
+      retailerUrl: item.retailerUrl,
     });
     successToast(`Added ${item.name} to your closet`);
+  }
+
+  function prettyDay(iso: string): string {
+    if (iso === todayKey) return 'Today';
+    const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+    if (iso === tomorrow) return 'Tomorrow';
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
   }
 
   if (mounted && !onboarded) {
@@ -176,12 +194,22 @@ export default function HomePage() {
                   size="sm"
                   className="flex-1"
                   onClick={() => {
-                    schedule(new Date().toISOString().slice(0, 10), todaysPick.id, todaysPick.occasion);
+                    schedule(todayKey, todaysPick.id, todaysPick.occasion);
                     successToast('Added to today’s planner');
                   }}
                 >
                   Wear today
                 </PremiumButton>
+                <button
+                  onClick={() => {
+                    toggleSaveOutfit(todaysPick.id);
+                    successToast('Saved to your looks');
+                  }}
+                  className="grid place-items-center w-11 h-9 rounded-full bg-white/90 text-ink shrink-0"
+                  aria-label="Save"
+                >
+                  <Bookmark size={16} />
+                </button>
               </div>
             </div>
           </motion.div>
@@ -213,14 +241,41 @@ export default function HomePage() {
         <SectionHeader title="Wardrobe basics" kicker="Tap to add" />
         <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
           {basics.map((i) => (
-            <ClothingCard key={i!.id} item={i!} className="w-[124px] shrink-0" onClick={() => addBasic(i!.id)} />
+            <ClothingCard key={i.id} item={i} className="w-[124px] shrink-0" onClick={() => addBasic(i)} />
           ))}
         </div>
       </section>
 
+      {/* planner preview */}
+      <section className="px-5 mt-7">
+        <SectionHeader title="Your planner" kicker="What’s next" action="Open" onAction={() => router.push('/planner')} />
+        {upcoming.length === 0 ? (
+          <button onClick={() => router.push('/planner')} className="w-full rounded-3xl border border-dashed border-hairline-2 bg-surface-1 p-4 text-left flex items-center gap-3 btn-press">
+            <span className="grid place-items-center w-11 h-11 rounded-2xl bg-accent-soft text-accent"><CalendarDays size={20} /></span>
+            <div>
+              <div className="text-sm font-semibold text-ink">Plan your week</div>
+              <div className="text-[12px] text-muted">Schedule outfits for the days ahead</div>
+            </div>
+          </button>
+        ) : (
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+            {upcoming.map((e) => {
+              const o = resolveOutfit(e.outfitId);
+              if (!o) return null;
+              return (
+                <div key={`${e.date}-${e.outfitId}`} className="w-[150px] shrink-0">
+                  <div className="text-[11px] font-semibold text-accent mb-1">{prettyDay(e.date)}</div>
+                  <OutfitCard outfit={o} onClick={() => router.push('/planner')} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
       {/* trending */}
       <section className="px-5 mt-7">
-        <SectionHeader title="Trending now" kicker="From the community" action="Explore" onAction={() => router.push('/community')} />
+        <SectionHeader title="Trending now" kicker="Community · demo looks" action="Explore" onAction={() => router.push('/community')} />
         <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
           {trending.map((p) => {
             const o = getOutfit(p.outfitId);
@@ -231,7 +286,7 @@ export default function HomePage() {
           })}
         </div>
         <div className="mt-3 flex items-center gap-1.5 text-2xs text-muted">
-          <Chip>Pinterest × Polyvore × your closet</Chip>
+          <Chip>Demo looks · real product photos</Chip>
         </div>
       </section>
     </AppShell>

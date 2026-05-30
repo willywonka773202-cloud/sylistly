@@ -1,7 +1,7 @@
 'use client';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Sparkles } from 'lucide-react';
 import { FloatingTabBar } from './FloatingTabBar';
 
 export function AppShell({
@@ -61,6 +61,9 @@ export function AppHeader({
           )}
           {brand ? (
             <div className="flex items-center gap-2">
+              <span className="grid place-items-center w-8 h-8 rounded-xl brand-gradient text-white shadow-pink-glow">
+                <Sparkles size={17} strokeWidth={2.4} />
+              </span>
               <span className="font-display text-2xl tracking-tight text-ink">Sylistly</span>
             </div>
           ) : (

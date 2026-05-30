@@ -145,14 +145,3 @@ export function dnaInsights(dna: StyleDNA): DnaInsights {
   };
 }
 
-/** Curated wardrobe staples for the "Basics" home rail. */
-export const BASIC_ITEM_IDS = [
-  'top-white-tee',
-  'top-black-tee',
-  'bottom-blue-jeans',
-  'shoes-af1',
-  'outer-denim-jacket',
-  'bottom-cream-trousers',
-  'top-grey-hoodie',
-  'shoes-samba',
-];

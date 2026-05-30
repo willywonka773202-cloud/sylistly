@@ -18,13 +18,13 @@ export default {
         'muted-2': 'rgba(22,20,15,.64)',
         hairline: 'rgba(22,20,15,.08)',
         'hairline-2': 'rgba(22,20,15,.15)',
-        accent: '#c2554e', // refined terracotta-rose, used sparingly
-        'accent-hot': '#d96a5e',
-        'accent-soft': '#f4e4df',
+        accent: '#e8365d', // Sylistly hot pink — the brand signature
+        'accent-hot': '#ff4a72',
+        'accent-soft': '#fde7ee',
         skin: '#c9a98a',
         money: '#2f7d5b',
         emerald: '#2f7d5b',
-        crown: '#a9802f',
+        crown: '#f0a830',
       },
       fontFamily: {
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],
@@ -39,7 +39,7 @@ export default {
         card: '0 2px 8px -3px rgba(22,20,15,.08), 0 14px 36px -18px rgba(22,20,15,.20)',
         float: '0 10px 44px -14px rgba(22,20,15,.30)',
         item: '0 16px 30px -16px rgba(22,20,15,.45)',
-        'pink-glow': '0 10px 30px -10px rgba(194,85,78,.45)',
+        'pink-glow': '0 10px 30px -8px rgba(232,54,93,.5)',
         nav: '0 8px 40px -8px rgba(22,20,15,.22)',
       },
       fontSize: {

@@ -4,7 +4,7 @@ import type { Outfit } from '@/lib/social-types';
 import { canvasBackgroundCss, backgroundIsDark } from '@/lib/social-types';
 import { BASE_FRACTION } from '@/lib/outfit-layout';
 import { resolveItem } from '@/lib/item-registry';
-import { itemArt } from '@/lib/garment-art';
+import { ItemImage } from './ItemImage';
 
 type CollageOutfit = Pick<Outfit, 'layout' | 'background' | 'itemIds'>;
 
@@ -69,16 +69,15 @@ export function OutfitCollage({
               left: `${l.x * 100}%`,
               top: `${l.y * 100}%`,
               width: `${widthPct}%`,
+              aspectRatio: '200 / 240',
               zIndex: l.z,
               transform: `translate(-50%, -50%) rotate(${l.rotation}deg) scale(${l.flip ? -1 : 1}, 1)`,
             }}
           >
-            <img
-              src={itemArt(item!)}
-              alt={item!.name}
-              draggable={false}
-              className="w-full h-auto select-none"
-              style={{ outline: isSelected ? '2px solid #c2554e' : 'none', borderRadius: 12 }}
+            <ItemImage
+              item={item!}
+              className="absolute inset-0 w-full h-full object-contain select-none"
+              style={isSelected ? { outline: '2px solid #e8365d', borderRadius: 12 } : undefined}
             />
           </Wrapper>
         );

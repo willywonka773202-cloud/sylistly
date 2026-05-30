@@ -10,7 +10,7 @@ import { getPost } from '@/lib/data/community';
 import { getOutfit } from '@/lib/data/outfits';
 import { getCreator } from '@/lib/data/creators';
 import { resolveItem } from '@/lib/item-registry';
-import { itemArt } from '@/lib/garment-art';
+import { ItemImage } from '@/components/ItemImage';
 import { aestheticLabel, occasionLabel, compactCount, centsToUsd, timeAgo } from '@/lib/style';
 import type { Comment } from '@/lib/social-types';
 import { useSocial } from '@/store/social';
@@ -147,7 +147,7 @@ export default function PostDetailPage() {
               return (
                 <div key={id} className={`flex items-center gap-3 p-2.5 rounded-2xl border transition-colors ${isSel ? 'bg-accent-soft border-accent' : 'bg-surface-1 border-hairline'}`}>
                   <div className="w-12 h-12 rounded-xl collage-paper grid place-items-center overflow-hidden shrink-0">
-                    <img src={itemArt(item)} alt="" className="w-full h-full object-contain p-1" />
+                    <ItemImage item={item} className="w-full h-full object-contain p-1" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-semibold text-ink truncate">{item.name}</div>

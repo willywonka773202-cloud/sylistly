@@ -24,6 +24,8 @@ export interface NewItemInput {
   warmth?: Warmth;
   priceCents?: number;
   shopUrl?: string;
+  imageUrl?: string;
+  retailerUrl?: string;
 }
 
 interface ClosetState {
@@ -57,6 +59,8 @@ export const useCloset = create<ClosetState>()(
           warmth: input.warmth || 'mid',
           priceCents: input.priceCents,
           shopUrl: input.shopUrl,
+          imageUrl: input.imageUrl,
+          retailerUrl: input.retailerUrl,
           ownerId: 'me',
           source: 'user',
           createdAt: new Date().toISOString(),

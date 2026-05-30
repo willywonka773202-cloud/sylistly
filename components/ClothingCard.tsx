@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import type { ClosetItem } from '@/lib/social-types';
-import { itemArt } from '@/lib/garment-art';
+import { ItemImage } from './ItemImage';
 import { centsToUsd } from '@/lib/style';
 
 export function ClothingCard({
@@ -25,12 +25,7 @@ export function ClothingCard({
       <button onClick={onClick} className="block w-full text-left">
         <div className={`relative rounded-2xl border border-hairline overflow-hidden ${imageClassName}`}>
           <div className="absolute inset-0 collage-paper" />
-          <img
-            src={itemArt(item)}
-            alt={item.name}
-            draggable={false}
-            className="absolute inset-0 w-full h-full object-contain p-5 select-none"
-          />
+          <ItemImage item={item} className="absolute inset-0 w-full h-full object-contain p-4 select-none" />
           {onToggleFavorite && (
             <button
               onClick={(e) => {

@@ -4,9 +4,10 @@
 
 :root {
   --skin: #c9a98a;
-  --ring-a: #c2554e;
-  --ring-b: #d99a6c;
-  --ring-c: #a9802f;
+  /* Sylistly brand ring: hot pink -> coral -> gold */
+  --ring-a: #e8365d;
+  --ring-b: #ff4a72;
+  --ring-c: #f0a830;
 }
 
 html, body {
@@ -25,7 +26,7 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-::selection { background: #16140f; color: #f6f3ee; }
+::selection { background: #e8365d; color: #fff; }
 
 .skin { background: var(--skin); }
 
@@ -99,13 +100,21 @@ html, body {
   background: linear-gradient(168deg, #ffffff 0%, #f7f2ea 100%);
 }
 
-/* ===== Text gradient accent (used sparingly) ===== */
+/* ===== Sylistly brand accents ===== */
 .text-gradient {
-  background: linear-gradient(120deg, #c2554e 0%, #d99a6c 60%, #a9802f 100%);
+  background: linear-gradient(120deg, #e8365d 0%, #ff4a72 55%, #f0a830 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+.brand-gradient { background: linear-gradient(125deg, #e8365d 0%, #ff4a72 100%); }
+.brand-gradient-warm { background: linear-gradient(125deg, #e8365d 0%, #ff6a52 55%, #f0a830 100%); }
+.glow-pink { box-shadow: 0 10px 30px -8px rgba(232, 54, 93, 0.5); }
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 6px 22px -8px rgba(232, 54, 93, 0.45); }
+  50% { box-shadow: 0 10px 34px -6px rgba(232, 54, 93, 0.75); }
+}
+.animate-glow { animation: glow-pulse 2.6s ease-in-out infinite; }
 
 /* ===== Animations ===== */
 @keyframes shimmer {

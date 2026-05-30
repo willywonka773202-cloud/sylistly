@@ -5,7 +5,7 @@ import type { OutfitLayoutItem } from '@/lib/social-types';
 import { canvasBackgroundCss, backgroundIsDark } from '@/lib/social-types';
 import { BASE_FRACTION } from '@/lib/outfit-layout';
 import { resolveItem } from '@/lib/item-registry';
-import { itemArt } from '@/lib/garment-art';
+import { ItemImage } from '../ItemImage';
 
 type Mode = 'move' | 'resize' | 'rotate';
 
@@ -147,7 +147,7 @@ export function OutfitCanvas({
               zIndex: selected ? 999 : l.z,
             }}
           >
-            <img src={itemArt(item)} alt={item.name} draggable={false} className="w-full h-full object-contain pointer-events-none" />
+            <ItemImage item={item} className="w-full h-full object-contain pointer-events-none" />
             {selected && (
               <>
                 <div className="absolute inset-0 border-[1.5px] border-accent/70 rounded-lg pointer-events-none" />
