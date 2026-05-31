@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
-import { hasDirectRetailerUrl, hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
+import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
 import { searchBrandCatalog } from '@/lib/brand-catalog';
 import { getFeaturedCatalogProducts } from '@/lib/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { mockSearch } from '@/lib/mock-products';
+import { hasDirectRetailerUrl } from '@/lib/retailer-url';
+import { filterRenderableProducts, hasUsableImageUrl } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
+import {
+  applyFrameToIntent,
+  normalizeSearchFrame,
+  withFrameBias,
+} from '@/lib/search-frame';
+import type { GeneratorFrame } from '@/lib/vibes';
 
 export const runtime = 'nodejs';
 export const maxDuration = 20;
@@ -15,14 +23,17 @@ export const maxDuration = 20;
 interface SearchBody {
   query: string;
   category?: Category;
-  gender?: 'masc' | 'fem' | 'unisex';
   mode?: 'live' | 'demo';
+  frame?: GeneratorFrame;
+  priceMax?: number | null;
+  priceMin?: number | null;
 }
 
 type SearchSource = 'catalog' | 'live';
 type SearchMode = 'catalog-only' | 'catalog-preview' | 'hybrid';
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
+const SEARCH_RESULT_LIMIT = 10;
 const searchResponseCache = new Map<
   string,
   { expiresAt: number; products: Product[]; source: SearchSource }
@@ -79,8 +90,21 @@ function shouldUseCatalogFirst(query: string, category: Category | undefined, de
   return false;
 }
 
+function applyExplicitPriceBounds(
+  products: Product[],
+  priceMin?: number | null,
+  priceMax?: number | null,
+): Product[] {
+  return products.filter((product) => {
+    const price = product.priceCents || 0;
+    if (priceMin && price < priceMin * 100) return false;
+    if (priceMax && price > priceMax * 100) return false;
+    return true;
+  });
+}
+
 function imageLooksLikePlaceholder(imageUrl: string | undefined): boolean {
-  return typeof imageUrl === 'string' && imageUrl.startsWith('data:image/svg+xml');
+  return !hasUsableImageUrl(imageUrl);
 }
 
 function nameOverlapScore(left: string, right: string): number {
@@ -133,8 +157,31 @@ function enrichCatalogProductPhotos(catalogProducts: Product[], liveProducts: Pr
   });
 }
 
-function demoSearchResponse(category: Category | undefined, query: string, gender: string | undefined, reason: string) {
-  const products = mockSearch(category || 'top', query, gender as 'masc' | 'fem' | 'unisex');
+function mergeCatalogCandidates(...groups: Product[][]): Product[] {
+  const merged = new Map<string, Product>();
+
+  for (const group of groups) {
+    for (const product of group) {
+      if (!merged.has(product.id)) {
+        merged.set(product.id, product);
+        continue;
+      }
+
+      const existing = merged.get(product.id)!;
+      const existingLooksPlaceholder = imageLooksLikePlaceholder(existing.imageUrl);
+      const nextLooksReal = !imageLooksLikePlaceholder(product.imageUrl);
+
+      if (existingLooksPlaceholder && nextLooksReal) {
+        merged.set(product.id, product);
+      }
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
+function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
+  const products = filterRenderableProducts(mockSearch(category || 'top', query));
   return NextResponse.json({
     products,
     mock: true,
@@ -153,7 +200,11 @@ export async function POST(req: NextRequest) {
   const query = (body.query || '').slice(0, 200);
   const category = body.category;
   const mode = body.mode || 'live';
-  const cacheKey = `${category || 'any'}::${query.trim().toLowerCase()}`;
+  const frame = normalizeSearchFrame(body.frame);
+  const explicitPriceMax = typeof body.priceMax === 'number' ? body.priceMax : null;
+  const explicitPriceMin = typeof body.priceMin === 'number' ? body.priceMin : null;
+  const effectiveQuery = withFrameBias(query, category, frame);
+  const cacheKey = `${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
   const isDev = process.env.NODE_ENV === 'development';
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
   const searchMode = getSearchMode();
@@ -162,11 +213,11 @@ export async function POST(req: NextRequest) {
   const shouldUseDevMocks = isDev && !liveSearchKey;
 
   if (isDev && mode === 'demo') {
-    return demoSearchResponse(category, query, body.gender, 'manual_demo');
+    return demoSearchResponse(category, query, 'manual_demo');
   }
 
   if (shouldUseDevMocks && !catalogOnlyMode && !catalogPreviewMode) {
-    return demoSearchResponse(category, query, body.gender, 'missing_searchapi_key');
+    return demoSearchResponse(category, query, 'missing_searchapi_key');
   }
 
   const cached = searchResponseCache.get(cacheKey);
@@ -176,6 +227,7 @@ export async function POST(req: NextRequest) {
       cached: true,
       source: cached.source,
       searchMode,
+      frame,
     });
   }
   if (cached) searchResponseCache.delete(cacheKey);
@@ -184,82 +236,68 @@ export async function POST(req: NextRequest) {
 
   try {
     if (!query.trim() && category) {
-      const featuredCatalogProducts = getFeaturedCatalogProducts(6, category).map((product) => ({
+      const featuredCatalogProducts = applyExplicitPriceBounds(
+        getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT * 2, category),
+        explicitPriceMin,
+        explicitPriceMax,
+      );
+      const renderableFeaturedProducts = filterRenderableProducts(featuredCatalogProducts)
+        .slice(0, SEARCH_RESULT_LIMIT)
+        .map((product) => ({
         ...product,
         affiliateUrl: wrapAffiliate(product.retailerUrl),
       }));
 
       return NextResponse.json({
-        products: featuredCatalogProducts,
+        products: renderableFeaturedProducts,
         source: 'catalog',
+        catalogKind: 'featured',
         searchMode,
+        frame,
       });
     }
 
-    // 1. Prefer the real photo-backed catalog whenever we have a match.
-    const fastIntent = parseSearchIntentHeuristic(query, category);
-    const photoCatalogProducts = searchPhotoCatalog(fastIntent, query).map((product) => ({
+    const fastIntent = applyFrameToIntent(
+      parseSearchIntentHeuristic(effectiveQuery, category),
+      frame,
+    );
+    fastIntent.priceMax = explicitPriceMax ?? fastIntent.priceMax ?? null;
+    fastIntent.priceMin = explicitPriceMin ?? fastIntent.priceMin ?? null;
+    const photoCatalogProducts = searchPhotoCatalog(fastIntent, effectiveQuery).map((product) => ({
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
-
-    if (photoCatalogProducts.length) {
-      const rankedPhotoCatalogProducts = await rerankProducts(
-        query || fastIntent.category,
-        fastIntent,
-        photoCatalogProducts,
-        Math.min(6, photoCatalogProducts.length),
-      );
-      cacheProducts(rankedPhotoCatalogProducts).catch(() => {});
-      searchResponseCache.set(cacheKey, {
-        expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
-        products: rankedPhotoCatalogProducts,
-        source: 'catalog',
-      });
-
-      console.info(
-        '[api/search] query=%s category=%s source=photo_catalog results=%d durationMs=%d',
-        query || '(blank)',
-        category || fastIntent.category,
-        rankedPhotoCatalogProducts.length,
-        Date.now() - startedAt,
-      );
-
-      return NextResponse.json({ products: rankedPhotoCatalogProducts, source: 'catalog', searchMode });
-    }
-
-    // 2. In hybrid mode, we can use the starter catalog early for common
-    // branded searches. In preview mode we try live/photo results first and
-    // only fall back to starter placeholders if nothing better is available.
     const useCatalogFirst =
-      searchMode === 'hybrid' &&
-      shouldUseCatalogFirst(query, category, fastIntent.brand);
-    const seededCatalogProducts = useCatalogFirst
-      ? searchBrandCatalog(fastIntent, query)
-      : [];
+      catalogOnlyMode ||
+      (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
+    const seededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
+    const mergedCatalogProducts = applyExplicitPriceBounds(
+      mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts),
+      explicitPriceMin,
+      explicitPriceMax,
+    );
 
-    if (seededCatalogProducts.length) {
-      let catalogProducts = seededCatalogProducts;
+    if (mergedCatalogProducts.length && (useCatalogFirst || photoCatalogProducts.length > 0 || catalogOnlyMode)) {
+      let catalogProducts = mergedCatalogProducts;
 
-      if (!catalogOnlyMode && liveSearchKey && query.trim()) {
+      if (!catalogOnlyMode && liveSearchKey && effectiveQuery.trim()) {
         try {
-          const liveCandidates = await searchShopping(fastIntent, query, body.gender);
+          const liveCandidates = await searchShopping(fastIntent, effectiveQuery);
           catalogProducts = enrichCatalogProductPhotos(catalogProducts, liveCandidates);
         } catch (error) {
           console.warn('[api/search] catalog photo enrichment failed for "%s": %s', query, String(error));
         }
       }
 
-      const affiliateWrappedProducts = catalogProducts.map((product) => ({
-        ...product,
-        affiliateUrl: wrapAffiliate(product.retailerUrl),
-      }));
-      const rankedCatalogProducts = await rerankProducts(
-        query || fastIntent.category,
+      const rankedCatalogProducts = filterRenderableProducts(await rerankProducts(
+        effectiveQuery || fastIntent.category,
         fastIntent,
-        affiliateWrappedProducts,
-        Math.min(6, affiliateWrappedProducts.length),
-      );
+        filterRenderableProducts(catalogProducts),
+        Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
+      ));
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
@@ -269,14 +307,22 @@ export async function POST(req: NextRequest) {
       });
 
       console.info(
-        '[api/search] query=%s category=%s source=catalog results=%d durationMs=%d',
+        '[api/search] query=%s category=%s frame=%s source=%s results=%d durationMs=%d',
         query || '(blank)',
         category || fastIntent.category,
+        frame,
+        photoCatalogProducts.length ? 'catalog_blend' : 'catalog',
         rankedCatalogProducts.length,
         Date.now() - startedAt,
       );
 
-      return NextResponse.json({ products: rankedCatalogProducts, source: 'catalog', searchMode });
+      return NextResponse.json({
+        products: rankedCatalogProducts,
+        source: 'catalog',
+        catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
+        searchMode,
+        frame,
+      });
     }
 
     if (catalogOnlyMode) {
@@ -285,29 +331,31 @@ export async function POST(req: NextRequest) {
           products: [],
           source: 'catalog',
           searchMode,
-          error: 'No catalog matches yet for that search. Try a brand or a simpler clothing term while we keep expanding Sylistly inventory.',
+          frame,
+          error: 'No catalog matches yet for that search. Try Browse, a brand, or a simpler clothing term while we keep expanding Sylistly inventory.',
         },
         { status: 404 },
       );
     }
 
-    // 3. Try live photo search in preview/hybrid modes.
     let liveSearchError: unknown = null;
 
     if (liveSearchKey) {
       try {
-        const intent = await parseSearchIntent(query, category);
+        const intent = applyFrameToIntent(
+          await parseSearchIntent(effectiveQuery, category),
+          frame,
+        );
+        intent.priceMax = explicitPriceMax ?? intent.priceMax ?? null;
+        intent.priceMin = explicitPriceMin ?? intent.priceMin ?? null;
 
-        // 4. Search real inventory
-        const candidates = await searchShopping(intent, query, body.gender);
+        const candidates = await searchShopping(intent, effectiveQuery);
+        const filteredCandidates = applyExplicitPriceBounds(candidates, explicitPriceMin, explicitPriceMax);
+        const rerankLimit = Math.min(SEARCH_RESULT_LIMIT, filteredCandidates.length);
+        const ranked = filteredCandidates.length > rerankLimit
+          ? await rerankProducts(effectiveQuery, intent, filteredCandidates, rerankLimit)
+          : filteredCandidates.slice(0, rerankLimit);
 
-        // 5. Re-rank with Claude
-        const rerankLimit = Math.min(6, candidates.length);
-        const ranked = candidates.length > rerankLimit
-          ? await rerankProducts(query, intent, candidates, rerankLimit)
-          : candidates.slice(0, rerankLimit);
-
-        // 6. Resolve direct retailer links for the strongest results only.
         const hydrationTargets = ranked.slice(0, 3);
         const untouched = ranked.slice(3);
         const hydratedTop = await hydrateRetailerUrls(hydrationTargets);
@@ -321,25 +369,24 @@ export async function POST(req: NextRequest) {
               ...combined.filter((product) => !hasDirectRetailerUrl(product.retailerUrl)),
             ]
           : combined
-        ).slice(0, 6);
+        ).slice(0, SEARCH_RESULT_LIMIT);
 
-        // 7. Affiliate-wrap
-        const products: Product[] = selected.map((p) => ({
+        const products: Product[] = filterRenderableProducts(selected.map((p) => ({
           ...p,
           affiliateUrl: wrapAffiliate(p.retailerUrl),
-        }));
+        })));
 
         if (products.length) {
           console.info(
-            '[api/search] query=%s category=%s candidates=%d results=%d durationMs=%d',
+            '[api/search] query=%s category=%s frame=%s candidates=%d results=%d durationMs=%d',
             query || '(blank)',
             category || intent.category,
+            frame,
             candidates.length,
             products.length,
             Date.now() - startedAt,
           );
 
-          // 8. Fire-and-forget cache write
           cacheProducts(products).catch(() => {});
           searchResponseCache.set(cacheKey, {
             expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
@@ -347,7 +394,7 @@ export async function POST(req: NextRequest) {
             source: 'live',
           });
 
-          return NextResponse.json({ products, source: 'live', searchMode });
+          return NextResponse.json({ products, source: 'live', searchMode, frame });
         }
       } catch (error) {
         liveSearchError = error;
@@ -355,25 +402,20 @@ export async function POST(req: NextRequest) {
       }
     } else if (searchMode === 'hybrid') {
       return NextResponse.json(
-        { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode },
+        { error: 'SEARCHAPI_KEY is required for hybrid live product search.', searchMode, frame },
         { status: 500 },
       );
     }
 
-    // 4. Preview mode can still fall back to starter placeholders locally.
     if (catalogPreviewMode) {
-      const previewSeededCatalogProducts = searchBrandCatalog(fastIntent, query);
-      if (previewSeededCatalogProducts.length) {
-        const affiliateWrappedProducts = previewSeededCatalogProducts.map((product) => ({
-          ...product,
-          affiliateUrl: wrapAffiliate(product.retailerUrl),
-        }));
-        const rankedPreviewProducts = await rerankProducts(
-          query || fastIntent.category,
+      const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
+      if (previewCatalogProducts.length) {
+        const rankedPreviewProducts = filterRenderableProducts(await rerankProducts(
+          effectiveQuery || fastIntent.category,
           fastIntent,
-          affiliateWrappedProducts,
-          Math.min(6, affiliateWrappedProducts.length),
-        );
+          filterRenderableProducts(previewCatalogProducts),
+          Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
+        ));
 
         cacheProducts(rankedPreviewProducts).catch(() => {});
         searchResponseCache.set(cacheKey, {
@@ -383,14 +425,21 @@ export async function POST(req: NextRequest) {
         });
 
         console.info(
-          '[api/search] query=%s category=%s source=preview_catalog results=%d durationMs=%d',
+          '[api/search] query=%s category=%s frame=%s source=preview_catalog results=%d durationMs=%d',
           query || '(blank)',
           category || fastIntent.category,
+          frame,
           rankedPreviewProducts.length,
           Date.now() - startedAt,
         );
 
-        return NextResponse.json({ products: rankedPreviewProducts, source: 'catalog', searchMode });
+        return NextResponse.json({
+          products: rankedPreviewProducts,
+          source: 'catalog',
+          catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
+          searchMode,
+          frame,
+        });
       }
     }
 
@@ -399,7 +448,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'No products found for that query yet.', searchMode },
+      { error: 'No products found for that query yet.', searchMode, frame },
       { status: 404 },
     );
   } catch (err) {
@@ -412,6 +461,7 @@ export async function POST(req: NextRequest) {
           error: 'Live search is temporarily rate-limited. Please wait a moment and try again.',
           demoAvailable: isDev,
           searchMode,
+          frame,
         },
         { status: 429 },
       );
@@ -421,12 +471,13 @@ export async function POST(req: NextRequest) {
         {
           error: 'The SearchAPI key was rejected. Double-check that SEARCHAPI_KEY is your regular API key, not an MCP URL or token.',
           searchMode,
+          frame,
         },
         { status: 401 },
       );
     }
     return NextResponse.json(
-      { error: message, searchMode },
+      { error: message, searchMode, frame },
       { status: 500 },
     );
   }

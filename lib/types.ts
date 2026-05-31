@@ -5,19 +5,6 @@ export const CATEGORY_ORDER: Category[] = [
   'hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry',
 ];
 
-export const CATEGORY_LABELS: Record<Category, string> = {
-  hat: 'Hat',
-  outer: 'Outerwear',
-  top: 'Top',
-  bottom: 'Bottom',
-  shoes: 'Shoes',
-  bag: 'Bag',
-  eyewear: 'Eyewear',
-  jewelry: 'Jewelry',
-};
-
-export type Gender = 'masc' | 'fem' | 'unisex';
-
 export interface SearchIntent {
   category: Category;
   color?: string[];
@@ -25,7 +12,7 @@ export interface SearchIntent {
   style?: string[];
   priceMax?: number | null;
   priceMin?: number | null;
-  gender?: Gender | null;
+  gender?: 'masc' | 'fem' | 'androgynous' | null;
   keywords: string[];
 }
 
@@ -43,7 +30,17 @@ export interface Product {
   imageOriginalUrl?: string;   // debug
   inStock?: boolean;
   trusted?: boolean;
-  gender?: Gender;           // masc | fem | unisex
+  vibes?: string[];
+  occasions?: string[];
+  colors?: string[];
+  gender?: Array<'masc' | 'fem' | 'androgynous'>;
+  searchTerms?: string[];
+  sourceQuery?: string;
+  productUrl?: string;
+  googleShoppingUrl?: string;
+  fallbackUrl?: string;
+  imageQuality?: 'good' | 'ok' | 'missing';
+  popularityScore?: number;
   metadata?: Record<string, unknown>;
 }
 
@@ -64,7 +61,6 @@ export interface Profile {
   handle?: string;
   skinTone: string;           // hex
   bodyType: 'masc' | 'fem' | 'androgynous' | 'custom';
-  gender?: Gender;            // masc | fem | unisex
   sizes: {
     top?: string;
     bottom?: { waist?: number; inseam?: number };

@@ -1,12 +1,11 @@
 import crypto from 'node:crypto';
+import { GOOGLE_HOSTS, hasDirectRetailerUrl, safeHostname } from './retailer-url';
 import type { Category, Product, SearchIntent } from './types';
 
 const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
 const SEARCH_TIMEOUT_MS = 12_000;
-const PRODUCT_TIMEOUT_MS = 2_500;
+const PRODUCT_TIMEOUT_MS = Number.parseInt(process.env.SEARCHAPI_PRODUCT_TIMEOUT_MS || '2500', 10);
 const MIN_TRUSTED_RESULTS = 3;
-const GOOGLE_HOSTS = new Set(['google.com', 'www.google.com']);
-
 const CATEGORY_KEYWORDS: Record<Category, string> = {
   hat: 'hat cap beanie',
   outer: 'jacket coat outerwear',
@@ -33,6 +32,15 @@ export const TRUSTED_RETAILERS = new Set([
   'levi.com', 'levis.com', 'stussy.com', 'dickies.com', 'carhartt.com',
   'carhartt-wip.com', 'thenorthface.com', 'burberry.com', 'maxmara.com',
   'acnestudios.com', 'supremenewyork.com', 'ray-ban.com', 'oakley.com',
+  'stevemadden.com', 'coach.com', 'longchamp.com', 'bottegaveneta.com',
+  'michaelkors.com', 'gentlemonster.com', 'mejuri.com', 'pandora.net',
+  'swarovski.com', 'tiffany.com', 'missoma.com', 'abercrombie.com',
+  'drmartens.com', 'newbalance.com', 'converse.com', 'birkenstock.com',
+  'ugg.com', 'jordan.com', 'neweracap.com', 'bloomingdales.com',
+  'macys.com', 'dillards.com', 'zappos.com', 'dsw.com', 'journeys.com',
+  'footlocker.com', 'champssports.com', 'finishline.com', 'jdsports.com',
+  'dickssportinggoods.com', 'hibbett.com', 'mytheresa.com', 'luisaviaroma.com',
+  'zumiez.com', 'slamjam.com', 'scheels.com', 'gemplers.com',
 ]);
 
 const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
@@ -82,7 +90,56 @@ const TRUSTED_RETAILER_ALIASES: Record<string, string[]> = {
   'supremenewyork.com': ['supreme'],
   'ray-ban.com': ['ray ban', 'ray-ban'],
   'oakley.com': ['oakley'],
+  'stevemadden.com': ['steve madden'],
+  'coach.com': ['coach'],
+  'longchamp.com': ['longchamp'],
+  'bottegaveneta.com': ['bottega veneta'],
+  'michaelkors.com': ['michael kors'],
+  'gentlemonster.com': ['gentle monster'],
+  'mejuri.com': ['mejuri'],
+  'pandora.net': ['pandora'],
+  'swarovski.com': ['swarovski'],
+  'tiffany.com': ['tiffany', 'tiffany co'],
+  'missoma.com': ['missoma'],
+  'abercrombie.com': ['abercrombie'],
+  'drmartens.com': ['dr martens', 'drmartens'],
+  'newbalance.com': ['new balance'],
+  'converse.com': ['converse'],
+  'birkenstock.com': ['birkenstock'],
+  'ugg.com': ['ugg'],
+  'jordan.com': ['jordan'],
+  'neweracap.com': ['new era'],
+  'bloomingdales.com': ['bloomingdale', 'bloomingdales'],
+  'macys.com': ['macys', 'macy s'],
+  'dillards.com': ['dillards', 'dillard s'],
+  'zappos.com': ['zappos'],
+  'dsw.com': ['dsw'],
+  'journeys.com': ['journeys'],
+  'footlocker.com': ['foot locker', 'footlocker'],
+  'champssports.com': ['champs sports', 'champssports'],
+  'finishline.com': ['finish line', 'finishline'],
+  'jdsports.com': ['jd sports', 'jdsports'],
+  'dickssportinggoods.com': ["dick's sporting goods", 'dicks sporting goods'],
+  'hibbett.com': ['hibbett'],
+  'mytheresa.com': ['mytheresa'],
+  'luisaviaroma.com': ['luisaviaroma'],
+  'zumiez.com': ['zumiez'],
+  'slamjam.com': ['slam jam', 'slamjam'],
+  'scheels.com': ['scheels'],
+  'gemplers.com': ['gemplers'],
 };
+
+const MARKETPLACE_RETAILERS = new Set([
+  'amazon.com',
+  'ebay.com',
+  'etsy.com',
+  'mercari.com',
+  'poshmark.com',
+  'vestiairecollective.com',
+  'whatnot.com',
+  'goat.com',
+  'stockx.com',
+]);
 
 const BRAND_ALIASES: Array<{ alias: string; brand: string }> = [
   { alias: 'fear of god essentials', brand: 'Essentials' },
@@ -158,7 +215,7 @@ function searchApiHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${apiKey}` };
 }
 
-function buildQueryString(intent: SearchIntent, rawQuery: string, gender?: 'masc' | 'fem' | 'unisex'): string {
+function buildQueryString(intent: SearchIntent, rawQuery: string): string {
   const parts: string[] = [];
   if (rawQuery.trim()) parts.push(rawQuery.trim());
   if (intent.brand?.length) parts.push(intent.brand.join(' '));
@@ -167,10 +224,6 @@ function buildQueryString(intent: SearchIntent, rawQuery: string, gender?: 'masc
   if (intent.priceMin && intent.priceMax) parts.push(`between $${intent.priceMin} and $${intent.priceMax}`);
   else if (intent.priceMax) parts.push(`under $${intent.priceMax}`);
   else if (intent.priceMin) parts.push(`over $${intent.priceMin}`);
-  
-  if (gender === 'masc') parts.push("men's");
-  else if (gender === 'fem') parts.push("women's");
-  
   parts.push(CATEGORY_KEYWORDS[intent.category]);
   parts.push(...(intent.keywords || []));
   const merged = Array.from(new Set(parts.filter(Boolean))).join(' ');
@@ -200,23 +253,9 @@ function normalizeText(value: string): string {
     .trim();
 }
 
-function safeHostname(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  } catch {
-    return null;
-  }
-}
-
 function isGoogleRetailerUrl(url: string): boolean {
   const host = safeHostname(url);
   return host ? GOOGLE_HOSTS.has(host) : false;
-}
-
-export function hasDirectRetailerUrl(url: string): boolean {
-  const host = safeHostname(url);
-  return Boolean(host) && !GOOGLE_HOSTS.has(host as string);
 }
 
 function isTrustedRetailer(retailer: string, host: string | null): boolean {
@@ -333,7 +372,7 @@ function toProduct(result: SearchApiShoppingResult, category: Category): Product
   };
 }
 
-export async function searchShopping(intent: SearchIntent, rawQuery: string, gender?: 'masc' | 'fem' | 'unisex'): Promise<Product[]> {
+export async function searchShopping(intent: SearchIntent, rawQuery: string): Promise<Product[]> {
   const query = buildQueryString(intent, rawQuery);
   const apiKey = getSearchApiKey();
   if (!apiKey) throw new Error('SEARCHAPI_KEY is not configured');
@@ -432,13 +471,15 @@ function offerSortKey(offer: SearchApiOffer): number {
   const host = safeHostname(offer.link || '');
   const merchantName = offer.merchant?.name || '';
   const trusted = isTrustedRetailer(merchantName, host);
+  const marketplace = host ? MARKETPLACE_RETAILERS.has(host) : false;
   const price = offer.extracted_total_price ?? offer.extracted_price ?? parsePrice(offer.total_price || offer.price || '0');
   const reviews = offer.reviews ?? 0;
 
   return (
-    (trusted ? 100_000 : 0) +
-    reviews -
-    Math.round(price * 100)
+    (trusted ? 1_000_000 : 0) +
+    (marketplace ? -250_000 : 0) +
+    reviews * 25 -
+    Math.round(price * 10)
   );
 }
 

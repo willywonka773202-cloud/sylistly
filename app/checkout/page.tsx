@@ -1,25 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { ArrowRight, Copy, ExternalLink, Store } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
-import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl } from '@/lib/checkout';
+import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
-
-function openUrls(urls: string[]) {
-  for (const url of urls) {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-}
 
 export default function CheckoutPage() {
   const products = useCheckout((state) => state.products);
   const title = useCheckout((state) => state.title);
   const retailerGroups = buildRetailerGroups(products);
   const totalCents = products.reduce((sum, product) => sum + (product.priceCents || 0), 0);
+  const [batchMessage, setBatchMessage] = useState<string | null>(null);
 
   async function copyLinks() {
     const text = products
-      .map((product) => `${product.brand} ${product.name} — ${product.url}`)
+      .map((product) => `${product.brand} ${product.name} - ${product.url}`)
       .join('\n');
 
     try {
@@ -29,12 +25,34 @@ export default function CheckoutPage() {
     }
   }
 
+  function openAllTabs() {
+    const result = openCheckoutUrls(products.map((product) => product.url));
+    if (!result.requestedCount) {
+      setBatchMessage('No retailer links are ready yet.');
+      return;
+    }
+
+    if (result.openedCount === result.requestedCount) {
+      setBatchMessage(`Opened ${result.openedCount} retailer tab${result.openedCount !== 1 ? 's' : ''}.`);
+      return;
+    }
+
+    if (result.openedCount > 0) {
+      setBatchMessage(
+        `Opened ${result.openedCount} of ${result.requestedCount} tabs. If your browser blocks the rest, use Copy all below.`,
+      );
+      return;
+    }
+
+    setBatchMessage('Your browser blocked the batch open. Use Copy all and open the retailer pages manually.');
+  }
+
   return (
     <PlaceholderScreen
       eyebrow="Checkout"
       title="Retailer"
       accent="links"
-      description="Use this page as a safer multi-store checkout helper when pop-up blockers stop Sylistly from opening every tab."
+      description="Use this page as a multi-store checkout helper. Sylistly can batch-open retailer tabs again, with manual links as the fallback."
     >
       {products.length ? (
         <div className="grid gap-3">
@@ -44,7 +62,7 @@ export default function CheckoutPage() {
                 <div className="text-[11px] uppercase tracking-[.18em] text-muted">Ready to shop</div>
                 <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{title}</h2>
                 <p className="mt-2 text-[12px] text-muted-2">
-                  {products.length} item{products.length !== 1 ? 's' : ''} · {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} · ${(totalCents / 100).toLocaleString()}
+                  {products.length} item{products.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString()}
                 </p>
               </div>
               <button
@@ -56,23 +74,30 @@ export default function CheckoutPage() {
                 Copy all
               </button>
             </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={openAllTabs}
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+              >
+                Open all tabs
+              </button>
+            </div>
+            {batchMessage ? (
+              <div className="mt-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
+                {batchMessage}
+              </div>
+            ) : null}
           </section>
 
           {retailerGroups.map((group) => (
             <section key={group.retailer} className="rounded-3xl border border-hairline bg-surface-1 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[.18em] text-muted">Retailer</div>
-                  <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{group.retailer}</h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => openUrls(group.products.map((product) => product.url))}
-                  className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
-                >
-                  <Store size={12} />
-                  Open retailer items
-                </button>
+              <div>
+                <div className="text-[11px] uppercase tracking-[.18em] text-muted">Retailer</div>
+                <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{group.retailer}</h2>
+                <p className="mt-1 text-[12px] text-muted-2">
+                  {group.products.length} clean link{group.products.length !== 1 ? 's' : ''} ready.
+                </p>
               </div>
 
               <div className="mt-4 grid gap-3">

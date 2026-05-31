@@ -1,7 +1,6 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import './globals.css';
-import { ToastContainer } from '@/components/Toast';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -15,34 +14,54 @@ const playfair = Playfair_Display({
   weight: ['500', '600', '700'],
 });
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: '#f6f3ee',
-};
-
 export const metadata: Metadata = {
-  title: 'Sylistly — Your AI Fashion Studio',
-  description:
-    'Build outfit collages, swipe your Style DNA, chat with an AI stylist, and share your looks. The social AI fashion app.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  openGraph: {
-    title: 'Sylistly — Your AI Fashion Studio',
-    description: 'Build, swipe, and share outfits. Discover your Style DNA.',
-    images: ['/og.png'],
-    siteName: 'Sylistly',
+  title: {
+    default: 'Sylistly',
+    template: '%s | Sylistly',
   },
+  description: 'Build polished outfits from real products, save full looks, and shop every piece in one premium flow.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sylistly.com'),
+  applicationName: 'Sylistly',
+  keywords: [
+    'fashion app',
+    'outfit builder',
+    'virtual styling',
+    'closet app',
+    'shop outfits',
+    'lookbook',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Sylistly',
+    description: 'Build and shop complete outfits from real products.',
+    url: '/',
+    siteName: 'Sylistly',
+    images: ['/og.svg'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sylistly',
+    description: 'Build and shop complete outfits from real products.',
+    images: ['/og.svg'],
+  },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.svg', type: 'image/svg+xml' },
+    ],
+  },
+  manifest: '/manifest.webmanifest',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
-      <body className="bg-bg text-ink antialiased">
-        {/* Desktop frame backdrop — keeps the mobile-first column centered & premium */}
-        <div className="min-h-[100dvh] bg-bg md:bg-[#ece5d9]">{children}</div>
-        <ToastContainer />
-      </body>
+      <body className="bg-bg text-ink">{children}</body>
     </html>
   );
 }

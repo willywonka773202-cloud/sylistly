@@ -1,11 +1,17 @@
 'use client';
-import { useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { type KeyboardEvent, type MouseEvent, useEffect } from 'react';
+import { useState } from 'react';
 import type { Product } from '@/lib/types';
-import { proxiedImageUrl } from '@/lib/image-url';
+import { ProductImage } from '@/components/ProductImage';
+import { getProductOutboundUrl } from '@/lib/product-links';
+import { isRenderableProduct } from '@/lib/product-image-quality';
 
 interface Props {
   product: Product;
+  selected?: boolean;
   onClick: () => void;
+  onImageAvailable?: () => void;
+  onImageUnavailable?: () => void;
 }
 
 function formatPrice(priceCents: number): string {
@@ -13,28 +19,51 @@ function formatPrice(priceCents: number): string {
   return `$${(priceCents / 100).toLocaleString()}`;
 }
 
-function fallbackImage(product: Product): string {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
-      <rect width="320" height="320" rx="36" fill="#0f0f0e" />
-      <rect x="18" y="18" width="284" height="284" rx="28" fill="#e8365d" opacity="0.14" />
-      <rect x="92" y="76" width="136" height="112" rx="28" fill="#fffefb" opacity="0.9" />
-      <rect x="108" y="206" width="104" height="14" rx="7" fill="#fffefb" opacity="0.85" />
-      <text x="28" y="276" fill="#fffefb" font-family="Arial, sans-serif" font-size="22" font-weight="700">${product.brand.replace(/&/g, '&amp;')}</text>
-    </svg>
-  `.trim();
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+function getHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'retailer';
+  }
 }
 
-export function ProductCard({ product: p, onClick }: Props) {
-  const buyUrl = p.affiliateUrl || p.retailerUrl;
-  const [imgFailed, setImgFailed] = useState(false);
-  const imageSrc = imgFailed || !p.imageUrl ? fallbackImage(p) : proxiedImageUrl(p.imageUrl);
+export function ProductCard({ product: p, selected = false, onClick, onImageAvailable, onImageUnavailable }: Props) {
+  const [imageReady, setImageReady] = useState(false);
+  const [imageUnavailable, setImageUnavailable] = useState(false);
+
+  useEffect(() => {
+    setImageReady(false);
+    setImageUnavailable(false);
+  }, [p.id, p.imageUrl]);
+
+  useEffect(() => {
+    if (imageReady || imageUnavailable) return;
+    const timer = window.setTimeout(() => {
+      markImageUnavailable();
+    }, 8_000);
+    return () => window.clearTimeout(timer);
+  }, [p.id, p.imageUrl, imageReady, imageUnavailable]);
+
+  function markImageAvailable() {
+    setImageReady(true);
+    onImageAvailable?.();
+  }
+
+  function markImageUnavailable() {
+    setImageUnavailable(true);
+    onImageUnavailable?.();
+  }
+
+  if (imageUnavailable) return null;
+  if (!isRenderableProduct(p)) return null;
+
+  const buyUrl = getProductOutboundUrl(p);
+  const retailHost = getHost(buyUrl);
 
   function openItem(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-    window.location.assign(buyUrl);
+    if (!buyUrl || buyUrl === '#') return;
+    window.open(buyUrl, '_blank', 'noopener,noreferrer');
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
@@ -43,70 +72,75 @@ export function ProductCard({ product: p, onClick }: Props) {
     onClick();
   }
 
+  if (!imageReady) {
+    return (
+      <div className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+        <ProductImage
+          product={p}
+          loading="eager"
+          wrapperClassName="h-px w-px overflow-hidden"
+          className="h-px w-px object-contain"
+          onAvailable={markImageAvailable}
+          onUnavailable={markImageUnavailable}
+        />
+      </div>
+    );
+  }
+
   return (
-    <article className="overflow-hidden rounded-2xl border border-hairline bg-surface-2 transition hover:-translate-y-0.5 hover:border-hairline-2">
+    <article className={`overflow-hidden rounded-[24px] border bg-[#f8f3ed] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition hover:-translate-y-0.5 ${
+      selected ? 'border-accent shadow-pink-glow' : 'border-[#e2d7cd]'
+    }`}>
       <div
         role="button"
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleKeyDown}
-        className="flex w-full cursor-pointer items-stretch gap-3 p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+        className="grid min-h-[206px] w-full cursor-pointer grid-cols-[150px_1fr] gap-3.5 p-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-accent/60 min-[390px]:grid-cols-[168px_1fr]"
       >
-        <div className="flex h-[112px] w-[96px] flex-none items-center justify-center rounded-2xl bg-black ring-1 ring-hairline">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={imageSrc}
-            alt={`${p.brand} ${p.name}`}
-            className="h-[82%] w-[82%] object-contain"
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={() => setImgFailed(true)}
+        <div className="relative flex h-[178px] w-full flex-none items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fffdfa_0%,#f1e8df_100%)] ring-1 ring-[#efe4da] min-[390px]:h-[190px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,.92),transparent_38%)]" />
+          <div className="absolute inset-x-5 bottom-4 h-5 rounded-full bg-[#d8cdc4]/38 blur-[7px]" />
+          <ProductImage
+            product={p}
+            wrapperClassName="relative h-full w-full"
+            className="relative h-full w-full object-contain p-2.5 drop-shadow-[0_16px_22px_rgba(0,0,0,.24)]"
+            onAvailable={markImageAvailable}
+            onUnavailable={markImageUnavailable}
           />
+          {selected ? (
+            <div className="absolute bottom-2 right-2 grid h-6 w-6 place-items-center rounded-full bg-accent text-[9px] font-bold text-white">
+              OK
+            </div>
+          ) : null}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-[10px] font-medium uppercase tracking-[.14em] text-muted-2">{p.brand}</div>
-              <div className="mt-1 line-clamp-3 text-[13px] leading-[1.25] text-ink">
-                {p.name}
-              </div>
-            </div>
-            <div className="rounded-full bg-surface-3 px-2.5 py-1 text-[13px] font-semibold text-ink">
-              {formatPrice(p.priceCents)}
-            </div>
+        <div className="flex min-w-0 flex-col py-0.5">
+          <div className="text-[9px] font-bold uppercase tracking-[.17em] text-[#8a7b72]">{p.brand}</div>
+          <div className="mt-1.5 line-clamp-3 font-serif text-[17px] font-semibold leading-[1.12] text-[#191513]">
+            {p.name}
           </div>
+          <div className="mt-2 text-[15px] font-semibold text-[#191513]">{formatPrice(p.priceCents)}</div>
+          <button
+            type="button"
+            onClick={openItem}
+            title={`Open ${retailHost}`}
+            className="mt-2 inline-flex max-w-full rounded-full bg-[#efe5dc] px-2.5 py-1.5 text-[9px] text-[#8a7b72] transition hover:bg-[#e8d8ca] hover:text-[#191513]"
+          >
+            <span className="truncate">{p.retailer}</span>
+          </button>
 
-          <div className="mt-auto pt-3">
-            <div className="text-[10px] uppercase tracking-[.12em] text-muted">{p.retailer}</div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`rounded-full px-2 py-1 text-[9px] uppercase tracking-[.16em] ${
-                p.trusted === false
-                  ? 'bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/20'
-                  : 'bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20'
-              }`}>
-                {p.trusted === false ? 'Expanded result' : 'Trusted retailer'}
-              </span>
-              <span className="text-[10px] text-muted-2">Tap to add to your fit</span>
-            </div>
-          </div>
+          <button
+            type="button"
+            aria-label={selected ? 'Added to fit' : 'Swap into fit'}
+            className="mt-auto inline-flex w-full items-center justify-center rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.13em] text-white shadow-pink-glow transition hover:bg-accent-hot"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClick();
+            }}
+          >
+            {selected ? 'Selected' : 'Swap'}
+          </button>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 px-3 pb-3">
-        <button
-          type="button"
-          className="inline-flex rounded-full bg-accent px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-white transition hover:bg-accent-hot"
-          onClick={onClick}
-        >
-          Add to fit
-        </button>
-        <button
-          type="button"
-          className="inline-flex rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"
-          onClick={openItem}
-        >
-          View item
-        </button>
       </div>
     </article>
   );

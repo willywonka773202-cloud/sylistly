@@ -1,5 +1,6 @@
-import photoCatalogData from '@/data/photo-catalog.json';
+import photoCatalogData from '../data/photo-catalog.json';
 import type { Category, Product, SearchIntent } from './types';
+import { presentationScore } from './presentation-score';
 
 type PersistedCatalogProduct = Product & {
   metadata?: Product['metadata'] & {
@@ -54,6 +55,7 @@ function photoCatalogScore(product: Product, intent: SearchIntent, rawQuery: str
   ]);
 
   let score = product.trusted === false ? 0 : 8;
+  score += presentationScore(product, intent);
 
   if (intent.priceMax && product.priceCents > intent.priceMax * 100) score -= 12;
   if (intent.priceMin && product.priceCents < intent.priceMin * 100) score -= 6;
@@ -83,12 +85,14 @@ function photoCatalogScore(product: Product, intent: SearchIntent, rawQuery: str
 export function searchPhotoCatalog(
   intent: SearchIntent,
   rawQuery: string,
-  limit = 6,
+  limit = 10,
 ): Product[] {
   const pool = PHOTO_CATALOG_PRODUCTS.filter((product) => product.category === intent.category);
   if (!pool.length) return [];
 
   const scored = pool
+    .filter((product) => !intent.priceMax || product.priceCents <= intent.priceMax * 100)
+    .filter((product) => !intent.priceMin || product.priceCents >= intent.priceMin * 100)
     .map((product) => ({
       product,
       score: photoCatalogScore(product, intent, rawQuery),

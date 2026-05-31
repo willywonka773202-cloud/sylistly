@@ -9,6 +9,7 @@ interface Props {
   title: string;
   description: string;
   children?: ReactNode;
+  maxWidthClassName?: string;
 }
 
 export function PlaceholderScreen({
@@ -17,9 +18,10 @@ export function PlaceholderScreen({
   title,
   description,
   children,
+  maxWidthClassName = 'max-w-[440px]',
 }: Props) {
   return (
-    <main className="flex h-[100dvh] max-w-[440px] mx-auto flex-col bg-bg">
+    <main className={`mx-auto flex h-[100dvh] flex-col bg-bg ${maxWidthClassName}`}>
       <div className="flex-1 overflow-y-auto px-4 pb-6 pt-11">
         <div className="flex items-center justify-between border-b border-hairline pb-3">
           <div>
@@ -32,7 +34,7 @@ export function PlaceholderScreen({
             </p>
           </div>
           <Link
-            href="/"
+            href="/build"
             className="inline-flex items-center gap-1 rounded-full border border-hairline-2 px-3 py-2 text-[11px] font-medium text-muted-2 transition hover:border-accent hover:text-ink"
           >
             <ArrowLeft size={12} />
