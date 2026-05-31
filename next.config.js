@@ -17,6 +17,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: { bodySizeLimit: '2mb' },
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 };
 
