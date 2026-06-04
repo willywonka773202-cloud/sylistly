@@ -1,11 +1,12 @@
 'use client';
-import { Grid, Star, Bookmark, User, Flame, Layers } from 'lucide-react';
+import { Grid, Star, Bookmark, User, Flame, Layers, Camera } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 const tabs = [
   { href: '/feed', label: 'Feed', icon: Flame },
   { href: '/swipe', label: 'Swipe', icon: Layers },
+  { href: '/snap', label: 'Snap', icon: Camera },
   { href: '/build', label: 'Build', icon: Grid },
   { href: '/discover', label: 'Discover', icon: Star },
   { href: '/saved', label: 'Saved', icon: Bookmark },
@@ -16,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <nav className="sticky bottom-0 z-40 grid grid-cols-6 border-t border-hairline bg-bg/85 pb-[max(10px,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
+    <nav className="sticky bottom-0 z-40 grid grid-cols-7 border-t border-hairline bg-bg/85 pb-[max(10px,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
       {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (

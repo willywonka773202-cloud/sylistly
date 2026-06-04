@@ -330,3 +330,94 @@ export async function rerankProducts(
     return fallback;
   }
 }
+
+const VISION_TIMEOUT_MS = 22_000;
+
+export type SnapMediaType = 'image/jpeg' | 'image/png' | 'image/webp';
+
+export interface DetectedGarment {
+  category: Category;
+  label: string; // human label, e.g. "Cream cable-knit sweater"
+  query: string; // shopping search query, e.g. "cream oversized cable-knit sweater"
+  color?: string;
+}
+
+const VALID_CATEGORIES: Category[] = [
+  'hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry',
+];
+
+/**
+ * "Snap to Shop": look at a photo of an outfit and identify each shoppable
+ * garment/accessory, with a precise search query for each. Powers the
+ * camera -> shoppable-outfit flow. Throws if no vision-capable key is set.
+ */
+export async function identifyOutfitFromImage(
+  imageBase64: string,
+  mediaType: SnapMediaType,
+): Promise<DetectedGarment[]> {
+  const client = getClient();
+  if (!client) throw new Error('vision_unavailable');
+
+  const res = await withTimeout(
+    client.messages.create({
+      model: MODEL,
+      max_tokens: 800,
+      system:
+        `You are a fashion stylist's trained eye. Look at the outfit in the image and identify each ` +
+        `distinct shoppable wearable item. For EACH item return: ` +
+        `"category" (exactly one of: hat, outer, top, bottom, shoes, bag, eyewear, jewelry), ` +
+        `"label" (a short human name, e.g. "Cream cable-knit sweater"), ` +
+        `"query" (a precise shopping search query of color + material + cut + item, ` +
+        `e.g. "cream oversized cable-knit sweater"), and "color" (the dominant color word). ` +
+        `Only include items clearly visible and shoppable. Ignore the person, skin, background, ` +
+        `and anything not wearable. At most one item per category (pick the most prominent). ` +
+        `Return STRICT JSON only, no prose:\n` +
+        `{ "items": [ { "category": string, "label": string, "query": string, "color": string } ] }`,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: imageBase64 },
+            },
+            {
+              type: 'text',
+              text: 'Identify every shoppable clothing item and accessory in this outfit. JSON only.',
+            },
+          ],
+        },
+      ],
+    }),
+    VISION_TIMEOUT_MS,
+    'Vision timed out',
+  );
+
+  const text = res.content
+    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .map((block) => block.text)
+    .join('');
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('vision_no_json');
+
+  const parsed = JSON.parse(jsonMatch[0]) as {
+    items?: Array<{ category?: string; label?: string; query?: string; color?: string }>;
+  };
+
+  const seen = new Set<Category>();
+  const garments: DetectedGarment[] = [];
+  for (const item of parsed.items || []) {
+    const category = item.category as Category;
+    const query = (item.query || '').trim();
+    if (!query || !VALID_CATEGORIES.includes(category) || seen.has(category)) continue;
+    seen.add(category);
+    garments.push({
+      category,
+      label: (item.label || query).slice(0, 64),
+      query: query.slice(0, 120),
+      color: item.color?.trim() || undefined,
+    });
+  }
+  return garments.slice(0, 8);
+}
