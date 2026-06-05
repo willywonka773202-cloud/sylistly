@@ -90,8 +90,6 @@ const COLOR_LEXICON: Record<string, string> = {
   silver: 'silver', metallic: 'silver', chrome: 'silver',
 };
 
-const NEUTRAL_COLORS = new Set(['black', 'white', 'grey', 'beige', 'tan', 'taupe', 'brown', 'navy', 'silver', 'gold']);
-
 function inferColors(product: Product): string[] {
   const found = new Set<string>();
   for (const raw of product.colors || []) {

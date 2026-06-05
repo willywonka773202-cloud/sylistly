@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
