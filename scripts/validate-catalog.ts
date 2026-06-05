@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { DROP_CATALOG_PRODUCTS } from '../lib/drop-catalog';
 import { genderMismatchReasons, productGenderTags } from '../lib/frame-inference';
 import type { Category, Product } from '../lib/types';
 
@@ -171,7 +172,8 @@ async function main(): Promise<void> {
   const generated = await readJson<Product[]>(GENERATED_PATH, []);
   const photo = await readJson<Product[]>(PHOTO_PATH, []);
   const overrides = await readJson<Record<string, CatalogTagOverride>>(OVERRIDES_PATH, {});
-  const all = [...photo, ...generated].map((product) => applyOverride(product, overrides[product.id]));
+  const drop = DROP_CATALOG_PRODUCTS as Product[];
+  const all = [...drop, ...photo, ...generated].map((product) => applyOverride(product, overrides[product.id]));
   const generatedWithOverrides = generated.map((product) => applyOverride(product, overrides[product.id]));
 
   const errors: string[] = [];
@@ -205,6 +207,7 @@ async function main(): Promise<void> {
   }
 
   console.log(`Generated products: ${generated.length}`);
+  console.log(`Drop catalog products: ${drop.length}`);
   console.log(`JSON-backed cached catalog products: ${all.length}`);
   console.log(`Catalog tag overrides: ${Object.keys(overrides).length}`);
   console.log(`Generated products with direct retailer URLs: ${generatedWithOverrides.filter(hasDirectRetailerUrl).length}`);

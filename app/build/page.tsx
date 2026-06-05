@@ -1,9 +1,9 @@
 'use client';
-import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, Sparkles, Wand2 } from 'lucide-react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { ArrowUpRight, Bookmark, ChevronRight, ExternalLink, Info, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mannequin, type FitVariant } from '@/components/Mannequin';
+import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
@@ -14,15 +14,25 @@ import { useSocialFeed } from '@/store/social-feed';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
   collectOutfitProductIds,
+  getClientCatalogProducts,
+  getBrandOrMerchant,
   getOutfitBrandCounts,
   getShoeId,
   hydrateItemsFromCatalog,
   outfitFullSignature,
   outfitRequiredSignature,
-} from '@/lib/catalog';
+} from '@/lib/client-catalog';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { proxiedImageUrl } from '@/lib/image-url';
-import { filterRenderableProducts, hasUsableProductImage, isRenderableProduct } from '@/lib/product-image-quality';
+import { hasFrameMismatch } from '@/lib/frame-inference';
+import {
+  getTransparentProductImageUrl,
+  hasHighCategoryConfidence,
+  hasExactProductLink,
+  hasTransparentProductImage,
+  isEditorialCutoutProduct,
+  productImageQualityScore,
+  sortTransparentFeedRenderableProducts,
+} from '@/lib/product-image-quality';
 import {
   VIBES,
   getBudgetMaxCents,
@@ -65,6 +75,122 @@ const FULL_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
   preppy: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
 };
 
+function isBuildReadyProduct(product?: Product | null): product is Product {
+  return Boolean(product && isEditorialCutoutProduct(product) && hasExactProductLink(product));
+}
+
+function isBuildReadySlotProduct(product: Product | null | undefined, slot: Category): product is Product {
+  return Boolean(
+    product
+    && product.category === slot
+    && isBuildReadyProduct(product)
+    && hasHighCategoryConfidence(product, slot),
+  );
+}
+
+function slotProductText(product: Product): string {
+  return [
+    product.brand,
+    product.name,
+    product.retailer,
+    ...(product.searchTerms || []),
+    ...(product.vibes || []),
+    ...(product.occasions || []),
+  ].join(' ').toLowerCase();
+}
+
+function slotCandidateScore(product: Product, query: string): number {
+  const queryTerms = query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((term) => term.length >= 3);
+  const text = slotProductText(product);
+  const queryHits = queryTerms.filter((term) => text.includes(term)).length;
+  return productImageQualityScore(product)
+    + queryHits * 8
+    + (hasExactProductLink(product) ? 40 : 0)
+    + (hasTransparentProductImage(product) ? 30 : 0);
+}
+
+function brandConcentrationPenalty(
+  product: Product,
+  recentBrandCounts: Record<string, number> = {},
+  draftItems: Partial<Record<Category, Product>> = {},
+): number {
+  const brand = getBrandOrMerchant(product);
+  if (!brand) return 0;
+  const recentCount = recentBrandCounts[brand] || 0;
+  const draftCount = Object.values(draftItems)
+    .filter((item): item is Product => Boolean(item))
+    .filter((item) => item.id !== product.id && getBrandOrMerchant(item) === brand)
+    .length;
+  return recentCount * 72
+    + Math.max(0, recentCount - 1) * 90
+    + draftCount * 260
+    + Math.max(0, draftCount - 1) * 320;
+}
+
+function buildSlotCandidateRankScore(
+  product: Product,
+  query: string,
+  recentBrandCounts: Record<string, number> = {},
+  draftItems: Partial<Record<Category, Product>> = {},
+): number {
+  return slotCandidateScore(product, query) - brandConcentrationPenalty(product, recentBrandCounts, draftItems);
+}
+
+function pickBuildSlotCandidate(
+  products: Product[],
+  slot: Category,
+  query: string,
+  avoidIds: string[] = [],
+  recentBrandCounts: Record<string, number> = {},
+  draftItems: Partial<Record<Category, Product>> = {},
+): Product | null {
+  const avoidSet = new Set(avoidIds);
+  const slotReady = products
+    .filter((product) => isBuildReadySlotProduct(product, slot))
+    .sort((left, right) =>
+      buildSlotCandidateRankScore(right, query, recentBrandCounts, draftItems)
+      - buildSlotCandidateRankScore(left, query, recentBrandCounts, draftItems),
+    );
+
+  const fresh = slotReady.filter((product) => !avoidSet.has(product.id));
+  const pool = fresh.length ? fresh : slotReady;
+  const shortList = pool.slice(0, Math.min(8, pool.length));
+  if (!shortList.length) return null;
+
+  const totalWeight = shortList.reduce((sum, product, index) => sum + Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems) / 25)), 0);
+  let roll = Math.random() * totalWeight;
+  for (let index = 0; index < shortList.length; index += 1) {
+    const product = shortList[index];
+    roll -= Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems) / 25));
+    if (roll <= 0) return product;
+  }
+  return shortList[0];
+}
+
+function mergeBuildCandidates(...candidateGroups: Product[][]): Product[] {
+  const productsById = new Map<string, Product>();
+  for (const product of candidateGroups.flat()) {
+    if (!product?.id || productsById.has(product.id)) continue;
+    productsById.set(product.id, product);
+  }
+  return Array.from(productsById.values());
+}
+
+function filterBuildContextProducts(products: Product[], frame: GeneratorFrame, priceMax?: number | null): Product[] {
+  const maxCents = typeof priceMax === 'number' && Number.isFinite(priceMax) && priceMax > 0
+    ? priceMax * 100
+    : null;
+
+  return products.filter((product) => {
+    if (maxCents && product.priceCents > maxCents) return false;
+    if (hasFrameMismatch(product, frame)) return false;
+    return true;
+  });
+}
+
 function defaultGenerationSlotsForVibe(vibe: VibeId): Category[] {
   return FULL_GENERATOR_SLOTS[vibe] || STARTER_GENERATOR_SLOTS[vibe] || ['top', 'bottom', 'shoes', 'bag'];
 }
@@ -84,45 +210,6 @@ interface BuilderPreferenceHistory {
   products: Record<string, { saved: number; passed: number }>;
 }
 
-const FIT_VARIANT_MAP: Record<FitVariant, Partial<Record<VibeId, VibeId>>> = {
-  casual: {
-    night: 'clean',
-    street: 'cozy',
-    clean: 'cozy',
-    gym: 'cozy',
-    cozy: 'cozy',
-    date: 'clean',
-    office: 'clean',
-    vacation: 'cozy',
-    edgy: 'street',
-    preppy: 'clean',
-  },
-  elevated: {
-    night: 'night',
-    street: 'office',
-    clean: 'office',
-    gym: 'clean',
-    cozy: 'office',
-    date: 'night',
-    office: 'office',
-    vacation: 'date',
-    edgy: 'night',
-    preppy: 'office',
-  },
-  bold: {
-    night: 'edgy',
-    street: 'street',
-    clean: 'edgy',
-    gym: 'street',
-    cozy: 'street',
-    date: 'night',
-    office: 'edgy',
-    vacation: 'street',
-    edgy: 'edgy',
-    preppy: 'street',
-  },
-};
-
 const CATEGORY_LABELS: Record<Category, string> = {
   hat: 'Headwear',
   outer: 'Outer',
@@ -136,7 +223,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
-const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v1';
+const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v2';
 const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
 
 /**
@@ -156,16 +243,16 @@ function itemSignature(items: Partial<Record<Category, Product>>): string {
     .join('|');
 }
 
-const BUILD_SECTION_TABS = ['build', 'refine', 'details'] as const;
-type BuildSectionTab = typeof BUILD_SECTION_TABS[number];
+type BuildSectionTab = 'build' | 'settings' | 'refine' | 'details';
 
 const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
   build: 'Build',
+  settings: 'Settings',
   refine: 'Refine',
   details: 'Details',
 };
 
-const BUILD_OVERLAY_TABS = ['refine', 'details'] as const;
+const BUILD_OVERLAY_TABS = ['settings', 'refine', 'details'] as const;
 
 function recordBuilderPreferenceEvent(
   kind: BuilderPreferenceKind,
@@ -239,12 +326,6 @@ function useBodyScrollLock(locked: boolean) {
     };
   }, [locked]);
 }
-
-const VARIANT_COPY: Record<FitVariant, { title: string; blurb: string }> = {
-  casual: { title: 'Casual', blurb: 'Relax the look' },
-  elevated: { title: 'Elevated', blurb: 'Sharpen the silhouette' },
-  bold: { title: 'Bold', blurb: 'Push contrast and statement' },
-};
 
 interface OutfitAnalysis {
   score: number;
@@ -325,6 +406,7 @@ function BuilderPageContent({
   quickFrame,
   quickSlots,
   quickLock,
+  quickSource,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
@@ -332,6 +414,7 @@ function BuilderPageContent({
   quickFrame: string | null;
   quickSlots: string | null;
   quickLock: string | null;
+  quickSource: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -361,7 +444,7 @@ function BuilderPageContent({
   const [swipeFeedback, setSwipeFeedback] = useState<'save' | 'pass' | null>(null);
   const [dragIntent, setDragIntent] = useState<'save' | 'pass' | null>(null);
   const [swipeCoachLabel, setSwipeCoachLabel] = useState<'save' | 'pass' | null>(null);
-  const [swipeHintDismissed, setSwipeHintDismissed] = useState(true);
+  const [swipeHintDismissed, setSwipeHintDismissed] = useState(false);
   const [swipeHintRunCount, setSwipeHintRunCount] = useState(0);
   const [saveBurst, setSaveBurst] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
@@ -373,12 +456,13 @@ function BuilderPageContent({
   // NOT inside a useEffect that depends on `items` — so it can't loop.
   const [recentChangedSlots, setRecentChangedSlots] = useState<Category[]>([]);
   const recentChangedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const quickSourceProcessedRef = useRef(false);
   const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
   const n = count();
-  const renderItems = hasMounted ? items : {};
+  const renderItems = useMemo<Partial<Record<Category, Product>>>(() => (hasMounted ? items : {}), [hasMounted, items]);
   const renderN = hasMounted ? n : 0;
   const totalDisplay = `$${(total / 100).toFixed(2)}`;
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
@@ -402,6 +486,34 @@ function BuilderPageContent({
     'top';
   const lockedSlotSet = useMemo(() => new Set(lockedSlots), [lockedSlots]);
 
+  const playSwipeHint = useCallback(async () => {
+    if (generatorLoading || boardDragging || searchFor) return;
+    if (window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1') {
+      setSwipeHintDismissed(true);
+      return;
+    }
+
+    setSwipeHintRunCount((current) => current + 1);
+    setSwipeCoachLabel('pass');
+    await boardControls.start({
+      x: -30,
+      rotate: -1.6,
+      transition: { type: 'spring', stiffness: 170, damping: 18 },
+    });
+    setSwipeCoachLabel('save');
+    await boardControls.start({
+      x: 34,
+      rotate: 1.8,
+      transition: { type: 'spring', stiffness: 170, damping: 18 },
+    });
+    await boardControls.start({
+      x: 0,
+      rotate: 0,
+      transition: { type: 'spring', stiffness: 220, damping: 20 },
+    });
+    setSwipeCoachLabel(null);
+  }, [boardControls, boardDragging, generatorLoading, searchFor]);
+
   useBodyScrollLock(Boolean(activeBuildOverlay || checkoutProducts));
 
   useEffect(() => {
@@ -420,13 +532,13 @@ function BuilderPageContent({
     if (seen) return;
     const timeout = window.setTimeout(() => void playSwipeHint(), 850);
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [playSwipeHint]);
 
   useEffect(() => {
     if (swipeHintDismissed || swipeHintRunCount >= 2 || boardDragging || generatorLoading || searchFor) return;
     const timeout = window.setTimeout(() => void playSwipeHint(), 6500);
     return () => window.clearTimeout(timeout);
-  }, [boardDragging, generatorLoading, searchFor, swipeHintDismissed, swipeHintRunCount]);
+  }, [boardDragging, generatorLoading, playSwipeHint, searchFor, swipeHintDismissed, swipeHintRunCount]);
 
   useEffect(() => {
     if (!generatorLoading) {
@@ -473,6 +585,15 @@ function BuilderPageContent({
   }, [quickVibe]);
 
   useEffect(() => {
+    if (quickSourceProcessedRef.current) return;
+    if (quickSource !== 'syli') return;
+    if (!hasMounted || n === 0) return;
+    setStatusMessage(`Loaded ${n} Syli recommendation${n === 1 ? '' : 's'} into Builder. Lock any piece you love, then remix or save.`);
+    quickSourceProcessedRef.current = true;
+    router.replace('/build');
+  }, [hasMounted, n, quickSource, router]);
+
+  useEffect(() => {
     if (quickSlots) return;
     setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe));
   }, [quickSlots, selectedVibe]);
@@ -512,22 +633,51 @@ function BuilderPageContent({
     if (quickSlot || quickQuery) router.replace('/');
   }
 
-  async function runCategorySearch(category: Category, query: string, avoidIds: string[] = []): Promise<Product | null> {
+  async function runCategorySearch(
+    category: Category,
+    query: string,
+    avoidIds: string[] = [],
+    draftItems: Partial<Record<Category, Product>> = items,
+  ): Promise<Product | null> {
+    const catalogFallbackProducts = filterBuildContextProducts(getClientCatalogProducts(80, category), generatorFrame, activePriceMax);
+    const catalogCandidate = pickBuildSlotCandidate(
+      catalogFallbackProducts,
+      category,
+      query,
+      avoidIds,
+      recentBrandCountsRef.current,
+      draftItems,
+    );
+    if (catalogCandidate) return catalogCandidate;
+
     const response = await fetch('/api/search', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ query, category, frame: generatorFrame, priceMax: activePriceMax }),
+      body: JSON.stringify({
+        query,
+        category,
+        frame: generatorFrame,
+        priceMax: activePriceMax,
+        transparentOnly: true,
+        exactOnly: true,
+      }),
     });
     const data = await response.json();
     if (!response.ok) {
       throw new Error(typeof data.error === 'string' ? data.error : 'Search failed.');
     }
-    const products = Array.isArray(data.products) ? filterRenderableProducts(data.products.filter(Boolean) as Product[]) : [];
-    const avoidSet = new Set(avoidIds);
-    const preferred = products.filter((product) => !avoidSet.has(product.id));
-    const eligible = preferred.length ? preferred : products;
-    const pool = eligible.slice(0, Math.min(12, eligible.length));
-    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+    const searchProducts = Array.isArray(data.products)
+      ? filterBuildContextProducts(sortTransparentFeedRenderableProducts(data.products.filter(Boolean) as Product[]), generatorFrame, activePriceMax)
+      : [];
+    const products = mergeBuildCandidates(searchProducts, catalogFallbackProducts);
+    return pickBuildSlotCandidate(
+      products,
+      category,
+      query,
+      avoidIds,
+      recentBrandCountsRef.current,
+      draftItems,
+    );
   }
 
   async function generateLook(
@@ -597,6 +747,7 @@ function BuilderPageContent({
         ...recentGeneratedIds.filter((id) => !lockedProductIds.has(id)),
         ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds.filter((id) => !lockedProductIds.has(id)) : []),
       ]));
+      const avoidedGeneratedIds = new Set(avoidProductIds);
 
       const lookResponse = await fetch('/api/look', {
         method: 'POST',
@@ -627,7 +778,8 @@ function BuilderPageContent({
       if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
         for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
           if (!targetSlots.includes(slot)) continue;
-          if (!isRenderableProduct(product)) continue;
+          if (avoidedGeneratedIds.has(product.id) && !lockedProductIds.has(product.id)) continue;
+          if (!isBuildReadySlotProduct(product, slot)) continue;
           nextItems[slot] = product;
           addedCount += 1;
         }
@@ -658,12 +810,13 @@ function BuilderPageContent({
                   .filter((product): product is Product => Boolean(product))
                   .map((product) => product.id),
               ])),
+              nextItems,
             ),
           })),
         );
 
         for (const result of results) {
-          if (result.status !== 'fulfilled' || !isRenderableProduct(result.value.product)) continue;
+          if (result.status !== 'fulfilled' || !isBuildReadySlotProduct(result.value.product, result.value.slot)) continue;
           nextItems[result.value.slot] = result.value.product;
           addedCount += 1;
         }
@@ -733,16 +886,9 @@ function BuilderPageContent({
     }
   }
 
-  async function generateVariant(variant: FitVariant) {
-    const mappedVibe = FIT_VARIANT_MAP[variant][selectedVibe] || selectedVibe;
-    if (mappedVibe !== selectedVibe) {
-      setSelectedVibe(mappedVibe);
-    }
-
-    await generateLook('full', {
-      vibeId: mappedVibe,
-      sourceLabel: `${variant.charAt(0).toUpperCase() + variant.slice(1)} pass.`,
-    });
+  async function generateFromSettings(mode: 'starter' | 'missing' | 'full' | 'refresh') {
+    setActiveBuildOverlay(null);
+    await generateLook(mode);
   }
 
   function toggleGenerationSlot(category: Category) {
@@ -880,7 +1026,7 @@ function BuilderPageContent({
     }
 
     await generateLook(hasCurrentFit ? 'refresh' : 'full', {
-      sourceLabel: direction === 'right' ? 'Saved swipe.' : 'Pass swipe.',
+      sourceLabel: direction === 'right' ? 'Saved look.' : 'Passed look.',
     });
   }
 
@@ -889,34 +1035,6 @@ function BuilderPageContent({
       window.localStorage.setItem(SWIPE_HINT_STORAGE_KEY, '1');
     }
     setSwipeHintDismissed(true);
-    setSwipeCoachLabel(null);
-  }
-
-  async function playSwipeHint() {
-    if (generatorLoading || boardDragging || searchFor) return;
-    if (window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1') {
-      setSwipeHintDismissed(true);
-      return;
-    }
-
-    setSwipeHintRunCount((current) => current + 1);
-    setSwipeCoachLabel('pass');
-    await boardControls.start({
-      x: -30,
-      rotate: -1.6,
-      transition: { type: 'spring', stiffness: 170, damping: 18 },
-    });
-    setSwipeCoachLabel('save');
-    await boardControls.start({
-      x: 34,
-      rotate: 1.8,
-      transition: { type: 'spring', stiffness: 170, damping: 18 },
-    });
-    await boardControls.start({
-      x: 0,
-      rotate: 0,
-      transition: { type: 'spring', stiffness: 220, damping: 20 },
-    });
     setSwipeCoachLabel(null);
   }
 
@@ -989,35 +1107,57 @@ function BuilderPageContent({
   }
 
   const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
+  const nextBuildAction = computeNextBestAction(renderItems, lockedSlots, renderN);
+  const builderProducts = Object.values(renderItems).filter((product): product is Product => Boolean(product));
+  const builderTransparentCount = builderProducts.filter(hasTransparentProductImage).length;
+  const builderLinkedCount = builderProducts.filter((product) => Boolean(getProductOutboundUrl(product))).length;
+  const builderExactLinkedCount = builderProducts.filter(hasExactProductLink).length;
 
   return (
-    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg">
-      <header className="flex items-center justify-between px-4 pb-2.5 pt-10">
+    <main
+      className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
+      data-build-route="true"
+      data-build-product-count={builderProducts.length}
+      data-build-transparent-count={builderTransparentCount}
+      data-build-linked-count={builderLinkedCount}
+      data-build-exact-linked-count={builderExactLinkedCount}
+    >
+      <header className="relative flex items-center justify-between px-4 pb-2.5 pt-10">
         <button
           type="button"
           onClick={() => router.back()}
-          className="grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
+          className="relative z-10 grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
           aria-label="Back"
         >
           <ArrowUpRight size={15} className="rotate-[225deg]" />
         </button>
-        <div className="text-center">
-          <div className="font-serif text-[18px] font-semibold leading-none text-ink">
+        <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[160px] -translate-x-1/2 text-center min-[380px]:w-[190px]">
+          <div className="truncate font-serif text-[17px] font-semibold leading-none text-ink min-[380px]:text-[18px]">
             Sylistly <em className="italic text-accent">Builder</em>
           </div>
           <div className="mt-1 text-[9px] font-semibold uppercase tracking-[.16em] text-muted">
             Build. Refine. Wear.
           </div>
         </div>
-        <button
-          onClick={saveFit}
-          disabled={renderN === 0}
-          className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold ${
-            renderN > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
-          }`}
-        >
-          <Bookmark size={12} /> Save fit
-        </button>
+        <div className="relative z-10 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveBuildOverlay('settings')}
+            className="grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
+            aria-label="Generation settings"
+          >
+            <SlidersHorizontal size={14} />
+          </button>
+          <button
+            onClick={saveFit}
+            disabled={renderN === 0}
+            className={`grid h-9 w-9 place-items-center rounded-full border text-xs font-semibold min-[380px]:flex min-[380px]:w-auto min-[380px]:gap-1.5 min-[380px]:px-3.5 min-[380px]:py-2 ${
+              renderN > 0 ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-hairline-2 text-muted-2'
+            }`}
+          >
+            <Bookmark size={12} /> <span className="hidden min-[380px]:inline">Save</span>
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
@@ -1031,7 +1171,7 @@ function BuilderPageContent({
                 className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
                   activeSwipeCue === 'pass'
                     ? 'border-white/25 bg-black/78 text-white shadow-[0_12px_30px_rgba(0,0,0,.32)]'
-                    : 'border-white/10 bg-black/28 text-white/42'
+                    : 'border-white/10 bg-black/28 text-white/42 opacity-0'
                 }`}
               >
                 Pass
@@ -1040,7 +1180,7 @@ function BuilderPageContent({
                 className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
                   activeSwipeCue === 'save'
                     ? 'border-accent bg-accent text-white shadow-pink-glow'
-                    : 'border-accent/20 bg-accent/10 text-white/48'
+                    : 'border-accent/20 bg-accent/10 text-white/48 opacity-0'
                 }`}
               >
                 Save
@@ -1110,18 +1250,31 @@ function BuilderPageContent({
                 />
               </motion.div>
             </div>
-            <div className="border-t border-hairline px-1 pt-4 text-center">
-              <div className="text-[12px] font-medium leading-relaxed text-muted-2">
-                <span className="text-[#fff4ee]">Swipe left</span> to pass / <span className="text-[#fff4ee]">Swipe right</span> to save / <span className="text-[#fff4ee]">Tap</span> any slot to refine
+            <div className="border-t border-hairline px-1 pt-4">
+              <div className="mb-3 flex items-center justify-center rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(246,48,107,.18)]">
+                Drag the fit sideways · left passes · right saves
               </div>
-              <div className="mt-1 text-[11px] text-muted">
-                Pink-lit slots are editable pieces. The chips below choose what generates next.
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 text-left">
+                  <div className="text-[10px] font-black uppercase tracking-[.18em] text-accent">Generate</div>
+                  <div className="mt-1 truncate text-[12px] font-semibold text-ink">
+                    {activeVibe.label} · {selectedGenerationSlots.length} slots · {renderN ? totalDisplay : 'ready'}
+                  </div>
+                  <div className="mt-1 text-[11px] leading-relaxed text-muted">
+                    Tap any slot to swap it, or swipe the card back and forth for the next look. Settings controls the categories.
+                    {lockedSlots.length ? ` ${lockedSlots.length} locked.` : ''}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveBuildOverlay('settings')}
+                  className="inline-flex flex-none items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-[.12em] text-muted-2 transition hover:border-accent/60 hover:text-ink"
+                >
+                  <SlidersHorizontal size={12} />
+                  Settings
+                </button>
               </div>
-              <div className="mt-1 text-[11px] uppercase tracking-[.16em] text-muted">
-                Selected {selectedGenerationSlots.length} of {CATEGORY_ORDER.length} categories
-                {lockedSlots.length ? ` / Locked ${lockedSlots.length}` : ''}
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-3 grid grid-cols-[.9fr_1.3fr_.9fr] gap-2">
                 <button
                   type="button"
                   onClick={() => void performBoardSwipe('left')}
@@ -1132,6 +1285,15 @@ function BuilderPageContent({
                 </button>
                 <button
                   type="button"
+                  onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
+                  disabled={generatorLoading || selectedGenerationSlots.length === 0}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(246,48,107,.42)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
+                >
+                  {generatorLoading ? <LoaderCircle size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                  Build
+                </button>
+                <button
+                  type="button"
                   onClick={() => void performBoardSwipe('right')}
                   disabled={generatorLoading || renderN === 0}
                   className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
@@ -1139,55 +1301,13 @@ function BuilderPageContent({
                   Save
                 </button>
               </div>
-              <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-                {CATEGORY_ORDER.map((category) => {
-                  const selected = selectedGenerationSlots.includes(category);
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => toggleGenerationSlot(category)}
-                      className={`rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] transition ${
-                        selected
-                          ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
-                          : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
-                      }`}
-                    >
-                      {CATEGORY_LABELS[category]}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
-                >
-                  Use vibe defaults
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-[#f2e7df] transition hover:border-accent hover:text-ink"
-                >
-                  Select all
-                </button>
-              </div>
-              <button
-                type="button"
-                onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
-                disabled={generatorLoading || selectedGenerationSlots.length === 0}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-4 text-[12px] font-semibold uppercase tracking-[.14em] text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] transition active:scale-[0.97] hover:bg-right motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
-              >
-                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                Build selected fit
-              </button>
             </div>
           </section>
 
-          {/* AI Stylist Command Center — live state, next-best-action, mode pills */}
-          <section className="flex flex-col gap-3">
+          {false ? (
+            <>
+          {/* Legacy generation controls are kept out of render; the Settings sheet owns this UI now. */}
+          <section className="hidden">
             <div className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(246,48,107,.22),transparent_45%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.025))] p-5 shadow-[0_28px_64px_rgba(246,48,107,.22)]">
               <div className="flex items-center gap-3">
                 <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-accent text-white shadow-pink-glow">
@@ -1236,8 +1356,8 @@ function BuilderPageContent({
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Next best</div>
-                      <div className="mt-0.5 text-[12px] font-semibold leading-snug text-white/92">{nba.label}</div>
-                      <div className="mt-0.5 text-[11px] leading-relaxed text-white/72">{nba.hint}</div>
+                      <div className="mt-0.5 text-[12px] font-semibold leading-snug text-white/92">{nba!.label}</div>
+                      <div className="mt-0.5 text-[11px] leading-relaxed text-white/72">{nba!.hint}</div>
                     </div>
                   </div>
                 );
@@ -1304,7 +1424,7 @@ function BuilderPageContent({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3">
+          <section className="hidden">
             <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -1343,7 +1463,7 @@ function BuilderPageContent({
                 </div>
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {VIBES.map((vibe) => (
                   <button
                     key={vibe.id}
@@ -1360,9 +1480,9 @@ function BuilderPageContent({
                 ))}
               </div>
 
-              <div className="mt-5 flex items-center justify-between gap-2">
+              <div className="mt-5 flex flex-col items-center gap-2 text-center">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
-                <div className="flex flex-wrap justify-end gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {[ 
                     { value: 'any', label: 'Any' },
                     { value: 'under100', label: '< $100' },
@@ -1419,9 +1539,9 @@ function BuilderPageContent({
                 </div>
               ) : null}
 
-              <div className="mt-5 flex items-center justify-between gap-2">
+              <div className="mt-5 flex flex-col items-center gap-2 text-center">
                 <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
-                <div className="flex flex-wrap justify-end gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {[
                     { value: 'masc', label: 'Male' },
                     { value: 'fem', label: 'Female' },
@@ -1483,20 +1603,22 @@ function BuilderPageContent({
               </div>
             </div>
           </section>
+            </>
+          ) : null}
 
-          <section className="rounded-[28px] border border-white/10 bg-[#141210]/92 p-3 shadow-[0_18px_42px_rgba(0,0,0,.2)]">
+          <section className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))] p-3 shadow-[0_18px_42px_rgba(40,20,24,.16)]">
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                className="rounded-full border border-hairline bg-surface-2 px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Refine
               </button>
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                className="rounded-full border border-hairline bg-surface-2 px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Details
               </button>
@@ -1525,7 +1647,242 @@ function BuilderPageContent({
           onChangeTab={setActiveBuildOverlay}
           onClose={() => setActiveBuildOverlay(null)}
         >
-          {activeBuildOverlay === 'refine' ? (
+          {activeBuildOverlay === 'settings' ? (
+            <div className="flex flex-col gap-3">
+              <section className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(246,48,107,.18),transparent_44%),linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025))] p-4 shadow-[0_24px_56px_rgba(246,48,107,.18)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[.22em] text-accent">Generation</div>
+                    <div className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">
+                      {activeVibe.label} <em className="italic text-accent">build logic</em>
+                    </div>
+                    <div className="mt-1 text-[12px] leading-relaxed text-muted-2">
+                      Choose what the next fit is allowed to change. Locked pieces stay put.
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
+                    <div className="text-[9px] uppercase tracking-[.16em] text-muted">Filled</div>
+                    <div className="mt-0.5 text-[13px] font-semibold text-ink">{renderN}/8</div>
+                  </div>
+                </div>
+
+                {nextBuildAction ? (
+                  <div className="mt-4 flex items-start gap-2.5 rounded-[18px] border border-accent/35 bg-accent/10 px-3 py-2.5">
+                    <span className="mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full bg-accent text-white">
+                      <Sparkles size={11} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Next best</div>
+                      <div className="mt-0.5 text-[12px] font-semibold leading-snug text-white/92">{nextBuildAction.label}</div>
+                      <div className="mt-0.5 text-[11px] leading-relaxed text-white/72">{nextBuildAction.hint}</div>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void generateFromSettings('starter')}
+                    disabled={generatorLoading}
+                    className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition hover:border-accent/55 disabled:opacity-60"
+                  >
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                      {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                    </span>
+                    <span className="min-w-0 leading-none">
+                      <span className="block text-[11px] font-bold text-ink">Quick Fit</span>
+                      <span className="mt-0.5 block text-[9px] uppercase tracking-[.14em] text-muted">Starter</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void generateFromSettings('missing')}
+                    disabled={generatorLoading}
+                    className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition hover:border-accent/55 disabled:opacity-60"
+                  >
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                      {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Plus size={14} />}
+                    </span>
+                    <span className="min-w-0 leading-none">
+                      <span className="block text-[11px] font-bold text-ink">Fill Missing</span>
+                      <span className="mt-0.5 block text-[9px] uppercase tracking-[.14em] text-muted">Empty slots</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void generateFromSettings('refresh')}
+                    disabled={generatorLoading || renderN === 0}
+                    className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition hover:border-accent/55 disabled:opacity-60"
+                  >
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                      {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <RotateCcw size={14} />}
+                    </span>
+                    <span className="min-w-0 leading-none">
+                      <span className="block text-[11px] font-bold text-ink">Remix</span>
+                      <span className="mt-0.5 block text-[9px] uppercase tracking-[.14em] text-muted">Unlocked</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void generateFromSettings('full')}
+                    disabled={generatorLoading}
+                    className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition hover:border-accent/55 disabled:opacity-60"
+                  >
+                    <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
+                      {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Layers size={14} />}
+                    </span>
+                    <span className="min-w-0 leading-none">
+                      <span className="block text-[11px] font-bold text-ink">Fuller Fit</span>
+                      <span className="mt-0.5 block text-[9px] uppercase tracking-[.14em] text-muted">More pieces</span>
+                    </span>
+                  </button>
+                </div>
+              </section>
+
+              <section className="rounded-[26px] border border-white/10 bg-white/[0.035] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[.18em] text-muted">Vibe</div>
+                    <div className="mt-1 text-[12px] text-muted-2">{activeVibe.blurb}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGenerationSlots(defaultGenerationSlotsForVibe(selectedVibe))}
+                    className="rounded-full border border-accent/35 bg-accent/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.12em] text-accent"
+                  >
+                    Defaults
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                  {VIBES.map((vibe) => (
+                    <button
+                      key={vibe.id}
+                      type="button"
+                      onClick={() => setSelectedVibe(vibe.id)}
+                      className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition active:scale-95 ${
+                        selectedVibe === vibe.id
+                          ? 'bg-accent text-white shadow-pink-glow'
+                          : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
+                      }`}
+                    >
+                      {vibe.label}
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-[26px] border border-white/10 bg-white/[0.035] p-4">
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <div className="text-[10px] font-black uppercase tracking-[.18em] text-muted">Budget</div>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {[
+                      { value: 'any', label: 'Any' },
+                      { value: 'under100', label: '< $100' },
+                      { value: 'under250', label: '< $250' },
+                      { value: 'under500', label: '< $500' },
+                      { value: 'custom', label: 'Custom' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 ${
+                          generatorBudget === option.value
+                            ? 'bg-white text-black'
+                            : 'border border-hairline bg-surface-2 text-muted'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {generatorBudget === 'custom' ? (
+                  <label className="mt-3 flex items-center justify-between gap-3 rounded-[18px] border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-ink">
+                    <span className="font-bold uppercase tracking-[.14em] text-muted">Custom max</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-muted">$</span>
+                      <input
+                        value={customBudgetInput}
+                        onChange={(event) => {
+                          setGeneratorBudget('custom');
+                          setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
+                        }}
+                        inputMode="numeric"
+                        placeholder="180"
+                        className="w-16 bg-transparent text-right outline-none"
+                      />
+                    </span>
+                  </label>
+                ) : null}
+              </section>
+
+              <section className="rounded-[26px] border border-white/10 bg-white/[0.035] p-4">
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <div className="text-[10px] font-black uppercase tracking-[.18em] text-muted">Style frame</div>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {[
+                      { value: 'masc', label: 'Male' },
+                      { value: 'fem', label: 'Female' },
+                      { value: 'androgynous', label: 'Neutral' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setBodyType(option.value as GeneratorFrame)}
+                        className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 ${
+                          generatorFrame === option.value
+                            ? 'bg-white text-black'
+                            : 'border border-hairline bg-surface-2 text-muted'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-[26px] border border-white/10 bg-white/[0.035] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[.18em] text-muted">Generated slots</div>
+                    <div className="mt-1 text-[12px] text-muted-2">
+                      {selectedGenerationSlots.length} selected. Locked slots are protected.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGenerationSlots(CATEGORY_ORDER)}
+                    className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[9px] font-black uppercase tracking-[.12em] text-muted-2"
+                  >
+                    All
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                  {CATEGORY_ORDER.map((category) => {
+                    const selected = selectedGenerationSlots.includes(category);
+                    const locked = lockedSlots.includes(category);
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => toggleGenerationSlot(category)}
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.1em] transition ${
+                          selected
+                            ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
+                            : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
+                        }`}
+                      >
+                        {locked ? <Lock size={9} /> : null}
+                        {CATEGORY_LABELS[category]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
+          ) : activeBuildOverlay === 'refine' ? (
             <div className="flex flex-col gap-3">
               <FocusedRefinePanel
                 items={renderItems}
@@ -1670,7 +2027,7 @@ function FocusedRefinePanel({
       </div>
 
       <div className="mt-4 overflow-x-auto pb-1 scrollbar-hide">
-        <div className="flex w-max gap-2 pr-2">
+        <div className="flex min-w-full w-max justify-center gap-2 pr-2">
           {CATEGORY_ORDER.map((category) => {
             const product = items[category];
             const active = category === activeCategory;
@@ -1698,7 +2055,6 @@ function FocusedRefinePanel({
                   {product ? (
                     <PanelPreviewImage
                       product={product}
-                      category={category}
                       wrapperClassName="h-full w-full"
                       modeClassName="h-full w-full object-contain p-1.5"
                     />
@@ -1728,7 +2084,6 @@ function FocusedRefinePanel({
           {activeProduct ? (
             <PanelPreviewImage
               product={activeProduct}
-              category={activeCategory}
               wrapperClassName="relative h-full w-full"
               modeClassName="h-full w-full object-contain p-5 drop-shadow-[0_18px_24px_rgba(0,0,0,.18)]"
             />
@@ -1817,7 +2172,7 @@ function BuildOverlay({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[80] mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
       <button
         type="button"
         aria-label="Close build panel"
@@ -1849,7 +2204,7 @@ function BuildOverlay({
               x
             </button>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {BUILD_OVERLAY_TABS.map((tab) => (
               <button
                 key={tab}
@@ -1871,75 +2226,6 @@ function BuildOverlay({
         </div>
       </motion.section>
     </div>
-  );
-}
-
-function SelectedPiecesPanel({
-  analysis,
-  items,
-  onOpenSearch,
-}: {
-  analysis: OutfitAnalysis;
-  items: Partial<Record<Category, Product>>;
-  onOpenSearch: (category: Category) => void;
-}) {
-  const stackEntries = CATEGORY_ORDER.filter((category) => items[category]).map((category) => ({
-    category,
-    product: items[category]!,
-  }));
-
-  return (
-    <section className="rounded-[24px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="font-serif text-[18px] font-semibold text-[#fff6f0]">Selected Pieces</div>
-          <span className="rounded-full bg-white/[0.07] px-2 py-0.5 text-[9px] font-semibold text-[#d7c8bf]">
-            {stackEntries.length}/8
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={() => onOpenSearch(analysis.primaryGap || 'top')}
-          className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold text-accent transition hover:text-white"
-        >
-          Edit
-          <ArrowUpRight size={11} />
-        </button>
-      </div>
-
-      <div className="mt-3 grid grid-cols-3 gap-2 min-[390px]:grid-cols-6">
-        {stackEntries.length ? (
-          stackEntries.map(({ category, product }) => (
-            <button
-              key={product.id}
-              type="button"
-              onClick={() => onOpenSearch(category)}
-              className="group min-w-0 text-left"
-            >
-              <div className="relative aspect-square overflow-hidden rounded-[12px] bg-[linear-gradient(180deg,#fbfaf8_0%,#f2ebe5_100%)] ring-1 ring-[#efe4da] transition group-hover:ring-accent/50">
-                <PanelPreviewImage
-                  product={product}
-                  category={category}
-                  modeClassName="h-full w-full object-contain p-1.5"
-                  wrapperClassName="h-full w-full"
-                />
-                <span className="absolute right-1 top-1 grid h-4 w-4 place-items-center rounded-full bg-[#181513] text-[10px] leading-none text-white">
-                  x
-                </span>
-              </div>
-              <div className="mt-1 min-w-0">
-                <div className="truncate text-[8px] uppercase tracking-[.08em] text-[#a69489]">{CATEGORY_LABELS[category]}</div>
-                <div className="truncate text-[9px] text-[#fff4ee]">{product.brand}</div>
-              </div>
-            </button>
-          ))
-        ) : (
-          <div className="col-span-full rounded-[18px] border border-dashed border-white/10 bg-[#141210] px-3 py-5 text-center text-[11px] leading-relaxed text-[#c8b9ae]">
-            Add pieces from the tray to build your selected stack.
-          </div>
-        )}
-      </div>
-    </section>
   );
 }
 
@@ -2028,7 +2314,7 @@ function FitDiagnosticsPanel({
         <div className="mt-3 text-[11px] leading-relaxed text-[#c7b8ae]">{analysis.upgradeNote}</div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
         {analysis.missing.length ? (
           analysis.missing.slice(0, 2).map((category) => (
             <button
@@ -2092,29 +2378,20 @@ function HeatChip({
 
 function PanelPreviewImage({
   product,
-  category,
   wrapperClassName,
   modeClassName,
 }: {
   product: Product;
-  category: Category;
   wrapperClassName: string;
   modeClassName: string;
 }) {
-  const [imageMode, setImageMode] = useState<'cutout' | 'plain' | 'hidden'>(() =>
-    hasUsableProductImage(product) ? 'cutout' : 'hidden',
-  );
+  const [imageOk, setImageOk] = useState(hasTransparentProductImage(product));
 
-  const src =
-    imageMode === 'hidden' || !hasUsableProductImage(product)
-      ? ''
-      : imageMode === 'cutout'
-      ? proxiedImageUrl(product.imageUrl, { cutout: true, category })
-      : proxiedImageUrl(product.imageUrl);
+  const src = imageOk ? getTransparentProductImageUrl(product) || '' : '';
 
   useEffect(() => {
-    setImageMode(hasUsableProductImage(product) ? 'cutout' : 'hidden');
-  }, [product.id, product.imageUrl]);
+    setImageOk(hasTransparentProductImage(product));
+  }, [product]);
 
   if (!src) return null;
 
@@ -2128,7 +2405,7 @@ function PanelPreviewImage({
         style={{ filter: 'drop-shadow(0 10px 18px rgba(0,0,0,.08))' }}
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={() => setImageMode((current) => (current === 'cutout' ? 'plain' : 'hidden'))}
+        onError={() => setImageOk(false)}
       />
     </div>
   );
@@ -2271,20 +2548,6 @@ function metadataList(product: Product, key: 'colors' | 'styles' | 'vibes' | 'ke
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
 
-function overlayFallback(label: string): string {
-  const safeLabel = label.slice(0, 10).toUpperCase();
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
-      <rect width="180" height="220" rx="24" fill="#ffffff" />
-      <rect x="10" y="10" width="160" height="200" rx="20" fill="#f4ebe4" />
-      <circle cx="90" cy="80" r="34" fill="#e8365d" opacity="0.12" />
-      <rect x="46" y="128" width="88" height="12" rx="6" fill="#cdb9ad" />
-      <text x="90" y="170" text-anchor="middle" fill="#5d4a42" font-family="Arial, sans-serif" font-size="16" font-weight="700">${safeLabel}</text>
-    </svg>
-  `.trim();
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function tokenize(value: string): string[] {
   return value
     .toLowerCase()
@@ -2332,19 +2595,20 @@ function BuilderPageWithSearchParams() {
   const searchParams = useSearchParams();
   return (
     <BuilderPageContent
-      quickSlot={searchParams.get('slot')}
-      quickQuery={searchParams.get('query')}
-      quickVibe={searchParams.get('vibe')}
-      quickFrame={searchParams.get('frame')}
-      quickSlots={searchParams.get('slots')}
-      quickLock={searchParams.get('lock')}
+      quickSlot={searchParams?.get('slot') ?? null}
+      quickQuery={searchParams?.get('query') ?? null}
+      quickVibe={searchParams?.get('vibe') ?? null}
+      quickFrame={searchParams?.get('frame') ?? null}
+      quickSlots={searchParams?.get('slots') ?? null}
+      quickLock={searchParams?.get('lock') ?? null}
+      quickSource={searchParams?.get('source') ?? null}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} quickSource={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-06-04T17:32:10.081Z",
+  "sourceDir": "/Users/willlambert/Documents/Sylistly/catalog-intelligence/data",
+  "candidatesRead": 623,
+  "detailsRead": 10,
+  "importedProducts": 501,
+  "skipped": {
+    "missingRequiredFields": 0,
+    "invalidCategory": 0,
+    "lowValueRetailer": 122,
+    "blockedTerms": 0,
+    "duplicate": 0
+  },
+  "byCategory": {
+    "hat": 43,
+    "outer": 93,
+    "top": 42,
+    "bottom": 93,
+    "shoes": 122,
+    "bag": 46,
+    "eyewear": 58,
+    "jewelry": 4
+  },
+  "directOfferProducts": 9,
+  "googleShoppingFallbackProducts": 492,
+  "outputFile": "data/searchapi-quality-catalog.json",
+  "notes": [
+    "SearchAPI quality rows are imported as original-image, needs-cutout catalog products.",
+    "They are available to catalog/search/review flows immediately, but transparent-only UI surfaces still require cutout generation.",
+    "Low-value marketplace and blocked terms are filtered during import."
+  ]
+}

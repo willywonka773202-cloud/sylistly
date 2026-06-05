@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { Product } from '@/lib/types';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { isRenderableProduct } from '@/lib/product-image-quality';
+import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 
 interface Props {
   product: Product;
@@ -39,10 +39,11 @@ export function ProductCard({ product: p, selected = false, onClick, onImageAvai
   useEffect(() => {
     if (imageReady || imageUnavailable) return;
     const timer = window.setTimeout(() => {
-      markImageUnavailable();
+      setImageUnavailable(true);
+      onImageUnavailable?.();
     }, 8_000);
     return () => window.clearTimeout(timer);
-  }, [p.id, p.imageUrl, imageReady, imageUnavailable]);
+  }, [p.id, p.imageUrl, imageReady, imageUnavailable, onImageUnavailable]);
 
   function markImageAvailable() {
     setImageReady(true);
@@ -55,7 +56,7 @@ export function ProductCard({ product: p, selected = false, onClick, onImageAvai
   }
 
   if (imageUnavailable) return null;
-  if (!isRenderableProduct(p)) return null;
+  if (!isEditorialCutoutProduct(p) || !hasExactProductLink(p)) return null;
 
   const buyUrl = getProductOutboundUrl(p);
   const retailHost = getHost(buyUrl);
@@ -77,6 +78,7 @@ export function ProductCard({ product: p, selected = false, onClick, onImageAvai
       <div className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
         <ProductImage
           product={p}
+          transparentOnly
           loading="eager"
           wrapperClassName="h-px w-px overflow-hidden"
           className="h-px w-px object-contain"
@@ -103,6 +105,7 @@ export function ProductCard({ product: p, selected = false, onClick, onImageAvai
           <div className="absolute inset-x-5 bottom-4 h-5 rounded-full bg-[#d8cdc4]/38 blur-[7px]" />
           <ProductImage
             product={p}
+            transparentOnly
             wrapperClassName="relative h-full w-full"
             className="relative h-full w-full object-contain p-2.5 drop-shadow-[0_16px_22px_rgba(0,0,0,.24)]"
             onAvailable={markImageAvailable}

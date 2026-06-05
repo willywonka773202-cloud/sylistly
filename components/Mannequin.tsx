@@ -1,10 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Check, Layers3, Lock, Radar, Sparkles, Wand2 } from 'lucide-react';
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { proxiedImageUrl } from '@/lib/image-url';
-import { hasUsableProductImage } from '@/lib/product-image-quality';
+import { Check, Lock } from 'lucide-react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { getTransparentProductImageUrl, hasTransparentProductImage } from '@/lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -23,18 +21,6 @@ interface Props {
   onOpenSlot?: (category: Category) => void;
   slotInteractionDisabled?: boolean;
   activeEditSlot?: Category | null;
-}
-
-interface Placement {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  z: number;
-  rotation?: number;
-  imageClassName?: string;
-  frameClassName?: string;
-  blend?: boolean;
 }
 
 interface OutfitAnalysis {
@@ -58,12 +44,6 @@ interface OutfitAnalysis {
   };
 }
 
-const FRAME_LABELS: Record<GeneratorFrame, string> = {
-  masc: 'Menswear edit',
-  fem: 'Womenswear edit',
-  androgynous: 'Neutral edit',
-};
-
 const CATEGORY_LABELS: Record<Category, string> = {
   hat: 'Headwear',
   outer: 'Outer',
@@ -75,26 +55,28 @@ const CATEGORY_LABELS: Record<Category, string> = {
   jewelry: 'Jewelry',
 };
 
-const GHOST_ZONES: Array<{ category: Category; label: string; style: CSSProperties }> = [
-  { category: 'hat', label: 'Head', style: { left: '50%', top: '8%', width: '26%', height: '12%', transform: 'translateX(-50%)' } },
-  { category: 'eyewear', label: 'Eyes', style: { left: '50%', top: '19%', width: '22%', height: '7%', transform: 'translateX(-50%)' } },
-  { category: 'top', label: 'Torso', style: { left: '50%', top: '29%', width: '46%', height: '24%', transform: 'translateX(-50%)' } },
-  { category: 'outer', label: 'Layer', style: { left: '50%', top: '28%', width: '56%', height: '28%', transform: 'translateX(-50%)' } },
-  { category: 'jewelry', label: 'Accessory', style: { left: '50%', top: '31%', width: '18%', height: '7%', transform: 'translateX(-50%)' } },
-  { category: 'bag', label: 'Bag', style: { right: '9%', top: '40%', width: '23%', height: '26%' } },
-  { category: 'bottom', label: 'Legs', style: { left: '50%', top: '55%', width: '39%', height: '28%', transform: 'translateX(-50%)' } },
-  { category: 'shoes', label: 'Feet', style: { left: '50%', bottom: '8%', width: '44%', height: '12%', transform: 'translateX(-50%)' } },
-];
-
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
+const BOOT_TERMS = ['boot', 'boots', 'chelsea', 'ugg'];
+const LOW_PROFILE_SHOE_TERMS = ['samba', 'sneaker', 'sneakers', 'trainer', 'trainers', 'court shoe', 'running shoe'];
+const FLAT_SHOE_TERMS = ['loafer', 'loafers', 'flat', 'flats', 'sandal', 'sandals', 'slide', 'slides', 'mule', 'mules'];
+const HEEL_TERMS = ['heel', 'heels', 'pump', 'pumps', 'slingback', 'stiletto'];
+const CAP_TERMS = ['baseball cap', 'dad cap', 'cap'];
+const BEANIE_TERMS = ['beanie', 'watch cap', 'skullcap'];
+const BUCKET_HAT_TERMS = ['bucket hat', 'bucket'];
+const WIDE_HAT_TERMS = ['sun hat', 'straw hat', 'wide brim', 'wide-brim'];
+const TOTE_TERMS = ['tote', 'shopper'];
+const MINI_BAG_TERMS = ['mini', 'micro', 'pouch', 'wallet', 'clutch'];
+const SHORT_BOTTOM_TERMS = ['short', 'shorts', 'skort', 'mini skirt'];
+const SKIRT_BOTTOM_TERMS = ['skirt', 'midi skirt', 'maxi skirt', 'slip skirt'];
+const LONG_BOTTOM_TERMS = ['jean', 'jeans', 'pant', 'pants', 'trouser', 'trousers', 'wide leg', 'wide-leg'];
+const JEWELRY_SMALL_TERMS = ['ring', 'earring', 'earrings', 'bracelet'];
+const JEWELRY_TALL_TERMS = ['necklace', 'chain', 'pendant'];
 
 export function Mannequin({
   items,
   skinTone,
-  bodyType = 'androgynous',
   vibeLabel,
-  vibeBlurb,
   selectedGenerationSlots = [],
   lockedSlots = [],
   onToggleGenerationSlot,
@@ -103,26 +85,9 @@ export function Mannequin({
   slotInteractionDisabled = false,
   activeEditSlot = null,
 }: Props) {
-  const [mirrorMode, setMirrorMode] = useState(false);
-  const [magnetMode, setMagnetMode] = useState(true);
-  const [heatmapMode, setHeatmapMode] = useState(true);
-  const [polishMode, setPolishMode] = useState(true);
-  const [bagLayer, setBagLayer] = useState<'front' | 'behind'>('front');
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-
-  const count = Object.values(items).filter(Boolean).length;
-  const hasItems = count > 0;
   const analysis = useMemo(() => analyzeOutfit(items, vibeLabel), [items, vibeLabel]);
-  const highlightCategory = activeCategory || analysis.primaryGap;
+  const highlightCategory = analysis.primaryGap;
   const glow = skinTone || '#edd7cc';
-
-  function autoFit() {
-    setMagnetMode(true);
-    setPolishMode(true);
-    setHeatmapMode(false);
-    setBagLayer('front');
-    setActiveCategory(analysis.primaryGap || 'top');
-  }
 
   return (
     <div
@@ -139,18 +104,13 @@ export function Mannequin({
       >
         <FrontCanvas
           items={items}
-          bagLayer={bagLayer}
-          heatmapMode={heatmapMode}
           highlightCategory={highlightCategory}
-          magnetMode={magnetMode}
           activeEditSlot={activeEditSlot}
           onOpenSlot={onOpenSlot}
           onToggleSlotLock={onToggleSlotLock}
           onToggleGenerationSlot={onToggleGenerationSlot}
-          polishMode={polishMode}
           selectedGenerationSlots={selectedGenerationSlots}
           lockedSlots={lockedSlots}
-          skinTone={skinTone}
           slotInteractionDisabled={slotInteractionDisabled}
         />
       </div>
@@ -160,55 +120,44 @@ export function Mannequin({
 
 function FrontCanvas({
   items,
-  bagLayer,
-  heatmapMode,
   highlightCategory,
-  magnetMode,
   activeEditSlot,
   onOpenSlot,
   onToggleSlotLock,
   onToggleGenerationSlot,
-  polishMode,
   selectedGenerationSlots,
   lockedSlots,
-  skinTone,
   slotInteractionDisabled,
 }: {
   items: Partial<Record<Category, Product>>;
-  bagLayer: 'front' | 'behind';
-  heatmapMode: boolean;
   highlightCategory: Category | null;
-  magnetMode: boolean;
   activeEditSlot?: Category | null;
   onOpenSlot?: (category: Category) => void;
   onToggleSlotLock?: (category: Category) => void;
   onToggleGenerationSlot?: (category: Category) => void;
-  polishMode: boolean;
   selectedGenerationSlots: Category[];
   lockedSlots: Category[];
-  skinTone?: string;
   slotInteractionDisabled?: boolean;
 }) {
-  const _crowding = getCrowding(items);
-  const _placements = buildPlacements(items, bagLayer, polishMode);
-  const _tone = skinTone;
-  const _heatmap = heatmapMode;
-  const _magnet = magnetMode;
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const transparentCount = CATEGORY_ORDER.filter((category) => {
+    const product = items[category];
+    return Boolean(product && hasTransparentProductImage(product) && !failedImageIds.has(product.id));
+  }).length;
   const zoneStyle: Record<Category, CSSProperties> = {
     hat: { gridColumn: '1', gridRow: '1 / span 2' },
     outer: { gridColumn: '1', gridRow: '3 / span 6' },
     top: { gridColumn: '2', gridRow: '1 / span 4' },
     bottom: { gridColumn: '2', gridRow: '5 / span 4' },
     eyewear: { gridColumn: '3', gridRow: '1 / span 2' },
-    jewelry: { gridColumn: '3', gridRow: '3 / span 2' },
-    bag: { gridColumn: '3', gridRow: '5 / span 2' },
-    shoes: { gridColumn: '3', gridRow: '7 / span 2' },
+    jewelry: { gridColumn: '3', gridRow: '3 / span 1' },
+    bag: { gridColumn: '3', gridRow: '4 / span 2' },
+    shoes: { gridColumn: '3', gridRow: '6 / span 3' },
   };
 
   const renderZone = (category: Category, prominent = false) => {
     const rawProduct = items[category];
-    const product = hasUsableProductImage(rawProduct) && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
+    const product = hasTransparentProductImage(rawProduct) && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
     const generationSelected = selectedGenerationSlots.includes(category);
     const locked = Boolean(product && lockedSlots.includes(category));
     const selected = generationSelected || activeEditSlot === category;
@@ -226,7 +175,10 @@ function FrontCanvas({
       : selected
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
       : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
-    const wrapperClassName = `relative h-full w-full overflow-hidden rounded-[20px] border-2 bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)] p-1.5 transition ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
+    const filledSlotClassName = product
+      ? 'bg-transparent shadow-none'
+      : 'bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)]';
+    const wrapperClassName = `relative h-full w-full overflow-visible rounded-[20px] border-2 p-1.5 transition ${filledSlotClassName} ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
       <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.42)]">
         {locked ? <Lock size={12} strokeWidth={3} /> : <Check size={13} strokeWidth={3} />}
@@ -244,27 +196,17 @@ function FrontCanvas({
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
           {selectionBadge}
-          <span className={`text-[8px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          <span className={`max-w-full truncate text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          {rawProduct && !hasTransparentProductImage(rawProduct) ? (
+            <span className="mt-1 text-[7px] font-bold uppercase tracking-[.12em] text-[#c4aa9a]">Cutout queued</span>
+          ) : null}
           <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
         </button>
       );
     }
-    const imageClassName =
-      category === 'top' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'bottom' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'shoes' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.04]' :
-      category === 'bag' ? 'h-full w-full object-contain object-center p-2 scale-[1.02]' :
-      category === 'outer' ? 'h-full w-full object-contain object-center p-1.5 scale-[0.99]' :
-      category === 'hat' ? 'h-full w-full object-contain object-center p-1.5 scale-[1.03]' :
-      category === 'eyewear' ? 'h-full w-full object-contain object-center p-2 scale-[1.08]' :
-      category === 'jewelry' ? 'h-full w-full object-contain object-center p-2.5 scale-[1.12]' :
-      `h-full w-full object-contain ${prominent ? 'p-1' : 'p-1.5'}`;
+    const imageClassName = builderPreviewImageClass(product, category, prominent);
     const innerFrameClassName =
-      category === 'jewelry'
-        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,.7)]'
-        : category === 'eyewear'
-        ? 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,.65)]'
-        : 'flex h-[calc(100%-13px)] items-center justify-center overflow-hidden rounded-[12px] bg-white/64 shadow-[inset_0_1px_0_rgba(255,255,255,.55)]';
+      'flex h-[calc(100%-13px)] items-center justify-center overflow-visible rounded-[12px] bg-transparent';
 
     return (
       <button
@@ -300,11 +242,10 @@ function FrontCanvas({
             <Lock size={12} strokeWidth={2.6} />
           </span>
         ) : null}
-        <div className={`mb-0.5 text-left text-[7px] font-bold uppercase tracking-[.18em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
+        <div className={`mb-0.5 max-w-[calc(100%-28px)] truncate text-left text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
         <div className={innerFrameClassName}>
           <PreviewImage
             product={product}
-            category={category}
             wrapperClassName="h-full w-full"
             modeClassName={imageClassName}
             blend={false}
@@ -318,11 +259,16 @@ function FrontCanvas({
   };
 
   return (
-    <div className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]">
+    <div
+      className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]"
+      data-builder-canvas="true"
+      data-builder-scale-system="silhouette-v3"
+      data-builder-transparent-count={transparentCount}
+    >
       <div
         className="grid h-full gap-2.5"
         style={{
-          gridTemplateColumns: '0.92fr 1.55fr 0.92fr',
+          gridTemplateColumns: '0.9fr 1.62fr 0.9fr',
           gridTemplateRows: 'repeat(8, minmax(0, 1fr))',
         }}
       >
@@ -340,155 +286,84 @@ function FrontCanvas({
   );
 }
 
-function FlatLayCanvas({ items }: { items: Partial<Record<Category, Product>> }) {
-  return (
-    <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#ffffff_0%,#f7f2ec_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.92)]">
-      <div className="grid h-full grid-cols-2 gap-2.5">
-        <div className="rounded-[20px] border border-[#ece2d9] bg-white/80 p-3">
-          <div className="text-[10px] uppercase tracking-[.18em] text-[#9e8e84]">Mirror mode</div>
-          <div className="mt-1 font-serif text-[16px] font-semibold text-[#342a26]">Outfit summary</div>
-          <div className="mt-3 space-y-2">
-            {CATEGORY_ORDER.filter((c) => items[c]).map((c) => (
-              <div key={c} className="flex items-center justify-between rounded-full border border-[#ece2d9] bg-[#faf6f2] px-3 py-1.5 text-[10px] uppercase tracking-[.14em] text-[#86756a]">
-                <span>{CATEGORY_LABELS[c]}</span>
-                <span>{items[c]?.brand}</span>
-              </div>
-            ))}
-            {CATEGORY_ORDER.every((c) => !items[c]) ? <div className="text-[11px] text-[#8d7c73]">Add pieces to populate your board.</div> : null}
-          </div>
-        </div>
-        <div className="rounded-[20px] border border-[#ece2d9] bg-white/80 p-2.5">
-          <div className="grid h-full grid-cols-2 gap-2">
-            {CATEGORY_ORDER.map((category) => (
-              <div key={category} className="overflow-hidden rounded-[14px] border border-[#eee4dc] bg-white p-1.5">
-                {items[category] ? (
-                  <>
-                    <div className="text-[8px] uppercase tracking-[.16em] text-[#a59082]">{CATEGORY_LABELS[category]}</div>
-                    <div className="h-[calc(100%-14px)]">
-                      <PreviewImage product={items[category]!} category={category} wrapperClassName="h-full w-full" modeClassName="h-full w-full object-contain p-1.5" blend={false} />
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-[8px] uppercase tracking-[.14em] text-[#b9a89d]">{CATEGORY_LABELS[category]}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function productText(product: Product): string {
+  return [
+    product.brand,
+    product.name,
+    product.category,
+    product.retailer,
+    ...(product.searchTerms || []),
+    ...(product.vibes || []),
+    ...(product.occasions || []),
+  ].join(' ').toLowerCase();
 }
 
-function ToolChip({
-  label,
-  active,
-  onClick,
-  icon,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  icon: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.16em] transition ${
-        active
-          ? 'border-accent/60 bg-accent/12 text-white shadow-pink-glow'
-          : 'border-white/10 bg-white/[0.04] text-[#d8c9c0] hover:border-white/20 hover:text-white'
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
+function productHasTerm(product: Product, terms: string[]): boolean {
+  const text = ` ${productText(product).replace(/[^a-z0-9]+/g, ' ')} `;
+  return terms.some((term) => {
+    const normalizedTerm = term.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    return Boolean(normalizedTerm) && text.includes(` ${normalizedTerm} `);
+  });
 }
 
-function AlignmentGuides() {
-  return (
-    <>
-      <div className="absolute bottom-0 left-1/2 top-0 w-px -translate-x-1/2 bg-[linear-gradient(180deg,transparent,rgba(195,180,171,.62),transparent)]" />
-      <div className="absolute left-[22%] right-[22%] top-[29%] h-px bg-[linear-gradient(90deg,transparent,rgba(210,196,188,.46),transparent)]" />
-      <div className="absolute left-[24%] right-[24%] top-[54%] h-px bg-[linear-gradient(90deg,transparent,rgba(210,196,188,.38),transparent)]" />
-      <div className="absolute left-[28%] right-[28%] top-[84%] h-px bg-[linear-gradient(90deg,transparent,rgba(210,196,188,.32),transparent)]" />
-    </>
-  );
-}
-
-function HeatmapOverlay({
-  crowding,
-}: {
-  crowding: { upper: number; mid: number; lower: number };
-}) {
-  return (
-    <>
-      <HeatSpot top="14%" left="50%" intensity={crowding.upper} />
-      <HeatSpot top="42%" left="53%" intensity={crowding.mid} />
-      <HeatSpot top="79%" left="50%" intensity={crowding.lower} />
-    </>
-  );
-}
-
-function HeatSpot({
-  top,
-  left,
-  intensity,
-}: {
-  top: string;
-  left: string;
-  intensity: number;
-}) {
-  const alpha = intensity >= 4 ? 0.16 : intensity >= 3 ? 0.1 : 0.05;
-  return (
-    <div
-      className="absolute h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-      style={{ top, left, background: `rgba(232, 54, 93, ${alpha})` }}
-    />
-  );
-}
-
-function Silhouette({ skinTone }: { skinTone?: string }) {
-  const tone = skinTone || '#d6c0b1';
-
-  return (
-    <>
-      <div className="absolute left-1/2 top-[12%] h-[64px] w-[62px] -translate-x-1/2 rounded-[28px] blur-[1px]" style={{ background: hexToRgba(tone, 0.25) }} />
-      <div className="absolute left-1/2 top-[28%] h-[122px] w-[112px] -translate-x-1/2 rounded-[42px]" style={{ background: hexToRgba(tone, 0.14) }} />
-      <div className="absolute left-[29%] top-[31%] h-[108px] w-[34px] rounded-[22px]" style={{ background: hexToRgba(tone, 0.12) }} />
-      <div className="absolute right-[29%] top-[31%] h-[108px] w-[34px] rounded-[22px]" style={{ background: hexToRgba(tone, 0.12) }} />
-      <div className="absolute left-[40%] top-[58%] h-[112px] w-[32px] rounded-[22px]" style={{ background: hexToRgba(tone, 0.12) }} />
-      <div className="absolute right-[40%] top-[58%] h-[112px] w-[32px] rounded-[22px]" style={{ background: hexToRgba(tone, 0.12) }} />
-      <div className="absolute left-[34%] bottom-[7%] h-4 w-16 rounded-full" style={{ background: hexToRgba(tone, 0.16) }} />
-      <div className="absolute right-[34%] bottom-[7%] h-4 w-16 rounded-full" style={{ background: hexToRgba(tone, 0.16) }} />
-    </>
-  );
+function builderPreviewImageClass(product: Product, category: Category, prominent: boolean): string {
+  const base = 'h-full w-full object-contain object-center p-0 drop-shadow-[0_16px_18px_rgba(54,34,24,.18)]';
+  if (category === 'top') return `${base} scale-[1.08]`;
+  if (category === 'outer') return `${base} scale-[.98]`;
+  if (category === 'bottom') {
+    if (productHasTerm(product, SHORT_BOTTOM_TERMS)) return `${base} translate-y-[-2%] scale-[.82]`;
+    if (productHasTerm(product, SKIRT_BOTTOM_TERMS)) return `${base} translate-y-[1%] scale-[.92]`;
+    if (productHasTerm(product, LONG_BOTTOM_TERMS)) return `${base} translate-y-[2%] scale-[1]`;
+    return `${base} scale-[.94]`;
+  }
+  if (category === 'shoes') {
+    if (productHasTerm(product, BOOT_TERMS)) return `${base} translate-y-[10%] scale-[.72]`;
+    if (productHasTerm(product, HEEL_TERMS)) return `${base} translate-y-[8%] scale-[.82]`;
+    if (productHasTerm(product, FLAT_SHOE_TERMS)) return `${base} translate-y-[7%] scale-[.84]`;
+    if (productHasTerm(product, LOW_PROFILE_SHOE_TERMS)) return `${base} translate-y-[6%] scale-[.88]`;
+    return `${base} translate-y-[7%] scale-[.84]`;
+  }
+  if (category === 'bag') {
+    if (productHasTerm(product, TOTE_TERMS)) return `${base} translate-y-[3%] scale-[.78]`;
+    if (productHasTerm(product, MINI_BAG_TERMS)) return `${base} scale-[1]`;
+    return `${base} scale-[.9]`;
+  }
+  if (category === 'hat') {
+    if (productHasTerm(product, BEANIE_TERMS)) return `${base} translate-y-[4%] scale-[.88]`;
+    if (productHasTerm(product, WIDE_HAT_TERMS)) return `${base} translate-y-[4%] scale-[.82]`;
+    if (productHasTerm(product, BUCKET_HAT_TERMS)) return `${base} translate-y-[4%] scale-[.94]`;
+    if (productHasTerm(product, CAP_TERMS)) return `${base} translate-y-[4%] scale-[1.02]`;
+    return `${base} scale-[.9]`;
+  }
+  if (category === 'eyewear') return `${base} scale-[.82]`;
+  if (category === 'jewelry') {
+    if (productHasTerm(product, JEWELRY_SMALL_TERMS)) return `${base} scale-[.68]`;
+    if (productHasTerm(product, JEWELRY_TALL_TERMS)) return `${base} scale-[.78]`;
+    return `${base} scale-[.76]`;
+  }
+  return `${base} ${prominent ? 'scale-[1.02]' : 'scale-[.96]'}`;
 }
 
 function PreviewImage({
   product,
-  category,
   wrapperClassName,
   modeClassName,
   blend,
   onUnavailable,
 }: {
   product: Product;
-  category: Category;
   wrapperClassName: string;
   modeClassName: string;
   blend: boolean;
   onUnavailable?: (product: Product) => void;
 }) {
-  const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
+  const [imageOk, setImageOk] = useState(hasTransparentProductImage(product));
 
-  const src = imageOk && hasUsableProductImage(product) ? proxiedImageUrl(product.imageUrl) : '';
+  const src = imageOk ? getTransparentProductImageUrl(product) || '' : '';
 
   useEffect(() => {
-    setImageOk(hasUsableProductImage(product));
-  }, [product.id, product.imageUrl]);
+    setImageOk(hasTransparentProductImage(product));
+  }, [product]);
 
   if (!src) return null;
 
@@ -498,10 +373,14 @@ function PreviewImage({
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
+        data-builder-product-image="true"
+        data-image-kind="transparent"
+        data-product-id={product.id}
+        data-product-category={product.category}
         className={modeClassName}
         style={{
           mixBlendMode: blend ? 'multiply' : 'normal',
-          filter: blend ? 'drop-shadow(0 14px 22px rgba(0,0,0,.16))' : 'drop-shadow(0 10px 18px rgba(0,0,0,.08))',
+          filter: blend ? 'drop-shadow(0 14px 22px rgba(0,0,0,.16))' : undefined,
         }}
         loading="lazy"
         referrerPolicy="no-referrer"
@@ -512,204 +391,6 @@ function PreviewImage({
       />
     </div>
   );
-}
-
-function buildPlacements(
-  items: Partial<Record<Category, Product>>,
-  bagLayer: 'front' | 'behind',
-  polishMode: boolean,
-): Partial<Record<Category, Placement>> {
-  const hasOuter = Boolean(items.outer);
-  const topY = hasOuter ? 30 : 29;
-  const bottomY = items.top || items.outer ? 56 : 52;
-
-  return {
-    hat: items.hat
-      ? {
-          x: 50,
-          y: 6,
-          w: 32,
-          h: 15,
-          z: 12,
-          imageClassName: 'h-full w-full object-contain object-bottom',
-        }
-      : undefined,
-    eyewear: items.eyewear
-      ? {
-          x: 50,
-          y: 18,
-          w: 23,
-          h: 8,
-          z: 13,
-          imageClassName: 'h-full w-full object-contain',
-          blend: false,
-        }
-      : undefined,
-    jewelry: items.jewelry
-      ? {
-          x: 50,
-          y: 29,
-          w: 13,
-          h: 8,
-          z: 10,
-          imageClassName: 'h-full w-full object-contain',
-          blend: false,
-        }
-      : undefined,
-    outer: items.outer
-      ? {
-          x: 50,
-          y: 28,
-          w: polishMode ? 57 : 60,
-          h: 33,
-          z: 4,
-          imageClassName: 'h-full w-full object-contain',
-        }
-      : undefined,
-    top: items.top
-      ? {
-          x: 50,
-          y: topY,
-          w: hasOuter ? 42 : 46,
-          h: hasOuter ? 27 : 29,
-          z: 6,
-          imageClassName: 'h-full w-full object-contain',
-        }
-      : undefined,
-    bottom: items.bottom
-      ? {
-          x: 50,
-          y: bottomY,
-          w: 38,
-          h: 29,
-          z: 6,
-          imageClassName: 'h-full w-full object-contain object-top',
-        }
-      : undefined,
-    bag: items.bag ? resolveBagPlacement(items.bag, bagLayer) : undefined,
-    shoes: items.shoes
-      ? {
-          x: 50,
-          y: 88,
-          w: 42,
-          h: 10,
-          z: 8,
-          imageClassName: 'h-full w-full object-contain object-bottom',
-          blend: false,
-        }
-      : undefined,
-  };
-}
-
-function resolveBagPlacement(product: Product, bagLayer: 'front' | 'behind'): Placement {
-  const styles = metadataList(product, 'styles').join(' ').toLowerCase();
-  const keywords = metadataList(product, 'keywords').join(' ').toLowerCase();
-  const tokens = `${styles} ${keywords}`;
-
-  if (tokens.includes('belt bag') || tokens.includes('waist bag')) {
-    return {
-      x: 67,
-      y: 50,
-      w: 24,
-      h: 16,
-      z: bagLayer === 'front' ? 8 : 5,
-      rotation: -10,
-      imageClassName: 'h-full w-full object-contain',
-      blend: false,
-    };
-  }
-
-  if (tokens.includes('tote')) {
-    return {
-      x: 75,
-      y: 53,
-      w: 24,
-      h: 28,
-      z: bagLayer === 'front' ? 8 : 3,
-      rotation: -4,
-      imageClassName: 'h-full w-full object-contain object-bottom',
-      blend: false,
-    };
-  }
-
-  if (tokens.includes('crossbody')) {
-    return {
-      x: 70,
-      y: 44,
-      w: 25,
-      h: 22,
-      z: bagLayer === 'front' ? 9 : 4,
-      rotation: -10,
-      imageClassName: 'h-full w-full object-contain',
-      blend: false,
-    };
-  }
-
-  return {
-    x: 71,
-    y: 44,
-    w: 24,
-    h: 24,
-    z: bagLayer === 'front' ? 9 : 4,
-    rotation: -6,
-    imageClassName: 'h-full w-full object-contain',
-    blend: false,
-  };
-}
-
-function renderShoes(product: Product, placement: Placement, highlighted: boolean) {
-  return (
-    <>
-      <motion.div
-        layout
-        transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className={highlighted ? 'drop-shadow-[0_18px_28px_rgba(232,54,93,.22)]' : ''}
-        style={{
-          ...placementStyle({ ...placement, x: 42.5, w: 18, h: 10 }),
-          zIndex: placement.z,
-        }}
-      >
-        <PreviewImage
-          product={product}
-          category="shoes"
-          modeClassName="h-full w-full object-contain object-bottom"
-          wrapperClassName="h-full w-full"
-          blend={false}
-        />
-      </motion.div>
-      <motion.div
-        layout
-        transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className={highlighted ? 'drop-shadow-[0_18px_28px_rgba(232,54,93,.22)]' : ''}
-        style={{
-          ...placementStyle({ ...placement, x: 57.5, w: 18, h: 10 }),
-          zIndex: placement.z,
-          transform: 'translateX(-50%) scaleX(-1)',
-        }}
-      >
-        <PreviewImage
-          product={product}
-          category="shoes"
-          modeClassName="h-full w-full object-contain object-bottom"
-          wrapperClassName="h-full w-full"
-          blend={false}
-        />
-      </motion.div>
-    </>
-  );
-}
-
-function placementStyle(placement: Placement): CSSProperties {
-  const rotation = placement.rotation || 0;
-  return {
-    position: 'absolute',
-    left: `${placement.x}%`,
-    top: `${placement.y}%`,
-    width: `${placement.w}%`,
-    height: `${placement.h}%`,
-    zIndex: placement.z,
-    transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-  };
 }
 
 function analyzeOutfit(
@@ -846,29 +527,6 @@ function extractPalette(products: Product[]): string[] {
 function metadataList(product: Product, key: 'colors' | 'styles' | 'vibes' | 'keywords'): string[] {
   const value = product.metadata?.[key];
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
-}
-
-function defaultCanvasImageClass(category: Category): string {
-  if (category === 'hat') return 'h-full w-full object-contain object-bottom';
-  if (category === 'eyewear') return 'h-full w-full object-contain';
-  if (category === 'jewelry') return 'h-full w-full object-contain';
-  if (category === 'bag') return 'h-full w-full object-contain';
-  if (category === 'bottom') return 'h-full w-full object-contain object-top';
-  return 'h-full w-full object-contain';
-}
-
-function overlayFallback(label: string): string {
-  const safeLabel = label.slice(0, 10).toUpperCase();
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220">
-      <rect width="180" height="220" rx="24" fill="#ffffff" />
-      <rect x="10" y="10" width="160" height="200" rx="20" fill="#f4ebe4" />
-      <circle cx="90" cy="80" r="34" fill="#e8365d" opacity="0.12" />
-      <rect x="46" y="128" width="88" height="12" rx="6" fill="#cdb9ad" />
-      <text x="90" y="170" text-anchor="middle" fill="#5d4a42" font-family="Arial, sans-serif" font-size="16" font-weight="700">${safeLabel}</text>
-    </svg>
-  `.trim();
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
 function tokenize(value: string): string[] {

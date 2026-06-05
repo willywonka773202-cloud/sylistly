@@ -16,6 +16,7 @@ interface BuildContextInput {
   savedFits: SavedFitRecord[];
   wardrobeItems: WardrobeItem[];
   feedPosts: FeedPost[];
+  catalogProducts?: Product[];
   profile?: Profile | null;
 }
 
@@ -43,7 +44,7 @@ function classifyBudgetTier(medianPrice: number): StylistContext['budgetTendency
 }
 
 export function buildStylistContext(input: BuildContextInput): StylistContext {
-  const { currentFitItems, savedFits, wardrobeItems, feedPosts, profile } = input;
+  const { currentFitItems, savedFits, wardrobeItems, feedPosts, catalogProducts = [], profile } = input;
 
   const closetItems = wardrobeItems.filter((entry) => entry.status === 'closet');
   const wishlistItems = wardrobeItems.filter((entry) => entry.status === 'wishlist');
@@ -80,12 +81,16 @@ export function buildStylistContext(input: BuildContextInput): StylistContext {
   const likedPosts = feedPosts.filter((post) => post.liked);
   const savedSocialPosts = feedPosts.filter((post) => post.saved);
   const signalSources: Product[] = [
+    ...currentProducts,
     ...closetProducts,
     ...wishlistProducts,
     ...savedProducts,
     ...likedPosts.flatMap((post) => Object.values(post.items).filter((p): p is Product => Boolean(p))),
     ...savedSocialPosts.flatMap((post) => Object.values(post.items).filter((p): p is Product => Boolean(p))),
   ];
+  const knownProducts = Array.from(
+    new Map([...signalSources, ...catalogProducts].map((product) => [product.id, product])).values(),
+  );
 
   const closetDistribution: Partial<Record<Category, number>> = {};
   for (const product of closetProducts) {
@@ -168,6 +173,6 @@ export function buildStylistContext(input: BuildContextInput): StylistContext {
     recentSavedFitSummary,
     recentWardrobeSummary,
     hasEnoughDataForStyleDNA,
-    knownProducts: signalSources,
+    knownProducts,
   };
 }

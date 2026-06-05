@@ -4,10 +4,12 @@ import type { GeneratorFrame } from './vibes';
 export type FrameTag = 'masc' | 'fem' | 'androgynous';
 
 const FEM_ONLY_TERMS = [
-  'women', 'womens', 'woman', 'ladies', 'lady', 'girl', 'girls',
+  'women', 'womens', 'wmns', 'woman', 'ladies', 'lady', 'girl', 'girls',
   'mini dress', 'slip dress', 'bodycon dress', 'mini skirt', 'pleated skirt', 'skirt', 'heels', 'heel', 'pumps', 'pump',
-  'sports bra', 'bralette', 'bra ', 'crop top', 'cropped cami', 'cami tank',
-  'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset',
+  'sports bra', 'bralette', 'bra ', 'crop top', 'cropped top', 'cropped cami', 'cami tank',
+  'cami', 'camisole', 'scoop bra', 'micro scoop bra', 'deep plunge', 'plunge top',
+  'halter', 'bandeau', 'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset',
+  'ditsy floral', 'skims', 'aritzia', 'babaton', 'wilfred',
 ];
 
 const MASC_ONLY_TERMS = [
@@ -68,7 +70,7 @@ export function productFrameHaystack(product: Product): string {
 
 export function inferProductGender(product: Product): FrameTag[] {
   const haystack = productFrameHaystack(product);
-  const explicitWomen = hasAny(haystack, ['women', 'womens', 'woman', 'ladies', 'lady', 'female', 'girls', 'girl']);
+  const explicitWomen = hasAny(haystack, ['women', 'womens', 'wmns', 'woman', 'ladies', 'lady', 'female', 'girls', 'girl']);
   const explicitMen = hasAny(haystack, ['men', 'mens', 'man', 'male']);
   const femOnly = explicitWomen || hasAny(haystack, FEM_ONLY_TERMS);
   const mascOnly = explicitMen || hasAny(haystack, MASC_ONLY_TERMS);
@@ -107,7 +109,7 @@ export function genderMismatchReasons(product: Product, requestedFrame: Generato
 
   if (requestedFrame === 'masc') {
     if (tags.includes('fem') && !tags.includes('androgynous') && !tags.includes('masc')) reasons.push('fem-only tag');
-    if (hasAny(haystack, ['women', 'womens', 'ladies', 'mini dress', 'slip dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'baby tee', 'cami tank', 'align tank', 'cropped cami'])) {
+    if (hasAny(haystack, ['women', 'womens', 'wmns', 'ladies', 'mini dress', 'slip dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'baby tee', 'crop top', 'cropped top', 'cami', 'camisole', 'cami tank', 'align tank', 'cropped cami', 'tube top', 'deep plunge', 'plunge top', 'halter', 'bandeau', 'scoop bra', 'ditsy floral', 'skims', 'aritzia', 'babaton', 'wilfred'])) {
       reasons.push('obvious fem keyword');
     }
   }

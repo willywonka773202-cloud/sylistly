@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
   buildCatalogLook,
+  CLIENT_CATALOG_PRODUCTS,
   getBrandOrMerchant,
   getCollectionProducts,
   getShoeId,
@@ -9,8 +10,8 @@ import {
   outfitCategorySignature,
   outfitFullSignature,
   outfitRequiredSignature,
-} from '@/lib/catalog';
-import { sortFeedRenderableProducts } from '@/lib/product-image-quality';
+} from '@/lib/client-catalog';
+import { hasExactProductLink, productImageQualityScore, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 
@@ -50,10 +51,16 @@ export interface FeedPost {
   comments: FeedComment[];
 }
 
+export interface FeedGenerationOptions {
+  vibe?: VibeId | 'any';
+  frame?: GeneratorFrame | 'any';
+  budget?: GeneratorBudget;
+}
+
 interface SocialFeedState {
   posts: FeedPost[];
   generationCursor: number;
-  generateMorePosts: (count?: number) => void;
+  generateMorePosts: (count?: number, options?: FeedGenerationOptions) => void;
   postFit: (
     items: Partial<Record<Category, Product>>,
     options?: { title?: string; vibe?: string; visibility?: 'public' | 'private' },
@@ -64,7 +71,7 @@ interface SocialFeedState {
 }
 
 function sanitizeItems(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
-  const products = sortFeedRenderableProducts(
+  const products = sortTransparentFeedRenderableProducts(
     Object.values(items).filter((product): product is Product => Boolean(product)),
   );
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
@@ -82,6 +89,39 @@ function hasRequiredSlots(items: Partial<Record<Category, Product>>): boolean {
   return Boolean(items.top && items.bottom && items.shoes);
 }
 
+function feedQualityProducts(items: Partial<Record<Category, Product>>): Product[] {
+  return sortTransparentFeedRenderableProducts(
+    Object.values(items).filter((product): product is Product => Boolean(product)),
+  );
+}
+
+function exactLinkedProductCount(items: Partial<Record<Category, Product>>): number {
+  return feedQualityProducts(items).filter(hasExactProductLink).length;
+}
+
+function feedOutfitQualityScore(items: Partial<Record<Category, Product>>): number {
+  const products = feedQualityProducts(items);
+  if (!products.length) return -999;
+  const exactCount = products.filter(hasExactProductLink).length;
+  const categoryCount = new Set(products.map((product) => product.category)).size;
+  const averageImageScore = products.reduce((sum, product) => sum + productImageQualityScore(product), 0) / products.length;
+  return (
+    averageImageScore
+    + products.length * 12
+    + categoryCount * 7
+    + exactCount * 28
+    + (hasRequiredSlots(items) ? 70 : -120)
+  );
+}
+
+function postMeetsFeedQualityFloor(items: Partial<Record<Category, Product>>): boolean {
+  const products = feedQualityProducts(items);
+  if (products.length < 3 || !hasRequiredSlots(items)) return false;
+  const exactMinimum = Math.min(2, Math.max(1, Math.floor(products.length / 3)));
+  if (exactLinkedProductCount(items) < exactMinimum) return false;
+  return feedOutfitQualityScore(items) > 90;
+}
+
 function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Posted fit'): string {
   const products = Object.values(items).filter((product): product is Product => Boolean(product));
   const brands = Array.from(new Set(products.map((product) => product.brand))).slice(0, 2);
@@ -90,7 +130,7 @@ function createTitle(items: Partial<Record<Category, Product>>, fallback = 'Post
 }
 
 function itemsFromCollection(index: number): Partial<Record<Category, Product>> {
-  const products = sortFeedRenderableProducts(getCollectionProducts(LAUNCH_COLLECTIONS[index]));
+  const products = sortTransparentFeedRenderableProducts(getCollectionProducts(LAUNCH_COLLECTIONS[index]));
   return Object.fromEntries(products.map((product) => [product.category, product])) as Partial<Record<Category, Product>>;
 }
 
@@ -225,6 +265,7 @@ function generatedLookFromPlan(
     recentBrandCounts: options.recentBrandCounts,
     preferredFormulaId: plan.formulaId,
     diversityStrength: 'high',
+    transparentOnly: true,
   });
   return {
     items: sanitizeItems(generated.products),
@@ -237,30 +278,392 @@ function generatedLookFromPlan(
   };
 }
 
-const GENERATED_POSTS = GENERATED_POST_PLAN.map((plan, index) => {
-  const generated = generatedLookFromPlan(plan);
-  return seedPost(
-    generated.items,
-    index + COLLECTION_POSTS.length,
-    // Generated-plan posts get a `feed-plan-` prefix so they cannot collide
-    // with `feed-launch-*` collection posts even when both lists share an
-    // id like `vacation-masc-resort`. See COLLECTION_POSTS for context.
-    `feed-plan-${plan.id}`,
-    ['@styleloop', '@closetlab', '@fitarchive', '@outfitindex', '@wearfile'][index % 5] || '@sylistly',
-    plan.title.slice(0, 1).toUpperCase(),
-    plan.title,
-    plan.label,
-    plan.tags,
-    360 - index * 7,
-    plan.caption,
-    plan.frame,
-    'catalog',
-    generated.formula,
-    'generated-plan',
-  );
-});
+// Generated-plan posts are not bulk-built at module load. The first-screen
+// posts below use a small deterministic generator pass with diversity history
+// so the feed opens with real transparent boards without hard-coded repeats.
+const GENERATED_POSTS: FeedPost[] = [];
+
+const REAL_CUTOUT_SEED_PLAN: Array<{
+  id: string;
+  title: string;
+  caption: string;
+  vibe: string;
+  tags: string[];
+  frameBias: FeedPost['frameBias'];
+  optional: Category[];
+  username: string;
+  avatar: string;
+  likeCount: number;
+}> = [
+  {
+    id: 'clean-capsule',
+    title: 'Clean capsule edit',
+    caption: 'A simple transparent-cutout board built from real linked pieces.',
+    vibe: 'Clean',
+    tags: ['clean', 'capsule', 'real links'],
+    frameBias: 'any',
+    optional: ['outer', 'bag', 'eyewear'],
+    username: '@cutoutfile',
+    avatar: 'C',
+    likeCount: 348,
+  },
+  {
+    id: 'street-sneaker',
+    title: 'Sneaker-led street board',
+    caption: 'The shoe carries the read while the core pieces stay easy to remix.',
+    vibe: 'Streetwear',
+    tags: ['streetwear', 'sneakers', 'remixable'],
+    frameBias: 'any',
+    optional: ['outer', 'hat', 'bag'],
+    username: '@styleloop',
+    avatar: 'S',
+    likeCount: 331,
+  },
+  {
+    id: 'office-soft',
+    title: 'Soft workday edit',
+    caption: 'Polished real pieces arranged for a lighter office formula.',
+    vibe: 'Office',
+    tags: ['office', 'tailored', 'minimal'],
+    frameBias: 'any',
+    optional: ['outer', 'bag', 'jewelry'],
+    username: '@wardrobestudio',
+    avatar: 'W',
+    likeCount: 316,
+  },
+  {
+    id: 'date-polish',
+    title: 'Date night polish',
+    caption: 'A compact night-out board with accessories framing the outfit.',
+    vibe: 'Night out',
+    tags: ['date', 'night', 'polished'],
+    frameBias: 'any',
+    optional: ['bag', 'jewelry', 'outer'],
+    username: '@maisonmira',
+    avatar: 'M',
+    likeCount: 304,
+  },
+  {
+    id: 'weekend-cozy',
+    title: 'Weekend layer stack',
+    caption: 'Soft layers, real product links, and no background-image filler.',
+    vibe: 'Cozy',
+    tags: ['cozy', 'weekend', 'layers'],
+    frameBias: 'any',
+    optional: ['outer', 'hat', 'bag'],
+    username: '@dailyform',
+    avatar: 'D',
+    likeCount: 292,
+  },
+  {
+    id: 'airport-neutral',
+    title: 'Airport neutral board',
+    caption: 'Travel-ready pieces kept clean enough for quick saves and remixes.',
+    vibe: 'Travel',
+    tags: ['travel', 'neutral', 'comfortable'],
+    frameBias: 'any',
+    optional: ['outer', 'bag', 'hat'],
+    username: '@terminalfit',
+    avatar: 'T',
+    likeCount: 286,
+  },
+  {
+    id: 'preppy-city',
+    title: 'Preppy city cutout',
+    caption: 'Classic shapes with enough whitespace to feel editorial.',
+    vibe: 'Preppy',
+    tags: ['preppy', 'city', 'classic'],
+    frameBias: 'any',
+    optional: ['outer', 'eyewear', 'jewelry'],
+    username: '@clubroom',
+    avatar: 'P',
+    likeCount: 274,
+  },
+  {
+    id: 'black-edit',
+    title: 'Black edit uniform',
+    caption: 'Dark real pieces with the accessory scale kept intentional.',
+    vibe: 'Edgy',
+    tags: ['black', 'edgy', 'uniform'],
+    frameBias: 'any',
+    optional: ['outer', 'bag', 'eyewear'],
+    username: '@outfitindex',
+    avatar: 'O',
+    likeCount: 268,
+  },
+  {
+    id: 'gym-clean',
+    title: 'Gym to street cutout',
+    caption: 'Performance pieces that still belong in the main visual feed.',
+    vibe: 'Gym',
+    tags: ['gym', 'sporty', 'street'],
+    frameBias: 'any',
+    optional: ['outer', 'hat', 'bag'],
+    username: '@studioafter',
+    avatar: 'G',
+    likeCount: 254,
+  },
+  {
+    id: 'vacation-light',
+    title: 'Light vacation board',
+    caption: 'Warm-weather pieces with transparent assets and outbound shopping paths.',
+    vibe: 'Vacation',
+    tags: ['vacation', 'light', 'resort'],
+    frameBias: 'any',
+    optional: ['hat', 'eyewear', 'bag'],
+    username: '@resortfile',
+    avatar: 'V',
+    likeCount: 247,
+  },
+  {
+    id: 'minimal-daily',
+    title: 'Minimal daily uniform',
+    caption: 'A quiet everyday formula sourced from reviewed catalog cutouts.',
+    vibe: 'Minimal',
+    tags: ['minimal', 'daily', 'uniform'],
+    frameBias: 'any',
+    optional: ['outer', 'bag'],
+    username: '@neutralindex',
+    avatar: 'N',
+    likeCount: 239,
+  },
+  {
+    id: 'night-mono',
+    title: 'Monochrome night fit',
+    caption: 'A darker board that keeps the clothing real and the canvas clean.',
+    vibe: 'Night out',
+    tags: ['night', 'monochrome', 'real links'],
+    frameBias: 'any',
+    optional: ['outer', 'bag', 'jewelry'],
+    username: '@wearfile',
+    avatar: 'W',
+    likeCount: 228,
+  },
+];
+
+const CURATED_REAL_CUTOUT_SEED_IDS: Record<string, Partial<Record<Category, string>>> = {
+  'clean-capsule': {
+    top: 'drop-801c170d2ea55154',
+    bottom: 'generated-74fe933994f14082',
+    shoes: 'catalog-shoes-stevemadden-heel',
+    outer: 'drop-5300f6d5ddd93126',
+    bag: 'catalog-bag-longchamp-lepliage',
+    eyewear: 'drop-d36288d25687c3c1',
+    jewelry: 'drop-76f8b0c619820c23',
+  },
+  'street-sneaker': {
+    top: 'generated-a40b4a1a792a2517',
+    bottom: 'drop-186f1a82b7d7f58f',
+    shoes: 'drop-ac9095f6e93a7998',
+    outer: 'drop-f2aa4850ca8554b2',
+    bag: 'drop-ae17bc93cc49eb90',
+    hat: 'drop-3001f97cdb615164',
+    eyewear: 'drop-d6b445c3b7a9c48f',
+  },
+  'office-soft': {
+    top: 'drop-45fff17e9bad78c8',
+    bottom: 'generated-74fe933994f14082',
+    shoes: 'drop-1a6a1daef1f7baf9',
+    outer: 'drop-6841a846416360a9',
+    bag: 'catalog-bag-longchamp-lepliage',
+    jewelry: 'drop-aa1f3ed5ae3eb698',
+  },
+  'date-polish': {
+    top: 'drop-07fd958a07ae21ad',
+    bottom: 'generated-99aeccf41750984d',
+    shoes: 'catalog-shoes-stevemadden-heel',
+    outer: 'drop-45cea998b25d57a2',
+    bag: 'drop-0a48f1226427b537',
+    jewelry: '5f0c9a42e1eb6cd1',
+  },
+  'weekend-cozy': {
+    top: 'generated-7ca4be6cd09823e8',
+    bottom: 'generated-275150bce379b9a7',
+    shoes: 'drop-7cf401599cf12aac',
+    outer: 'generated-2f1bfa27a4583c16',
+    bag: 'drop-d40a795efab86a1c',
+    hat: 'drop-aced2433cf49a015',
+  },
+  'airport-neutral': {
+    top: 'generated-7ca4be6cd09823e8',
+    bottom: 'generated-de7d7fa0912bedd2',
+    shoes: 'drop-aca0d9cd19822b6c',
+    outer: 'ac42819e80705c93',
+    bag: 'catalog-bag-longchamp-lepliage',
+    hat: 'drop-d3819cc4464e3b78',
+    eyewear: 'drop-8663a61076d67ff5',
+  },
+  'preppy-city': {
+    top: 'drop-f1f3c6969d86c0c6',
+    bottom: 'generated-16008bf3bb3a8476',
+    shoes: 'drop-1a6a1daef1f7baf9',
+    outer: 'drop-dc4c8e6f86f4f9a7',
+    bag: 'drop-509e967f0f0bf159',
+    hat: 'drop-4be50de0a894949f',
+    eyewear: 'drop-d36288d25687c3c1',
+  },
+  'black-edit': {
+    top: 'drop-07fd958a07ae21ad',
+    bottom: 'generated-3475f4f3d7fe7731',
+    shoes: 'drop-ac9095f6e93a7998',
+    outer: 'ac42819e80705c93',
+    bag: 'generated-e658d4d99d9e357d',
+    hat: 'drop-c94745f295e8a719',
+    eyewear: 'drop-d6b445c3b7a9c48f',
+  },
+  'gym-clean': {
+    top: 'drop-745cbb5a4c57a65f',
+    bottom: 'drop-3ae9091e99c3dbfb',
+    shoes: 'cf644945808d11f8',
+    outer: 'drop-308d9613a88aabae',
+    bag: 'generated-adc7c43cad42c4cb',
+    hat: 'drop-2f2b0aae5796c4da',
+  },
+  'vacation-light': {
+    top: 'drop-6552e83f3ef3e9b7',
+    bottom: 'generated-4e5b08cc31bf2b02',
+    shoes: 'drop-2f62f11e699bf8c4',
+    bag: 'catalog-bag-longchamp-lepliage',
+    hat: 'generated-7788ea56c2c2841a',
+    eyewear: 'drop-8663a61076d67ff5',
+    jewelry: 'drop-05793dd760e9ddbc',
+  },
+  'minimal-daily': {
+    top: 'drop-801c170d2ea55154',
+    bottom: 'generated-589e8f931d3c29f7',
+    shoes: 'catalog-shoes-nike-af1',
+    outer: 'drop-f5ebb99db1f47f0a',
+    bag: 'drop-d40a795efab86a1c',
+    eyewear: 'drop-8b49c4dfd62a1e33',
+  },
+  'night-mono': {
+    top: 'drop-07fd958a07ae21ad',
+    bottom: 'generated-99aeccf41750984d',
+    shoes: 'drop-00cd2debba354113',
+    outer: 'drop-45cea998b25d57a2',
+    bag: 'drop-ae17bc93cc49eb90',
+    jewelry: '561d375c28389500',
+  },
+};
+
+const FEED_PRODUCT_BY_ID = new Map(CLIENT_CATALOG_PRODUCTS.map((product) => [product.id, product]));
+
+function curatedSeedItems(seedId: string): Partial<Record<Category, Product>> {
+  const idsByCategory = CURATED_REAL_CUTOUT_SEED_IDS[seedId];
+  if (!idsByCategory) return {};
+  return sanitizeItems(Object.fromEntries(
+    Object.entries(idsByCategory)
+      .map(([category, productId]) => [category, productId ? FEED_PRODUCT_BY_ID.get(productId) : undefined])
+      .filter((entry): entry is [Category, Product] => Boolean(entry[1])),
+  ) as Partial<Record<Category, Product>>);
+}
+
+function maxOutfitBrandRepeat(items: Partial<Record<Category, Product>>): number {
+  const counts = new Map<string, number>();
+  for (const product of Object.values(items).filter((product): product is Product => Boolean(product))) {
+    const brand = getBrandOrMerchant(product);
+    if (!brand) continue;
+    counts.set(brand, (counts.get(brand) || 0) + 1);
+  }
+  return Math.max(0, ...Array.from(counts.values()));
+}
+
+const REAL_CUTOUT_SEED_GENERATOR_IDS = [
+  'coffee-clean-fem',
+  'street-masc-campus',
+  'office-fem-cream',
+  'date-femme-soft',
+  'cozy-masc-winter',
+  'airport-neutral',
+  'preppy-femme-city',
+  'street-any-black',
+  'gym-masc-training',
+  'vacation-femme-linen',
+  'clean-masc-casual',
+  'night-any-luxe',
+];
+
+function seedGeneratorPlan(index: number): (typeof GENERATED_POST_PLAN)[number] {
+  const preferredId = REAL_CUTOUT_SEED_GENERATOR_IDS[index % REAL_CUTOUT_SEED_GENERATOR_IDS.length];
+  return GENERATED_POST_PLAN.find((plan) => plan.id === preferredId) || GENERATED_POST_PLAN[index % GENERATED_POST_PLAN.length] || GENERATED_POST_PLAN[0];
+}
+
+function buildRealCutoutSeedPosts(): FeedPost[] {
+  const posts: FeedPost[] = [];
+  const usedProductIds: string[] = [];
+  const recentShoeIds: string[] = [];
+  const recentBrandCounts: Record<string, number> = {};
+
+  REAL_CUTOUT_SEED_PLAN.forEach((plan, index) => {
+    const generatorPlan = seedGeneratorPlan(index);
+    const generatedCandidate = generatedLookFromPlan(generatorPlan, index, {
+      avoidProductIds: usedProductIds.slice(-72),
+      recentShoeIds: recentShoeIds.slice(-16),
+      recentBrandCounts,
+    });
+    const curatedItems = curatedSeedItems(plan.id);
+    const curatedTotals = fitTotals(curatedItems);
+    const curatedCandidate = curatedTotals.itemCount >= 3 && hasRequiredSlots(curatedItems)
+      ? {
+          items: curatedItems,
+          formula: {
+            id: generatorPlan.formulaId,
+            label: generatorPlan.label,
+            structure: generatorPlan.caption,
+            reason: plan.caption,
+          },
+        }
+      : null;
+    const generatedBrandRepeat = maxOutfitBrandRepeat(generatedCandidate.items);
+    const curatedBrandRepeat = curatedCandidate ? maxOutfitBrandRepeat(curatedCandidate.items) : Number.POSITIVE_INFINITY;
+    const generated = postMeetsFeedQualityFloor(generatedCandidate.items)
+      && (generatedBrandRepeat <= 1 || !curatedCandidate || !postMeetsFeedQualityFloor(curatedCandidate.items) || curatedBrandRepeat >= generatedBrandRepeat)
+      ? generatedCandidate
+      : curatedCandidate || generatedCandidate;
+    const post = seedPost(
+      generated.items,
+      index,
+      `feed-real-${plan.id}`,
+      plan.username,
+      plan.avatar,
+      plan.title,
+      plan.vibe,
+      plan.tags,
+      plan.likeCount,
+      plan.caption,
+      plan.frameBias,
+      'catalog',
+      generated.formula,
+      'first-screen',
+    );
+
+    if (!postMeetsFeedQualityFloor(post.items)) return;
+    posts.push(post);
+    for (const product of Object.values(post.items).filter((product): product is Product => Boolean(product))) {
+      usedProductIds.push(product.id);
+      const brand = getBrandOrMerchant(product);
+      if (brand) recentBrandCounts[brand] = (recentBrandCounts[brand] || 0) + 1;
+    }
+    const shoeId = shoesId(post);
+    if (shoeId) recentShoeIds.push(shoeId);
+  });
+
+  return posts;
+}
+
+const REAL_CUTOUT_SEED_POSTS = buildRealCutoutSeedPosts();
 
 const FIRST_SCREEN_POST_IDS = [
+  'feed-real-clean-capsule',
+  'feed-real-street-sneaker',
+  'feed-real-office-soft',
+  'feed-real-date-polish',
+  'feed-real-weekend-cozy',
+  'feed-real-airport-neutral',
+  'feed-real-preppy-city',
+  'feed-real-black-edit',
+  'feed-real-gym-clean',
+  'feed-real-vacation-light',
   'feed-plan-airport-neutral',
   'feed-plan-street-femme-downtown',
   'feed-plan-street-masc-campus',
@@ -299,14 +702,15 @@ function dedupeFeedPostsById(posts: FeedPost[]): FeedPost[] {
 }
 
 const SEED_POSTS: FeedPost[] = prioritizeFirstScreenPosts(dedupeFeedPostsById(
-  // Require ≥ 5 sanitized products per seed post. OutfitBoard renders an
-  // 8-slot absolute-positioned collage; posts with only 3-4 products leave
-  // 4-5 visibly empty slot positions and look broken on the first /feed
-  // page. The launch + generated catalog easily produces 5+ piece outfits;
-  // sparse seeds (mostly legacy LAUNCH_COLLECTIONS with dead product refs)
-  // get filtered out.
-  [...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => fitTotals(post.items).itemCount >= 5 && hasRequiredSlots(post.items)),
+  // Require the core outfit only. The current catalog gate intentionally
+  // prefers 3-4 true transparent garment cutouts over 5+ model/full-body
+  // composites, and the collage renderer no longer exposes empty fixed slots.
+  [...REAL_CUTOUT_SEED_POSTS, ...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => postMeetsFeedQualityFloor(post.items)),
 ));
+
+export function getSeedFeedPosts(): FeedPost[] {
+  return SEED_POSTS;
+}
 
 function recentProductIds(posts: FeedPost[]): string[] {
   return Array.from(new Set(
@@ -324,10 +728,8 @@ function capFeedPosts(posts: FeedPost[], limit = FEED_POST_LIMIT): FeedPost[] {
 function normalizeFeedPost(post: FeedPost): FeedPost | null {
   const items = sanitizeItems(post.items);
   const totals = fitTotals(items);
-  // Persisted state must also clear the 5-product board minimum (see
-  // SEED_POSTS construction). Posts that fall below after sanitize get
-  // dropped on rehydration rather than rendering with empty board slots.
-  if (totals.itemCount < 5 || !hasRequiredSlots(items)) return null;
+  // Persisted state must also clear the transparent core outfit minimum.
+  if (!postMeetsFeedQualityFloor(items)) return null;
   return {
     ...post,
     items,
@@ -374,12 +776,10 @@ function makeGeneratedPost(
 ): FeedPost | null {
   const generated = generatedLookFromPlan(plan, cursor, options);
   const items = generated.items;
-  const totals = fitTotals(items);
-  // Streaming generated posts also clear the 5-product board minimum so
-  // infinite-scroll never injects a sparse "broken-looking" card. The
-  // generateFeedBatch retry budget (count * 8) is generous enough to
-  // tolerate the higher rejection rate.
-  if (totals.itemCount < 5 || !hasRequiredSlots(items)) return null;
+  // Streaming generated posts clear the same transparent core minimum as
+  // seed posts. Sparse editorial collages are acceptable while catalog
+  // cutouts are being expanded; model/full-body composites are not.
+  if (!postMeetsFeedQualityFloor(items)) return null;
   return seedPost(
     items,
     cursor + COLLECTION_POSTS.length,
@@ -401,6 +801,28 @@ function makeGeneratedPost(
   );
 }
 
+function normalizeGenerationOptions(options?: FeedGenerationOptions): Required<FeedGenerationOptions> {
+  return {
+    vibe: options?.vibe || 'any',
+    frame: options?.frame || 'any',
+    budget: options?.budget || 'any',
+  };
+}
+
+function generationPlanPool(options: Required<FeedGenerationOptions>): typeof GENERATED_POST_PLAN {
+  const exactMatches = GENERATED_POST_PLAN.filter((plan) =>
+    (options.vibe === 'any' || plan.vibe === options.vibe)
+    && (options.frame === 'any' || plan.frame === options.frame),
+  );
+  if (exactMatches.length) return exactMatches;
+
+  const vibeMatches = options.vibe === 'any' ? [] : GENERATED_POST_PLAN.filter((plan) => plan.vibe === options.vibe);
+  if (vibeMatches.length) return vibeMatches;
+
+  const frameMatches = options.frame === 'any' ? [] : GENERATED_POST_PLAN.filter((plan) => plan.frame === options.frame);
+  return frameMatches.length ? frameMatches : GENERATED_POST_PLAN;
+}
+
 /**
  * Per-shoe usage cap when generating a streaming feed batch. The catalog
  * has only ~63 shoes; without this guard the same Steve Madden Slingback /
@@ -410,23 +832,32 @@ function makeGeneratedPost(
 const FEED_SHOE_REPEAT_CAP = 2;
 
 /**
- * Per-brand cap on top/bottom/outer/bag picks across a streaming batch.
- * Same rationale — prevents one brand monopolising the visible feed.
+ * Per-brand cap across visible feed pieces. Counting every visible product
+ * catches repeated bags, shoes, and accessories instead of only tops/bottoms.
  */
-const FEED_BRAND_REPEAT_CAP = 3;
+const FEED_BRAND_REPEAT_CAP = 4;
 
 function shoesId(post: FeedPost): string | undefined {
   return getShoeId(post.items) || undefined;
 }
 
-function postPrimaryBrands(post: FeedPost): string[] {
-  const slots: Category[] = ['top', 'bottom', 'outer', 'bag'];
-  return slots
-    .map((slot) => getBrandOrMerchant(post.items[slot]))
+function postVisibleBrands(post: FeedPost): string[] {
+  return feedQualityProducts(post.items)
+    .map((product) => getBrandOrMerchant(product))
     .filter((brand): brand is string => Boolean(brand));
 }
 
-function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count: number): { posts: FeedPost[]; cursor: number } {
+function postBrandCounts(post: FeedPost): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const brand of postVisibleBrands(post)) {
+    counts.set(brand, (counts.get(brand) || 0) + 1);
+  }
+  return counts;
+}
+
+function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count: number, options?: FeedGenerationOptions): { posts: FeedPost[]; cursor: number } {
+  const generationOptions = normalizeGenerationOptions(options);
+  const planPool = generationPlanPool(generationOptions);
   const requiredSignatures = new Set(existingPosts.map((post) => outfitRequiredSignature(post.items)).filter(Boolean));
   const fullSignatures = new Set(existingPosts.map((post) => outfitFullSignature(post.items)).filter(Boolean));
   const categoryStructureCounts = new Map<string, number>();
@@ -435,7 +866,7 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
   for (const post of existingPosts) {
     const sid = shoesId(post);
     if (sid) shoeCounts.set(sid, (shoeCounts.get(sid) || 0) + 1);
-    for (const brand of postPrimaryBrands(post)) {
+    for (const brand of postVisibleBrands(post)) {
       brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
     }
     const structure = outfitCategorySignature(post.items);
@@ -446,14 +877,19 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
   let attempts = 0;
 
   while (batch.length < count && attempts < count * 8) {
-    const plan = GENERATED_POST_PLAN[cursor % GENERATED_POST_PLAN.length];
+    const basePlan = planPool[cursor % planPool.length];
+    const plan = {
+      ...basePlan,
+      frame: generationOptions.frame === 'any' ? basePlan.frame : generationOptions.frame,
+      budget: generationOptions.budget === 'any' ? basePlan.budget : generationOptions.budget,
+    };
     // Build avoid list: rolling recent IDs + over-capped shoes that we
     // want the generator to actively avoid this iteration.
     const overUsedShoes = Array.from(shoeCounts.entries())
       .filter(([, n]) => n >= FEED_SHOE_REPEAT_CAP)
       .map(([id]) => id);
     const avoidProductIds = Array.from(new Set([
-      ...recentProductIds([...batch, ...existingPosts]),
+      ...recentProductIds([...existingPosts, ...batch]),
       ...overUsedShoes,
     ])).slice(0, 120);
 
@@ -490,8 +926,9 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
 
     // Reject when this post would push a brand past the brand cap. Same
     // soft-rejection — only enforced while we still have retry budget.
-    const brands = postPrimaryBrands(post);
-    const wouldOvercap = brands.some((brand) => (brandCounts.get(brand) || 0) >= FEED_BRAND_REPEAT_CAP);
+    const brands = postBrandCounts(post);
+    const wouldOvercap = Array.from(brands.entries())
+      .some(([brand, count]) => (brandCounts.get(brand) || 0) + count > FEED_BRAND_REPEAT_CAP);
     if (wouldOvercap && attempts < count * 6) continue;
     const structure = outfitCategorySignature(post.items);
     const structureCount = categoryStructureCounts.get(structure) || 0;
@@ -501,36 +938,49 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
     requiredSignatures.add(requiredSignature);
     fullSignatures.add(fullSignature);
     if (sid) shoeCounts.set(sid, (shoeCounts.get(sid) || 0) + 1);
-    for (const brand of brands) {
-      brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
+    for (const [brand, brandCount] of brands) {
+      brandCounts.set(brand, (brandCounts.get(brand) || 0) + brandCount);
     }
     categoryStructureCounts.set(structure, structureCount + 1);
     batch.push(post);
   }
 
-  return { posts: batch, cursor };
+  return {
+    posts: batch,
+    cursor,
+  };
 }
+
+const INITIAL_GENERATED_BATCH = SEED_POSTS.length >= 14
+  ? { posts: [] as FeedPost[], cursor: 0 }
+  : generateFeedBatch(SEED_POSTS, 0, Math.max(14 - SEED_POSTS.length, 14));
+
+const INITIAL_FEED_POSTS = capFeedPosts([...SEED_POSTS, ...INITIAL_GENERATED_BATCH.posts]);
+const INITIAL_GENERATION_CURSOR = INITIAL_GENERATED_BATCH.cursor;
 
 export const useSocialFeed = create<SocialFeedState>()(
   persist(
     (set) => ({
-      posts: SEED_POSTS,
-      generationCursor: GENERATED_POST_PLAN.length,
-      generateMorePosts: (count = 12) =>
+      posts: INITIAL_FEED_POSTS,
+      generationCursor: INITIAL_GENERATION_CURSOR,
+      generateMorePosts: (count = 12, options) =>
         set((state) => {
           const cleanExisting = state.posts
             .map(normalizeFeedPost)
             .filter((post): post is FeedPost => Boolean(post));
-          const generated = generateFeedBatch(cleanExisting, state.generationCursor || 0, count);
+          const existingWithSeeds = cleanExisting.length < SEED_POSTS.length
+            ? mergePersistedPostsWithSeeds(cleanExisting)
+            : cleanExisting;
+          const generated = generateFeedBatch(existingWithSeeds, state.generationCursor || 0, count, options);
           return {
-            posts: capFeedPosts([...cleanExisting, ...generated.posts]),
+            posts: capFeedPosts([...existingWithSeeds, ...generated.posts]),
             generationCursor: generated.cursor,
           };
         }),
       postFit: (items, options) => {
         const selected = sanitizeItems(items);
         const totals = fitTotals(selected);
-        if (totals.itemCount < 3) return null;
+        if (totals.itemCount < 3 || !postMeetsFeedQualityFloor(selected)) return null;
         const post: FeedPost = {
           id: `post-${Date.now()}`,
           username: '@you',
@@ -583,24 +1033,30 @@ export const useSocialFeed = create<SocialFeedState>()(
     }),
     {
       name: 'sylistly.social-feed.v1',
-      // Bumped 4 → 5 because the per-post product minimum changed (3 → 5):
-      // posts persisted at v4 with itemCount=3-4 would re-render with empty
-      // OutfitBoard slot positions. Resetting on bump ensures existing
-      // users see the new fully-populated feed on first load after deploy.
-      // (Earlier v3 → v4 bump was for the namespaced `feed-launch-X` /
-      // `feed-plan-X` id format.)
-      // Current v6 restores generated seeds first, then merges persisted
-      // interactions, so old localStorage cannot keep a stale first screen.
-      version: 6,
+      // v19 refreshes the first-screen seed pool after replacing hard-coded
+      // curated product IDs with diversity-aware transparent catalog picks.
+      version: 19,
       migrate: (persistedState) => {
         const state = persistedState as Partial<SocialFeedState> | undefined;
         const posts = mergePersistedPostsWithSeeds(state?.posts);
         const generationCursor = Number.isFinite(state?.generationCursor) ? Number(state?.generationCursor) : GENERATED_POST_PLAN.length;
         return {
           ...state,
-          posts: posts.length >= 8 ? posts : SEED_POSTS,
+          posts: posts.length ? posts : INITIAL_FEED_POSTS,
           generationCursor,
         } as SocialFeedState;
+      },
+      merge: (persistedState, currentState) => {
+        const state = persistedState as Partial<SocialFeedState> | undefined;
+        const posts = mergePersistedPostsWithSeeds(state?.posts);
+        const generationCursor = Number.isFinite(state?.generationCursor)
+          ? Math.max(Number(state?.generationCursor), currentState.generationCursor || 0)
+          : currentState.generationCursor;
+        return {
+          ...currentState,
+          posts: posts.length ? posts : currentState.posts,
+          generationCursor,
+        };
       },
     },
   ),

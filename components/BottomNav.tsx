@@ -1,224 +1,90 @@
 'use client';
 
-import { Flame, House, Layers, Plus, Sparkles, User, Wand2, X } from 'lucide-react';
+import { House, Images, Plus, Shirt, User, WandSparkles } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useFit } from '@/store/fit';
-import { useSavedFits } from '@/store/saved-fits';
+import { usePathname } from 'next/navigation';
 
-const tabs: Array<{ href: string; label: string; icon: typeof Flame }> = [
-  { href: '/', label: 'Home', icon: House },
-  { href: '/feed', label: 'Feed', icon: Flame },
-  { href: '/stylist', label: 'Syli', icon: Wand2 },
-  { href: '/profile', label: 'Profile', icon: User },
-];
-
-export function BottomNav() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [createOpen, setCreateOpen] = useState(false);
-
-  const currentFitItems = useFit((state) => state.items);
-  const saveFit = useSavedFits((state) => state.saveFit);
-  const savedCount = useSavedFits((state) => state.fits.length);
-  const currentFitCount = Object.values(currentFitItems).filter(Boolean).length;
-  const hasCanvasSource = currentFitCount > 0 || savedCount > 0;
-
-  function dispatch(action: string) {
-    setCreateOpen(false);
-    if (action === 'make-outfit') router.push('/build');
-    else if (action === 'wardrobe') router.push('/wardrobe');
-    else if (action === 'save-current') {
-      if (currentFitCount === 0) return;
-      saveFit(currentFitItems);
-      router.push('/saved');
-    } else if (action === 'feed') router.push('/feed');
-    else if (action === 'stylist') router.push('/stylist');
-    else if (action === 'canvas' && hasCanvasSource) router.push('/canvas');
-  }
+export function BottomNav({ variant = 'dark' }: { variant?: 'dark' | 'light' }) {
+  const pathname = usePathname() ?? '';
+  const homeActive = pathname === '/';
+  const feedActive = pathname.startsWith('/feed') || pathname.startsWith('/discover') || pathname.startsWith('/saved');
+  const createActive = pathname.startsWith('/canvas') || pathname.startsWith('/build');
+  const stylistActive = pathname.startsWith('/stylist');
+  const closetActive = pathname.startsWith('/wardrobe');
+  const profileActive = pathname.startsWith('/profile');
+  const light = variant === 'light';
 
   return (
-    <>
-      <nav className="relative grid h-[72px] grid-cols-5 border-t border-hairline bg-bg pb-3.5 pt-1.5">
-        {tabs.slice(0, 2).map((tab) => (
-          <NavTab key={tab.href} {...tab} active={pathname === tab.href} />
-        ))}
-
-        <div className="relative flex items-start justify-center">
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
-            aria-label="Open create menu"
-            className="sy-press absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-[3px] border-bg bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_55%,#f6306b_100%)] bg-[length:200%_100%] text-white shadow-[0_18px_40px_rgba(246,48,107,.62)] transition hover:bg-right motion-safe:transition-all motion-safe:duration-200"
-          >
-            <Plus size={24} strokeWidth={2.4} />
-          </button>
-          <span className="pointer-events-none absolute -bottom-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-accent">Create</span>
-        </div>
-
-        {tabs.slice(2).map((tab) => (
-          <NavTab key={tab.href} {...tab} active={pathname === tab.href} />
-        ))}
-      </nav>
-
-      {createOpen ? (
-        <div className="fixed inset-0 z-[60] mx-auto flex max-w-[480px] items-end bg-black/60 backdrop-blur-sm">
-          <button
-            type="button"
-            className="absolute inset-0"
-            aria-label="Close create menu"
-            onClick={() => setCreateOpen(false)}
-          />
-          <section className="sy-sheet-enter relative z-10 w-full rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
-            <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
-
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">Create</div>
-                <div className="mt-0.5 font-serif text-[22px] font-semibold text-ink">Start a real style flow</div>
-                <p className="mt-1 max-w-[28ch] text-[11px] leading-relaxed text-muted-2">
-                  Builder, Syli, Wardrobe, Canvas, and Feed stay one tap away.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCreateOpen(false)}
-                aria-label="Close"
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <ActionCard
-                eyebrow="Builder"
-                title="Make outfit"
-                body="Open Builder and generate a catalog-backed fit."
-                icon={Sparkles}
-                onClick={() => dispatch('make-outfit')}
-              />
-              <ActionCard
-                eyebrow="AI stylist"
-                title="Ask Syli"
-                body="Get local beta styling help from your real state."
-                icon={Wand2}
-                onClick={() => dispatch('stylist')}
-              />
-              <ActionCard
-                eyebrow="Use your closet"
-                title="Add wardrobe item"
-                body="Manage closet, wishlist, and gap suggestions."
-                icon={Layers}
-                onClick={() => dispatch('wardrobe')}
-              />
-              <ActionCard
-                eyebrow={currentFitCount > 0 ? 'Ready to save' : 'Needs a fit'}
-                title="Save current fit"
-                body={
-                  currentFitCount > 0
-                    ? `${currentFitCount} piece${currentFitCount === 1 ? '' : 's'} ready to save.`
-                    : 'Build a fit first.'
-                }
-                icon={Sparkles}
-                onClick={() => dispatch('save-current')}
-                disabled={currentFitCount === 0}
-              />
-              <ActionCard
-                eyebrow={hasCanvasSource ? 'Share-ready' : 'Needs outfit'}
-                title="Canvas / Share"
-                body={
-                  hasCanvasSource
-                    ? 'Turn this fit into a moodboard or share card.'
-                    : 'Build or save a fit first.'
-                }
-                icon={Sparkles}
-                onClick={() => dispatch('canvas')}
-                disabled={!hasCanvasSource}
-              />
-              <ActionCard
-                eyebrow="Browse real looks"
-                title="Browse feed"
-                body="Swipe catalog-backed fits and remix them."
-                icon={Flame}
-                onClick={() => dispatch('feed')}
-              />
-            </div>
-
-            <div className="mt-4 rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2 text-[11px] leading-relaxed text-muted-2">
-              Saved fits: <strong className="text-white">{savedCount}</strong> · Builder slots filled:{' '}
-              <strong className="text-white">{currentFitCount}</strong>
-            </div>
-          </section>
-        </div>
-      ) : null}
-    </>
+    <nav
+      aria-label="Primary navigation"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[480px] justify-center px-5 pb-[calc(env(safe-area-inset-bottom)+10px)]"
+    >
+      <div className={`pointer-events-auto relative grid h-[76px] w-full max-w-[462px] grid-cols-[1fr_1fr_76px_1fr_1fr_1fr] items-center overflow-visible rounded-full px-2 backdrop-blur-2xl ${
+        light
+          ? 'border border-[#eee7f3] bg-white shadow-[0_18px_46px_rgba(50,20,72,.16)]'
+          : 'border border-[rgba(232,54,93,.32)] bg-[radial-gradient(circle_at_50%_-18%,rgba(246,48,107,.22),transparent_48%),linear-gradient(180deg,rgba(39,24,29,.88),rgba(15,12,12,.9))] shadow-[0_18px_58px_rgba(0,0,0,.46),0_0_36px_rgba(246,48,107,.16)]'
+      }`}>
+        <div className={`pointer-events-none absolute inset-x-5 top-2 h-px rounded-full ${light ? 'bg-[linear-gradient(90deg,transparent,rgba(248,70,167,.22),transparent)]' : 'bg-[linear-gradient(90deg,transparent,rgba(255,123,159,.55),transparent)]'}`} />
+        <div className={`pointer-events-none absolute inset-x-8 bottom-2 h-px rounded-full ${light ? 'bg-[linear-gradient(90deg,transparent,rgba(179,92,255,.18),transparent)]' : 'bg-[linear-gradient(90deg,transparent,rgba(246,48,107,.28),transparent)]'}`} />
+        <NavTool href="/" label="Home" icon={House} active={homeActive} variant={variant} />
+        <NavTool href="/feed" label="Feed" icon={Images} active={feedActive} variant={variant} />
+        <Link
+          href="/build"
+          aria-label="Create outfit"
+          aria-current={createActive ? 'page' : undefined}
+          className={`sy-press mx-auto flex -translate-y-2 flex-col items-center justify-center gap-1 transition active:scale-95 ${light ? 'text-[#171118]' : 'text-white'}`}
+        >
+          <span className={`grid h-[60px] w-[60px] place-items-center rounded-full text-white shadow-[0_18px_38px_rgba(246,48,107,.28)] ${
+            light
+              ? 'bg-[linear-gradient(135deg,#f846a7_0%,#b35cff_100%)]'
+              : createActive
+                ? 'bg-[linear-gradient(135deg,#f6306b_0%,#ff7aa2_58%,#f6306b_100%)] shadow-pink-glow ring-1 ring-[rgba(255,255,255,.14)]'
+                : 'border border-[rgba(232,54,93,.45)] bg-[radial-gradient(circle_at_34%_20%,rgba(255,124,159,.9),rgba(246,48,107,.52)_50%,rgba(86,25,43,.72)_100%)] ring-1 ring-[rgba(255,255,255,.14)]'
+          }`}>
+            <Plus size={32} strokeWidth={2.1} />
+          </span>
+          <span className={`text-[10px] font-black uppercase tracking-[.12em] ${
+            light ? (createActive ? 'text-[#f846a7]' : 'text-[#9f91a5]') : createActive ? 'text-white' : 'text-[rgba(232,54,93,.78)]'
+          }`}>Create</span>
+        </Link>
+        <NavTool href="/stylist" label="Syli" icon={WandSparkles} active={stylistActive} variant={variant} />
+        <NavTool href="/wardrobe" label="Closet" icon={Shirt} active={closetActive} variant={variant} />
+        <NavTool href="/profile" label="Profile" icon={User} active={profileActive} variant={variant} />
+      </div>
+    </nav>
   );
 }
 
-function NavTab({
+function NavTool({
   href,
   label,
   icon: Icon,
   active,
+  variant,
 }: {
   href: string;
   label: string;
-  icon: typeof Flame;
+  icon: typeof House;
   active: boolean;
+  variant: 'dark' | 'light';
 }) {
+  const light = variant === 'light';
   return (
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`sy-press relative flex flex-col items-center justify-center gap-1 text-[10px] font-medium ${
-        active ? 'text-ink opacity-100' : 'text-muted opacity-55'
+      className={`sy-press relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-[22px] py-2 text-center transition active:scale-95 motion-safe:transition-all motion-safe:duration-150 ${
+        light
+          ? active
+            ? 'bg-[#fff0f8] text-[#171118] shadow-[inset_0_0_0_1px_rgba(248,70,167,.18)]'
+            : 'text-[#9f91a5] hover:bg-[#faf6fc] hover:text-[#171118]'
+          : active
+            ? 'bg-[rgba(232,54,93,.12)] text-white shadow-[inset_0_0_0_1px_rgba(246,48,107,.26),0_10px_26px_rgba(246,48,107,.1)]'
+            : 'text-[#b9909b] hover:bg-white/[0.045] hover:text-[#ffdbe5]'
       }`}
     >
-      {active ? <span className="absolute top-0.5 h-0.5 w-4 rounded bg-accent" /> : null}
-      <Icon size={22} strokeWidth={1.6} />
-      {label}
+      <Icon size={21} strokeWidth={active ? 2.6 : 2.05} className={active ? 'text-accent' : ''} />
+      <span className={`max-w-full truncate text-[9px] font-semibold tracking-[-.01em] ${active && !light ? 'text-white' : ''}`}>{label}</span>
     </Link>
-  );
-}
-
-function ActionCard({
-  eyebrow,
-  title,
-  body,
-  icon: Icon,
-  onClick,
-  disabled = false,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  icon: typeof Plus;
-  onClick?: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`sy-lift sy-press flex flex-col gap-2 rounded-[20px] border-2 p-3 text-left ${
-        disabled
-          ? 'cursor-not-allowed border-white/8 bg-white/[0.02] opacity-60'
-          : 'border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))]'
-      }`}
-    >
-      <span
-        className={`grid h-8 w-8 place-items-center rounded-full transition ${
-          disabled ? 'bg-white/8 text-muted' : 'bg-accent/18 text-accent'
-        }`}
-      >
-        <Icon size={14} />
-      </span>
-      <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">{eyebrow}</div>
-      <div className="font-serif text-[14px] font-semibold leading-tight text-ink">{title}</div>
-      <div className="text-[10px] leading-relaxed text-muted-2">{body}</div>
-    </button>
   );
 }

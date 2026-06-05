@@ -93,7 +93,7 @@ function main() {
   });
 
   let appliedCount = 0;
-  let overrideFile = relative(root, overridePath).replace(/\\/g, '/');
+  const overrideFile = relative(root, overridePath).replace(/\\/g, '/');
   if (apply) {
     const existing = readExistingOverrides();
     const next = { ...existing };

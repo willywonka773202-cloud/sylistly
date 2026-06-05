@@ -9,13 +9,34 @@
 // function (e.g. `requestApiStylistResponse`) with the same context;
 // the UI consumes the same StylistResponse shape, so the swap is local.
 
-import type { Category } from '@/lib/types';
+import type { Category, Product } from '@/lib/types';
+import { hasExactProductLink, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import type {
   StylistAction,
+  StylistRecommendedProduct,
   StylistContext,
   StylistResponse,
   StylistUserIntent,
 } from './types';
+
+const OUTFIT_FOUNDATION_CATEGORIES: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat'];
+
+const HERO_COMPLEMENT_CATEGORIES: Record<Category, Category[]> = {
+  top: ['top', 'bottom', 'shoes', 'outer', 'bag'],
+  bottom: ['bottom', 'top', 'shoes', 'outer', 'bag'],
+  shoes: ['shoes', 'bottom', 'top', 'outer', 'bag'],
+  outer: ['outer', 'top', 'bottom', 'shoes', 'bag'],
+  bag: ['bag', 'top', 'bottom', 'shoes', 'outer'],
+  hat: ['hat', 'top', 'bottom', 'shoes', 'outer'],
+  eyewear: ['eyewear', 'top', 'bottom', 'shoes', 'outer'],
+  jewelry: ['jewelry', 'top', 'bottom', 'shoes', 'outer'],
+};
+
+const PROMPT_STOPWORDS = new Set([
+  'the', 'and', 'for', 'with', 'around', 'build', 'make', 'fit', 'look',
+  'outfit', 'today', 'please', 'that', 'this', 'from', 'into', 'what',
+  'should', 'would', 'could', 'wear', 'piece', 'pieces',
+]);
 
 export function detectIntent(input: string): StylistUserIntent {
   const text = input.toLowerCase();
@@ -72,6 +93,68 @@ function categoryLabel(category: Category): string {
   return category;
 }
 
+function productText(product: Product): string {
+  return [
+    product.brand,
+    product.name,
+    product.category,
+    product.retailer,
+    product.sourceQuery,
+    ...(product.vibes || []),
+    ...(product.occasions || []),
+    ...(product.searchTerms || []),
+    ...(product.colors || []),
+  ].join(' ').toLowerCase();
+}
+
+function promptTerms(input: string): string[] {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 2 && !PROMPT_STOPWORDS.has(term))
+    .slice(0, 12);
+}
+
+function inferHeroCategory(input: string): Category | null {
+  const text = input.toLowerCase();
+  if (/\b(sneaker|sneakers|shoe|shoes|boot|boots|loafer|loafers|sandal|sandals)\b/.test(text)) return 'shoes';
+  if (/\b(bag|bags|tote|purse|crossbody|backpack|satchel)\b/.test(text)) return 'bag';
+  if (/\b(jacket|coat|outer|outerwear|blazer|hoodie|cardigan)\b/.test(text)) return 'outer';
+  if (/\b(pant|pants|trouser|trousers|jean|jeans|skirt|shorts|bottom)\b/.test(text)) return 'bottom';
+  if (/\b(shirt|tee|t-shirt|top|sweater|knit|tank|blouse)\b/.test(text)) return 'top';
+  if (/\b(hat|cap|beanie|headwear)\b/.test(text)) return 'hat';
+  if (/\b(sunglasses|glasses|frames|eyewear)\b/.test(text)) return 'eyewear';
+  if (/\b(jewelry|jewellery|ring|necklace|bracelet|earring|earrings)\b/.test(text)) return 'jewelry';
+  return null;
+}
+
+function productPromptScore(product: Product, terms: string[]): number {
+  if (terms.length === 0) return product.popularityScore || 0;
+  const text = productText(product);
+  const matchScore = terms.reduce((score, term) => score + (text.includes(term) ? 1 : 0), 0);
+  return matchScore * 1000 + (product.popularityScore || 0);
+}
+
+function comparePromptProductFit(left: Product, right: Product, terms: string[]): number {
+  const leftExact = hasExactProductLink(left) ? 1 : 0;
+  const rightExact = hasExactProductLink(right) ? 1 : 0;
+  const leftTransparent = left.imageTransparentUrl || left.imageCutoutUrl ? 1 : 0;
+  const rightTransparent = right.imageTransparentUrl || right.imageCutoutUrl ? 1 : 0;
+  const promptDifference = productPromptScore(right, terms) - productPromptScore(left, terms);
+
+  if (terms.length > 0) {
+    return promptDifference
+      || rightExact - leftExact
+      || rightTransparent - leftTransparent;
+  }
+
+  return rightExact - leftExact
+    || rightTransparent - leftTransparent
+    || promptDifference;
+}
+
 function action(label: string, href: string, primary = false): StylistAction {
   return { label, href, primary };
 }
@@ -81,8 +164,86 @@ function build(
   intent: StylistUserIntent,
   actions: StylistAction[],
   reasoningSummary: string,
+  recommendedProducts: StylistRecommendedProduct[] = [],
 ): StylistResponse {
-  return { message, intent, actions, mode: 'local', reasoningSummary };
+  return { message, intent, actions, recommendedProducts, mode: 'local', reasoningSummary };
+}
+
+function pickKnownProducts(
+  context: StylistContext,
+  categories: Category[],
+  limit = 5,
+  input = '',
+): StylistRecommendedProduct[] {
+  const realCutoutProducts = sortTransparentFeedRenderableProducts(context.knownProducts);
+  const terms = promptTerms(input);
+  const picked: Product[] = [];
+  const usedIds = new Set<string>();
+
+  for (const category of categories) {
+    const candidate = realCutoutProducts
+      .filter((product) =>
+        product.category === category
+        && !usedIds.has(product.id)
+      )
+      .sort((left, right) => comparePromptProductFit(left, right, terms))[0];
+    if (!candidate) continue;
+    usedIds.add(candidate.id);
+    picked.push(candidate);
+    if (picked.length >= limit) break;
+  }
+
+  if (picked.length && !picked.some(hasExactProductLink)) {
+    const exactFallback = realCutoutProducts.find((product) => hasExactProductLink(product) && !usedIds.has(product.id));
+    if (exactFallback) {
+      picked[picked.length - 1] = exactFallback;
+    }
+  }
+
+  return picked.map((product) => ({
+    productId: product.id,
+    reason: hasExactProductLink(product)
+      ? `${product.brand} ${categoryLabel(product.category)} is a real exact merchant-linked cutout Syli can place into the look.`
+      : `${product.brand} ${categoryLabel(product.category)} is a real linked cutout Syli can place into the look.`,
+  }));
+}
+
+function productLookup(context: StylistContext): Map<string, Product> {
+  return new Map(context.knownProducts.map((product) => [product.id, product]));
+}
+
+function recommendationSummary(context: StylistContext, recommendations: StylistRecommendedProduct[]): string {
+  const productsById = productLookup(context);
+  return recommendations
+    .map((recommendation) => productsById.get(recommendation.productId))
+    .filter((product): product is Product => Boolean(product))
+    .slice(0, 4)
+    .map((product) => `${product.brand} ${categoryLabel(product.category)}`)
+    .join(', ');
+}
+
+function buildAroundRecommendations(input: string, context: StylistContext): StylistRecommendedProduct[] {
+  const heroCategory = inferHeroCategory(input) || 'outer';
+  const categories = HERO_COMPLEMENT_CATEGORIES[heroCategory];
+  const recommendations = pickKnownProducts(context, categories, 5, input);
+  if (!recommendations.length) return [];
+
+  const productsById = productLookup(context);
+  const hero = productsById.get(recommendations[0].productId);
+  return recommendations.map((recommendation, index) => {
+    const product = productsById.get(recommendation.productId);
+    if (!product) return recommendation;
+    if (index === 0) {
+      return {
+        ...recommendation,
+        reason: `${product.brand} ${product.name} is the real linked ${categoryLabel(product.category)} Syli is anchoring around.`,
+      };
+    }
+    return {
+      ...recommendation,
+      reason: `${product.brand} ${categoryLabel(product.category)} balances the ${hero ? categoryLabel(hero.category) : 'anchor'} without adding fake inventory.`,
+    };
+  });
 }
 
 export function generateLocalStylistResponse(input: string, context: StylistContext): StylistResponse {
@@ -155,6 +316,7 @@ export function generateLocalStylistResponse(input: string, context: StylistCont
       intent,
       [action('Open Wardrobe', '/wardrobe', true), action('Shop Discover', '/discover')],
       'closet gaps detected',
+      pickKnownProducts(context, context.wardrobeMissingCategories.slice(0, 5), 5, input),
     );
   }
 
@@ -166,6 +328,7 @@ export function generateLocalStylistResponse(input: string, context: StylistCont
         intent,
         [action('Open Discover', '/discover', true), action('Open Wardrobe', '/wardrobe')],
         'shopping gap-driven',
+        pickKnownProducts(context, context.wardrobeMissingCategories.slice(0, 4), 4, input),
       );
     }
     const topSignal = context.topSavedVibes[0] || context.topCategories[0] || 'your saved style data';
@@ -174,6 +337,7 @@ export function generateLocalStylistResponse(input: string, context: StylistCont
       intent,
       [action('Open Discover', '/discover', true), action('Open Wardrobe', '/wardrobe')],
       'shopping quality upgrade',
+      pickKnownProducts(context, ['outer', 'shoes', 'bag', 'top'], 4, input),
     );
   }
 
@@ -195,6 +359,17 @@ export function generateLocalStylistResponse(input: string, context: StylistCont
   }
 
   if (intent === 'build_around_piece') {
+    const recommendations = buildAroundRecommendations(input, context);
+    const summary = recommendationSummary(context, recommendations);
+    if (recommendations.length) {
+      return build(
+        `I picked a real anchor and built around it from linked cutouts: ${summary || 'a complete catalog-backed starter look'}. Tap Build or Studio on the preview to use these exact merchant product pages.`,
+        intent,
+        [action('Build this look', '/build', true), action('Edit in Studio', '/canvas'), action('Browse Discover', '/discover')],
+        'build around real catalog anchor',
+        recommendations,
+      );
+    }
     return build(
       `I can help you build around a real selected piece, but this beta will not invent items. Open Wardrobe to choose an owned or wished item, or open Builder and lock the anchor piece before generating around it.`,
       intent,
@@ -228,17 +403,22 @@ export function generateLocalStylistResponse(input: string, context: StylistCont
   }
 
   if (intent === 'outfit_request') {
+    const recommendations = pickKnownProducts(context, OUTFIT_FOUNDATION_CATEGORIES, 6, input);
+    const summary = recommendationSummary(context, recommendations);
     return build(
-      `I can start this in Builder using the real generator and catalog-backed products. This chat is local guidance, so I will not pretend to generate a fit here. Current context: ${context.currentFitPieceCount} build pieces, ${context.closetCount} closet pieces, ${context.savedFitCount} saved fits.`,
+      summary
+        ? `I made a real linked starter fit from the catalog: ${summary}. It starts with top, bottom, and shoes, then adds shape with outerwear or a bag when available. Tap Build or Studio on the preview to use these exact cutout-backed pieces.`
+        : `I can start this in Builder using the real generator and catalog-backed products. Current context: ${context.currentFitPieceCount} build pieces, ${context.closetCount} closet pieces, ${context.savedFitCount} saved fits. Start with top, bottom, and shoes, then add outerwear or a bag if the vibe needs more shape.`,
       intent,
-      [action('Make outfit in Builder', '/build', true), action('Open Discover', '/discover')],
+      [action('Make outfit in Builder', '/build', true), action('Edit in Studio', '/canvas'), action('Open Discover', '/discover')],
       'outfit_request routed to builder',
+      recommendations,
     );
   }
 
   // unknown — be honest and surface real state instead of making up an answer.
   return build(
-    `I am Syli in local beta. I read your real saved fits, wardrobe, wishlist, and current build to suggest next moves. I do not call an external AI yet. Try one of the prompt cards, or ask me to rate your current fit, complete your closet, or build around a piece.`,
+    `I am Syli in beta. I read your real saved fits, wardrobe, wishlist, current build, and linked cutout catalog to suggest next moves. I will not invent products or fake purchase links. Try a prompt card, or ask me to rate your current fit, complete your closet, or build around shoes, a jacket, or a bag.`,
     intent,
     [action('Open Builder', '/build'), action('Open Wardrobe', '/wardrobe'), action('Browse feed', '/feed')],
     'unknown intent fallback',

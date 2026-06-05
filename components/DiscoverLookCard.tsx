@@ -5,7 +5,7 @@ import { ArrowRight, Bookmark, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ProductImage } from '@/components/ProductImage';
 import { useFit } from '@/store/fit';
-import { isRenderableProduct } from '@/lib/product-image-quality';
+import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { VibeId } from '@/lib/vibes';
 
@@ -23,17 +23,6 @@ export interface DiscoverLookCardData {
   previewImageStatus: 'ready' | 'pending' | 'missing';
   tags: string[];
 }
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  hat: 'Hat',
-  outer: 'Outer',
-  top: 'Top',
-  bottom: 'Bottom',
-  shoes: 'Shoes',
-  bag: 'Bag',
-  eyewear: 'Eyewear',
-  jewelry: 'Jewelry',
-};
 
 function frameLabel(frame: DiscoverFrame): string {
   if (frame === 'all') return 'Any frame';
@@ -68,6 +57,7 @@ function ProductFallbackHero({ products }: { products: Product[] }) {
         <div className="h-[168px]">
           <ProductImage
             product={lead}
+            transparentOnly
             wrapperClassName="h-full w-full"
             className="h-full w-full object-contain p-3 drop-shadow-[0_20px_24px_rgba(0,0,0,.18)]"
           />
@@ -79,6 +69,7 @@ function ProductFallbackHero({ products }: { products: Product[] }) {
           <div key={product.id} className="h-[74px] overflow-hidden rounded-[18px] border border-[#eaded4] bg-white/76 shadow-[0_10px_22px_rgba(62,42,30,.1)]">
               <ProductImage
                 product={product}
+                transparentOnly
                 wrapperClassName="h-full w-full"
                 className="h-full w-full object-contain p-2"
               />
@@ -101,7 +92,7 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
   );
 
   function openInBuilder() {
-    const renderableProducts = look.products.filter(isRenderableProduct);
+    const renderableProducts = look.products.filter(isTransparentRenderableProduct);
     const slots = renderableProducts.map((product) => product.category).join(',');
     replaceItems(productsToItems(renderableProducts));
     router.push(`/build?vibe=${look.vibe}&frame=${look.frameBias === 'all' ? 'androgynous' : look.frameBias}&slots=${encodeURIComponent(slots)}`);
@@ -140,8 +131,8 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
         <div className="mt-4 flex flex-wrap items-center gap-2.5 text-[10px] uppercase tracking-[.14em] text-[#a9988e]">
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{frameLabel(look.frameBias)}</span>
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">${(look.estimatedTotal / 100).toLocaleString()} est.</span>
-          {look.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{tag}</span>
+          {look.tags.slice(0, 2).map((tag, index) => (
+            <span key={`${look.id}-tag-${tag}-${index}`} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{tag}</span>
           ))}
         </div>
 
@@ -150,6 +141,7 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
             <div key={product.id} className="h-16 w-16 flex-none overflow-hidden rounded-[16px] border border-[#eadfd5] bg-[#fbf4ee] shadow-[0_8px_18px_rgba(0,0,0,.14)] sm:h-[70px] sm:w-[70px]">
               <ProductImage
                 product={product}
+                transparentOnly
                 wrapperClassName="h-full w-full"
                 className="h-full w-full object-contain p-1.5"
                 onUnavailable={(failedProduct) => {

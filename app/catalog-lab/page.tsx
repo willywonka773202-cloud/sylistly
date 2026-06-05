@@ -148,7 +148,7 @@ export default function CatalogLabPage() {
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="rounded-[28px] border border-[#eadfd3] bg-white/80 p-5 shadow-[0_20px_60px_rgba(70,45,24,.08)]">
           <p className="text-xs font-black uppercase tracking-[.22em] text-[#9a7660]">Catalog Lab · local read-only</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">Database and cutout dashboard</h1>
+          <h1 className="mt-2 text-3xl font-black tracking-tight">Database and asset readiness</h1>
           <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-[#6f5a49]">
             Read-only visibility into runtime catalog coverage, transparent asset progress, and the next expansion gaps.
           </p>
@@ -157,14 +157,14 @@ export default function CatalogLabPage() {
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Total products" value={products.length} />
           <Stat label="Transparent products" value={transparentProducts.length} />
-          <Stat label="Needs cutout" value={needsCutout.length} />
+          <Stat label="Needs transparent asset" value={needsCutout.length} />
           <Stat label="Unsafe images" value={unsafeImages} />
         </section>
 
         <section className="rounded-[24px] border border-[#eadfd3] bg-white/78 p-5">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-lg font-black">Cutout progress</h2>
+              <h2 className="text-lg font-black">Transparent asset progress</h2>
               <p className="text-sm font-semibold text-[#7d6755]">{transparentProducts.length} of {safeProducts.length} safe products registered</p>
             </div>
             <div className="text-2xl font-black">{progress}%</div>
@@ -173,7 +173,7 @@ export default function CatalogLabPage() {
             <div className="h-full rounded-full bg-[#2f5d50]" style={{ width: `${progress}%` }} />
           </div>
           <div className="mt-4 rounded-2xl border border-[#f0d5c4] bg-[#fff7ef] p-3 text-sm font-black text-[#7a3f22]">
-            Do not enable transparent-only until readiness passes. Style readiness uses explicit generator aliases, not unreviewed live metadata edits.
+            Do not enable transparent-only until readiness passes. Style readiness uses reviewed style aliases, not unreviewed live metadata edits.
           </div>
         </section>
 
@@ -234,9 +234,9 @@ export default function CatalogLabPage() {
               />
             ))}
           </Panel>
-          <Panel title="Latest generated cutouts">
+          <Panel title="Latest reviewed transparent assets">
             {latestRun.generated.length === 0 ? (
-              <p className="text-sm font-semibold text-[#7d6755]">No recent generated cutout report found.</p>
+              <p className="text-sm font-semibold text-[#7d6755]">No recent transparent asset review report found.</p>
             ) : (
               latestRun.generated.slice(0, 8).map((item) => (
                 <MetricRow key={item.id} label={`${item.category || 'item'} - ${item.name || item.id}`} value={1} />
@@ -251,10 +251,10 @@ export default function CatalogLabPage() {
         </section>
 
         <section className="rounded-[24px] border border-[#eadfd3] bg-white/78 p-5">
-          <h2 className="text-lg font-black">Failed cutouts</h2>
+          <h2 className="text-lg font-black">Failed asset reviews</h2>
           <div className="mt-3 grid gap-2 md:grid-cols-2">
             {latestRun.failed.length === 0 ? (
-              <p className="text-sm font-semibold text-[#7d6755]">Latest run reported no failed or blocked cutouts.</p>
+              <p className="text-sm font-semibold text-[#7d6755]">Latest run reported no failed or blocked assets.</p>
             ) : (
               latestRun.failed.map((item) => (
                 <div key={item.id} className="rounded-2xl bg-[#fff0ec] p-3 text-sm font-semibold text-[#763b2c]">
@@ -305,7 +305,7 @@ export default function CatalogLabPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <ProductList title="First cutout candidates" products={firstCandidates} empty="No candidates pending." />
+          <ProductList title="First transparent asset candidates" products={firstCandidates} empty="No candidates pending." />
           <ProductList title="Transparent-ready products" products={readyProducts} empty="No transparent assets registered yet." />
         </section>
 
@@ -313,7 +313,7 @@ export default function CatalogLabPage() {
           <h2 className="text-lg font-black">SearchAPI can help with</h2>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             <Note title="Category gaps" body="Find reviewed candidate products for thin categories like eyewear, jewelry, bags, and shoes." />
-            <Note title="Better originals" body="Resolve cleaner merchant images for unsafe or low-quality image records before cutout processing." />
+            <Note title="Better originals" body="Resolve cleaner merchant images for unsafe or low-quality image records before transparent asset review." />
             <Note title="Product URL gaps" body="Fill missing productUrl or retailerUrl fields so candidates can be reviewed before any live merge." />
           </div>
         </section>

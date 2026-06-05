@@ -1,32 +1,48 @@
-// Placeholder API boundary for the Syli AI stylist.
-//
-// The UI does NOT depend on this route — every page reads
-// /lib/stylist/local-response.ts directly. This file exists so that:
-//   1. The architecture for switching to a real AI backend is
-//      already in place (the URL, the JSON shape, the local-fallback
-//      contract).
-//   2. Any client that DOES try to call /api/stylist gets an honest
-//      response instead of a silent 500 or a fake AI reply.
-//   3. CI / monitoring can hit this route to confirm the boundary
-//      exists.
-//
-// This route makes NO external API call. It does NOT require any
-// environment variable. It is safe to deploy as-is.
-
 import { NextResponse } from 'next/server';
+import { hasDatabaseCatalog } from '@/lib/catalog-db';
+import { generateApiStylistResponse } from '@/lib/stylist/ai-response';
+import { getStylistCatalogProducts } from '@/lib/stylist/catalog';
+import { buildStylistContext } from '@/lib/stylist/context';
+import type { StylistContext } from '@/lib/stylist/types';
 
 interface StylistApiRequest {
   message?: unknown;
   context?: unknown;
 }
 
-interface StylistApiResponse {
-  mode: 'local_fallback';
-  message: string;
-  hint: string;
-  // Future contract: when an AI backend is configured, this route
-  // would instead return `{ mode: 'api', reply, intent, actions, ... }`
-  // matching the StylistResponse shape from lib/stylist/types.ts.
+export const runtime = 'nodejs';
+export const maxDuration = 15;
+
+function defaultStylistContext(): StylistContext {
+  return buildStylistContext({
+    currentFitItems: {},
+    savedFits: [],
+    wardrobeItems: [],
+    feedPosts: [],
+    catalogProducts: getStylistCatalogProducts(),
+    profile: null,
+  });
+}
+
+function hasKnownProductList(value: unknown): value is StylistContext {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && Array.isArray((value as { knownProducts?: unknown }).knownProducts),
+  );
+}
+
+function safeContext(value: unknown): StylistContext {
+  if (!value || typeof value !== 'object') {
+    return defaultStylistContext();
+  }
+  if (!hasKnownProductList(value)) return defaultStylistContext();
+  if (value.knownProducts.length > 0) return value;
+  return {
+    ...defaultStylistContext(),
+    ...value,
+    knownProducts: getStylistCatalogProducts(),
+  };
 }
 
 export async function POST(request: Request) {
@@ -37,30 +53,33 @@ export async function POST(request: Request) {
     parsed = null;
   }
 
-  const payload: StylistApiResponse = {
-    mode: 'local_fallback',
-    message:
-      'AI stylist backend is not configured. The Sylistly app is running the local rule-based responder, which uses your real saved fits, wardrobe, wishlist, and current build to suggest next moves.',
-    hint:
-      'To enable a real AI backend later, this route should call an external chat provider (OpenAI / Anthropic / etc.) using a server-side env var. See docs/stylist-ai-integration.md when added.',
-  };
-
-  // Echo back the bare detection of intent if the client sent a message
-  // — useful for future API integration scaffolding without doing any
-  // real work here. We deliberately do NOT call the local responder
-  // from this server route because the UI already does that, and
-  // duplicating it would mean two divergent rule sets.
-  if (parsed && typeof parsed.message === 'string') {
-    return NextResponse.json({ ...payload, echoedMessageLength: parsed.message.length });
+  if (!parsed || typeof parsed.message !== 'string' || !parsed.message.trim()) {
+    return NextResponse.json(
+      {
+        mode: process.env.ANTHROPIC_API_KEY?.trim() ? 'api' : 'local',
+        message: 'POST { message, context } to ask Syli for a real-context styling response.',
+      },
+      { status: 400 },
+    );
   }
 
-  return NextResponse.json(payload);
+  const response = await generateApiStylistResponse(parsed.message.slice(0, 1_000), safeContext(parsed.context));
+  return NextResponse.json(response);
 }
 
 export async function GET() {
-  // Tiny GET for health checks. Same fallback contract.
+  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY?.trim());
+  const hasOllamaKey = Boolean(process.env.OLLAMA_API_KEY?.trim());
+  const hasApiKey = hasAnthropicKey || hasOllamaKey;
   return NextResponse.json({
-    mode: 'local_fallback',
-    message: 'Stylist API boundary is up. POST a JSON body to receive a fallback response.',
+    mode: hasApiKey ? 'api' : 'local',
+    provider: hasAnthropicKey ? 'anthropic' : hasOllamaKey ? 'ollama' : 'local',
+    model: hasAnthropicKey
+      ? process.env.ANTHROPIC_MODEL?.trim() || 'claude-sonnet-4-20250514'
+      : process.env.OLLAMA_DEFAULT_MODEL?.trim() || process.env.OLLAMA_MODEL?.trim() || 'gpt-oss:120b',
+    databaseCatalog: hasDatabaseCatalog(),
+    message: hasApiKey
+      ? 'Syli API is configured for AI-backed responses.'
+      : 'Syli API is up and will use local fallback until ANTHROPIC_API_KEY is configured.',
   });
 }

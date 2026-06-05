@@ -3,12 +3,15 @@ import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@
 import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { cacheProducts } from '@/lib/products';
+import { searchDatabaseCatalog } from '@/lib/catalog-db';
 import { searchBrandCatalog } from '@/lib/brand-catalog';
 import { getFeaturedCatalogProducts } from '@/lib/catalog';
+import { getStylistCatalogProducts } from '@/lib/stylist/catalog';
 import { searchPhotoCatalog } from '@/lib/photo-catalog';
-import { mockSearch } from '@/lib/mock-products';
+import { searchDropCatalog } from '@/lib/drop-catalog';
+import { searchSearchApiQualityCatalog } from '@/lib/searchapi-quality-catalog';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
-import { filterRenderableProducts, hasUsableImageUrl } from '@/lib/product-image-quality';
+import { hasExactProductLink, hasUsableImageUrl, sortRealCommerceFeedProducts, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,
@@ -23,14 +26,16 @@ export const maxDuration = 20;
 interface SearchBody {
   query: string;
   category?: Category;
-  mode?: 'live' | 'demo';
   frame?: GeneratorFrame;
   priceMax?: number | null;
   priceMin?: number | null;
+  transparentOnly?: boolean;
+  exactOnly?: boolean;
 }
 
 type SearchSource = 'catalog' | 'live';
 type SearchMode = 'catalog-only' | 'catalog-preview' | 'hybrid';
+type CatalogKind = 'database' | 'drops' | 'searchapi-quality' | 'photo' | 'blend' | 'starter';
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
 const SEARCH_RESULT_LIMIT = 10;
@@ -180,45 +185,49 @@ function mergeCatalogCandidates(...groups: Product[][]): Product[] {
   return Array.from(merged.values());
 }
 
-function demoSearchResponse(category: Category | undefined, query: string, reason: string) {
-  const products = filterRenderableProducts(mockSearch(category || 'top', query));
-  return NextResponse.json({
-    products,
-    mock: true,
-    mode: 'demo',
-    reason,
-  });
-}
-
 function getSearchMode(): SearchMode {
   if (process.env.SEARCH_MODE === 'catalog-preview') return 'catalog-preview';
   return process.env.SEARCH_MODE === 'hybrid' ? 'hybrid' : 'catalog-only';
+}
+
+function realCommerceProducts(products: Product[], transparentOnly = false, exactOnly = transparentOnly): Product[] {
+  const sortedProducts = transparentOnly ? sortTransparentFeedRenderableProducts(products) : sortRealCommerceFeedProducts(products);
+  return exactOnly ? sortedProducts.filter(hasExactProductLink) : sortedProducts;
+}
+
+function catalogKindFor({
+  databaseCount,
+  dropCount,
+  searchApiQualityCount,
+  photoCount,
+}: {
+  databaseCount: number;
+  dropCount: number;
+  searchApiQualityCount: number;
+  photoCount: number;
+}): CatalogKind {
+  if (databaseCount) return 'database';
+  if (dropCount) return 'drops';
+  if (searchApiQualityCount) return 'searchapi-quality';
+  if (photoCount) return 'photo';
+  return 'starter';
 }
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as SearchBody;
   const query = (body.query || '').slice(0, 200);
   const category = body.category;
-  const mode = body.mode || 'live';
   const frame = normalizeSearchFrame(body.frame);
   const explicitPriceMax = typeof body.priceMax === 'number' ? body.priceMax : null;
   const explicitPriceMin = typeof body.priceMin === 'number' ? body.priceMin : null;
+  const transparentOnly = Boolean(body.transparentOnly);
+  const exactOnly = body.exactOnly !== undefined ? Boolean(body.exactOnly) : transparentOnly;
   const effectiveQuery = withFrameBias(query, category, frame);
-  const cacheKey = `${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
-  const isDev = process.env.NODE_ENV === 'development';
+  const cacheKey = `${transparentOnly ? 'cutout' : 'real'}::${exactOnly ? 'exact' : 'linked'}::${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
   const searchMode = getSearchMode();
   const catalogOnlyMode = searchMode === 'catalog-only';
   const catalogPreviewMode = searchMode === 'catalog-preview';
-  const shouldUseDevMocks = isDev && !liveSearchKey;
-
-  if (isDev && mode === 'demo') {
-    return demoSearchResponse(category, query, 'manual_demo');
-  }
-
-  if (shouldUseDevMocks && !catalogOnlyMode && !catalogPreviewMode) {
-    return demoSearchResponse(category, query, 'missing_searchapi_key');
-  }
 
   const cached = searchResponseCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
@@ -241,7 +250,7 @@ export async function POST(req: NextRequest) {
         explicitPriceMin,
         explicitPriceMax,
       );
-      const renderableFeaturedProducts = filterRenderableProducts(featuredCatalogProducts)
+      const renderableFeaturedProducts = realCommerceProducts(featuredCatalogProducts, transparentOnly, exactOnly)
         .slice(0, SEARCH_RESULT_LIMIT)
         .map((product) => ({
         ...product,
@@ -267,6 +276,18 @@ export async function POST(req: NextRequest) {
       ...product,
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
+    const dropCatalogProducts = searchDropCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 3).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
+    const searchApiQualityProducts = searchSearchApiQualityCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 4).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
+    const databaseCatalogProducts = (await searchDatabaseCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 4)).map((product) => ({
+      ...product,
+      affiliateUrl: wrapAffiliate(product.retailerUrl),
+    }));
     const useCatalogFirst =
       catalogOnlyMode ||
       (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
@@ -275,12 +296,13 @@ export async function POST(req: NextRequest) {
       affiliateUrl: wrapAffiliate(product.retailerUrl),
     }));
     const mergedCatalogProducts = applyExplicitPriceBounds(
-      mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts),
+      mergeCatalogCandidates(databaseCatalogProducts, dropCatalogProducts, searchApiQualityProducts, photoCatalogProducts, seededCatalogProducts),
       explicitPriceMin,
       explicitPriceMax,
     );
+    const mergedRenderableProducts = realCommerceProducts(mergedCatalogProducts, transparentOnly, exactOnly);
 
-    if (mergedCatalogProducts.length && (useCatalogFirst || photoCatalogProducts.length > 0 || catalogOnlyMode)) {
+    if (mergedRenderableProducts.length && (useCatalogFirst || dropCatalogProducts.length > 0 || searchApiQualityProducts.length > 0 || photoCatalogProducts.length > 0 || catalogOnlyMode)) {
       let catalogProducts = mergedCatalogProducts;
 
       if (!catalogOnlyMode && liveSearchKey && effectiveQuery.trim()) {
@@ -292,12 +314,13 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const rankedCatalogProducts = filterRenderableProducts(await rerankProducts(
+      const realCatalogProducts = realCommerceProducts(catalogProducts, transparentOnly, exactOnly);
+      const rankedCatalogProducts = realCommerceProducts(await rerankProducts(
         effectiveQuery || fastIntent.category,
         fastIntent,
-        filterRenderableProducts(catalogProducts),
-        Math.min(SEARCH_RESULT_LIMIT, catalogProducts.length),
-      ));
+        realCatalogProducts,
+        Math.min(SEARCH_RESULT_LIMIT, realCatalogProducts.length),
+      ), transparentOnly, exactOnly);
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
       searchResponseCache.set(cacheKey, {
@@ -319,10 +342,54 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         products: rankedCatalogProducts,
         source: 'catalog',
-        catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
+        catalogKind: catalogKindFor({
+          databaseCount: databaseCatalogProducts.length,
+          dropCount: dropCatalogProducts.length,
+          searchApiQualityCount: searchApiQualityProducts.length,
+          photoCount: photoCatalogProducts.length,
+        }),
         searchMode,
         frame,
       });
+    }
+
+    const fallbackCategory = category || fastIntent.category;
+    if (transparentOnly && fallbackCategory) {
+      const stylistFallbackProducts = getStylistCatalogProducts()
+        .filter((product) => product.category === fallbackCategory);
+      const categoryFallbackProducts = realCommerceProducts(
+        applyExplicitPriceBounds(
+          mergeCatalogCandidates(
+            stylistFallbackProducts,
+            getFeaturedCatalogProducts(SEARCH_RESULT_LIMIT * 3, fallbackCategory),
+          ),
+          explicitPriceMin,
+          explicitPriceMax,
+        ),
+        true,
+        exactOnly,
+      )
+        .slice(0, SEARCH_RESULT_LIMIT)
+        .map((product) => ({
+          ...product,
+          affiliateUrl: wrapAffiliate(product.retailerUrl),
+        }));
+
+      if (categoryFallbackProducts.length) {
+        searchResponseCache.set(cacheKey, {
+          expiresAt: Date.now() + RESPONSE_CACHE_TTL_MS,
+          products: categoryFallbackProducts,
+          source: 'catalog',
+        });
+
+        return NextResponse.json({
+          products: categoryFallbackProducts,
+          source: 'catalog',
+          catalogKind: 'cutout-category-fallback',
+          searchMode,
+          frame,
+        });
+      }
     }
 
     if (catalogOnlyMode) {
@@ -371,10 +438,10 @@ export async function POST(req: NextRequest) {
           : combined
         ).slice(0, SEARCH_RESULT_LIMIT);
 
-        const products: Product[] = filterRenderableProducts(selected.map((p) => ({
+        const products: Product[] = realCommerceProducts(selected.map((p) => ({
           ...p,
           affiliateUrl: wrapAffiliate(p.retailerUrl),
-        })));
+        })), transparentOnly, exactOnly);
 
         if (products.length) {
           console.info(
@@ -408,14 +475,15 @@ export async function POST(req: NextRequest) {
     }
 
     if (catalogPreviewMode) {
-      const previewCatalogProducts = mergeCatalogCandidates(photoCatalogProducts, seededCatalogProducts);
-      if (previewCatalogProducts.length) {
-        const rankedPreviewProducts = filterRenderableProducts(await rerankProducts(
+      const previewCatalogProducts = mergeCatalogCandidates(databaseCatalogProducts, dropCatalogProducts, searchApiQualityProducts, photoCatalogProducts, seededCatalogProducts);
+      const realPreviewProducts = realCommerceProducts(previewCatalogProducts, transparentOnly, exactOnly);
+      if (realPreviewProducts.length) {
+        const rankedPreviewProducts = realCommerceProducts(await rerankProducts(
           effectiveQuery || fastIntent.category,
           fastIntent,
-          filterRenderableProducts(previewCatalogProducts),
-          Math.min(SEARCH_RESULT_LIMIT, previewCatalogProducts.length),
-        ));
+          realPreviewProducts,
+          Math.min(SEARCH_RESULT_LIMIT, realPreviewProducts.length),
+        ), transparentOnly, exactOnly);
 
         cacheProducts(rankedPreviewProducts).catch(() => {});
         searchResponseCache.set(cacheKey, {
@@ -436,7 +504,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           products: rankedPreviewProducts,
           source: 'catalog',
-          catalogKind: photoCatalogProducts.length ? 'blend' : 'starter',
+          catalogKind: catalogKindFor({
+            databaseCount: databaseCatalogProducts.length,
+            dropCount: dropCatalogProducts.length,
+            searchApiQualityCount: searchApiQualityProducts.length,
+            photoCount: photoCatalogProducts.length,
+          }),
           searchMode,
           frame,
         });
@@ -459,7 +532,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Live search is temporarily rate-limited. Please wait a moment and try again.',
-          demoAvailable: isDev,
           searchMode,
           frame,
         },

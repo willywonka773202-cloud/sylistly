@@ -13,6 +13,7 @@ Install/runtime note:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import re
@@ -30,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CUTOUT_DIR = ROOT / "public" / "assets" / "cutouts"
 REPORT_DIR = ROOT / "data" / "catalog" / "cutout-reviewed"
 REPORT_PATH = REPORT_DIR / "cutout-run-report.json"
+REMBG_SESSION = None
 
 
 def parse_args() -> argparse.Namespace:
@@ -37,6 +39,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=5, help="Maximum candidates to consider. Default: 5.")
     parser.add_argument("--apply", action="store_true", help="Actually download images and generate cutout PNGs.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing public/assets/cutouts/<id>.png files.")
+    parser.add_argument("--max-input-px", type=int, default=1400, help="Resize source images to this max width/height before rembg. Default: 1400.")
+    parser.add_argument("--rembg-model", default=os.environ.get("CUTOUT_REMBG_MODEL", "u2netp"), help="rembg model name. Default: u2netp.")
     parser.add_argument(
         "--candidate-json",
         type=Path,
@@ -238,13 +242,18 @@ def load_candidates(
             command.append(f"--target-frame={target_frame}")
         if prefer_feed_first > 0:
             command.append(f"--prefer-feed-first={prefer_feed_first}")
-        raw = subprocess.check_output(
-            command,
-            cwd=ROOT,
-            text=True,
-            encoding="utf-8",
-        )
-        payload = json.loads(raw)
+        with tempfile.NamedTemporaryFile("w+b", delete=False) as output_file:
+            output_path = Path(output_file.name)
+            subprocess.run(
+                command,
+                cwd=ROOT,
+                stdout=output_file,
+                check=True,
+            )
+        try:
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+        finally:
+            output_path.unlink(missing_ok=True)
     candidates = payload.get("candidates", [])
     return select_category_batch(candidates, limit, categories, category_quotas)
 
@@ -274,10 +283,35 @@ def download_bytes(url: str) -> bytes:
         return response.read()
 
 
-def generate_cutout(input_bytes: bytes) -> bytes:
+def normalize_input_image(input_bytes: bytes, max_input_px: int) -> bytes:
+    from PIL import Image, ImageOps
+
+    with Image.open(io.BytesIO(input_bytes)) as image:
+        image = ImageOps.exif_transpose(image)
+        if image.mode not in {"RGB", "RGBA"}:
+            image = image.convert("RGBA")
+        limit = max(320, max_input_px)
+        if max(image.size) > limit:
+            image.thumbnail((limit, limit), Image.Resampling.LANCZOS)
+        output = io.BytesIO()
+        image.save(output, format="PNG", optimize=True)
+        return output.getvalue()
+
+
+def get_rembg_session(model_name: str):
+    global REMBG_SESSION
+    if REMBG_SESSION is None:
+        from rembg import new_session
+
+        REMBG_SESSION = new_session(model_name)
+    return REMBG_SESSION
+
+
+def generate_cutout(input_bytes: bytes, model_name: str, max_input_px: int) -> bytes:
     from rembg import remove
 
-    return remove(input_bytes)
+    normalized_bytes = normalize_input_image(input_bytes, max_input_px)
+    return remove(normalized_bytes, session=get_rembg_session(model_name))
 
 
 def write_report(report: dict[str, Any]) -> None:
@@ -322,6 +356,8 @@ def main() -> int:
         "preferFeedFirst": args.prefer_feed_first,
         "rembgAvailable": has_rembg,
         "rembgError": rembg_error,
+        "rembgModel": args.rembg_model,
+        "maxInputPx": args.max_input_px,
         "outputDir": str(CUTOUT_DIR.relative_to(ROOT)).replace(os.sep, "/"),
         "items": [],
     }
@@ -370,7 +406,7 @@ def main() -> int:
             with tempfile.TemporaryDirectory(prefix="sylistly-cutout-") as tmp:
                 _tmp_dir = Path(tmp)
                 source_bytes = download_bytes(image_url)
-                output_bytes = generate_cutout(source_bytes)
+                output_bytes = generate_cutout(source_bytes, args.rembg_model, args.max_input_px)
                 output_path.write_bytes(output_bytes)
                 item_report["status"] = "generated"
                 item_report["bytes"] = len(output_bytes)

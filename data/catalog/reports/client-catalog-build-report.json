@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-06-04T21:53:23.064Z",
+  "runtimeProducts": 1704,
+  "eligibleProducts": 217,
+  "emittedProducts": 217,
+  "limit": 240,
+  "byCategory": {
+    "hat": 20,
+    "outer": 35,
+    "top": 22,
+    "bottom": 42,
+    "shoes": 36,
+    "bag": 28,
+    "eyewear": 16,
+    "jewelry": 18
+  },
+  "rejected": {
+    "noTransparentCutout": 1355,
+    "failedEditorialGate": 132,
+    "blockedStatusOrFlags": 0,
+    "noCommerceLink": 0,
+    "syntheticStudio": 0,
+    "missingLocalCutoutFile": 0
+  },
+  "outputFile": "data/client-catalog.json",
+  "notes": [
+    "Client catalog is generated from reviewed transparent runtime products only.",
+    "Products must pass the feed editorial transparent-cutout gate, have a real commerce/search outbound link, avoid failed/quarantined/bad cutout flags, and reference an existing local cutout file.",
+    "The export intentionally shares the same visual quality floor as the feed and generator so noisy marketplace, costume, set, and category-mismatched items do not re-enter the UI.",
+    "The emitted order is category- and brand-balanced so the first client slices do not collapse into one brand or two outfit formulas.",
+    "Run this after catalog ingestion + cutout registration so the client UI stops relying on a small handpicked subset."
+  ]
+}

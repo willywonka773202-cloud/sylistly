@@ -1,291 +1,288 @@
 {
-  "generatedAt": "2026-05-17T19:15:12.637Z",
-  "total": 674,
+  "generatedAt": "2026-06-04T21:48:33.678Z",
+  "total": 1704,
   "byCategory": {
-    "hat": 77,
-    "outer": 136,
-    "top": 127,
-    "bottom": 115,
-    "shoes": 63,
-    "bag": 60,
-    "eyewear": 39,
-    "jewelry": 57
+    "hat": 143,
+    "outer": 268,
+    "top": 251,
+    "bottom": 273,
+    "shoes": 323,
+    "bag": 147,
+    "eyewear": 116,
+    "jewelry": 183
   },
   "bySource": {
-    "photo-catalog": 405,
+    "drop-catalog": 542,
+    "searchapi-quality-catalog": 501,
+    "photo-catalog": 392,
     "brand-catalog": 94,
     "generated-catalog": 175
   },
   "byFrame": {
-    "masc": 148,
-    "fem": 252,
-    "androgynous": 184,
+    "masc": 170,
+    "fem": 357,
+    "androgynous": 1087,
     "unspecified": 90
   },
   "byPriceTier": {
-    "under-50": 209,
-    "under-150": 287,
-    "under-400": 140,
-    "400-plus": 38,
+    "under-50": 345,
+    "under-150": 762,
+    "under-400": 493,
+    "400-plus": 104,
     "unknown": 0
   },
   "byCategoryAndFrame": {
     "hat": {
       "masc": 13,
       "fem": 10,
-      "androgynous": 46,
+      "androgynous": 112,
       "unspecified": 8
     },
     "outer": {
-      "masc": 42,
-      "fem": 65,
-      "androgynous": 16,
+      "masc": 44,
+      "fem": 77,
+      "androgynous": 134,
       "unspecified": 13
     },
     "top": {
-      "masc": 42,
-      "fem": 39,
-      "androgynous": 31,
+      "masc": 48,
+      "fem": 61,
+      "androgynous": 127,
       "unspecified": 15
     },
     "bottom": {
-      "masc": 32,
-      "fem": 48,
-      "androgynous": 22,
+      "masc": 44,
+      "fem": 93,
+      "androgynous": 123,
       "unspecified": 13
     },
     "shoes": {
       "masc": 7,
-      "fem": 20,
-      "androgynous": 24,
+      "fem": 21,
+      "androgynous": 283,
       "unspecified": 12
     },
     "bag": {
       "masc": 4,
-      "fem": 22,
-      "androgynous": 23,
+      "fem": 33,
+      "androgynous": 99,
       "unspecified": 11
     },
     "eyewear": {
       "masc": 4,
-      "fem": 4,
-      "androgynous": 22,
+      "fem": 18,
+      "androgynous": 85,
       "unspecified": 9
     },
     "jewelry": {
-      "masc": 4,
+      "masc": 6,
       "fem": 44,
-      "androgynous": 0,
+      "androgynous": 124,
       "unspecified": 9
     }
   },
   "byCategoryAndPriceTier": {
     "hat": {
-      "under-50": 50,
-      "under-150": 25,
-      "under-400": 1,
+      "under-50": 95,
+      "under-150": 45,
+      "under-400": 2,
       "400-plus": 1,
       "unknown": 0
     },
     "outer": {
-      "under-50": 31,
-      "under-150": 56,
-      "under-400": 44,
-      "400-plus": 5,
+      "under-50": 34,
+      "under-150": 112,
+      "under-400": 103,
+      "400-plus": 19,
       "unknown": 0
     },
     "top": {
-      "under-50": 77,
-      "under-150": 44,
-      "under-400": 6,
-      "400-plus": 0,
+      "under-50": 108,
+      "under-150": 111,
+      "under-400": 26,
+      "400-plus": 6,
       "unknown": 0
     },
     "bottom": {
-      "under-50": 40,
-      "under-150": 62,
-      "under-400": 13,
-      "400-plus": 0,
+      "under-50": 65,
+      "under-150": 166,
+      "under-400": 36,
+      "400-plus": 6,
       "unknown": 0
     },
     "shoes": {
-      "under-50": 2,
-      "under-150": 43,
-      "under-400": 18,
-      "400-plus": 0,
+      "under-50": 12,
+      "under-150": 146,
+      "under-400": 152,
+      "400-plus": 13,
       "unknown": 0
     },
     "bag": {
-      "under-50": 8,
-      "under-150": 23,
-      "under-400": 11,
-      "400-plus": 18,
+      "under-50": 24,
+      "under-150": 40,
+      "under-400": 55,
+      "400-plus": 28,
       "unknown": 0
     },
     "eyewear": {
       "under-50": 0,
-      "under-150": 5,
-      "under-400": 26,
-      "400-plus": 8,
+      "under-150": 37,
+      "under-400": 63,
+      "400-plus": 16,
       "unknown": 0
     },
     "jewelry": {
-      "under-50": 1,
-      "under-150": 29,
-      "under-400": 21,
-      "400-plus": 6,
+      "under-50": 7,
+      "under-150": 105,
+      "under-400": 56,
+      "400-plus": 15,
       "unknown": 0
     }
   },
   "topBrands": [
     {
-      "brand": "H&M",
-      "count": 51
-    },
-    {
-      "brand": "Poshmark",
-      "count": 46
-    },
-    {
-      "brand": "Adidas",
-      "count": 39
-    },
-    {
-      "brand": "ALO",
-      "count": 31
-    },
-    {
-      "brand": "Carhartt",
-      "count": 29
+      "brand": "Nike",
+      "count": 72
     },
     {
       "brand": "Aritzia",
-      "count": 25
+      "count": 63
     },
     {
-      "brand": "lululemon",
-      "count": 18
+      "brand": "Carhartt",
+      "count": 62
     },
     {
-      "brand": "Fashion Nova",
-      "count": 16
+      "brand": "Aimé Leon Dore",
+      "count": 61
     },
     {
-      "brand": "Nike",
-      "count": 15
+      "brand": "Adidas",
+      "count": 60
+    },
+    {
+      "brand": "Radial",
+      "count": 46
+    },
+    {
+      "brand": "Poshmark",
+      "count": 44
+    },
+    {
+      "brand": "Heaven Mayhem",
+      "count": 42
+    },
+    {
+      "brand": "Missoma",
+      "count": 42
+    },
+    {
+      "brand": "H&M",
+      "count": 42
+    },
+    {
+      "brand": "Alo Yoga",
+      "count": 41
     },
     {
       "brand": "Dickies",
-      "count": 13
+      "count": 41
     },
     {
-      "brand": "Etsy - Seller",
-      "count": 13
+      "brand": "Birkenstock",
+      "count": 36
     },
     {
-      "brand": "Nordstrom",
-      "count": 12
+      "brand": "ALO",
+      "count": 32
     },
     {
-      "brand": "Abercrombie & Fitch",
-      "count": 12
-    },
-    {
-      "brand": "BIRKENSTOCK",
-      "count": 11
-    },
-    {
-      "brand": "Stussy",
-      "count": 10
+      "brand": "TELFAR",
+      "count": 30
     }
   ],
   "topVibes": [
     {
-      "vibe": "everyday",
-      "count": 448
-    },
-    {
-      "vibe": "date",
-      "count": 416
-    },
-    {
-      "vibe": "office",
-      "count": 248
-    },
-    {
-      "vibe": "night out",
-      "count": 234
-    },
-    {
-      "vibe": "casual",
-      "count": 163
-    },
-    {
-      "vibe": "night",
-      "count": 160
-    },
-    {
-      "vibe": "old money",
-      "count": 151
-    },
-    {
-      "vibe": "preppy",
-      "count": 151
-    },
-    {
-      "vibe": "business casual",
-      "count": 151
-    },
-    {
-      "vibe": "college",
-      "count": 147
+      "vibe": "clean",
+      "count": 1069
     },
     {
       "vibe": "streetwear",
-      "count": 147
+      "count": 1022
     },
     {
-      "vibe": "school",
-      "count": 147
+      "vibe": "everyday",
+      "count": 982
+    },
+    {
+      "vibe": "date",
+      "count": 963
+    },
+    {
+      "vibe": "casual",
+      "count": 766
+    },
+    {
+      "vibe": "night",
+      "count": 483
+    },
+    {
+      "vibe": "office",
+      "count": 410
+    },
+    {
+      "vibe": "gym",
+      "count": 408
+    },
+    {
+      "vibe": "night out",
+      "count": 383
+    },
+    {
+      "vibe": "preppy",
+      "count": 344
+    },
+    {
+      "vibe": "workout",
+      "count": 230
+    },
+    {
+      "vibe": "minimal",
+      "count": 228
     }
   ],
   "transparent": {
-    "withTransparent": 183,
-    "originalOnly": 402,
+    "withTransparent": 349,
+    "originalOnly": 1266,
     "unsafeImages": 89,
-    "needsCutout": 402,
+    "needsCutout": 1266,
     "transparentByCategory": {
-      "hat": 10,
-      "outer": 45,
-      "top": 39,
-      "bottom": 43,
-      "shoes": 20,
-      "bag": 10,
-      "eyewear": 8,
-      "jewelry": 8
+      "hat": 25,
+      "outer": 80,
+      "top": 62,
+      "bottom": 66,
+      "shoes": 41,
+      "bag": 35,
+      "eyewear": 18,
+      "jewelry": 22
     },
     "needsCutoutByCategory": {
-      "hat": 59,
-      "outer": 78,
-      "top": 73,
-      "bottom": 59,
-      "shoes": 32,
-      "bag": 39,
-      "eyewear": 22,
-      "jewelry": 40
+      "hat": 110,
+      "outer": 175,
+      "top": 174,
+      "bottom": 194,
+      "shoes": 271,
+      "bag": 101,
+      "eyewear": 89,
+      "jewelry": 152
     }
   },
   "missingAssets": {
-    "missingProductUrl": 175,
+    "missingProductUrl": 161,
     "missingImageUrl": 0,
     "registeredTransparentUrlMissingFile": []
   },
   "thinCombinations": [
-    {
-      "category": "jewelry",
-      "frame": "androgynous",
-      "count": 0
-    },
     {
       "category": "bag",
       "frame": "masc",
@@ -293,114 +290,63 @@
     },
     {
       "category": "eyewear",
-      "frame": "masc",
-      "count": 4
-    },
-    {
-      "category": "eyewear",
-      "frame": "fem",
-      "count": 4
-    },
-    {
-      "category": "jewelry",
       "frame": "masc",
       "count": 4
     }
   ],
   "thinPriceTiers": [
     {
-      "category": "top",
-      "priceTier": "400-plus",
-      "count": 0
-    },
-    {
-      "category": "bottom",
-      "priceTier": "400-plus",
-      "count": 0
-    },
-    {
-      "category": "shoes",
-      "priceTier": "400-plus",
-      "count": 0
-    },
-    {
       "category": "eyewear",
       "priceTier": "under-50",
       "count": 0
     },
     {
       "category": "hat",
-      "priceTier": "under-400",
-      "count": 1
-    },
-    {
-      "category": "hat",
       "priceTier": "400-plus",
       "count": 1
     },
     {
-      "category": "jewelry",
-      "priceTier": "under-50",
-      "count": 1
-    },
-    {
-      "category": "shoes",
-      "priceTier": "under-50",
+      "category": "hat",
+      "priceTier": "under-400",
       "count": 2
     }
   ],
   "overrepresentedBrands": [
     {
-      "brand": "H&M",
-      "share": 0.076
-    },
-    {
-      "brand": "Poshmark",
-      "share": 0.068
-    },
-    {
-      "brand": "Adidas",
-      "share": 0.058
-    },
-    {
-      "brand": "ALO",
-      "share": 0.046
-    },
-    {
-      "brand": "Carhartt",
-      "share": 0.043
+      "brand": "Nike",
+      "share": 0.042
     }
   ],
   "recommendedNextExpansionCategories": [
     {
-      "category": "eyewear",
-      "priority": 104.3,
-      "reason": "39 runtime products, 22 still need transparent assets"
-    },
-    {
-      "category": "jewelry",
-      "priority": 92.3,
-      "reason": "57 runtime products, 40 still need transparent assets"
-    },
-    {
       "category": "bag",
-      "priority": 81,
-      "reason": "60 runtime products, 39 still need transparent assets"
+      "priority": 41.7,
+      "reason": "147 runtime products, 101 still need transparent assets"
     },
     {
-      "category": "shoes",
-      "priority": 67.7,
-      "reason": "63 runtime products, 32 still need transparent assets"
-    },
-    {
-      "category": "hat",
-      "priority": 62.7,
-      "reason": "77 runtime products, 59 still need transparent assets"
+      "category": "eyewear",
+      "priority": 41.7,
+      "reason": "116 runtime products, 89 still need transparent assets"
     },
     {
       "category": "outer",
-      "priority": 26,
-      "reason": "136 runtime products, 78 still need transparent assets"
+      "priority": 40,
+      "reason": "268 runtime products, 175 still need transparent assets"
+    },
+    {
+      "category": "top",
+      "priority": 40,
+      "reason": "251 runtime products, 174 still need transparent assets"
+    },
+    {
+      "category": "bottom",
+      "priority": 40,
+      "reason": "273 runtime products, 194 still need transparent assets"
+    },
+    {
+      "category": "shoes",
+      "priority": 40,
+      "reason": "323 runtime products, 271 still need transparent assets"
     }
   ]
 }

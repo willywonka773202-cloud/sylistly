@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Heart, Layers, ShoppingBag, Sparkles, Wand2 } from 'lucide-react';
 import { DiscoverLookCard, type DiscoverLookCardData } from '@/components/DiscoverLookCard';
@@ -11,9 +11,9 @@ import {
   getCollectionProducts,
   LAUNCH_COLLECTIONS,
   type CatalogCollection,
-} from '@/lib/catalog';
+} from '@/lib/client-catalog';
 import { getDiscoverLookPreview } from '@/lib/discover-previews';
-import { isRenderableProduct } from '@/lib/product-image-quality';
+import { hasTransparentProductImage, isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import recipeData from '@/data/discover-look-recipes.json';
@@ -193,7 +193,7 @@ function recipeProductsFor(collection: CatalogCollection): Product[] {
     if (!slotRecipe) continue;
     const match = ALL_CATALOG_PRODUCTS
       .filter((product) => product.category === category)
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .filter((product) => !usedIds.has(product.id))
       .map((product) => ({ product, score: recipeScore(product, collection, slotRecipe) }))
       .filter((entry) => entry.score > 0)
@@ -214,7 +214,7 @@ function curatedProductsFor(collection: CatalogCollection): Product[] {
   const seen = new Set<string>();
   const selected: Product[] = [];
   const addProduct = (product: Product) => {
-    if (seen.has(product.id) || !isRenderableProduct(product)) return;
+    if (seen.has(product.id) || !isTransparentRenderableProduct(product)) return;
     seen.add(product.id);
     selected.push(product);
   };
@@ -226,7 +226,7 @@ function curatedProductsFor(collection: CatalogCollection): Product[] {
     const replacement = ALL_CATALOG_PRODUCTS
       .filter((product) => product.category === category)
       .filter((product) => productMatchesCollection(product, collection))
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .sort((left, right) => {
         const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + (left.priceCents ? 2 : 0);
         const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + (right.priceCents ? 2 : 0);
@@ -237,7 +237,7 @@ function curatedProductsFor(collection: CatalogCollection): Product[] {
   }
 
   if (selected.length < 4) {
-    for (const product of ALL_CATALOG_PRODUCTS.filter(isRenderableProduct)) {
+    for (const product of ALL_CATALOG_PRODUCTS.filter(isTransparentRenderableProduct)) {
       if (!productMatchesCollection(product, collection)) continue;
       addProduct(product);
       if (selected.length >= 6) break;
@@ -280,7 +280,7 @@ function uniqueProducts(products: Product[], limit: number, excludedIds = new Se
   const seen = new Set<string>();
   const out: Product[] = [];
   for (const product of products) {
-    if (!isRenderableProduct(product)) continue;
+    if (!isTransparentRenderableProduct(product)) continue;
     if (seen.has(product.id) || excludedIds.has(product.id)) continue;
     seen.add(product.id);
     out.push(product);
@@ -307,12 +307,17 @@ function itemsFromProduct(product: Product): Partial<Record<Category, Product>> 
 
 export default function DiscoverPage() {
   const router = useRouter();
+  const [hasMounted, setHasMounted] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const posts = useSocialFeed((state) => state.posts);
   const replaceItems = useFit((state) => state.replaceItems);
   const wardrobeItems = useWardrobe(selectWardrobeItems);
   const addToCloset = useWardrobe((state) => state.addToCloset);
   const addToWishlist = useWardrobe((state) => state.addToWishlist);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const wardrobeProductIds = useMemo(() => new Set(wardrobeItems.map((item) => item.productId)), [wardrobeItems]);
   const closetCategories = useMemo(
@@ -327,14 +332,17 @@ export default function DiscoverPage() {
   );
 
   const feedProducts = useMemo(
-    () => posts.flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product))),
-    [posts],
+    () => (hasMounted
+      ? posts.flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product)))
+      : []),
+    [hasMounted, posts],
   );
 
   const transparentReadyProducts = useMemo(() => {
+    if (!hasMounted) return [];
     const products = ALL_CATALOG_PRODUCTS
-      .filter((product) => Boolean(product.imageTransparentUrl))
-      .filter(isRenderableProduct)
+      .filter(hasTransparentProductImage)
+      .filter(isTransparentRenderableProduct)
       .sort((left, right) => {
         const leftCategory = CATEGORY_ORDER.indexOf(left.category);
         const rightCategory = CATEGORY_ORDER.indexOf(right.category);
@@ -342,9 +350,10 @@ export default function DiscoverPage() {
         return `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`);
       });
     return uniqueProducts(products, 24, wardrobeProductIds);
-  }, [wardrobeProductIds]);
+  }, [hasMounted, wardrobeProductIds]);
 
   const formulaRails = useMemo(() => {
+    if (!hasMounted) return [];
     return FORMULA_RAILS.map((rail) => {
       const postProducts = posts
         .filter((post) => {
@@ -354,7 +363,7 @@ export default function DiscoverPage() {
         .flatMap((post) => Object.values(post.items).filter((product): product is Product => Boolean(product)));
 
       const catalogProducts = ALL_CATALOG_PRODUCTS
-        .filter(isRenderableProduct)
+        .filter(isTransparentRenderableProduct)
         .map((product) => ({ product, score: scoreForKeywords(product, rail.keywords, rail.categories) }))
         .filter((entry) => entry.score > 0)
         .sort((left, right) => right.score - left.score)
@@ -365,24 +374,26 @@ export default function DiscoverPage() {
         products: uniqueProducts([...postProducts, ...catalogProducts], 12),
       };
     }).filter((rail) => rail.products.length > 0);
-  }, [posts]);
+  }, [hasMounted, posts]);
 
   const basics = useMemo(() => {
+    if (!hasMounted) return [];
     const scored = [...feedProducts, ...ALL_CATALOG_PRODUCTS]
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .map((product) => ({ product, score: scoreForKeywords(product, BASIC_KEYWORDS, ['top', 'bottom', 'shoes', 'outer', 'bag']) }))
       .filter((entry) => entry.score > 0)
       .sort((left, right) => right.score - left.score)
       .map((entry) => entry.product);
     return uniqueProducts(scored, 12, wardrobeProductIds);
-  }, [feedProducts, wardrobeProductIds]);
+  }, [feedProducts, hasMounted, wardrobeProductIds]);
 
   const gapProducts = useMemo(() => {
+    if (!hasMounted) return [];
     const suggestions = missingCategories.flatMap((category) => {
       const fromFeed = feedProducts.filter((product) => product.category === category);
       const fromCatalog = ALL_CATALOG_PRODUCTS
         .filter((product) => product.category === category)
-        .filter(isRenderableProduct)
+        .filter(isTransparentRenderableProduct)
         .sort((left, right) => {
           const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + (left.priceCents ? 2 : 0);
           const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + (right.priceCents ? 2 : 0);
@@ -391,35 +402,38 @@ export default function DiscoverPage() {
       return uniqueProducts([...fromFeed, ...fromCatalog], 2, wardrobeProductIds);
     });
     return uniqueProducts(suggestions, 12, wardrobeProductIds);
-  }, [feedProducts, missingCategories, wardrobeProductIds]);
+  }, [feedProducts, hasMounted, missingCategories, wardrobeProductIds]);
 
   const budgetFinds = useMemo(() => {
+    if (!hasMounted) return [];
     const products = [...feedProducts, ...ALL_CATALOG_PRODUCTS]
       .filter((product) => product.priceCents > 0 && product.priceCents <= 9000)
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .sort((left, right) => {
         const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 4 : 0) - left.priceCents / 10000;
         const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 4 : 0) - right.priceCents / 10000;
         return rightScore - leftScore;
       });
     return uniqueProducts(products, 12, wardrobeProductIds);
-  }, [feedProducts, wardrobeProductIds]);
+  }, [feedProducts, hasMounted, wardrobeProductIds]);
 
   const premiumPicks = useMemo(() => {
+    if (!hasMounted) return [];
     const products = [...feedProducts, ...ALL_CATALOG_PRODUCTS]
       .filter((product) => product.priceCents >= 25000)
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .sort((left, right) => {
         const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + left.priceCents / 100000;
         const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + right.priceCents / 100000;
         return rightScore - leftScore;
       });
     return uniqueProducts(products, 12, wardrobeProductIds);
-  }, [feedProducts, wardrobeProductIds]);
+  }, [feedProducts, hasMounted, wardrobeProductIds]);
 
   const underusedGems = useMemo(() => {
+    if (!hasMounted) return [];
     const products = [...ALL_CATALOG_PRODUCTS, ...feedProducts]
-      .filter(isRenderableProduct)
+      .filter(isTransparentRenderableProduct)
       .filter((product) => !wardrobeProductIds.has(product.id))
       .sort((left, right) => {
         const leftScore = (left.metadata?.featured ? 4 : 0) + (left.imageQuality === 'good' ? 8 : 0);
@@ -427,9 +441,9 @@ export default function DiscoverPage() {
         return rightScore - leftScore;
       });
     return uniqueProducts(products, 12);
-  }, [feedProducts, wardrobeProductIds]);
+  }, [feedProducts, hasMounted, wardrobeProductIds]);
 
-  const looks = useMemo(() => buildDiscoverLooks(), []);
+  const looks = useMemo(() => (hasMounted ? buildDiscoverLooks() : []), [hasMounted]);
 
   function showToast(message: string) {
     setToast(message);
@@ -720,7 +734,7 @@ function DiscoverProductCard({
         aria-label={`Build around ${product.name}`}
       >
         <div className="relative h-[168px]">
-          <ProductImage product={product} displayMode="closet" />
+          <ProductImage product={product} displayMode="closet" transparentOnly />
           <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white backdrop-blur-md">
             {product.category}
           </div>

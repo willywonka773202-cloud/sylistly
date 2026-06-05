@@ -85,8 +85,8 @@ export interface StylistContext {
   recentWardrobeSummary: Array<{ id: string; productId: string; category: Category; brand: string; status: 'closet' | 'wishlist' }>;
   // ── meta ──────────────────────────────────────────────────────
   hasEnoughDataForStyleDNA: boolean;
-  /** Real catalog-side products the user has actually touched, used for
-   * recommending real items instead of inventing them. */
+  /** Real products available to recommend. This includes user-touched items
+   * plus a small catalog preview so new users can still get real picks. */
   knownProducts: Product[];
 }
 

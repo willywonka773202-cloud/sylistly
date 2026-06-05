@@ -161,14 +161,6 @@ function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
-function titleCase(value: string): string {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
 function safeHostname(url: string): string | null {
   try {
     return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
@@ -222,12 +214,6 @@ function inferBrand(title: string, seller: string): string {
   ];
   const found = known.find((brand) => normalized.includes(normalize(brand)));
   return found || seller.trim() || 'Unknown';
-}
-
-function cleanName(title: string, brand: string): string {
-  const trimmed = title.trim();
-  const withoutBrand = trimmed.replace(new RegExp(`^${brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+`, 'i'), '');
-  return withoutBrand.replace(/\s*[|·-]\s*[^|·-]+$/, '').trim() || trimmed || brand;
 }
 
 function inferCategory(title: string, plan: SearchPlanItem): Category | null {
@@ -316,18 +302,6 @@ function qualityScore(product: Product): number {
     arrayValue(product, 'searchTerms', 'searchTerms').length,
     metadataSize(product),
   ].reduce((sum, value) => sum + value, 0);
-}
-
-function stableProductId(product: Product): string {
-  const sourceId = typeof product.metadata?.searchapiProductId === 'string' ? product.metadata.searchapiProductId : '';
-  const seed = [
-    product.category,
-    normalize(product.brand),
-    normalize(product.name),
-    sourceId,
-    urlKey(product),
-  ].filter(Boolean).join('::');
-  return `generated-${crypto.createHash('sha1').update(seed || productKey(product)).digest('hex').slice(0, 16)}`;
 }
 
 function mergeProducts(left: Product, right: Product): Product {
@@ -427,17 +401,6 @@ function dedupeProducts(products: Product[]): Product[] {
   }
 
   return output;
-}
-
-function dedupeGeneratedAgainstCatalog(generatedProducts: Product[], catalogProducts: Product[]): Product[] {
-  const catalogKeys = new Set(catalogProducts.map(productKey));
-  const catalogUrls = new Set(catalogProducts.map(urlKey).filter(Boolean));
-
-  return dedupeProducts(generatedProducts).filter((product) => {
-    const key = productKey(product);
-    const url = urlKey(product);
-    return !catalogKeys.has(key) && (!url || !catalogUrls.has(url));
-  });
 }
 
 async function readJson<T>(filePath: string, fallback: T): Promise<T> {

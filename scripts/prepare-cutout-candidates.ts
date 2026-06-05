@@ -21,13 +21,22 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
+import { DROP_CATALOG_PRODUCTS } from '../lib/drop-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { SEARCHAPI_QUALITY_PRODUCTS } from '../lib/searchapi-quality-catalog';
 import { applyCatalogCutoutOverridesToProducts } from '../lib/catalog-cutout-overrides';
 import { validateProduct } from '../lib/catalog-schemas/product.v2';
+import {
+  hasFeedCategoryMismatch,
+  hasHighCategoryConfidence,
+  hasProductCommerceLink,
+  isFeedBlockedProductImage,
+  isSyntheticStudioProduct,
+} from '../lib/product-image-quality';
 import type { Category, Product } from '../lib/types';
 
-type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog';
+type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog' | 'drop-catalog' | 'searchapi-quality-catalog';
 
 interface CutoutCandidate {
   id: string;
@@ -176,6 +185,7 @@ function looksRetailWhite(url: string): boolean {
 function buildCandidate(product: unknown, source: SourceLabel): CutoutCandidate | null {
   if (!product || typeof product !== 'object') return null;
   const p = product as Partial<Product> & { imageTransparentUrl?: unknown };
+  const candidateProduct = product as Product;
 
   const id = typeof p.id === 'string' ? p.id : '';
   if (!id) return null;
@@ -207,7 +217,14 @@ function buildCandidate(product: unknown, source: SourceLabel): CutoutCandidate 
   const brand = typeof p.brand === 'string' ? p.brand : '<missing>';
   const name = typeof p.name === 'string' ? p.name : '<missing>';
   const category = (typeof p.category === 'string' ? p.category : 'unknown') as Category | 'unknown';
+  if (category === 'unknown') return null;
   const productUrl = typeof p.productUrl === 'string' ? p.productUrl : undefined;
+  if (!hasProductCommerceLink(candidateProduct)) return null;
+  if (isSyntheticStudioProduct(candidateProduct)) return null;
+  if (isFeedBlockedProductImage(candidateProduct)) return null;
+  if (hasFeedCategoryMismatch(candidateProduct)) return null;
+  if (!hasHighCategoryConfidence(candidateProduct, category)) return null;
+
   const vibes = [...(Array.isArray(p.vibes) ? p.vibes : []), ...(Array.isArray(p.occasions) ? p.occasions : [])]
     .filter((vibe): vibe is string => typeof vibe === 'string')
     .map((vibe) => vibe.toLowerCase());
@@ -330,6 +347,8 @@ function orderCandidates(
 
 function build(flags: CliFlags): CutoutReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
+    { label: 'drop-catalog', products: applyCatalogCutoutOverridesToProducts(DROP_CATALOG_PRODUCTS as Product[]) as unknown[] },
+    { label: 'searchapi-quality-catalog', products: applyCatalogCutoutOverridesToProducts(SEARCHAPI_QUALITY_PRODUCTS as Product[]) as unknown[] },
     { label: 'brand-catalog', products: applyCatalogCutoutOverridesToProducts(BRAND_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'generated-catalog', products: applyCatalogCutoutOverridesToProducts(GENERATED_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'photo-catalog', products: applyCatalogCutoutOverridesToProducts(PHOTO_CATALOG_PRODUCTS as Product[]) as unknown[] },

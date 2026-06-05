@@ -9,12 +9,15 @@ import { useCheckout } from '@/store/checkout';
 export default function CheckoutPage() {
   const products = useCheckout((state) => state.products);
   const title = useCheckout((state) => state.title);
-  const retailerGroups = buildRetailerGroups(products);
-  const totalCents = products.reduce((sum, product) => sum + (product.priceCents || 0), 0);
+  const linkedProducts = products.filter((product) => Boolean(product.url));
+  const exactProducts = linkedProducts.filter((product) => isExactProductUrl(product.url));
+  const withheldCount = linkedProducts.length - exactProducts.length;
+  const retailerGroups = buildRetailerGroups(exactProducts);
+  const totalCents = exactProducts.reduce((sum, product) => sum + (product.priceCents || 0), 0);
   const [batchMessage, setBatchMessage] = useState<string | null>(null);
 
   async function copyLinks() {
-    const text = products
+    const text = exactProducts
       .map((product) => `${product.brand} ${product.name} - ${product.url}`)
       .join('\n');
 
@@ -26,7 +29,7 @@ export default function CheckoutPage() {
   }
 
   function openAllTabs() {
-    const result = openCheckoutUrls(products.map((product) => product.url));
+    const result = openCheckoutUrls(exactProducts.map((product) => product.url));
     if (!result.requestedCount) {
       setBatchMessage('No retailer links are ready yet.');
       return;
@@ -52,9 +55,9 @@ export default function CheckoutPage() {
       eyebrow="Checkout"
       title="Retailer"
       accent="links"
-      description="Use this page as a multi-store checkout helper. Sylistly can batch-open retailer tabs again, with manual links as the fallback."
+      description="Use this page as a multi-store checkout helper. Sylistly only opens exact merchant product pages here; stale search fallback links are held for refresh."
     >
-      {products.length ? (
+      {linkedProducts.length ? (
         <div className="grid gap-3">
           <section className="rounded-3xl border border-hairline bg-surface-1 p-4">
             <div className="flex items-start justify-between gap-3">
@@ -62,7 +65,7 @@ export default function CheckoutPage() {
                 <div className="text-[11px] uppercase tracking-[.18em] text-muted">Ready to shop</div>
                 <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{title}</h2>
                 <p className="mt-2 text-[12px] text-muted-2">
-                  {products.length} item{products.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString()}
+                  {exactProducts.length} exact item{exactProducts.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString()}
                 </p>
               </div>
               <button
@@ -86,6 +89,14 @@ export default function CheckoutPage() {
             {batchMessage ? (
               <div className="mt-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
                 {batchMessage}
+              </div>
+            ) : null}
+            {withheldCount > 0 ? (
+              <div
+                className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
+                data-checkout-withheld-search-links={withheldCount}
+              >
+                {withheldCount} legacy search fallback link{withheldCount !== 1 ? 's were' : ' was'} withheld. Refresh the fit from Feed or Editor to rebuild exact product pages.
               </div>
             ) : null}
           </section>
@@ -121,7 +132,7 @@ export default function CheckoutPage() {
                             ? 'bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20'
                             : 'bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/20'
                         }`}>
-                          {exact ? 'Exact product page' : 'Retailer search link'}
+                          {exact ? 'Exact product page' : 'Needs refresh'}
                         </span>
                       </div>
 

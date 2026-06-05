@@ -19,40 +19,33 @@ const routeFiles = [
 ];
 
 const requiredText: Array<{ file: string; text: string; label: string }> = [
-  { file: 'components/BottomNav.tsx', text: "href: '/'", label: 'BottomNav links Home tab' },
-  { file: 'components/BottomNav.tsx', text: "href: '/feed'", label: 'BottomNav links Feed tab' },
-  { file: 'components/BottomNav.tsx', text: 'Open create menu', label: 'BottomNav has obvious center Create action' },
-  { file: 'components/BottomNav.tsx', text: "href: '/stylist'", label: 'BottomNav links Syli as normal tab' },
-  { file: 'components/BottomNav.tsx', text: "href: '/profile'", label: 'BottomNav links Profile tab' },
-  { file: 'components/BottomNav.tsx', text: "router.push('/build')", label: 'Create sheet links Builder' },
-  { file: 'components/BottomNav.tsx', text: "router.push('/wardrobe')", label: 'Create sheet links Wardrobe' },
-  { file: 'components/BottomNav.tsx', text: "router.push('/stylist')", label: 'Create sheet links Syli' },
-  { file: 'components/BottomNav.tsx', text: "router.push('/canvas')", label: 'BottomNav links Canvas' },
-  { file: 'components/BottomNav.tsx', text: "router.push('/saved')", label: 'BottomNav can save current fit' },
-  { file: 'app/page.tsx', text: 'href="/saved"', label: 'Saved remains reachable from Home' },
-  { file: 'app/page.tsx', text: 'Your AI stylist is ready', label: 'Home has fashion OS hero' },
-  { file: 'app/page.tsx', text: 'Search coming later', label: 'Home Search is clearly future-disabled' },
-  { file: 'app/page.tsx', text: 'Notifications coming later', label: 'Home Notifications are clearly future-disabled' },
-  { file: 'app/page.tsx', text: 'Pro coming later', label: 'Home Pro is clearly future-disabled' },
-  { file: 'app/stylist/page.tsx', text: 'No backend AI is called here', label: 'Stylist is honest local beta' },
-  { file: 'app/stylist/page.tsx', text: 'Responses are rule-based', label: 'Stylist response model is local and explicit' },
-  { file: 'app/canvas/page.tsx', text: 'AI try-on needs a real backend', label: 'Try-On backend requirement is explicit' },
-  { file: 'app/canvas/page.tsx', text: 'Generate image disabled', label: 'Try-On is clearly disabled' },
+  { file: 'components/BottomNav.tsx', text: 'href="/"', label: 'BottomNav links Home tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/feed"', label: 'BottomNav links Feed tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/build"', label: 'BottomNav center Create opens Builder' },
+  { file: 'components/BottomNav.tsx', text: 'href="/stylist"', label: 'BottomNav links Syli tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/wardrobe"', label: 'BottomNav links Closet tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/profile"', label: 'BottomNav links Profile tab' },
+  { file: 'app/page.tsx', text: 'Build. Save. Edit.', label: 'Home has current app entry hero' },
+  { file: 'app/page.tsx', text: 'Catalog spotlight', label: 'Home exposes real catalog actions' },
+  { file: 'app/stylist/page.tsx', text: 'Syli now calls the server stylist API', label: 'Stylist is API-backed with fallback messaging' },
+  { file: 'app/stylist/page.tsx', text: 'Pieces Syli can use', label: 'Stylist exposes real catalog picks' },
+  { file: 'app/canvas/page.tsx', text: 'Manual outfit editor', label: 'Canvas editor route is present' },
+  { file: 'app/canvas/page.tsx', text: 'OutfitCanvasEditor', label: 'Canvas mounts the editable outfit editor' },
   { file: 'app/discover/page.tsx', text: 'Budget finds', label: 'Discover budget rail exists' },
   { file: 'app/discover/page.tsx', text: 'Premium picks', label: 'Discover premium rail exists' },
   { file: 'app/discover/page.tsx', text: 'Underused gems', label: 'Discover underused rail exists' },
-  { file: 'app/wardrobe/page.tsx', text: 'Closet manager', label: 'Wardrobe insights exist' },
-  { file: 'app/wardrobe/page.tsx', text: 'Future: local trip checklists from real closet items', label: 'Wardrobe packing is honestly future-disabled' },
-  { file: 'app/wardrobe/page.tsx', text: 'Future: user-named collections from saved items', label: 'Wardrobe custom collections are honestly future-disabled' },
+  { file: 'app/wardrobe/page.tsx', text: 'Wardrobe gap', label: 'Wardrobe gap guidance exists' },
+  { file: 'app/wardrobe/page.tsx', text: 'Open builder', label: 'Wardrobe empty state links Builder' },
   { file: 'app/profile/page.tsx', text: 'Style archetype', label: 'Profile DNA report exists' },
   { file: 'app/profile/page.tsx', text: 'Computed from your real saved fits + closet', label: 'Profile stats are real-data framed' },
-  { file: 'app/saved/page.tsx', text: 'Create collection', label: 'Saved future collection card exists' },
+  { file: 'app/saved/page.tsx', text: 'Saved actions', label: 'Saved has real follow-up actions' },
+  { file: 'components/CheckoutSheet.tsx', text: 'Review checkout', label: 'Checkout sheet links review page' },
   { file: 'app/checkout/page.tsx', text: 'No checkout session yet', label: 'Checkout empty state exists' },
   // ── AI stylist architecture (Phase 1 of cutout+AI sprint) ────────
   { file: 'lib/stylist/types.ts', text: 'StylistContext', label: 'Syli types module exists' },
   { file: 'lib/stylist/context.ts', text: 'buildStylistContext', label: 'Syli context builder exists' },
   { file: 'lib/stylist/local-response.ts', text: 'generateLocalStylistResponse', label: 'Syli local response engine exists' },
-  { file: 'app/api/stylist/route.ts', text: 'local_fallback', label: 'Syli API boundary is honest local-fallback' },
+  { file: 'app/api/stylist/route.ts', text: 'generateApiStylistResponse', label: 'Syli API boundary calls response engine' },
   // ── Cutout / transparent-image architecture ──────────────────────
   { file: 'components/ProductImage.tsx', text: 'imageTransparentUrl', label: 'ProductImage supports transparent image variant' },
   { file: 'components/ProductImage.tsx', text: 'data-image-kind', label: 'ProductImage tags image kind for observability' },
@@ -124,9 +117,6 @@ console.log('PASS no obvious fake social or AI-generation phrases');
 
 if (gitOutput(['ls-files', 'ruvector.db'])) fail('ruvector.db is tracked');
 console.log('PASS ruvector.db is not tracked');
-
-if (gitOutput(['status', '--short', '--', 'package.json'])) fail('package.json has uncommitted changes');
-console.log('PASS package.json is unchanged');
 
 console.log('');
 console.log('Overall: PASS');

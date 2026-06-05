@@ -3,24 +3,16 @@
 import { useEffect, useState } from 'react';
 import { Footprints, Gem, Glasses, Layers, Shirt, ShoppingBag, Sparkles } from 'lucide-react';
 import { proxiedImageUrl } from '@/lib/image-url';
-import { hasUsableProductImage } from '@/lib/product-image-quality';
+import { getTransparentProductImageUrl, hasUsableProductImage } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
 /**
  * Display mode system for product photography across the app.
  *
- * Every mode controls TWO surfaces: the outer `wrapper` (background +
- * shadow + radius) and the inner `image` (padding + object-fit).  The
- * goal is consistent, premium clothing display whether the original
- * source has a transparent cutout or a hard white retail background.
- *
- * We do NOT perform background removal here — that would require
- * server-side image processing we haven't shipped. Instead we rely on
- * (a) object-contain padding so products never get cropped, (b) soft
- * neutral / radial gradients so a hard white background blends into
- * the page instead of looking like a harsh box, and (c) consistent
- * shadows that make pieces feel like floating cutouts even when they
- * aren't truly transparent.
+ * Every mode controls TWO surfaces: the outer `wrapper` and the inner
+ * image. Product surfaces that pass `transparentOnly` now enforce a hard
+ * cutout-only rule; if a product does not have a reviewed transparent
+ * asset, the original retail photo is not shown.
  *
  * Modes:
  *   default     — generic catalog tile, neutral warm background
@@ -117,11 +109,11 @@ const MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
 
 const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle> = {
   default: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-2xl bg-[radial-gradient(circle_at_50%_68%,rgba(255,255,255,.18)_0%,rgba(255,255,255,.08)_34%,transparent_68%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-2xl bg-transparent',
     image: 'h-full w-full object-contain p-3 drop-shadow-[0_24px_22px_rgba(0,0,0,.42)]',
   },
   cutout: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[24px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.2)_0%,rgba(255,255,255,.08)_34%,transparent_70%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[24px] bg-transparent',
     image: 'h-full w-full object-contain p-3 drop-shadow-[0_30px_24px_rgba(0,0,0,.46)]',
     paddingByCategory: {
       shoes: 'p-2.5 drop-shadow-[0_28px_22px_rgba(0,0,0,.48)]',
@@ -131,7 +123,7 @@ const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle>
     },
   },
   closet: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[20px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.22)_0%,rgba(255,255,255,.08)_36%,transparent_72%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[20px] bg-transparent',
     image: 'h-full w-full object-contain p-3.5 drop-shadow-[0_26px_22px_rgba(0,0,0,.42)]',
     paddingByCategory: {
       shoes: 'p-2.5 drop-shadow-[0_24px_20px_rgba(0,0,0,.42)]',
@@ -140,7 +132,7 @@ const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle>
     },
   },
   moodboard: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[22px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.2)_0%,rgba(255,255,255,.08)_35%,transparent_72%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[22px] bg-transparent',
     image: 'h-full w-full object-contain p-3 drop-shadow-[0_32px_26px_rgba(0,0,0,.48)]',
     paddingByCategory: {
       shoes: 'p-2 drop-shadow-[0_32px_26px_rgba(0,0,0,.5)]',
@@ -148,7 +140,7 @@ const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle>
     },
   },
   hero: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[28px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.22)_0%,rgba(255,255,255,.08)_34%,transparent_72%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[28px] bg-transparent',
     image: 'h-full w-full object-contain p-5 drop-shadow-[0_40px_34px_rgba(0,0,0,.5)]',
     paddingByCategory: {
       shoes: 'p-4 drop-shadow-[0_42px_34px_rgba(0,0,0,.52)]',
@@ -156,7 +148,7 @@ const TRANSPARENT_MODE_STYLES: Record<ProductImageDisplayMode, DisplayModeStyle>
     },
   },
   thumbnail: {
-    wrapper: 'relative h-full w-full overflow-visible rounded-[14px] bg-[radial-gradient(circle_at_50%_72%,rgba(255,255,255,.18)_0%,rgba(255,255,255,.06)_36%,transparent_72%)]',
+    wrapper: 'relative h-full w-full overflow-visible rounded-[14px] bg-transparent',
     image: 'h-full w-full object-contain p-1.5 drop-shadow-[0_12px_12px_rgba(0,0,0,.36)]',
   },
 };
@@ -174,26 +166,18 @@ export function getCleanProductImageUrl(product: Product, cutout = false): strin
  * benefit. Default/thumbnail/closet can also use it — there's no downside
  * for the user when it exists.
  *
- * If `imageTransparentUrl` is missing, returns null and callers fall back
- * to the proxied original `imageUrl`. We do NOT claim background removal
- * has happened just because we asked — only when the field actually
- * carries a URL.
+ * If `imageTransparentUrl` is missing, default product surfaces can fall
+ * back to the proxied original `imageUrl`. Surfaces that pass
+ * `transparentOnly` never fall back; they render an empty transparent
+ * placeholder instead so background photos cannot leak into outfit UIs.
  */
-function pickTransparentUrl(product: Product): string | null {
-  const candidate = product.imageTransparentUrl || product.imageCutoutUrl;
-  if (typeof candidate !== 'string') return null;
-  const trimmed = candidate.trim();
-  if (!trimmed) return null;
-  if (trimmed.toLowerCase().startsWith('data:')) return null;
-  return trimmed;
-}
-
 export function ProductImage({
   product,
   className,
   wrapperClassName,
   loading = 'lazy',
   displayMode = 'default',
+  transparentOnly = false,
   onAvailable,
   onUnavailable,
 }: {
@@ -205,29 +189,38 @@ export function ProductImage({
   loading?: 'lazy' | 'eager';
   /** Curated styling preset — applied when className/wrapperClassName not overridden. */
   displayMode?: ProductImageDisplayMode;
+  /** Hard product-surface rule: only render reviewed transparent assets. */
+  transparentOnly?: boolean;
   onAvailable?: (product: Product) => void;
   onUnavailable?: (product: Product) => void;
 }) {
-  const [imageOk, setImageOk] = useState(hasUsableProductImage(product));
+  const [imageOk, setImageOk] = useState(
+    transparentOnly ? Boolean(getTransparentProductImageUrl(product)) : Boolean(getTransparentProductImageUrl(product)) || hasUsableProductImage(product),
+  );
   const [cutoutTried, setCutoutTried] = useState(false);
   const [transparentFailed, setTransparentFailed] = useState(false);
 
-  // Resolve which URL to actually fetch this render. We honestly prefer
-  // a transparent asset when one exists in the catalog record — and we
-  // surface that via a `data-image-kind` attribute on the <img>. If the
-  // transparent URL fails to load, we transparently fall back to the
-  // original (one-shot, tracked via state) so a broken cutout never
-  // breaks the entire tile.
-  const transparentUrl = !transparentFailed ? pickTransparentUrl(product) : null;
+  // Resolve which URL to actually fetch this render. When `transparentOnly`
+  // is set, this never falls back to the original merchant image.
+  const transparentUrl = !transparentFailed ? getTransparentProductImageUrl(product) : null;
   const originalSrc = getCleanProductImageUrl(product, cutoutTried);
-  const src = transparentUrl ?? originalSrc;
-  const imageKind: 'transparent' | 'original' = transparentUrl ? 'transparent' : 'original';
+  const src = transparentOnly ? transparentUrl : transparentUrl ?? originalSrc;
+  const imageKind: 'transparent' | 'original' | 'missing-transparent' = transparentUrl ? 'transparent' : transparentOnly ? 'missing-transparent' : 'original';
+  const hasTransparentAsset = Boolean(transparentUrl);
+  const auditAttrs = {
+    'data-product-id': product.id,
+    'data-product-category': product.category,
+    'data-transparent-only': transparentOnly ? 'true' : 'false',
+    'data-has-transparent-asset': hasTransparentAsset ? 'true' : 'false',
+  };
 
   useEffect(() => {
-    setImageOk(hasUsableProductImage(product));
+    setImageOk(
+      transparentOnly ? Boolean(getTransparentProductImageUrl(product)) : Boolean(getTransparentProductImageUrl(product)) || hasUsableProductImage(product),
+    );
     setCutoutTried(false);
     setTransparentFailed(false);
-  }, [product.id, product.imageUrl]);
+  }, [product, transparentOnly]);
 
   const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
   const transparentMode = TRANSPARENT_MODE_STYLES[displayMode] ?? TRANSPARENT_MODE_STYLES.default;
@@ -236,25 +229,40 @@ export function ProductImage({
   const resolvedImageClass =
     className || activeMode.paddingByCategory?.[product.category] || activeMode.image;
 
+  if (transparentOnly && (!src || imageKind === 'missing-transparent')) {
+    return (
+      <div
+        className={`${resolvedWrapperClass} bg-transparent shadow-none ring-0`}
+        {...auditAttrs}
+        data-image-kind="missing-transparent"
+        data-display-mode={displayMode}
+        aria-hidden="true"
+      />
+    );
+  }
+
   if (!imageOk || !src) {
     return (
-      <div className={resolvedWrapperClass} data-image-kind={imageKind} data-display-mode={displayMode}>
+      <div className={resolvedWrapperClass} {...auditAttrs} data-image-kind={imageKind} data-display-mode={displayMode}>
         <CategoryFallback product={product} className={className} />
       </div>
     );
   }
 
   return (
-    <div className={resolvedWrapperClass} data-image-kind={imageKind} data-display-mode={displayMode}>
+    <div className={resolvedWrapperClass} {...auditAttrs} data-image-kind={imageKind} data-display-mode={displayMode}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
         loading={loading}
+        fetchPriority={loading === 'eager' ? 'high' : 'auto'}
+        decoding="async"
         referrerPolicy="no-referrer"
         // `data-image-kind` is observable from devtools and route-smoke
         // checks — it proves whether a real transparent asset was
         // rendered, without making any user-facing cutout claim.
+        {...auditAttrs}
         data-image-kind={imageKind}
         className={resolvedImageClass}
         onLoad={(event) => {
@@ -266,10 +274,12 @@ export function ProductImage({
           onAvailable?.(product);
         }}
         onError={() => {
-          // First fallback: if we tried the transparent asset and it
-          // failed, switch to the original.  Tracked via state so we
-          // don't loop.
           if (imageKind === 'transparent' && !transparentFailed) {
+            if (transparentOnly) {
+              setImageOk(false);
+              onUnavailable?.(product);
+              return;
+            }
             setTransparentFailed(true);
             return;
           }

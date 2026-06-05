@@ -29,11 +29,15 @@ export function buildRetailerGroups(products: CheckoutProduct[]): RetailerGroup[
 export function isExactProductUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
     const pathname = parsed.pathname.toLowerCase();
     const params = parsed.searchParams;
+    const isNordstromProductPath =
+      (hostname === 'nordstrom.com' || hostname === 'nordstromrack.com') &&
+      /^\/s\/[^/]+\/\d+/.test(pathname);
 
     if (!pathname || pathname === '/') return false;
-    if (pathname.includes('/search') || pathname.includes('/s/')) return false;
+    if (pathname.includes('/search') || (pathname.includes('/s/') && !isNordstromProductPath)) return false;
     if (pathname.includes('search-result')) return false;
     if (params.has('q') || params.has('query') || params.has('search') || params.has('searchTerm') || params.has('text') || params.has('keyword')) {
       return false;
@@ -42,6 +46,14 @@ export function isExactProductUrl(url: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+export function getCheckoutUrlHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'merchant link';
   }
 }
 

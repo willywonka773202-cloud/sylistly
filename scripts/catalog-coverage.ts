@@ -13,8 +13,10 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
+import { DROP_CATALOG_PRODUCTS } from '../lib/drop-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { SEARCHAPI_QUALITY_PRODUCTS } from '../lib/searchapi-quality-catalog';
 import { validateProduct } from '../lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
 
@@ -82,6 +84,8 @@ function emptyCategoryRecord<T>(value: () => T): Record<Category, T> {
 function build(): CoverageReport {
   const products: Product[] = ALL_CATALOG_PRODUCTS as Product[];
   const sourceById = new Map<string, string>();
+  for (const product of DROP_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, 'drop-catalog');
+  for (const product of SEARCHAPI_QUALITY_PRODUCTS as Product[]) sourceById.set(product.id, 'searchapi-quality-catalog');
   for (const product of BRAND_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, 'brand-catalog');
   for (const product of GENERATED_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, 'generated-catalog');
   for (const product of PHOTO_CATALOG_PRODUCTS as Product[]) sourceById.set(product.id, sourceById.get(product.id) || 'photo-catalog');

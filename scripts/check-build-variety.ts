@@ -9,7 +9,7 @@ import {
 } from '../lib/catalog';
 import { genderMismatchReasons } from '../lib/frame-inference';
 import { isRenderableProduct } from '../lib/product-image-quality';
-import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
+import type { Product } from '../lib/types';
 import type { GeneratorFrame, VibeId } from '../lib/vibes';
 
 const RUNS_PER_SCENARIO = 25;

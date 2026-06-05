@@ -1,3 +1,4 @@
+import { getProductOutboundUrl } from './product-links';
 import type { Product } from './types';
 
 const BAD_IMAGE_URL_TERMS = [
@@ -46,6 +47,9 @@ const BLOCKED_IMAGE_URL_SUBSTRINGS = [
   'folded-cloth',
   'textile-closeup',
   'textile-close-up',
+  // Aritzia product media is Cloudflare-blocked from our image proxy in local
+  // and production, so keeping it renderable creates broken feed images.
+  'assets.aritzia.com',
 ];
 
 const BLOCKED_PRODUCT_ID_SUBSTRINGS = [
@@ -73,13 +77,18 @@ const INTIMATES_SLEEPWEAR_TERMS = [
   'lingerie', 'intimate', 'intimates',
   'thong', 'panty', 'panties',
   'underwear', 'undergarment', 'undergarments',
-  'boyshort', 'boyshorts',
+  'boyshort', 'boyshorts', 'boxer', 'boxers', 'boxer short', 'boxer shorts',
+  'undershirt', 'undershirts',
   'g string', 'g-string',
+  'bra', 'bralette',
+  't shirt bra', 't-shirt bra', 'teardrop t shirt bra', 'teardrop t-shirt bra',
   'lace bra', 'push up bra', 'padded bra', 'wireless bra', 'underwire bra',
   'corset lingerie', 'lace set', 'lingerie set',
   'pajama', 'pajamas', 'pyjama', 'pyjamas', 'pjs',
   'sleepwear', 'nightgown', 'nightie', 'nightshirt',
-  'bikini bottom', 'bikini set', 'swim brief', 'swim briefs',
+  'bikini', 'bikinis', 'bikini top', 'bikini bottom', 'bikini set',
+  'swim', 'swimsuit', 'swimwear', 'swim top', 'swim short', 'swim shorts', 'swim brief', 'swim briefs',
+  'board short', 'board shorts', 'cover up', 'cover-up', 'cover ups', 'cover-ups', 'coverup', 'coverups',
 ];
 
 /**
@@ -93,6 +102,140 @@ const VISUALLY_WEAK_PRODUCT_TERMS = [
   'body part', 'body shot', 'cropped body',
   'macro shot', 'macro photo',
 ];
+
+const MULTI_ITEM_SET_TERMS = [
+  '2 piece', '2-piece', 'two piece', 'two-piece',
+  '3 piece', '3-piece', 'three piece', 'three-piece',
+  '2 pcs', '2pcs', '3 pcs', '3pcs',
+  '2 pack', '2-pack', '3 pack', '3-pack',
+  'matching set', 'co ord', 'co-ord', 'coord set', 'coordinated set',
+  'outfit set', 'pant set', 'pants set', 'trouser set', 'trousers set',
+  'short set', 'shorts set', 'skirt set', 'sweater set',
+  'blazer set', 'jacket set', 'cardigan set', 'tracksuit',
+  'bag set', 'tote bag set', 'hat and tote', 'hat and tote bag set', 'tote and hat set',
+  'suit set', 'complete outfit',
+];
+
+const TOP_CONFLICT_SINGLE_ITEM_TERMS = [
+  'pant', 'pants', 'trouser', 'trousers', 'jean', 'jeans',
+  'bottom', 'bottoms', 'short', 'shorts', 'skirt', 'leggings', 'jogger', 'joggers',
+  'suit', 'bottoms',
+];
+
+const OUTER_CONFLICT_SINGLE_ITEM_TERMS = [
+  'pant set', 'pants set', 'trouser set', 'trousers set',
+  'skirt set', 'shorts set', 'co ord', 'co-ord', 'tracksuit',
+  'complete outfit',
+];
+
+const BOTTOM_CONFLICT_SINGLE_ITEM_TERMS = [
+  'blouse', 'shirt set', 'top set', 'tee set', 'blazer set', 'jacket set',
+  'cardigan set', 'suit set', 'complete outfit',
+];
+
+// Reviewed local cutouts that technically have alpha but are model/full-outfit
+// composites instead of standalone garment PNGs. Keep them out of feed,
+// profile, and Studio until the catalog has true item-only replacements.
+const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
+  'generated-dc188b225d49fbd3',
+  'generated-f1e5461b86e85cb7',
+  'generated-041da4cfe0a7056b',
+  'generated-156d42979e60b705',
+  'generated-1f202726dff2f014',
+  'generated-2b668469c7d84f6e',
+  'generated-2eeb9177b2a156a5',
+  'generated-35f0341cafaf810d',
+  'generated-3869739e43797ced',
+  'generated-487eeeb7ad2ed5b2',
+  'generated-5aefcd19a46a76a7',
+  'generated-6256d844cd2f73bc',
+  'generated-6de1b00357f7dd68',
+  'generated-88f416d38d4962b4',
+  'generated-958408328a58e8bb',
+  'generated-bf4f3fe2a92cf5a3',
+  'generated-c677c02745bffdd5',
+  'generated-cb9a8d25c4d3df34',
+  'generated-d7fe8cdb6fe638b2',
+  'generated-e0ad64fcd8e46714',
+  'generated-e190f85176ee9be5',
+  'generated-e946a57f141dc54c',
+  'generated-ef1ef5d28cfcf7d5',
+  'generated-ef8c18a9ce9f8c03',
+  'generated-efe763d1bf479e59',
+  'generated-225686ca63c9d93c',
+  'generated-45eb351ccebff462',
+  'generated-7c557ad32e2c12be',
+  'generated-8c4ffd01ffe62765',
+  'generated-8f03b87432cc3508',
+  'generated-ab5e6d73176190dd',
+  'generated-b0b6e135c92a2b63',
+  'generated-b72613e805c41cbc',
+  'generated-b96a8896c72f00bf',
+  'generated-d888f3299a33a53c',
+  '597372a8b97e783f',
+  '9d9a77f2e03b6851',
+  'generated-16a4517c50e5ee1d',
+  'generated-30526b6c04e69ac5',
+  'generated-75790e3b8b9f7733',
+  'generated-9b9db014b2d9ed3b',
+  'generated-c3564a6db0b7b1d0',
+  'generated-e6b0808f98ef5088',
+  'generated-0dd8cfe08bb7a011',
+  'generated-4e43016dfc8eedee',
+  'generated-502841f449c32876',
+  'generated-a5801e98c45f1cbf',
+  'generated-c8dab16c6c0f23f2',
+  'generated-edc1856050584cdb',
+  '91d2606d3ed9958a',
+  'generated-837496a0a03041b8',
+  'generated-8d4e3bcd82077a3d',
+  'generated-91163af986a5b635',
+  'generated-07a062f2c9f7de29',
+  'generated-0e18fa1391190bba',
+  'generated-1008f102d799c90d',
+  'generated-130d1c8797765e26',
+  'generated-2e20fec284a6cd6b',
+  'generated-38b88276652f406d',
+  'generated-39cb3da53d56aafb',
+  'generated-61904954680f6ff8',
+  'generated-6d3010389559c096',
+  'generated-70b1660ec9405a6b',
+  'generated-7709b5e5769a8e76',
+  'generated-7da43d666e4b7449',
+  'generated-867a2968367d0d14',
+  'generated-8d0a40412cd7c0af',
+  'generated-99542fd664d775ef',
+  'generated-99fdae77bcd417ac',
+  'generated-9f26b6fa3eaeecc1',
+  'generated-9f7712f662e0034d',
+  'generated-a45af73010be409a',
+  'generated-aa6cb4ece0190b0a',
+  'generated-ce58332aab800a94',
+  'generated-d91ad828ec14dafd',
+  'generated-e4521506a432189e',
+  'generated-f0e7bfe9cff043d9',
+  'generated-f3212c62c5d40d22',
+  'generated-f403e370ccf52a12',
+  'generated-f7db09272e73cd2c',
+  'generated-fdb47b6778ec997e',
+  '85f6cb6cd1ec6df2',
+  'f2e4852913aacbdf',
+  'generated-2e0beab658a1e16a',
+  'generated-3084801187d53eaa',
+  'generated-9bc59c9d7498e99f',
+  'generated-130411501038e332',
+  'generated-624a9117048c37d2',
+  'generated-9745d91b67c10bb9',
+  'generated-758ef28a0e13da4b',
+  'generated-bb0fee93a3e25796',
+  'generated-ca938ba8cedc6c1f',
+  'generated-d846c2cc5d7d5160',
+  'generated-d21d09ad6fd72b69',
+  'generated-e6454b5080145d0e',
+  'generated-efea7e82501f92dd',
+  'ba8f3b445e60ac75',
+  'bc78a561ef3414cd',
+]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
   'fabric swatch',
@@ -136,10 +279,26 @@ const LOW_INFORMATION_PRODUCT_TERMS = [
   'unresolved product photo',
 ];
 
+const COSTUME_SET_LISTING_TERMS = [
+  'costume',
+  'cosplay',
+  'dress up',
+  'set includes',
+  'outfit for women',
+  'outfit for men',
+  'western outfits women',
+  'cowboy clothes for women',
+];
+
 const FEED_BLOCKED_PRODUCT_TERMS = [
   ...LOW_INFORMATION_PRODUCT_TERMS,
   ...INTIMATES_SLEEPWEAR_TERMS,
   ...VISUALLY_WEAK_PRODUCT_TERMS,
+  ...COSTUME_SET_LISTING_TERMS,
+  'fuck',
+  'fucking',
+  'bitch',
+  'asshole',
 ];
 
 const MARKETPLACE_TERMS = [
@@ -153,6 +312,18 @@ const MARKETPLACE_TERMS = [
   'vestiaire',
   'stockx',
   'goat',
+  'tiktok shop',
+  'lightinthebox',
+  'devilinspired',
+  'wild jolie',
+  'cool shapewear',
+];
+
+const BLOCKED_FEED_RETAILER_TERMS = [
+  ...MARKETPLACE_TERMS,
+  'costume',
+  'cosplay',
+  'shopcarters',
 ];
 
 const LOW_QUALITY_LISTING_TERMS = [
@@ -206,9 +377,9 @@ const KNOWN_EYEWEAR_BRANDS = ['ray ban', 'ray-ban', 'oakley', 'warby parker', 'g
 
 const CATEGORY_CONFLICT_TERMS: Record<Product['category'], string[]> = {
   shoes: ['shirt', 'jacket', 'coat', 'pants', 'trouser', 'jeans', 'shorts', 'bag', 'tote', 'necklace', 'sunglasses'],
-  top: ['shoes', 'sneaker', 'boot', 'pants', 'trouser', 'jeans', 'shorts', 'bag', 'tote', 'necklace', 'sunglasses'],
-  bottom: ['shirt', 'tee', 'jacket', 'coat', 'shoes', 'sneaker', 'boot', 'bag', 'tote', 'necklace', 'sunglasses'],
-  outer: ['shoes', 'sneaker', 'boot', 'pants', 'trouser', 'jeans', 'shorts', 'bag', 'tote', 'necklace'],
+  top: ['shoes', 'sneaker', 'boot', 'pants', 'trouser', 'jeans', 'shorts', 'bottom', 'bottoms', 'skirt', 'leggings', 'bag', 'tote', 'necklace', 'sunglasses'],
+  bottom: ['shirt', 'tee', 'blouse', 'jacket', 'coat', 'shoes', 'sneaker', 'boot', 'bag', 'tote', 'necklace', 'sunglasses'],
+  outer: ['shirt', 'tee', 't-shirt', 'top', 'blouse', 'shoes', 'sneaker', 'boot', 'pants', 'trouser', 'jeans', 'shorts', 'bag', 'tote', 'necklace'],
   bag: ['shoes', 'sneaker', 'boot', 'pants', 'trouser', 'jeans', 'shirt', 'jacket', 'coat', 'necklace', 'sunglasses'],
   eyewear: ['shirt', 'jacket', 'pants', 'jeans', 'shoes', 'bag', 'necklace'],
   jewelry: ['shirt', 'jacket', 'pants', 'jeans', 'shoes', 'bag', 'sunglasses'],
@@ -241,6 +412,20 @@ export function hasUsableImageUrl(imageUrl?: string | null): boolean {
     || normalized.startsWith('/');
 }
 
+export function getTransparentProductImageUrl(product?: Product | null): string | null {
+  if (!product) return null;
+  if (product.imageStatus === 'cutout-failed' || product.imageStatus === 'quarantined') return null;
+  const candidate = product.imageTransparentUrl || product.imageCutoutUrl;
+  if (typeof candidate !== 'string') return null;
+  const trimmed = candidate.trim();
+  if (!hasUsableImageUrl(trimmed)) return null;
+  return trimmed;
+}
+
+export function hasTransparentProductImage(product?: Product | null): product is Product {
+  return Boolean(product && getTransparentProductImageUrl(product));
+}
+
 function productImageContext(product: Product): string {
   return [
     product.id,
@@ -265,11 +450,25 @@ function productDescriptiveContext(product: Product): string {
     product.id,
     product.name,
     product.brand,
+    product.retailer,
     product.sourceQuery,
     ...(product.searchTerms || []),
     ...(product.colors || []),
     typeof product.metadata?.title === 'string' ? product.metadata.title : '',
     typeof product.metadata?.description === 'string' ? product.metadata.description : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function productTitleContext(product: Product): string {
+  return [
+    product.id,
+    product.name,
+    product.brand,
+    product.retailer,
+    typeof product.metadata?.title === 'string' ? product.metadata.title : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -308,6 +507,7 @@ export function isFeedBlockedProductImage(product?: Product | null): boolean {
   ].filter(Boolean).join(' ').toLowerCase();
 
   if (FEED_BLOCKED_PRODUCT_TERMS.some((term) => hasAnyTerm(descriptive, [term]))) return true;
+  if (BLOCKED_FEED_RETAILER_TERMS.some((term) => descriptive.includes(term) || urlContext.includes(term))) return true;
   if (BLOCKED_IMAGE_URL_SUBSTRINGS.some((term) => urlContext.includes(term))) return true;
   return false;
 }
@@ -320,7 +520,7 @@ export function isFeedBlockedProductImage(product?: Product | null): boolean {
  */
 export function isIntimatesOrSleepwear(product?: Product | null): boolean {
   if (!product) return false;
-  const descriptive = productDescriptiveContext(product);
+  const descriptive = productTitleContext(product);
   return INTIMATES_SLEEPWEAR_TERMS.some((term) => hasAnyTerm(descriptive, [term]));
 }
 
@@ -333,6 +533,26 @@ export function isVisuallyWeakFeedProduct(product?: Product | null): boolean {
   if (!product) return false;
   const descriptive = productDescriptiveContext(product);
   return VISUALLY_WEAK_PRODUCT_TERMS.some((term) => hasAnyTerm(descriptive, [term]));
+}
+
+export function isMultiItemSetProduct(product?: Product | null): boolean {
+  if (!product) return false;
+  const descriptive = productTitleContext(product);
+  const padded = ` ${normalizedText(descriptive)} `;
+
+  if (MULTI_ITEM_SET_TERMS.some((term) => hasAnyTerm(descriptive, [term]))) return true;
+
+  if (product.category === 'top' && TOP_CONFLICT_SINGLE_ITEM_TERMS.some((term) => hasAnyTerm(descriptive, [term]))) {
+    return true;
+  }
+  if (product.category === 'outer' && OUTER_CONFLICT_SINGLE_ITEM_TERMS.some((term) => padded.includes(` ${normalizedText(term)} `))) {
+    return true;
+  }
+  if (product.category === 'bottom' && BOTTOM_CONFLICT_SINGLE_ITEM_TERMS.some((term) => padded.includes(` ${normalizedText(term)} `))) {
+    return true;
+  }
+
+  return false;
 }
 
 // Positive-whitelist term sets — a product whose category claims to be X
@@ -369,7 +589,9 @@ const NORMAL_SHOE_TERMS = [
   // catalog flagship products that should remain feed-eligible.
   'samba', 'gazelle', 'campus', 'spezial', 'forum',
   'air force', 'air max', 'dunk', 'jordan', 'blazer mid', 'cortez',
+  'new balance', '860v2', '471', '475',
   '530', '574', '550', '9060', '993', '2002r', '1080',
+  'f50',
   '1460', '1461', 'jadon', 'pascal',
   'birkenstock', 'boston', 'arizona',
   'converse', 'chuck taylor', 'vans', 'authentic', 'old skool',
@@ -385,7 +607,7 @@ const NORMAL_BAG_TERMS = [
 const NORMAL_OUTER_TERMS = [
   'jacket', 'coat', 'blazer', 'cardigan', 'puffer', 'parka',
   'hoodie', 'overshirt', 'trench', 'bomber', 'shell', 'windbreaker',
-  'shacket', 'fleece', 'gilet', 'vest',
+  'shacket', 'fleece', 'gilet', 'vest', 'track',
 ];
 
 /**
@@ -398,7 +620,9 @@ const NORMAL_OUTER_TERMS = [
  * categories without a positive whitelist defined here.
  */
 function hasNormalCategoryWhitelistMatch(product: Product): boolean {
-  const text = productDescriptiveContext(product);
+  // Search terms/source queries can say "coat" even when the merchant title
+  // says "tee"; trust the product title for category integrity.
+  const text = productTitleContext(product);
   switch (product.category) {
     case 'top':
       return hasAnyTerm(text, NORMAL_TOP_TERMS);
@@ -484,7 +708,7 @@ export function isFeedHeroCandidate(product?: Product | null): boolean {
 }
 
 export function hasFeedCategoryMismatch(product: Product): boolean {
-  const text = productDescriptiveContext(product);
+  const text = productTitleContext(product);
   if (CATEGORY_CONFLICT_TERMS[product.category]?.some((term) => hasAnyTerm(text, [term]))) {
     const categoryTerm = CATEGORY_REQUIRED_TERMS[product.category]?.some((term) => hasAnyTerm(text, [term]));
     if (!categoryTerm) return true;
@@ -514,12 +738,69 @@ export function isRenderableProduct(product?: Product | null): product is Produc
   );
 }
 
+export function isTransparentRenderableProduct(product?: Product | null): product is Product {
+  return Boolean(isRenderableProduct(product) && hasTransparentProductImage(product));
+}
+
 export function isRenderableProductForFeed(product?: Product | null): product is Product {
   return Boolean(
     isRenderableProduct(product)
     && !isFeedBlockedProductImage(product)
     && !hasFeedCategoryMismatch(product)
+    && !isMultiItemSetProduct(product)
+    && hasHighCategoryConfidence(product)
     && productImageQualityScore(product) > -20,
+  );
+}
+
+export function isTransparentRenderableProductForFeed(product?: Product | null): product is Product {
+  return Boolean(isRenderableProductForFeed(product) && hasTransparentProductImage(product));
+}
+
+export function isEditorialCutoutProduct(product?: Product | null): product is Product {
+  if (!isTransparentRenderableProductForFeed(product)) return false;
+  if (NON_GARMENT_CUTOUT_PRODUCT_IDS.has(product.id)) return false;
+  if (product.imageStatus === 'review-only' || product.imageStatus === 'quarantined' || product.imageStatus === 'cutout-failed') {
+    return false;
+  }
+  if (product.imageQualityFlags?.some((flag) => ['body-model', 'full-body', 'multi-item', 'outfit-set', 'bad-cutout'].includes(flag))) {
+    return false;
+  }
+  return true;
+}
+
+export function hasProductCommerceLink(product?: Product | null): boolean {
+  return Boolean(
+    product
+    && (
+      product.productUrl?.trim()
+      || product.retailerUrl?.trim()
+      || product.googleShoppingUrl?.trim()
+      || product.fallbackUrl?.trim()
+    ),
+  );
+}
+
+export function isSyntheticStudioProduct(product?: Product | null): boolean {
+  if (!product) return false;
+  const source = String(product.metadata?.source || '').toLowerCase();
+  const brand = String(product.brand || '').toLowerCase();
+  const retailer = String(product.retailer || '').toLowerCase();
+  // `generated_catalog` means the row was discovered from a search/catalog
+  // expansion job. Those products can still be real merchant-backed pieces
+  // with real product images and shopping links. Only block true synthetic
+  // studio assets or AI-created product imagery.
+  return product.imageSource === 'generated'
+    || source === 'editorial_essentials'
+    || brand === 'sylistly studio'
+    || retailer === 'sylistly studio';
+}
+
+export function isRealCommerceProductForFeed(product?: Product | null): product is Product {
+  return Boolean(
+    isRenderableProductForFeed(product)
+    && hasProductCommerceLink(product)
+    && !isSyntheticStudioProduct(product),
   );
 }
 
@@ -529,6 +810,14 @@ export function filterRenderableProducts(products: Product[]): Product[] {
 
 export function filterFeedRenderableProducts(products: Product[]): Product[] {
   return products.filter(isRenderableProductForFeed);
+}
+
+export function filterTransparentRenderableProducts(products: Product[]): Product[] {
+  return products.filter(isTransparentRenderableProduct);
+}
+
+export function filterTransparentFeedRenderableProducts(products: Product[]): Product[] {
+  return products.filter(isTransparentRenderableProductForFeed);
 }
 
 function productQualityText(product: Product): string {
@@ -547,15 +836,67 @@ function productQualityText(product: Product): string {
     .toLowerCase();
 }
 
+function isSearchOrAggregatorUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+    const pathname = parsed.pathname.toLowerCase();
+    const params = parsed.searchParams;
+    const hash = parsed.hash.toLowerCase();
+    const isNordstromProductPath =
+      (hostname === 'nordstrom.com' || hostname === 'nordstromrack.com') &&
+      /^\/s\/[^/]+\/\d+/.test(pathname);
+
+    if (hostname.includes('google.') && (pathname.includes('/search') || pathname.includes('/shopping'))) return true;
+    if (hash.includes('oshopproduct')) return true;
+    if (pathname.includes('/search') || (pathname.includes('/s/') && !isNordstromProductPath) || pathname.includes('search-result')) return true;
+    return params.has('q')
+      || params.has('query')
+      || params.has('search')
+      || params.has('searchTerm')
+      || params.has('text')
+      || params.has('keyword');
+  } catch {
+    return true;
+  }
+}
+
+export function hasExactProductLink(product?: Product | null): boolean {
+  if (!product || !hasProductCommerceLink(product)) return false;
+
+  try {
+    const outboundUrl = getProductOutboundUrl(product);
+    const parsed = new URL(outboundUrl);
+    const pathname = parsed.pathname.toLowerCase();
+
+    if (!pathname || pathname === '/') return false;
+    return !isSearchOrAggregatorUrl(outboundUrl);
+  } catch {
+    return false;
+  }
+}
+
+function productCommerceQualityScore(product: Product): number {
+  if (!hasProductCommerceLink(product)) return 0;
+
+  const outboundUrl = getProductOutboundUrl(product);
+  let score = hasExactProductLink(product) ? 36 : 8;
+  if (isSearchOrAggregatorUrl(outboundUrl)) score -= 14;
+  if (product.productUrl || product.retailerUrl) score += 6;
+  return score;
+}
+
 export function productImageQualityScore(product: Product): number {
   const text = productQualityText(product);
   let score = 0;
 
   if (isBlockedProductImage(product)) return -999;
+  if (isMultiItemSetProduct(product)) return -999;
 
   if (product.imageQuality === 'good') score += 18;
   if (product.imageQuality === 'ok') score += 6;
-  if (product.productUrl || product.retailerUrl) score += 14;
+  if (product.productUrl || product.retailerUrl) score += 8;
+  score += productCommerceQualityScore(product);
   if (product.priceCents > 0) score += 4;
   if ((product.vibes?.length || 0) + (product.searchTerms?.length || 0) >= 3) score += 4;
 
@@ -565,7 +906,7 @@ export function productImageQualityScore(product: Product): number {
   if (LOW_INFORMATION_PRODUCT_TERMS.some((term) => text.includes(term))) score -= 80;
   if (isFeedBlockedProductImage(product)) score -= 120;
   if (hasFeedCategoryMismatch(product)) score -= 90;
-  if (text.includes('google.com/shopping') || text.includes('#oshopproduct')) score -= 8;
+  if (text.includes('google.com/shopping') || text.includes('google.com/search') || text.includes('#oshopproduct')) score -= 8;
 
   return score;
 }
@@ -591,6 +932,38 @@ export function sortProductsByImageQuality(products: Product[]): Product[] {
 export function sortFeedRenderableProducts(products: Product[]): Product[] {
   return filterFeedRenderableProducts(products)
     .map((product, index) => ({ product, index, score: productImageQualityScore(product) }))
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map((entry) => entry.product);
+}
+
+export function sortRealCommerceFeedProducts(products: Product[]): Product[] {
+  return products.filter(isRealCommerceProductForFeed)
+    .map((product, index) => ({
+      product,
+      index,
+      score:
+        productImageQualityScore(product)
+        + (hasTransparentProductImage(product) ? 14 : 0)
+        + productCommerceQualityScore(product),
+    }))
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map((entry) => entry.product);
+}
+
+export function sortTransparentFeedRenderableProducts(products: Product[]): Product[] {
+  return products
+    .filter((product) =>
+      isEditorialCutoutProduct(product)
+      && hasProductCommerceLink(product)
+      && !isSyntheticStudioProduct(product),
+    )
+    .map((product, index) => ({
+      product,
+      index,
+      score:
+        productImageQualityScore(product)
+        + productCommerceQualityScore(product),
+    }))
     .sort((left, right) => right.score - left.score || left.index - right.index)
     .map((entry) => entry.product);
 }

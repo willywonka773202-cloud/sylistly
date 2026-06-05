@@ -2,14 +2,18 @@ import { BRAND_CATALOG_PRODUCTS } from './brand-catalog';
 import { parseSearchIntentHeuristic, rerankProducts } from './claude';
 import { GENERATED_CATALOG_PRODUCTS } from './generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from './photo-catalog';
+import { DROP_CATALOG_PRODUCTS } from './drop-catalog';
+import { SEARCHAPI_QUALITY_PRODUCTS } from './searchapi-quality-catalog';
 import { presentationScore } from './presentation-score';
 import { hasDirectRetailerUrl } from './retailer-url';
 import { searchBrandCatalog } from './brand-catalog';
 import { searchPhotoCatalog } from './photo-catalog';
+import { applyCatalogUrlOverridesToProducts } from './catalog-url-overrides';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
 import { applyCatalogCutoutOverridesToProducts } from './catalog-cutout-overrides';
+import { applyCatalogVisionCacheToProducts } from './catalog-vision-cache';
 import { frameCompatibilityScore, genderMismatchReasons, hasFrameMismatch } from './frame-inference';
-import { hasHighCategoryConfidence, hasUsableProductImage, isRenderableProduct } from './product-image-quality';
+import { hasHighCategoryConfidence, hasUsableProductImage, isEditorialCutoutProduct, isRealCommerceProductForFeed, isRenderableProduct } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
 import {
   VIBES,
@@ -137,7 +141,7 @@ const OUTFIT_RECIPES: Record<VibeId, OutfitRecipe> = {
   office: {
     required: ['top', 'bottom', 'shoes'],
     optional: ['outer', 'bag', 'jewelry'],
-    prefer: ['blazer', 'trouser', 'button down', 'polo', 'loafer', 'cardigan', 'tote', 'work bag', 'chino', 'tailored'],
+    prefer: ['blazer', 'trouser', 'button down', 'polo', 'loafer', 'derby', 'mule', 'cardigan', 'tote', 'work bag', 'chino', 'tailored'],
     avoid: ['gym', 'beach', 'cargo', 'graphic', 'running', 'sweatpants', 'puffer', 'track', 'western', 'cowboy'],
     colors: ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown'],
     jewelry: 'optional',
@@ -271,22 +275,30 @@ const DEFAULT_ACCESSORY_RATES: Record<VibeId, Partial<Record<Category, number>>>
   edgy: { eyewear: 0.58, jewelry: 0.75 },
 };
 
+const STRICT_SOFT_AVOID_SLOTS: Partial<Record<VibeId, Category[]>> = {
+  gym: ['bottom', 'shoes', 'bag'],
+  office: ['shoes', 'bag'],
+  edgy: ['shoes', 'bag'],
+};
+
 const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
   gym: {
     all: {
       prefer: ['gym', 'training', 'running', 'workout', 'performance', 'athletic', 'sport'],
-      hardAvoid: ['blazer', 'trench', 'suit', 'loafer', 'dress pants', 'work pants', 'cardigan', 'heels', 'pumps', 'leather shoulder bag', 'luxury handbag', 'ugg'],
+      hardAvoid: ['blazer', 'trench', 'suit', 'loafer', 'dress pants', 'work pants', 'cardigan', 'heels', 'pumps', 'leather shoulder bag', 'luxury handbag', 'ugg', 'denim jacket', 'suede jacket', 'halter', 'cami', 'camisole', 'crop top', 'cropped top', 'sculpted top', 'babaton', 'wilfred'],
     },
     outer: {
       prefer: ['hoodie', 'track jacket', 'training jacket', 'performance jacket', 'fleece', 'zip', 'windbreaker'],
-      hardAvoid: ['trench', 'blazer', 'suit jacket', 'sport coat', 'leather jacket', 'cardigan', 'detroit jacket', 'duck', 'carhartt', 'techwear', 'futuristic'],
+      hardAvoid: ['trench', 'blazer', 'suit jacket', 'sport coat', 'leather jacket', 'cardigan', 'denim', 'suede', 'detroit jacket', 'duck', 'carhartt', 'techwear', 'futuristic'],
     },
     bottom: {
-      prefer: ['shorts', 'leggings', 'jogger', 'sweatpant', 'track pant', 'training', 'running'],
-      hardAvoid: ['dress pant', 'work pants', 'trouser', 'chino', 'jean', 'cargo work'],
+      prefer: ['shorts', 'leggings', 'jogger', 'sweatpant', 'track pant', 'track trouser', 'windbreaker pant', 'nylon pant', 'athletic pant', 'active errands pant', 'training', 'running'],
+      avoid: ['cargo', 'cargo pant', 'trouser'],
+      hardAvoid: ['dress pant', 'work pants', 'chino', 'jean', 'cargo work'],
     },
     shoes: {
       prefer: ['running', 'training', 'trainer', 'sneaker', 'basketball', 'workout'],
+      avoid: ['samba', 'campus', 'air force', 'jordan', 'chuck', 'converse'],
       hardAvoid: ['boot', 'clog', 'heel', 'loafer', 'sandal', 'ugg', 'birkenstock', 'boston', 'arizona'],
     },
     bag: {
@@ -296,7 +308,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     },
     top: {
       prefer: ['training', 'workout', 'running', 'performance', 'sports bra', 'tank', 'tee', 'mesh', 'airism'],
-      hardAvoid: ['sweater polo', 'button down', 'cardigan', 'blazer', 'dress shirt', 'oxford', 'cable knit', 'winter bliss'],
+      hardAvoid: ['sweater polo', 'button down', 'cardigan', 'blazer', 'dress shirt', 'oxford', 'cable knit', 'winter bliss', 'halter', 'cami', 'camisole', 'crop top', 'cropped top', 'sculpted top', 'sheer', 'kite top', 'plunge', 'tube top', 'chiffon', 'wrap top'],
     },
     jewelry: { hardAvoid: ['necklace', 'earring', 'bracelet', 'ring', 'chain', 'pendant', 'jewelry'] },
   },
@@ -318,7 +330,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       hardAvoid: ['cargo', 'sweatpant', 'shorts', 'legging', 'track pant', 'work pants'],
     },
     shoes: {
-      prefer: ['loafer', 'flat', 'dress shoe', 'chelsea', 'oxford', 'ballet', 'wallabee'],
+      prefer: ['loafer', 'derby', 'lug sole', 'mule', 'venetian mule', 'flat', 'dress shoe', 'chelsea', 'oxford', 'ballet', 'wallabee'],
       hardAvoid: ['ugg', 'running', 'training', 'hiking', 'chunky sneaker', 'basketball', 'dr martens', 'doc martens', 'samba', 'campus', 'birkenstock', 'clog'],
     },
     bag: {
@@ -330,7 +342,7 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
   vacation: {
     all: {
       prefer: ['linen', 'summer', 'resort', 'vacation', 'beach', 'sandal', 'straw', 'sunglasses'],
-      hardAvoid: ['beanie', 'puffer', 'heavy boot', 'winter coat', 'trench coat', 'tech shell', 'shell jacket', 'work pants', 'fleece', 'wool coat', 'arcteryx', 'arc teryx', 'atom jacket', 'beta lt'],
+      hardAvoid: ['beanie', 'puffer', 'heavy boot', 'winter coat', 'trench coat', 'tech shell', 'shell jacket', 'work pants', 'fleece', 'wool coat', 'arcteryx', 'arc teryx', 'atom jacket', 'beta lt', 'western', 'cowboy'],
     },
     top: {
       prefer: ['linen', 'tank', 'tee', 'shirt', 'camp collar', 'resort', 'beach', 'cotton'],
@@ -341,8 +353,8 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       hardAvoid: ['puffer', 'trench', 'wool', 'fleece', 'shell jacket', 'winter coat'],
     },
     bottom: {
-      prefer: ['shorts', 'linen pant', 'easy pant', 'skirt'],
-      hardAvoid: ['work pants', 'wool trouser', 'fleece', 'sweatpant', 'double knee', 'duck pant', 'cargo pant'],
+      prefer: ['short', 'shorts', 'swim short', 'nylon short', 'coastal short', 'linen pant', 'easy pant', 'skirt'],
+      hardAvoid: ['work pants', 'wool trouser', 'suit pant', 'suit pants', 'tailored pant', 'tailored pants', 'dress pant', 'dress pants', 'blazer trousers', 'fleece', 'sweatpant', 'double knee', 'duck pant', 'cargo pant'],
     },
     shoes: {
       prefer: ['sandal', 'slide', 'espadrille', 'sneaker', 'loafer'],
@@ -350,15 +362,15 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
     },
     hat: {
       prefer: ['straw', 'bucket', 'cap', 'sun hat'],
-      hardAvoid: ['beanie'],
+      hardAvoid: ['beanie', 'pom knit', 'knit hat', 'cuffed knit'],
     },
     bag: {
       prefer: ['tote', 'straw', 'canvas', 'beach bag', 'shoulder bag'],
-      hardAvoid: ['cassette', 'tech cassette', 'belt bag', 'dress size', 'hat and jewelry set'],
+      hardAvoid: ['cassette', 'tech cassette', 'belt bag', 'backpack', 'dress size', 'hat and jewelry set'],
     },
     jewelry: {
       prefer: ['bracelet', 'necklace', 'earring', 'ring', 'gold', 'shell'],
-      avoid: ['tennis necklace', 'matrix'],
+      avoid: ['tennis necklace', 'matrix', 'toe ring'],
     },
   },
   night: {
@@ -476,13 +488,18 @@ const VIBE_QUALITY_RULES: Record<VibeId, SlotQualityRules> = {
       prefer: ['shell', 'leather', 'bomber', 'utility', 'technical'],
       hardAvoid: ['blazer', 'cardigan', 'western denim'],
     },
+    top: {
+      prefer: ['mesh', 'tee', 'technical', 'utility', 'black', 'mock neck', 'long sleeve'],
+      hardAvoid: ['tube top', 'halter', 'cami', 'camisole', 'chiffon', 'wrap top', 'satin', 'blouse'],
+    },
     bottom: {
       prefer: ['cargo', 'black jean', 'utility', 'parachute'],
       hardAvoid: ['chino', 'pleated trouser', 'linen'],
     },
     shoes: {
       prefer: ['boot', 'technical sneaker', 'sneaker', 'black'],
-      hardAvoid: ['loafer', 'sandal', 'espadrille', 'ugg', 'heel', 'pump', 'samba', 'campus', 'air force', 'af1', 'gazelle'],
+      avoid: ['samba', 'campus', 'air force', 'af1', 'gazelle'],
+      hardAvoid: ['loafer', 'sandal', 'espadrille', 'ugg', 'heel', 'pump'],
     },
     bag: {
       prefer: ['crossbody', 'sling', 'utility', 'messenger'],
@@ -561,12 +578,39 @@ function titleHaystack(product: Product): string {
   ].join(' '));
 }
 
-function metadataList(
-  product: Product,
-  key: 'colors' | 'styles' | 'vibes' | 'keywords' | 'occasions' | 'searchTerms' | 'gender',
-): string[] {
+function metadataList(product: Product, key: string): string[] {
   const value = product.metadata?.[key];
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  const direct = Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  const catalogVision = product.metadata?.catalogVision;
+  const visionValues: string[] = [];
+
+  if (catalogVision && typeof catalogVision === 'object') {
+    const vision = catalogVision as Record<string, unknown>;
+    const nestedValue = vision[key];
+    if (Array.isArray(nestedValue)) {
+      visionValues.push(...nestedValue.filter((item): item is string => typeof item === 'string'));
+    } else if (typeof nestedValue === 'string') {
+      visionValues.push(nestedValue);
+    }
+
+    if (key === 'styles' || key === 'vibes') {
+      const vibes = vision.vibes;
+      if (Array.isArray(vibes)) visionValues.push(...vibes.filter((item): item is string => typeof item === 'string'));
+    }
+
+    if (key === 'keywords' || key === 'searchTerms') {
+      for (const nestedKey of ['subcategory', 'formality']) {
+        const nestedText = vision[nestedKey];
+        if (typeof nestedText === 'string') visionValues.push(nestedText);
+      }
+      for (const nestedKey of ['materials', 'patterns', 'silhouette', 'compatibleWith']) {
+        const nestedList = vision[nestedKey];
+        if (Array.isArray(nestedList)) visionValues.push(...nestedList.filter((item): item is string => typeof item === 'string'));
+      }
+    }
+  }
+
+  return Array.from(new Set([...direct, ...visionValues].map((item) => item.trim()).filter(Boolean)));
 }
 
 function isUnderBudget(product: Product, budget: GeneratorBudget, customMaxCents?: number | null): boolean {
@@ -732,6 +776,29 @@ export const OUTFIT_FORMULAS: OutfitFormula[] = [
     },
   },
   {
+    id: 'active-errands',
+    label: 'Active Errands',
+    vibeIds: ['gym'],
+    structure: 'clean tee/hoodie + sweat or nylon bottom + everyday sneaker',
+    reason: 'The look stays active and comfortable, but reads more like a styled off-duty fit than a repeated training set.',
+    required: ['top', 'bottom', 'shoes'],
+    optional: ['outer', 'bag', 'hat'],
+    prefer: {
+      all: ['active', 'sport', 'sneaker', 'sweatpant', 'nylon', 'tee', 'hoodie', 'cap'],
+      outer: ['hoodie', 'windbreaker', 'fleece', 'zip', 'nylon'],
+      top: ['tee', 'tank', 'hoodie', 'airism', 'mesh'],
+      bottom: ['sweatpant', 'shorts', 'track', 'nylon', 'jogger'],
+      shoes: ['sneaker', 'running', 'trainer', 'new balance', 'nike', 'adidas'],
+      bag: ['tote', 'backpack', 'sling', 'duffel'],
+      hat: ['cap', 'trucker', 'snapback'],
+    },
+    avoid: {
+      all: ['heel', 'loafer', 'blazer', 'satin', 'dressy', 'leather shoulder bag'],
+      shoes: ['samba', 'campus', 'air force', 'gazelle', 'converse', 'chuck', 'jordan'],
+      jewelry: ['necklace', 'bracelet', 'ring', 'earring'],
+    },
+  },
+  {
     id: 'date-polished',
     label: 'Date Polished',
     vibeIds: ['date', 'night'],
@@ -829,7 +896,7 @@ export const OUTFIT_FORMULAS: OutfitFormula[] = [
     prefer: {
       all: ['vacation', 'resort', 'summer', 'linen', 'beach'],
       top: ['linen', 'tank', 'tee', 'shirt', 'polo'],
-      bottom: ['shorts', 'skirt', 'linen', 'easy pant'],
+      bottom: ['short', 'shorts', 'swim short', 'nylon short', 'skirt', 'linen', 'easy pant'],
       shoes: ['sandal', 'slide', 'sneaker', 'loafer'],
       bag: ['tote', 'straw', 'canvas'],
       eyewear: ['sunglasses'],
@@ -1282,10 +1349,16 @@ export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
 ];
 
 function applyRuntimeCatalogOverrides(products: Product[]): Product[] {
-  return applyCatalogCutoutOverridesToProducts(applyCatalogTagOverridesToProducts(products));
+  return applyCatalogVisionCacheToProducts(
+    applyCatalogCutoutOverridesToProducts(
+      applyCatalogTagOverridesToProducts(applyCatalogUrlOverridesToProducts(products)),
+    ),
+  );
 }
 
 export const ALL_CATALOG_PRODUCTS: Product[] = dedupeProducts([
+  ...applyRuntimeCatalogOverrides(DROP_CATALOG_PRODUCTS),
+  ...applyRuntimeCatalogOverrides(SEARCHAPI_QUALITY_PRODUCTS),
   ...applyRuntimeCatalogOverrides(PHOTO_CATALOG_PRODUCTS),
   ...applyRuntimeCatalogOverrides(GENERATED_CATALOG_PRODUCTS),
   ...applyRuntimeCatalogOverrides(BRAND_CATALOG_PRODUCTS),
@@ -1406,13 +1479,14 @@ function countBrandsForProductIds(ids: string[]): Record<string, number> {
 
 function countFamiliesForProductIds(ids: string[]): Record<string, number> {
   const counts: Record<string, number> = {};
-  for (const id of ids) {
+  ids.forEach((id, index) => {
     const product = PRODUCTS_BY_ID.get(id);
-    if (!product) continue;
+    if (!product) return;
     const key = productFamilyKey(product);
-    if (!key) continue;
-    counts[key] = (counts[key] || 0) + 1;
-  }
+    if (!key) return;
+    const recencyWeight = Math.max(0.35, 1 - index / 72);
+    counts[key] = (counts[key] || 0) + recencyWeight;
+  });
   return counts;
 }
 
@@ -1466,6 +1540,7 @@ function scoreFallbackProduct(
 }
 
 export function getVibeQualityWarnings(product: Product, vibe: VibeId, _frame: GeneratorFrame = 'androgynous'): string[] {
+  void _frame;
   const haystack = searchHaystack(product);
   const rules = [
     VIBE_QUALITY_RULES[vibe]?.all,
@@ -1487,6 +1562,16 @@ export function getVibeQualityWarnings(product: Product, vibe: VibeId, _frame: G
 
 function hasHardVibeContradiction(product: Product, vibe: VibeId, frame: GeneratorFrame): boolean {
   return getVibeQualityWarnings(product, vibe, frame).some((warning) => warning.includes('hard-avoids'));
+}
+
+function hasSoftVibeAvoid(product: Product, vibe: VibeId): boolean {
+  return getVibeQualityWarnings(product, vibe).some((warning) => warning.includes(' avoids '));
+}
+
+function preferSoftAvoidFreeProducts(products: Product[], vibe: VibeId, slot: Category): Product[] {
+  if (!STRICT_SOFT_AVOID_SLOTS[vibe]?.includes(slot)) return products;
+  const cleaner = products.filter((product) => !hasSoftVibeAvoid(product, vibe));
+  return cleaner.length >= 3 ? cleaner : products;
 }
 
 function hasVibeCategoryPreference(product: Product, vibe: VibeId): boolean {
@@ -1592,6 +1677,56 @@ function scoreFormulaProduct(product: Product, slot: Category, formula: OutfitFo
   return score;
 }
 
+function scoreVisualCatalogIntelligence(product: Product, vibe: VibeId, slot: Category): number {
+  const catalogVision = product.metadata?.catalogVision;
+  if (!catalogVision || typeof catalogVision !== 'object') return 0;
+  const vision = catalogVision as Record<string, unknown>;
+  let score = 0;
+
+  const visualCategory = typeof vision.category === 'string' ? vision.category : '';
+  const categoryConfidence = typeof vision.categoryConfidence === 'number' && Number.isFinite(vision.categoryConfidence)
+    ? Math.max(0, Math.min(1, vision.categoryConfidence))
+    : 0;
+  if (visualCategory && visualCategory !== product.category) score -= Math.round(280 * Math.max(0.45, categoryConfidence));
+  if (visualCategory === slot) score += Math.round(58 * Math.max(0.35, categoryConfidence));
+
+  const transparentCutoutScore = typeof vision.transparentCutoutScore === 'number' && Number.isFinite(vision.transparentCutoutScore)
+    ? Math.max(0, Math.min(1, vision.transparentCutoutScore))
+    : null;
+  if (transparentCutoutScore !== null) {
+    score += Math.round(transparentCutoutScore * 48);
+    if (transparentCutoutScore < 0.55) score -= 90;
+  }
+
+  const flags = Array.isArray(vision.imageQualityFlags)
+    ? vision.imageQualityFlags.filter((flag): flag is string => typeof flag === 'string').map(normalize)
+    : [];
+  if (flags.some((flag) => ['multi item', 'model visible', 'unclear category', 'bad cutout'].includes(flag))) score -= 140;
+  if (flags.some((flag) => ['background visible'].includes(flag))) score -= 72;
+
+  const visionText = normalize([
+    typeof vision.subcategory === 'string' ? vision.subcategory : '',
+    typeof vision.formality === 'string' ? vision.formality : '',
+    ...metadataList(product, 'materials'),
+    ...metadataList(product, 'patterns'),
+    ...metadataList(product, 'silhouette'),
+    ...metadataList(product, 'vibes'),
+    ...metadataList(product, 'compatibleWith'),
+    ...metadataList(product, 'avoidWith'),
+  ].join(' '));
+
+  score += Math.min(matchedTerms(visionText, VIBE_TAG_ALIASES[vibe]).length * 24, 72);
+  score += Math.min(matchedTerms(visionText, VIBE_TERMS[vibe]).length * 12, 48);
+  score -= Math.min(matchedTerms(visionText, ['costume', 'kids', 'infant', 'bundle']).length * 120, 240);
+
+  if ((vibe === 'office' || vibe === 'preppy') && matchedTerms(visionText, ['office', 'smart casual', 'structured', 'tailored']).length) score += 34;
+  if ((vibe === 'night' || vibe === 'date') && matchedTerms(visionText, ['dressy', 'sleek', 'pointed', 'satin']).length) score += 32;
+  if ((vibe === 'street' || vibe === 'edgy') && matchedTerms(visionText, ['relaxed', 'oversized', 'cargo', 'leather']).length) score += 30;
+  if (vibe === 'vacation' && matchedTerms(visionText, ['warm', 'linen', 'raffia', 'sandal']).length) score += 32;
+
+  return score;
+}
+
 function scoreCatalogQuality(product: Product, vibe: VibeId, frame: GeneratorFrame): number {
   const haystack = searchHaystack(product);
   const retailer = normalize(product.retailer || '');
@@ -1621,6 +1756,8 @@ function scoreCatalogQuality(product: Product, vibe: VibeId, frame: GeneratorFra
       && !haystack.includes('pendant')
     ) score -= 34;
     if (product.category === 'bag' && (haystack.includes('tabby') || haystack.includes('purse'))) score -= 80;
+    if (haystack.includes(' aritzia ') || haystack.includes(' babaton ') || haystack.includes(' wilfred ') || haystack.includes(' wmns ')) score -= 420;
+    if (product.category === 'jewelry' && (haystack.includes(' earring ') || haystack.includes(' earrings ') || haystack.includes(' hoop '))) score -= 130;
   }
 
   if (frame === 'fem') {
@@ -1741,10 +1878,37 @@ function scoreOutfitCompatibility(product: Product, vibe: VibeId, selectedProduc
 }
 
 function productFamilyKey(product: Product): string {
+  const brand = normalize(product.brand || product.retailer || '');
   const text = normalize(`${product.brand} ${product.name}`)
-    .replace(/\b(men|mens|women|womens|ladies|unisex|black|white|cream|brown|navy|grey|gray|green|blue|size|small|medium|large|xs|xl)\b/g, ' ')
+    .replace(/\b(men|mens|women|womens|ladies|unisex|black|white|cream|brown|navy|grey|gray|green|blue|red|yellow|ivory|obsidian|gravel|cobalt|size|one|small|medium|large|xs|xl|1l|2l|nano|regular)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+
+  if (product.category === 'bag') {
+    if (text.includes('everywhere belt bag')) return `${brand} everywhere belt bag`.trim();
+    if (text.includes('belt bag')) return `${brand} belt bag`.trim();
+    if (text.includes('utility tote')) return `${brand} utility tote`.trim();
+    if (text.includes('tote')) return `${brand} tote`.trim();
+    if (text.includes('shoulder bag')) return `${brand} shoulder bag`.trim();
+    if (text.includes('crossbody')) return `${brand} crossbody`.trim();
+  }
+  if (product.category === 'bottom') {
+    if (text.includes('sweatpant') || text.includes('sweat pant')) return `${brand} sweatpant`.trim();
+    if (text.includes('track pant')) return `${brand} track pant`.trim();
+    if (text.includes('cargo')) return `${brand} cargo pant`.trim();
+    if (text.includes('short')) return `${brand} short`.trim();
+  }
+  if (product.category === 'top') {
+    if (text.includes('airism')) return `${brand} airism tee`.trim();
+    if (text.includes('hoodie') || text.includes('hooded') || text.includes('sweatshirt')) return `${brand} hoodie`.trim();
+    if (text.includes('sportwear tee') || text.includes('sportswear tee')) return `${brand} sport tee`.trim();
+  }
+  if (product.category === 'outer') {
+    if (text.includes('track jacket')) return `${brand} track jacket`.trim();
+    if (text.includes('windbreaker')) return `${brand} windbreaker`.trim();
+    if (text.includes('flight jacket') || text.includes('bomber')) return `${brand} bomber jacket`.trim();
+  }
+
   return text.split(' ').slice(0, 5).join(' ');
 }
 
@@ -1754,7 +1918,34 @@ function hasExplicitOppositeFrameTerm(product: Product, frame: GeneratorFrame): 
   if (frame === 'fem') {
     return text.includes(' mens ') || text.includes(' men s ') || text.includes(' men ');
   }
-  return text.includes(' womens ') || text.includes(' women s ') || text.includes(' ladies ') || text.includes(' women ');
+  return text.includes(' womens ')
+    || text.includes(' women s ')
+    || text.includes(' wmns ')
+    || text.includes(' ladies ')
+    || text.includes(' women ')
+    || text.includes(' aritzia ')
+    || text.includes(' babaton ')
+    || text.includes(' wilfred ')
+    || text.includes(' cami ')
+    || text.includes(' camisole ')
+    || text.includes(' tube top ')
+    || text.includes(' deep plunge ')
+    || text.includes(' plunge top ')
+    || text.includes(' halter ')
+    || text.includes(' bandeau ')
+    || text.includes(' scoop bra ')
+    || text.includes(' ditsy floral ')
+    || text.includes(' skims ')
+    || (
+      product.category === 'top'
+      && (
+        text.includes(' crop ')
+        || text.includes(' cropped ')
+        || text.includes(' crop top ')
+        || text.includes(' cropped top ')
+        || text.includes(' sculpted top ')
+      )
+    );
 }
 
 function getSlotCandidates({
@@ -1775,6 +1966,7 @@ function getSlotCandidates({
   formula,
   selectedProducts,
   collectionCandidates,
+  transparentOnly = false,
 }: {
   slot: Category;
   vibe: VibeId;
@@ -1793,6 +1985,7 @@ function getSlotCandidates({
   formula: OutfitFormula;
   selectedProducts: Product[];
   collectionCandidates: Product[];
+  transparentOnly?: boolean;
 }): Product[] {
   const query = vibeSearchQuery(vibe, slot, budget, frame, customMaxCents);
   const intent = parseSearchIntentHeuristic(query, slot);
@@ -1814,7 +2007,7 @@ function getSlotCandidates({
 
   const categoryProducts = ALL_CATALOG_PRODUCTS
     .filter((product) => product.category === slot)
-    .filter(isRenderableProduct)
+    .filter((product) => transparentOnly ? isEditorialCutoutProduct(product) : isRealCommerceProductForFeed(product))
     .filter(isAdultCatalogCandidate)
     .filter((product) => !hasCategoryMismatch(product))
     .filter((product) => !REQUIRED_OUTFIT_SLOTS.includes(slot) || hasHighCategoryConfidence(product, slot))
@@ -1822,11 +2015,12 @@ function getSlotCandidates({
     .filter((product) => !usedIds.has(product.id));
   const vibeCoherentProducts = categoryProducts.filter((product) => !hasHardVibeContradiction(product, vibe, frame));
   const vibePool = vibeCoherentProducts.length >= 3 ? vibeCoherentProducts : categoryProducts;
-  const categoryPreferredProducts = vibePool.filter((product) => hasVibeCategoryPreference(product, vibe));
+  const cleanVibePool = preferSoftAvoidFreeProducts(vibePool, vibe, slot);
+  const categoryPreferredProducts = cleanVibePool.filter((product) => hasVibeCategoryPreference(product, vibe));
   const requiresCategoryPreference = STRICT_CATEGORY_PREFERENCE_VIBES.has(vibe) && Boolean(VIBE_QUALITY_RULES[vibe]?.[slot]?.prefer?.length);
   const qualityPool = categoryPreferredProducts.length >= 3 || (requiresCategoryPreference && categoryPreferredProducts.length)
     ? categoryPreferredProducts
-    : vibePool;
+    : cleanVibePool;
   const frameMatched = frame === 'androgynous'
     ? qualityPool
     : qualityPool.filter((product) =>
@@ -1837,6 +2031,8 @@ function getSlotCandidates({
   const framePool = frame === 'androgynous' ? qualityPool : frameMatched;
 
   const penaltyScale = diversityPenaltyScale(diversityStrength);
+  const needsAggressiveFamilyRotation = (vibe === 'gym' || vibe === 'edgy')
+    && ['top', 'bottom', 'outer', 'bag'].includes(slot);
   const scored = framePool
     .map((product) => {
       const brandKey = getBrandOrMerchant(product);
@@ -1844,9 +2040,12 @@ function getSlotCandidates({
       const recentBrandCount = brandKey ? recentBrandCounts[brandKey] || 0 : 0;
       const recentFamilyCount = familyKey ? recentProductFamilyCounts[familyKey] || 0 : 0;
       const isRecentShoe = slot === 'shoes' && recentShoeIds.has(product.id);
+      const familyPenaltyUnit = needsAggressiveFamilyRotation ? 74 : 46;
+      const familyPenaltyCap = needsAggressiveFamilyRotation ? 220 : 120;
 
       return {
         product,
+        recentFamilyCount,
         score:
           scoreFallbackProduct(product, vibe, frame)
           + frameCompatibilityScore(product, frame)
@@ -1855,6 +2054,7 @@ function getSlotCandidates({
           + scoreCatalogQuality(product, vibe, frame)
           + scoreCategoryIntegrity(product)
           + scoreVibeCategoryFit(product, vibe, frame)
+          + scoreVisualCatalogIntelligence(product, vibe, slot)
           + scoreOutfitCompatibility(product, vibe, selectedProducts)
           + (hasRealPhoto(product) ? 28 : -24)
           + (collectionIds.has(product.id) ? 10 : 0)
@@ -1865,13 +2065,17 @@ function getSlotCandidates({
           - (product.id === currentProductId ? 340 : 0)
           - (isRecentShoe ? Math.round(620 * penaltyScale) : 0)
           - Math.min(160, Math.round(recentBrandCount * 36 * penaltyScale))
-          - Math.min(120, Math.round(recentFamilyCount * 46 * penaltyScale))
+          - Math.min(familyPenaltyCap, Math.round(recentFamilyCount * familyPenaltyUnit * penaltyScale))
           + ((product.productUrl || product.retailerUrl || product.googleShoppingUrl || product.fallbackUrl) ? 6 : -10),
       };
     });
-  const rankedEntries = (scored.filter((entry) => entry.score > 0).length >= 3
-    ? scored.filter((entry) => entry.score > 0)
-    : scored.filter((entry) => entry.score > -120))
+  const freshFamilyScored = needsAggressiveFamilyRotation
+    ? scored.filter((entry) => entry.recentFamilyCount === 0 && entry.score > -60)
+    : [];
+  const scoringPool = freshFamilyScored.length >= 3 ? freshFamilyScored : scored;
+  const rankedEntries = (scoringPool.filter((entry) => entry.score > 0).length >= 3
+    ? scoringPool.filter((entry) => entry.score > 0)
+    : scoringPool.filter((entry) => entry.score > -120))
     .sort((left, right) => right.score - left.score)
     .map((entry) => entry.product)
     .filter((product, index, list) => list.findIndex((entry) => entry.id === product.id) === index);
@@ -1919,6 +2123,7 @@ function getRequiredSlotEmergencyCandidate({
   currentIds,
   selectedProducts,
   seed,
+  transparentOnly = false,
 }: {
   slot: Category;
   vibe: VibeId;
@@ -1929,10 +2134,11 @@ function getRequiredSlotEmergencyCandidate({
   currentIds: Set<string>;
   selectedProducts: Product[];
   seed: number;
+  transparentOnly?: boolean;
 }): Product | null {
   const basePool = ALL_CATALOG_PRODUCTS
     .filter((product) => product.category === slot)
-    .filter(isRenderableProduct)
+    .filter((product) => transparentOnly ? isEditorialCutoutProduct(product) : isRealCommerceProductForFeed(product))
     .filter(isAdultCatalogCandidate)
     .filter((product) => !usedIds.has(product.id))
     .filter((product) => !currentIds.has(product.id))
@@ -1948,7 +2154,7 @@ function getRequiredSlotEmergencyCandidate({
       );
   const framePool = frame === 'androgynous' ? basePool : frameMatched;
   const vibeCoherent = framePool.filter((product) => !hasHardVibeContradiction(product, vibe, frame));
-  const candidatePool = vibeCoherent.length ? vibeCoherent : framePool;
+  const candidatePool = preferSoftAvoidFreeProducts(vibeCoherent.length ? vibeCoherent : framePool, vibe, slot);
   const ranked = candidatePool
     .map((product) => ({
       product,
@@ -1959,6 +2165,7 @@ function getRequiredSlotEmergencyCandidate({
         + scoreCatalogQuality(product, vibe, frame)
         + scoreCategoryIntegrity(product)
         + scoreVibeCategoryFit(product, vibe, frame)
+        + scoreVisualCatalogIntelligence(product, vibe, slot)
         + scoreOutfitCompatibility(product, vibe, selectedProducts)
         + (hasRealPhoto(product) ? 24 : -20),
     }))
@@ -1986,6 +2193,7 @@ export function buildCatalogLook({
   preferredFormulaId,
   diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
+  transparentOnly = false,
   _diversityRetry = 0,
 }: {
   vibe: VibeId;
@@ -2004,6 +2212,7 @@ export function buildCatalogLook({
   preferredFormulaId?: string;
   diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
+  transparentOnly?: boolean;
   _diversityRetry?: number;
 }): {
   products: Partial<Record<Category, Product>>;
@@ -2085,6 +2294,7 @@ export function buildCatalogLook({
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),
       ],
       collectionCandidates,
+      transparentOnly,
     });
     const chosen = chooseVariedCandidate(candidatePool, seed, `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:catalog`);
 
@@ -2175,13 +2385,14 @@ export function buildCatalogLook({
           formula,
           selectedProducts: Object.values(picked).filter((product): product is Product => Boolean(product)),
           collectionCandidates,
+          transparentOnly,
         });
         // Even though the fallback uses a different vibe's prefer/ranking,
         // the primary vibe's hard-avoid list still applies — office must
         // not get Dr Martens boots even if old-money tolerates them.
-        const fallbackPool = rawFallbackPool.filter(
+        const fallbackPool = preferSoftAvoidFreeProducts(rawFallbackPool.filter(
           (product) => !hasHardVibeContradiction(product, vibe, frame),
-        );
+        ), vibe, slot);
         const fallbackChosen = chooseVariedCandidate(
           fallbackPool,
           seed,
@@ -2218,6 +2429,7 @@ export function buildCatalogLook({
           ...Object.values(picked).filter((product): product is Product => Boolean(product)),
         ],
         seed: seed + 13_337,
+        transparentOnly,
       });
       if (!emergencyChosen) continue;
       picked[slot] = emergencyChosen;
@@ -2292,6 +2504,7 @@ export async function buildAiCatalogLook({
   preferredFormulaId,
   diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
+  transparentOnly = false,
 }: {
   vibe: VibeId;
   frame: GeneratorFrame;
@@ -2309,6 +2522,7 @@ export async function buildAiCatalogLook({
   preferredFormulaId?: string;
   diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
+  transparentOnly?: boolean;
 }): Promise<{
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
@@ -2333,6 +2547,7 @@ export async function buildAiCatalogLook({
     preferredFormulaId,
     diversityStrength,
     targetSlots: selectedTargetSlots,
+    transparentOnly,
   });
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
   const existingItems = currentItems || {};
@@ -2393,6 +2608,7 @@ export async function buildAiCatalogLook({
         ...Object.values(picked).filter((product): product is Product => Boolean(product)),
       ],
       collectionCandidates,
+      transparentOnly,
     });
 
     if (!candidatePool.length) continue;
@@ -2471,6 +2687,10 @@ export async function buildAiCatalogLook({
     if (!current) continue;
     if (!isUnderBudget(current, budget, customMaxCents)) {
       delete mergedProducts[slot];
+      continue;
+    }
+    if (transparentOnly && !isEditorialCutoutProduct(current)) {
+      delete mergedProducts[slot];
     }
   }
 
@@ -2479,6 +2699,7 @@ export async function buildAiCatalogLook({
     if (!current || hasRealPhoto(current)) continue;
     const replacement = findRealPhotoReplacement(current, budget, customMaxCents, usedIds);
     if (!replacement) continue;
+    if (transparentOnly && !isEditorialCutoutProduct(replacement)) continue;
     mergedProducts[slot] = replacement;
     usedIds.add(replacement.id);
   }

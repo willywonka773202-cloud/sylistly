@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "stussy-new-arrivals",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "new-arrivals",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "aime-leon-dore-new-arrivals",
+      "type": "shopifyCollection",
+      "retailer": "Aime Leon Dore",
+      "baseUrl": "https://www.aimeleondore.com",
+      "collection": "new-arrivals",
+      "vibes": ["preppy", "old money", "streetwear", "clean"],
+      "occasions": ["everyday", "office"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "aime-leon-dore-footwear",
+      "type": "shopifyCollection",
+      "retailer": "Aime Leon Dore",
+      "baseUrl": "https://www.aimeleondore.com",
+      "collection": "footwear",
+      "defaultCategory": "shoes",
+      "vibes": ["preppy", "old money", "streetwear", "clean"],
+      "occasions": ["everyday", "office", "date"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "aime-leon-dore-outerwear",
+      "type": "shopifyCollection",
+      "retailer": "Aime Leon Dore",
+      "baseUrl": "https://www.aimeleondore.com",
+      "collection": "outerwear",
+      "defaultCategory": "outer",
+      "vibes": ["preppy", "old money", "streetwear", "clean"],
+      "occasions": ["everyday", "office"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "aime-leon-dore-accessories",
+      "type": "shopifyCollection",
+      "retailer": "Aime Leon Dore",
+      "baseUrl": "https://www.aimeleondore.com",
+      "collection": "accessories",
+      "vibes": ["preppy", "old money", "streetwear", "clean"],
+      "occasions": ["everyday", "date"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "kith-mens-footwear",
+      "type": "shopifyCollection",
+      "retailer": "Kith",
+      "baseUrl": "https://kith.com",
+      "collection": "mens-footwear",
+      "defaultCategory": "shoes",
+      "vibes": ["streetwear", "clean", "premium", "preppy"],
+      "occasions": ["everyday", "date"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "kith-womens-footwear",
+      "type": "shopifyCollection",
+      "retailer": "Kith",
+      "baseUrl": "https://kith.com",
+      "collection": "womens-footwear",
+      "defaultCategory": "shoes",
+      "vibes": ["streetwear", "clean", "premium", "preppy"],
+      "occasions": ["everyday", "date"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "kith-womens-new-arrivals",
+      "type": "shopifyCollection",
+      "retailer": "Kith",
+      "baseUrl": "https://kith.com",
+      "collection": "womens-new-arrivals",
+      "vibes": ["streetwear", "clean", "premium"],
+      "occasions": ["everyday", "date"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "stussy-outerwear",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "outerwear",
+      "defaultCategory": "outer",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "stussy-headwear",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "headwear",
+      "defaultCategory": "hat",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "stussy-accessories",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "accessories",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "skims-new-arrivals",
+      "type": "shopifyCollection",
+      "retailer": "SKIMS",
+      "baseUrl": "https://www.skims.com",
+      "collection": "new-arrivals",
+      "vibes": ["clean", "minimal", "casual", "gym"],
+      "occasions": ["everyday", "workout"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "alo-new-arrivals",
+      "type": "shopifyCollection",
+      "retailer": "Alo Yoga",
+      "baseUrl": "https://www.aloyoga.com",
+      "collection": "new-arrivals",
+      "vibes": ["gym", "athletic", "clean", "casual"],
+      "occasions": ["workout", "everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "bodega-footwear",
+      "type": "shopifyCollection",
+      "retailer": "Bodega",
+      "baseUrl": "https://bdgastore.com",
+      "collection": "footwear",
+      "defaultCategory": "shoes",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "bodega-accessories",
+      "type": "shopifyCollection",
+      "retailer": "Bodega",
+      "baseUrl": "https://bdgastore.com",
+      "collection": "accessories",
+      "vibes": ["streetwear", "street", "casual"],
+      "occasions": ["everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "everlane-mens-shoes",
+      "type": "shopifyCollection",
+      "retailer": "Everlane",
+      "baseUrl": "https://www.everlane.com",
+      "collection": "mens-shoes",
+      "defaultCategory": "shoes",
+      "vibes": ["clean", "minimal", "casual"],
+      "occasions": ["everyday", "office"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "heaven-mayhem-earrings",
+      "type": "shopifyCollection",
+      "retailer": "Heaven Mayhem",
+      "baseUrl": "https://heavenmayhem.com",
+      "collection": "earrings",
+      "defaultCategory": "jewelry",
+      "vibes": ["clean", "night", "date"],
+      "occasions": ["date", "night out", "everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "missoma-earrings",
+      "type": "shopifyCollection",
+      "retailer": "Missoma",
+      "baseUrl": "https://us.missoma.com",
+      "collection": "earrings",
+      "defaultCategory": "jewelry",
+      "vibes": ["clean", "night", "date"],
+      "occasions": ["date", "night out", "everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "local-eclectic-rings",
+      "type": "shopifyCollection",
+      "retailer": "Local Eclectic",
+      "baseUrl": "https://www.localeclectic.com",
+      "collection": "rings",
+      "defaultCategory": "jewelry",
+      "vibes": ["clean", "night", "date"],
+      "occasions": ["date", "night out", "everyday"],
+      "gender": ["androgynous"],
+      "maxProducts": 40
+    },
+    {
+      "id": "telfar-shopping-bags",
+      "type": "shopifyCollection",
+      "retailer": "Telfar",
+      "baseUrl": "https://www.telfar.net",
+      "collection": "shopping-bags",
+      "defaultCategory": "bag",
+      "vibes": ["streetwear", "clean", "night"],
+      "occasions": ["everyday", "night out"],
+      "gender": ["androgynous"],
+      "maxProducts": 30
+    }
+  ],
+  "searches": [
+    {
+      "id": "new-arrival-loafers",
+      "query": "new arrival leather loafers official product page",
+      "category": "shoes",
+      "vibes": ["office", "old money", "preppy", "clean"],
+      "occasions": ["office", "date", "everyday"],
+      "gender": ["androgynous"],
+      "maxResults": 12
+    },
+    {
+      "id": "new-arrival-crossbody-bags",
+      "query": "new arrival crossbody bag official product page",
+      "category": "bag",
+      "vibes": ["streetwear", "clean", "date"],
+      "occasions": ["everyday", "night out", "date"],
+      "gender": ["androgynous"],
+      "maxResults": 12
+    }
+  ]
+}

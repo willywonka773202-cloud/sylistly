@@ -372,30 +372,6 @@
     }
   },
   {
-    "id": "266a7d853e6a1fa6",
-    "brand": "lululemon",
-    "name": "Everywhere Belt Bag",
-    "category": "bag",
-    "priceCents": 4800,
-    "currency": "USD",
-    "retailer": "lululemon",
-    "retailerUrl": "https://www.google.com/search?q=lululemon+everywhere+belt+bag+bag+handbag+tote+backpack+lululemon+everywhere+belt+bag&oq=lululemon+everywhere+belt+bag+bag+handbag+tote+backpack+lululemon+everywhere+belt+bag&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:5805992650100557031,gid:3286541881051951789,oid:10651717614130624661,iid:10494762795259207821&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQo47IpwN2jbfuYcwIobpdvcZzpbHd38eRuStNTrn3CCzA-h7-OaHpVT0X0CBl4VXgTgWXsA4bm3--vFQAjZcIEnAtiwjf900ywKvL4-z0De9y1kCm_LjhGdA",
-    "imageOriginalUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQo47IpwN2jbfuYcwIobpdvcZzpbHd38eRuStNTrn3CCzA-h7-OaHpVT0X0CBl4VXgTgWXsA4bm3--vFQAjZcIEnAtiwjf900ywKvL4-z0De9y1kCm_LjhGdA",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "5805992650100557031",
-      "searchapiProductToken": "eyJxIjoibHVsdWxlbW9uIGV2ZXJ5d2hlcmUgYmVsdCBiYWcgYmFnIGhhbmRiYWcgdG90ZSBiYWNrcGFjayBsdWx1bGVtb24gZXZlcnl3aGVyZSBiZWx0IGJhZyIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6IllwdnFhZlhMRkxtN3J1RVAxOC03MkFzIiwiY2F0YWxvZ2lkIjoiNTgwNTk5MjY1MDEwMDU1NzAzMSIsImdwY2lkIjoiMzI4NjU0MTg4MTA1MTk1MTc4OSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjEwNjUxNzE3NjE0MTMwNjI0NjYxIiwiaW1hZ2VEb2NpZCI6IjEwNDk0NzYyNzk1MjU5MjA3ODIxIn0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=lululemon+everywhere+belt+bag+bag+handbag+tote+backpack+lululemon+everywhere+belt+bag&oq=lululemon+everywhere+belt+bag+bag+handbag+tote+backpack+lululemon+everywhere+belt+bag&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:5805992650100557031,gid:3286541881051951789,oid:10651717614130624661,iid:10494762795259207821&oshop=apv&pvs=0",
-      "rawSeller": "lululemon",
-      "rawPrice": "$48.00",
-      "source": "photo_catalog",
-      "catalogQuery": "lululemon everywhere belt bag"
-    }
-  },
-  {
     "id": "f0e03ebf14dc8285",
     "brand": "lululemon",
     "name": "Everywhere Belt Bag 1L - One Size",
@@ -1544,31 +1520,6 @@
     }
   },
   {
-    "id": "cf3c1961defc340d",
-    "brand": "ALO",
-    "name": "Airbrush High",
-    "category": "bottom",
-    "priceCents": 13400,
-    "currency": "USD",
-    "retailer": "ALO",
-    "retailerUrl": "https://www.aloyoga.com/products/w54341r-airbrush-high-waist-7-8-heart-throb-legging-black-white?variant=50661685264743&disableCurrencyEstimate=&srsltid=AfmBOopssQE3rUFZ3q1qydToDEHSlrakYA9Ibic-eNYdoQOm58iHp10-3bw",
-    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQM0tHnNWDOUbPdgpXlh1pDEnDMie8kJpYhNmTOmYucDKs2Wk0JbW3mH8dHlOW6g046wpPsCb5D76bNRLCjUYgZMnIC7Zz1p10lEpWnUcdv3j3SKAbq-0AD9Zo",
-    "imageOriginalUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQM0tHnNWDOUbPdgpXlh1pDEnDMie8kJpYhNmTOmYucDKs2Wk0JbW3mH8dHlOW6g046wpPsCb5D76bNRLCjUYgZMnIC7Zz1p10lEpWnUcdv3j3SKAbq-0AD9Zo",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "aloyoga.com",
-      "searchapiProductId": "10103391102109628590",
-      "searchapiProductToken": "eyJxIjoiYWxvIHN3ZWF0cGFudHMgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGFsbyBzd2VhdHBhbnRzIiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiUUgzcWFkdUhJSWU3cnVFUDF2TE9tUXMiLCJjYXRhbG9naWQiOiIxMDEwMzM5MTEwMjEwOTYyODU5MCIsImdwY2lkIjoiNTIzMDU5MTQ5Njg1ODkwODU1MCIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjQ1MjcxNDIyNjc2MzEwNDUyNjgiLCJpbWFnZURvY2lkIjoiMTEyMTI5MTk2MzI4NTI2NTYxMTAifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=alo+sweatpants+pants+jeans+shorts+skirt+alo+sweatpants&oq=alo+sweatpants+pants+jeans+shorts+skirt+alo+sweatpants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:10103391102109628590,gid:5230591496858908550,oid:4527142267631045268,iid:11212919632852656110&oshop=apv&pvs=0",
-      "rawSeller": "ALO",
-      "rawPrice": "$134.00",
-      "source": "photo_catalog",
-      "catalogQuery": "alo sweatpants",
-      "resolvedBy": "google_product_offers"
-    }
-  },
-  {
     "id": "beb9247993f66036",
     "brand": "ALO",
     "name": "Alosoft High",
@@ -1769,31 +1720,6 @@
     }
   },
   {
-    "id": "7ed2f62a7ac3e865",
-    "brand": "ALO",
-    "name": "Yoga Match Point Tennis Skirt",
-    "category": "bottom",
-    "priceCents": 7800,
-    "currency": "USD",
-    "retailer": "ALO",
-    "retailerUrl": "https://www.aloyoga.com/products/w6240r-match-point-tennis-skirt-black?variant=39398310969524&disableCurrencyEstimate=&srsltid=AfmBOopS2v-cj27WPGnfqED5d9_I3-JAzsH7tM2Y4l1lP8SFVMRXDav3qqw",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT9nYdWYAjWlKgbTLw5bRGmiwQGaP5ciT6vbFngGkGwqnt_MN0gFWYiH5ELZHBYprVpBpgaQXqRig8HEckRFOBDeu9WwNVGMfzcucGAiwTlBHU_IfJFgGFP-io",
-    "imageOriginalUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT9nYdWYAjWlKgbTLw5bRGmiwQGaP5ciT6vbFngGkGwqnt_MN0gFWYiH5ELZHBYprVpBpgaQXqRig8HEckRFOBDeu9WwNVGMfzcucGAiwTlBHU_IfJFgGFP-io",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "aloyoga.com",
-      "searchapiProductId": "328097355611865347",
-      "searchapiProductToken": "eyJxIjoiYWxvIHN3ZWF0cGFudHMgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGFsbyBzd2VhdHBhbnRzIiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiUUgzcWFkdUhJSWU3cnVFUDF2TE9tUXMiLCJjYXRhbG9naWQiOiIzMjgwOTczNTU2MTE4NjUzNDciLCJncGNpZCI6IjE3NzM4MjY1Mjc4ODM0MTM0MjAxIiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiMTYxOTI3NzQ1NDgxMjQyMTU3MDEiLCJpbWFnZURvY2lkIjoiMTcyNTIwNTEzMzE1MTcxNDU1MDAifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=alo+sweatpants+pants+jeans+shorts+skirt+alo+sweatpants&oq=alo+sweatpants+pants+jeans+shorts+skirt+alo+sweatpants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:328097355611865347,gid:17738265278834134201,oid:16192774548124215701,iid:17252051331517145500&oshop=apv&pvs=0",
-      "rawSeller": "ALO",
-      "rawPrice": "$78.00",
-      "source": "photo_catalog",
-      "catalogQuery": "alo sweatpants",
-      "resolvedBy": "google_product_offers"
-    }
-  },
-  {
     "id": "catalog-bottom-aritzia-effortless",
     "brand": "Aritzia",
     "name": "The Effortless Pant",
@@ -1868,29 +1794,6 @@
       "searchapiProductId": "8138947130380616185",
       "searchapiProductToken": "eyJxIjoiY2FyaGFydHQgd2lwIGRvdWJsZSBrbmVlIHBhbnQgQ2FyaGFydHQgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGNhcmhhcnR0IHdpcCBkb3VibGUga25lZSBwYW50IiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiVjV2cWFlRUM4IiwiY2F0YWxvZ2lkIjoiODEzODk0NzEzMDM4MDYxNjE4NSIsImdwY2lkIjoiNzA0MzA3MzQxMjAzOTE0MzUxMSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjY1NzgyMTgzNzQ2MzQ5MjQ1MjEiLCJpbWFnZURvY2lkIjoiMTI1MDc4ODc4MjE0ODYzNTQ2MjQifQ==",
       "searchapiOffersLink": "https://www.google.com/search?q=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&oq=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:8138947130380616185,gid:7043073412039143511,oid:6578218374634924521,iid:12507887821486354624&oshop=apv&pvs=0",
-      "rawSeller": "Carhartt Work in Progress",
-      "rawPrice": "$168.00",
-      "source": "photo_catalog",
-      "catalogQuery": "carhartt wip double knee pant"
-    }
-  },
-  {
-    "id": "72a2186d04300b7a",
-    "brand": "Carhartt",
-    "name": "WIP Double Knee Pant",
-    "category": "bottom",
-    "priceCents": 16800,
-    "currency": "USD",
-    "retailer": "Carhartt Work in Progress",
-    "retailerUrl": "https://www.google.com/search?q=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&oq=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:10129948667531204711,oid:10129948667531204711,iid:6809882064006550436,rds:UENfNzA0MzA3MzQxMjAzOTE0MzUxMXxQUk9EX1BDXzcwNDMwNzM0MTIwMzkxNDM1MTE=,pvt:a,pvo:3&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQwuvFYJ6tIsGGQ_OkinFlNFQONe425W4wEEC3l22enxOJfFCFG68gKJJZoBgDd8tY1x8IPLm9_Leb7SYjJcb9nBVQVXqHg4VaR5w-uOsN7GCKxcP3Chrtj",
-    "imageOriginalUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQwuvFYJ6tIsGGQ_OkinFlNFQONe425W4wEEC3l22enxOJfFCFG68gKJJZoBgDd8tY1x8IPLm9_Leb7SYjJcb9nBVQVXqHg4VaR5w-uOsN7GCKxcP3Chrtj",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductToken": "eyJxIjoiY2FyaGFydHQgd2lwIGRvdWJsZSBrbmVlIHBhbnQgQ2FyaGFydHQgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGNhcmhhcnR0IHdpcCBkb3VibGUga25lZSBwYW50IiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiVjV2cWFlRUM4IiwicHJvZHVjdGlkIjoiMTAxMjk5NDg2Njc1MzEyMDQ3MTEiLCJoZWFkbGluZU9mZmVyRG9jaWQiOiIxMDEyOTk0ODY2NzUzMTIwNDcxMSIsInJkcyI6IlBDXzcwNDMwNzM0MTIwMzkxNDM1MTF8UFJPRF9QQ183MDQzMDczNDEyMDM5MTQzNTExIiwiaW1hZ2VEb2NpZCI6IjY4MDk4ODIwNjQwMDY1NTA0MzYiLCJwdm8iOjMsInB2dCI6ImEifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&oq=carhartt+wip+double+knee+pant+Carhartt+pants+jeans+shorts+skirt+carhartt+wip+double+knee+pant&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:10129948667531204711,oid:10129948667531204711,iid:6809882064006550436,rds:UENfNzA0MzA3MzQxMjAzOTE0MzUxMXxQUk9EX1BDXzcwNDMwNzM0MTIwMzkxNDM1MTE=,pvt:a,pvo:3&oshop=apv&pvs=0",
       "rawSeller": "Carhartt Work in Progress",
       "rawPrice": "$168.00",
       "source": "photo_catalog",
@@ -2300,30 +2203,6 @@
     }
   },
   {
-    "id": "c8b20ca27b39d256",
-    "brand": "H&M",
-    "name": "Ladies Linen",
-    "category": "bottom",
-    "priceCents": 2999,
-    "currency": "USD",
-    "retailer": "H&M",
-    "retailerUrl": "https://www.google.com/search?q=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&oq=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:13164332057028112014,gid:12695295604006585929,oid:2509982923536343053,iid:1948308445594086657&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQX0sddN2P0kwkiRHZg09dPltbqrjZY-pAmYkEEEseAAxMQ0X9MDaTlxx8oWFOQjodnvcRJsFC3tmGqUlPI2lRAP4QUfBbK2zTkv7XeFd2Qc1e9N9vVim1Q0w",
-    "imageOriginalUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQX0sddN2P0kwkiRHZg09dPltbqrjZY-pAmYkEEEseAAxMQ0X9MDaTlxx8oWFOQjodnvcRJsFC3tmGqUlPI2lRAP4QUfBbK2zTkv7XeFd2Qc1e9N9vVim1Q0w",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "13164332057028112014",
-      "searchapiProductToken": "eyJxIjoiaFx1MDAyNm0gbGluZW4gcGFudHMgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGggbSBsaW5lbiBwYW50cyIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6Ilc1dnFhZTJhT3RhZjVOb1BvUHUza0FFIiwiY2F0YWxvZ2lkIjoiMTMxNjQzMzIwNTcwMjgxMTIwMTQiLCJncGNpZCI6IjEyNjk1Mjk1NjA0MDA2NTg1OTI5IiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiMjUwOTk4MjkyMzUzNjM0MzA1MyIsImltYWdlRG9jaWQiOiIxOTQ4MzA4NDQ1NTk0MDg2NjU3In0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&oq=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:13164332057028112014,gid:12695295604006585929,oid:2509982923536343053,iid:1948308445594086657&oshop=apv&pvs=0",
-      "rawSeller": "H&M",
-      "rawPrice": "$29.99",
-      "source": "photo_catalog",
-      "catalogQuery": "h&m linen pants"
-    }
-  },
-  {
     "id": "186820dba6db1ed5",
     "brand": "H&M",
     "name": "Ladies Linen-Blend Pull",
@@ -2365,30 +2244,6 @@
       "searchapiProductId": "13259997183606390100",
       "searchapiProductToken": "eyJxIjoiaFx1MDAyNm0gbGluZW4gcGFudHMgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGggbSBsaW5lbiBwYW50cyIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6Ilc1dnFhZTJhT3RhZjVOb1BvUHUza0FFIiwiY2F0YWxvZ2lkIjoiMTMyNTk5OTcxODM2MDYzOTAxMDAiLCJncGNpZCI6IjExNDc2NTg2NTIyMTI1MTc3Njg5IiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiNjU4NTY1Mzk2ODYwNzQ3MTYwNyIsImltYWdlRG9jaWQiOiIzNzY4NTg5NTg1NDU2NDc3MzkifQ==",
       "searchapiOffersLink": "https://www.google.com/search?q=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&oq=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:13259997183606390100,gid:11476586522125177689,oid:6585653968607471607,iid:376858958545647739&oshop=apv&pvs=0",
-      "rawSeller": "H&M",
-      "rawPrice": "$39.99",
-      "source": "photo_catalog",
-      "catalogQuery": "h&m linen pants"
-    }
-  },
-  {
-    "id": "bddcd54327924130",
-    "brand": "H&M",
-    "name": "Ladies Wide-Leg Linen",
-    "category": "bottom",
-    "priceCents": 3999,
-    "currency": "USD",
-    "retailer": "H&M",
-    "retailerUrl": "https://www.google.com/search?q=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&oq=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:15199296243086877257,gid:5326636260253135917,oid:18197336630449489485,iid:12027534361870414010&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTXo0NalgISdlxjaZe8PC2pIu4aXfEFWRHQ1-liYIo6hYIYnCADStGsRdiGVcBp1zZBxVfVtJYh3hh3X191mkR4t7RI8-6fXobolJeNUVE19tP8Ze6Vh3onD1A",
-    "imageOriginalUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTXo0NalgISdlxjaZe8PC2pIu4aXfEFWRHQ1-liYIo6hYIYnCADStGsRdiGVcBp1zZBxVfVtJYh3hh3X191mkR4t7RI8-6fXobolJeNUVE19tP8Ze6Vh3onD1A",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "15199296243086877257",
-      "searchapiProductToken": "eyJxIjoiaFx1MDAyNm0gbGluZW4gcGFudHMgcGFudHMgamVhbnMgc2hvcnRzIHNraXJ0IGggbSBsaW5lbiBwYW50cyIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6Ilc1dnFhZTJhT3RhZjVOb1BvUHUza0FFIiwiY2F0YWxvZ2lkIjoiMTUxOTkyOTYyNDMwODY4NzcyNTciLCJncGNpZCI6IjUzMjY2MzYyNjAyNTMxMzU5MTciLCJoZWFkbGluZU9mZmVyRG9jaWQiOiIxODE5NzMzNjYzMDQ0OTQ4OTQ4NSIsImltYWdlRG9jaWQiOiIxMjAyNzUzNDM2MTg3MDQxNDAxMCJ9",
-      "searchapiOffersLink": "https://www.google.com/search?q=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&oq=h%26m+linen+pants+pants+jeans+shorts+skirt+h+m+linen+pants&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:15199296243086877257,gid:5326636260253135917,oid:18197336630449489485,iid:12027534361870414010&oshop=apv&pvs=0",
       "rawSeller": "H&M",
       "rawPrice": "$39.99",
       "source": "photo_catalog",
@@ -4438,30 +4293,6 @@
     }
   },
   {
-    "id": "addd16c4b19b7081",
-    "brand": "Stussy",
-    "name": "Stüssy Basic Striped Skullcap",
-    "category": "hat",
-    "priceCents": 5000,
-    "currency": "USD",
-    "retailer": "stussy.com",
-    "retailerUrl": "https://www.google.com/search?q=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&oq=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:11980898270156017029,gid:16771015014021697902,oid:4303429719710096561,iid:1040753126066002040&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT6T4b1rO29k-BSyDd5vhBrL-r7qIGUxcCILLGQOAzRZlJdiYdugyxS3a1ddf7K-01g9CWrshv-9GDDG1aLEFTl_Ju7WofIeR3la50kD0YdxziTPsvsDA",
-    "imageOriginalUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT6T4b1rO29k-BSyDd5vhBrL-r7qIGUxcCILLGQOAzRZlJdiYdugyxS3a1ddf7K-01g9CWrshv-9GDDG1aLEFTl_Ju7WofIeR3la50kD0YdxziTPsvsDA",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "11980898270156017029",
-      "searchapiProductToken": "eyJxIjoic3R1c3N5IGNhcCBTdHVzc3kgY2FwIGhhdCBjYXAgYmVhbmllIHN0dXNzeSIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6IjNYenFhWTMzRU1UeTFzUVB6Y1NXbVFzIiwiY2F0YWxvZ2lkIjoiMTE5ODA4OTgyNzAxNTYwMTcwMjkiLCJncGNpZCI6IjE2NzcxMDE1MDE0MDIxNjk3OTAyIiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiNDMwMzQyOTcxOTcxMDA5NjU2MSIsImltYWdlRG9jaWQiOiIxMDQwNzUzMTI2MDY2MDAyMDQwIn0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&oq=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:11980898270156017029,gid:16771015014021697902,oid:4303429719710096561,iid:1040753126066002040&oshop=apv&pvs=0",
-      "rawSeller": "stussy.com",
-      "rawPrice": "$50.00",
-      "source": "photo_catalog",
-      "catalogQuery": "stussy cap"
-    }
-  },
-  {
     "id": "4f4727ffd047c813",
     "brand": "Stussy",
     "name": "Stüssy Sport Stripe Skullcap",
@@ -4482,29 +4313,6 @@
       "rawPrice": "$50.00",
       "source": "photo_catalog",
       "catalogQuery": "stussy beanie"
-    }
-  },
-  {
-    "id": "aa6dbff84c93cd92",
-    "brand": "Stussy",
-    "name": "Stüssy Sport Stripe Skullcap",
-    "category": "hat",
-    "priceCents": 5000,
-    "currency": "USD",
-    "retailer": "stussy.com",
-    "retailerUrl": "https://www.google.com/search?q=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&oq=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:311989936171847442,oid:311989936171847442,iid:13464143311320317242,pvt:a,pvo:3&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQBD2hVCqPUSp2Dio0B4saezh5n4wLaoI3M8m65V8ULRyr5Yazy4y3u4Jdxk1NsBLHKbKNL4fBdQ54EEL-uoUF4B6dRFlJlpPkYxVD7W4-XsKzyj27Zew",
-    "imageOriginalUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQBD2hVCqPUSp2Dio0B4saezh5n4wLaoI3M8m65V8ULRyr5Yazy4y3u4Jdxk1NsBLHKbKNL4fBdQ54EEL-uoUF4B6dRFlJlpPkYxVD7W4-XsKzyj27Zew",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductToken": "eyJxIjoic3R1c3N5IGNhcCBTdHVzc3kgY2FwIGhhdCBjYXAgYmVhbmllIHN0dXNzeSIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6IjNYenFhWTMzRU1UeTFzUVB6Y1NXbVFzIiwicHJvZHVjdGlkIjoiMzExOTg5OTM2MTcxODQ3NDQyIiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiMzExOTg5OTM2MTcxODQ3NDQyIiwiaW1hZ2VEb2NpZCI6IjEzNDY0MTQzMzExMzIwMzE3MjQyIiwicHZvIjozLCJwdnQiOiJhIn0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&oq=stussy+cap+Stussy+cap+hat+cap+beanie+stussy&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:311989936171847442,oid:311989936171847442,iid:13464143311320317242,pvt:a,pvo:3&oshop=apv&pvs=0",
-      "rawSeller": "stussy.com",
-      "rawPrice": "$50.00",
-      "source": "photo_catalog",
-      "catalogQuery": "stussy cap"
     }
   },
   {
@@ -5992,30 +5800,6 @@
     }
   },
   {
-    "id": "033f4860b3d63c1f",
-    "brand": "Aritzia",
-    "name": "The Super Puff Women's The Super Puff Shorty Jacket in Black",
-    "category": "outer",
-    "priceCents": 25800,
-    "currency": "USD",
-    "retailer": "Aritzia",
-    "retailerUrl": "https://www.aritzia.com/us/en/product/the-super-puff%E2%84%A2-shorty/126366015.html?srsltid=AfmBOoqY92-I2D71PCU68olXYGBtRxs55UKSJshwIHgai2CF5DklKiO4bDU",
-    "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT2C9qOPDNy9esZ_ubg_a2M9gYdf8TH9ofOnH9yq0y8wsN24kGZMnYkF70CnbERdlHKF9EyjsuYxPCF5AzmuOLTVGGXojXb7uME_yJ0f9mJVh1AKu4g9juH2w",
-    "imageOriginalUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT2C9qOPDNy9esZ_ubg_a2M9gYdf8TH9ofOnH9yq0y8wsN24kGZMnYkF70CnbERdlHKF9EyjsuYxPCF5AzmuOLTVGGXojXb7uME_yJ0f9mJVh1AKu4g9juH2w",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "aritzia.com",
-      "searchapiProductToken": "eyJxIjoiYXJpdHppYSBzdXBlciBwdWZmIGphY2tldCBjb2F0IG91dGVyd2VhciBhcml0emlhIHN1cGVyIHB1ZmYiLCJnbCI6InVzIiwiaGwiOiJlbiIsInV1bGUiOiJ3K0NBSVFJQ0lOVlc1cGRHVmtJRk4wWVhSbGN3IiwiZWkiOiI4SHpxYWRPIiwicHJvZHVjdGlkIjoiMzg1OTA4MTU3Njg4MjIyMzkyNCIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjM4NTkwODE1NzY4ODIyMjM5MjQiLCJpbWFnZURvY2lkIjoiMTgzNTA4MDM2MjQ1NTQzOTg3MTciLCJwdm8iOjMsInB2dCI6ImEifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=aritzia+super+puff+jacket+coat+outerwear+aritzia+super+puff&oq=aritzia+super+puff+jacket+coat+outerwear+aritzia+super+puff&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:3859081576882223924,oid:3859081576882223924,iid:18350803624554398717,pvt:a,pvo:3&oshop=apv&pvs=0",
-      "rawSeller": "Aritzia",
-      "rawPrice": "$250.00",
-      "source": "photo_catalog",
-      "catalogQuery": "aritzia super puff",
-      "resolvedBy": "google_product_offers"
-    }
-  },
-  {
     "id": "200a5e3a008bfa5f",
     "brand": "Aritzia",
     "name": "The Super Puff Women's The Supersnug Puff Jacket in Scarab",
@@ -6868,52 +6652,6 @@
       "searchapiOffersLink": "https://www.google.com/search?q=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&oq=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:2919537769515939201,oid:2919537769515939201,iid:11027437974247588333,pvt:a,pvo:3&oshop=apv&pvs=0",
       "rawSeller": "Poshmark",
       "rawPrice": "$28.00",
-      "source": "photo_catalog",
-      "catalogQuery": "abercrombie bomber jacket"
-    }
-  },
-  {
-    "id": "100a41129f910268",
-    "brand": "Poshmark",
-    "name": "Abercrombie Bomber jacket",
-    "category": "outer",
-    "priceCents": 2800,
-    "currency": "USD",
-    "retailer": "Poshmark",
-    "retailerUrl": "https://www.google.com/search?q=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&oq=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:382874315418748711,oid:382874315418748711,iid:6968117772466717962,pvt:a,pvo:3&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTd8JNU1w9B1Dx1std1a-HqgZWFo1U42wNz1xd83jndts7GAvG570FEeo1ETx4ZhUCITmRmvNPlhcTFqDaEGiR3NWoRSSWa",
-    "imageOriginalUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTd8JNU1w9B1Dx1std1a-HqgZWFo1U42wNz1xd83jndts7GAvG570FEeo1ETx4ZhUCITmRmvNPlhcTFqDaEGiR3NWoRSSWa",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductToken": "eyJxIjoiYWJlcmNyb21iaWUgYm9tYmVyIGphY2tldCBqYWNrZXQgY29hdCBvdXRlcndlYXIgYWJlcmNyb21iaWUgYm9tYmVyIGphY2tldCIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6IkgzbnFhYnl5TnVpNXF0c1BrTzZROFFrIiwicHJvZHVjdGlkIjoiMzgyODc0MzE1NDE4NzQ4NzExIiwiaGVhZGxpbmVPZmZlckRvY2lkIjoiMzgyODc0MzE1NDE4NzQ4NzExIiwiaW1hZ2VEb2NpZCI6IjY5NjgxMTc3NzI0NjY3MTc5NjIiLCJwdm8iOjMsInB2dCI6ImEifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&oq=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:382874315418748711,oid:382874315418748711,iid:6968117772466717962,pvt:a,pvo:3&oshop=apv&pvs=0",
-      "rawSeller": "Poshmark",
-      "rawPrice": "$28.00",
-      "source": "photo_catalog",
-      "catalogQuery": "abercrombie bomber jacket"
-    }
-  },
-  {
-    "id": "2f46aac2034efc66",
-    "brand": "Poshmark",
-    "name": "Abercrombie Bomber Jacket",
-    "category": "outer",
-    "priceCents": 8000,
-    "currency": "USD",
-    "retailer": "Poshmark",
-    "retailerUrl": "https://www.google.com/search?q=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&oq=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:2732478467023605005,oid:2732478467023605005,iid:16623057148522916539,pvt:a,pvo:3&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS8Bw5KNE0PAcw6iEF5P6lkTSuQnPlXc4fBQl4N2tNLY9SYld4_oNgNxOqu5oLwEEEy4_wBIPIzQSjWCvkeKPMAftJtCt9p",
-    "imageOriginalUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS8Bw5KNE0PAcw6iEF5P6lkTSuQnPlXc4fBQl4N2tNLY9SYld4_oNgNxOqu5oLwEEEy4_wBIPIzQSjWCvkeKPMAftJtCt9p",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductToken": "eyJxIjoiYWJlcmNyb21iaWUgYm9tYmVyIGphY2tldCBqYWNrZXQgY29hdCBvdXRlcndlYXIgYWJlcmNyb21iaWUgYm9tYmVyIGphY2tldCIsImdsIjoidXMiLCJobCI6ImVuIiwidXVsZSI6IncrQ0FJUUlDSU5WVzVwZEdWa0lGTjBZWFJsY3ciLCJlaSI6IkgzbnFhYnl5TnVpNXF0c1BrTzZROFFrIiwicHJvZHVjdGlkIjoiMjczMjQ3ODQ2NzAyMzYwNTAwNSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjI3MzI0Nzg0NjcwMjM2MDUwMDUiLCJpbWFnZURvY2lkIjoiMTY2MjMwNTcxNDg1MjI5MTY1MzkiLCJwdm8iOjMsInB2dCI6ImEifQ==",
-      "searchapiOffersLink": "https://www.google.com/search?q=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&oq=abercrombie+bomber+jacket+jacket+coat+outerwear+abercrombie+bomber+jacket&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:2732478467023605005,oid:2732478467023605005,iid:16623057148522916539,pvt:a,pvo:3&oshop=apv&pvs=0",
-      "rawSeller": "Poshmark",
-      "rawPrice": "$80.00",
       "source": "photo_catalog",
       "catalogQuery": "abercrombie bomber jacket"
     }
@@ -9066,30 +8804,6 @@
     }
   },
   {
-    "id": "03371809724786a1",
-    "brand": "H&M",
-    "name": "Ladies Melange Rib",
-    "category": "top",
-    "priceCents": 1599,
-    "currency": "USD",
-    "retailer": "H&M",
-    "retailerUrl": "https://www.google.com/search?q=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&oq=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:13978497070508685880,gid:16317635984628647070,oid:2219552210336526634,iid:17917571459001627247&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT4J7NzMr-FhEbDgYZzDlZr_gIJS4YIhSmNzXofK4gFSdIpgK4gr_lzvhmdL1XuO8wiHsyTUQrsZadsKBfBnIWvfVbcqpxqwJjBi6zoEkqEzNzynBR8fBL2",
-    "imageOriginalUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT4J7NzMr-FhEbDgYZzDlZr_gIJS4YIhSmNzXofK4gFSdIpgK4gr_lzvhmdL1XuO8wiHsyTUQrsZadsKBfBnIWvfVbcqpxqwJjBi6zoEkqEzNzynBR8fBL2",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "13978497070508685880",
-      "searchapiProductToken": "eyJxIjoiaFx1MDAyNm0gcmliIGtuaXQgdGFuayB0b3AgdGFuIHRhbmsgc2hpcnQgdG9wIHRlZSBibG91c2Ugc3dlYXRlciBoIG0gcmliIGtuaXQgdG9wIiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiVXB2cWFlYk5NdEtxdzhjUHpJcnhrQTQiLCJjYXRhbG9naWQiOiIxMzk3ODQ5NzA3MDUwODY4NTg4MCIsImdwY2lkIjoiMTYzMTc2MzU5ODQ2Mjg2NDcwNzAiLCJoZWFkbGluZU9mZmVyRG9jaWQiOiIyMjE5NTUyMjEwMzM2NTI2NjM0IiwiaW1hZ2VEb2NpZCI6IjE3OTE3NTcxNDU5MDAxNjI3MjQ3In0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&oq=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:13978497070508685880,gid:16317635984628647070,oid:2219552210336526634,iid:17917571459001627247&oshop=apv&pvs=0",
-      "rawSeller": "H&M",
-      "rawPrice": "$15.99",
-      "source": "photo_catalog",
-      "catalogQuery": "h&m rib knit tank top"
-    }
-  },
-  {
     "id": "81b6bfb50f963faf",
     "brand": "H&M",
     "name": "Ladies Oversized Cotton T",
@@ -9181,30 +8895,6 @@
       "searchapiOffersLink": "https://www.google.com/search?q=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&oq=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:15741468840695797230,gid:6563395333356728175,oid:3827444737727246473,iid:17229253832566365618&oshop=apv&pvs=0",
       "rawSeller": "H&M",
       "rawPrice": "$12.99",
-      "source": "photo_catalog",
-      "catalogQuery": "h&m rib knit tank top"
-    }
-  },
-  {
-    "id": "ffa7ed6ad4820bd2",
-    "brand": "H&M",
-    "name": "Ladies Rib",
-    "category": "top",
-    "priceCents": 2499,
-    "currency": "USD",
-    "retailer": "H&M",
-    "retailerUrl": "https://www.google.com/search?q=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&oq=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:15076503107273946161,gid:6049538165856415699,oid:3119543210525179814,iid:4025557192105600443&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRv8za4b5RV7wNnU_8FBtHecFpQBBY0qFvzZYmlD-EAbUuv3PW7JPuBrmVfjmlVK9ki-GeQQcjdX0lBxgNDTjqtrQLZRtWYncpspdnKgJdGk2HiDtkj14-iUw",
-    "imageOriginalUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRv8za4b5RV7wNnU_8FBtHecFpQBBY0qFvzZYmlD-EAbUuv3PW7JPuBrmVfjmlVK9ki-GeQQcjdX0lBxgNDTjqtrQLZRtWYncpspdnKgJdGk2HiDtkj14-iUw",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductId": "15076503107273946161",
-      "searchapiProductToken": "eyJxIjoiaFx1MDAyNm0gcmliIGtuaXQgdGFuayB0b3AgdGFuIHRhbmsgc2hpcnQgdG9wIHRlZSBibG91c2Ugc3dlYXRlciBoIG0gcmliIGtuaXQgdG9wIiwiZ2wiOiJ1cyIsImhsIjoiZW4iLCJ1dWxlIjoidytDQUlRSUNJTlZXNXBkR1ZrSUZOMFlYUmxjdyIsImVpIjoiVXB2cWFlYk5NdEtxdzhjUHpJcnhrQTQiLCJjYXRhbG9naWQiOiIxNTA3NjUwMzEwNzI3Mzk0NjE2MSIsImdwY2lkIjoiNjA0OTUzODE2NTg1NjQxNTY5OSIsImhlYWRsaW5lT2ZmZXJEb2NpZCI6IjMxMTk1NDMyMTA1MjUxNzk4MTQiLCJpbWFnZURvY2lkIjoiNDAyNTU1NzE5MjEwNTYwMDQ0MyJ9",
-      "searchapiOffersLink": "https://www.google.com/search?q=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&oq=h%26m+rib+knit+tank+top+tan+tank+shirt+top+tee+blouse+sweater+h+m+rib+knit+top&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:15076503107273946161,gid:6049538165856415699,oid:3119543210525179814,iid:4025557192105600443&oshop=apv&pvs=0",
-      "rawSeller": "H&M",
-      "rawPrice": "$24.99",
       "source": "photo_catalog",
       "catalogQuery": "h&m rib knit tank top"
     }
@@ -9420,29 +9110,6 @@
       "retailerHost": "google.com",
       "searchapiProductToken": "eyJxIjoibHVsdWxlbW9uIGFsaWduIHRhbmsgdGFuIHRhbmsgc2hpcnQgdG9wIHRlZSBibG91c2Ugc3dlYXRlciBsdWx1bGVtb24gYWxpZ24iLCJnbCI6InVzIiwiaGwiOiJlbiIsInV1bGUiOiJ3K0NBSVFJQ0lOVlc1cGRHVmtJRk4wWVhSbGN3IiwiZWkiOiJWSnZxYWFEbERxN2FwdFFQemVubHlBOCIsInByb2R1Y3RpZCI6IjUwOTg1MzUzNTU3MDQzMzE2NjciLCJoZWFkbGluZU9mZmVyRG9jaWQiOiI1MDk4NTM1MzU1NzA0MzMxNjY3IiwicmRzIjoiUENfMjY5ODYxNzAxMTY5NjA0Mzk2MnxQUk9EX1BDXzI2OTg2MTcwMTE2OTYwNDM5NjIiLCJpbWFnZURvY2lkIjoiMzAxMjgyNzU4MTI2OTQ1OTI3NyIsInB2byI6MywicHZ0IjoiYSJ9",
       "searchapiOffersLink": "https://www.google.com/search?q=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&oq=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:5098535355704331667,oid:5098535355704331667,iid:3012827581269459277,rds:UENfMjY5ODYxNzAxMTY5NjA0Mzk2MnxQUk9EX1BDXzI2OTg2MTcwMTE2OTYwNDM5NjI=,pvt:a,pvo:3&oshop=apv&pvs=0",
-      "rawSeller": "lululemon",
-      "rawPrice": "$29.00",
-      "source": "photo_catalog",
-      "catalogQuery": "lululemon align tank"
-    }
-  },
-  {
-    "id": "e2544ff951b1919d",
-    "brand": "lululemon",
-    "name": "Align Tank Top Light Support, A/B Cup - Size 0",
-    "category": "top",
-    "priceCents": 2900,
-    "currency": "USD",
-    "retailer": "lululemon",
-    "retailerUrl": "https://www.google.com/search?q=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&oq=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:6739016451486384199,oid:6739016451486384199,iid:484601359875129178,rds:UENfMjY5ODYxNzAxMTY5NjA0Mzk2MnxQUk9EX1BDXzI2OTg2MTcwMTE2OTYwNDM5NjI=,pvt:a,pvo:3&oshop=apv&pvs=0",
-    "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTjm38dD0pdXoIhheFuskedJuFrYHH2gC_g238grQUcSjAwBGAk1K_GLKuyhN79iuHuEvyhT695-i3WEoshyyMlvE0si_MFTHR_6Ml65LABZTLlsFYNFkA4BA",
-    "imageOriginalUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTjm38dD0pdXoIhheFuskedJuFrYHH2gC_g238grQUcSjAwBGAk1K_GLKuyhN79iuHuEvyhT695-i3WEoshyyMlvE0si_MFTHR_6Ml65LABZTLlsFYNFkA4BA",
-    "trusted": true,
-    "metadata": {
-      "trusted": true,
-      "retailerHost": "google.com",
-      "searchapiProductToken": "eyJxIjoibHVsdWxlbW9uIGFsaWduIHRhbmsgdGFuIHRhbmsgc2hpcnQgdG9wIHRlZSBibG91c2Ugc3dlYXRlciBsdWx1bGVtb24gYWxpZ24iLCJnbCI6InVzIiwiaGwiOiJlbiIsInV1bGUiOiJ3K0NBSVFJQ0lOVlc1cGRHVmtJRk4wWVhSbGN3IiwiZWkiOiJWSnZxYWFEbERxN2FwdFFQemVubHlBOCIsInByb2R1Y3RpZCI6IjY3MzkwMTY0NTE0ODYzODQxOTkiLCJoZWFkbGluZU9mZmVyRG9jaWQiOiI2NzM5MDE2NDUxNDg2Mzg0MTk5IiwicmRzIjoiUENfMjY5ODYxNzAxMTY5NjA0Mzk2MnxQUk9EX1BDXzI2OTg2MTcwMTE2OTYwNDM5NjIiLCJpbWFnZURvY2lkIjoiNDg0NjAxMzU5ODc1MTI5MTc4IiwicHZvIjozLCJwdnQiOiJhIn0=",
-      "searchapiOffersLink": "https://www.google.com/search?q=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&oq=lululemon+align+tank+tan+tank+shirt+top+tee+blouse+sweater+lululemon+align&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=pid:6739016451486384199,oid:6739016451486384199,iid:484601359875129178,rds:UENfMjY5ODYxNzAxMTY5NjA0Mzk2MnxQUk9EX1BDXzI2OTg2MTcwMTE2OTYwNDM5NjI=,pvt:a,pvo:3&oshop=apv&pvs=0",
       "rawSeller": "lululemon",
       "rawPrice": "$29.00",
       "source": "photo_catalog",

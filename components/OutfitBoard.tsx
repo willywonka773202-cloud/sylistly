@@ -1,11 +1,12 @@
 'use client';
 
 import { ProductImage } from '@/components/ProductImage';
+import { getProductOutboundUrl } from '@/lib/product-links';
 import {
-  filterFeedRenderableProducts,
   hasHighCategoryConfidence,
   isFeedHeroCandidate,
   isRenderableProductForFeed,
+  sortTransparentFeedRenderableProducts,
   productImageQualityScore,
 } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -34,19 +35,152 @@ const IMAGE_PADDING: Record<Category, string> = {
   jewelry: 'p-2.5',
 };
 
+const STACKED_FIT_ORDER: Category[] = ['bottom', 'top', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
+
+const STACKED_FIT_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[9%] top-[19%] h-[43%] w-[34%] rotate-[-7deg] z-[30]',
+  top: 'left-[34%] top-[16%] h-[33%] w-[36%] rotate-[.5deg] z-[44]',
+  bottom: 'left-[32%] top-[39%] h-[43%] w-[39%] rotate-[-.5deg] z-[34]',
+  shoes: 'left-[26%] bottom-[2%] h-[18%] w-[50%] rotate-[1deg] z-[58]',
+  bag: 'right-[5%] top-[37%] h-[28%] w-[26%] rotate-[5deg] z-[62]',
+  hat: 'left-[39%] top-[2%] h-[15%] w-[26%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[14%] top-[15%] h-[10%] w-[22%] rotate-[4deg] z-[72]',
+  jewelry: 'right-[12%] top-[61%] h-[11%] w-[16%] rotate-[-5deg] z-[74]',
+};
+
+const STACKED_FIT_COMPACT_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[7%] top-[20%] h-[42%] w-[36%] rotate-[-7deg] z-[30]',
+  top: 'left-[33%] top-[17%] h-[33%] w-[38%] rotate-[.5deg] z-[44]',
+  bottom: 'left-[31%] top-[41%] h-[42%] w-[41%] rotate-[-.5deg] z-[34]',
+  shoes: 'left-[23%] bottom-[1%] h-[19%] w-[55%] rotate-[1deg] z-[58]',
+  bag: 'right-[3%] top-[39%] h-[28%] w-[28%] rotate-[5deg] z-[62]',
+  hat: 'left-[38%] top-[2%] h-[15%] w-[28%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[12%] top-[16%] h-[10%] w-[24%] rotate-[4deg] z-[72]',
+  jewelry: 'right-[10%] top-[62%] h-[11%] w-[17%] rotate-[-5deg] z-[74]',
+};
+
+const STACKED_FIT_MOTION_CLASSES: Record<Category, string> = {
+  outer: 'sy-fit-float-soft [animation-delay:-1.2s]',
+  top: 'sy-fit-float [animation-delay:-.2s]',
+  bottom: 'sy-fit-float-soft [animation-delay:-2.1s]',
+  shoes: 'sy-fit-float-soft [animation-delay:-3.4s]',
+  bag: 'sy-fit-float [animation-delay:-2.8s]',
+  hat: 'sy-fit-float-soft [animation-delay:-.9s]',
+  eyewear: 'sy-fit-float-soft [animation-delay:-2.5s]',
+  jewelry: 'sy-fit-float [animation-delay:-3.1s]',
+};
+
+const STACKED_FIT_IMAGE_CLASSES: Record<Category, string> = {
+  hat: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_20px_16px_rgba(0,0,0,.26)]',
+  eyewear: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_16px_14px_rgba(0,0,0,.28)]',
+  outer: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_38px_30px_rgba(0,0,0,.36)]',
+  top: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_30px_24px_rgba(0,0,0,.3)]',
+  bottom: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_34px_28px_rgba(0,0,0,.3)]',
+  bag: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_28px_22px_rgba(0,0,0,.34)]',
+  jewelry: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_16px_12px_rgba(0,0,0,.3)]',
+  shoes: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_30px_20px_rgba(0,0,0,.34)]',
+};
+
+const FITS_AI_FLATLAY_ORDER: Category[] = ['bottom', 'top', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
+
+const FITS_AI_FLATLAY_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[16%] top-[12%] h-[49%] w-[47%] rotate-[-3deg] z-[28]',
+  top: 'left-[41%] top-[16%] h-[38%] w-[38%] rotate-[1deg] z-[38]',
+  bottom: 'left-[31%] top-[39%] h-[48%] w-[41%] rotate-[-.5deg] z-[22]',
+  shoes: 'left-[18%] bottom-[0%] h-[26%] w-[64%] rotate-[1deg] z-[54]',
+  bag: 'right-[5%] top-[38%] h-[30%] w-[29%] rotate-[4deg] z-[58]',
+  hat: 'left-[34%] top-[3%] h-[17%] w-[32%] rotate-[-3deg] z-[64]',
+  eyewear: 'right-[17%] top-[15%] h-[10%] w-[25%] rotate-[4deg] z-[66]',
+  jewelry: 'left-[12%] top-[56%] h-[13%] w-[19%] rotate-[-6deg] z-[62]',
+};
+
+const FITS_AI_FLATLAY_NO_OUTER_SLOT_STYLES: Record<Category, string> = {
+  outer: FITS_AI_FLATLAY_SLOT_STYLES.outer,
+  top: 'left-[27%] top-[12%] h-[43%] w-[47%] rotate-[.5deg] z-[36]',
+  bottom: 'left-[29%] top-[39%] h-[48%] w-[42%] rotate-[-.5deg] z-[22]',
+  shoes: 'left-[18%] bottom-[0%] h-[26%] w-[64%] rotate-[1deg] z-[54]',
+  bag: 'right-[5%] top-[38%] h-[30%] w-[29%] rotate-[4deg] z-[58]',
+  hat: 'left-[34%] top-[3%] h-[17%] w-[32%] rotate-[-3deg] z-[64]',
+  eyewear: 'right-[13%] top-[15%] h-[10%] w-[25%] rotate-[4deg] z-[66]',
+  jewelry: 'left-[11%] top-[54%] h-[13%] w-[19%] rotate-[-6deg] z-[62]',
+};
+
+const FITS_AI_FLATLAY_COMPACT_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[16%] top-[14%] h-[46%] w-[48%] rotate-[-3deg] z-[28]',
+  top: 'left-[40%] top-[18%] h-[36%] w-[39%] rotate-[1deg] z-[38]',
+  bottom: 'left-[30%] top-[40%] h-[46%] w-[42%] rotate-[-.5deg] z-[22]',
+  shoes: 'left-[19%] bottom-[0%] h-[25%] w-[62%] rotate-[1deg] z-[54]',
+  bag: 'right-[4%] top-[40%] h-[29%] w-[29%] rotate-[4deg] z-[58]',
+  hat: 'left-[35%] top-[3%] h-[15%] w-[30%] rotate-[-3deg] z-[64]',
+  eyewear: 'right-[14%] top-[15%] h-[10%] w-[26%] rotate-[4deg] z-[66]',
+  jewelry: 'left-[10%] top-[56%] h-[13%] w-[20%] rotate-[-6deg] z-[62]',
+};
+
+const FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[9%] top-[34%] h-[34%] w-[34%] rotate-[-5deg] z-[28]',
+  top: 'left-[12%] top-[16%] h-[30%] w-[34%] rotate-[2deg] z-[36]',
+  bottom: 'right-[11%] top-[32%] h-[39%] w-[35%] rotate-[-.5deg] z-[22]',
+  shoes: 'left-[19%] bottom-[2%] h-[25%] w-[62%] rotate-[1deg] z-[58]',
+  bag: 'right-[8%] top-[10%] h-[23%] w-[27%] rotate-[5deg] z-[54]',
+  hat: 'left-[39%] top-[3%] h-[15%] w-[29%] rotate-[-3deg] z-[64]',
+  eyewear: 'right-[18%] top-[21%] h-[9%] w-[23%] rotate-[4deg] z-[66]',
+  jewelry: 'left-[13%] top-[57%] h-[12%] w-[17%] rotate-[-6deg] z-[62]',
+};
+
+const FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES: Record<Category, string> = {
+  outer: 'left-[10%] top-[18%] h-[42%] w-[39%] rotate-[-4deg] z-[28]',
+  top: 'right-[14%] top-[11%] h-[44%] w-[43%] rotate-[1deg] z-[40]',
+  bottom: 'left-[30%] top-[42%] h-[45%] w-[43%] rotate-[-.5deg] z-[22]',
+  shoes: 'left-[20%] bottom-[0%] h-[25%] w-[60%] rotate-[1deg] z-[56]',
+  bag: 'right-[4%] top-[43%] h-[29%] w-[28%] rotate-[5deg] z-[58]',
+  hat: 'left-[34%] top-[3%] h-[16%] w-[31%] rotate-[-3deg] z-[64]',
+  eyewear: 'right-[15%] top-[17%] h-[9%] w-[25%] rotate-[4deg] z-[66]',
+  jewelry: 'left-[12%] top-[58%] h-[12%] w-[18%] rotate-[-6deg] z-[62]',
+};
+
+const FITS_AI_FLATLAY_IMAGE_CLASSES: Record<Category, string> = {
+  hat: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_18px_15px_rgba(24,18,28,.18)]',
+  eyewear: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_14px_12px_rgba(24,18,28,.18)]',
+  outer: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_22px_rgba(24,18,28,.2)]',
+  top: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_23px_21px_rgba(24,18,28,.19)]',
+  bottom: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_22px_rgba(24,18,28,.18)]',
+  bag: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_20px_rgba(24,18,28,.2)]',
+  jewelry: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_14px_12px_rgba(24,18,28,.17)]',
+  shoes: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_25px_18px_rgba(24,18,28,.22)]',
+};
+
 const FEED_SUPPORT_ORDER: Category[] = ['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
+const BOOT_TERMS = ['boot', 'boots', 'chelsea', 'ugg'];
+const LOW_PROFILE_SHOE_TERMS = ['samba', 'sneaker', 'sneakers', 'trainer', 'trainers', 'court shoe', 'running shoe'];
+const FLAT_SHOE_TERMS = ['loafer', 'loafers', 'flat', 'flats', 'sandal', 'sandals', 'slide', 'slides', 'mule', 'mules'];
+const HEEL_TERMS = ['heel', 'heels', 'pump', 'pumps', 'slingback', 'stiletto'];
+const CAP_TERMS = ['baseball cap', 'dad cap', 'cap'];
+const BEANIE_TERMS = ['beanie', 'watch cap', 'skullcap'];
+const BUCKET_HAT_TERMS = ['bucket hat', 'bucket'];
+const WIDE_HAT_TERMS = ['sun hat', 'straw hat', 'wide brim', 'wide-brim'];
+const TOTE_TERMS = ['tote', 'shopper'];
+const MINI_BAG_TERMS = ['mini', 'micro', 'pouch', 'wallet', 'clutch'];
+const SHORT_BOTTOM_TERMS = ['short', 'shorts', 'skort', 'mini skirt'];
+const SKIRT_BOTTOM_TERMS = ['skirt', 'midi skirt', 'maxi skirt', 'slip skirt'];
+const LONG_BOTTOM_TERMS = ['jean', 'jeans', 'pant', 'pants', 'trouser', 'trousers', 'wide leg', 'wide-leg'];
+const JEWELRY_SMALL_TERMS = ['ring', 'earring', 'earrings', 'bracelet'];
+const JEWELRY_TALL_TERMS = ['necklace', 'chain', 'pendant'];
 
 type FeedLayoutVariant = 'hero-left' | 'hero-top' | 'sneaker-led';
 
 type FeedContext = {
   formulaId?: string;
   formulaLabel?: string;
+  layoutVariant?: FeedLayoutVariant;
 };
+
+type OutfitPresentation = 'flatlay' | 'stacked';
 
 const SNEAKER_LED_FORMULAS = new Set([
   'streetwear-sneaker-led',
   'campus-cozy',
   'gym-training',
+  'active-errands',
   'techwear-utility',
 ]);
 
@@ -59,7 +193,7 @@ const HERO_TOP_FORMULAS = new Set([
 
 export function outfitBoardProducts(items: Partial<Record<Category, Product>> | Product[]): Product[] {
   const products = Array.isArray(items) ? items : BOARD_ORDER.map((category) => items[category]).filter(Boolean);
-  return filterFeedRenderableProducts(products.filter((product): product is Product => Boolean(product)));
+  return sortTransparentFeedRenderableProducts(products.filter((product): product is Product => Boolean(product)));
 }
 
 export function OutfitBoard({
@@ -102,11 +236,12 @@ export function OutfitBoard({
         return (
           <div
             key={`${category}-${product.id}`}
-            className={`absolute overflow-hidden rounded-[22px] bg-white/58 shadow-[0_16px_28px_rgba(99,68,45,.13)] ring-1 ring-[#eadfd5]/80 backdrop-blur-sm ${SLOT_STYLES[category]}`}
+            className={`absolute overflow-visible rounded-[22px] bg-transparent ${SLOT_STYLES[category]}`}
           >
             <ProductImage
               product={product}
-              wrapperClassName="h-full w-full"
+              transparentOnly
+              wrapperClassName="h-full w-full overflow-visible bg-transparent"
               className={`h-full w-full object-contain ${IMAGE_PADDING[category]}`}
               onUnavailable={onImageUnavailable}
             />
@@ -115,6 +250,260 @@ export function OutfitBoard({
       })}
       <div className="absolute inset-x-0 bottom-0 h-20 bg-[linear-gradient(180deg,transparent_0%,rgba(236,219,203,.42)_100%)]" />
     </div>
+  );
+}
+
+export function OutfitLookCard({
+  items,
+  title,
+  subtitle,
+  className = '',
+  compact = false,
+  tilt = false,
+  productLinks = true,
+  showMeta = false,
+  loading = 'lazy',
+  onImageUnavailable,
+  feedContext,
+  presentation = 'flatlay',
+}: {
+  items: Partial<Record<Category, Product>> | Product[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  compact?: boolean;
+  tilt?: boolean;
+  productLinks?: boolean;
+  showMeta?: boolean;
+  loading?: 'lazy' | 'eager';
+  onImageUnavailable?: (product: Product) => void;
+  feedContext?: FeedContext;
+  presentation?: OutfitPresentation;
+}) {
+  const products = outfitBoardProducts(items);
+  const byCategory = new Map(products.map((product) => [product.category, product]));
+  const visibleSlots = BOARD_ORDER.filter((category) => byCategory.has(category));
+
+  if (visibleSlots.length < 3) return null;
+
+  const label = [title, subtitle].filter(Boolean).join(' ') || 'Assembled outfit';
+
+  if (presentation === 'stacked') {
+    return (
+      <StackedFitCanvas
+        products={products}
+        title={title}
+        subtitle={subtitle}
+        className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
+        compact={compact}
+        productLinks={productLinks}
+        showMeta={showMeta}
+        loading={loading}
+        ariaLabel={label}
+        onImageUnavailable={onImageUnavailable}
+      />
+    );
+  }
+
+  return (
+    <FitsAiOutfitCanvas
+      products={products}
+      title={title}
+      subtitle={subtitle}
+      className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
+      compact={compact}
+      productLinks={productLinks}
+      showMeta={showMeta}
+      loading={loading}
+      ariaLabel={label}
+      onImageUnavailable={onImageUnavailable}
+      feedContext={feedContext}
+    />
+  );
+}
+
+export function StackedFitCanvas({
+  products,
+  title,
+  subtitle,
+  className = '',
+  compact = false,
+  productLinks = true,
+  showMeta = false,
+  loading = 'lazy',
+  ariaLabel,
+  onImageUnavailable,
+}: {
+  products: Product[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  compact?: boolean;
+  productLinks?: boolean;
+  showMeta?: boolean;
+  loading?: 'lazy' | 'eager';
+  ariaLabel?: string;
+  onImageUnavailable?: (product: Product) => void;
+}) {
+  const byCategory = new Map(products.map((product) => [product.category, product]));
+  const renderSlots = STACKED_FIT_ORDER.filter((category) => byCategory.has(category)).slice(0, compact ? 7 : 8);
+  const slotStyles = compact ? STACKED_FIT_COMPACT_SLOT_STYLES : STACKED_FIT_SLOT_STYLES;
+  const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Layered transparent outfit';
+
+  if (renderSlots.length < 3) return null;
+
+  return (
+    <article
+      className={`relative isolate h-full min-h-[180px] overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.07)_0%,rgba(255,255,255,.025)_50%,rgba(255,255,255,.045)_100%)] shadow-[0_30px_76px_rgba(0,0,0,.38)] ${className}`}
+      aria-label={label}
+      data-stacked-fit-canvas
+      data-stacked-fit-count={renderSlots.length}
+      data-stacked-fit-transparent="true"
+      data-fit-scale-system="silhouette-v3"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,.12),transparent_42%),linear-gradient(140deg,rgba(255,255,255,.13)_0%,transparent_34%,rgba(0,0,0,.2)_100%)]" />
+      <div className="pointer-events-none absolute left-[30%] top-[11%] h-[78%] w-[43%] rounded-full border border-white/[.055] bg-white/[.025] blur-[1px]" />
+      <div className="pointer-events-none absolute left-[5%] top-[18%] h-[48%] w-[36%] rounded-[42px] bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,.06),transparent_68%)]" />
+      <div className="pointer-events-none absolute right-[4%] top-[32%] h-[42%] w-[30%] rounded-[42px] bg-[radial-gradient(circle_at_50%_45%,rgba(246,48,107,.1),transparent_68%)]" />
+      <div className="pointer-events-none absolute inset-x-[19%] bottom-[5%] h-[17%] rounded-full bg-black/35 blur-2xl" />
+      <div className="pointer-events-none absolute inset-x-[25%] bottom-[2%] h-px bg-white/10" />
+
+      {renderSlots.map((category) => {
+        const product = byCategory.get(category);
+        if (!product) return null;
+        return (
+          <ProductTileLink
+            key={`${category}-${product.id}-stacked`}
+            product={product}
+            className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.035] ${slotStyles[category]}`}
+            disabled={!productLinks}
+            fitSlot={category}
+          >
+            <span className={`block h-full w-full overflow-visible bg-transparent ${STACKED_FIT_MOTION_CLASSES[category]}`}>
+              <ProductImage
+                product={product}
+                transparentOnly
+                loading={loading}
+                displayMode={compact ? 'thumbnail' : 'moodboard'}
+                wrapperClassName="h-full w-full overflow-visible bg-transparent"
+                className={stackedFitImageClass(product)}
+                onUnavailable={onImageUnavailable}
+              />
+            </span>
+            <span className="sr-only">{product.brand} {product.name}</span>
+          </ProductTileLink>
+        );
+      })}
+
+      {showMeta && (title || subtitle) ? (
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[22px] border border-white/10 bg-black/42 px-3 py-2 text-white shadow-[0_14px_32px_rgba(0,0,0,.28)] backdrop-blur-md">
+          {subtitle ? (
+            <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div>
+          ) : null}
+          {title ? <div className="mt-0.5 truncate text-[14px] font-semibold tracking-tight">{title}</div> : null}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+export function FitsAiOutfitCanvas({
+  products,
+  title,
+  subtitle,
+  className = '',
+  productLinks = false,
+  compact = false,
+  showMeta = false,
+  loading = 'lazy',
+  ariaLabel,
+  onImageUnavailable,
+  feedContext,
+}: {
+  products: Product[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  productLinks?: boolean;
+  compact?: boolean;
+  showMeta?: boolean;
+  loading?: 'lazy' | 'eager';
+  ariaLabel?: string;
+  onImageUnavailable?: (product: Product) => void;
+  feedContext?: FeedContext;
+}) {
+  const byCategory = new Map(products.map((product) => [product.category, product]));
+  const hasOuter = byCategory.has('outer');
+  const forcedSneakerLed = feedContext?.layoutVariant === 'sneaker-led' || isSneakerLedFormula(feedContext?.formulaId);
+  const forcedHeroTop = feedContext?.layoutVariant === 'hero-top' || isHeroTopFormula(feedContext?.formulaId);
+  const sneakerLed = byCategory.has('shoes') && (forcedSneakerLed || !byCategory.has('top') || !byCategory.has('bottom'));
+  const heroTop = !sneakerLed && forcedHeroTop && (byCategory.has('top') || byCategory.has('outer'));
+  const resolvedLayout = sneakerLed ? 'sneaker-led' : heroTop ? 'hero-top' : hasOuter ? 'hero-left' : 'no-outer';
+  const slotStyles = sneakerLed
+    ? FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES
+    : heroTop
+      ? FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES
+      : compact
+        ? FITS_AI_FLATLAY_COMPACT_SLOT_STYLES
+        : hasOuter
+          ? FITS_AI_FLATLAY_SLOT_STYLES
+          : FITS_AI_FLATLAY_NO_OUTER_SLOT_STYLES;
+  const renderSlots = FITS_AI_FLATLAY_ORDER
+    .filter((category) => byCategory.has(category))
+    .slice(0, compact ? 6 : 8);
+  const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Editorial transparent outfit flat lay';
+
+  if (renderSlots.length < 3) return null;
+
+  return (
+    <article
+      className={`relative isolate h-full min-h-[220px] overflow-hidden rounded-[30px] border border-[#ece7df] bg-[linear-gradient(180deg,#fff_0%,#fbfaf7_58%,#f4efe8_100%)] shadow-[0_24px_54px_rgba(42,28,21,.14)] ${className}`}
+      aria-label={label}
+      data-fits-ai-canvas
+      data-fits-ai-canvas-count={renderSlots.length}
+      data-fits-ai-transparent="true"
+      data-fits-ai-sneaker-led={sneakerLed ? 'true' : 'false'}
+      data-fits-ai-layout={resolvedLayout}
+      data-fits-ai-formula={feedContext?.formulaId || 'unknown'}
+      data-fit-scale-system="silhouette-v3"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_48%_34%,rgba(255,247,239,.92)_0%,rgba(255,255,255,0)_45%)]" />
+      <div className="pointer-events-none absolute inset-x-[18%] bottom-[7%] h-[15%] rounded-full bg-[#241622]/10 blur-2xl" />
+      <div className="pointer-events-none absolute inset-x-[24%] bottom-[6%] h-px bg-black/5" />
+
+      {renderSlots.map((category) => {
+        const product = byCategory.get(category);
+        if (!product) return null;
+        return (
+          <ProductTileLink
+            key={`${category}-${product.id}-fits-ai`}
+            product={product}
+            className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.025] ${slotStyles[category]}`}
+            disabled={!productLinks}
+          >
+            <ProductImage
+              product={product}
+              transparentOnly
+              loading={loading}
+              displayMode={compact ? 'thumbnail' : 'moodboard'}
+              wrapperClassName="h-full w-full overflow-visible bg-transparent"
+              className={flatlayImageClass(product)}
+              onUnavailable={onImageUnavailable}
+            />
+            <span className="sr-only">{product.brand} {product.name}</span>
+          </ProductTileLink>
+        );
+      })}
+
+      {showMeta && (title || subtitle) ? (
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[20px] border border-black/5 bg-white/72 px-3 py-2 text-[#171118] shadow-[0_14px_32px_rgba(40,28,54,.1)] backdrop-blur-md">
+          {subtitle ? (
+            <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div>
+          ) : null}
+          {title ? <div className="mt-0.5 truncate text-[14px] font-semibold tracking-tight">{title}</div> : null}
+        </div>
+      ) : null}
+    </article>
   );
 }
 
@@ -181,6 +570,190 @@ function heroCategoryBoost(category: Category, sneakerLed: boolean): number {
   return 0;
 }
 
+function productText(product: Product): string {
+  return [
+    product.brand,
+    product.name,
+    product.category,
+    product.retailer,
+    ...(product.searchTerms || []),
+    ...(product.vibes || []),
+    ...(product.occasions || []),
+  ].join(' ').toLowerCase();
+}
+
+function productHasTerm(product: Product, terms: string[]): boolean {
+  const text = ` ${productText(product).replace(/[^a-z0-9]+/g, ' ')} `;
+  return terms.some((term) => {
+    const normalizedTerm = term.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    return Boolean(normalizedTerm) && text.includes(` ${normalizedTerm} `);
+  });
+}
+
+function adjustedShoeImageClass(product: Product, base: string, surface: 'stacked' | 'flatlay' | 'feed'): string {
+  if (productHasTerm(product, BOOT_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[11%] scale-[.72]`;
+    if (surface === 'flatlay') return `${base} translate-y-[10%] scale-[.74]`;
+    return `${base} translate-y-[10%] scale-[.78]`;
+  }
+  if (productHasTerm(product, HEEL_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[8%] scale-[.82]`;
+    if (surface === 'flatlay') return `${base} translate-y-[7%] scale-[.86]`;
+    return `${base} translate-y-[7%] scale-[.88]`;
+  }
+  if (productHasTerm(product, FLAT_SHOE_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[7%] scale-[.86]`;
+    if (surface === 'flatlay') return `${base} translate-y-[6%] scale-[.9]`;
+    return `${base} translate-y-[7%] scale-[.9]`;
+  }
+  if (productHasTerm(product, LOW_PROFILE_SHOE_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[6%] scale-[.88]`;
+    if (surface === 'flatlay') return `${base} translate-y-[6%] scale-[.93]`;
+    return `${base} translate-y-[7%] scale-[.92]`;
+  }
+  if (surface === 'feed') return `${base} translate-y-[7%] scale-[.84]`;
+  if (surface === 'flatlay') return `${base} translate-y-[7%] scale-[.88]`;
+  return `${base} translate-y-[7%] scale-[.88]`;
+}
+
+function adjustedHatImageClass(product: Product, base: string, surface: 'stacked' | 'flatlay' | 'feed'): string {
+  if (productHasTerm(product, BEANIE_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[5%] scale-[.9]`;
+    return `${base} translate-y-[4%] scale-[.94]`;
+  }
+  if (productHasTerm(product, WIDE_HAT_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[4%] scale-[.82]`;
+    return `${base} translate-y-[4%] scale-[.88]`;
+  }
+  if (productHasTerm(product, BUCKET_HAT_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[4%] scale-[.96]`;
+    return `${base} translate-y-[4%] scale-[1]`;
+  }
+  if (productHasTerm(product, CAP_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[4%] scale-[1.04]`;
+    return `${base} translate-y-[4%] scale-[1.08]`;
+  }
+  if (surface === 'feed') return `${base} translate-y-[4%] scale-[.92]`;
+  return `${base} translate-y-[3%] scale-[.98]`;
+}
+
+function adjustedBagImageClass(product: Product, base: string, surface: 'stacked' | 'flatlay' | 'feed'): string {
+  if (productHasTerm(product, TOTE_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[3%] scale-[.78]`;
+    if (surface === 'flatlay') return `${base} translate-y-[3%] scale-[.82]`;
+    return `${base} translate-y-[3%] scale-[.84]`;
+  }
+  if (productHasTerm(product, MINI_BAG_TERMS)) {
+    if (surface === 'feed') return `${base} scale-[1]`;
+    return `${base} scale-[1.04]`;
+  }
+  if (surface === 'feed') return `${base} scale-[.9]`;
+  if (surface === 'flatlay') return `${base} scale-[.92]`;
+  return `${base} scale-[.94]`;
+}
+
+function adjustedBottomImageClass(product: Product, base: string, surface: 'stacked' | 'flatlay' | 'feed'): string {
+  if (productHasTerm(product, SHORT_BOTTOM_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[-2%] scale-[.78]`;
+    if (surface === 'flatlay') return `${base} translate-y-[-3%] scale-[.82]`;
+    return `${base} translate-y-[-2%] scale-[.84]`;
+  }
+  if (productHasTerm(product, SKIRT_BOTTOM_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[1%] scale-[.9]`;
+    if (surface === 'flatlay') return `${base} translate-y-[1%] scale-[.94]`;
+    return `${base} translate-y-[1%] scale-[.96]`;
+  }
+  if (productHasTerm(product, LONG_BOTTOM_TERMS)) {
+    if (surface === 'feed') return `${base} translate-y-[2%] scale-[.98]`;
+    if (surface === 'flatlay') return `${base} translate-y-[1%] scale-[1]`;
+    return `${base} translate-y-[1%] scale-[1.02]`;
+  }
+  return base;
+}
+
+function adjustedJewelryImageClass(product: Product, base: string, surface: 'stacked' | 'flatlay' | 'feed'): string {
+  if (productHasTerm(product, JEWELRY_SMALL_TERMS)) {
+    if (surface === 'feed') return `${base} scale-[.68]`;
+    if (surface === 'flatlay') return `${base} scale-[.72]`;
+    return `${base} scale-[.74]`;
+  }
+  if (productHasTerm(product, JEWELRY_TALL_TERMS)) {
+    if (surface === 'feed') return `${base} scale-[.78]`;
+    if (surface === 'flatlay') return `${base} scale-[.84]`;
+    return `${base} scale-[.86]`;
+  }
+  if (surface === 'feed') return `${base} scale-[.76]`;
+  if (surface === 'flatlay') return `${base} scale-[.8]`;
+  return `${base} scale-[.82]`;
+}
+
+function stackedFitImageClass(product: Product): string {
+  const base = STACKED_FIT_IMAGE_CLASSES[product.category];
+  if (product.category === 'shoes') {
+    return adjustedShoeImageClass(product, base, 'stacked');
+  }
+  if (product.category === 'hat') {
+    return adjustedHatImageClass(product, base, 'stacked');
+  }
+  if (product.category === 'bag') {
+    return adjustedBagImageClass(product, base, 'stacked');
+  }
+  if (product.category === 'bottom') {
+    return adjustedBottomImageClass(product, base, 'stacked');
+  }
+  if (product.category === 'jewelry') {
+    return adjustedJewelryImageClass(product, base, 'stacked');
+  }
+  if (product.category === 'eyewear') return `${base} scale-[.84]`;
+  return base;
+}
+
+function flatlayImageClass(product: Product): string {
+  const base = FITS_AI_FLATLAY_IMAGE_CLASSES[product.category];
+  if (product.category === 'shoes') {
+    return adjustedShoeImageClass(product, base, 'flatlay');
+  }
+  if (product.category === 'hat') {
+    return adjustedHatImageClass(product, base, 'flatlay');
+  }
+  if (product.category === 'bag') {
+    return adjustedBagImageClass(product, base, 'flatlay');
+  }
+  if (product.category === 'bottom') {
+    return adjustedBottomImageClass(product, base, 'flatlay');
+  }
+  if (product.category === 'jewelry') {
+    return adjustedJewelryImageClass(product, base, 'flatlay');
+  }
+  if (product.category === 'eyewear') return `${base} scale-[.84]`;
+  return base;
+}
+
+function feedTileImageClass(product: Product, role: 'hero' | 'support'): string {
+  const shadow = role === 'hero'
+    ? 'drop-shadow-[0_34px_26px_rgba(0,0,0,.28)]'
+    : 'drop-shadow-[0_24px_20px_rgba(0,0,0,.24)]';
+  const base = `h-full w-full object-contain p-0 ${shadow}`;
+
+  if (product.category === 'shoes') {
+    return adjustedShoeImageClass(product, base, 'feed');
+  }
+  if (product.category === 'hat') {
+    return adjustedHatImageClass(product, base, 'feed');
+  }
+  if (product.category === 'bag') {
+    return adjustedBagImageClass(product, base, 'feed');
+  }
+  if (product.category === 'bottom') {
+    return adjustedBottomImageClass(product, base, 'feed');
+  }
+  if (product.category === 'jewelry') {
+    return adjustedJewelryImageClass(product, base, 'feed');
+  }
+  if (product.category === 'eyewear') return `${base} scale-[.82]`;
+  return base;
+}
+
 function FeedOutfitBoard({
   products,
   byCategory,
@@ -245,7 +818,8 @@ function FeedFrame({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[34px] border border-white/14 bg-[radial-gradient(circle_at_22%_15%,rgba(255,245,226,.35),transparent_32%),linear-gradient(135deg,#f7eee1_0%,#dcc9b8_48%,#9f8270_100%)] p-3 shadow-[0_32px_80px_rgba(0,0,0,.45)] ${className}`}
+      className={`relative overflow-hidden rounded-[34px] border border-white/14 bg-[radial-gradient(circle_at_22%_15%,rgba(255,245,226,.35),transparent_32%),linear-gradient(135deg,#fbf8f1_0%,#eadccc_54%,#c3a996_100%)] p-3 shadow-[0_32px_80px_rgba(0,0,0,.45)] ${className}`}
+      data-feed-scale-system="silhouette-v2"
     >
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,.36),transparent_36%,rgba(28,18,13,.18)_100%)]" />
       <div className="relative h-full">{children}</div>
@@ -261,14 +835,17 @@ function HeroTile({
   onImageUnavailable?: (product: Product) => void;
 }) {
   return (
-    <article className="relative h-full w-full overflow-hidden rounded-[28px] border border-white/48 bg-[#fffaf3]/82 shadow-[0_20px_42px_rgba(68,42,26,.18)]">
-      <ProductImage
-        product={product}
-        loading="eager"
-        wrapperClassName="h-full w-full"
-        className="h-full w-full object-contain p-3"
-        onUnavailable={onImageUnavailable}
-      />
+    <article className="relative h-full w-full overflow-visible rounded-[28px] bg-transparent">
+      <ProductTileLink product={product} className="block h-full w-full overflow-visible">
+        <ProductImage
+          product={product}
+          transparentOnly
+          loading="eager"
+          wrapperClassName="h-full w-full overflow-visible bg-transparent"
+          className={feedTileImageClass(product, 'hero')}
+          onUnavailable={onImageUnavailable}
+        />
+      </ProductTileLink>
       <HeroBrandCaption product={product} />
     </article>
   );
@@ -285,15 +862,50 @@ function SupportTile({
 }) {
   return (
     <article
-      className={`relative h-full w-full overflow-hidden rounded-[22px] border border-white/42 bg-[#fffaf3]/78 shadow-[0_14px_28px_rgba(68,42,26,.13)] ${rotation}`}
+      className={`relative h-full w-full overflow-visible rounded-[22px] bg-transparent ${rotation}`}
     >
-      <ProductImage
-        product={product}
-        wrapperClassName="h-full w-full"
-        className="h-full w-full object-contain p-2"
-        onUnavailable={onImageUnavailable}
-      />
+      <ProductTileLink product={product} className="block h-full w-full overflow-visible">
+        <ProductImage
+          product={product}
+          transparentOnly
+          wrapperClassName="h-full w-full overflow-visible bg-transparent"
+          className={feedTileImageClass(product, 'support')}
+          onUnavailable={onImageUnavailable}
+        />
+      </ProductTileLink>
     </article>
+  );
+}
+
+function ProductTileLink({
+  product,
+  className,
+  disabled = false,
+  fitSlot,
+  children,
+}: {
+  product: Product;
+  className?: string;
+  disabled?: boolean;
+  fitSlot?: Category;
+  children: React.ReactNode;
+}) {
+  const outboundUrl = getProductOutboundUrl(product);
+  if (disabled || !outboundUrl) {
+    return <div className={className} data-stacked-fit-slot={fitSlot}>{children}</div>;
+  }
+  return (
+    <a
+      href={outboundUrl}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`Shop ${product.brand} ${product.name}`}
+      className={className}
+      data-product-link={product.id}
+      data-stacked-fit-slot={fitSlot}
+    >
+      {children}
+    </a>
   );
 }
 

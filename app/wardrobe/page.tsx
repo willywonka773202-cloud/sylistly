@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   BarChart3,
@@ -12,14 +12,13 @@ import {
   Plus,
   ShoppingBag,
   Sparkles,
-  Trash2,
   Wand2,
   X,
 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
-import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
-import { isRenderableProduct } from '@/lib/product-image-quality';
+import { ALL_CATALOG_PRODUCTS } from '@/lib/client-catalog';
+import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
@@ -47,7 +46,7 @@ function uniqueProducts(products: Product[], limit: number, excludedIds = new Se
   const seen = new Set<string>();
   const out: Product[] = [];
   for (const product of products) {
-    if (!isRenderableProduct(product)) continue;
+    if (!isTransparentRenderableProduct(product)) continue;
     if (seen.has(product.id) || excludedIds.has(product.id)) continue;
     seen.add(product.id);
     out.push(product);
@@ -72,8 +71,22 @@ export default function WardrobePage() {
   const [showWishlist, setShowWishlist] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  const closetItems = useMemo(() => items.filter((entry) => entry.status === 'closet'), [items]);
-  const wishlistItems = useMemo(() => items.filter((entry) => entry.status === 'wishlist'), [items]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'wishlist') {
+      setShowWishlist(true);
+      setTab('Clothes');
+      window.history.replaceState(null, '', '/wardrobe');
+    }
+    if (params.get('tab') === 'insights') {
+      setTab('Insights');
+      window.history.replaceState(null, '', '/wardrobe');
+    }
+  }, []);
+
+  const displayableItems = useMemo(() => items.filter((entry) => isTransparentRenderableProduct(entry.product)), [items]);
+  const closetItems = useMemo(() => displayableItems.filter((entry) => entry.status === 'closet'), [displayableItems]);
+  const wishlistItems = useMemo(() => displayableItems.filter((entry) => entry.status === 'wishlist'), [displayableItems]);
   const visibleStatusItems = showWishlist ? wishlistItems : closetItems;
 
   const activeFilter = CATEGORY_FILTERS.find((option) => option.label === filterLabel) || CATEGORY_FILTERS[0];
@@ -96,7 +109,7 @@ export default function WardrobePage() {
   const estClosetValueCents = closetItems.reduce((sum, entry) => sum + (entry.product.priceCents || 0), 0);
   const estWishlistValueCents = wishlistItems.reduce((sum, entry) => sum + (entry.product.priceCents || 0), 0);
   const categoriesCovered = new Set(closetItems.map((entry) => entry.product.category)).size;
-  const wardrobeProductIds = useMemo(() => new Set(items.map((entry) => entry.productId)), [items]);
+  const wardrobeProductIds = useMemo(() => new Set(displayableItems.map((entry) => entry.productId)), [displayableItems]);
   const categoryDistribution = useMemo(() => {
     return CATEGORY_ORDER.map((category) => ({
       category,
@@ -106,11 +119,11 @@ export default function WardrobePage() {
   }, [closetItems, wishlistItems]);
   const topBrands = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const entry of items) {
+    for (const entry of displayableItems) {
       counts.set(entry.product.brand, (counts.get(entry.product.brand) || 0) + 1);
     }
     return Array.from(counts.entries()).sort((left, right) => right[1] - left[1]).slice(0, 5);
-  }, [items]);
+  }, [displayableItems]);
   const gapSuggestions = useMemo(() => {
     const feedProducts = feedPosts.flatMap((post) =>
       Object.values(post.items).filter((product): product is Product => Boolean(product)),
@@ -120,7 +133,7 @@ export default function WardrobePage() {
       const fromFeed = feedProducts.filter((product) => product.category === category);
       const fromCatalog = ALL_CATALOG_PRODUCTS
         .filter((product) => product.category === category)
-        .filter(isRenderableProduct)
+        .filter(isTransparentRenderableProduct)
         .sort((left, right) => {
           const leftScore = (left.imageQuality === 'good' ? 10 : 0) + (left.metadata?.featured ? 6 : 0) + (left.priceCents ? 2 : 0);
           const rightScore = (right.imageQuality === 'good' ? 10 : 0) + (right.metadata?.featured ? 6 : 0) + (right.priceCents ? 2 : 0);
@@ -397,6 +410,7 @@ function ClothesTab({
               <div className="aspect-square overflow-hidden">
                 <ProductImage
                   product={item.product}
+                  transparentOnly
                   displayMode="closet"
                   className="h-full w-full object-contain p-3 drop-shadow-[0_12px_14px_rgba(60,32,18,.14)] motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.04]"
                 />
@@ -591,7 +605,7 @@ function InsightsTab({
               >
                 <button type="button" onClick={() => onBuildAround(product)} className="block w-full text-left">
                   <div className="relative h-[132px]">
-                    <ProductImage product={product} displayMode="closet" />
+                    <ProductImage product={product} displayMode="closet" transparentOnly />
                     <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
                       {product.category}
                     </div>

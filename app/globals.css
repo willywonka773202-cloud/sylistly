@@ -61,6 +61,19 @@ body {
   }
 }
 
+@keyframes sy-fit-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: saturate(1);
+  }
+
+  50% {
+    transform: translateY(-3px) scale(1.006);
+    filter: saturate(1.035);
+  }
+}
+
 @layer utilities {
   .sy-enter {
     animation: sy-rise-in 220ms ease-out both;
@@ -68,6 +81,16 @@ body {
 
   .sy-sheet-enter {
     animation: sy-sheet-up 240ms cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .sy-fit-float {
+    animation: sy-fit-float 5.8s ease-in-out infinite both;
+    will-change: transform, filter;
+  }
+
+  .sy-fit-float-soft {
+    animation: sy-fit-float 7.2s ease-in-out infinite both;
+    will-change: transform, filter;
   }
 
   .sy-press {
@@ -172,7 +195,9 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .sy-enter,
-  .sy-sheet-enter {
+  .sy-sheet-enter,
+  .sy-fit-float,
+  .sy-fit-float-soft {
     animation: none;
   }
 

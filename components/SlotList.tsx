@@ -4,7 +4,7 @@ import { type ComponentType, type MouseEvent, useState } from 'react';
 import { ExternalLink, Footprints, Glasses, Hand, PackageSearch, RotateCcw, Shirt, ShoppingBag, Watch } from 'lucide-react';
 import { ProductImage } from '@/components/ProductImage';
 import { CATEGORY_ORDER, type Category } from '@/lib/types';
-import { hasUsableProductImage } from '@/lib/product-image-quality';
+import { hasTransparentProductImage } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { useFit } from '@/store/fit';
 
@@ -43,7 +43,7 @@ export function SlotList({ onOpenSearch }: Props) {
       <div className="flex min-w-max gap-3">
         {CATEGORY_ORDER.map((cat) => {
           const p = items[cat];
-          const renderableProduct = hasUsableProductImage(p) && !failedImageIds.has(p.id) ? p : null;
+          const renderableProduct = hasTransparentProductImage(p) && !failedImageIds.has(p.id) ? p : null;
           const Icon = ICONS[cat];
           const shopUrl = renderableProduct ? getProductOutboundUrl(renderableProduct) : '';
 
@@ -88,10 +88,11 @@ export function SlotList({ onOpenSearch }: Props) {
                 renderableProduct ? 'bg-[linear-gradient(180deg,#fffdf9_0%,#efe5dc_100%)] ring-1 ring-[#eadfd5]' : 'bg-[#efe5dc]'
               }`}
               >
-                {renderableProduct ? (
-                  <ProductImage
-                    product={renderableProduct}
-                    wrapperClassName="h-full w-full"
+                  {renderableProduct ? (
+                    <ProductImage
+                      product={renderableProduct}
+                      transparentOnly
+                      wrapperClassName="h-full w-full"
                     className="h-full w-full object-contain p-4 drop-shadow-[0_18px_24px_rgba(0,0,0,.18)]"
                     onUnavailable={(failedProduct) => {
                       setFailedImageIds((current) => new Set(current).add(failedProduct.id));

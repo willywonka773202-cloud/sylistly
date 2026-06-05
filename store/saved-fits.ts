@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { hydrateItemsFromCatalog } from '@/lib/catalog';
+import { hydrateItemsFromCatalog } from '@/lib/client-catalog';
+import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
 export interface SavedFitRecord {
@@ -32,14 +33,20 @@ function createTitle(items: Partial<Record<Category, Product>>, itemCount: numbe
   return `${brands.join(' + ')} fit`;
 }
 
+function transparentItemsOnly(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
+  return Object.fromEntries(
+    Object.entries(items).filter((entry): entry is [Category, Product] =>
+      Boolean(entry[1] && isTransparentRenderableProduct(entry[1])),
+    ),
+  ) as Partial<Record<Category, Product>>;
+}
+
 export const useSavedFits = create<SavedFitsState>()(
   persist(
     (set) => ({
       fits: [],
       saveFit: (items) => {
-        const selected = Object.fromEntries(
-          Object.entries(items).filter(([, product]) => Boolean(product)),
-        ) as Partial<Record<Category, Product>>;
+        const selected = transparentItemsOnly(items);
         const itemCount = Object.keys(selected).length;
 
         if (!itemCount) return null;
@@ -65,17 +72,25 @@ export const useSavedFits = create<SavedFitsState>()(
     }),
     {
       name: 'sylistly.saved-fits.v1',
-      version: 2,
+      version: 3,
       migrate: (persistedState) => {
         const state = persistedState as SavedFitsState | undefined;
         if (!state?.fits) return state as SavedFitsState;
 
         return {
           ...state,
-          fits: state.fits.map((fit) => ({
-            ...fit,
-            items: hydrateItemsFromCatalog(fit.items),
-          })),
+          fits: state.fits
+            .map((fit) => {
+              const items = transparentItemsOnly(hydrateItemsFromCatalog(fit.items));
+              const itemCount = Object.keys(items).length;
+              return {
+                ...fit,
+                items,
+                itemCount,
+                totalCents: Object.values(items).reduce((sum, product) => sum + (product?.priceCents || 0), 0),
+              };
+            })
+            .filter((fit) => fit.itemCount > 0),
         };
       },
     },

@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-06-04T21:35:16.369Z",
+  "apply": false,
+  "provider": "local",
+  "model": "local-heuristic",
+  "enabled": false,
+  "hasProviderKey": false,
+  "requestedLimit": 3,
+  "analyzed": 3,
+  "cacheSizeBefore": 0,
+  "cacheSizeAfter": 3,
+  "outputFile": "data/catalog-vision-cache.json",
+  "notes": [
+    "This script analyzes only real stylist-catalog products that already pass transparent cutout and exact commerce-link gates.",
+    "Run with --apply to write cache entries. Without --apply, it only writes the report.",
+    "If CATALOG_VISION_ENABLED is off or no provider key exists, analysis uses deterministic local heuristics.",
+    "The app consumes cached metadata at runtime so feed/build pages do not make live vision calls."
+  ]
+}

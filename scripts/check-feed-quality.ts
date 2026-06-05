@@ -39,7 +39,6 @@ import {
   getCollectionProducts,
   getShoeId,
   LAUNCH_COLLECTIONS,
-  OUTFIT_FORMULAS,
   outfitFullSignature,
   outfitRequiredSignature,
 } from '../lib/catalog';
@@ -135,10 +134,6 @@ const FIRST_SCREEN_POST_IDS = [
   'feed-plan-edgy-masc-tech',
   'feed-plan-night-femme-gold',
 ];
-
-function formulaLabel(id?: string): string | undefined {
-  return OUTFIT_FORMULAS.find((formula) => formula.id === id)?.label;
-}
 
 function prioritizeFirstScreenPosts<T extends FeedPostShape>(posts: T[]): T[] {
   const order = new Map(FIRST_SCREEN_POST_IDS.map((id, index) => [id, index]));

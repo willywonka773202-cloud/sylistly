@@ -24,8 +24,12 @@ cp .env.example .env.local
 # fill in keys — see §Environment below
 
 # 3. database
-# In Supabase SQL editor, run the migration:
+# In Supabase SQL editor, run the migrations in order:
 #   supabase/migrations/0001_initial.sql
+#   supabase/migrations/0002_products_catalog_expansion.sql
+#
+# Then seed the current runtime catalog:
+#   npm run seed:catalog
 
 # 4. dev
 pnpm dev
@@ -63,16 +67,48 @@ CATALOG_CATEGORY_FILTER=shoes npm run catalog:build
 CATALOG_MAX_TASKS=10 npm run catalog:build
 ```
 
-This writes real product records into [`data/photo-catalog.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/photo-catalog.json). Once populated, `/api/search` prefers that photo-backed catalog before the starter placeholder catalog.
+This writes real product records into [`data/photo-catalog.json`](/Users/willlambert/Documents/GitHub/sylistly/data/photo-catalog.json). Once populated, `/api/search` prefers that photo-backed catalog before the starter merchant catalog.
 
 The importer now rotates through a saved queue cursor in [`data/catalog-build-state.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/catalog-build-state.json), so repeated runs keep working through different brand/category queries instead of starting from the top every time.
+
+## New Drop Catalog Refresh
+
+The drop catalog pulls current products from configured brand collection feeds in [`data/drop-sources.json`](/Users/willlambert/Documents/GitHub/sylistly/data/drop-sources.json), stores them in [`data/drop-catalog.json`](/Users/willlambert/Documents/GitHub/sylistly/data/drop-catalog.json), and marks new items as `imageStatus=needs-cutout` until transparent PNGs are reviewed.
+
+```bash
+# Preview new drops without writing files
+npm run catalog:ingest-drops
+
+# Write data/drop-catalog.json, then rebuild the client transparent catalog
+npm run catalog:refresh
+
+# Also upsert newly ingested products into Supabase
+npm run catalog:ingest-drops -- --apply --supabase
+```
+
+After ingesting drops, run the cutout pipeline before expecting them to show in the transparent outfit builder:
+
+```bash
+npx jiti scripts/prepare-cutout-candidates.ts
+python3 scripts/generate-cutouts-local.py --apply
+npx jiti scripts/register-cutouts.ts --apply
+npm run catalog:client
+```
+
+`/api/catalog-refresh` is protected by `Authorization: Bearer $CATALOG_REFRESH_TOKEN` or `Authorization: Bearer $CRON_SECRET`. `vercel.json` schedules it daily at 10:00 UTC, and it requires `NEXT_PUBLIC_SUPABASE_URL` plus `SUPABASE_SERVICE_ROLE_KEY`. Set `CATALOG_REFRESH_SEARCHAPI=1` and `SEARCHAPI_KEY` only when you want scheduled SearchAPI-backed sources in addition to free brand feeds.
 
 ```
 # Required
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+CRON_SECRET=
+CATALOG_REFRESH_TOKEN=
 ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+OLLAMA_API_KEY=
+OLLAMA_DEFAULT_MODEL=gpt-oss:120b
+OLLAMA_API_BASE_URL=https://ollama.com/api
 SEARCHAPI_KEY=
 
 # Recommended
@@ -150,12 +186,12 @@ lib/
   affiliate.ts           Skimlinks/Rakuten URL wrapping
   products.ts            DB queries
   types.ts               shared types
-  mock-products.ts       fallback dataset for local dev
 store/
   fit.ts                 Zustand store for current fit
 supabase/
   migrations/
     0001_initial.sql     schema from MASTER_PROMPT §8
+    0002_products_catalog_expansion.sql
 ```
 
 ## Deploy

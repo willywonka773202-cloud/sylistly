@@ -1,4 +1,5 @@
 'use client';
+import dynamic from 'next/dynamic';
 import {
   Bookmark,
   Check,
@@ -15,22 +16,34 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import { hasTransparentProductImage, isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import { useWardrobe } from '@/store/wardrobe';
 
 const COLLECTIONS = ['All', 'Clean', 'Streetwear', 'Gym', 'Date', 'Travel', 'Work'] as const;
 type Collection = (typeof COLLECTIONS)[number];
 
+const CheckoutSheet = dynamic(
+  () => import('@/components/CheckoutSheet').then((module) => module.CheckoutSheet),
+  { ssr: false, loading: () => null },
+);
+
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
+}
+
+function formatCompactPrice(cents: number): string {
+  if (!cents) return '—';
+  const dollars = cents / 100;
+  if (dollars >= 1000) return `$${Math.round(dollars / 100) / 10}k`;
+  return `$${Math.round(dollars).toLocaleString()}`;
 }
 
 function formatDate(value: string): string {
@@ -91,7 +104,7 @@ export default function SavedPage() {
         .map((fit) => {
           const visualEntries = Object.entries(fit.items).filter(
             (entry): entry is [Category, Product] =>
-              isHighConfidenceRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id),
+              hasTransparentProductImage(entry[1]) && isHighConfidenceRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id),
           );
           const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
           const visualProducts = visualEntries.map(([, product]) => product);
@@ -217,7 +230,7 @@ export default function SavedPage() {
             onChange={setActiveFilter}
             counts={collectionCounts}
           />
-          <CreateCollectionFuture />
+          <SavedActionPanel />
           {visibleFits.length === 0 ? (
             <section className="rounded-[20px] border border-white/10 bg-white/[0.04] p-5 text-center">
               <p className="text-[12px] leading-relaxed text-muted-2">
@@ -242,6 +255,7 @@ export default function SavedPage() {
                 <button
                   key={fit.id}
                   type="button"
+                  aria-label={`Open saved fit ${fit.title}`}
                   onClick={() => setDetailFitId(fit.id)}
                   className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] text-left shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(246,48,107,.32)]"
                 >
@@ -253,6 +267,7 @@ export default function SavedPage() {
                       >
                         <ProductImage
                           product={product}
+                          transparentOnly
                           wrapperClassName="h-full w-full"
                           className="h-full w-full object-contain p-1.5 motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.04]"
                           onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
@@ -328,8 +343,8 @@ function SavedStats({
       </div>
       <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
         <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Avg fit</div>
-        <div className="mt-0.5 truncate font-serif text-[20px] font-semibold text-ink">
-          {stats.avgPriceCents > 0 ? formatPrice(stats.avgPriceCents) : '—'}
+        <div className="mt-0.5 whitespace-nowrap font-serif text-[18px] font-semibold leading-none text-ink">
+          {formatCompactPrice(stats.avgPriceCents)}
         </div>
       </div>
       <div className="rounded-[16px] border border-accent/30 bg-accent/10 p-2.5">
@@ -384,7 +399,7 @@ function CollectionFilters({
   );
 }
 
-function CreateCollectionFuture() {
+function SavedActionPanel() {
   return (
     <section className="rounded-[20px] border border-dashed border-white/12 bg-white/[0.025] p-4">
       <div className="flex items-start gap-3">
@@ -392,14 +407,29 @@ function CreateCollectionFuture() {
           <Layers size={16} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Create collection</div>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
-            Future: user-named collections will organize real saved fits. Current filters are inferred from each fit.
-          </p>
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Saved actions</div>
+          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">Turn saved fits into the next build, feed post, or shopping session.</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Link
+              href="/build"
+              className="inline-flex items-center justify-center rounded-full bg-accent px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-95"
+            >
+              Build
+            </Link>
+            <Link
+              href="/feed"
+              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+            >
+              Feed
+            </Link>
+            <Link
+              href="/discover"
+              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+            >
+              Shop
+            </Link>
+          </div>
         </div>
-        <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[8px] font-black uppercase tracking-[.14em] text-muted">
-          Soon
-        </span>
       </div>
     </section>
   );
@@ -475,6 +505,7 @@ function SavedDetailSheet({
               >
                 <ProductImage
                   product={product}
+                  transparentOnly
                   displayMode="moodboard"
                   onUnavailable={onProductFailed}
                 />
@@ -494,7 +525,7 @@ function SavedDetailSheet({
                   className="flex h-[64px] w-[180px] flex-none items-center gap-2 rounded-[14px] border border-white/10 bg-white/[0.04] p-1.5"
                 >
                   <div className="h-full w-[60px] flex-none overflow-hidden">
-                    <ProductImage product={product} displayMode="thumbnail" />
+                    <ProductImage product={product} displayMode="thumbnail" transparentOnly />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[8px] font-bold uppercase tracking-[.14em] text-accent">{category}</div>

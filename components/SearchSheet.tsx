@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, RotateCcw, X, Search as SearchIcon } from 'lucide-react';
 import { ProductImage } from './ProductImage';
 import { useFit } from '@/store/fit';
@@ -8,7 +8,7 @@ import {
   frameBiasDescription,
   frameDisplayLabel,
 } from '@/lib/search-frame';
-import { hasUsableProductImage, sortImageBackedProducts } from '@/lib/product-image-quality';
+import { hasUsableProductImage, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -144,11 +144,9 @@ export function SearchSheet({
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDemoResults, setIsDemoResults] = useState(false);
   const [resultSource, setResultSource] = useState<'catalog' | 'live' | null>(null);
-  const [catalogKind, setCatalogKind] = useState<'photo' | 'starter' | 'blend' | null>(null);
+  const [catalogKind, setCatalogKind] = useState<'database' | 'photo' | 'starter' | 'blend' | 'drops' | 'searchapi-quality' | null>(null);
   const [searchMode, setSearchMode] = useState<'catalog-only' | 'catalog-preview' | 'hybrid' | null>(null);
-  const [canUseDemo, setCanUseDemo] = useState(false);
   const [readyImageIds, setReadyImageIds] = useState<Set<string>>(new Set());
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeResultIndex, setActiveResultIndex] = useState(0);
@@ -161,46 +159,29 @@ export function SearchSheet({
   const fitItems = useFit((s) => s.items);
   const displayItems = itemsOverride || fitItems;
   const selectedItem = activeCategory ? displayItems[activeCategory] : null;
-  const demoSupported = process.env.NODE_ENV === 'development';
   const currentCategory = activeCategory || category;
   const suggestions = currentCategory ? TRENDING[frame][currentCategory] : [];
+  const currentCategoryRef = useRef<Category | null>(currentCategory);
+  const queryRef = useRef(query);
+  const hasResultsRef = useRef(results !== null);
 
   useEffect(() => {
-    if (!open || !category) return;
-    const product = displayItems[category];
-    const autoQuery = initialQuery?.trim() || buildSimilarQuery(product, category, TRENDING[frame][category][0] || '');
-    setActiveCategory(category);
-    setQuery(autoQuery);
-    setResults(null);
-    setError(null);
-    setIsDemoResults(false);
-    setResultSource(null);
-    setCatalogKind(null);
-    setSearchMode(null);
-    setCanUseDemo(false);
-    setReadyImageIds(new Set());
-    setFailedImageIds(new Set());
-    setActiveResultIndex(0);
-    setSearchPriceMax(priceMax);
-    setCustomPriceInput(
-      priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
-    );
-    void runSearch(autoQuery, category, 'live', priceMax);
-  }, [open, category, initialQuery, frame, priceMax]);
+    currentCategoryRef.current = currentCategory;
+  }, [currentCategory]);
 
   useEffect(() => {
-    if (!open || !currentCategory || results === null) return;
-    void runSearch(query, currentCategory, 'live', searchPriceMax);
-  }, [searchPriceMax]);
+    queryRef.current = query;
+  }, [query]);
 
-  useEffect(() => () => activeRequest.current?.abort(), []);
+  useEffect(() => {
+    hasResultsRef.current = results !== null;
+  }, [results]);
 
-  async function runSearch(
+  const runSearch = useCallback(async (
     q: string,
     cat: Category,
-    mode: 'live' | 'demo' = 'live',
     overridePriceMax?: number | null,
-  ) {
+  ) => {
     const trimmed = q.trim();
     const effectivePriceMax = overridePriceMax === undefined ? searchPriceMax : overridePriceMax;
 
@@ -210,20 +191,25 @@ export function SearchSheet({
     const timeout = setTimeout(() => controller.abort(), 15_000);
     setLoading(true);
     setError(null);
-    setCanUseDemo(false);
 
     try {
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, category: cat, mode, frame, priceMax: effectivePriceMax }),
+        body: JSON.stringify({
+          query: trimmed,
+          category: cat,
+          frame,
+          priceMax: effectivePriceMax,
+          transparentOnly: true,
+          exactOnly: true,
+        }),
         signal: controller.signal,
       });
       const data = await response.json();
 
       if (!response.ok) {
         setResults([]);
-        setIsDemoResults(false);
         setReadyImageIds(new Set());
         setFailedImageIds(new Set());
         setActiveResultIndex(0);
@@ -238,12 +224,10 @@ export function SearchSheet({
             ? 'catalog-preview'
             : null,
         );
-        setCanUseDemo(Boolean(data.demoAvailable));
         setError(typeof data.error === 'string' ? data.error : 'Search failed.');
         return;
       }
 
-      setIsDemoResults(Boolean(data.mock));
       setReadyImageIds(new Set());
       setFailedImageIds(new Set());
       setActiveResultIndex(0);
@@ -251,6 +235,12 @@ export function SearchSheet({
       setCatalogKind(
         data.catalogKind === 'blend'
           ? 'blend'
+          : data.catalogKind === 'database'
+          ? 'database'
+          : data.catalogKind === 'drops'
+          ? 'drops'
+          : data.catalogKind === 'searchapi-quality'
+          ? 'searchapi-quality'
           : data.catalogKind === 'photo'
           ? 'photo'
           : data.catalogKind === 'starter'
@@ -266,20 +256,18 @@ export function SearchSheet({
           ? 'catalog-preview'
           : null,
       );
-      setResults(Array.isArray(data.products) ? sortImageBackedProducts(data.products) : []);
+      setResults(Array.isArray(data.products) ? sortTransparentFeedRenderableProducts(data.products) : []);
     } catch (error) {
       if (controller.signal.aborted && activeRequest.current !== controller) {
         return;
       }
       setResults([]);
-      setIsDemoResults(false);
       setReadyImageIds(new Set());
       setFailedImageIds(new Set());
       setActiveResultIndex(0);
       setResultSource(null);
       setCatalogKind(null);
       setSearchMode(null);
-      setCanUseDemo(false);
       setError(
         error instanceof Error && error.name === 'AbortError'
           ? 'Search timed out. Please try again.'
@@ -290,7 +278,36 @@ export function SearchSheet({
       if (activeRequest.current === controller) activeRequest.current = null;
       setLoading(false);
     }
-  }
+  }, [frame, searchPriceMax]);
+
+  useEffect(() => {
+    if (!open || !category) return;
+    const product = displayItems[category];
+    const autoQuery = initialQuery?.trim() || buildSimilarQuery(product, category, TRENDING[frame][category][0] || '');
+    setActiveCategory(category);
+    setQuery(autoQuery);
+    setResults(null);
+    setError(null);
+    setResultSource(null);
+    setCatalogKind(null);
+    setSearchMode(null);
+    setReadyImageIds(new Set());
+    setFailedImageIds(new Set());
+    setActiveResultIndex(0);
+    setSearchPriceMax(priceMax);
+    setCustomPriceInput(
+      priceMax && ![100, 250, 500].includes(Math.round(priceMax)) ? String(Math.round(priceMax)) : '',
+    );
+    void runSearch(autoQuery, category, priceMax);
+  }, [category, displayItems, frame, initialQuery, open, priceMax, runSearch]);
+
+  useEffect(() => {
+    const activeCategoryRef = currentCategoryRef.current;
+    if (!open || !activeCategoryRef || !hasResultsRef.current) return;
+    void runSearch(queryRef.current, activeCategoryRef, searchPriceMax);
+  }, [open, runSearch, searchPriceMax]);
+
+  useEffect(() => () => activeRequest.current?.abort(), []);
 
   function chooseCategory(nextCategory: Category) {
     if (nextCategory === currentCategory) return;
@@ -299,18 +316,16 @@ export function SearchSheet({
     setQuery('');
     setResults(null);
     setError(null);
-    setIsDemoResults(false);
     setResultSource(null);
     setCatalogKind(null);
     setSearchMode(null);
-    setCanUseDemo(false);
     setReadyImageIds(new Set());
     setFailedImageIds(new Set());
     setActiveResultIndex(0);
   }
 
   const candidateResults = results
-    ? sortImageBackedProducts(results).filter((product) => !failedImageIds.has(product.id))
+    ? sortTransparentFeedRenderableProducts(results).filter((product) => !failedImageIds.has(product.id))
     : results;
   const activeCandidate = candidateResults?.[activeResultIndex] || null;
   const activeImageReady = activeCandidate ? readyImageIds.has(activeCandidate.id) : false;
@@ -340,7 +355,7 @@ export function SearchSheet({
       setFailedImageIds((current) => new Set(current).add(activeCandidate.id));
     }, 8_000);
     return () => window.clearTimeout(timer);
-  }, [activeCandidate?.id, activeImageReady]);
+  }, [activeCandidate, activeImageReady]);
 
   function goToPreviousResult() {
     setActiveResultIndex((current) => Math.max(0, current - 1));
@@ -429,6 +444,7 @@ export function SearchSheet({
                           {renderableProduct ? (
                             <ProductImage
                               product={renderableProduct}
+                              transparentOnly
                               wrapperClassName="h-full w-full"
                               className="h-full w-full object-contain p-2"
                               onUnavailable={(failedProduct) => {
@@ -463,13 +479,11 @@ export function SearchSheet({
                     {frameDisplayLabel(frame)} search bias
                   </div>
                   <div className="mt-0.5 line-clamp-1">
-                    {isDemoResults
-                      ? 'Demo mode is on. These are local sample products for UI testing.'
-                      : searchMode === 'catalog-only'
+                    {searchMode === 'catalog-only'
                       ? `${frameBiasDescription(frame)} Results come from the stored catalog so the site can run without live API costs.`
                       : searchMode === 'catalog-preview'
-                      ? `${frameBiasDescription(frame)} Preview mode can use starter catalog items while the real photo catalog is built.`
-                      : `${frameBiasDescription(frame)} Search by brand, color, or vibe, or browse featured inventory for this slot.`}
+                      ? `${frameBiasDescription(frame)} Preview mode only shows image-backed merchant pieces while the catalog keeps expanding.`
+                      : `${frameBiasDescription(frame)} Search by brand, color, or vibe, or browse real merchant-backed inventory for this slot.`}
                   </div>
                 </div>
                 <div className="flex flex-none items-center gap-2">
@@ -480,15 +494,6 @@ export function SearchSheet({
                   >
                     Browse
                   </button>
-                  {demoSupported ? (
-                    <button
-                      type="button"
-                      onClick={() => void runSearch(query, currentCategory, 'demo')}
-                      className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
-                    >
-                      Demo
-                    </button>
-                  ) : null}
                 </div>
               </div>
             </div>
@@ -575,11 +580,15 @@ export function SearchSheet({
               <span>{resultLabel}</span>
               {activeCandidate ? (
                 <span>
-                  {isDemoResults
-                    ? 'Local sample data'
-                    : resultSource === 'catalog'
+                  {resultSource === 'catalog'
                     ? catalogKind === 'blend'
                       ? 'Photo catalog + starter catalog'
+                      : catalogKind === 'database'
+                      ? 'Merchant catalog'
+                      : catalogKind === 'drops'
+                      ? 'Drop catalog'
+                      : catalogKind === 'searchapi-quality'
+                      ? 'SearchAPI quality catalog'
                       : catalogKind === 'photo'
                       ? 'Real-photo catalog'
                       : searchMode === 'catalog-only'
@@ -607,15 +616,6 @@ export function SearchSheet({
                 ? (
                     <div className="py-10 text-center text-sm">
                       <div className="text-rose-300">{error}</div>
-                      {canUseDemo ? (
-                        <button
-                          type="button"
-                          onClick={() => void runSearch(query, currentCategory, 'demo')}
-                          className="mt-4 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
-                        >
-                          Use demo results
-                        </button>
-                      ) : null}
                     </div>
                   )
                 : candidateResults === null
@@ -663,6 +663,7 @@ export function SearchSheet({
                         <div className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
                           <ProductImage
                             product={activeCandidate}
+                            transparentOnly
                             loading="eager"
                             wrapperClassName="h-px w-px overflow-hidden"
                             className="h-px w-px object-contain"
@@ -704,6 +705,7 @@ export function SearchSheet({
                             <div className="absolute inset-x-12 bottom-5 h-6 rounded-full bg-[#c7b8aa]/42 blur-[11px]" />
                             <ProductImage
                               product={activeCandidate}
+                              transparentOnly
                               wrapperClassName="relative h-[min(160px,23dvh)] min-[390px]:h-[min(180px,24dvh)] w-full"
                               className="relative h-full w-full object-contain p-4 drop-shadow-[0_15px_20px_rgba(0,0,0,.22)]"
                               onAvailable={(product) => {

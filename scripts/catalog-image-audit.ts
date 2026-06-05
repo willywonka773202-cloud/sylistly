@@ -12,6 +12,7 @@
 // Exit code is always 0 — this is an advisory audit, not a release gate.
 
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
+import { DROP_CATALOG_PRODUCTS } from '../lib/drop-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
 import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
@@ -21,7 +22,7 @@ import type { Category, Product } from '../lib/types';
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog';
+type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog' | 'drop-catalog';
 
 interface ImageAuditRow {
   source: SourceLabel;
@@ -220,6 +221,7 @@ function buildRow(product: unknown, source: SourceLabel): ImageAuditRow | null {
 
 function audit(): ImageAuditReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
+    { label: 'drop-catalog', products: applyCatalogCutoutOverridesToProducts(DROP_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'brand-catalog', products: applyCatalogCutoutOverridesToProducts(BRAND_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'generated-catalog', products: applyCatalogCutoutOverridesToProducts(GENERATED_CATALOG_PRODUCTS as Product[]) as unknown[] },
     { label: 'photo-catalog', products: applyCatalogCutoutOverridesToProducts(PHOTO_CATALOG_PRODUCTS as Product[]) as unknown[] },
@@ -227,7 +229,7 @@ function audit(): ImageAuditReport {
 
   const rows: ImageAuditRow[] = [];
   const bySource: ImageAuditReport['bySource'] = [];
-  let totals = { products: 0, withTransparent: 0, withOriginalOnly: 0, withUnsafeImage: 0, needsCutoutPriority: 0 };
+  const totals = { products: 0, withTransparent: 0, withOriginalOnly: 0, withUnsafeImage: 0, needsCutoutPriority: 0 };
   const categoryCounts = new Map<string, number>();
 
   for (const { label, products } of sources) {

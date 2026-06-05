@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { GOOGLE_HOSTS, hasDirectRetailerUrl, safeHostname } from './retailer-url';
+import { GOOGLE_HOSTS, safeHostname } from './retailer-url';
 import type { Category, Product, SearchIntent } from './types';
 
 const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
@@ -251,11 +251,6 @@ function normalizeText(value: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
-}
-
-function isGoogleRetailerUrl(url: string): boolean {
-  const host = safeHostname(url);
-  return host ? GOOGLE_HOSTS.has(host) : false;
 }
 
 function isTrustedRetailer(retailer: string, host: string | null): boolean {

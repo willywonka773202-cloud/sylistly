@@ -168,6 +168,7 @@ export const useWardrobe = create<WardrobeState>()(
       name: 'sylistly.wardrobe.v1',
       version: 2,
       migrate: (persistedState, fromVersion) => {
+        void fromVersion;
         // Accept anything, normalize to a known-good array. Earlier
         // drafts of this store had a different shape; this migrate
         // path is what stops the .filter-is-not-a-function crash for

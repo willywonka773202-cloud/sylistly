@@ -26,15 +26,22 @@
 // existing audits.
 
 import { BRAND_CATALOG_PRODUCTS } from '../lib/brand-catalog';
+import { DROP_CATALOG_PRODUCTS } from '../lib/drop-catalog';
 import { GENERATED_CATALOG_PRODUCTS } from '../lib/generated-catalog';
 import { PHOTO_CATALOG_PRODUCTS } from '../lib/photo-catalog';
+import { SEARCHAPI_QUALITY_PRODUCTS } from '../lib/searchapi-quality-catalog';
 import {
   validateProduct,
   type ProductValidationIssueCode,
   type ProductValidationResult,
 } from '../lib/catalog-schemas/product.v2';
 
-type SourceLabel = 'brand-catalog' | 'generated-catalog' | 'photo-catalog';
+type SourceLabel =
+  | 'brand-catalog'
+  | 'generated-catalog'
+  | 'photo-catalog'
+  | 'drop-catalog'
+  | 'searchapi-quality-catalog';
 
 interface SourceStats {
   label: SourceLabel;
@@ -119,6 +126,8 @@ const FAKE_TERM_CODES: ProductValidationIssueCode[] = [
 
 function audit(): CatalogReport {
   const sources: Array<{ label: SourceLabel; products: unknown[] }> = [
+    { label: 'drop-catalog', products: DROP_CATALOG_PRODUCTS as unknown[] },
+    { label: 'searchapi-quality-catalog', products: SEARCHAPI_QUALITY_PRODUCTS as unknown[] },
     { label: 'brand-catalog', products: BRAND_CATALOG_PRODUCTS as unknown[] },
     { label: 'generated-catalog', products: GENERATED_CATALOG_PRODUCTS as unknown[] },
     { label: 'photo-catalog', products: PHOTO_CATALOG_PRODUCTS as unknown[] },
@@ -384,7 +393,10 @@ function main(): void {
     // type ergonomic during accumulation.
     const wire = {
       ...report,
-      sources: report.sources.map(({ _byCategoryAcc: _, ...rest }) => rest),
+      sources: report.sources.map(({ _byCategoryAcc, ...rest }) => {
+        void _byCategoryAcc;
+        return rest;
+      }),
     };
     console.log(JSON.stringify(wire, null, 2));
   } else {

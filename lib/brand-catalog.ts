@@ -1,4 +1,4 @@
-import type { Category, Product, SearchIntent } from './types';
+import type { Product, SearchIntent } from './types';
 import { presentationScore } from './presentation-score';
 import { hasDirectRetailerUrl } from './retailer-url';
 
