@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ExternalLink,
   Flame,
+  Heart,
   ShoppingBag,
   Sparkles,
   WandSparkles,
@@ -126,29 +127,25 @@ export default function HomePage() {
     router.push(`/build?lock=${encodeURIComponent(product.category)}`);
   }
 
-  function shopProduct(product: Product) {
-    const url = getProductOutboundUrl(product);
-    if (url && url !== '#') window.open(url, '_blank', 'noopener,noreferrer');
-  }
-
   return (
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
-      <header className="border-b border-hairline px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)]">
-        <div className="flex items-center justify-between">
+      <header className="px-5 pb-4 pt-[calc(env(safe-area-inset-top)+18px)]">
+        <div className="flex items-end justify-between">
           <div>
-            <div className="text-[8px] font-bold uppercase tracking-[.24em] text-accent">Sylistly</div>
-            <h1 className="mt-0.5 font-serif text-[26px] font-semibold leading-tight text-ink">Home</h1>
+            <div className="sy-eyebrow">Sylistly</div>
+            <h1 className="mt-1 font-serif text-[34px] font-semibold leading-[0.95] tracking-[-0.02em] text-ink">
+              Today&rsquo;s <span className="italic text-accent">looks</span>
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/stylist"
-              className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-[9px] font-black uppercase tracking-[.14em] text-accent transition active:scale-95 hover:border-accent/55"
-            >
-              <WandSparkles size={12} />
-              Syli
-            </Link>
-          </div>
+          <Link
+            href="/stylist"
+            className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent-soft px-3.5 py-2 text-[11px] font-bold uppercase tracking-[.12em] text-accent transition active:scale-95 hover:border-accent/55"
+          >
+            <WandSparkles size={13} />
+            Syli
+          </Link>
         </div>
+        <div className="sy-rule mt-4" />
       </header>
 
       <div className="flex-1 overflow-y-auto pb-32">
@@ -157,14 +154,14 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => router.push('/build')}
-              className="w-[68px] flex-none text-center transition active:scale-95"
+              className="w-[70px] flex-none text-center transition active:scale-95"
               aria-label="Create your outfit of the day"
             >
-              <span className="relative mx-auto grid h-[64px] w-[64px] place-items-center rounded-full bg-[#079783] text-[28px] font-black text-white shadow-[0_12px_26px_rgba(0,0,0,.24)]">
-                W
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-bg bg-accent text-[18px] leading-none text-white">+</span>
+              <span className="relative mx-auto grid h-[66px] w-[66px] place-items-center rounded-full bg-[linear-gradient(135deg,#ff3b63,#ff6e8a)] text-white shadow-[0_14px_30px_rgba(255,59,99,.4)]">
+                <Sparkles size={26} strokeWidth={2.1} />
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-bg bg-ink text-[16px] leading-none text-bg">+</span>
               </span>
-              <span className="mt-1 block truncate text-[11px] font-semibold text-muted-2">Your OOTD</span>
+              <span className="mt-1.5 block truncate text-[11px] font-semibold text-ink">Your OOTD</span>
             </button>
             {homeStories.map((post, index) => {
               const preview = Object.values(post.items).find(isLinkedCutoutProduct);
@@ -198,38 +195,41 @@ export default function HomePage() {
         </section>
 
         {/* Focused launch */}
-        <section className="px-4 pt-4">
-          <div className="sy-card-strong sy-enter rounded-[30px] p-5">
+        <section className="px-5 pt-5">
+          <div className="sy-card-strong sy-enter overflow-hidden rounded-card-lg p-6">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="sy-eyebrow">Today</div>
-                <h2 className="mt-2 font-serif text-[34px] font-semibold leading-[.9] text-ink">
-                  Build. Save. Edit.
+                <div className="sy-eyebrow">AI Stylist</div>
+                <h2 className="mt-2.5 font-serif text-[40px] font-semibold leading-[0.9] tracking-[-0.025em] text-ink">
+                  Style a fit
+                  <br />
+                  <span className="italic text-accent">in seconds.</span>
                 </h2>
-                <p className="mt-3 max-w-[28ch] text-[12px] leading-relaxed text-muted-2">
-                  A cleaner start screen for real linked fits and cutout-only collage pieces.
+                <p className="mt-3.5 max-w-[30ch] text-[14px] leading-relaxed text-muted-2">
+                  Pick a vibe and Syli composes a complete, color-matched outfit from real, shoppable pieces.
                 </p>
               </div>
               <span className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
-                <Sparkles size={21} />
+                <Sparkles size={22} />
               </span>
             </div>
 
-            <div className="mt-5 grid grid-cols-[1.15fr_.85fr] gap-2">
-              <Link href="/feed" className="sy-cta-primary px-4 py-3 text-[11px] font-black uppercase tracking-[.14em]">
-                <Flame size={13} />
-                Browse fits
+            <div className="mt-6 grid grid-cols-[1.25fr_.75fr] gap-2.5">
+              <Link href="/build" className="sy-cta-primary px-4 py-3.5 text-[12px] font-bold uppercase tracking-[.12em]">
+                <Sparkles size={15} />
+                Style my fit
               </Link>
-              <Link href="/canvas" className="sy-cta-secondary px-4 py-3 text-[11px] font-black uppercase tracking-[.14em]">
-                Editor
+              <Link href="/feed" className="sy-cta-secondary px-4 py-3.5 text-[12px] font-bold uppercase tracking-[.12em]">
+                <Flame size={14} />
+                Feed
               </Link>
             </div>
 
-            <div className="mt-4 grid grid-cols-4 gap-2">
-              <HeroMetric label="Saved" value={savedCount} />
-              <HeroMetric label="Closet" value={closetCount} />
-              <HeroMetric label="Wish" value={wishlistCount} />
-              <HeroMetric label="Liked" value={likedFeedCount} />
+            <div className="mt-5 grid grid-cols-4 gap-2">
+              <HeroMetric label="Saved" value={savedCount} href="/saved" />
+              <HeroMetric label="Closet" value={closetCount} href="/wardrobe" />
+              <HeroMetric label="Wish" value={wishlistCount} href="/wardrobe?status=wishlist" />
+              <HeroMetric label="Liked" value={likedFeedCount} href="/feed" />
             </div>
           </div>
         </section>
@@ -238,7 +238,7 @@ export default function HomePage() {
         <section className="mt-6">
           <div className="mb-2 flex items-center justify-between px-4">
             <div>
-              <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Recent</div>
+              <div className="sy-eyebrow">Recent</div>
               <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Saved outfits</div>
             </div>
             {recentSavedFits.length > 0 ? (
@@ -291,7 +291,7 @@ export default function HomePage() {
         <section className="mt-6">
           <div className="mb-2 flex items-center justify-between px-4">
             <div>
-              <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Recently added</div>
+              <div className="sy-eyebrow">Recently added</div>
               <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Your closet</div>
             </div>
             <Link href="/wardrobe" className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
@@ -337,7 +337,7 @@ export default function HomePage() {
         <section className="mt-6 pb-6">
           <div className="mb-2 flex items-center justify-between px-4">
             <div>
-              <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Catalog spotlight</div>
+              <div className="sy-eyebrow">Catalog spotlight</div>
               <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Real pieces to act on</div>
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function HomePage() {
                 return (
                 <article
                   key={`basic-${product.id}`}
-                  className="group w-[136px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-white/[0.055] shadow-[0_12px_28px_rgba(0,0,0,.28)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 motion-safe:transition-all motion-safe:duration-200"
+                  className="sy-lift group w-[152px] flex-none overflow-hidden rounded-card border border-hairline-2 bg-surface-1 shadow-card transition hover:border-accent/50"
                   data-home-real-piece
                 >
                   <button
@@ -364,75 +364,65 @@ export default function HomePage() {
                     className="block w-full text-left"
                     aria-label={`Build around ${product.name}`}
                   >
-                    <div className="relative h-[128px] bg-black/18">
+                    <div className="sy-studio relative h-[150px]">
                       <ProductImage
                         product={product}
                         transparentOnly
-                        wrapperClassName="h-full w-full"
-                        className="h-full w-full object-contain p-2.5"
+                        wrapperClassName="h-full w-full bg-transparent"
+                        className="h-full w-full object-contain p-3"
                       />
-                      <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                      <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[.1em] text-white backdrop-blur-md">
                         {product.category}
                       </div>
                     </div>
-                      <div className="p-2.5">
-                        <div className="truncate text-[8px] font-black uppercase tracking-[.14em] text-accent">{product.brand}</div>
-                        <div className="mt-1 line-clamp-2 min-h-[30px] text-[11px] font-semibold leading-tight text-ink">{product.name}</div>
-                        <div className="mt-1 text-[10px] font-bold text-white">{formatPrice(product.priceCents)}</div>
-                        <div className="mt-0.5 flex items-center justify-between gap-1">
-                          <span className="truncate text-[8px] font-bold uppercase tracking-[.12em] text-muted">{merchantHost(product)}</span>
-                          <span className={`rounded-full px-1.5 py-0.5 text-[6px] font-black uppercase tracking-[.1em] ${
-                            exact ? 'bg-emerald-400/10 text-emerald-100' : 'bg-amber-400/10 text-amber-100'
-                          }`}>
-                            {exact ? 'Exact' : 'Refresh'}
-                          </span>
-                        </div>
+                    <div className="p-3">
+                      <div className="truncate text-[10px] font-bold uppercase tracking-[.12em] text-accent">{product.brand}</div>
+                      <div className="mt-1 line-clamp-2 min-h-[34px] text-[13px] font-semibold leading-snug text-ink">{product.name}</div>
+                      <div className="mt-1.5 flex items-center justify-between gap-1">
+                        <span className="text-[14px] font-bold text-ink">{formatPrice(product.priceCents)}</span>
+                        <span className="truncate text-[9px] font-medium uppercase tracking-[.08em] text-muted">{merchantHost(product)}</span>
                       </div>
+                    </div>
                   </button>
-                  <div className="grid grid-cols-2 gap-1.5 px-2.5 pb-2.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToWishlist(product, 'catalog');
-                        showToast('Added to wishlist');
-                      }}
-                      className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
-                    >
-                      Wish
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToCloset(product, 'catalog');
-                        showToast('Added to closet');
-                      }}
-                      className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
-                    >
-                      Closet
-                    </button>
+                  <div className="flex items-center gap-1.5 px-3 pb-3">
                     <button
                       type="button"
                       onClick={() => buildAround(product)}
-                      className="rounded-full bg-accent px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white shadow-pink-glow transition active:scale-95"
+                      className="sy-cta-primary flex-1 px-3 py-2 text-[11px] font-bold uppercase tracking-[.1em]"
                     >
                       Build
                     </button>
                     <button
                       type="button"
-                      onClick={() => shopProduct(product)}
-                      className="rounded-full border border-[rgba(232,54,93,.3)] bg-[rgba(232,54,93,.12)] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95 hover:border-[rgba(232,54,93,.55)]"
+                      aria-label="Save to wishlist"
+                      onClick={() => {
+                        addToWishlist(product, 'catalog');
+                        showToast('Added to wishlist');
+                      }}
+                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-hairline-2 text-muted-2 transition hover:border-accent/50 hover:text-accent"
                     >
-                      Shop
+                      <Heart size={15} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Add to closet"
+                      onClick={() => {
+                        addToCloset(product, 'catalog');
+                        showToast('Added to closet');
+                      }}
+                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-hairline-2 text-muted-2 transition hover:border-accent/50 hover:text-accent"
+                    >
+                      <ShoppingBag size={15} />
                     </button>
                     <a
                       href={outboundUrl}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label="Open real product link"
                       data-home-product-link-kind={exact ? 'exact' : 'blocked'}
-                      className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/35 bg-accent/10 px-2 py-1.5 text-[8px] font-black uppercase tracking-[.1em] text-accent transition active:scale-95 hover:border-accent/60"
+                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-accent/35 bg-accent-soft text-accent transition hover:border-accent/60"
                     >
-                      Open real link
-                      <ExternalLink size={9} />
+                      <ExternalLink size={15} />
                     </a>
                   </div>
                 </article>
@@ -459,11 +449,14 @@ export default function HomePage() {
   );
 }
 
-function HeroMetric({ label, value }: { label: string; value: number }) {
+function HeroMetric({ label, value, href }: { label: string; value: number; href: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 px-2 py-2.5 text-center">
-      <div className="font-serif text-[20px] font-semibold leading-none text-ink">{value}</div>
-      <div className="mt-1 text-[8px] font-black uppercase tracking-[.16em] text-muted">{label}</div>
-    </div>
+    <Link
+      href={href}
+      className="sy-press rounded-2xl border border-white/10 bg-black/20 px-2 py-2.5 text-center transition hover:border-accent/40"
+    >
+      <div className="font-serif text-[22px] font-semibold leading-none text-ink">{value}</div>
+      <div className="mt-1 text-[9px] font-bold uppercase tracking-[.14em] text-muted">{label}</div>
+    </Link>
   );
 }
