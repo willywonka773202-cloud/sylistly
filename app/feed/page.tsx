@@ -312,14 +312,26 @@ export default function FitFeedPage() {
   const feedScrollerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const lastFilterGenerateRef = useRef<string | null>(null);
-  const lastTopResetRef = useRef<string | null>(null);
+  // A post's feed-quality verdict depends only on its (immutable) products, not
+  // on like/save toggles — cache it by id so mutating `posts` (every like/save)
+  // doesn't re-run the expensive per-post quality scoring across the whole feed.
+  const feedQualityCacheRef = useRef<Map<string, boolean>>(new Map());
   const feedGenerationOptions = useMemo(() => feedGenerationOptionsForFilter(activeFilter), [activeFilter]);
   const filteredPosts = useMemo(
     // Show only real commerce-backed pieces, then interleave the queue so
     // consecutive cards do not feel like the same generated formula.
     () => {
       if (!hasMounted) return [];
-      return limitRepeatedFeedProducts(diversifyFeedPosts(posts.filter((post) => postMatches(post, activeFilter) && postMeetsFeedQuality(post))));
+      const cache = feedQualityCacheRef.current;
+      const meetsQuality = (post: FeedPost) => {
+        let verdict = cache.get(post.id);
+        if (verdict === undefined) {
+          verdict = postMeetsFeedQuality(post);
+          cache.set(post.id, verdict);
+        }
+        return verdict;
+      };
+      return limitRepeatedFeedProducts(diversifyFeedPosts(posts.filter((post) => postMatches(post, activeFilter) && meetsQuality(post))));
     },
     [posts, activeFilter, hasMounted],
   );
@@ -365,67 +377,18 @@ export default function FitFeedPage() {
     return () => window.clearTimeout(timeout);
   }, [activeFilter, firstRenderedPostId, hasMounted]);
 
+  // Scroll back to the top when the user switches filters. Scroll restoration is
+  // already pinned to 'manual' above, so one rAF'd scrollTo is enough — no need
+  // for the old listener/timer/interval gauntlet.
   useLayoutEffect(() => {
     if (!hasMounted) return;
-    const firstPostId = firstRenderedPostId;
-    if (!firstPostId) return;
-    const resetKey = `${activeFilter}:${firstPostId}`;
-    const currentScroller = feedScrollerRef.current;
-    if (lastTopResetRef.current === resetKey && (!currentScroller || currentScroller.scrollTop < 4)) return;
-
-    const reset = () => {
-      const scroller = feedScrollerRef.current;
-      if (!scroller) return false;
-      const previousBehavior = scroller.style.scrollBehavior;
-      scroller.style.scrollBehavior = 'auto';
-      scroller.scrollTop = 0;
-      scroller.scrollLeft = 0;
+    const scroller = feedScrollerRef.current;
+    if (!scroller) return;
+    const raf = window.requestAnimationFrame(() => {
       scroller.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      window.scrollTo(0, 0);
-      if (previousBehavior) scroller.style.scrollBehavior = previousBehavior;
-      else scroller.style.removeProperty('scroll-behavior');
-      return true;
-    };
-
-    if (!reset()) return;
-    lastTopResetRef.current = resetKey;
-
-    let keepResetting = true;
-    const stopInitialReset = () => {
-      keepResetting = false;
-    };
-    const resetIfRestored = () => {
-      if (!keepResetting) return;
-      reset();
-    };
-
-    currentScroller?.addEventListener('scroll', resetIfRestored, { passive: true });
-    window.addEventListener('pointerdown', stopInitialReset, { passive: true });
-    window.addEventListener('touchstart', stopInitialReset, { passive: true });
-    window.addEventListener('wheel', stopInitialReset, { passive: true });
-
-    reset();
-    const raf = window.requestAnimationFrame(reset);
-    const timeout = window.setTimeout(reset, 120);
-    const delayedResets = [180, 420, 820].map((delay) => window.setTimeout(resetIfRestored, delay));
-    let attempts = 0;
-    const interval = window.setInterval(() => {
-      attempts += 1;
-      resetIfRestored();
-      if (attempts >= 10) window.clearInterval(interval);
-    }, 120);
-    return () => {
-      keepResetting = false;
-      currentScroller?.removeEventListener('scroll', resetIfRestored);
-      window.removeEventListener('pointerdown', stopInitialReset);
-      window.removeEventListener('touchstart', stopInitialReset);
-      window.removeEventListener('wheel', stopInitialReset);
-      window.cancelAnimationFrame(raf);
-      window.clearTimeout(timeout);
-      delayedResets.forEach((id) => window.clearTimeout(id));
-      window.clearInterval(interval);
-    };
-  }, [activeFilter, firstRenderedPostId, hasMounted]);
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [activeFilter, hasMounted]);
 
   useEffect(() => {
     if (!hasMounted) return;
