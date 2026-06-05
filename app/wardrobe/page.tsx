@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  ArrowRight,
   BarChart3,
   Bookmark,
   Check,
@@ -22,11 +23,11 @@ import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { useFit } from '@/store/fit';
-import { useSavedFits } from '@/store/saved-fits';
+import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { selectWardrobeItems, useWardrobe, type WardrobeItem } from '@/store/wardrobe';
 
-const TABS = ['Clothes', 'Insights', 'Outfits', 'Collections'] as const;
+const TABS = ['Clothes', 'Insights', 'Outfits'] as const;
 type Tab = (typeof TABS)[number];
 
 const CATEGORY_FILTERS: Array<{ label: string; categories: Category[] | null }> = [
@@ -186,8 +187,8 @@ export default function WardrobePage() {
       <header className="border-b border-hairline px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Your closet</div>
-            <h1 className="mt-0.5 font-serif text-[26px] font-semibold leading-tight text-ink">
+            <div className="sy-eyebrow">Your closet</div>
+            <h1 className="mt-1 font-serif text-[26px] font-semibold leading-tight text-ink">
               Wardrobe
             </h1>
           </div>
@@ -195,7 +196,7 @@ export default function WardrobePage() {
             <button
               type="button"
               onClick={() => setShowWishlist((prev) => !prev)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.12em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
                 showWishlist
                   ? 'border-accent bg-accent text-white shadow-pink-glow'
                   : 'border-white/14 bg-white/[0.06] text-white/80 hover:bg-white/12'
@@ -204,7 +205,7 @@ export default function WardrobePage() {
               <Heart size={12} fill={showWishlist ? 'currentColor' : 'none'} />
               {showWishlist ? 'Wishlist' : 'Closet'}
             </button>
-            <div className="text-[10px] text-muted">
+            <div className="text-[11px] text-muted">
               {closetItems.length} closet · {wishlistItems.length} wishlist
             </div>
           </div>
@@ -216,7 +217,7 @@ export default function WardrobePage() {
               key={label}
               type="button"
               onClick={() => setTab(label)}
-              className={`flex-1 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
+              className={`flex-1 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.12em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
                 tab === label
                   ? 'bg-ink text-bg shadow-[0_8px_18px_rgba(0,0,0,.32)]'
                   : 'border border-white/12 bg-white/[0.04] text-white/65'
@@ -262,11 +263,7 @@ export default function WardrobePage() {
           />
         ) : null}
 
-        {tab === 'Outfits' ? <OutfitsTab fitsCount={savedFits.length} /> : null}
-
-        {tab === 'Collections' ? (
-          <CollectionsTab wishlistCount={wishlistItems.length} closetCount={totalCloset} />
-        ) : null}
+        {tab === 'Outfits' ? <OutfitsTab fits={savedFits} /> : null}
       </div>
 
       <BottomNav />
@@ -314,15 +311,15 @@ function ClothesTab({
     <div className="flex flex-col gap-4">
       <section className="grid grid-cols-3 gap-2">
         <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-          <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Closet</div>
+          <div className="text-[11px] font-bold uppercase tracking-[.12em] text-muted">Closet</div>
           <div className="mt-0.5 font-serif text-[20px] font-semibold text-ink">{totalCloset}</div>
         </div>
         <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-          <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Categories</div>
+          <div className="text-[11px] font-bold uppercase tracking-[.12em] text-muted">Categories</div>
           <div className="mt-0.5 font-serif text-[20px] font-semibold text-ink">{categoriesCovered}/{CATEGORY_ORDER.length}</div>
         </div>
         <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-          <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Est. value</div>
+          <div className="text-[11px] font-bold uppercase tracking-[.12em] text-muted">Est. value</div>
           <div className="mt-0.5 font-serif text-[20px] font-semibold text-ink">{estValueCents > 0 ? formatPrice(estValueCents) : '—'}</div>
         </div>
       </section>
@@ -330,7 +327,7 @@ function ClothesTab({
       <section className="rounded-[20px] border border-accent/25 bg-accent/10 p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Closet coverage</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-accent">Closet coverage</div>
             <p className="mt-1 text-[12px] leading-relaxed text-white/84">
               {categoriesCovered}/{CATEGORY_ORDER.length} categories covered from real closet items.
             </p>
@@ -353,7 +350,7 @@ function ClothesTab({
             key={option.label}
             type="button"
             onClick={() => onFilter(option.label)}
-            className={`flex-none rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
+            className={`flex-none rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.12em] transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 ${
               filterLabel === option.label
                 ? 'bg-accent text-white shadow-pink-glow'
                 : 'border border-white/12 bg-white/[0.04] text-white/70 hover:text-white'
@@ -366,7 +363,7 @@ function ClothesTab({
 
       {!isWishlist && gapCategories.length > 0 ? (
         <section className="rounded-[20px] border border-accent/30 bg-accent/10 p-3">
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-accent">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.12em] text-accent">
             <Sparkles size={12} />
             Wardrobe gap
           </div>
@@ -416,14 +413,14 @@ function ClothesTab({
                 />
               </div>
               <div className="px-3 pb-3 pt-2">
-                <div className="truncate text-[9px] font-bold uppercase tracking-[.16em] text-accent">{item.product.brand}</div>
+                <div className="truncate text-[11px] font-bold uppercase tracking-[.12em] text-accent">{item.product.brand}</div>
                 <div className="mt-0.5 line-clamp-2 text-[12px] font-semibold leading-tight text-ink">{item.product.name}</div>
                 <div className="mt-0.5 text-[11px] text-muted">{formatPrice(item.product.priceCents)} · {item.product.category}</div>
                 <div className="mt-2 grid grid-cols-2 gap-1.5">
                   <button
                     type="button"
                     onClick={() => onMove(item.productId)}
-                    className="inline-flex items-center justify-center gap-1 rounded-full border border-white/14 bg-white/[0.06] px-2 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
+                    className="inline-flex items-center justify-center gap-1 rounded-full border border-white/14 bg-white/[0.06] px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.1em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
                     aria-label={isWishlist ? 'Move to closet' : 'Move to wishlist'}
                   >
                     {isWishlist ? <Bookmark size={10} /> : <Heart size={10} />}
@@ -432,7 +429,7 @@ function ClothesTab({
                   <button
                     type="button"
                     onClick={() => onBuildAround(item.product)}
-                    className="inline-flex items-center justify-center gap-1 rounded-full border border-accent/40 bg-accent/14 px-2 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-white transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-accent/22"
+                    className="inline-flex items-center justify-center gap-1 rounded-full border border-accent/40 bg-accent/14 px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.1em] text-white transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-accent/22"
                     aria-label={`Build around ${item.product.name}`}
                   >
                     <Wand2 size={10} className="text-accent" />
@@ -442,7 +439,7 @@ function ClothesTab({
                 <button
                   type="button"
                   onClick={() => onShop(item.product)}
-                  className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded-full border border-white/12 bg-white/[0.04] px-2 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-white/75 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:text-white"
+                  className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded-full border border-white/12 bg-white/[0.04] px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.1em] text-white/75 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:text-white"
                 >
                   <ShoppingBag size={10} />
                   Shop
@@ -490,7 +487,7 @@ function InsightsTab({
       <section className="sy-card-strong rounded-[26px] p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Closet manager</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-accent">Closet manager</div>
             <div className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">
               {coveragePercent}% category coverage
             </div>
@@ -511,7 +508,7 @@ function InsightsTab({
             return (
               <span
                 key={`coverage-${category}`}
-                className={`rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] ${
+                className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-[.1em] ${
                   covered ? 'bg-accent text-white shadow-pink-glow' : 'border border-white/10 bg-white/[0.04] text-muted'
                 }`}
               >
@@ -530,7 +527,7 @@ function InsightsTab({
       </section>
 
       <section className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
-        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.18em] text-accent">
+        <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[.14em] text-accent">
           <BarChart3 size={13} />
           Category distribution
         </div>
@@ -540,7 +537,7 @@ function InsightsTab({
             const width = `${Math.max(6, Math.round((total / maxCategoryCount) * 100))}%`;
             return (
               <div key={entry.category}>
-                <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-[.14em] text-muted">
+                <div className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-[.1em] text-muted">
                   <span>{entry.category}</span>
                   <span>{entry.closet} closet · {entry.wishlist} wish</span>
                 </div>
@@ -555,13 +552,13 @@ function InsightsTab({
 
       <section className="grid grid-cols-1 gap-2">
         <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Top brands</div>
+          <div className="text-[11px] font-black uppercase tracking-[.14em] text-accent">Top brands</div>
           {topBrands.length === 0 ? (
             <p className="mt-2 text-[12px] leading-relaxed text-muted-2">Add closet or wishlist pieces to calculate real brand concentration.</p>
           ) : (
             <div className="mt-3 flex flex-wrap gap-2">
               {topBrands.map(([brand, count]) => (
-                <span key={brand} className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-white/85">
+                <span key={brand} className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.1em] text-white/85">
                   {brand} · {count}
                 </span>
               ))}
@@ -570,7 +567,7 @@ function InsightsTab({
         </div>
 
         <div className="rounded-[24px] border border-accent/25 bg-accent/10 p-4">
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.18em] text-accent">
+          <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[.14em] text-accent">
             <Sparkles size={13} />
             Gap assistant
           </div>
@@ -582,7 +579,7 @@ function InsightsTab({
           {missingCategories.length > 0 ? (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {missingCategories.slice(0, 5).map((category) => (
-                <span key={`missing-${category}`} className="rounded-full bg-black/20 px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/82">
+                <span key={`missing-${category}`} className="rounded-full bg-black/20 px-2.5 py-1 text-[11px] font-black uppercase tracking-[.1em] text-white/82">
                   {category}
                 </span>
               ))}
@@ -594,7 +591,7 @@ function InsightsTab({
       {suggestions.length > 0 ? (
         <section>
           <div className="mb-2 px-1">
-            <div className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Real suggestions</div>
+            <div className="sy-eyebrow">Real suggestions</div>
             <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Fill the gaps</div>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -606,35 +603,35 @@ function InsightsTab({
                 <button type="button" onClick={() => onBuildAround(product)} className="block w-full text-left">
                   <div className="relative h-[132px]">
                     <ProductImage product={product} displayMode="closet" transparentOnly />
-                    <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
+                    <div className="absolute left-1.5 top-1.5 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[.1em] text-white backdrop-blur-md">
                       {product.category}
                     </div>
                   </div>
                   <div className="p-2.5">
-                    <div className="truncate text-[8px] font-black uppercase tracking-[.14em] text-accent">{product.brand}</div>
+                    <div className="truncate text-[11px] font-black uppercase tracking-[.1em] text-accent">{product.brand}</div>
                     <div className="mt-1 line-clamp-2 min-h-[30px] text-[11px] font-semibold leading-tight text-ink">{product.name}</div>
-                    <div className="mt-1 text-[10px] font-bold text-white">{formatPrice(product.priceCents)}</div>
+                    <div className="mt-1 text-[12px] font-bold text-white">{formatPrice(product.priceCents)}</div>
                   </div>
                 </button>
                 <div className="grid grid-cols-2 gap-1.5 px-2.5 pb-2.5">
                   <button
                     type="button"
                     onClick={() => onWishlist(product)}
-                    className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white transition active:scale-95"
+                    className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-white transition active:scale-95"
                   >
                     Wishlist
                   </button>
                   <button
                     type="button"
                     onClick={() => onBuildAround(product)}
-                    className="rounded-full bg-accent px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-white shadow-pink-glow transition active:scale-95"
+                    className="rounded-full bg-accent px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-white shadow-pink-glow transition active:scale-95"
                   >
                     Build
                   </button>
                   <button
                     type="button"
                     onClick={() => onShop(product)}
-                    className="col-span-2 rounded-full bg-white px-2 py-1.5 text-[8px] font-bold uppercase tracking-[.1em] text-black transition active:scale-95"
+                    className="col-span-2 rounded-full bg-white px-2 py-1.5 text-[11px] font-bold uppercase tracking-[.08em] text-black transition active:scale-95"
                   >
                     Shop
                   </button>
@@ -660,7 +657,7 @@ function InsightStat({
   return (
     <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">{label}</div>
+        <div className="text-[11px] font-bold uppercase tracking-[.12em] text-muted">{label}</div>
         <Icon size={13} className="text-accent" />
       </div>
       <div className="mt-2 font-serif text-[22px] font-semibold leading-none text-ink">{value}</div>
@@ -668,67 +665,96 @@ function InsightStat({
   );
 }
 
-function OutfitsTab({ fitsCount }: { fitsCount: number }) {
-  if (fitsCount === 0) {
-    return (
-      <EmptyState
-        icon={Layers}
-        title="No saved outfits yet"
-        body="Tap save on any feed card or build a fit to start your outfit library."
-        primaryHref="/feed"
-        primaryLabel="Browse feed"
-        secondaryHref="/build"
-        secondaryLabel="Open builder"
-      />
-    );
-  }
+function FitPreviewCollage({ fit }: { fit: SavedFitRecord }) {
+  const products = CATEGORY_ORDER.map((category) => fit.items[category]).filter(
+    (product): product is Product => Boolean(product),
+  ).slice(0, 6);
+
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 text-center">
-      <Layers size={28} className="mx-auto text-accent" />
-      <div className="mt-2 font-serif text-[20px] font-semibold text-ink">Your saved fits live in /saved</div>
-      <p className="mt-1 text-[12px] text-muted-2">
-        We&apos;re consolidating the saved-fit detail view next sprint. For now, head to{' '}
-        <Link href="/saved" className="underline decoration-accent decoration-[1.5px] underline-offset-2">/saved</Link>{' '}
-        to remix or shop them.
-      </p>
+    <div className="sy-studio grid aspect-[3/4] grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden p-1.5">
+      {products.map((product) => (
+        <div key={product.id} className="overflow-hidden rounded-[10px]">
+          <ProductImage product={product} displayMode="closet" transparentOnly />
+        </div>
+      ))}
     </div>
   );
 }
 
-function CollectionsTab({ wishlistCount, closetCount }: { wishlistCount: number; closetCount: number }) {
-  const cells: Array<{ label: string; count: number; description: string; future?: boolean }> = [
-    { label: 'Wishlist', count: wishlistCount, description: 'Pieces saved to buy later' },
-    { label: 'Closet', count: closetCount, description: 'Pieces you already own' },
-    { label: 'Packing', count: 0, description: 'Coming next sprint — local trip checklists' },
-    { label: 'Custom', count: 0, description: 'Coming next sprint — user-named collections' },
-  ];
+function OutfitsTab({ fits }: { fits: SavedFitRecord[] }) {
+  const preview = fits.slice(0, 4);
+
   return (
-    <div className="grid grid-cols-2 gap-2">
-      {cells.map((cell) => {
-        const isFuture = cell.future || cell.label === 'Packing' || cell.label === 'Custom';
-        const description =
-          cell.label === 'Packing'
-            ? 'Future: local trip checklists from real closet items'
-            : cell.label === 'Custom'
-            ? 'Future: user-named collections from saved items'
-            : cell.description;
-        return (
-        <div
-          key={cell.label}
-          className={`rounded-[22px] border p-3 shadow-[0_10px_24px_rgba(0,0,0,.18)] ${
-            isFuture ? 'border-white/8 bg-white/[0.025] opacity-75' : 'border-white/10 bg-white/[0.04]'
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <div className="text-[9px] font-bold uppercase tracking-[.18em] text-accent">{cell.label}</div>
-            <div className={`text-[11px] font-bold ${isFuture ? 'text-muted' : 'text-white/80'}`}>
-              {isFuture ? 'Soon' : cell.count}
+    <div className="flex flex-col gap-4">
+      <Link href="/saved" className="sy-press block">
+        <section className="sy-card-strong rounded-card-lg p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="sy-eyebrow">Saved outfits</div>
+              <div className="mt-1 font-serif text-[22px] font-semibold leading-tight text-ink">
+                {fits.length > 0 ? `${fits.length} saved ${fits.length === 1 ? 'fit' : 'fits'}` : 'Build your fit library'}
+              </div>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-2">
+                {fits.length > 0
+                  ? 'Open Saved to remix, shop, or share the outfits you kept.'
+                  : 'Save a look from the feed or the builder and it lands in your Saved tab.'}
+              </p>
             </div>
+            <span className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent/18 text-accent">
+              <Bookmark size={19} />
+            </span>
           </div>
-          <div className="mt-2 text-[11px] leading-relaxed text-muted-2">{description}</div>
-        </div>
-        );
-      })}
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-[12px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow">
+            View your saved outfits
+            <ArrowRight size={14} />
+          </div>
+        </section>
+      </Link>
+
+      {preview.length > 0 ? (
+        <section>
+          <div className="mb-2 flex items-end justify-between gap-3 px-1">
+            <div>
+              <div className="sy-eyebrow">Recently saved</div>
+              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Your latest fits</div>
+            </div>
+            <Link
+              href="/saved"
+              className="inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[.12em] text-accent transition active:scale-[0.97]"
+            >
+              See all
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {preview.map((fit) => (
+              <Link
+                key={fit.id}
+                href="/saved"
+                className="sy-lift sy-press group block overflow-hidden rounded-card border border-hairline bg-surface-1 shadow-[0_12px_28px_rgba(0,0,0,.26)] hover:border-accent/45"
+              >
+                <FitPreviewCollage fit={fit} />
+                <div className="px-3 pb-3 pt-2">
+                  <div className="line-clamp-1 text-[12px] font-semibold leading-tight text-ink">{fit.title}</div>
+                  <div className="mt-0.5 text-[11px] text-muted">
+                    {fit.itemCount} {fit.itemCount === 1 ? 'piece' : 'pieces'} · {formatPrice(fit.totalCents)}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <EmptyState
+          icon={Layers}
+          title="No saved outfits yet"
+          body="Tap save on any feed card or build a fit, then find it in your Saved tab."
+          primaryHref="/feed"
+          primaryLabel="Browse feed"
+          secondaryHref="/build"
+          secondaryLabel="Open builder"
+        />
+      )}
     </div>
   );
 }
@@ -760,14 +786,14 @@ function EmptyState({
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Link
           href={primaryHref}
-          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
         >
           {primaryLabel}
         </Link>
         {secondaryHref ? (
           <Link
             href={secondaryHref}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.12em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
           >
             {secondaryLabel}
           </Link>

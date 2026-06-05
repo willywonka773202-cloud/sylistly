@@ -10,7 +10,7 @@ import type {
   StylistUserIntent,
 } from '@/lib/stylist/types';
 
-const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-6';
 const DEFAULT_OLLAMA_MODEL = 'gpt-oss:120b';
 const DEFAULT_OLLAMA_BASE_URL = 'https://ollama.com/api';
 const STYLIST_TIMEOUT_MS = 8_000;

@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Bookmark, CalendarDays, ChartPie, CheckCircle2, Grid3X3, Heart, Menu, MoreHorizontal, Pencil, Plus, RotateCcw, ShoppingBag, SlidersHorizontal, Sparkles, WandSparkles } from 'lucide-react';
+import { Bookmark, CalendarDays, ChartPie, CheckCircle2, Grid3X3, Heart, Menu, MoreHorizontal, Pencil, Plus, RotateCcw, ShoppingBag, SlidersHorizontal, Sparkles, User, WandSparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -207,6 +207,14 @@ export default function ProfilePage() {
   const likedCount = hasMounted ? posts.filter((post) => post.liked).length : 0;
   const currentBuildCount = hasMounted ? Object.values(currentFitItems).filter(Boolean).length : 0;
 
+  // Identity is derived from the profile store — never hardcoded. The Profile
+  // type only carries an optional `handle`, so we synthesize a neutral display
+  // handle, display name, and avatar initial with safe fallbacks.
+  const rawHandle = (profile.handle || '').trim().replace(/^@+/, '');
+  const displayHandle = rawHandle || 'your_style';
+  const displayName = rawHandle || 'Your Profile';
+  const avatarInitial = displayHandle.charAt(0).toUpperCase();
+
   // Style DNA — derived from REAL saved fits + wardrobe. No invented
   // stats. If the user hasn't saved anything, the panel says so rather
   // than fabricating "top vibe: streetwear".
@@ -404,7 +412,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="sy-eyebrow">Profile</div>
-              <h1 className="mt-1 font-serif text-[35px] font-semibold tracking-[-.04em] text-white">willys</h1>
+              <h1 className="mt-1 font-serif text-[35px] font-semibold tracking-[-.04em] text-white">@{displayHandle}</h1>
             </div>
             <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[.055] px-2 py-1 shadow-[0_18px_44px_rgba(0,0,0,.32)] backdrop-blur-xl">
               <Link href="/saved" className="grid h-10 w-10 place-items-center rounded-full text-white/88 transition active:scale-95 hover:bg-white/[.08]" aria-label="Open planner">
@@ -422,7 +430,7 @@ export default function ProfilePage() {
           <div className="mt-5 grid grid-cols-[116px_1fr] items-center gap-5">
             <div className="relative">
               <div className="grid h-[96px] w-[96px] place-items-center rounded-full border border-white/12 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.32),transparent_34%),linear-gradient(135deg,#f6306b,#35242b_54%,#0d0a09)] text-[46px] font-black text-white shadow-[0_18px_46px_rgba(246,48,107,.25)]">
-                W
+                {rawHandle ? avatarInitial : <User size={42} strokeWidth={2.4} aria-hidden />}
               </div>
               <Link
                 href="/build"
@@ -433,7 +441,7 @@ export default function ProfilePage() {
               </Link>
             </div>
             <div className="min-w-0">
-              <div className="text-[20px] font-bold leading-tight text-white">Will Lambert</div>
+              <div className="text-[20px] font-bold leading-tight text-white">{displayName}</div>
               <div className="mt-3 grid max-w-[230px] grid-cols-3 gap-5">
                 <SocialStat label="Posts" value={hasMounted ? savedFitCount : 0} />
                 <SocialStat label="Likes" value={likedCount} />
@@ -460,7 +468,7 @@ export default function ProfilePage() {
           <div className="mt-4 rounded-[24px] border border-accent/22 bg-[radial-gradient(circle_at_20%_0%,rgba(246,48,107,.24),transparent_44%),rgba(255,255,255,.045)] p-4 shadow-[0_20px_54px_rgba(0,0,0,.32)]">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-[8px] font-black uppercase tracking-[.22em] text-accent">Style pulse</div>
+                <div className="sy-eyebrow">Style pulse</div>
                 <div className="mt-1 font-serif text-[24px] font-semibold tracking-[-.03em] text-white">{styleDna.archetype}</div>
               </div>
               <Link href="/build" className="grid h-12 w-12 flex-none place-items-center rounded-full bg-white text-[#15100f] shadow-[0_14px_34px_rgba(0,0,0,.25)] transition active:scale-95" aria-label="Create outfit from profile">
@@ -475,12 +483,8 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-6 border-b border-white/10">
-            <div className="grid grid-cols-3 text-center text-[17px] font-bold">
-              {[
-                { id: 'posted' as const, label: 'Clothes' },
-                { id: 'saved' as const, label: 'Outfits' },
-                { id: 'inspo' as const, label: 'Collections' },
-              ].map((tab) => (
+            <div className="grid grid-cols-4 text-center text-[17px] font-bold">
+              {PROFILE_ARCHIVE_TABS.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
@@ -491,7 +495,7 @@ export default function ProfilePage() {
                 >
                   {tab.label}
                   {activeArchiveTab === tab.id ? (
-                    <span className="absolute inset-x-7 bottom-0 h-[3px] rounded-full bg-accent shadow-pink-glow" />
+                    <span className="absolute inset-x-5 bottom-0 h-[3px] rounded-full bg-accent shadow-pink-glow" />
                   ) : null}
                 </button>
               ))}
@@ -499,23 +503,6 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-4 flex items-center gap-3 overflow-x-auto scrollbar-hide">
-            {[
-              { label: 'All', tab: 'inspo' as const },
-              { label: 'Posted', tab: 'posted' as const },
-              { label: 'Saved', tab: 'saved' as const },
-              { label: 'Liked', tab: 'liked' as const },
-            ].map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={() => setActiveArchiveTab(chip.tab)}
-                className={`flex-none rounded-[13px] px-4 py-2 text-[13px] font-bold transition active:scale-95 ${
-                  activeArchiveTab === chip.tab ? 'bg-white text-[#15100f]' : 'border border-white/10 bg-white/[.045] text-white/54'
-                }`}
-              >
-                {chip.label}
-              </button>
-            ))}
             <button type="button" className="ml-auto grid h-12 w-12 flex-none place-items-center rounded-full border border-white/10 bg-white/[.07] text-white transition active:scale-95" aria-label="Filter outfits">
               <SlidersHorizontal size={22} />
             </button>
@@ -555,13 +542,13 @@ export default function ProfilePage() {
         <section className="px-4">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-[9px] uppercase tracking-[.18em] text-accent">Profile archive</div>
+              <div className="sy-eyebrow">Profile archive</div>
               <h2 className="mt-1 font-serif text-[29px] font-semibold tracking-[-.04em] text-white">
                 {isArchiveFallback ? 'Suggested real looks' : `${archiveTabLabel} grid`}
               </h2>
             </div>
             {!activeArchivePosts.length ? (
-              <p className="max-w-[18ch] text-right text-[10px] leading-snug text-white/46">
+              <p className="max-w-[18ch] text-right text-[12px] leading-snug text-white/46">
                 {archiveEmptyCopy}
                 {isArchiveFallback ? ' Showing linked catalog looks for now.' : null}
               </p>
@@ -607,11 +594,11 @@ export default function ProfilePage() {
                   </div>
                   <div className="px-3 pb-3">
                     <h3 className="line-clamp-1 text-[15px] font-black tracking-[-.02em] text-white">{post.title}</h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/58">
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[12px] font-semibold text-white/58">
                       <span>{post.vibe}</span>
                       <span>{formatPrice(post.totalCents)}</span>
                       <span
-                        className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[.12em] text-emerald-200"
+                        className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[.12em] text-emerald-200"
                         aria-label={`${linkStats.exactCount} exact product pages out of ${linkStats.linkedCount} linked pieces`}
                         data-profile-link-quality-badge={`${linkStats.exactCount}/${linkStats.linkedCount}`}
                       >
@@ -652,7 +639,7 @@ export default function ProfilePage() {
           <div className="mt-4 rounded-[24px] border border-accent/30 bg-[radial-gradient(circle_at_18%_0%,rgba(246,48,107,.18),transparent_44%),rgba(246,48,107,.08)] p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-[8px] font-black uppercase tracking-[.18em] text-accent">Style archetype</div>
+                <div className="sy-eyebrow">Style archetype</div>
                 <div className="mt-1 font-serif text-[27px] font-semibold leading-tight text-ink">{styleDna.archetype}</div>
               </div>
               <div className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
@@ -680,8 +667,8 @@ export default function ProfilePage() {
 
           <div className="mt-4 rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Progress checklist</div>
-              <div className="text-[10px] font-bold uppercase tracking-[.14em] text-muted-2">{completedProgress}/{progressChecklist.length}</div>
+              <div className="sy-eyebrow">Progress checklist</div>
+              <div className="text-[12px] font-bold uppercase tracking-[.14em] text-muted-2">{completedProgress}/{progressChecklist.length}</div>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.07]">
               <div className="h-full rounded-full bg-accent shadow-pink-glow" style={{ width: `${Math.max(6, progressPercent)}%` }} />
@@ -692,7 +679,7 @@ export default function ProfilePage() {
                   <CheckCircle2 size={16} className={item.complete ? 'mt-0.5 flex-none text-accent' : 'mt-0.5 flex-none text-muted'} />
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-semibold text-ink">{item.label}</div>
-                    <div className="mt-0.5 text-[10px] leading-relaxed text-muted-2">{item.detail}</div>
+                    <div className="mt-0.5 text-[12px] leading-relaxed text-muted-2">{item.detail}</div>
                   </div>
                 </div>
               ))}
@@ -700,7 +687,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-4 rounded-[22px] border border-accent/25 bg-accent/10 p-4">
-            <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Improve recommendations</div>
+            <div className="sy-eyebrow">Improve recommendations</div>
             <div className="mt-3 grid gap-2">
               <RecommendationLink href="/saved" label="Save 3 fits" complete={savedFits.length >= 3} />
               <RecommendationLink href="/wardrobe" label="Add 5 closet items" complete={wardrobeItems.length >= 5} />
@@ -711,8 +698,8 @@ export default function ProfilePage() {
           </div>
 
           <div id="style-dna" className="mt-5 border-t border-white/10 pt-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-accent">
-              <Pencil size={11} />
+            <div className="sy-eyebrow flex items-center gap-2">
+              <Pencil size={12} />
               Edit your preferences
             </div>
           </div>
@@ -853,7 +840,7 @@ function PulseMetric({
   return (
     <div className="rounded-[16px] border border-white/10 bg-black/20 px-3 py-2">
       <div className="text-[17px] font-black leading-none text-white">{value}</div>
-      <div className="mt-1 text-[8px] font-black uppercase tracking-[.16em] text-white/42">{label}</div>
+      <div className="mt-1 text-[11px] font-black uppercase tracking-[.16em] text-white/42">{label}</div>
     </div>
   );
 }
@@ -869,7 +856,7 @@ function DnaStat({
 }) {
   return (
     <div className={`rounded-[16px] border p-2.5 ${accent ? 'border-accent/30 bg-accent/10' : 'border-white/10 bg-white/[0.04]'}`}>
-      <div className={`text-[8px] font-bold uppercase tracking-[.16em] ${accent ? 'text-accent' : 'text-muted'}`}>{label}</div>
+      <div className={`text-[11px] font-bold uppercase tracking-[.16em] ${accent ? 'text-accent' : 'text-muted'}`}>{label}</div>
       <div className={`mt-1 line-clamp-2 text-[12px] font-semibold ${accent ? 'text-white' : 'text-ink'}`}>{value}</div>
     </div>
   );
@@ -890,7 +877,7 @@ function RecommendationLink({
       className="flex items-center justify-between gap-3 rounded-[16px] border border-white/8 bg-black/18 px-3 py-2.5 transition active:scale-[0.98] hover:border-accent/45"
     >
       <span className="text-[12px] font-semibold text-ink">{label}</span>
-      <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-[.14em] ${
+      <span className={`rounded-full px-2 py-0.5 text-[11px] font-black uppercase tracking-[.14em] ${
         complete ? 'bg-accent text-white shadow-pink-glow' : 'border border-white/10 bg-white/[0.04] text-muted'
       }`}>
         {complete ? 'Done' : 'Open'}
