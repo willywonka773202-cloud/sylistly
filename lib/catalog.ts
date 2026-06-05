@@ -2714,3 +2714,153 @@ export async function buildAiCatalogLook({
     assistantMode: aiEnabled ? 'ai-assisted' : 'catalog',
   };
 }
+
+export interface OutfitCandidateShortlists {
+  formula: OutfitFormula;
+  collection: CatalogCollection | null;
+  targetSlots: Category[];
+  /** Ranked candidate pool per non-locked target slot (deterministic retriever output). */
+  candidatesBySlot: Partial<Record<Category, Product[]>>;
+  /** Deterministic baseline pick per slot — used as the fallback when AI is unavailable. */
+  base: Partial<Record<Category, Product>>;
+  baseMissingSlots: Category[];
+  /** Locked / anchor products the composer must build around. */
+  anchorProducts: Product[];
+  lockedSlots: Category[];
+}
+
+/**
+ * Retriever for the AI outfit composer: runs the full deterministic candidate
+ * filtering/scoring pipeline and returns the top-N ranked candidates PER slot
+ * (instead of greedily picking one). The composer (lib/stylist/outfit-composer)
+ * then lets a model assemble one coherent outfit from these shortlists, falling
+ * back to `base` when no model is available. Reuses every existing gate so the
+ * AI only ever sees products that already pass quality/budget/frame/vibe filters.
+ */
+export function getOutfitCandidateShortlists({
+  vibe,
+  frame,
+  budget,
+  customMaxCents,
+  currentItems,
+  lockedItems,
+  mode,
+  seed = 0,
+  avoidProductIds = [],
+  avoidComboSignatures = [],
+  recentShoeIds = [],
+  recentBrandCounts,
+  recentFormulaIds = [],
+  preferredFormulaId,
+  diversityStrength = 'medium',
+  targetSlots: selectedTargetSlots,
+  transparentOnly = false,
+  perSlotLimit = 16,
+}: {
+  vibe: VibeId;
+  frame: GeneratorFrame;
+  budget: GeneratorBudget;
+  customMaxCents?: number | null;
+  currentItems?: Partial<Record<Category, Product>>;
+  lockedItems?: Partial<Record<Category, Product>>;
+  mode: GeneratorMode;
+  seed?: number;
+  avoidProductIds?: string[];
+  avoidComboSignatures?: string[];
+  recentShoeIds?: string[];
+  recentBrandCounts?: Record<string, number>;
+  recentFormulaIds?: string[];
+  preferredFormulaId?: string;
+  diversityStrength?: DiversityStrength;
+  targetSlots?: Category[];
+  transparentOnly?: boolean;
+  perSlotLimit?: number;
+}): OutfitCandidateShortlists {
+  const base = buildCatalogLook({
+    vibe,
+    frame,
+    budget,
+    customMaxCents,
+    currentItems,
+    lockedItems,
+    mode,
+    seed,
+    avoidProductIds,
+    avoidComboSignatures,
+    recentShoeIds,
+    recentBrandCounts,
+    recentFormulaIds,
+    preferredFormulaId,
+    diversityStrength,
+    targetSlots: selectedTargetSlots,
+    transparentOnly,
+  });
+
+  const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
+  const existingItems = currentItems || {};
+  const anchorProducts = getGenerationAnchorProducts({ lockedItems, existingItems, mode });
+  const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
+  const lockedSlots = (Object.keys(lockedItems || {}) as Category[])
+    .filter((slot) => Boolean((lockedItems || {})[slot]));
+  const currentIds = new Set(
+    Object.values(existingItems)
+      .filter((product): product is Product => Boolean(product))
+      .map((product) => product.id),
+  );
+  const avoidIds = new Set([
+    ...avoidProductIds,
+    ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? Array.from(currentIds) : []),
+  ]);
+  const collections = getCollectionsFor(vibe, frame);
+  const chosenCollection = collections.length
+    ? collections[(stableHash(`${vibe}:${frame}:${budget}:${customMaxCents || 0}:compose`) + Math.abs(seed || 0)) % collections.length] || collections[0] || null
+    : null;
+  const collectionCandidates = dedupeProducts([
+    ...(chosenCollection ? getCollectionProducts(chosenCollection) : []),
+    ...collections.flatMap((collection) => getCollectionProducts(collection)),
+  ]);
+
+  const candidatesBySlot: Partial<Record<Category, Product[]>> = {};
+  for (const slot of targetSlots) {
+    if (mode === 'missing' && existingItems[slot]) continue;
+    if (lockedSlots.includes(slot)) continue;
+    const pool = getSlotCandidates({
+      slot,
+      vibe,
+      frame,
+      budget,
+      customMaxCents,
+      usedIds: new Set<string>(),
+      avoidIds,
+      currentIds,
+      currentProductId: existingItems[slot]?.id,
+      usedBrands: new Set<string>(),
+      recentShoeIds: new Set(recentShoeIds),
+      recentBrandCounts: {
+        ...countBrandsForProductIds(avoidProductIds),
+        ...(recentBrandCounts || {}),
+      },
+      recentProductFamilyCounts: countFamiliesForProductIds(avoidProductIds),
+      diversityStrength,
+      formula: base.formula,
+      selectedProducts: anchorProducts,
+      collectionCandidates,
+      transparentOnly,
+    });
+    if (!pool.length) continue;
+    const photoFirst = pool.filter(hasRealPhoto);
+    const ordered = photoFirst.length >= 4 ? photoFirst : pool;
+    candidatesBySlot[slot] = ordered.slice(0, Math.max(4, perSlotLimit));
+  }
+
+  return {
+    formula: base.formula,
+    collection: base.collection,
+    targetSlots,
+    candidatesBySlot,
+    base: base.products,
+    baseMissingSlots: base.missingSlots,
+    anchorProducts,
+    lockedSlots,
+  };
+}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { buildAiCatalogLook } from '@/lib/catalog';
+import { composeOutfitLook, type StylistProfileInput } from '@/lib/stylist/outfit-composer';
 import { hasProductCommerceLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
@@ -22,9 +22,31 @@ interface LookBody {
   lockedItems?: Partial<Record<Category, Product>>;
   targetSlots?: Category[];
   selectedSlots?: Category[];
+  profile?: StylistProfileInput | null;
 }
 
 export const runtime = 'nodejs';
+export const maxDuration = 20;
+
+function sanitizeProfile(value: unknown): StylistProfileInput | null {
+  if (!value || typeof value !== 'object') return null;
+  const raw = value as Record<string, unknown>;
+  const profile: StylistProfileInput = {};
+  if (typeof raw.skinTone === 'string') profile.skinTone = raw.skinTone.slice(0, 16);
+  if (raw.bodyType === 'masc' || raw.bodyType === 'fem' || raw.bodyType === 'androgynous' || raw.bodyType === 'custom') {
+    profile.bodyType = raw.bodyType;
+  }
+  if (Array.isArray(raw.preferredBrands)) {
+    profile.preferredBrands = raw.preferredBrands.filter((b): b is string => typeof b === 'string').slice(0, 12);
+  }
+  if (Array.isArray(raw.preferredVibes)) {
+    profile.preferredVibes = raw.preferredVibes.filter((v): v is string => typeof v === 'string').slice(0, 8);
+  }
+  if (raw.budgetTier === 'low' || raw.budgetTier === 'mid' || raw.budgetTier === 'high' || raw.budgetTier === 'luxury') {
+    profile.budgetTier = raw.budgetTier;
+  }
+  return Object.keys(profile).length ? profile : null;
+}
 
 const VIBE_IDS = new Set<VibeId>(VIBES.map((vibe) => vibe.id));
 const VIBE_ALIASES: Record<string, VibeId> = {
@@ -125,7 +147,7 @@ export async function POST(req: NextRequest) {
     ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds : []),
   ]));
 
-  const result = await buildAiCatalogLook({
+  const result = await composeOutfitLook({
     vibe,
     frame,
     budget,
@@ -143,12 +165,17 @@ export async function POST(req: NextRequest) {
     mode,
     targetSlots,
     transparentOnly: true,
+    profile: sanitizeProfile(body.profile),
   });
   const renderableProducts = Object.fromEntries(
     Object.entries(result.products).filter((entry): entry is [Category, Product] =>
       Boolean(entry[1] && isEditorialCutoutProduct(entry[1]) && hasProductCommerceLink(entry[1])),
     ),
   ) as Partial<Record<Category, Product>>;
+  // Keep only rationales for slots that survived the renderable filter.
+  const reasons = result.reasons
+    ? Object.fromEntries(Object.entries(result.reasons).filter(([slot]) => slot in renderableProducts))
+    : undefined;
 
   return NextResponse.json({
     products: renderableProducts,
@@ -167,7 +194,10 @@ export async function POST(req: NextRequest) {
       structure: result.formula.structure,
       reason: result.formula.reason,
     },
-    source: 'catalog',
+    source: result.assistantMode === 'ai-styled' ? 'ai' : 'catalog',
     assistantMode: result.assistantMode,
+    stylingNotes: result.stylingNotes,
+    palette: result.palette,
+    reasons,
   });
 }

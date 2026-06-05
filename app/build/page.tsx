@@ -420,6 +420,7 @@ function BuilderPageContent({
   const skinTone = useProfile((state) => state.profile.skinTone);
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
+  const stylePrefs = useProfile((state) => state.profile.stylePrefs);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const postFitToFeed = useSocialFeed((state) => state.postFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
@@ -771,6 +772,13 @@ function BuilderPageContent({
           currentItems: items,
           lockedItems,
           targetSlots,
+          profile: {
+            skinTone,
+            bodyType,
+            preferredBrands: stylePrefs?.brands,
+            preferredVibes: stylePrefs?.vibes,
+            budgetTier: stylePrefs?.budget,
+          },
         }),
       });
       const lookData = await lookResponse.json();
