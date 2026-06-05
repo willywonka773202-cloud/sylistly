@@ -425,6 +425,7 @@ function BuilderPageContent({
   const postFitToFeed = useSocialFeed((state) => state.postFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [stylingNote, setStylingNote] = useState<{ notes?: string; palette?: string[] } | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
   const [selectedGenerationSlots, setSelectedGenerationSlots] = useState<Category[]>(() =>
@@ -795,8 +796,19 @@ function BuilderPageContent({
         if (lookData.collection?.label) {
           collectionLabel = lookData.collection.label as string;
         }
-        if (lookData.assistantMode === 'ai-assisted') {
-          assistantLabel = ' with AI stylist assist';
+        if (lookData.assistantMode === 'ai-styled' || lookData.assistantMode === 'ai-assisted') {
+          assistantLabel = ' styled by Syli';
+          setStylingNote(
+            (typeof lookData.stylingNotes === 'string' && lookData.stylingNotes.trim())
+              || (Array.isArray(lookData.palette) && lookData.palette.length)
+              ? {
+                  notes: typeof lookData.stylingNotes === 'string' ? lookData.stylingNotes : undefined,
+                  palette: Array.isArray(lookData.palette) ? lookData.palette.slice(0, 5).map(String) : undefined,
+                }
+              : null,
+          );
+        } else {
+          setStylingNote(null);
         }
         if (lookData.formula?.id && typeof lookData.formula.id === 'string') {
           recentFormulaIdsRef.current = Array.from(new Set([lookData.formula.id, ...recentFormulaIdsRef.current])).slice(0, 10);
@@ -1312,307 +1324,6 @@ function BuilderPageContent({
             </div>
           </section>
 
-          {false ? (
-            <>
-          {/* Legacy generation controls are kept out of render; the Settings sheet owns this UI now. */}
-          <section className="hidden">
-            <div className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(246,48,107,.22),transparent_45%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.025))] p-5 shadow-[0_28px_64px_rgba(246,48,107,.22)]">
-              <div className="flex items-center gap-3">
-                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-accent text-white shadow-pink-glow">
-                  <Wand2 size={19} strokeWidth={2.2} />
-                </span>
-                <div className="flex-1">
-                  <div className="text-[9px] font-black uppercase tracking-[.24em] text-accent">AI stylist</div>
-                  <div className="mt-0.5 font-serif text-[20px] font-semibold leading-tight text-ink">Command Center</div>
-                </div>
-                {generatorLoading ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/45 bg-accent/14 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-accent">
-                    <LoaderCircle size={11} className="animate-spin" />
-                    Styling
-                  </span>
-                ) : null}
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Vibe</div>
-                  <div className="mt-0.5 truncate text-[13px] font-semibold text-ink">{activeVibe.label}</div>
-                </div>
-                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Total</div>
-                  <div className="mt-0.5 truncate text-[13px] font-semibold text-ink">{renderN > 0 ? totalDisplay : '—'}</div>
-                </div>
-                <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-                  <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Filled</div>
-                  <div className="mt-0.5 text-[13px] font-semibold text-ink">{renderN} / {CATEGORY_ORDER.length}</div>
-                </div>
-                <div className={`rounded-[16px] border p-2.5 ${lockedSlots.length > 0 ? 'border-accent/45 bg-accent/14' : 'border-white/10 bg-white/[0.04]'}`}>
-                  <div className={`text-[8px] font-bold uppercase tracking-[.16em] ${lockedSlots.length > 0 ? 'text-accent' : 'text-muted'}`}>Locked</div>
-                  <div className={`mt-0.5 text-[13px] font-semibold ${lockedSlots.length > 0 ? 'text-accent' : 'text-ink'}`}>
-                    {lockedSlots.length === 0 ? 'none' : `${lockedSlots.length} piece${lockedSlots.length === 1 ? '' : 's'}`}
-                  </div>
-                </div>
-              </div>
-
-              {(() => {
-                const nba = computeNextBestAction(renderItems, lockedSlots, renderN);
-                if (!nba) return null;
-                return (
-                  <div className="mt-4 flex items-start gap-2.5 rounded-[18px] border border-accent/35 bg-accent/10 px-3 py-2.5">
-                    <span className="mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full bg-accent text-white">
-                      <Sparkles size={11} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Next best</div>
-                      <div className="mt-0.5 text-[12px] font-semibold leading-snug text-white/92">{nba!.label}</div>
-                      <div className="mt-0.5 text-[11px] leading-relaxed text-white/72">{nba!.hint}</div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => void generateLook('starter')}
-                  disabled={generatorLoading}
-                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
-                >
-                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
-                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                  </span>
-                  <div className="leading-none">
-                    <div className="text-[11px] font-bold text-ink">Quick Fit</div>
-                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Starter look</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full')}
-                  disabled={generatorLoading}
-                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
-                >
-                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
-                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Layers size={14} />}
-                  </span>
-                  <div className="leading-none">
-                    <div className="text-[11px] font-bold text-ink">Fuller Fit</div>
-                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">More pieces</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('refresh')}
-                  disabled={generatorLoading || renderN === 0}
-                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
-                >
-                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
-                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <RotateCcw size={14} />}
-                  </span>
-                  <div className="leading-none">
-                    <div className="text-[11px] font-bold text-ink">Remix</div>
-                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Swap unlocked</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('missing')}
-                  disabled={generatorLoading}
-                  className="group flex items-center gap-2.5 rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))] p-2.5 text-left transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/55 hover:bg-[linear-gradient(135deg,rgba(246,48,107,.18),rgba(246,48,107,.04))] disabled:opacity-60 disabled:active:scale-100"
-                >
-                  <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent/18 text-accent transition group-hover:bg-accent group-hover:text-white">
-                    {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Plus size={14} />}
-                  </span>
-                  <div className="leading-none">
-                    <div className="text-[11px] font-bold text-ink">Fill Missing</div>
-                    <div className="mt-0.5 text-[9px] uppercase tracking-[.14em] text-muted">Empty slots only</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section className="hidden">
-            <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))] p-5 shadow-[0_24px_56px_rgba(0,0,0,.24)]">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-muted">
-                    <Sparkles size={12} className="text-accent" />
-                    Outfit generator
-                  </div>
-                  <div className="mt-2 font-serif text-[25px] font-semibold leading-[1.04] text-ink">
-                    {activeVibe.label} <em className="italic text-accent">starter look</em>
-                  </div>
-                  <div className="mt-2 text-[13px] leading-relaxed text-muted-2">
-                    {activeVibe.blurb}. Generates the key pieces first, then you can swap anything slot by slot.
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveBuildOverlay('details')}
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-[#1a0d12]/80 px-3 py-2 text-white shadow-[0_8px_22px_rgba(246,48,107,.36)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:border-accent/70 hover:shadow-[0_12px_28px_rgba(246,48,107,.5)]"
-                    aria-label="Open fit insight"
-                  >
-                    <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
-                      <Info size={11} />
-                    </span>
-                    <div className="flex flex-col leading-none text-left">
-                      <span className="text-[8px] font-bold uppercase tracking-[.22em] text-accent">Fit insight</span>
-                      <span className="mt-0.5 text-[11px] font-semibold text-white">
-                        {renderN > 0 ? `${renderN} pieces · ${lockedSlots.length} locked` : 'Generate to see styling notes'}
-                      </span>
-                    </div>
-                    <ChevronRight size={12} className="text-white/70" />
-                  </button>
-                </div>
-                <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-right">
-                  <div className="text-[9px] uppercase tracking-[.18em] text-muted">
-                    {generatorLoading ? EDITORIAL_LOADING_LINES[loadingPhraseIndex] : 'AI pass - ready'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap justify-center gap-2">
-                {VIBES.map((vibe) => (
-                  <button
-                    key={vibe.id}
-                    type="button"
-                    onClick={() => setSelectedVibe(vibe.id)}
-                    className={`rounded-full px-3.5 py-2 text-[11px] font-semibold transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
-                      selectedVibe === vibe.id
-                        ? 'bg-accent text-white shadow-pink-glow'
-                        : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
-                    }`}
-                  >
-                    {vibe.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-5 flex flex-col items-center gap-2 text-center">
-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Budget</div>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {[ 
-                    { value: 'any', label: 'Any' },
-                    { value: 'under100', label: '< $100' },
-                    { value: 'under250', label: '< $250' },
-                    { value: 'under500', label: '< $500' },
-                    { value: 'custom', label: 'Custom' },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
-                        generatorBudget === option.value
-                          ? 'bg-white text-black'
-                          : 'border border-hairline bg-surface-2 text-muted'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {generatorBudget === 'custom' ? (
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="text-[10px] uppercase tracking-[.14em] text-muted">Custom max</div>
-                  <label className="flex items-center gap-2 rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink">
-                    <span className="text-muted">$</span>
-                    <input
-                      value={customBudgetInput}
-                      onChange={(event) => {
-                        setGeneratorBudget('custom');
-                        setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
-                      }}
-                      inputMode="numeric"
-                      placeholder="180"
-                      className="w-16 bg-transparent text-right outline-none"
-                    />
-                  </label>
-                </div>
-              ) : null}
-
-                {generatorBudget === 'custom' ? (
-                <div className="mt-2 text-[11px] text-muted-2">
-                  {customBudgetInput
-                    ? `Generating pieces at or below $${customBudgetInput} each.`
-                    : 'Set a per-item max price for generated pieces.'}
-                </div>
-              ) : null}
-
-              {generatorLoading ? (
-                <div className="mt-3 rounded-[18px] border border-accent/20 bg-accent/10 px-3 py-2 text-[11px] text-[#ffe7ee]">
-                  {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
-                </div>
-              ) : null}
-
-              <div className="mt-5 flex flex-col items-center gap-2 text-center">
-                <div className="text-[10px] uppercase tracking-[.14em] text-muted">Style frame</div>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {[
-                    { value: 'masc', label: 'Male' },
-                    { value: 'fem', label: 'Female' },
-                    { value: 'androgynous', label: 'Neutral' },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setBodyType(option.value as 'masc' | 'fem' | 'androgynous')}
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 motion-safe:transition-transform motion-safe:duration-150 ${
-                        generatorFrame === option.value
-                          ? 'bg-white text-black'
-                          : 'border border-hairline bg-surface-2 text-muted'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-1 gap-3">
-                <button
-                  type="button"
-                  onClick={() => void generateLook('starter')}
-                  disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-4 text-[12px] font-semibold uppercase tracking-[.14em] text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
-                >
-                  {generatorLoading ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                  Generate starter look
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('missing')}
-                  disabled={generatorLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/70 px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[.12em] text-ink transition hover:bg-accent/10 active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
-                >
-                  <Sparkles size={13} />
-                  Fill missing pieces
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => void generateLook('refresh')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
-                >
-                  Refresh look
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-60 disabled:active:scale-100"
-                >
-                  Build fuller fit
-                </button>
-              </div>
-            </div>
-          </section>
-            </>
-          ) : null}
 
           <section className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))] p-3 shadow-[0_18px_42px_rgba(40,20,24,.16)]">
             <div className="grid grid-cols-3 gap-2">
@@ -1641,8 +1352,31 @@ function BuilderPageContent({
             </div>
           </section>
 
+          {stylingNote && (stylingNote.notes || stylingNote.palette?.length) ? (
+            <div className="sy-enter overflow-hidden rounded-card border border-accent/25 bg-[radial-gradient(120%_80%_at_12%_-10%,rgba(255,59,99,.16),transparent_46%),linear-gradient(180deg,rgba(251,247,242,.06),rgba(251,247,242,.02))] p-4">
+              <div className="flex items-center gap-2">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
+                  <Sparkles size={13} />
+                </span>
+                <span className="text-[11px] font-bold uppercase tracking-[.16em] text-accent">Syli&rsquo;s take</span>
+              </div>
+              {stylingNote.notes ? (
+                <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink">{stylingNote.notes}</p>
+              ) : null}
+              {stylingNote.palette?.length ? (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {stylingNote.palette.map((color) => (
+                    <span key={color} className="sy-chip rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.1em]">
+                      {color}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           {statusMessage ? (
-            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[11px] leading-relaxed text-muted-2">
+            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">
               {statusMessage}
             </div>
           ) : null}
