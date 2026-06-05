@@ -32,7 +32,7 @@ interface ClientCatalogReport {
 const ROOT = process.cwd();
 const OUTPUT_PATH = join(ROOT, 'data', 'client-catalog.json');
 const REPORT_PATH = join(ROOT, 'data', 'catalog', 'reports', 'client-catalog-build-report.json');
-const LIMIT = Number.parseInt(process.env.CLIENT_CATALOG_LIMIT || '240', 10);
+const LIMIT = Number.parseInt(process.env.CLIENT_CATALOG_LIMIT || '560', 10);
 const BALANCED_CATEGORY_ORDER: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const BRAND_CAP_PASSES = [3, 6, 10, Number.POSITIVE_INFINITY];
 const CATEGORY_BRAND_CAP_PASSES = [2, 3, 5, Number.POSITIVE_INFINITY];

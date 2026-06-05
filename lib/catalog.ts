@@ -2194,6 +2194,7 @@ export function buildCatalogLook({
   diversityStrength = 'medium',
   targetSlots: selectedTargetSlots,
   transparentOnly = false,
+  collectPools,
   _diversityRetry = 0,
 }: {
   vibe: VibeId;
@@ -2213,6 +2214,8 @@ export function buildCatalogLook({
   diversityStrength?: DiversityStrength;
   targetSlots?: Category[];
   transparentOnly?: boolean;
+  /** When provided, receives each slot's full ranked candidate pool (for the AI composer retriever). */
+  collectPools?: Partial<Record<Category, Product[]>>;
   _diversityRetry?: number;
 }): {
   products: Partial<Record<Category, Product>>;
@@ -2296,6 +2299,7 @@ export function buildCatalogLook({
       collectionCandidates,
       transparentOnly,
     });
+    if (collectPools) collectPools[slot] = candidatePool;
     const chosen = chooseVariedCandidate(candidatePool, seed, `${vibe}:${frame}:${budget}:${customMaxCents || 0}:${slot}:catalog`);
 
     if (slot === 'jewelry') {
@@ -2776,6 +2780,7 @@ export function getOutfitCandidateShortlists({
   transparentOnly?: boolean;
   perSlotLimit?: number;
 }): OutfitCandidateShortlists {
+  const pools: Partial<Record<Category, Product[]>> = {};
   const base = buildCatalogLook({
     vibe,
     frame,
@@ -2794,6 +2799,7 @@ export function getOutfitCandidateShortlists({
     diversityStrength,
     targetSlots: selectedTargetSlots,
     transparentOnly,
+    collectPools: pools,
   });
 
   const vibeConfig = VIBES.find((entry) => entry.id === vibe) || VIBES[0];
@@ -2802,52 +2808,14 @@ export function getOutfitCandidateShortlists({
   const targetSlots = resolveTargetSlots(mode, vibe, vibeConfig.slots, existingItems, selectedTargetSlots, seed);
   const lockedSlots = (Object.keys(lockedItems || {}) as Category[])
     .filter((slot) => Boolean((lockedItems || {})[slot]));
-  const currentIds = new Set(
-    Object.values(existingItems)
-      .filter((product): product is Product => Boolean(product))
-      .map((product) => product.id),
-  );
-  const avoidIds = new Set([
-    ...avoidProductIds,
-    ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? Array.from(currentIds) : []),
-  ]);
-  const collections = getCollectionsFor(vibe, frame);
-  const chosenCollection = collections.length
-    ? collections[(stableHash(`${vibe}:${frame}:${budget}:${customMaxCents || 0}:compose`) + Math.abs(seed || 0)) % collections.length] || collections[0] || null
-    : null;
-  const collectionCandidates = dedupeProducts([
-    ...(chosenCollection ? getCollectionProducts(chosenCollection) : []),
-    ...collections.flatMap((collection) => getCollectionProducts(collection)),
-  ]);
 
+  // Reuse the candidate pools buildCatalogLook already computed (via collectPools)
+  // instead of re-running the per-slot search — one deterministic pass, not two.
   const candidatesBySlot: Partial<Record<Category, Product[]>> = {};
   for (const slot of targetSlots) {
-    if (mode === 'missing' && existingItems[slot]) continue;
     if (lockedSlots.includes(slot)) continue;
-    const pool = getSlotCandidates({
-      slot,
-      vibe,
-      frame,
-      budget,
-      customMaxCents,
-      usedIds: new Set<string>(),
-      avoidIds,
-      currentIds,
-      currentProductId: existingItems[slot]?.id,
-      usedBrands: new Set<string>(),
-      recentShoeIds: new Set(recentShoeIds),
-      recentBrandCounts: {
-        ...countBrandsForProductIds(avoidProductIds),
-        ...(recentBrandCounts || {}),
-      },
-      recentProductFamilyCounts: countFamiliesForProductIds(avoidProductIds),
-      diversityStrength,
-      formula: base.formula,
-      selectedProducts: anchorProducts,
-      collectionCandidates,
-      transparentOnly,
-    });
-    if (!pool.length) continue;
+    const pool = pools[slot];
+    if (!pool || !pool.length) continue;
     const photoFirst = pool.filter(hasRealPhoto);
     const ordered = photoFirst.length >= 4 ? photoFirst : pool;
     candidatesBySlot[slot] = ordered.slice(0, Math.max(4, perSlotLimit));

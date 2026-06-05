@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-06-04T11:39:22Z",
+  "generatedAt": "2026-06-05T18:31:48Z",
   "mode": "apply",
-  "limit": 5,
+  "limit": 240,
   "categoryFilter": [],
   "categoryQuotas": {},
   "targetVibes": [],
@@ -10,59 +10,2409 @@
   "preferFeedFirst": 0,
   "rembgAvailable": true,
   "rembgError": null,
-  "rembgModel": "u2netp",
-  "maxInputPx": 1200,
+  "rembgModel": "isnet-general-use",
+  "maxInputPx": 1600,
   "outputDir": "public/assets/cutouts",
   "items": [
     {
-      "id": "drop-b480d297ee83c852",
-      "brand": "Aim\u00e9 Leon Dore",
-      "name": "Reversible Madras Windbreaker",
-      "category": "outer",
-      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69a9d052a13ea269a9d052a1596.1485892569a9d052a1596.jpg?v=1772819283",
-      "outputPath": "public/assets/cutouts/drop-b480d297ee83c852.png",
+      "id": "searchapi-quality-sandals-clean-birkenstock-women-s-mayari-d14ae00862dbd9",
+      "brand": "Birkenstock",
+      "name": "BIRKENSTOCK Women's Mayari",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTg2RhRvDTUiqZdbLyL7NzWYpDPuUTmG-TIACEM4FYR_ltXzer5S3dRhyUlT8zZNjqfc2-Ye8jly7K96dn-WaHPb_-sj_QiX11xOVwkjeU",
+      "outputPath": "public/assets/cutouts/searchapi-quality-sandals-clean-birkenstock-women-s-mayari-d14ae00862dbd9.png",
       "status": "generated",
-      "bytes": 888405
+      "bytes": 141147
     },
     {
-      "id": "drop-89a1d418e1754361",
-      "brand": "Aim\u00e9 Leon Dore",
-      "name": "Suede Track Jacket",
-      "category": "outer",
-      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69d0230022fc3669d02300231fa.1208135569d02300231fa.jpg?v=1775248154",
-      "outputPath": "public/assets/cutouts/drop-89a1d418e1754361.png",
-      "status": "generated",
-      "bytes": 956416
-    },
-    {
-      "id": "drop-ecfec4a6d2dabf10",
-      "brand": "Marine Serre",
-      "name": "Marine Serre Upcycled Jersey Polo Shirt - White",
+      "id": "drop-8f239a3d4e14683b",
+      "brand": "Alo Yoga",
+      "name": "Alosoft Crop Finesse Short Sleeve - Oatmeal Heather",
       "category": "top",
-      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MSUTO101AUJER0003-FRONT_6bc37a97-457d-413d-9c2e-e9eda327037f.jpg?v=1779896808",
-      "outputPath": "public/assets/cutouts/drop-ecfec4a6d2dabf10.png",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W1406R_04357_b1_s1_a2_dSP26_m134.jpg?v=1772448661",
+      "outputPath": "public/assets/cutouts/drop-8f239a3d4e14683b.png",
       "status": "generated",
-      "bytes": 329273
+      "bytes": 1002424
     },
     {
-      "id": "drop-2a653bf5d2cc277b",
+      "id": "drop-17b74f1fcdb75033",
+      "brand": "Alo Yoga",
+      "name": "Aspire Tank - Gravel/White",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W2675RG_02577_b2_s1_a1_1_m54.jpg?v=1773699394",
+      "outputPath": "public/assets/cutouts/drop-17b74f1fcdb75033.png",
+      "status": "generated",
+      "bytes": 1255875
+    },
+    {
+      "id": "drop-6cddab51be40dbc3",
+      "brand": "Alo Yoga",
+      "name": "Pointelle Sweater Be Mine Cardigan - Black",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W3914R_01_b1_s1_a5_m125.jpg?v=1770654811",
+      "outputPath": "public/assets/cutouts/drop-6cddab51be40dbc3.png",
+      "status": "generated",
+      "bytes": 790967
+    },
+    {
+      "id": "drop-fc0b2381f61fa4f6",
+      "brand": "Alo Yoga",
+      "name": "Tennis Club Sweater Knit Cropped Polo - Black/Ivory",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W1484R_03850_b1_s1_a1_m143.jpg?v=1749475224",
+      "outputPath": "public/assets/cutouts/drop-fc0b2381f61fa4f6.png",
+      "status": "generated",
+      "bytes": 713777
+    },
+    {
+      "id": "drop-91771da2cd4ce0ff",
+      "brand": "Alo Yoga",
+      "name": "Tennis Club Sweater Knit Dress - Black/Ivory",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W8277R_03850_b2_s1_a1_dSP26_m190_1d1e4b16-4899-4b6d-9e7f-f8ddd89bc497.jpg?v=1774044703",
+      "outputPath": "public/assets/cutouts/drop-91771da2cd4ce0ff.png",
+      "status": "generated",
+      "bytes": 772401
+    },
+    {
+      "id": "drop-df951f5b1a1af0bc",
+      "brand": "COTTON JERSEY",
+      "name": "COTTON JERSEY TUBE TOP | SIENNA NATURAL LEOPARD",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-SL-TNK-9005W-SIN-FLT.jpg?v=1777409638",
+      "outputPath": "public/assets/cutouts/drop-df951f5b1a1af0bc.png",
+      "status": "generated",
+      "bytes": 2193817
+    },
+    {
+      "id": "drop-619da35fecfe4aea",
+      "brand": "CUPRO JERSEY",
+      "name": "CUPRO JERSEY ASYMMETRICAL TOP | PEARL",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-LSL-11920W-PRL-FLT_f82d86f9-b175-4955-9e78-cddf67f722fd.jpg?v=1780093338",
+      "outputPath": "public/assets/cutouts/drop-619da35fecfe4aea.png",
+      "status": "generated",
+      "bytes": 490904
+    },
+    {
+      "id": "drop-220b0b87f7e7de7f",
+      "brand": "CUPRO JERSEY",
+      "name": "CUPRO JERSEY HALTER BODYSUIT | PEARL",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-BS-TNK-11919W-PRL-FLT_f306693d-1347-4058-95b2-87d1dd0786b2.jpg?v=1780093337",
+      "outputPath": "public/assets/cutouts/drop-220b0b87f7e7de7f.png",
+      "status": "generated",
+      "bytes": 310303
+    },
+    {
+      "id": "drop-8f8d0b34503d6260",
+      "brand": "Made Some",
+      "name": "Made Some Greece Tank Top - White / Navy",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MS-TANK-GC-FRONT_927f262f-c842-4df0-9655-5ae3dfb71764.jpg?v=1779896798",
+      "outputPath": "public/assets/cutouts/drop-8f8d0b34503d6260.png",
+      "status": "generated",
+      "bytes": 383517
+    },
+    {
+      "id": "drop-82715a07b8aa25c5",
+      "brand": "NikeSKIMS MATTE",
+      "name": "NikeSKIMS MATTE DOUBLE STRAP SCOOP TANK | IVORY",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-IR5027-IVY.jpg?v=1778106250",
+      "outputPath": "public/assets/cutouts/drop-82715a07b8aa25c5.png",
+      "status": "generated",
+      "bytes": 297513
+    },
+    {
+      "id": "drop-d0359d780607cbb4",
       "brand": "Radial",
-      "name": "CURSIVE APPLIQUE ZIP HOODIE",
+      "name": "BEACH OMBRE PLAID SHIRT",
       "category": "top",
-      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/118617_LIME_1.jpg?v=1778692711",
-      "outputPath": "public/assets/cutouts/drop-2a653bf5d2cc277b.png",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1110391_GREN_3.jpg?v=1778692008",
+      "outputPath": "public/assets/cutouts/drop-d0359d780607cbb4.png",
       "status": "generated",
-      "bytes": 522362
+      "bytes": 894895
     },
     {
-      "id": "drop-929248d4365be5aa",
-      "brand": "Peachy Den",
-      "name": "Peachy Den Mercy Track Trouser - Grey Marl",
-      "category": "bottom",
-      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/PDCN-SP26-1007-0155-FRONT_f2d66af4-ad8c-43db-b72b-97003beba33a.jpg?v=1780432974",
-      "outputPath": "public/assets/cutouts/drop-929248d4365be5aa.png",
+      "id": "drop-c311cfc426b564c2",
+      "brand": "Radial",
+      "name": "BEACH STRIPE TEE",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1140386_MOSS_3.jpg?v=1778692290",
+      "outputPath": "public/assets/cutouts/drop-c311cfc426b564c2.png",
       "status": "generated",
-      "bytes": 840738
+      "bytes": 943755
+    },
+    {
+      "id": "drop-939282b5f5e18c51",
+      "brand": "Radial",
+      "name": "COTTON SILK WESTERN SHIRT",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1110389_BLUE_3.jpg?v=1778691933",
+      "outputPath": "public/assets/cutouts/drop-939282b5f5e18c51.png",
+      "status": "generated",
+      "bytes": 720537
+    },
+    {
+      "id": "drop-3e2a849286c30fd2",
+      "brand": "Radial",
+      "name": "FLORAL ROLL NECK SWEATER",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/117295_BLAC_3.jpg?v=1778692548",
+      "outputPath": "public/assets/cutouts/drop-3e2a849286c30fd2.png",
+      "status": "generated",
+      "bytes": 681113
+    },
+    {
+      "id": "drop-ec01b592617c962f",
+      "brand": "Radial",
+      "name": "HEMP STOCK KNIT BUCKET HAT",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1321268_MUGR_1.jpg?v=1778692964",
+      "outputPath": "public/assets/cutouts/drop-ec01b592617c962f.png",
+      "status": "generated",
+      "bytes": 1209780
+    },
+    {
+      "id": "drop-e6d366efdecd3673",
+      "brand": "Radial",
+      "name": "LIGHTWEIGHT THERMAL HOODIE",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1140410_CAMO_3.jpg?v=1778692353",
+      "outputPath": "public/assets/cutouts/drop-e6d366efdecd3673.png",
+      "status": "generated",
+      "bytes": 797954
+    },
+    {
+      "id": "drop-b4562a152ee38184",
+      "brand": "REFINED KNIT",
+      "name": "REFINED KNIT TUBE TOP | AMETHYST",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-TOP-11750W-AME-FLT_b5a64158-cfc9-48fa-97b8-d9a82de8ad25.jpg?v=1777486642",
+      "outputPath": "public/assets/cutouts/drop-b4562a152ee38184.png",
+      "status": "generated",
+      "bytes": 1495843
+    },
+    {
+      "id": "drop-d244f36551a64b29",
+      "brand": "REFINED KNIT",
+      "name": "REFINED KNIT TUBE TOP | OBSIDIAN",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-TOP-11750W-OBD-FLT_6cdc8b8f-e216-4b29-84c8-2481ec6c220c.jpg?v=1777486643",
+      "outputPath": "public/assets/cutouts/drop-d244f36551a64b29.png",
+      "status": "generated",
+      "bytes": 890512
+    },
+    {
+      "id": "drop-ba153cdc0bdadec8",
+      "brand": "SLINKY KNIT",
+      "name": "SLINKY KNIT CAMI | BUFF",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-TNK-11703W-BFF-FLT.jpg?v=1780093474",
+      "outputPath": "public/assets/cutouts/drop-ba153cdc0bdadec8.png",
+      "status": "generated",
+      "bytes": 1233107
+    },
+    {
+      "id": "drop-f62cb71635fbbbec",
+      "brand": "SLINKY KNIT",
+      "name": "SLINKY KNIT CARDIGAN | BUFF",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-LSL-11712W-BFF-FLT.jpg?v=1780093472",
+      "outputPath": "public/assets/cutouts/drop-f62cb71635fbbbec.png",
+      "status": "generated",
+      "bytes": 1002008
+    },
+    {
+      "id": "drop-9b0b10d69cd2964d",
+      "brand": "SLINKY KNIT",
+      "name": "SLINKY KNIT DEEP PLUNGE TOP | BUFF",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-TP-LSL-11710W-BFF-FLT.jpg?v=1780093472",
+      "outputPath": "public/assets/cutouts/drop-9b0b10d69cd2964d.png",
+      "status": "generated",
+      "bytes": 1336216
+    },
+    {
+      "id": "drop-2a751a284b764217",
+      "brand": "Tae Park",
+      "name": "Tae Park Chiffon Wrap Top - Ivory",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TAETP-025-IVY-FRONT_7df7f8c4-cb5f-48ba-b51c-720c48e488ab.jpg?v=1773770605",
+      "outputPath": "public/assets/cutouts/drop-2a751a284b764217.png",
+      "status": "generated",
+      "bytes": 529027
+    },
+    {
+      "id": "drop-b9059a5d83a12c7e",
+      "brand": "Tae Park",
+      "name": "Tae Park Chiffon Wrap Top - Sky Blue / Matcha",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/Tae-Park--8_4a5b2b29-a4e6-4874-90fc-2c2bd102eeff.jpg?v=1779311587",
+      "outputPath": "public/assets/cutouts/drop-b9059a5d83a12c7e.png",
+      "status": "generated",
+      "bytes": 1287864
+    },
+    {
+      "id": "drop-ae2b4dbef5e10a16",
+      "brand": "Tae Park",
+      "name": "Tae Park Embellished Napkin Top - Stone Grey",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TP-064-SG-FRONT_3be55fdd-5732-428f-98b1-84b91bd10b8b.jpg?v=1779310476",
+      "outputPath": "public/assets/cutouts/drop-ae2b4dbef5e10a16.png",
+      "status": "generated",
+      "bytes": 1574034
+    },
+    {
+      "id": "drop-ec1be60350aa2fd2",
+      "brand": "Tae Park",
+      "name": "Tae Park Sculpted Halter Top - Black",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TAETP-0334-BLK-FRONT_07cb4fcf-7300-42eb-99fd-29834d75e4b0.jpg?v=1773948388",
+      "outputPath": "public/assets/cutouts/drop-ec1be60350aa2fd2.png",
+      "status": "generated",
+      "bytes": 692719
+    },
+    {
+      "id": "drop-6e0d68d46535c289",
+      "brand": "Tae Park",
+      "name": "Tae Park Sculpted Halter Top - Brown",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TAETP-034-BRN-FRONT_cae31f1a-28ba-4ac3-8cef-23050fdfe45b.jpg?v=1778094480",
+      "outputPath": "public/assets/cutouts/drop-6e0d68d46535c289.png",
+      "status": "generated",
+      "bytes": 1194107
+    },
+    {
+      "id": "drop-ab953f80eb1b5d64",
+      "brand": "Tae Park",
+      "name": "Tae Park Sheer Kite Top - Black",
+      "category": "top",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TAETP-058-BLK-FRONT.jpg?v=1773778489",
+      "outputPath": "public/assets/cutouts/drop-ab953f80eb1b5d64.png",
+      "status": "generated",
+      "bytes": 1139177
+    },
+    {
+      "id": "drop-f28023f0a181882a",
+      "brand": "Alo Yoga",
+      "name": "5\" Airbrush Double Up Short - Black/White",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W6525R_06401_b2_s1_a1_m191.jpg?v=1752216054",
+      "outputPath": "public/assets/cutouts/drop-f28023f0a181882a.png",
+      "status": "generated",
+      "bytes": 486688
+    },
+    {
+      "id": "drop-8d3e9c28eb2f4ee5",
+      "brand": "Alo Yoga",
+      "name": "5\" Airbrush Double Up Short - Navy/White",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W6525R_04893_b2_s1_a1_dSP26_m125.jpg?v=1775845334",
+      "outputPath": "public/assets/cutouts/drop-8d3e9c28eb2f4ee5.png",
+      "status": "generated",
+      "bytes": 865532
+    },
+    {
+      "id": "drop-6a0b7091519b2108",
+      "brand": "Alo Yoga",
+      "name": "7/8 High-Waist Airlift Legging - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W5766R_05438_b1_s1_a1_1_m191.jpg?v=1774304113",
+      "outputPath": "public/assets/cutouts/drop-6a0b7091519b2108.png",
+      "status": "generated",
+      "bytes": 492933
+    },
+    {
+      "id": "drop-eb391b321a27c5ae",
+      "brand": "Alo Yoga",
+      "name": "Accolade Straight Leg Sweatpant - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/U5012RG_05438_b1_s1_a3_m207.jpg?v=1761866238",
+      "outputPath": "public/assets/cutouts/drop-eb391b321a27c5ae.png",
+      "status": "generated",
+      "bytes": 986955
+    },
+    {
+      "id": "drop-4e68633e9e1a199c",
+      "brand": "Alo Yoga",
+      "name": "Accolade Straight Leg Sweatpant - Oatmeal Heather",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/U5012RG_04357_b2_s1_a1_dSP26_m0.jpg?v=1772526277",
+      "outputPath": "public/assets/cutouts/drop-4e68633e9e1a199c.png",
+      "status": "generated",
+      "bytes": 785375
+    },
+    {
+      "id": "drop-10eabca7227e7822",
+      "brand": "Alo Yoga",
+      "name": "Airlift High Waist Charger 7/8 Legging - Black/White",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W54220R_0100_b1_s1_a2_dSP26_m246.jpg?v=1770411232",
+      "outputPath": "public/assets/cutouts/drop-10eabca7227e7822.png",
+      "status": "generated",
+      "bytes": 303044
+    },
+    {
+      "id": "drop-91b636accb9a1ab4",
+      "brand": "Alo Yoga",
+      "name": "Airlift High-Waist 7/8 Line Up Legging - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W51154R_05438_b2_s1_a1_dFA25_m143.jpg?v=1773868189",
+      "outputPath": "public/assets/cutouts/drop-91b636accb9a1ab4.png",
+      "status": "generated",
+      "bytes": 698420
+    },
+    {
+      "id": "drop-5e2c21f04a4fa0bf",
+      "brand": "Alo Yoga",
+      "name": "Alosoft High-Waist 7/8 Highlight Legging - Oatmeal Heather",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W51104R_04357_b2_s1_a1_dSP26_m134.jpg?v=1772526442",
+      "outputPath": "public/assets/cutouts/drop-5e2c21f04a4fa0bf.png",
+      "status": "generated",
+      "bytes": 894668
+    },
+    {
+      "id": "drop-3a10313518b82133",
+      "brand": "Alo Yoga",
+      "name": "Alosoft Sincere Micro Short - Athletic Heather Grey",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W6548R_06501_b2_s1_a1_m177_596da12d-17ab-401c-af59-4255562b96a7.jpg?v=1768422240",
+      "outputPath": "public/assets/cutouts/drop-3a10313518b82133.png",
+      "status": "generated",
+      "bytes": 1001442
+    },
+    {
+      "id": "drop-e16aff2afe647401",
+      "brand": "Alo Yoga",
+      "name": "Alosoft Sincere Micro Short - Black",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W6548R_01_b2_s1_a1_dSP26_m134.jpg?v=1770056039",
+      "outputPath": "public/assets/cutouts/drop-e16aff2afe647401.png",
+      "status": "generated",
+      "bytes": 988922
+    },
+    {
+      "id": "drop-a255faeacae55f32",
+      "brand": "Alo Yoga",
+      "name": "High-Waist Airlift Legging - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W5561R_05438_b2_s1_a1_1_m18.jpg?v=1774304155",
+      "outputPath": "public/assets/cutouts/drop-a255faeacae55f32.png",
+      "status": "generated",
+      "bytes": 725193
+    },
+    {
+      "id": "drop-3ddb155ed15d53ee",
+      "brand": "Alo Yoga",
+      "name": "High-Waist Pursuit Trouser (Long) - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W51346R_05438_b1_s1_a1_2_m134.jpg?v=1773439378",
+      "outputPath": "public/assets/cutouts/drop-3ddb155ed15d53ee.png",
+      "status": "generated",
+      "bytes": 425145
+    },
+    {
+      "id": "drop-2e25bf1f4b23293d",
+      "brand": "Alo Yoga",
+      "name": "High-Waist Pursuit Trouser (Regular) - Gravel",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W51436R_05438_b1_s1_a1_dSP26_m191.jpg?v=1772832712",
+      "outputPath": "public/assets/cutouts/drop-2e25bf1f4b23293d.png",
+      "status": "generated",
+      "bytes": 420566
+    },
+    {
+      "id": "drop-aac4e25cc3f826fc",
+      "brand": "Alo Yoga",
+      "name": "Silk Luminous Short - Black",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W6579P_01_b2_s1_a1_dSP26_m267_51b63743-6446-4f0f-917f-3bd19ca1bbb1.jpg?v=1770523218",
+      "outputPath": "public/assets/cutouts/drop-aac4e25cc3f826fc.png",
+      "status": "generated",
+      "bytes": 726093
+    },
+    {
+      "id": "drop-479155cfaa641534",
+      "brand": "COTTON POPLIN",
+      "name": "COTTON POPLIN MENS LOGO BAND SLEEP PANT | PLATINUM DOUBLE STRIPE",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-BO-PNT-12182M-PDS-FLT.png?v=1779918262",
+      "outputPath": "public/assets/cutouts/drop-479155cfaa641534.png",
+      "status": "generated",
+      "bytes": 775344
+    },
+    {
+      "id": "drop-b378f4efd304982d",
+      "brand": "Made Some",
+      "name": "Made Some Mini Skirt - Yellow / Green",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MS-SKRT-YG-FRONT_cf287641-1fc8-453d-8396-e208bee74cb4.jpg?v=1779896798",
+      "outputPath": "public/assets/cutouts/drop-b378f4efd304982d.png",
+      "status": "generated",
+      "bytes": 912216
+    },
+    {
+      "id": "drop-d7124c283e3ebaa5",
+      "brand": "Marine Serre",
+      "name": "Marine Serre Baggy Jeans - Light Blue",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MSWPA174ACDEN0002-FRONT_13bd99f0-f832-4994-9248-41d44bd59b19.jpg?v=1779896808",
+      "outputPath": "public/assets/cutouts/drop-d7124c283e3ebaa5.png",
+      "status": "generated",
+      "bytes": 1747508
+    },
+    {
+      "id": "drop-1c30a775edce2972",
+      "brand": "Marine Serre",
+      "name": "Marine Serre Denim Bermuda - Light Blue",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MSUSH004BCDEN0002-FRONT_874f32ef-cce2-4339-9116-fcd273744ffe.jpg?v=1779896810",
+      "outputPath": "public/assets/cutouts/drop-1c30a775edce2972.png",
+      "status": "generated",
+      "bytes": 1074731
+    },
+    {
+      "id": "drop-09c4fce3422635e4",
+      "brand": "Marine Serre",
+      "name": "Marine Serre Moon Printed Jersey Mini Short - Pink",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MSWSH007ACJER0001-FRONT_e9616fa4-e5d1-4f9c-bcb4-e1f049fd5613.jpg?v=1780432968",
+      "outputPath": "public/assets/cutouts/drop-09c4fce3422635e4.png",
+      "status": "generated",
+      "bytes": 620115
+    },
+    {
+      "id": "drop-cf01d7562d1d3a82",
+      "brand": "Radial",
+      "name": "BIG OL' JEAN SLUB DENIM",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/116797_BLUE_3.jpg?v=1778693073",
+      "outputPath": "public/assets/cutouts/drop-cf01d7562d1d3a82.png",
+      "status": "generated",
+      "bytes": 862313
+    },
+    {
+      "id": "drop-7ca495fbcf9cc9dd",
+      "brand": "Radial",
+      "name": "NEW CLASSIC JEAN DENIM",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/116803_PIHA_3.jpg?v=1779821493",
+      "outputPath": "public/assets/cutouts/drop-7ca495fbcf9cc9dd.png",
+      "status": "generated",
+      "bytes": 814289
+    },
+    {
+      "id": "drop-9e3adb2d52a803ca",
+      "brand": "Radial",
+      "name": "NEW CLASSIC JEAN SLUB DENIM",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/116798_BLUE_3.jpg?v=1778693087",
+      "outputPath": "public/assets/cutouts/drop-9e3adb2d52a803ca.png",
+      "status": "generated",
+      "bytes": 877600
+    },
+    {
+      "id": "drop-936a4dc27d982506",
+      "brand": "Tae Park",
+      "name": "Tae Park Flowy Chiffon Skirt - Sky Blue / Matcha",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/Tae-Park--11_48e932d1-7d3f-475b-baa7-0f1169865771.jpg?v=1779311661",
+      "outputPath": "public/assets/cutouts/drop-936a4dc27d982506.png",
+      "status": "generated",
+      "bytes": 610718
+    },
+    {
+      "id": "drop-2e97c9217d0fb7b9",
+      "brand": "Tae Park",
+      "name": "Tae Park Sheer Table Skirt - Emerald",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/Tae-Park---13_577a9b99-89a8-4c51-b6d9-3f2f02b7bcf5.jpg?v=1779311624",
+      "outputPath": "public/assets/cutouts/drop-2e97c9217d0fb7b9.png",
+      "status": "generated",
+      "bytes": 772086
+    },
+    {
+      "id": "drop-2c1464b6f823004e",
+      "brand": "ULTRA FINE LACE",
+      "name": "ULTRA FINE LACE MIDI SKIRT | OBSIDIAN",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-LG-BTM-11531W-OBD-FLT.jpg?v=1777069895",
+      "outputPath": "public/assets/cutouts/drop-2c1464b6f823004e.png",
+      "status": "generated",
+      "bytes": 2165310
+    },
+    {
+      "id": "drop-08c109b5951d65b3",
+      "brand": "What Goes Around Comes Around",
+      "name": "WGACA Fendi Denim Baguette - Navy",
+      "category": "bottom",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/WGQBB0470WNB00B-front_2eec015b-2539-4310-b3f1-ab1e6949d96a.jpg?v=1774977415",
+      "outputPath": "public/assets/cutouts/drop-08c109b5951d65b3.png",
+      "status": "generated",
+      "bytes": 656553
+    },
+    {
+      "id": "searchapi-quality-office-fem-babaton-women-s-broker-pant-in-black-size-10-polyester-viscose-cotton-535a91de50a612",
+      "brand": "Babaton",
+      "name": "Babaton Women's Broker Pant in Black size 10 | Polyester/Viscose/Cotton",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTOXQDFVh6uxWvTWKJH8nXiuqiAsp_Qcz88fdbhVmXK7hgbMdekwFtVL8BJ0foN2SAcbJ49xG_z8UtyCllO4PqUvnrELGF2aKcJl8Qh4cH96RaziYWSNVz_fw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-office-fem-babaton-women-s-broker-pant-in-black-size-10-polyester-viscose-cotton-535a91de50a612.png",
+      "status": "generated",
+      "bytes": 93251
+    },
+    {
+      "id": "drop-b2bf4d0c167f95ba",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "ALD  / New Balance Made in USA 1300",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69bd91ee15eb8169bd91ee1609c.1396717069bd91ee1609c.jpg?v=1774037758",
+      "outputPath": "public/assets/cutouts/drop-b2bf4d0c167f95ba.png",
+      "status": "generated",
+      "bytes": 820242
+    },
+    {
+      "id": "drop-2ca0f430ab769aec",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "ALD / New Balance        RC56",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore698e1c0e2d6748698e1c0e2d82b.94854480698e1c0e2d82b.jpg?v=1771002302",
+      "outputPath": "public/assets/cutouts/drop-2ca0f430ab769aec.png",
+      "status": "generated",
+      "bytes": 827070
+    },
+    {
+      "id": "drop-e06ef180bad84301",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "ALD / New Balance Made in UK    991",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/NB25FS009_CHOCOLATE_-14-06copy.jpg?v=1765919004",
+      "outputPath": "public/assets/cutouts/drop-e06ef180bad84301.png",
+      "status": "generated",
+      "bytes": 935220
+    },
+    {
+      "id": "drop-a70941399f127097",
+      "brand": "Air Jordan",
+      "name": "AIR JORDAN 12 RETRO",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_CT8013-003_PHSRH000-2000_f2825e4c-c7e3-49a3-bde4-1060bf5facc5.jpg?v=1778607028",
+      "outputPath": "public/assets/cutouts/drop-a70941399f127097.png",
+      "status": "generated",
+      "bytes": 854532
+    },
+    {
+      "id": "drop-9666afe788027e20",
+      "brand": "Air Jordan",
+      "name": "AIR JORDAN 12 RETRO \"BLOODLINE\"",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_153265-003_PHSRH000-2000.jpg?v=1779305355",
+      "outputPath": "public/assets/cutouts/drop-9666afe788027e20.png",
+      "status": "generated",
+      "bytes": 692391
+    },
+    {
+      "id": "drop-a8c65ca302798c2c",
+      "brand": "Air Jordan",
+      "name": "AIR JORDAN 4 RETRO",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_FQ8138-600_PHSRH000-2000.jpg?v=1778606088",
+      "outputPath": "public/assets/cutouts/drop-a8c65ca302798c2c.png",
+      "status": "generated",
+      "bytes": 947931
+    },
+    {
+      "id": "drop-c129055c58918097",
+      "brand": "Air Jordan",
+      "name": "JORDAN TRUNNER O/S SP",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IV4373-001_PHSRH000-2000.jpg?v=1780346425",
+      "outputPath": "public/assets/cutouts/drop-c129055c58918097.png",
+      "status": "generated",
+      "bytes": 545107
+    },
+    {
+      "id": "drop-0e89c07e484577e3",
+      "brand": "Alo Yoga",
+      "name": "ALO Recovery Mode Sneaker - Gravel/White",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/A0685U_02577_b1_a4_m181.jpg?v=1765919950",
+      "outputPath": "public/assets/cutouts/drop-0e89c07e484577e3.png",
+      "status": "generated",
+      "bytes": 681309
+    },
+    {
+      "id": "drop-a0e943062190c684",
+      "brand": "Everlane",
+      "name": "The Court Sneaker | White",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/64096e92_8f57.jpg?v=1753411465",
+      "outputPath": "public/assets/cutouts/drop-a0e943062190c684.png",
+      "status": "generated",
+      "bytes": 146193
+    },
+    {
+      "id": "drop-1970c6c13d505b81",
+      "brand": "Everlane",
+      "name": "The Court Sneaker | White / Grass Green / Parchment",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/6b997b61_1635.jpg?v=1753411646",
+      "outputPath": "public/assets/cutouts/drop-1970c6c13d505b81.png",
+      "status": "generated",
+      "bytes": 183617
+    },
+    {
+      "id": "drop-808b5877d0362d3d",
+      "brand": "Everlane",
+      "name": "The Forever High-Top Sneaker | Bronze",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/b9f358c7_b0aa.jpg?v=1750093771",
+      "outputPath": "public/assets/cutouts/drop-808b5877d0362d3d.png",
+      "status": "generated",
+      "bytes": 266201
+    },
+    {
+      "id": "drop-2362debaf6671aba",
+      "brand": "Everlane",
+      "name": "The Forever Sneaker\u00ae | White",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/0e70f64b_5211.jpg?v=1753411416",
+      "outputPath": "public/assets/cutouts/drop-2362debaf6671aba.png",
+      "status": "generated",
+      "bytes": 144584
+    },
+    {
+      "id": "drop-75b4abc8d934f50a",
+      "brand": "Everlane",
+      "name": "The ReLeather\u00ae Court Sneaker | Off White / Black",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/f5139d2c_0b67.jpg?v=1750093768",
+      "outputPath": "public/assets/cutouts/drop-75b4abc8d934f50a.png",
+      "status": "generated",
+      "bytes": 110010
+    },
+    {
+      "id": "drop-7e58b05826c83544",
+      "brand": "Everlane",
+      "name": "The ReLeather\u00ae Tennis Shoe  | Orchid",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/d17a9f21_2fe1.jpg?v=1753411392",
+      "outputPath": "public/assets/cutouts/drop-7e58b05826c83544.png",
+      "status": "generated",
+      "bytes": 117363
+    },
+    {
+      "id": "drop-8bde728c4a43bfd9",
+      "brand": "Everlane",
+      "name": "The ReLeather\u00ae Tennis Shoe  | White / Gum Sole",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/132cf231_3f08.jpg?v=1753411431",
+      "outputPath": "public/assets/cutouts/drop-8bde728c4a43bfd9.png",
+      "status": "generated",
+      "bytes": 324540
+    },
+    {
+      "id": "drop-c825757ba2060d79",
+      "brand": "Everlane",
+      "name": "The Tread-Bare Sneaker | Canvas",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/372e22c3_e2cc.jpg?v=1753411617",
+      "outputPath": "public/assets/cutouts/drop-c825757ba2060d79.png",
+      "status": "generated",
+      "bytes": 321089
+    },
+    {
+      "id": "drop-0c5ff711a6247d9c",
+      "brand": "Everlane",
+      "name": "The Tread-Bare Sneaker | Canvas / Lapis Blue / Classic Red",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/68a3c5cf_c35c.jpg?v=1753411602",
+      "outputPath": "public/assets/cutouts/drop-0c5ff711a6247d9c.png",
+      "status": "generated",
+      "bytes": 363738
+    },
+    {
+      "id": "drop-ab9a3033efe16b76",
+      "brand": "Everlane",
+      "name": "The Tread-Bare Sneaker | Forest Green",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/474eb10b_8aa4.jpg?v=1757792545",
+      "outputPath": "public/assets/cutouts/drop-ab9a3033efe16b76.png",
+      "status": "generated",
+      "bytes": 302871
+    },
+    {
+      "id": "drop-fb8ace9fd3d694d7",
+      "brand": "Everlane",
+      "name": "The Tread-Bare Sneaker | Natural Canvas / Black",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/625117e9_597f.jpg?v=1753411608",
+      "outputPath": "public/assets/cutouts/drop-fb8ace9fd3d694d7.png",
+      "status": "generated",
+      "bytes": 322508
+    },
+    {
+      "id": "drop-0093d0e35a88bde3",
+      "brand": "Everlane",
+      "name": "The Tread-Bare Sneaker | Natural Canvas / Dark Sapphire / Argan Oil",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0623/7916/3734/files/5321b194_8a7e.jpg?v=1753411609",
+      "outputPath": "public/assets/cutouts/drop-0093d0e35a88bde3.png",
+      "status": "generated",
+      "bytes": 341223
+    },
+    {
+      "id": "drop-3fea251ec11c7a63",
+      "brand": "Jordan",
+      "name": "Jordan Air Jordan 13 Retro - White / Black / True Red",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/JB414571-102AirJordan13RetroWhiteBlackTrueRed_1760.jpg?v=1773433022",
+      "outputPath": "public/assets/cutouts/drop-3fea251ec11c7a63.png",
+      "status": "generated",
+      "bytes": 627313
+    },
+    {
+      "id": "drop-40ca81bdd8aad08a",
+      "brand": "Jordan",
+      "name": "Jordan Air Jordan 14 Retro - Black / White / University Blue / Metallic Silver",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/JB487471-007AirJordan14RetroBlackWhiteUnivBlueMtlcSilver_1819.jpg?v=1774020599",
+      "outputPath": "public/assets/cutouts/drop-40ca81bdd8aad08a.png",
+      "status": "generated",
+      "bytes": 627565
+    },
+    {
+      "id": "drop-378a837007f6474b",
+      "brand": "Jordan",
+      "name": "Jordan Air Jordan 3 Retro - Sail / Jade Aura",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_IF4396-100_PHSRH000-2000.jpg?v=1775585268",
+      "outputPath": "public/assets/cutouts/drop-378a837007f6474b.png",
+      "status": "generated",
+      "bytes": 610380
+    },
+    {
+      "id": "drop-c2b9a494c7eaf093",
+      "brand": "Jordan",
+      "name": "Jordan Trunner O/S - Blue Beyond / Atomic Orange / Cobblestone",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/Previews_JBIQ5649-400JordanTrunnerRacerBlue-Black-BrtCeramic-VelvetBrown-VarsityMaize_88.jpg?v=1773065481",
+      "outputPath": "public/assets/cutouts/drop-c2b9a494c7eaf093.png",
+      "status": "generated",
+      "bytes": 669876
+    },
+    {
+      "id": "drop-e5fc3a6c553d85b7",
+      "brand": "Jordan",
+      "name": "Jordan x Levi's Air Jordan 3 - Denim / Black / Gym Red",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/air-jordan-3-x-levi-s_-black-and-white-ir0914-400-release-date_2.jpg?v=1772722084",
+      "outputPath": "public/assets/cutouts/drop-e5fc3a6c553d85b7.png",
+      "status": "generated",
+      "bytes": 581399
+    },
+    {
+      "id": "drop-e96401d85d35d6d5",
+      "brand": "Maison Margiela",
+      "name": "Maison Margiela Replica Sneakers - Black",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MMS57WS0236-H6851ReplicaSneakersBlackBlack_7820.jpg?v=1744125924",
+      "outputPath": "public/assets/cutouts/drop-e96401d85d35d6d5.png",
+      "status": "generated",
+      "bytes": 490347
+    },
+    {
+      "id": "drop-4522f4b265ccfae7",
+      "brand": "Maison Margiela",
+      "name": "Maison Margiela Replica Sneakers - Off White Gum",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/products/MMS57WS0236-101MargielaReplicaSneakersOffWhiteGum_10771.jpg?v=1624906802",
+      "outputPath": "public/assets/cutouts/drop-4522f4b265ccfae7.png",
+      "status": "generated",
+      "bytes": 399395
+    },
+    {
+      "id": "drop-f904887ace26ed2b",
+      "brand": "New Balance",
+      "name": "New Balance 992 Made in USA - White / Silver Metalic",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU992NCNewBalance992White.1jpg.jpg?v=1743712397",
+      "outputPath": "public/assets/cutouts/drop-f904887ace26ed2b.png",
+      "status": "generated",
+      "bytes": 627027
+    },
+    {
+      "id": "drop-f1b2787e50cce0c7",
+      "brand": "New Balance",
+      "name": "New Balance Made in USA 990v4 - Olive Leaf / Permafrost / Light Olive",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU9901MX-Front.jpg?v=1774633586",
+      "outputPath": "public/assets/cutouts/drop-f1b2787e50cce0c7.png",
+      "status": "generated",
+      "bytes": 688432
+    },
+    {
+      "id": "drop-8148277f12771c11",
+      "brand": "New Balance",
+      "name": "New Balance Made in USA 992 - Olivine / Incense / Raw Cashew",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU992720-Front.jpg?v=1774036650",
+      "outputPath": "public/assets/cutouts/drop-8148277f12771c11.png",
+      "status": "generated",
+      "bytes": 601556
+    },
+    {
+      "id": "drop-ebcebdea81be425f",
+      "brand": "New Balance",
+      "name": "New Balance WMNS 574 Core - Grey / White",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/wl574evg_nb_02_i.jpg?v=1779223014",
+      "outputPath": "public/assets/cutouts/drop-ebcebdea81be425f.png",
+      "status": "generated",
+      "bytes": 595166
+    },
+    {
+      "id": "drop-d477ca577d1f346e",
+      "brand": "Nike",
+      "name": "AIR FORCE 1 '07 PATENT LEATHER",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IV2857-010_PHSRH000-2000.jpg?v=1778615120",
+      "outputPath": "public/assets/cutouts/drop-d477ca577d1f346e.png",
+      "status": "generated",
+      "bytes": 514540
+    },
+    {
+      "id": "drop-22d260d85e98ab1c",
+      "brand": "Nike",
+      "name": "NIKE AIR FORCE 1 '07 LV8",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IR5896-030_PHSRH000-2000.jpg?v=1780341408",
+      "outputPath": "public/assets/cutouts/drop-22d260d85e98ab1c.png",
+      "status": "generated",
+      "bytes": 874742
+    },
+    {
+      "id": "drop-4d5e2f0f789a04bb",
+      "brand": "Nike",
+      "name": "Nike Air Max 95 - Volt / University Red",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NKIQ0620-100NikeAIRMAX95SPSAILVOLT-UNIVERSITYRED-SPORTGREEN_127.jpg?v=1773318703",
+      "outputPath": "public/assets/cutouts/drop-4d5e2f0f789a04bb.png",
+      "status": "generated",
+      "bytes": 768522
+    },
+    {
+      "id": "drop-e4e08db1a6d56b38",
+      "brand": "Nike",
+      "name": "NIKE AIR MAX 95 BIG BUBBLE",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IB6830-001_PHSRH000-2000.jpg?v=1779399139",
+      "outputPath": "public/assets/cutouts/drop-e4e08db1a6d56b38.png",
+      "status": "generated",
+      "bytes": 971282
+    },
+    {
+      "id": "drop-bcf8734b21417213",
+      "brand": "Nike",
+      "name": "Nike Air Max 95 Big Bubble - Metallic Silver / Black",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_IB6830-002_PHSRH000-2000.jpg?v=1774543664",
+      "outputPath": "public/assets/cutouts/drop-bcf8734b21417213.png",
+      "status": "generated",
+      "bytes": 535852
+    },
+    {
+      "id": "drop-a3689647bcd29598",
+      "brand": "Nike",
+      "name": "Nike Air Max Goadome Low - Black",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_IQ0641-001_PHSRH000-2000.jpg?v=1770678251",
+      "outputPath": "public/assets/cutouts/drop-a3689647bcd29598.png",
+      "status": "generated",
+      "bytes": 378154
+    },
+    {
+      "id": "drop-32144bdd839e2622",
+      "brand": "Nike",
+      "name": "Nike WMNS Air Max 95 Big Bubble - Black / Fresh Mint / White / Medium Grey / Anthracite / Light Graphite",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_HJ5996-005_PHSRH000-2000.jpg?v=1780082168",
+      "outputPath": "public/assets/cutouts/drop-32144bdd839e2622.png",
+      "status": "generated",
+      "bytes": 622676
+    },
+    {
+      "id": "drop-6954ba6127cb2fd3",
+      "brand": "Nike",
+      "name": "T90 MULE SP",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IH4422-201_PHSRH000-2000.jpg?v=1779304133",
+      "outputPath": "public/assets/cutouts/drop-6954ba6127cb2fd3.png",
+      "status": "generated",
+      "bytes": 780776
+    },
+    {
+      "id": "drop-f0e6802dc43745e9",
+      "brand": "Repetto",
+      "name": "Repetto Cendrillon Ballet Flats - Swan Beige",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/V086VE-1449-P1_375x_crop_center_e90a5bb0-9955-4067-9646-8c48bb9e7204.jpg?v=1780320702",
+      "outputPath": "public/assets/cutouts/drop-f0e6802dc43745e9.png",
+      "status": "generated",
+      "bytes": 171766
+    },
+    {
+      "id": "drop-2518b8e08ed2f5bb",
+      "brand": "Timberland",
+      "name": "Timberland Textured Premium 6-Inch Boots - Beige Full Grain",
+      "category": "shoes",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/TB0A6FD6EN2Timberland6InchLaceUpBootMediumBeigeFullGrain_121.jpg?v=1773318875",
+      "outputPath": "public/assets/cutouts/drop-2518b8e08ed2f5bb.png",
+      "status": "generated",
+      "bytes": 820971
+    },
+    {
+      "id": "searchapi-quality-shoes-clean-sneakers-new-balance-men-s-bb550-in-white-black-leather-60ccc114c4d66b",
+      "brand": "New Balance",
+      "name": "New Balance Men's BB550 in White/Black Leather",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSivTcVs_rMgD8wsXFn_A6LKKHnii5PEtPHvNmM3UIt5RiGXNtqhtHFCKCk8tJTnAre8bdxGrwoGOfp7OfZkVGrelJ6xQbGJwOh_5u8SZwPTBiOqqgSHNxMWg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-shoes-clean-sneakers-new-balance-men-s-bb550-in-white-black-leather-60ccc114c4d66b.png",
+      "status": "generated",
+      "bytes": 222825
+    },
+    {
+      "id": "searchapi-quality-shoes-clean-sneakers-new-balance-550-au-lait-men-sneakers-white-gray-orange-e8a5de50dc4a40",
+      "brand": "New Balance",
+      "name": "New Balance 550 \"au Lait\" Men Sneakers - White/gray/orange",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRdXY9TzoxA8M3WCsgeWli3AutkK2b_MQsRATUtlUm-PxZrvcibevnQd8oca8geDmjfuSGDdUI",
+      "outputPath": "public/assets/cutouts/searchapi-quality-shoes-clean-sneakers-new-balance-550-au-lait-men-sneakers-white-gray-orange-e8a5de50dc4a40.png",
+      "status": "generated",
+      "bytes": 318545
+    },
+    {
+      "id": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9",
+      "brand": "Birkenstock",
+      "name": "Birkenstock Arizona Stealth Buckle Two-Strap Sandals",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTpEvgJZcg6XXrg7lL6SoOfvOx1nx5XhlhbXzshghzW5EHpQXoqLNBDmoPwhPTWxLxm5XIekm22Ddi6RF0LvIprq4dgAO4_24dWizFt2HfyuxuXTi_T1Jl8tQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9.png",
+      "status": "generated",
+      "bytes": 604894
+    },
+    {
+      "id": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+      "brand": "Birkenstock",
+      "name": "Arizona EVA Birkenstock",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTbFC309JA2l0dKxPZG6fbUPd9F3eBzk46hWwmUX1xR7ETqpJV_mDFULYRVkg9_EqIq9y3yQfmXcMgqDV2By4DDuynnQYtGmDZ2JOMyQbup-Gq8kGk5vEj6Dg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4.png",
+      "status": "generated",
+      "bytes": 565474
+    },
+    {
+      "id": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
+      "brand": "adidas",
+      "name": "adidas Originals Womens Samba OG Trainer - Black - Size - 3",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ5VvQxMV8t-y9-oKSlTlUOX8hAdjVilkDPNZi0pn1bjhvulb8hqUrfcBYYnWktgEnYOMx5imKvIEmvmuSbgZzejQa3wJzf",
+      "outputPath": "public/assets/cutouts/searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d.png",
+      "status": "generated",
+      "bytes": 187808
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-women-s-cotton-rib-tank-a2a5d88d0f97e1",
+      "brand": "SKIMS",
+      "name": "Skims Women's Cotton Rib Tank",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ1WmUuiPqRrS5wh49aj4AnGMF4pvyVuRrSXD1ybRKZ9qn_p1oaMHRY0qkPmGPngunZMoE58kwGV9J4ZF5CoFNrCaHQqoEPTimnh4pic4mt1Rgvd2bMx7_P9w",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-women-s-cotton-rib-tank-a2a5d88d0f97e1.png",
+      "status": "generated",
+      "bytes": 447285
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-women-s-cotton-rib-high-scoop-tank-eb319fa30f726f",
+      "brand": "Nordstrom",
+      "name": "SKIMS Women's Cotton Rib High Scoop Tank",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTn-h_2e3PgyyJK8R11_djtnePJ6Wx2hctZ_BaHe_MNCPDqOW_mEERO3NIZuBXtVjePA7GJqxpVst1Rbo0VWiDKlnjzkFBKme4GmCzsGew",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-women-s-cotton-rib-high-scoop-tank-eb319fa30f726f.png",
+      "status": "generated",
+      "bytes": 150160
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-3-pack-onyx-4a43fd76e127ad",
+      "brand": "SKIMS",
+      "name": "Skims Cotton Rib Tank 3-pack - Onyx",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRQR_tzvwa01IjVM5kIT-pe81tx7mSrpf0ljKSwTjgUKfQcdXD1j_5hcll75CgC3SCD4PrIM8cg0twSr4J4R3AaEq9UH2sIjsxQtFAlPVo4SgHzq4qB2amHtQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-3-pack-onyx-4a43fd76e127ad.png",
+      "status": "generated",
+      "bytes": 82098
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-nwt-skims-cotton-rib-tank1-c73ca19c672cbc",
+      "brand": "SKIMS",
+      "name": "NWT Skims Cotton Rib Tank1",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTYABL4ffMNVL_nTtsdAG-jWc_A2TP9RKdaDU0Ysi5WFmuoiIh8fssGbU0mgd1xmiwPWMIN3VUSkG_DfLGiTAleOxoRyQasMw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-nwt-skims-cotton-rib-tank1-c73ca19c672cbc.png",
+      "status": "generated",
+      "bytes": 182070
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-top-in-black-size-m-d83c5906df0df4",
+      "brand": "SKIMS",
+      "name": "SKIMS Cotton Rib Tank Top in Black - size M",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSB_n81Q0keS5jWNe9LaLOJ3y3CrJ3S4NZu9W6j1IGYwCuOHinQPdbma0bQ6_NIbRDmdNEYyW3mktvkKaj43yL9n49cWAxULA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-top-in-black-size-m-d83c5906df0df4.png",
+      "status": "generated",
+      "bytes": 126196
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-women-s-sheer-rib-tank-top-0a3be70e901ec9",
+      "brand": "Nordstrom",
+      "name": "Skims Women's Sheer Rib Tank Top",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRDiUg7_UvD61OC-tHVGXDut2E0dINMv4cfbhRRJGCRF9XFnznFhY2YK15ducavg1TIyHpEVqDWTq2njKUuYXohA6BIFuzz4dPmYseB1oU32CqL4fM5PGc7",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-women-s-sheer-rib-tank-top-0a3be70e901ec9.png",
+      "status": "generated",
+      "bytes": 188385
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-3-pack-chalk-248a1dc7bb727f",
+      "brand": "SKIMS",
+      "name": "Skims Cotton Rib Tank, 3 Pack - Chalk",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRyvu2P2UHwOwZXoDVJawZizmKpXlsHJBbsMinKsAobE-6LvuFbrW6CgS4c9EN_MQ8Q3nUQFWPDt6_B7VddMBixnfmjYUUSid64dI2rcWEmE04RYg9cS7Yycg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-3-pack-chalk-248a1dc7bb727f.png",
+      "status": "generated",
+      "bytes": 289683
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+      "brand": "SKIMS",
+      "name": "Skims Cotton Rib Tank1",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ6ushQPg9dixvQ-Fr5fe-iOAkigZEFyLxAxb-n7QrCtZvagNDCsPzkKan8UpXYpeuKDCzBahGj-lIQsjuiSep4ZXhZ0oCDEtPrARuzj6PZ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788.png",
+      "status": "generated",
+      "bytes": 230832
+    },
+    {
+      "id": "searchapi-quality-tops-skims-rib-tank-skims-ribbed-knit-jersey-tank-women-white-tops-xxl-a7552e267ec5c0",
+      "brand": "NET-A-PORTER",
+      "name": "SKIMS Ribbed-knit Jersey Tank - Women - White Tops - XXL",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbJw8JlffW0Lp6epgozsVYvElaYi4xizO1vMn1mLWl5UrbjiXobzouGSWcHi5YN6YEnFaRUwTmY98eiBO3h2WBJyb2Cz3PIvmUC-fqDo_i49c36aogZ5vr",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-skims-rib-tank-skims-ribbed-knit-jersey-tank-women-white-tops-xxl-a7552e267ec5c0.png",
+      "status": "generated",
+      "bytes": 171318
+    },
+    {
+      "id": "searchapi-quality-tops-aritzia-contour-aritzia-women-s-original-contour-float-cami-bodysuit-a81a86a4a8287f",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Original Contour Float Cami Bodysuit",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSmXI4xCwegnfNrCrPfXB8Qdcq7K0UHtWrwM4-zKLrLt7IBne-VexaBhVMXDjatDdqfU_LFgvdvPri_SqlRTqWmTzPuB4ecKCc1zl1vQmkVYMlEO5SFXnr_Wejf",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-aritzia-contour-aritzia-women-s-original-contour-float-cami-bodysuit-a81a86a4a8287f.png",
+      "status": "generated",
+      "bytes": 72753
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-wrinkle-free-dress-shirt-6406dfb7bd3fe6",
+      "brand": "J.Crew",
+      "name": "J.Crew Men's Wrinkle-Free Dress Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSVYJ1VW_SPZHtoYuOYVOkEqs837VhxhiQJJMZjEXhNDkJSS9VJZvZAhKcZfoh1Y5TWb9FdMjqrgb8FXZEMTKilbdaP-fXiyJmgGMoMkCVNesC3F4mOdF-K9w",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-men-s-wrinkle-free-dress-shirt-6406dfb7bd3fe6.png",
+      "status": "generated",
+      "bytes": 443411
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-wrinkle-free-dobby-dress-shirt-17cb13eea64368",
+      "brand": "J.Crew",
+      "name": "J.Crew Men's Wrinkle-Free Dobby Dress Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTl_Krj-9sdaqdniqVdPysGDNSSu5v_FcqKSXvnj_3HMj2-tK-LMut4-QHWhzaDHZbXBV39mrDcIyCC__V7bBeMSMsnmB1ZV4CGYx0MPjM0AR5BmGEn12Djglg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-men-s-wrinkle-free-dobby-dress-shirt-17cb13eea64368.png",
+      "status": "generated",
+      "bytes": 385978
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-classic-fit-oxford-shirt-910a6ecc8499ea",
+      "brand": "J.Crew",
+      "name": "J.Crew Men's Classic-Fit Oxford Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRXw3s1KcaT7DsMojn41xVCXQHWg7E7DAR6FEwNSvbqwt2VDzWT7S_-uUeu-LlZ3hFmq6wJNdJGM4Chqqzwk9SzWwtM6ej6o5mjP1qmTy9UTe1G7L0E4n8geAU",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-men-s-classic-fit-oxford-shirt-910a6ecc8499ea.png",
+      "status": "generated",
+      "bytes": 334905
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-3x-8d248b4ccdc54c",
+      "brand": "J.Crew",
+      "name": "J.Crew Women's \u00c9tienne oversized shirt in lightweight oxford (Size 3X)",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS7YGpRYPGc5R9wXFHVy7e1_7RK2Nz7wrxcSKtYoJzScjwa240rwkztcvbnTm21_x6IsTPYav7yb5Wbh1vYFx6eX5A-Svcc6Rti_ADd9c0M8VRtlgdZhYCa",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-3x-8d248b4ccdc54c.png",
+      "status": "generated",
+      "bytes": 252224
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-large-c54d2666e66e6",
+      "brand": "J.Crew",
+      "name": "J.Crew Women's \u00c9tienne oversized shirt in lightweight oxford (Size Large)",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ_eU7qIiJiv8SIg3612Mk7objfsiWmpOIXgUegfL68nY4P6zX3JdWaA2SZAZ7Jjq8Yo_hajCRwQMK5ZzMVB8ucdo7es1D2eaPyGKO_Jw2jl3yjgB7AmoeecG8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-large-c54d2666e66e6.png",
+      "status": "generated",
+      "bytes": 288060
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-bowery-performance-stretch-oxford-shirt-256d450dfb2d72",
+      "brand": "J.Crew",
+      "name": "J.Crew Men's Bowery Performance Stretch Oxford Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRUQoA818bfyabIh1ebtZLETxXI-JtMZKi-5bv4Qomc4OtAPb1JrGZVwtQbZEMBJfnLhChGHSMHiyc0XiVgzh3bFkAWqBco7hx79RevEdRC4K7kfzcek4jkpFM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-men-s-bowery-performance-stretch-oxford-shirt-256d450dfb2d72.png",
+      "status": "generated",
+      "bytes": 283111
+    },
+    {
+      "id": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-tall-bowery-performance-stretch-dress-shirt-44703355dd5d23",
+      "brand": "J.Crew",
+      "name": "J.Crew Men's Tall Bowery Performance Stretch Dress Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRTaoGYpwgj6lKHOD-8c77c0BOZabHv1r2mgqfc084MiK0SV6_3tvRgg2r9vCakI8HXqISIMqqWo-A5Jfz7_vPZrD7oCPSrPEUWlJOE_ry68SZmhbaW05HlQg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-jcrew-oxford-j-crew-men-s-tall-bowery-performance-stretch-dress-shirt-44703355dd5d23.png",
+      "status": "generated",
+      "bytes": 293545
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-oversized-half-sleeve-t-shirt-44604ff3b6c959",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Men's Airism Cotton Oversized Half-Sleeve T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ1ZmTyxM0Win79wZjClfbLJ0jAosqp34KDZpKwapSbqnTAWWnzjI4RQ2cLZwt8mxN8vqhTc-0J_yr7qtAfI06OuPwpvP-MZFZKdy1seWCPVtkr1FUxYrOs8A",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-oversized-half-sleeve-t-shirt-44604ff3b6c959.png",
+      "status": "generated",
+      "bytes": 237034
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-airism-cotton-oversized-striped-t-shirt-0381e6c5ac7853",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Airism Cotton Oversized Striped T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTx5KySW_GrEy-ACaUpOvlbblTJArGpO06W1IuXGEcKytv8m70B_1V18VbhtAuElo32dArDYrk5JL6AfVA6lC0nRX_ZgYICzEkrPClSENwWlXYh2JXYwxqFDg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-airism-cotton-oversized-striped-t-shirt-0381e6c5ac7853.png",
+      "status": "generated",
+      "bytes": 363229
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-t-shirt-with-odor-control-969a2205972c53",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Men's Airism Cotton T-Shirt with Odor Control",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTo6Id2jSIRMXJ9UtBwqbax5fPfyfP9RP5Co5C2oUTgR860x8lrzk_WspHKZ3lbFKpuMhWdm32FXOZ1Cn4VVtMxirrS49k3IevCwKu_1PZjomGi7AXSsIlosA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-t-shirt-with-odor-control-969a2205972c53.png",
+      "status": "generated",
+      "bytes": 159681
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-cotton-t-shirt-f7722590f3c129",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Women's Airism Cotton T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSGPA25xLOSiBYulrt0L6L-yZeATeh0Ue0Jed8LHyy8tBM3iWg3J2F5_IlZqMfay34SLbkduemIEY6iwl_VRcu2_Bifw8vlPBqxAXRuGQO0JXMyrg5aP0UrGcs",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-cotton-t-shirt-f7722590f3c129.png",
+      "status": "generated",
+      "bytes": 456275
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-quick-drying-crew-neck-t-shirt-2a1d0a95eb9575",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Men's Airism Quick-Drying Crew Neck T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQSSfhybb_9tUPpObGyi-7UiGVapvhVUkosc9wy6I4l_2Jsa52JCBZaHZuAzopctc2JQ9X-xAcuqUOjNvjbVWCheUikm1VuPGqUcLTNGz4jJ0mC5IVkqrty7Q",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-quick-drying-crew-neck-t-shirt-2a1d0a95eb9575.png",
+      "status": "generated",
+      "bytes": 208672
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-t-shirt-784441e66db8af",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Women's Airism Relaxed T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQsj-5mfdLfGxRkGxoKnkpgiy52fT5uma34BvNUqtIYY7xCDKEFc2OWCi-1RtFO9gqUijC68F5O02HIe-G7TYy0uZ-eGJGGKPpOJTidBl-MeW5pLY0r2w4T5Q",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-t-shirt-784441e66db8af.png",
+      "status": "generated",
+      "bytes": 168585
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-v-neck-t-shirt-8b9d1baab84f16",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Women's Airism Relaxed V-Neck T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTXiUXhHCgSslJFPl-PagM_nc8nUa9UQjdtfk5ixccfs5ZNNEUX-n_EyDM0ezSv2XQ2VIL6ouvk0L9d75fba9Ekhjk0shv5XFGJ-6o5vij17FgLLvymPrwQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-v-neck-t-shirt-8b9d1baab84f16.png",
+      "status": "generated",
+      "bytes": 217772
+    },
+    {
+      "id": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-quick-drying-oversized-t-shirt-e79810c95eb4c5",
+      "brand": "Uniqlo",
+      "name": "UNIQLO Men's Airism Quick-Drying Oversized T-Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRtmmyEd2xcPCwOtWtrsX7eZyUkdbCait75w0xezty-77288L5_jGdKippBRIw1CTBS7ba1Hyvt3xWn1Hd2wGIi3JZEycwviiWXTzyuEaFLyZcrS3Z_f0q2hOw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-quick-drying-oversized-t-shirt-e79810c95eb4c5.png",
+      "status": "generated",
+      "bytes": 251934
+    },
+    {
+      "id": "searchapi-quality-outer-patagonia-fleece-better-sweater-1-4-zip-patagonia-men-s-76f26bede35f5c",
+      "brand": "Patagonia",
+      "name": "Better Sweater 1/4-Zip Patagonia Men's",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcROQvHU-JyVmrByoJ-FWKFba9lRUM2GOzVlRtxz51OiA5NoUEvqIFQNig9Evq2X288eKFlVAN4EAw0qnqxv2UHCDq7ih6EdYw1BGTwXOxhfk-sQuzg6_Ack",
+      "outputPath": "public/assets/cutouts/searchapi-quality-outer-patagonia-fleece-better-sweater-1-4-zip-patagonia-men-s-76f26bede35f5c.png",
+      "status": "generated",
+      "bytes": 357192
+    },
+    {
+      "id": "searchapi-quality-vacation-masc-fashion-nova-men-s-bahamas-linen-shirt-ecaaf0b8990fda",
+      "brand": "Fashion Nova",
+      "name": "Fashion Nova Men's Bahamas Linen Shirt",
+      "category": "top",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSI0n53LzF8i8T6CkTaIeft9J-ge0bPKAzyVVDKoEKvz2sOd0T64v0v7RWZoOiu21ym6tZQ2Fctfx9wShJ2d0ArmOJaPrl4ESpqYkeoema9Y1ercw1BnO_i",
+      "outputPath": "public/assets/cutouts/searchapi-quality-vacation-masc-fashion-nova-men-s-bahamas-linen-shirt-ecaaf0b8990fda.png",
+      "status": "generated",
+      "bytes": 336031
+    },
+    {
+      "id": "drop-35ce33edd6616448",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "Safari Utility Bomber",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69af24b924072069af24b924235.1214572369af24b924235.jpg?v=1773086691",
+      "outputPath": "public/assets/cutouts/drop-35ce33edd6616448.png",
+      "status": "generated",
+      "bytes": 1992377
+    },
+    {
+      "id": "drop-b940baa889bb3632",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "Sun Faded Chore Jacket",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69c16d54f0106769c16d54f0256.2045393869c16d54f0256.jpg?v=1774286882",
+      "outputPath": "public/assets/cutouts/drop-b940baa889bb3632.png",
+      "status": "generated",
+      "bytes": 2200405
+    },
+    {
+      "id": "drop-25233cd33974fd23",
+      "brand": "Aim\u00e9 Leon Dore",
+      "name": "World's Borough Leather Flight Jacket",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore698e6227909bf2698e622790b2b.45492943698e622790b2b.jpg?v=1770999291",
+      "outputPath": "public/assets/cutouts/drop-25233cd33974fd23.png",
+      "status": "generated",
+      "bytes": 2038012
+    },
+    {
+      "id": "drop-8c1806170fd31316",
+      "brand": "Alo Yoga",
+      "name": "Tennis Club Sweater Knit Cardigan - Black/Ivory",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/2185/2813/files/W3847R_03850_b2_s1_a1_1_m143.jpg?v=1752692567",
+      "outputPath": "public/assets/cutouts/drop-8c1806170fd31316.png",
+      "status": "generated",
+      "bytes": 1174338
+    },
+    {
+      "id": "drop-1ad74113b0e32d23",
+      "brand": "Radial",
+      "name": "LEATHER BLAZER",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/115941_SNAK_6.jpg?v=1778692519",
+      "outputPath": "public/assets/cutouts/drop-1ad74113b0e32d23.png",
+      "status": "generated",
+      "bytes": 954790
+    },
+    {
+      "id": "drop-095a54c2e93e0aa1",
+      "brand": "Radial",
+      "name": "LEATHER WORK JACKET",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/115938_BLAC_3.jpg?v=1778692486",
+      "outputPath": "public/assets/cutouts/drop-095a54c2e93e0aa1.png",
+      "status": "generated",
+      "bytes": 577672
+    },
+    {
+      "id": "drop-d74b2e5cef0138c8",
+      "brand": "Radial",
+      "name": "MOCK NECK FLIGHT BOMBER",
+      "category": "outer",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/115903_BLAC_3.jpg?v=1773267127",
+      "outputPath": "public/assets/cutouts/drop-d74b2e5cef0138c8.png",
+      "status": "generated",
+      "bytes": 700158
+    },
+    {
+      "id": "searchapi-quality-outer-aritzia-blazer-aritzia-women-s-standout-blazer-d5856946f842f6",
+      "brand": "Babaton",
+      "name": "Aritzia Women's Standout Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQCDWtrNU0jQf6oHwt3YK2A7Cs-ld8be6YsINxsLwDyPlx6kLOmuHzSm0ntbhjb1l6VbuxaLbv3bhXQCU5JqwF0dsnlBY9h_oHPfPewhM5_t3r1nz4MyYDflw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-outer-aritzia-blazer-aritzia-women-s-standout-blazer-d5856946f842f6.png",
+      "status": "generated",
+      "bytes": 109577
+    },
+    {
+      "id": "searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb",
+      "brand": "Wilfred",
+      "name": "Aritzia Wilfred Women's Etiquette Blazer",
+      "category": "outer",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSUI-iG9_hEAQghFSzHDH_8HJtMuiVroIWmS2RE8Ojt-dy_koAN8EQBWh6hy5jAPO8pdBGK803xzg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb.png",
+      "status": "generated",
+      "bytes": 76698
+    },
+    {
+      "id": "searchapi-quality-gym-masc-lululemon-mile-maker-shorts-men-s-ripstop-linerless-short-6-size-xxl-black-neutral-e50a1264d6",
+      "brand": "Lululemon",
+      "name": "lululemon Mile Maker Shorts | Men's Ripstop Linerless Short 6\" | Size XXL | Black,Neutral",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTnWhyRv9Z15WZrAl4JeDaAKPzY4WZEv9pzE-ie1hVjXOKJS3Q1kbwl_iPwJzhXRLtIfS1ozLjptY8y3LLyrJgIIgfjL8xhysVWrK0Eu2KDtthUV4yzpWMn41M",
+      "outputPath": "public/assets/cutouts/searchapi-quality-gym-masc-lululemon-mile-maker-shorts-men-s-ripstop-linerless-short-6-size-xxl-black-neutral-e50a1264d6.png",
+      "status": "generated",
+      "bytes": 109892
+    },
+    {
+      "id": "searchapi-quality-gym-masc-lululemon-fast-and-free-shorts-men-s-ultralight-ripstop-lined-short-4-size-xxl-grey-purple-8a",
+      "brand": "Lululemon",
+      "name": "lululemon Fast & Free Shorts | Men's Ultralight Ripstop Lined Short 4\" | Size XXL | Grey,Purple",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTWA4lHbBf-Qp8kY3nR-ISQUSQYW3HbdZXbVwtMu3IwzwNvYHxHLC-8JwzUSsVHIajDQkfsvf3Wws0weFjOhw_HMgLtZjfHXYuwv_XEPQe-rDhs4RlSpTaEzQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-gym-masc-lululemon-fast-and-free-shorts-men-s-ultralight-ripstop-lined-short-4-size-xxl-grey-purple-8a.png",
+      "status": "generated",
+      "bytes": 113902
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-wilfred-women-s-thesis-pant-e9f67721813ddf",
+      "brand": "Aritzia",
+      "name": "Aritzia Wilfred Women's Thesis Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRM1KN-931cIgdjDKOb5I6OdRdZinzqiU-osIimq24NZvfAMFlqcXCx7aq_44n4jXv0DOwIhSur7x8tMrNbqCqJWnnyociecMjFiNa8KK74t0asTMoerN4Zng",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-wilfred-women-s-thesis-pant-e9f67721813ddf.png",
+      "status": "generated",
+      "bytes": 72512
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-no-line-high-rise-pant-28-size-2-black-neutra",
+      "brand": "Lululemon",
+      "name": "lululemon Align Leggings | Women's No Line High-Rise Pant 28\" | Size 2 | Black,Neutral",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQPWxf6GnWOjnBOeQzileAf2_zcghcsw5tZFVEf6tFX28b3SCd1CbVv6RT6dZ3YPMwvoFLoo36-9RqY6OaXrbnc1wG7YoflcO6KXw9t6PHScxl93948oWctWbM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-no-line-high-rise-pant-28-size-2-black-neutra.png",
+      "status": "generated",
+      "bytes": 132837
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-no-line-high-rise-pant-28-size-6-navy-blue-aa",
+      "brand": "Lululemon",
+      "name": "lululemon Align Leggings | Women's No Line High-Rise Pant 28\" | Size 6 | Navy,Blue",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ-Mk2UZt0TVp_teJXfBECMoNLPmmFr-qi0750hYaG1sWLq2X-fA-JJ3gtVtpL2dky7uR9dsPQtAkkYS5HLKMfAD8tOA-2Exo_EcyJZBGWJSaQswB5q2O9Gnw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-no-line-high-rise-pant-28-size-6-navy-blue-aa.png",
+      "status": "generated",
+      "bytes": 109980
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-wunder-train-leggings-women-s-no-line-high-rise-tight-25-size-4-blac",
+      "brand": "Lululemon",
+      "name": "lululemon Wunder Train Leggings | Women's No Line High-Rise Tight 25\" | Size 4 | Black,Neutral",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQH1D6bsgZ7xaTRlvvOXc5xf7tILfhAoWI0k2PSsiOyxldnszWq0A1IW3MQKNsOTfBb1R8zK059k4qYduDVWYe4Rb2Ocx0N-Q40kCxkh7kum1_qY8WxaclsjpA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-wunder-train-leggings-women-s-no-line-high-rise-tight-25-size-4-blac.png",
+      "status": "generated",
+      "bytes": 80668
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-high-rise-pant-with-pockets-25-size-12-navy-b",
+      "brand": "Lululemon",
+      "name": "lululemon Align Leggings | Women's High-Rise Pant with Pockets 25\" | Size 12 | Navy,Blue",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS1qTcg4vuj5u18Ge6yejjnCqT_0YoIF2IUQfxXXr8ick7YNbHQKikmQByrJaoxQHrZtHdbs6HzrZWvUuVCCxtGc-G7KOrByoXCkdngLRz1GL5eyvYI4lTQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-high-rise-pant-with-pockets-25-size-12-navy-b.png",
+      "status": "generated",
+      "bytes": 104689
+    },
+    {
+      "id": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-low-rise-tailored-wide-leg-pants-7ab53",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Sloane Low Rise Tailored Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQoBgwSka6gILBX6XtnVZbQAJg-U9ILyYQLdBjXq1k2nD4zdzHh4dvhHNUTZxHLwd1tzzQ7RkabNhrrqDLXSpdERn3tBbWSbnd6eiq-isUYRkxM2mKApGh5fQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-low-rise-tailored-wide-leg-pants-7ab53.png",
+      "status": "generated",
+      "bytes": 116248
+    },
+    {
+      "id": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-crepe-tailored-wide-leg-pants-ed53a6d0",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Sloane Crepe Tailored Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQg1IG78FUvJQfWALMTgXin3rOZReIVqQvpJNrrRk4i0Qvl5ormeoOA-lbsdA5D9aTHE57Xi2COBxc-HebQp0BocmNO-wODI91GKCeU1Sc",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-crepe-tailored-wide-leg-pants-ed53a6d0.png",
+      "status": "generated",
+      "bytes": 89157
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-black-30-771e3db31eaad8",
+      "brand": "Dickies",
+      "name": "Dickies Men's Original 874 Work Pants Black | 30",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRtl4paU2TMHJhyjAwxhTwwU131Y-P_hQj3p-2t44mQqksLfQZUuywIzF0YTQsbnhvDR3Z0h8kaSL5Sn51QP7U3fzOpGWmF8ROsGnJruhE_zC7byFuhONut",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-black-30-771e3db31eaad8.png",
+      "status": "generated",
+      "bytes": 132599
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pants-6abec6eaf90247",
+      "brand": "Dickies",
+      "name": "Dickies Original 874 Black Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRkIj8R2FfsTtq8QO6g3WkJfeOoXYj7tBUchLoqnX7y71z1A017wvOHc9wul8WChNP96GJ11pmyo4fjaKhCYdNXxenHURYyyA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pants-6abec6eaf90247.png",
+      "status": "generated",
+      "bytes": 34968
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117",
+      "brand": "Dickies",
+      "name": "Dickies Original 874 Black Work Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTr7Ieu6FQn_AumOWJlg_rAblezXKx3xF0lmMhSXbW561w985udbcIwFS8vrvKL0iqqEqH-Ksbh8aCJ4sqeun0m86YdvIDqBAvmkwJ6AsEWfjKyHObwhsUN",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117.png",
+      "status": "generated",
+      "bytes": 63524
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-874-pro-series-relaxed-fit-tapered-leg-work-pants-76f95084abfbbd",
+      "brand": "Dickies",
+      "name": "Dickies Men's 874 Pro Series Relaxed Fit Tapered Leg Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTlwzOTsjqvXa1ScCdilh8ZLIvBmG66xe6QsVXOO1dLRVq3lDY75BLbETgKqmQFZcvvb4N2MuZT6TIENErOYQZDKv4V_r_rnTnyTtkLupDO2OfxJMFWpQ9KDA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-874-pro-series-relaxed-fit-tapered-leg-work-pants-76f95084abfbbd.png",
+      "status": "generated",
+      "bytes": 133679
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-silver-40-2445bb28a42908",
+      "brand": "Dickies",
+      "name": "Dickies Men's Original 874 Work Pants Silver | 40",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRNAHxnmuSZ4t96a-e9t8emGxyibkrbqxymxB_KTk5snFRq4BxDOBsl5LzgiUrLbJ33moKhsmSXvxrCbnEGl__GnwKcDHkFBfRU2w8Bn9C09wXdXe1lWfwBnw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-silver-40-2445bb28a42908.png",
+      "status": "generated",
+      "bytes": 137364
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-874-straight-leg-pants-in-black-e4b2a2438199fb",
+      "brand": "Dickies",
+      "name": "Dickies 874 straight leg pants in black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQUQrc8Xi2cpzpRduZsakqspMz569uHsNpj90bt-4XaQgoP7kw7HflIiJeuARYJ-jwNUN-zfdqa4IWNknK8L-wp7CzoLrL-f4Lvh4oBPKA7gzyaZj7u1hEGxQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-874-straight-leg-pants-in-black-e4b2a2438199fb.png",
+      "status": "generated",
+      "bytes": 93793
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-original-work-pants-black-ca60203a6c8e5d",
+      "brand": "Dickies",
+      "name": "Dickies Original Work Pants - Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTe_R7Pr9w8Wn88pljGLXNucAt2nLuTDN0vd3CFZAtH_LCkeKsUCwcS4JC83i_ScvK7otxaDz8qEX8HpfAC2FLCqReIuMsDAw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-original-work-pants-black-ca60203a6c8e5d.png",
+      "status": "generated",
+      "bytes": 22410
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-original-874-work-pants-black-32x32-16a87d7a823f60",
+      "brand": "Dickies",
+      "name": "Dickies Original 874 Work Pants - Black 32x32",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQHzV0ZL2gw3BYnNIpldRon87MdlpBY65K7Xc_QjEHwKYh0MMcZYYXQ62xjdvm85S5uPpfdNqVgq00GESJ_kPfeLI1cBY2ccMWPKYUSA6GiYg86y54B3sWVHQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-original-874-work-pants-black-32x32-16a87d7a823f60.png",
+      "status": "generated",
+      "bytes": 126601
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-874-work-pants-black-b87c0e3541ca8e",
+      "brand": "Dickies",
+      "name": "Dickies 874 Work Pants - Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRVaWsTfVnI9PzPHps8RIAKU1IZEnRiOt0MHnihfAOMk3hsUFJWgxEumlcMnFRagfAyOx7hk8vDFyeHMflw8auWoHh3iM1xfQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-874-work-pants-black-b87c0e3541ca8e.png",
+      "status": "generated",
+      "bytes": 134625
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-501-original-men-s-jeans-black-x-34-c3187f970682ac",
+      "brand": "Levi's",
+      "name": "Levi's 501 Original Men's Jeans - Black x 34",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS0IOQnhmS_2rh5cX2dVdVaJszHQvbu0J4fZYLUVix4TcWxdfWB3hNIen0JZz9u9VtlWdIzUClg8Lqs0bXW6DrhScer3WcQQlrDcvPObGxn7wHfHKXwoeiemxM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-501-original-men-s-jeans-black-x-34-c3187f970682ac.png",
+      "status": "generated",
+      "bytes": 149552
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-501-pre-washed-jeans-pre-washed-black-40-x-30-287e823803465a",
+      "brand": "Levi's",
+      "name": "Levi's 501 Pre Washed Jeans Pre Washed Black / 40 X 30",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQgLi-ghsq3KRV99untbgtheDCzNUODRD_7_ayjBmRaM8AZvF_0L-JqeVK708EZNJBlLlRueXFi2ylYsT1YsTEOe11cjCqtsyQG9EqlYdEf4fTdV77XbUkL",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-501-pre-washed-jeans-pre-washed-black-40-x-30-287e823803465a.png",
+      "status": "generated",
+      "bytes": 145542
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-501-preshrunk-jean-black-6eaee4c1ed9d64",
+      "brand": "Levi's",
+      "name": "Levi's 501 Preshrunk Jean - Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT6qnk0_tHcl8Z1-M4h-3ugREA_NmLKp1-q7Yda4IlsTrzfdA-1p-ir2HveuYJnTKgWjoIlGhQxG2HHgVdIMjAdKAVtU8s5j_ihnwYM0dQJyQzzVW6bBU90",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-501-preshrunk-jean-black-6eaee4c1ed9d64.png",
+      "status": "generated",
+      "bytes": 108146
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-madewell-women-s-relaxed-cargo-pants-1b2325b1d20419",
+      "brand": "Madewell",
+      "name": "Madewell Women's Relaxed Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTQ7NtMZXH1VjPHKClVXX2kAQ9J8MFMPesKAmlAVDCNlLljluGRqAs957PFKjYSMtrcJd5PX_d4s_aQUbzr72EUg85lzVcbVQIfCNNXMwSQfhFpT-zJPUBUxQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-madewell-women-s-relaxed-cargo-pants-1b2325b1d20419.png",
+      "status": "generated",
+      "bytes": 122275
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-women-s-baggy-dad-cargo-pants-bbdc3e5c8175a5",
+      "brand": "Levi's",
+      "name": "Levi's Women's Baggy Dad Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSxthNN0QS7-DDsuZvu7pv3wUauhIxKT-YPukt0guzPrWQOx9qVjMvSFK9XphtcRc-B7MwKcPe2lbrjkLB4Be6jzmkLcbVwrD2rLu23Pu1-wb_B2kmdUFxJNGE",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-women-s-baggy-dad-cargo-pants-bbdc3e5c8175a5.png",
+      "status": "generated",
+      "bytes": 194311
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-men-s-baggy-field-cargo-pants-8edd7c92d0adda",
+      "brand": "Levi's",
+      "name": "Levi's Men's Baggy Field Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTwC5knkiPaMp3zzPl97xEDgidi6wJu2nMySLaoSp9n0C7Y7G92akZcmB9NDExwggKL5_vpFGD74rJwictx9jIV1rd4l8J11QatESf3D3YCGuy4BBo19eE4lH8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-men-s-baggy-field-cargo-pants-8edd7c92d0adda.png",
+      "status": "generated",
+      "bytes": 435351
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-baggy-cargo-pants-e4e2c132c2ea30",
+      "brand": "Levi's",
+      "name": "Levi's Men's XX Baggy Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR_FQDJRDOg7g1yA_B-bsKu54IE5DupFrxgcUOucZC9qQuCF1agnX5-eTYAyR7YOwlSuEVC3JfJJstTo37ONmKZMN3R7OYnBGNb4vJuVQYYkB7VuZMVQ7z9QXo3",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-baggy-cargo-pants-e4e2c132c2ea30.png",
+      "status": "generated",
+      "bytes": 210074
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-abercrombie-and-fitch-women-s-curve-love-low-rise-ultra-loose-cargo-pants-be999d54",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Curve Love Low Rise Ultra Loose Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ9Ylj8ENlolHFJTKgxQIC7QLzBVu6GHfWqfR4fGvSK_BLcmC1ZIFwDluiwiLxz6sghukQ9d2lPfVmDDb8IWlWxGXapsXxYW7p1OyJmwPJexc4zzASYBa7gvfs",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-abercrombie-and-fitch-women-s-curve-love-low-rise-ultra-loose-cargo-pants-be999d54.png",
+      "status": "generated",
+      "bytes": 270168
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-women-s-superlow-loose-cargo-jeans-0a74d4c106a941",
+      "brand": "Levi's",
+      "name": "Levi's Women's Superlow Loose Cargo Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTiEV6S1XOBwriw7hTWJcLY_8KE2JL9iqIjD-xtC4Lc1QSU_KQVMlfZmtv-wwFkA9NSvhnvPn04o6ob-vbkXemRLXQL4c_py5Gldm6-CMU_vspbdjil3Ssvpl8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-women-s-superlow-loose-cargo-jeans-0a74d4c106a941.png",
+      "status": "generated",
+      "bytes": 166997
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-cargo-straight-pants-ed27b74d922a1d",
+      "brand": "Levi's",
+      "name": "Levi's Men's Xx Cargo Straight Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR-CqT_vX0S_rufknbPUPIMoqKRgH7pWhtFHdDb6WAXSZjDQijR2pvbMRpbfVZqTg4BlnAVmmcMx5GqE7nSsVfnUWcOa6qNN4SvyNaOrFFiq_xL97CJJIID",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-cargo-straight-pants-ed27b74d922a1d.png",
+      "status": "generated",
+      "bytes": 251735
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-568-loose-straight-cargo-men-s-4b2cf88c0407ab",
+      "brand": "Levi's",
+      "name": "Levi's 568 Loose Straight Cargo Men's",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRIofbYhG-vvjNzolW-Z2Iu-FRioxnYPWDoV9X-i0CLvPLo_rCGaogy9mm9JMyIPk1PawOTtWNsvJ9uZslljWCPLiX5iWW2PDZd3Y16tTgGEdTT4Jh7E5GM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-568-loose-straight-cargo-men-s-4b2cf88c0407ab.png",
+      "status": "generated",
+      "bytes": 259311
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-taper-cargo-pants-ad6564a54a8b9a",
+      "brand": "Levi's",
+      "name": "Levi's Men's XX Taper Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS2L6DTDQegwvyIbRrWOuyl8g8yar6hmIvqNdqE7ucbZYWkcbu7Lv8_qrJ_LGjah2oo8SR11sc4XkRKhVJLkCwYMux96qt7",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-taper-cargo-pants-ad6564a54a8b9a.png",
+      "status": "generated",
+      "bytes": 84359
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-levi-s-men-s-pants-levi-s-ace-cargo-pants-relaxed-2a27d81641a079",
+      "brand": "Levi's",
+      "name": "Levi's Men's Pants Levi's Ace Cargo Pants Relaxed",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTZR1TygVlAgeSAqigD3CVN8XelC7m1l-BDlxhUfhhnc6mnIwsCKDVXR625Leba965cxWbC2_MNC22H9pAT7tXaJel_qNPs",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-levi-s-men-s-pants-levi-s-ace-cargo-pants-relaxed-2a27d81641a079.png",
+      "status": "generated",
+      "bytes": 65589
+    },
+    {
+      "id": "searchapi-quality-bottom-denim-casual-gap-men-s-gapflex-essential-straight-cargo-pants-94af00c56d7911",
+      "brand": "Gap",
+      "name": "Gap Men's Gapflex Essential Straight Cargo Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR_c-eA48S8-fWVTEaHRC1Xz5_2PyzvxSc1FhgLNMkOcEcDWoNdn6rwu68gXSs_r-UOJD8PNr0We1WVKvtEqKEQ1T4faxlowFiIFkfJr8kWGxuK4Hv47BWDPVuE",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottom-denim-casual-gap-men-s-gapflex-essential-straight-cargo-pants-94af00c56d7911.png",
+      "status": "generated",
+      "bytes": 138797
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-women-s-effortless-pant-261f9bd5cdd69f",
+      "brand": "Aritzia",
+      "name": "Women's Effortless Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcROGM_SgcQIGVwCxYrlBMiL7N86iPVV59J_ocNrnM3JtKeb7DXIhlOEjqY58Lw9d1dayzpe3D61L1Uc5oCDNnZHuHQXjOKvz1u-AEKioDPNzjFjSLg9oHT_cQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-women-s-effortless-pant-261f9bd5cdd69f.png",
+      "status": "generated",
+      "bytes": 81041
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-pants-2bc4ab4c7ce930",
+      "brand": "Aritzia",
+      "name": "Effortless Pants Women's Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR3DWroiMyrfz6GyNC2uoIA2RWKm7m5wPbywVhPGmwENq0luGoqV0ALXixjkseSFfQYZrvnRqJfrJpfXzekSN-pYSjnwY6MwkOLyomgmKx4MSMNUVir-ohUypQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-pants-2bc4ab4c7ce930.png",
+      "status": "generated",
+      "bytes": 109695
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-lo-rise-effortless-pants-4d64fbe1b6cbce",
+      "brand": "Aritzia",
+      "name": "Effortless Pants Women's Lo-Rise Effortless Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTQGa884_8zBI7BcV4l4OO3agDU55qBZcXQJCsOI8Wz2CGuGodz2gw11X7D58QAd0wkzxz1YaxR6v8b_LhGdpuCw8WHcyqhi55b2H-N2kerFNUjANMOgx47uwQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-lo-rise-effortless-pants-4d64fbe1b6cbce.png",
+      "status": "generated",
+      "bytes": 85464
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-cropped-effortless-pants-846db58e678597",
+      "brand": "Aritzia",
+      "name": "Effortless Pants Women's Cropped Effortless Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTw_t20fM3kR1D1UyzhZiypCevsuvu-suL3lzOWjpDCR3U6E-oUNW75aPQuc-m2yJkaVJvNOVZqA2-dcqsTYxPpFGKa-lSbZJ0NaeWlShjlmRmbWC8mHMauE_g",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-cropped-effortless-pants-846db58e678597.png",
+      "status": "generated",
+      "bytes": 60716
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-markova-pants-cb997a72950fc4",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Markova Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRCut2K0A8D2umgyqwSzJHG4vSjWRXzsqrB9Oy2AirPXeuc3paYwxIE0GhZLiqSQNX86THjLvuKF3wE2XYTwRG1qhdaPGPRjVnWq095YIkBKV5fdbgKCN3dMw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-markova-pants-cb997a72950fc4.png",
+      "status": "generated",
+      "bytes": 56210
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-leeway-pants-5ad706d6c78afa",
+      "brand": "Aritzia",
+      "name": "Aritzia Babaton Leeway Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRgU8vsWrP4DlQq3Wm3K_SUBTmHfCnBx9wEbWbGztd38UuzCx5T0R72gB8ya2xtRKEsnbS9D5CoXDjtvr7MjB6Zo-ky3RXMdzG9gJFSuugMEBPGaIkZL42P31g",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-leeway-pants-5ad706d6c78afa.png",
+      "status": "generated",
+      "bytes": 60535
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-limitless-pant-dfa23082162e4f",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Limitless Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRowilbmw411YGQqg1CxCEDztjGkGegN7Y91pFwPhHjG8dwlYOAmIe17a_4aeIpplqmQHub2Iu_Qm7ueOvf4TZIXbpdGUQnaseSqTnW8YD0VFVzmbGEV4o5Zw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-limitless-pant-dfa23082162e4f.png",
+      "status": "generated",
+      "bytes": 87249
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-babaton-lavish-pant-fde069577f95ff",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Babaton Lavish Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQHle_Qpg2rxe105gQ7-zBre_38q0PjLBWv4Ci7scWvzZEBg8-AV597jv22MIFJ0b7A9N9GqUmeWRh2u7EuhneQnpSZ0Z-m151yVMidsu0pwL_cBN__v6mHPh8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-babaton-lavish-pant-fde069577f95ff.png",
+      "status": "generated",
+      "bytes": 67801
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-artisan-pants-8db900f555b0f5",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Artisan Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRgW7OEem-uTA209w5fC4Pcn_4rXzRBRqdV9xAMzaBKrrPU6Uc5SSnZZdgoQyt2jhwh64UuHuB1hRimchHP61TLyd48eaxpbIC-tXLWPhfiQk8ETHnTufcnCw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-artisan-pants-8db900f555b0f5.png",
+      "status": "generated",
+      "bytes": 69148
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-women-s-agency-pant-2bfc0e624d7a2c",
+      "brand": "Aritzia",
+      "name": "Aritzia Babaton Women's Agency Pant",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRxpObuMAwNDv6CqRggJTz60fFP0QrgXfR50Dlb9tFPz2xn-idQrFmAuniLlqnPTejOpAIlkHJjdsDXg-5toof0u8jsNdeBpSooGDN1EzmNG_TGF8iGVq4dVw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-women-s-agency-pant-2bfc0e624d7a2c.png",
+      "status": "generated",
+      "bytes": 79212
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-babaton-new-agency-linen-viscose-pants-18ce542652b401",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Babaton New Agency Linen/Viscose Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQgPmWsC-PVqYileAHKdnbQeMygw7lqK5xebttR3I388iYnPqTTzb8HiuyWdR64S-tert5XsSPGEKX6fSYT5-1ETSQGz-5l8y4gIe43bjnQ6UYgkGOuROicEJU",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-babaton-new-agency-linen-viscose-pants-18ce542652b401.png",
+      "status": "generated",
+      "bytes": 70761
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-pants-f57cdbd6b897fe",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's New Agency Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRClH205VKsMM1XNMIl1INk44QOv28fSm6GUsWPvDl9bYagb_GwMZHzbnukU1lK9HCvOUCirCdUMTmszoyjfYGG8ZgrMR-PIzUSJOitd7RryFZQE0LlDsE5nw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-pants-f57cdbd6b897fe.png",
+      "status": "generated",
+      "bytes": 44276
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-lo-rise-pants-1b9f5c1c78c299",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's New Agency Lo-Rise Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTjRF7vIV06uTQxojNZYzpO98VLkLhgKdKR2j54WVdyXfslBOljuofukkRXW_UpIxcoNOHtzAT_nDgP74i1rqYF1E8oMj18wHyYpFJnEJ8BhiE68SUo2-MUlQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-lo-rise-pants-1b9f5c1c78c299.png",
+      "status": "generated",
+      "bytes": 69435
+    },
+    {
+      "id": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-limitless-curve-fit-pants-22eac148e17bce",
+      "brand": "Aritzia",
+      "name": "Aritzia Women's Limitless Curve-Fit Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQMwX4XZOhw1RhXjgi9ARmtkSvOOIZdIJaeoVGV6-VD67foqQNhvf8KeBqyHa47RQm5oEVZ2SDfaKRo79I5XeCKZmS4BB71e8I3z9zpgbyYPb9c2iShQzCbCA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-limitless-curve-fit-pants-22eac148e17bce.png",
+      "status": "generated",
+      "bytes": 71391
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-high-rise-leggings-women-s-4ef74dd847b8fa",
+      "brand": "Lululemon",
+      "name": "lululemon Align High-Rise Leggings Women's",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQWnUHet2HyWlnJPfBzrCsCEgJXxV5hF280Y0US7MN_dfVEuy_xK2qJlEjHKWPDI33FQqKJlbo8CwxNVDlf4xTrts-dqflv5wOtPX32yjt6hgJq7zz7LK6w",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-high-rise-leggings-women-s-4ef74dd847b8fa.png",
+      "status": "generated",
+      "bytes": 112953
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-high-rise-pant-with-pockets-25-b535b459d6efdb",
+      "brand": "Lululemon",
+      "name": "lululemon Align Leggings Women's High-Rise Pant with Pockets 25",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ0KtyoyaewmPLmLfuv-O6tlhrJTSifV_ZlHJB9yT5rJVtEIcvYiMT3bX4CE1ip1i3-ODmkNg6_mARbTcTv-HzBHsNoXtyht7_KSyrBEb0pazTweHnjHEJiXw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-high-rise-pant-with-pockets-25-b535b459d6efdb.png",
+      "status": "generated",
+      "bytes": 128857
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-high-rise-31-leggings-8981eae2be01f1",
+      "brand": "Lululemon",
+      "name": "lululemon Women's Align High-Rise 31\" Leggings",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSEkd6EjVMv5zcZvpwSRB0raWWHH6VminYJLljghSbKHvEuGsl1zBOONIkqGlY_yrQnhpKX173YtpWXyFaKZYZZDctGwQtE22ljuuFkok7ZmaRq5pg_xvI1Vw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-high-rise-31-leggings-8981eae2be01f1.png",
+      "status": "generated",
+      "bytes": 112864
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-high-rise-pants-with-pockets-7f8b1f9ec1efa4",
+      "brand": "Lululemon",
+      "name": "lululemon Women's Align High-Rise Pants with Pockets",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR3XYmMerxdwxkwcFJ84GS5htH9-0Up-BW92IVUUKFvQDtySa4VdXcbofhnSg1YbmxZGulTXMfNdZBPI4QeGKHKtjOXUC6-ocVtOhpy0GPVsyi2-INVrXHz0zw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-high-rise-pants-with-pockets-7f8b1f9ec1efa4.png",
+      "status": "generated",
+      "bytes": 85753
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-capri-leggings-align-high-rise-crop-17-5e953dd653ed2c",
+      "brand": "Lululemon",
+      "name": "lululemon Capri Leggings Align High-Rise Crop 17",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQFyk_-JAOdX4rQq8JHCMC8Lk-OHLDCIh1anfvbhl2umv4FFDTjebFBX5w6ciU2BMzINFZn3mRTHazjwgup8yPuj4WwJBbpbgrQyNIPexEVsKE05Ql9iVk3",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-capri-leggings-align-high-rise-crop-17-5e953dd653ed2c.png",
+      "status": "generated",
+      "bytes": 107028
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-no-line-high-rise-pants-ed760b5fde3fb1",
+      "brand": "Lululemon",
+      "name": "lululemon Women's Align No Line High-Rise Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRQkEfHUP69buydn3wGiZ3V8uPYR6CxO4IjsqLhqSYrOOUHz6v1ryMPbf2VuvDlt_Wreg815Uu1rEqI16_mh1y8wKvt0MEa9SYU4MybgR7FUG5UuGmevppJEBM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-no-line-high-rise-pants-ed760b5fde3fb1.png",
+      "status": "generated",
+      "bytes": 92116
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-capri-leggings-align-high-rise-crop-23-5eba386dee1700",
+      "brand": "Lululemon",
+      "name": "lululemon Capri Leggings Align High-Rise Crop 23",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRI4VdByOr5wG20uxnkl0buGSBZJgB890pBN8UlCsrEs_cgTQ57r4_NjwX6D3G2JVKSWDj-tyYwgL_OcmK2MR2KZGpsAWtLdnJI7NZIR3L6RP8Z6fBUWw7kFl8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-capri-leggings-align-high-rise-crop-23-5eba386dee1700.png",
+      "status": "generated",
+      "bytes": 84261
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-super-high-rise-25-leggings-b4e65588a4fc7e",
+      "brand": "Lululemon",
+      "name": "lululemon Women's Align Super-High-Rise 25\" Leggings",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSddeEGyHiFP3z9fsYgsScSAF8ETvW-C-IsI9y2hRpZvNRYbObQ8yF9zSMMes1nMJbXYXAWdLh16eo_Qr8exSNXn9oPbc0xpUNZMYtXp3NuWVonHjlFeu77XQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-super-high-rise-25-leggings-b4e65588a4fc7e.png",
+      "status": "generated",
+      "bytes": 95873
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-no-line-high-rise-twist-tight-25-leggings-8df53a8570a9",
+      "brand": "Lululemon",
+      "name": "lululemon Women's Align No Line High-Rise Twist Tight 25\" Leggings",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQY8iSIuiSNWC_1cGacUHV-nEjBYsxUmbY2EOYaaL5RtzUoFkZ8ggv946p_3vftMy1qDcP0pOJpIH3_7TfOP2XqIMPxuRZY4dffHKM2GunuUa6us6kRDEm1Pg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-women-s-align-no-line-high-rise-twist-tight-25-leggings-8df53a8570a9.png",
+      "status": "generated",
+      "bytes": 115719
+    },
+    {
+      "id": "searchapi-quality-bottoms-lululemon-align-lululemon-align-high-rise-jogger-shorts-2f72973da2eae2",
+      "brand": "Lululemon",
+      "name": "lululemon Align High-Rise Jogger Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQgTrEZzLH53Xhgg6wSuBLq10E4r87DJ8gaBUNAM7eTad6w19GXhKh8owcKAZ-44gRz48GEsj5qqV_2N87dUWz2mt1CU7YkruUktNgUSeStfoyUZNMTy4nOfQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-lululemon-align-lululemon-align-high-rise-jogger-shorts-2f72973da2eae2.png",
+      "status": "generated",
+      "bytes": 107894
+    },
+    {
+      "id": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-linen-blend-wide-leg-pants-25aa31da24d",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Sloane Linen-Blend Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTgAceSHc2ZFFiTCqc1Nwrm81eegHIyTU404WbWg3BUI147HQXYbnXgeCfx2g2UX6f6XCs6Gdmg-k7zBoUELUkxgy_rl1hOsTkgpmTYjnsrYLcwaLQD6c34kIM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-linen-blend-wide-leg-pants-25aa31da24d.png",
+      "status": "generated",
+      "bytes": 132175
+    },
+    {
+      "id": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-lightweight-crepe-wide-leg-pants-767e7",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Sloane Lightweight Crepe Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTwjgWDMArP-4AV6mllxaUaYi-gF2urSG12DtLzE_CJszbl6Qd5yqiuDB29QaRsermUDJonCpgZx_FHONsNimYYhrpVmQ1muYOg_sAxBXw_T08Br2gKxl7HNFk",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-lightweight-crepe-wide-leg-pants-767e7.png",
+      "status": "generated",
+      "bytes": 158040
+    },
+    {
+      "id": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-lightweight-crepe-pants-99b84c678478ba",
+      "brand": "Abercrombie & Fitch",
+      "name": "Abercrombie & Fitch Women's Sloane Lightweight Crepe Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRL-nSWeqo2cl5JkIi41HIBDnetEPDuhMItiltUxhVPP4W6vY59T2qEQqUDr8_VlTDNsghbEuZNCGcuc7fUAuD2GpqgY_O92wQ8zSknkDW4vDP1AjJlyM9ZAg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-lightweight-crepe-pants-99b84c678478ba.png",
+      "status": "generated",
+      "bytes": 115030
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-khaki-40-4a3bdd4df94154",
+      "brand": "Dickies",
+      "name": "Dickies Men's Original 874 Work Pants Khaki | 40",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQZwAB77Rbh3p13YVKrzBkPACeGCgjc4KW27KfLx-APzaB2V5Jc0w89crk-Bik7itsHvK-VHRyUi8rO40tSOV9naqt1wcWkkJHO1LZuX66I1is7Jkw3roKO0Q",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-khaki-40-4a3bdd4df94154.png",
+      "status": "generated",
+      "bytes": 169480
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-slim-fit-straight-leg-work-pants-edbeadeb08e4f1",
+      "brand": "Dickies",
+      "name": "Dickies Men's Slim Fit Straight Leg Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSfBqhQlT4cgu86oqZlyjbfoXSauIB2ajDSZEFg-B-XZ1jz9XzT45qttvakDLfhGn10UA39-Onk--SpK5YwFM60DDtq3MBC4g",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-slim-fit-straight-leg-work-pants-edbeadeb08e4f1.png",
+      "status": "generated",
+      "bytes": 65464
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-women-s-original-874-work-pants-fbf8084cf446c3",
+      "brand": "Dickies",
+      "name": "Dickies Women's Original 874 Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTfm94r7u4AcmfLAb758FqZ56RAMCbpQXKrtCW5UABurzJTZodglEohfAmC4UE01ki9dasPNPxqeGXd5O5fyEE-41Z34aNjsVN3bsqihJu6mljnCw8Tn-jTPg",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-women-s-original-874-work-pants-fbf8084cf446c3.png",
+      "status": "generated",
+      "bytes": 117850
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-boys-original-874-work-pants-3f01e921104799",
+      "brand": "Dickies",
+      "name": "Dickies Boys' Original 874 Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQFrSE4f9jhESwmDcNWJOyTLAknfAqaO03C3kaJTDWFSORALc5vHZABNXjTEKBPaxsGWAL35I1156SU7eKqspR1P0CN9qYRgW_MmhAJn2OknpSiC5W4GQ0N",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-boys-original-874-work-pants-3f01e921104799.png",
+      "status": "generated",
+      "bytes": 118592
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-501ff70f6f38bd",
+      "brand": "Dickies",
+      "name": "Dickies Men's Original 874 Work Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSxJzKsAQy1mSIamkQhY_6x9BNYQgwuCRw0lsIkpIQRJxJaFlPig3Rmt_xegv4HDBpefBqXkupW07msmVyRE6YvNFKzJ5hlbdF0lraV39s",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-501ff70f6f38bd.png",
+      "status": "generated",
+      "bytes": 136756
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-men-s-501-original-fit-jeans-c89073e32791e0",
+      "brand": "Levi's",
+      "name": "Levi's Men's 501 Original Fit Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcStOaJYOSkve6pDOvQzvJ03e4albHVXKLVx06pYbxInLtKwhBBzrZk66xqegb3ZsOu29CH7NaQnPrJ6Z25hKbSfZNTDFu4dFcOhCvTDCJE",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-men-s-501-original-fit-jeans-c89073e32791e0.png",
+      "status": "generated",
+      "bytes": 205418
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-fit-jeans-745d3ab856c06b",
+      "brand": "Levi's",
+      "name": "Levi's Women's 501 Original Fit Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTJMlvJ1q3ucgeip-5rJ3U5pcuDuCrHbyYiF6-63QVTXCrSn-3uIh-VpE3fa3cILjZPI7zrrq81aK8avo6RmnfaLoSfZjAaRHWu0fnOpKbBFglAG7M4HzuSEXM",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-fit-jeans-745d3ab856c06b.png",
+      "status": "generated",
+      "bytes": 201829
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-high-rise-shorts-90cf6838143bb7",
+      "brand": "Levi's",
+      "name": "Levi's Women's 501 Original High-Rise Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT90OqkGKPqkcrM6CZ5yHbsF4E-OqxfmBwjo6WWmDzgJ3y2_7sKlD4s4elN8O6Ezwjk54JeAesu9NkppyNz-7D-Qu0kA_07o_5CYypvA8hNh-V7lg1Z-FKqO50",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-high-rise-shorts-90cf6838143bb7.png",
+      "status": "generated",
+      "bytes": 296233
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-men-s-501-shrink-to-fit-jeans-646b315b4cd005",
+      "brand": "Levi's",
+      "name": "Levi's Men's 501 Shrink-To-Fit Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRO7pCgF4hW_fQVlYZaRkt7Mf6E68mYJT80hoteVrRSXL6bEpHS7xbVl3ypoy-ACLoMwfq31naPCHVNg1CNqdFHrND_wuXeeynbW27J4hfrftgZumOl9XDH",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-men-s-501-shrink-to-fit-jeans-646b315b4cd005.png",
+      "status": "generated",
+      "bytes": 214248
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-original-straight-leg-jeans-7ebb4d44e5f249",
+      "brand": "Nordstrom",
+      "name": "\u2075\u2070\u00b9 Original Straight Leg Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRL_7pj_NLLF8PaA4mKkz0CRIUeKVUr0v3dmnUCPKSJA0kjQPoBdgo5knt7-uHosRfZ5RjixfiWgdfEo8wPwhEe7TrVs85YYA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-original-straight-leg-jeans-7ebb4d44e5f249.png",
+      "status": "generated",
+      "bytes": 40831
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-jeans-5f3745f408af7e",
+      "brand": "Levi's",
+      "name": "Levi's Women's 501 Original Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTSosc0jYzNTcYG-TxMM7mgzoa9SwKirBkjOiqB3EZsPwKpUNsCUIJcKXW3DmOprHcn6DMoYcWE4ubUqiCRBZTLj34gQJKqDlBWwFMANwBPkzxKBuGGsU9lgA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-jeans-5f3745f408af7e.png",
+      "status": "generated",
+      "bytes": 204497
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-501-original-fit-denim-jeans-6f329aa8d1b9fd",
+      "brand": "Levi's",
+      "name": "Levi's 501 Original Fit Denim Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTw_tWJgHS7APwFcvc1w6R7sHDGYWXglRgyT8_CAYM5vzDQNaIzv1azIJV4usGP3FrCSg0Fzdar--8u_OaU6jTJ7XcIPl0j5uoTf_rCKvPoH90ibOC3AkNAdw",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-501-original-fit-denim-jeans-6f329aa8d1b9fd.png",
+      "status": "generated",
+      "bytes": 41538
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levi-s-501-90s-women-s-jeans-b3c131bdddd09d",
+      "brand": "Levi's",
+      "name": "Levi's 501 90s Women's Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT7_36RZR0tMkHwrhm_xQfx0vEisspdGPBuuPB7VGsmteZxeUsZNQFLSDNm_8bNhAX3JKlr7NWSK1ImHiqN___npbvGy22x-seQkorGmlWfXVjnTtiS7QolvA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levi-s-501-90s-women-s-jeans-b3c131bdddd09d.png",
+      "status": "generated",
+      "bytes": 99293
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-levis-501-original-fit-jeans-straight-leg-button-fly-100-cotton-blue-black-bd1ea64f1",
+      "brand": "chamrun.ai",
+      "name": "Levis 501 Original Fit Jeans Straight Leg Button Fly 100% Cotton Blue Black",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTXIwsB8gKp8pvCF0C5bTYVgxQ-KyfYsLXbt7xWBP9bow6ke7roaIGQ7p3GrsWPLzZVvQUOXpEdMcZwyxdvGmsWhFQW-lkrshd1ACyQoEsyklIje1T25Gcp",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-levis-501-original-fit-jeans-straight-leg-button-fly-100-cotton-blue-black-bd1ea64f1.png",
+      "status": "generated",
+      "bytes": 46382
+    },
+    {
+      "id": "searchapi-quality-vacation-fem-quince-women-s-european-linen-pants-e219daf1717ab4",
+      "brand": "Quince",
+      "name": "Quince Women's European Linen Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSCidxSrjqmwOHszTFwHkujcw5W0LlGXF3Lru1f2ppPDJOVV-MZwG9MFKk_igSDNTqTv1ceJO5tfJbe0rGB2f7mRNDrVnFUBwrO6jbUwoD-SEo_qkr46cCUWp8",
+      "outputPath": "public/assets/cutouts/searchapi-quality-vacation-fem-quince-women-s-european-linen-pants-e219daf1717ab4.png",
+      "status": "generated",
+      "bytes": 498792
+    },
+    {
+      "id": "searchapi-quality-vacation-masc-coofandy-men-s-casual-linen-2-piece-short-sets-9cbae99747237c",
+      "brand": "Kohl's",
+      "name": "COOFANDY Men's Casual Linen 2 Piece Short Sets",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQvRFdS0HpE9Rt18NgLMXn9WIReO0rjzflc1JUT-lPEASIehiGfgf0nzqAbQQgaYymKPwaJoNj_-WAiTiryROmj_n28ey7VdBTn0PFwwpmU",
+      "outputPath": "public/assets/cutouts/searchapi-quality-vacation-masc-coofandy-men-s-casual-linen-2-piece-short-sets-9cbae99747237c.png",
+      "status": "generated",
+      "bytes": 201180
+    },
+    {
+      "id": "searchapi-quality-vacation-masc-coofandy-men-linen-pants-short-sets-2-pieces-summer-shirts-beach-shorts-casual-party-yog",
+      "brand": "Kohl's",
+      "name": "COOFANDY Men' Linen Pants Short Sets 2 Pieces Summer Shirts Beach Shorts Casual Party Yoga Outfits, Men's, Size: Medium, Khaki",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQbOq8vJxWvqaCl5AUjCirFvuHEwdBGhxtU6mlqUcyoUOSjs2temWBSzHoo1vv3AaJsd8CMbHe4xsadUFPjXfaptuzTy1WSLuKbnhC_BLUC",
+      "outputPath": "public/assets/cutouts/searchapi-quality-vacation-masc-coofandy-men-linen-pants-short-sets-2-pieces-summer-shirts-beach-shorts-casual-party-yog.png",
+      "status": "generated",
+      "bytes": 330080
+    },
+    {
+      "id": "searchapi-quality-bottoms-dickies-874-men-s-original-work-pants-d874-blk-29x30-665f309c5f2463",
+      "brand": "Good's Store",
+      "name": "Men's Original Work Pants D874-BLK - 29x30",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTX9VJToKULERfdOt6H2fakdmOZrXaSXQTDVzwdIXhYp13tlPPc-PGD8Pi6-onp2jSRn69LP0oROpUEoekGQ9eiS3EX-BlQ2RhkkulDyvTs5hqqSCk70fdf",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-dickies-874-men-s-original-work-pants-d874-blk-29x30-665f309c5f2463.png",
+      "status": "generated",
+      "bytes": 100861
+    },
+    {
+      "id": "searchapi-quality-bottoms-levis-501-501-original-fit-stretch-jeans-4cbc139dc42399",
+      "brand": "Brylane Home",
+      "name": "501 Original Fit Stretch Jeans",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRK7tCVLWSFwC8UTLeLpbymYp7yirn2629p9_NkHJqI-yLXSVb98hoMcShPhXMfBvr_HWDQLERT2qzrMNUzTQS02m1nvn_F0QQL-HGicHq2-BAxXI1ZkmWiBQ",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bottoms-levis-501-501-original-fit-stretch-jeans-4cbc139dc42399.png",
+      "status": "generated",
+      "bytes": 36212
+    },
+    {
+      "id": "generated-a47079a869c3e20d",
+      "brand": "Kohl's",
+      "name": "Women Linen Palazzo Pants Boho Wide Leg High Waist Casual Lounge Pant Beach Travel Vacation Outfits, Women's, Size: Large, Navy",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSpL7bliaKhU_3S_LpoGTqg0vY3DOryx4RmsfAtA6rwxoH-eW7IjWbMOAsdBGRWOmmWnpo7DNuqpHwpmPtF8lmrPS5_8eF6ulksxlaaGlU",
+      "outputPath": "public/assets/cutouts/generated-a47079a869c3e20d.png",
+      "status": "generated",
+      "bytes": 211386
+    },
+    {
+      "id": "generated-f7c73ba185c8e08c",
+      "brand": "Lands' End",
+      "name": "Lands' End Women's Linen High Rise Pull On 7\" Shorts",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ32ns4O2j-JkLwveBUIxvnxu3KkdJb1WSQjiiKJcgnOEmf83GPox7wPUynm3UTi5O6V0X_Tw7NPACRWd5VbQNl2JHF-SFT2PBvUtFD5tvu1HtvfXoCihkJx6w",
+      "outputPath": "public/assets/cutouts/generated-f7c73ba185c8e08c.png",
+      "status": "generated",
+      "bytes": 211340
+    },
+    {
+      "id": "generated-6eb51c3be129f9a1",
+      "brand": "Lulus",
+      "name": "Lulus Seashell Drawstring Wide-Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ5uZhH3DFHGdbuRkLXPphDfB4REJSVWTPH5p_3e-6Yo5-osHp3hU-JyVi4NMku9s26rtDNh_39YacoQu1PKq2L8o9fAdp0h4i0XsSCcEyN4St-sqe0uXXi",
+      "outputPath": "public/assets/cutouts/generated-6eb51c3be129f9a1.png",
+      "status": "generated",
+      "bytes": 156337
+    },
+    {
+      "id": "generated-decef491b31eaba0",
+      "brand": "Quince",
+      "name": "Quince Women's European Linen Wide Leg Pants",
+      "category": "bottom",
+      "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRuK_hRPObUXvsl3knlReq_TOCayJr4ijqOB_dUT7QTQ633SXqTGEZpbBCHQu0UvYlbiQuT7J3Vxot7NqIuOmEOi54tReHX6ceu0jytIbh2onO1YXBfPp_7AeQ",
+      "outputPath": "public/assets/cutouts/generated-decef491b31eaba0.png",
+      "status": "generated",
+      "bytes": 112634
+    },
+    {
+      "id": "drop-7e85e02b50a32ac5",
+      "brand": "b.Eautiful",
+      "name": "BAMBI REUSABLE BAG",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/40390202-2026-03-20T102804.843.png?v=1774027758",
+      "outputPath": "public/assets/cutouts/drop-7e85e02b50a32ac5.png",
+      "status": "generated",
+      "bytes": 515641
+    },
+    {
+      "id": "drop-934791e94b174385",
+      "brand": "b.Eautiful",
+      "name": "SHELLS REUSABLE BAG XL",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/40390202-2026-03-20T103415.937.png?v=1774028077",
+      "outputPath": "public/assets/cutouts/drop-934791e94b174385.png",
+      "status": "generated",
+      "bytes": 397896
+    },
+    {
+      "id": "drop-0b9e52c6fa6f28e5",
+      "brand": "TELFAR",
+      "name": "Medium Shopping Bag - Kush",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-MEDIUM-KUSH-SHOPPING-BAG-FRONT.jpg?v=1710885080",
+      "outputPath": "public/assets/cutouts/drop-0b9e52c6fa6f28e5.png",
+      "status": "generated",
+      "bytes": 920429
+    },
+    {
+      "id": "drop-051e0fcf97fac95c",
+      "brand": "TELFAR",
+      "name": "Medium Shopping Bag - Oxblood",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-MEDIUM-OXBLOOD-SHOPPING-BAG-FRONT_bb1814ef-5e2f-47b2-be18-d68be33cc51a.jpg?v=1701756886",
+      "outputPath": "public/assets/cutouts/drop-051e0fcf97fac95c.png",
+      "status": "generated",
+      "bytes": 684972
+    },
+    {
+      "id": "drop-4aef8541d3bce4cc",
+      "brand": "TELFAR",
+      "name": "Medium Shopping Bag - Pearl",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-MEDIUM-SHOPPING-BAG-PEARL-FRONT.jpg?v=1724681315",
+      "outputPath": "public/assets/cutouts/drop-4aef8541d3bce4cc.png",
+      "status": "generated",
+      "bytes": 288579
+    },
+    {
+      "id": "drop-c1393cf9ff02e148",
+      "brand": "TELFAR",
+      "name": "Medium Shopping Bag - Tan",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-MEDIUM-TAN-SHOPPING-BAG-FRONT_245e3d8a-453b-4e49-903e-d8797453c84f.jpg?v=1701756587",
+      "outputPath": "public/assets/cutouts/drop-c1393cf9ff02e148.png",
+      "status": "generated",
+      "bytes": 779896
+    },
+    {
+      "id": "drop-7e229f66ed316645",
+      "brand": "TELFAR",
+      "name": "Medium Shopping Bag - White",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-MEDIUM-WHITE-SHOPPING-BAG-FRONT_18380cda-cd6b-45f7-890a-aa0af58aff79.jpg?v=1701756320",
+      "outputPath": "public/assets/cutouts/drop-7e229f66ed316645.png",
+      "status": "generated",
+      "bytes": 292315
+    },
+    {
+      "id": "drop-da9dfc31d2ee0584",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Black",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-BLACK-SHOPPING-BAG-FRONT.jpg?v=1701756573",
+      "outputPath": "public/assets/cutouts/drop-da9dfc31d2ee0584.png",
+      "status": "generated",
+      "bytes": 206667
+    },
+    {
+      "id": "drop-fce8eac901f8a2e1",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Chocolate",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-CHOCOLATE-SHOPPING-BAG-FRONT_49c4446e-7ab4-44b5-be22-b419baadede2.jpg?v=1701756548",
+      "outputPath": "public/assets/cutouts/drop-fce8eac901f8a2e1.png",
+      "status": "generated",
+      "bytes": 263315
+    },
+    {
+      "id": "drop-a0b0a8d1f2000283",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Cream",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-CREAM-SHOPPING-BAG-FRONT_4063dd3b-e6ba-473a-b15f-8458aa9c4a63.jpg?v=1701756324",
+      "outputPath": "public/assets/cutouts/drop-a0b0a8d1f2000283.png",
+      "status": "generated",
+      "bytes": 235804
+    },
+    {
+      "id": "drop-31aa3db8f7e8001a",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Dark Olive",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-DARK-OLIVE-SHOPPING-BAG-FRONT_f6498cc2-dec2-4aa7-939c-ea96796b5f4b.jpg?v=1701756897",
+      "outputPath": "public/assets/cutouts/drop-31aa3db8f7e8001a.png",
+      "status": "generated",
+      "bytes": 279108
+    },
+    {
+      "id": "drop-7904a489bc3f8072",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Grey",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-GREY-SHOPPING-BAG-FRONT_7bc5c58a-6435-4bb4-967f-96c5264ead8d.jpg?v=1701756300",
+      "outputPath": "public/assets/cutouts/drop-7904a489bc3f8072.png",
+      "status": "generated",
+      "bytes": 280424
+    },
+    {
+      "id": "drop-f93202027ddab759",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Kush",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-KUSH-SHOPPING-BAG-FRONT.jpg?v=1710885080",
+      "outputPath": "public/assets/cutouts/drop-f93202027ddab759.png",
+      "status": "generated",
+      "bytes": 438272
+    },
+    {
+      "id": "drop-e7afc6b800485f67",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Oxblood",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-OXBLOOD-SHOPPING-BAG-FRONT_47eb1c73-742b-4aaf-935b-ce42fc4f0c7c.jpg?v=1701756870",
+      "outputPath": "public/assets/cutouts/drop-e7afc6b800485f67.png",
+      "status": "generated",
+      "bytes": 297371
+    },
+    {
+      "id": "drop-3fb5e756ecf5b0ee",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Pearl",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-SHOPPING-BAG-PEARL-FRONT.jpg?v=1724681315",
+      "outputPath": "public/assets/cutouts/drop-3fb5e756ecf5b0ee.png",
+      "status": "generated",
+      "bytes": 223325
+    },
+    {
+      "id": "drop-50c32da841acdeff",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - Tan",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-TAN-SHOPPING-BAG-FRONT_af669f66-7722-4d42-91e9-9a9c80dc5b3f.jpg?v=1701756276",
+      "outputPath": "public/assets/cutouts/drop-50c32da841acdeff.png",
+      "status": "generated",
+      "bytes": 331367
+    },
+    {
+      "id": "drop-417c3f839b9ae940",
+      "brand": "TELFAR",
+      "name": "Small Shopping Bag - White",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0880/7204/files/TELFAR-SMALL-WHITE-SHOPPING-BAG-FRONT.jpg?v=1701756344",
+      "outputPath": "public/assets/cutouts/drop-417c3f839b9ae940.png",
+      "status": "generated",
+      "bytes": 194622
+    },
+    {
+      "id": "drop-e202e8c18d3e9a53",
+      "brand": "What Goes Around Comes Around",
+      "name": "WGACA Balenciaga Chevre Metallic Edge Classic City Bag - Yellow",
+      "category": "bag",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/WGQ0B71K0IYB000-front_f02884e5-3104-4be7-989b-48ef4fe96079.jpg?v=1777407806",
+      "outputPath": "public/assets/cutouts/drop-e202e8c18d3e9a53.png",
+      "status": "generated",
+      "bytes": 1206599
+    },
+    {
+      "id": "searchapi-quality-bags-lululemon-belt-lululemon-black-everywhere-belt-bag-blank-black-os-75e90acc9cd107",
+      "brand": "lululemon",
+      "name": "lululemon Black Everywhere Belt Bag - Blank BLACK OS",
+      "category": "bag",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRn-N9nR9FOIAEHrTSxg4n3BHz_aXierCuipZTPorFvq6spGGHX9y-M3OiT_f4H42xBud3BRIJGC2sVDUBr53tjuYMcQNz3",
+      "outputPath": "public/assets/cutouts/searchapi-quality-bags-lululemon-belt-lululemon-black-everywhere-belt-bag-blank-black-os-75e90acc9cd107.png",
+      "status": "generated",
+      "bytes": 50770
+    },
+    {
+      "id": "searchapi-quality-shoes-adidas-samba-adidas-samba-og-w-in-black-white-lace-up-retro-sneakers-4-uk-36-2-3-eu-5-5-us-695f6",
+      "brand": "Adidas",
+      "name": "Adidas Samba OG W In Black White | Lace up Retro sneakers | 4 UK - 36 2/3 EU - 5.5 US",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQjyqq1ZS2rUwf-b-tzR-6PiaAnfL5HjlFcXVAgE-W566dkuxDNuE8tZViCoUI92zKdH_JTYEw6co-luoCiBxOt29BiypBsEUIAU5ZtsQ-X-ASb8EfTpK_C",
+      "outputPath": "public/assets/cutouts/searchapi-quality-shoes-adidas-samba-adidas-samba-og-w-in-black-white-lace-up-retro-sneakers-4-uk-36-2-3-eu-5-5-us-695f6.png",
+      "status": "generated",
+      "bytes": 243390
+    },
+    {
+      "id": "searchapi-quality-shoes-adidas-samba-adidas-originals-samba-og-in-black-size-mens-5-5-womens-6-5-d9eb2d0da6a1bc",
+      "brand": "Revolve",
+      "name": "adidas Originals Samba OG in Black - size Mens 5.5 / Womens 6.5",
+      "category": "shoes",
+      "imageUrl": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRuS2obYg0ZrjB8qm5mPSvWX_nm25l1CAp02PXnlXwHlkIDG4p_ckoCoZXAT4DEJ8B-Dt5YXw98awG5rRSIaEOT9DP9zEhvoWf4_eTJtA7MDDUJhJyH1tbniQA",
+      "outputPath": "public/assets/cutouts/searchapi-quality-shoes-adidas-samba-adidas-originals-samba-og-in-black-size-mens-5-5-womens-6-5-d9eb2d0da6a1bc.png",
+      "status": "generated",
+      "bytes": 150796
     }
   ]
 }

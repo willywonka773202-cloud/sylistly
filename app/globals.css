@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 :root {
+  --accent: #ff3b63;
+  --accent-hot: #ff6e8a;
+  --accent-deep: #c61e45;
+  --champagne: #e7c79b;
+  --ink: #fbf7f2;
   --skin: #c9a98a;
 }
 
@@ -11,22 +16,26 @@ body {
   margin: 0;
   padding: 0;
   background:
-    radial-gradient(circle at 50% 0%, rgba(232,54,93,.12), transparent 28%),
-    linear-gradient(180deg, #11110f 0%, #080807 32%, #030303 100%);
-  color: #fffefb;
+    radial-gradient(120% 60% at 50% -8%, rgba(255, 59, 99, 0.16), transparent 46%),
+    radial-gradient(90% 50% at 100% 4%, rgba(231, 199, 155, 0.07), transparent 50%),
+    linear-gradient(180deg, #131016 0%, #0a0a0c 34%, #060507 100%);
+  background-attachment: fixed;
+  color: var(--ink);
   font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: #e8365d;
+  background: var(--accent);
   color: #fff;
 }
 
 .skin {
   background:
-    radial-gradient(circle at 35% 18%, rgba(255,255,255,.22), transparent 28%),
-    linear-gradient(180deg, rgba(255,255,255,.18), transparent 44%),
+    radial-gradient(circle at 35% 18%, rgba(255, 255, 255, 0.22), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 44%),
     var(--skin);
 }
 
@@ -39,156 +48,129 @@ body {
   display: none;
 }
 
+/* A light "studio" surface for product cutouts so transparent PNGs always read. */
+.sy-studio {
+  background:
+    radial-gradient(circle at 38% 22%, #ffffff, transparent 58%),
+    linear-gradient(168deg, #f6f1ea 0%, #efe7dc 60%, #e7dccd 100%);
+}
+
 @keyframes sy-rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes sy-sheet-up {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes sy-fit-float {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-    filter: saturate(1);
-  }
-
-  50% {
-    transform: translateY(-3px) scale(1.006);
-    filter: saturate(1.035);
-  }
+  0%, 100% { transform: translateY(0) scale(1); filter: saturate(1); }
+  50% { transform: translateY(-3px) scale(1.006); filter: saturate(1.035); }
 }
 
 @layer utilities {
-  .sy-enter {
-    animation: sy-rise-in 220ms ease-out both;
+  .sy-enter { animation: sy-rise-in 280ms cubic-bezier(.2, .8, .2, 1) both; }
+  .sy-sheet-enter { animation: sy-sheet-up 260ms cubic-bezier(.2, .8, .2, 1) both; }
+  .sy-fit-float { animation: sy-fit-float 5.8s ease-in-out infinite both; will-change: transform, filter; }
+  .sy-fit-float-soft { animation: sy-fit-float 7.2s ease-in-out infinite both; will-change: transform, filter; }
+
+  .sy-press { transition: transform 150ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease; }
+  .sy-press:active { transform: scale(.97); }
+  .sy-lift { transition: transform 220ms cubic-bezier(.2,.8,.2,1), border-color 200ms ease, box-shadow 220ms ease, background-color 200ms ease; }
+  .sy-lift:hover { transform: translateY(-3px); }
+
+  /* Editorial display heading helper. */
+  .sy-display {
+    font-family: var(--font-playfair), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
   }
 
-  .sy-sheet-enter {
-    animation: sy-sheet-up 240ms cubic-bezier(.2, .8, .2, 1) both;
-  }
-
-  .sy-fit-float {
-    animation: sy-fit-float 5.8s ease-in-out infinite both;
-    will-change: transform, filter;
-  }
-
-  .sy-fit-float-soft {
-    animation: sy-fit-float 7.2s ease-in-out infinite both;
-    will-change: transform, filter;
-  }
-
-  .sy-press {
-    transition: transform 150ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
-  }
-
-  .sy-press:active {
-    transform: scale(.97);
-  }
-
-  .sy-lift {
-    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
-  }
-
-  .sy-lift:hover {
-    transform: translateY(-2px);
+  /* Thin editorial rule with an accent tick — a signature motif. */
+  .sy-rule {
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent) 0 22px, rgba(251, 247, 242, 0.12) 22px);
   }
 
   .sy-card {
-    border: 1px solid rgba(255, 255, 255, .11);
-    background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025));
-    box-shadow: 0 18px 42px rgba(0, 0, 0, .28);
+    border: 1px solid rgba(251, 247, 242, .1);
+    background: linear-gradient(180deg, rgba(251, 247, 242, .06), rgba(251, 247, 242, .02));
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .34);
   }
 
   .sy-card-strong {
-    border: 1px solid rgba(246, 48, 107, .28);
+    border: 1px solid rgba(255, 59, 99, .26);
     background:
-      radial-gradient(circle at 18% 0%, rgba(246, 48, 107, .22), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .025));
-    box-shadow: 0 24px 58px rgba(0, 0, 0, .36);
+      radial-gradient(120% 80% at 12% -10%, rgba(255, 59, 99, .2), transparent 46%),
+      linear-gradient(180deg, rgba(251, 247, 242, .08), rgba(251, 247, 242, .02));
+    box-shadow: 0 26px 64px rgba(0, 0, 0, .46);
   }
 
   .sy-eyebrow {
-    font-size: 8px;
-    font-weight: 900;
+    font-size: 10px;
+    font-weight: 800;
     letter-spacing: .22em;
     text-transform: uppercase;
-    color: #f6306b;
+    color: var(--accent);
   }
 
   .sy-copy {
-    font-size: 12px;
-    line-height: 1.65;
-    color: rgba(224, 212, 203, .78);
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(251, 247, 242, .68);
   }
 
   .sy-cta-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: .4rem;
+    gap: .45rem;
     border-radius: 9999px;
-    background: linear-gradient(135deg, #f6306b 0%, #ff7099 58%, #f6306b 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hot) 56%, var(--accent) 100%);
     background-size: 200% 100%;
     color: white;
-    box-shadow: 0 16px 34px rgba(246, 48, 107, .46);
-    transition: transform 150ms ease, background-position 220ms ease, box-shadow 220ms ease;
+    font-weight: 700;
+    box-shadow: 0 16px 34px rgba(255, 59, 99, .42);
+    transition: transform 150ms ease, background-position 240ms ease, box-shadow 240ms ease;
   }
 
-  .sy-cta-primary:hover {
-    background-position: right center;
-    box-shadow: 0 20px 44px rgba(246, 48, 107, .58);
-  }
+  .sy-cta-primary:hover { background-position: right center; box-shadow: 0 20px 46px rgba(255, 59, 99, .55); }
+  .sy-cta-primary:active, .sy-cta-secondary:active { transform: scale(.97); }
 
   .sy-cta-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: .4rem;
+    gap: .45rem;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, .14);
-    background: rgba(255, 255, 255, .055);
-    color: rgba(255, 255, 255, .88);
+    border: 1px solid rgba(251, 247, 242, .16);
+    background: rgba(251, 247, 242, .05);
+    color: rgba(251, 247, 242, .9);
+    font-weight: 600;
     transition: transform 150ms ease, border-color 180ms ease, background-color 180ms ease;
   }
-
-  .sy-cta-primary:active,
-  .sy-cta-secondary:active {
-    transform: scale(.97);
-  }
+  .sy-cta-secondary:hover { border-color: rgba(251, 247, 242, .3); background: rgba(251, 247, 242, .08); }
 
   .sy-chip {
-    border: 1px solid rgba(255, 255, 255, .12);
-    background: rgba(255, 255, 255, .045);
-    color: rgba(255, 255, 255, .74);
+    border: 1px solid rgba(251, 247, 242, .13);
+    background: rgba(251, 247, 242, .045);
+    color: rgba(251, 247, 242, .76);
   }
 
   .sy-chip-active {
-    border-color: rgba(246, 48, 107, .75);
-    background: #f6306b;
+    border-color: transparent;
+    background: var(--accent);
     color: white;
-    box-shadow: 0 10px 28px rgba(246, 48, 107, .42);
+    box-shadow: 0 10px 28px rgba(255, 59, 99, .4);
   }
 
   .sy-toast {
-    border: 1px solid rgba(246, 48, 107, .38);
-    background: rgba(21, 17, 15, .96);
-    box-shadow: 0 14px 42px rgba(246, 48, 107, .34);
+    border: 1px solid rgba(255, 59, 99, .36);
+    background: rgba(16, 13, 14, .96);
+    box-shadow: 0 14px 44px rgba(255, 59, 99, .32);
     backdrop-filter: blur(12px);
   }
 }

@@ -12,9 +12,12 @@ import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
 
-const DEFAULT_MODEL = 'claude-sonnet-4-6';
-const COMPOSE_TIMEOUT_MS = 13_000;
-const PER_SLOT_LIMIT = 14;
+// Haiku is fast + strong at this constrained, structured selection task, keeping
+// generation snappy. Override with OUTFIT_COMPOSER_MODEL (e.g. a Sonnet for max taste).
+const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
+const COMPOSE_TIMEOUT_MS = 12_000;
+const PER_SLOT_LIMIT = 10;
+const COMPOSE_MAX_TOKENS = 720;
 
 /** Optional, privacy-safe styling profile the composer can personalize against. */
 export interface StylistProfileInput {
@@ -346,11 +349,11 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
   }
 
   try {
-    const model = process.env.ANTHROPIC_MODEL?.trim() || DEFAULT_MODEL;
+    const model = process.env.OUTFIT_COMPOSER_MODEL?.trim() || DEFAULT_MODEL;
     const message = await withTimeout(
       client.messages.create({
         model,
-        max_tokens: 1024,
+        max_tokens: COMPOSE_MAX_TOKENS,
         system: STYLIST_RUBRIC,
         tools: [COMPOSE_TOOL],
         tool_choice: { type: 'tool', name: 'compose_outfit' },
