@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
 import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
 import { wrapAffiliate } from '@/lib/affiliate';
@@ -215,6 +216,8 @@ function catalogKindFor({
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as SearchBody;
+  // Per-client rate limit: when exceeded, search uses the free heuristic path.
+  const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed;
   const query = (body.query || '').slice(0, 200);
   const category = body.category;
   const frame = normalizeSearchFrame(body.frame);
@@ -320,6 +323,7 @@ export async function POST(req: NextRequest) {
         fastIntent,
         realCatalogProducts,
         Math.min(SEARCH_RESULT_LIMIT, realCatalogProducts.length),
+        allowAi,
       ), transparentOnly, exactOnly);
 
       cacheProducts(rankedCatalogProducts).catch(() => {});
@@ -410,7 +414,7 @@ export async function POST(req: NextRequest) {
     if (liveSearchKey) {
       try {
         const intent = applyFrameToIntent(
-          await parseSearchIntent(effectiveQuery, category),
+          await parseSearchIntent(effectiveQuery, category, allowAi),
           frame,
         );
         intent.priceMax = explicitPriceMax ?? intent.priceMax ?? null;
@@ -420,7 +424,7 @@ export async function POST(req: NextRequest) {
         const filteredCandidates = applyExplicitPriceBounds(candidates, explicitPriceMin, explicitPriceMax);
         const rerankLimit = Math.min(SEARCH_RESULT_LIMIT, filteredCandidates.length);
         const ranked = filteredCandidates.length > rerankLimit
-          ? await rerankProducts(effectiveQuery, intent, filteredCandidates, rerankLimit)
+          ? await rerankProducts(effectiveQuery, intent, filteredCandidates, rerankLimit, allowAi)
           : filteredCandidates.slice(0, rerankLimit);
 
         const hydrationTargets = ranked.slice(0, 3);
@@ -483,6 +487,7 @@ export async function POST(req: NextRequest) {
           fastIntent,
           realPreviewProducts,
           Math.min(SEARCH_RESULT_LIMIT, realPreviewProducts.length),
+          allowAi,
         ), transparentOnly, exactOnly);
 
         cacheProducts(rankedPreviewProducts).catch(() => {});

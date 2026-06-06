@@ -9,6 +9,7 @@ import {
 } from '@/lib/catalog';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
+import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
 
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
@@ -49,6 +50,8 @@ export interface ComposeOutfitParams {
   targetSlots?: Category[];
   transparentOnly?: boolean;
   profile?: StylistProfileInput | null;
+  /** When false (e.g. rate-limited), skip the paid call and use the free engine. */
+  allowAi?: boolean;
 }
 
 export interface ComposedLook {
@@ -367,7 +370,10 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
 
   const slotsWithCandidates = Object.values(inventory).filter((pool) => pool && pool.length).length;
   const client = getClient();
-  if (!client || slotsWithCandidates === 0) {
+  // Cost governor: skip the paid call (use the free engine) when rate-limited,
+  // the kill switch is on, or the daily spend cap is reached.
+  const aiPermitted = params.allowAi !== false && aiBudgetAvailable();
+  if (!client || slotsWithCandidates === 0 || !aiPermitted) {
     return assembleFallback(shortlists, params);
   }
 
@@ -385,6 +391,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
       COMPOSE_TIMEOUT_MS,
       'Outfit composer timed out',
     );
+    recordAiUsage(model, message.usage);
 
     const result = parseToolResult(message);
     if (!result || !result.picks.length) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { composeOutfitLook, type StylistProfileInput } from '@/lib/stylist/outfit-composer';
 import { hasProductCommerceLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
@@ -166,6 +167,8 @@ export async function POST(req: NextRequest) {
     targetSlots,
     transparentOnly: true,
     profile: sanitizeProfile(body.profile),
+    // Per-client rate limit: when exceeded, compose with the free engine instead.
+    allowAi: allowAiCall(clientKeyFromRequest(req)).allowed,
   });
   const renderableProducts = Object.fromEntries(
     Object.entries(result.products).filter((entry): entry is [Category, Product] =>

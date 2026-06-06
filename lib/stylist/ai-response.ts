@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
 import { CATEGORY_ORDER, type Product } from '@/lib/types';
 import { hasExactProductLink, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import { detectIntent, generateLocalStylistResponse } from '@/lib/stylist/local-response';
@@ -198,7 +199,7 @@ function sanitizeRecommendedProducts(value: unknown, context: StylistContext): S
   return recommendations;
 }
 
-export async function generateApiStylistResponse(message: string, context: StylistContext): Promise<StylistResponse> {
+export async function generateApiStylistResponse(message: string, context: StylistContext, allowAi = true): Promise<StylistResponse> {
   const localFallback = generateLocalStylistResponse(message, context);
   const intentFallback = detectIntent(message);
   const actionFallback = fallbackActionsForIntent(intentFallback);
@@ -219,12 +220,17 @@ export async function generateApiStylistResponse(message: string, context: Styli
   const client = getClient();
   const ollama = getOllamaConfig();
   if (!client && !ollama) return localFallback;
+  // Cost governor: rate-limited, killed, or over the daily cap → free responder.
+  // (Anthropic budget gates the paid client; a user-run Ollama endpoint is exempt.)
+  if (allowAi === false) return localFallback;
+  const anthropicAllowed = Boolean(client) && aiBudgetAvailable();
+  if (!anthropicAllowed && !ollama) return localFallback;
 
   try {
     let text = '';
     let provider = 'anthropic';
 
-    if (client) {
+    if (client && anthropicAllowed) {
       const model = process.env.ANTHROPIC_MODEL?.trim() || DEFAULT_ANTHROPIC_MODEL;
       const response = await withTimeout(
         client.messages.create({
@@ -236,6 +242,7 @@ export async function generateApiStylistResponse(message: string, context: Styli
         STYLIST_TIMEOUT_MS,
         'Syli AI timed out',
       );
+      recordAiUsage(model, response.usage);
 
       text = response.content
         .filter((block): block is Anthropic.TextBlock => block.type === 'text')

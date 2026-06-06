@@ -1,9 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { aiBudgetAvailable, recordAiUsage } from './ai-budget';
 import type { Category, Product, SearchIntent } from './types';
 
-const MODEL = 'claude-sonnet-4-6';
-const PARSE_TIMEOUT_MS = 2_000;
-const RERANK_TIMEOUT_MS = 2_000;
+// Search intent + rerank use Haiku (cheap) rather than Sonnet — search is the
+// highest-volume AI path, so cost matters most here. Override with CLAUDE_SEARCH_MODEL.
+const MODEL = process.env.CLAUDE_SEARCH_MODEL?.trim() || 'claude-haiku-4-5-20251001';
+const PARSE_TIMEOUT_MS = 4_000;
+const RERANK_TIMEOUT_MS = 4_000;
 
 const COLOR_WORDS = [
   'black', 'white', 'grey', 'gray', 'red', 'blue', 'green', 'pink', 'purple',
@@ -204,11 +207,13 @@ function fallbackRerank(
 export async function parseSearchIntent(
   query: string,
   forcedCategory?: Category,
+  allowAi = true,
 ): Promise<SearchIntent> {
   const fallback = parseSearchIntentHeuristic(query, forcedCategory);
   const client = getClient();
 
-  if (!client) return fallback;
+  // Cost governor: rate-limited / killed / over daily cap → free heuristic.
+  if (!client || allowAi === false || !aiBudgetAvailable()) return fallback;
 
   try {
     const res = await withTimeout(
@@ -234,6 +239,7 @@ export async function parseSearchIntent(
       PARSE_TIMEOUT_MS,
       'Claude intent parse timed out',
     );
+    recordAiUsage(MODEL, res.usage);
 
     const text = res.content
       .filter((block): block is Anthropic.TextBlock => block.type === 'text')
@@ -264,13 +270,15 @@ export async function rerankProducts(
   intent: SearchIntent,
   candidates: Product[],
   limit = 6,
+  allowAi = true,
 ): Promise<Product[]> {
   if (candidates.length <= limit) return candidates;
 
   const fallback = fallbackRerank(query, intent, candidates, limit);
   const client = getClient();
 
-  if (!client) return fallback;
+  // Cost governor: rate-limited / killed / over daily cap → free heuristic rerank.
+  if (!client || allowAi === false || !aiBudgetAvailable()) return fallback;
 
   const catalog = candidates.map((candidate, index) => ({
     i: index,
@@ -303,6 +311,7 @@ export async function rerankProducts(
       RERANK_TIMEOUT_MS,
       'Claude rerank timed out',
     );
+    recordAiUsage(MODEL, res.usage);
 
     const text = res.content
       .filter((block): block is Anthropic.TextBlock => block.type === 'text')

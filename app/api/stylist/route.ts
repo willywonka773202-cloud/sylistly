@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { aiBudgetSnapshot } from '@/lib/ai-budget';
+import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { hasDatabaseCatalog } from '@/lib/catalog-db';
 import { generateApiStylistResponse } from '@/lib/stylist/ai-response';
 import { getStylistCatalogProducts } from '@/lib/stylist/catalog';
@@ -63,7 +65,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const response = await generateApiStylistResponse(parsed.message.slice(0, 1_000), safeContext(parsed.context));
+  const allowAi = allowAiCall(clientKeyFromRequest(request)).allowed;
+  const response = await generateApiStylistResponse(parsed.message.slice(0, 1_000), safeContext(parsed.context), allowAi);
   return NextResponse.json(response);
 }
 
@@ -75,9 +78,11 @@ export async function GET() {
     mode: hasApiKey ? 'api' : 'local',
     provider: hasAnthropicKey ? 'anthropic' : hasOllamaKey ? 'ollama' : 'local',
     model: hasAnthropicKey
-      ? process.env.ANTHROPIC_MODEL?.trim() || 'claude-sonnet-4-20250514'
+      ? process.env.ANTHROPIC_MODEL?.trim() || 'claude-sonnet-4-6'
       : process.env.OLLAMA_DEFAULT_MODEL?.trim() || process.env.OLLAMA_MODEL?.trim() || 'gpt-oss:120b',
     databaseCatalog: hasDatabaseCatalog(),
+    // Live cost-governor state (estimated daily spend vs cap, kill switch).
+    budget: aiBudgetSnapshot(),
     message: hasApiKey
       ? 'Syli API is configured for AI-backed responses.'
       : 'Syli API is up and will use local fallback until ANTHROPIC_API_KEY is configured.',
