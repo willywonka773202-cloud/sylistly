@@ -174,7 +174,11 @@ function FrontCanvas({
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.74),0_0_30px_rgba(232,54,93,.36),0_14px_28px_rgba(40,18,22,.14)]'
       : selected
       ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
-      : 'border-[#eadfd5] shadow-[0_10px_22px_rgba(48,34,24,.07)]';
+      : product
+      // Filled pieces float borderless on the board so the outfit reads as one
+      // cohesive flat lay; empty/editable slots keep only a faint outline.
+      ? 'border-transparent shadow-none'
+      : 'border-[#e6dad0]/55 shadow-none';
     const filledSlotClassName = product
       ? 'bg-transparent shadow-none'
       : 'bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)]';
@@ -191,7 +195,7 @@ function FrontCanvas({
           type="button"
           onClick={handleSlotClick}
           disabled={slotInteractionDisabled}
-          className={`${wrapperClassName} flex flex-col items-center justify-center border-dashed bg-white/64 px-1.5 text-center`}
+          className={`${wrapperClassName} flex flex-col items-center justify-center border-dashed bg-black/[0.02] px-1.5 text-center opacity-80`}
           aria-pressed={selected}
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
@@ -307,41 +311,43 @@ function productHasTerm(product: Product, terms: string[]): boolean {
 }
 
 function builderPreviewImageClass(product: Product, category: Category, prominent: boolean): string {
+  // Pieces are scaled up to fill their cells so the board reads as a full,
+  // styled outfit rather than small items floating in empty space.
   const base = 'h-full w-full object-contain object-center p-0 drop-shadow-[0_16px_18px_rgba(54,34,24,.18)]';
-  if (category === 'top') return `${base} scale-[1.08]`;
-  if (category === 'outer') return `${base} scale-[.98]`;
+  if (category === 'top') return `${base} scale-[1.3]`;
+  if (category === 'outer') return `${base} scale-[1.2]`;
   if (category === 'bottom') {
-    if (productHasTerm(product, SHORT_BOTTOM_TERMS)) return `${base} translate-y-[-2%] scale-[.82]`;
-    if (productHasTerm(product, SKIRT_BOTTOM_TERMS)) return `${base} translate-y-[1%] scale-[.92]`;
-    if (productHasTerm(product, LONG_BOTTOM_TERMS)) return `${base} translate-y-[2%] scale-[1]`;
-    return `${base} scale-[.94]`;
+    if (productHasTerm(product, SHORT_BOTTOM_TERMS)) return `${base} translate-y-[-2%] scale-[1.0]`;
+    if (productHasTerm(product, SKIRT_BOTTOM_TERMS)) return `${base} translate-y-[1%] scale-[1.12]`;
+    if (productHasTerm(product, LONG_BOTTOM_TERMS)) return `${base} translate-y-[2%] scale-[1.18]`;
+    return `${base} scale-[1.14]`;
   }
   if (category === 'shoes') {
-    if (productHasTerm(product, BOOT_TERMS)) return `${base} translate-y-[10%] scale-[.72]`;
-    if (productHasTerm(product, HEEL_TERMS)) return `${base} translate-y-[8%] scale-[.82]`;
-    if (productHasTerm(product, FLAT_SHOE_TERMS)) return `${base} translate-y-[7%] scale-[.84]`;
-    if (productHasTerm(product, LOW_PROFILE_SHOE_TERMS)) return `${base} translate-y-[6%] scale-[.88]`;
-    return `${base} translate-y-[7%] scale-[.84]`;
+    if (productHasTerm(product, BOOT_TERMS)) return `${base} translate-y-[8%] scale-[.92]`;
+    if (productHasTerm(product, HEEL_TERMS)) return `${base} translate-y-[6%] scale-[1.0]`;
+    if (productHasTerm(product, FLAT_SHOE_TERMS)) return `${base} translate-y-[6%] scale-[1.04]`;
+    if (productHasTerm(product, LOW_PROFILE_SHOE_TERMS)) return `${base} translate-y-[5%] scale-[1.06]`;
+    return `${base} translate-y-[6%] scale-[1.04]`;
   }
   if (category === 'bag') {
-    if (productHasTerm(product, TOTE_TERMS)) return `${base} translate-y-[3%] scale-[.78]`;
-    if (productHasTerm(product, MINI_BAG_TERMS)) return `${base} scale-[1]`;
-    return `${base} scale-[.9]`;
+    if (productHasTerm(product, TOTE_TERMS)) return `${base} translate-y-[3%] scale-[.96]`;
+    if (productHasTerm(product, MINI_BAG_TERMS)) return `${base} scale-[1.15]`;
+    return `${base} scale-[1.08]`;
   }
   if (category === 'hat') {
-    if (productHasTerm(product, BEANIE_TERMS)) return `${base} translate-y-[4%] scale-[.88]`;
-    if (productHasTerm(product, WIDE_HAT_TERMS)) return `${base} translate-y-[4%] scale-[.82]`;
-    if (productHasTerm(product, BUCKET_HAT_TERMS)) return `${base} translate-y-[4%] scale-[.94]`;
-    if (productHasTerm(product, CAP_TERMS)) return `${base} translate-y-[4%] scale-[1.02]`;
-    return `${base} scale-[.9]`;
+    if (productHasTerm(product, BEANIE_TERMS)) return `${base} translate-y-[3%] scale-[1.05]`;
+    if (productHasTerm(product, WIDE_HAT_TERMS)) return `${base} translate-y-[3%] scale-[1.0]`;
+    if (productHasTerm(product, BUCKET_HAT_TERMS)) return `${base} translate-y-[3%] scale-[1.12]`;
+    if (productHasTerm(product, CAP_TERMS)) return `${base} translate-y-[3%] scale-[1.2]`;
+    return `${base} scale-[1.08]`;
   }
-  if (category === 'eyewear') return `${base} scale-[.82]`;
+  if (category === 'eyewear') return `${base} scale-[1.0]`;
   if (category === 'jewelry') {
-    if (productHasTerm(product, JEWELRY_SMALL_TERMS)) return `${base} scale-[.68]`;
-    if (productHasTerm(product, JEWELRY_TALL_TERMS)) return `${base} scale-[.78]`;
-    return `${base} scale-[.76]`;
+    if (productHasTerm(product, JEWELRY_SMALL_TERMS)) return `${base} scale-[.84]`;
+    if (productHasTerm(product, JEWELRY_TALL_TERMS)) return `${base} scale-[.95]`;
+    return `${base} scale-[.92]`;
   }
-  return `${base} ${prominent ? 'scale-[1.02]' : 'scale-[.96]'}`;
+  return `${base} ${prominent ? 'scale-[1.22]' : 'scale-[1.15]'}`;
 }
 
 function PreviewImage({
