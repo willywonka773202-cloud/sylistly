@@ -14,6 +14,7 @@ import {
 import { hasExactProductLink, productImageQualityScore, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
+import aiFeedLooksRaw from '../data/ai-feed-looks.json';
 
 const FEED_POST_LIMIT = 360;
 
@@ -653,6 +654,61 @@ function buildRealCutoutSeedPosts(): FeedPost[] {
 
 const REAL_CUTOUT_SEED_POSTS = buildRealCutoutSeedPosts();
 
+// AI-composed feed looks, baked offline by scripts/generate-ai-feed.mjs (the
+// real composer running via /api/look). Resolved against the client catalog so
+// there is ZERO runtime AI cost — the feed shows genuinely AI-styled outfits
+// for free. Re-run the script + bump the persist version to refresh the pool.
+interface AiFeedLookRaw {
+  id: string;
+  vibe: string;
+  frameBias?: FeedPost['frameBias'];
+  title: string;
+  username: string;
+  tags: string[];
+  likeCount: number;
+  caption: string;
+  palette?: string[];
+  formula?: { id: string; label: string; structure: string; reason: string } | null;
+  items: Record<string, string>;
+}
+
+const AI_FEED_AVATARS = ['#c9a98a', '#8a6f5b', '#e7c79b', '#b3937a', '#d8b48f', '#6f5a49', '#a9866a', '#caa07c'];
+
+function buildAiSeedPosts(): FeedPost[] {
+  const posts: FeedPost[] = [];
+  (aiFeedLooksRaw as unknown as AiFeedLookRaw[]).forEach((look, index) => {
+    const items = sanitizeItems(
+      Object.fromEntries(
+        Object.entries(look.items)
+          .map(([category, productId]) => [category, FEED_PRODUCT_BY_ID.get(productId)])
+          .filter((entry): entry is [Category, Product] => Boolean(entry[1])),
+      ) as Partial<Record<Category, Product>>,
+    );
+    if (!hasRequiredSlots(items) || !postMeetsFeedQualityFloor(items)) return;
+    posts.push(
+      seedPost(
+        items,
+        index,
+        `feed-ai-${look.id}`,
+        look.username,
+        AI_FEED_AVATARS[index % AI_FEED_AVATARS.length],
+        look.title,
+        look.vibe,
+        look.tags,
+        look.likeCount,
+        look.caption,
+        look.frameBias || 'any',
+        'community',
+        look.formula || undefined,
+        'first-screen',
+      ),
+    );
+  });
+  return posts;
+}
+
+const AI_SEED_POSTS = buildAiSeedPosts();
+
 const FIRST_SCREEN_POST_IDS = [
   'feed-real-clean-capsule',
   'feed-real-street-sneaker',
@@ -678,11 +734,10 @@ const FIRST_SCREEN_POST_IDS = [
 
 function prioritizeFirstScreenPosts(posts: FeedPost[]): FeedPost[] {
   const order = new Map(FIRST_SCREEN_POST_IDS.map((id, index) => [id, index]));
-  return [...posts].sort((left, right) => {
-    const leftOrder = order.get(left.id) ?? 999;
-    const rightOrder = order.get(right.id) ?? 999;
-    return leftOrder - rightOrder;
-  });
+  // AI-composed looks always lead the feed; then the curated first-screen set;
+  // then everything else. Array.sort is stable, so ties keep insertion order.
+  const rank = (post: FeedPost) => (post.id.startsWith('feed-ai-') ? -1000 : (order.get(post.id) ?? 999));
+  return [...posts].sort((left, right) => rank(left) - rank(right));
 }
 
 /**
@@ -705,7 +760,7 @@ const SEED_POSTS: FeedPost[] = prioritizeFirstScreenPosts(dedupeFeedPostsById(
   // Require the core outfit only. The current catalog gate intentionally
   // prefers 3-4 true transparent garment cutouts over 5+ model/full-body
   // composites, and the collage renderer no longer exposes empty fixed slots.
-  [...REAL_CUTOUT_SEED_POSTS, ...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => postMeetsFeedQualityFloor(post.items)),
+  [...AI_SEED_POSTS, ...REAL_CUTOUT_SEED_POSTS, ...COLLECTION_POSTS, ...GENERATED_POSTS].filter((post) => postMeetsFeedQualityFloor(post.items)),
 ));
 
 export function getSeedFeedPosts(): FeedPost[] {
@@ -1032,7 +1087,7 @@ export const useSocialFeed = create<SocialFeedState>()(
         })),
     }),
     {
-      name: 'sylistly.social-feed.v1',
+      name: 'sylistly.social-feed.v2',
       // v19 refreshes the first-screen seed pool after replacing hard-coded
       // curated product IDs with diversity-aware transparent catalog picks.
       version: 19,
