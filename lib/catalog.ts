@@ -2832,3 +2832,81 @@ export function getOutfitCandidateShortlists({
     lockedSlots,
   };
 }
+
+/**
+ * Full eligible inventory per slot, filtered ONLY by hard constraints
+ * (category, transparent cutout, budget, frame, category confidence, not
+ * avoided/locked) — NOT by vibe scoring. This is what lets the AI composer
+ * "read the whole database" and make the styling call itself, instead of the
+ * deterministic keyword scorer pre-deciding which items the model is even
+ * allowed to see. Ordering is neutral (real-photo first, then a seeded shuffle
+ * for round-to-round variety), so the model sees a wide, representative slice.
+ */
+export function getFullSlotInventory({
+  targetSlots,
+  budget,
+  customMaxCents,
+  frame,
+  avoidProductIds = [],
+  lockedItems,
+  currentItems,
+  mode,
+  transparentOnly = true,
+  perSlotLimit = 36,
+  seed = 0,
+}: {
+  targetSlots: Category[];
+  budget: GeneratorBudget;
+  customMaxCents?: number | null;
+  frame: GeneratorFrame;
+  avoidProductIds?: string[];
+  lockedItems?: Partial<Record<Category, Product>>;
+  currentItems?: Partial<Record<Category, Product>>;
+  mode: GeneratorMode;
+  transparentOnly?: boolean;
+  perSlotLimit?: number;
+  seed?: number;
+}): Partial<Record<Category, Product[]>> {
+  const avoid = new Set(avoidProductIds);
+  const lockedSlots = new Set(
+    (Object.keys(lockedItems || {}) as Category[]).filter((slot) => Boolean((lockedItems || {})[slot])),
+  );
+  const existingItems = currentItems || {};
+  const result: Partial<Record<Category, Product[]>> = {};
+
+  for (const slot of targetSlots) {
+    if (lockedSlots.has(slot)) continue;
+    if (mode === 'missing' && existingItems[slot]) continue;
+
+    const pool = ALL_CATALOG_PRODUCTS
+      .filter((product) => product.category === slot)
+      .filter((product) => (transparentOnly ? isEditorialCutoutProduct(product) : isRealCommerceProductForFeed(product)))
+      .filter(isAdultCatalogCandidate)
+      .filter((product) => !hasCategoryMismatch(product))
+      .filter((product) => hasHighCategoryConfidence(product, slot))
+      .filter((product) => isUnderBudget(product, budget, customMaxCents))
+      .filter((product) => !avoid.has(product.id));
+
+    const frameMatched = frame === 'androgynous'
+      ? pool
+      : pool.filter((product) =>
+          !hasFrameMismatch(product, frame)
+          && !hasExplicitOppositeFrameTerm(product, frame)
+          && !genderMismatchReasons(product, frame).length,
+        );
+    const usable = frameMatched.length >= 5 ? frameMatched : pool;
+
+    const ordered = usable
+      .map((product) => ({
+        product,
+        // real photos first; within that, a stable per-seed shuffle for variety.
+        key: (hasRealPhoto(product) ? 0 : 1_000_000) + (stableHash(`${product.id}:${seed}`) % 100_000),
+      }))
+      .sort((left, right) => left.key - right.key)
+      .map((entry) => entry.product);
+
+    if (ordered.length) result[slot] = ordered.slice(0, Math.max(8, perSlotLimit));
+  }
+
+  return result;
+}

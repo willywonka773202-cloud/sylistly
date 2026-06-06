@@ -83,37 +83,44 @@ const STACKED_FIT_IMAGE_CLASSES: Record<Category, string> = {
 
 const FITS_AI_FLATLAY_ORDER: Category[] = ['bottom', 'top', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 
+// Cohesive "worn silhouette" flat lay: a centered head-to-toe column (hat → top
+// → bottom → shoes) with outerwear layered to the left and accessories tucked to
+// the right. z-order is anatomical and CONSISTENT across every variant so the
+// hat and accessories always sit ON TOP and never disappear behind a garment.
+// Layering rule: bottom(20) < outer(30) < top(40) < shoes(55) < bag(60) <
+// jewelry(64) < hat(70) < eyewear(74).
 const FITS_AI_FLATLAY_SLOT_STYLES: Record<Category, string> = {
-  outer: 'left-[16%] top-[12%] h-[49%] w-[47%] rotate-[-3deg] z-[28]',
-  top: 'left-[41%] top-[16%] h-[38%] w-[38%] rotate-[1deg] z-[38]',
-  bottom: 'left-[31%] top-[39%] h-[48%] w-[41%] rotate-[-.5deg] z-[22]',
-  shoes: 'left-[18%] bottom-[0%] h-[26%] w-[64%] rotate-[1deg] z-[54]',
-  bag: 'right-[5%] top-[38%] h-[30%] w-[29%] rotate-[4deg] z-[58]',
-  hat: 'left-[34%] top-[3%] h-[17%] w-[32%] rotate-[-3deg] z-[64]',
-  eyewear: 'right-[17%] top-[15%] h-[10%] w-[25%] rotate-[4deg] z-[66]',
-  jewelry: 'left-[12%] top-[56%] h-[13%] w-[19%] rotate-[-6deg] z-[62]',
+  hat: 'left-[35%] top-[1%] h-[18%] w-[30%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[13%] top-[20%] h-[9%] w-[22%] rotate-[5deg] z-[74]',
+  outer: 'left-[3%] top-[23%] h-[44%] w-[40%] rotate-[-6deg] z-[30]',
+  top: 'left-[33%] top-[20%] h-[34%] w-[39%] rotate-[1deg] z-[40]',
+  bottom: 'left-[32%] top-[47%] h-[40%] w-[40%] rotate-[-1deg] z-[20]',
+  shoes: 'left-[27%] bottom-[2%] h-[19%] w-[46%] rotate-[1deg] z-[55]',
+  bag: 'right-[3%] top-[45%] h-[31%] w-[27%] rotate-[5deg] z-[60]',
+  jewelry: 'left-[7%] top-[70%] h-[12%] w-[16%] rotate-[-6deg] z-[64]',
 };
 
+// No outerwear: widen the top and recenter so the column stays balanced.
 const FITS_AI_FLATLAY_NO_OUTER_SLOT_STYLES: Record<Category, string> = {
   outer: FITS_AI_FLATLAY_SLOT_STYLES.outer,
-  top: 'left-[27%] top-[12%] h-[43%] w-[47%] rotate-[.5deg] z-[36]',
-  bottom: 'left-[29%] top-[39%] h-[48%] w-[42%] rotate-[-.5deg] z-[22]',
-  shoes: 'left-[18%] bottom-[0%] h-[26%] w-[64%] rotate-[1deg] z-[54]',
-  bag: 'right-[5%] top-[38%] h-[30%] w-[29%] rotate-[4deg] z-[58]',
-  hat: 'left-[34%] top-[3%] h-[17%] w-[32%] rotate-[-3deg] z-[64]',
-  eyewear: 'right-[13%] top-[15%] h-[10%] w-[25%] rotate-[4deg] z-[66]',
-  jewelry: 'left-[11%] top-[54%] h-[13%] w-[19%] rotate-[-6deg] z-[62]',
+  hat: 'left-[35%] top-[1%] h-[18%] w-[30%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[14%] top-[19%] h-[9%] w-[23%] rotate-[5deg] z-[74]',
+  top: 'left-[29%] top-[18%] h-[37%] w-[42%] rotate-[.5deg] z-[40]',
+  bottom: 'left-[30%] top-[48%] h-[40%] w-[40%] rotate-[-1deg] z-[20]',
+  shoes: 'left-[27%] bottom-[2%] h-[19%] w-[46%] rotate-[1deg] z-[55]',
+  bag: 'right-[4%] top-[44%] h-[30%] w-[26%] rotate-[5deg] z-[60]',
+  jewelry: 'left-[8%] top-[40%] h-[12%] w-[16%] rotate-[-6deg] z-[64]',
 };
 
 const FITS_AI_FLATLAY_COMPACT_SLOT_STYLES: Record<Category, string> = {
-  outer: 'left-[16%] top-[14%] h-[46%] w-[48%] rotate-[-3deg] z-[28]',
-  top: 'left-[40%] top-[18%] h-[36%] w-[39%] rotate-[1deg] z-[38]',
-  bottom: 'left-[30%] top-[40%] h-[46%] w-[42%] rotate-[-.5deg] z-[22]',
-  shoes: 'left-[19%] bottom-[0%] h-[25%] w-[62%] rotate-[1deg] z-[54]',
-  bag: 'right-[4%] top-[40%] h-[29%] w-[29%] rotate-[4deg] z-[58]',
-  hat: 'left-[35%] top-[3%] h-[15%] w-[30%] rotate-[-3deg] z-[64]',
-  eyewear: 'right-[14%] top-[15%] h-[10%] w-[26%] rotate-[4deg] z-[66]',
-  jewelry: 'left-[10%] top-[56%] h-[13%] w-[20%] rotate-[-6deg] z-[62]',
+  hat: 'left-[36%] top-[2%] h-[16%] w-[28%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[13%] top-[20%] h-[8%] w-[23%] rotate-[5deg] z-[74]',
+  outer: 'left-[3%] top-[24%] h-[42%] w-[40%] rotate-[-6deg] z-[30]',
+  top: 'left-[33%] top-[21%] h-[33%] w-[40%] rotate-[1deg] z-[40]',
+  bottom: 'left-[32%] top-[48%] h-[39%] w-[40%] rotate-[-1deg] z-[20]',
+  shoes: 'left-[28%] bottom-[2%] h-[18%] w-[44%] rotate-[1deg] z-[55]',
+  bag: 'right-[3%] top-[46%] h-[29%] w-[27%] rotate-[5deg] z-[60]',
+  jewelry: 'left-[8%] top-[70%] h-[11%] w-[16%] rotate-[-6deg] z-[64]',
 };
 
 const FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES: Record<Category, string> = {
@@ -121,10 +128,10 @@ const FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES: Record<Category, string> = {
   top: 'left-[12%] top-[16%] h-[30%] w-[34%] rotate-[2deg] z-[36]',
   bottom: 'right-[11%] top-[32%] h-[39%] w-[35%] rotate-[-.5deg] z-[22]',
   shoes: 'left-[19%] bottom-[2%] h-[25%] w-[62%] rotate-[1deg] z-[58]',
-  bag: 'right-[8%] top-[10%] h-[23%] w-[27%] rotate-[5deg] z-[54]',
-  hat: 'left-[39%] top-[3%] h-[15%] w-[29%] rotate-[-3deg] z-[64]',
-  eyewear: 'right-[18%] top-[21%] h-[9%] w-[23%] rotate-[4deg] z-[66]',
-  jewelry: 'left-[13%] top-[57%] h-[12%] w-[17%] rotate-[-6deg] z-[62]',
+  bag: 'right-[8%] top-[10%] h-[23%] w-[27%] rotate-[5deg] z-[60]',
+  hat: 'left-[39%] top-[2%] h-[16%] w-[29%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[18%] top-[21%] h-[9%] w-[23%] rotate-[4deg] z-[74]',
+  jewelry: 'left-[13%] top-[57%] h-[12%] w-[17%] rotate-[-6deg] z-[64]',
 };
 
 const FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES: Record<Category, string> = {
@@ -132,10 +139,10 @@ const FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES: Record<Category, string> = {
   top: 'right-[14%] top-[11%] h-[44%] w-[43%] rotate-[1deg] z-[40]',
   bottom: 'left-[30%] top-[42%] h-[45%] w-[43%] rotate-[-.5deg] z-[22]',
   shoes: 'left-[20%] bottom-[0%] h-[25%] w-[60%] rotate-[1deg] z-[56]',
-  bag: 'right-[4%] top-[43%] h-[29%] w-[28%] rotate-[5deg] z-[58]',
-  hat: 'left-[34%] top-[3%] h-[16%] w-[31%] rotate-[-3deg] z-[64]',
-  eyewear: 'right-[15%] top-[17%] h-[9%] w-[25%] rotate-[4deg] z-[66]',
-  jewelry: 'left-[12%] top-[58%] h-[12%] w-[18%] rotate-[-6deg] z-[62]',
+  bag: 'right-[4%] top-[43%] h-[29%] w-[28%] rotate-[5deg] z-[60]',
+  hat: 'left-[34%] top-[2%] h-[16%] w-[31%] rotate-[-3deg] z-[70]',
+  eyewear: 'right-[15%] top-[17%] h-[9%] w-[25%] rotate-[4deg] z-[74]',
+  jewelry: 'left-[12%] top-[58%] h-[12%] w-[18%] rotate-[-6deg] z-[64]',
 };
 
 const FITS_AI_FLATLAY_IMAGE_CLASSES: Record<Category, string> = {

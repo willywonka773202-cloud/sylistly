@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import {
+  getFullSlotInventory,
   getOutfitCandidateShortlists,
   REQUIRED_OUTFIT_SLOTS,
   type CatalogCollection,
@@ -15,9 +16,10 @@ type DiversityStrength = 'low' | 'medium' | 'high';
 // Haiku is fast + strong at this constrained, structured selection task, keeping
 // generation snappy. Override with OUTFIT_COMPOSER_MODEL (e.g. a Sonnet for max taste).
 const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
-const COMPOSE_TIMEOUT_MS = 12_000;
-const PER_SLOT_LIMIT = 10;
-const COMPOSE_MAX_TOKENS = 720;
+const COMPOSE_TIMEOUT_MS = 13_000;
+const PER_SLOT_LIMIT = 10; // deterministic shortlist (fallback base only)
+const FULL_INVENTORY_PER_SLOT = 32; // how much of the real catalog the model reads per slot
+const COMPOSE_MAX_TOKENS = 900;
 
 /** Optional, privacy-safe styling profile the composer can personalize against. */
 export interface StylistProfileInput {
@@ -149,21 +151,21 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 }
 
 const STYLIST_RUBRIC = [
-  'You are the lead stylist for Sylistly, a premium outfit app. You assemble ONE complete, genuinely good-looking outfit by choosing exactly one product per slot from the candidate lists provided.',
+  'You are the lead stylist for Sylistly, a premium outfit app. You are given the FULL eligible catalog for each requested slot — read every option and assemble ONE complete, genuinely good-looking outfit by choosing exactly one product per slot.',
   '',
-  'Style like a real human stylist, not a keyword matcher. Optimize the whole look, not each slot in isolation:',
+  'Read the whole candidate list for each slot before deciding — the lists are the real inventory, not pre-filtered by style, so it is your job to find the pieces that actually go together. Style like a real human stylist, not a keyword matcher. Optimize the whole look, not each slot in isolation:',
   '• COLOR: build a cohesive palette — a neutral base (black/white/grey/tan/navy/brown) with AT MOST one saturated accent, OR a tonal/analogous scheme. Avoid two competing bright colors. Earthy tones pair together; cool tones pair together.',
   '• FORMALITY: keep the formality levels within ~1 point of each other. Never mix athletic pieces (formality 1-2: gym, sweats, running shoes) with tailored pieces (formality 4-5: blazers, trousers, heels).',
   '• SILHOUETTE: balance proportion — pair a relaxed/oversized top with a slimmer or structured bottom (and vice versa). Avoid baggy-on-baggy unless the vibe is explicitly oversized/street.',
-  '• VIBE: every piece must read as the requested vibe. A "clean"/minimal look avoids loud graphics; "street" leans bolder; "office"/"preppy" stays polished.',
-  '• FRAME: respect the requested frame (masc/fem/androgynous) — already pre-filtered, but keep proportions appropriate.',
+  '• VIBE: every piece must read as the requested vibe. A "clean"/minimal look avoids loud graphics; "street" leans bolder; "office"/"preppy" stays polished. Because the lists are unfiltered, actively skip off-vibe items (e.g. no gym shorts in an office look) — pick the ones that fit.',
+  '• FRAME: respect the requested frame (masc/fem/androgynous) and keep proportions appropriate.',
   '• BUDGET: stay at or under budget across the whole outfit when possible; spend where it matters (shoes, outerwear).',
   '',
-  'ALWAYS fill top, bottom, and shoes. Add outer, hat, bag, eyewear, jewelry ONLY when they genuinely elevate the look and a strong on-palette option exists — it is better to omit an accessory than to force a mismatched one. One statement piece per outfit, maximum.',
+  'Fill EVERY slot that has a candidate list — the user explicitly chose to include these slots, so do not skip one (including hat, bag, eyewear, jewelry). For each, pick the single option that best completes the look; if a slot is genuinely hard, still choose the most on-palette, on-vibe piece available. One statement piece per outfit, maximum.',
   '',
   'When a user profile is given, personalize: bias toward their preferred brands when an option fits, respect their budget tendency, and choose colors that flatter their skin tone (warm undertones → earthy/warm neutrals, olive, rust, cream; cool undertones → navy, grey, cool white, jewel tones; deep skin → high-contrast and rich saturated tones read beautifully).',
   '',
-  'You MUST pick productId values that appear in the candidate list for that slot. Never invent IDs. Call the compose_outfit tool with your final picks, a 2-5 word palette, and one tight sentence of styling notes that a shopper would find genuinely useful (why these pieces work together).',
+  'You MUST pick productId values that appear in the candidate list for that slot. Never invent IDs. Call the compose_outfit tool with one pick per slot, a 2-5 word palette, and one tight sentence of styling notes that a shopper would find genuinely useful (why these pieces work together).',
 ].join('\n');
 
 const COMPOSE_TOOL: Anthropic.Tool = {
@@ -192,9 +194,13 @@ const COMPOSE_TOOL: Anthropic.Tool = {
   },
 };
 
-function buildUserPayload(shortlists: OutfitCandidateShortlists, params: ComposeOutfitParams) {
+function buildUserPayload(
+  candidatePools: Partial<Record<Category, Product[]>>,
+  shortlists: OutfitCandidateShortlists,
+  params: ComposeOutfitParams,
+) {
   const slots: Record<string, ReturnType<typeof compactCandidate>[]> = {};
-  for (const [slot, products] of Object.entries(shortlists.candidatesBySlot)) {
+  for (const [slot, products] of Object.entries(candidatePools)) {
     if (!products?.length) continue;
     slots[slot] = products.map(compactCandidate);
   }
@@ -268,6 +274,7 @@ function parseToolResult(message: Anthropic.Message): StylistToolResult | null {
 
 function applyPicks(
   shortlists: OutfitCandidateShortlists,
+  candidatePools: Partial<Record<Category, Product[]>>,
   params: ComposeOutfitParams,
   result: StylistToolResult,
 ): ComposedLook {
@@ -285,7 +292,7 @@ function applyPicks(
     const slot = pick.slot as Category;
     if (!CATEGORY_ORDER.includes(slot)) continue;
     if (products[slot]) continue; // already locked
-    const pool = shortlists.candidatesBySlot[slot];
+    const pool = candidatePools[slot];
     if (!pool) continue;
     const product = pool.find((entry) => entry.id === pick.productId);
     if (!product) continue;
@@ -293,11 +300,12 @@ function applyPicks(
     if (pick.reason) reasons[slot] = pick.reason.slice(0, 120);
   }
 
-  // Guarantee the required slots even if the model omitted/mis-id'd one.
-  for (const slot of REQUIRED_OUTFIT_SLOTS) {
+  // Backfill EVERY requested slot the model skipped — the user explicitly chose
+  // to include these slots (e.g. hat), so they should not come back empty.
+  for (const slot of shortlists.targetSlots) {
     if (products[slot]) continue;
-    const basePick = shortlists.base[slot] || shortlists.candidatesBySlot[slot]?.[0];
-    if (basePick) products[slot] = basePick;
+    const backfill = shortlists.base[slot] || candidatePools[slot]?.[0];
+    if (backfill) products[slot] = backfill;
   }
 
   const missingSlots = shortlists.targetSlots.filter((slot) => !products[slot]);
@@ -340,7 +348,24 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
     perSlotLimit: PER_SLOT_LIMIT,
   });
 
-  const slotsWithCandidates = Object.values(shortlists.candidatesBySlot).filter((pool) => pool && pool.length).length;
+  // Give the model the FULL eligible inventory per slot (hard constraints only),
+  // so it reads the whole catalog and makes the styling call — not a vibe-scored
+  // shortlist that pre-decides for it.
+  const inventory = getFullSlotInventory({
+    targetSlots: shortlists.targetSlots,
+    budget: params.budget,
+    customMaxCents: params.customMaxCents,
+    frame: params.frame,
+    avoidProductIds: params.avoidProductIds,
+    lockedItems: params.lockedItems,
+    currentItems: params.currentItems,
+    mode: params.mode,
+    transparentOnly: params.transparentOnly ?? true,
+    perSlotLimit: FULL_INVENTORY_PER_SLOT,
+    seed: params.seed ?? 0,
+  });
+
+  const slotsWithCandidates = Object.values(inventory).filter((pool) => pool && pool.length).length;
   const client = getClient();
   if (!client || slotsWithCandidates === 0) {
     return assembleFallback(shortlists, params);
@@ -355,7 +380,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
         system: STYLIST_RUBRIC,
         tools: [COMPOSE_TOOL],
         tool_choice: { type: 'tool', name: 'compose_outfit' },
-        messages: [{ role: 'user', content: JSON.stringify(buildUserPayload(shortlists, params)) }],
+        messages: [{ role: 'user', content: JSON.stringify(buildUserPayload(inventory, shortlists, params)) }],
       }),
       COMPOSE_TIMEOUT_MS,
       'Outfit composer timed out',
@@ -365,7 +390,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
     if (!result || !result.picks.length) {
       return assembleFallback(shortlists, params);
     }
-    const composed = applyPicks(shortlists, params, result);
+    const composed = applyPicks(shortlists, inventory, params, result);
     // If the model failed to fill even the required slots, prefer the deterministic look.
     const hasRequired = REQUIRED_OUTFIT_SLOTS.every((slot) => composed.products[slot]);
     return hasRequired ? composed : assembleFallback(shortlists, params);
