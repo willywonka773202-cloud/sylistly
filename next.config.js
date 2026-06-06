@@ -18,6 +18,15 @@ const nextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: '2mb' },
   },
+  // Cutout PNGs are large static assets served from /public — they must never be
+  // traced into serverless function bundles (that blew past Vercel's 250MB limit).
+  outputFileTracingExcludes: {
+    '*': [
+      'public/assets/cutouts/**',
+      './public/assets/cutouts/**',
+      '**/public/assets/cutouts/**',
+    ],
+  },
 };
 
 module.exports = nextConfig;
