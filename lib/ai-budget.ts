@@ -13,6 +13,8 @@
  * back recordAiUsage/aiBudgetAvailable with a shared store (Upstash/Supabase).
  */
 
+import { getGlobalSpendUsd, hasSharedUsageStore, recordGlobalSpendUsd } from './ai-usage-store';
+
 // Approximate Anthropic list prices, USD per 1M tokens. Override per model via
 // AI_PRICE_<MODELKEY>_IN / _OUT if pricing changes. These are estimates used
 // only for the spend cap, not billing.
@@ -81,10 +83,46 @@ export function aiBudgetAvailable(): boolean {
 export function recordAiUsage(model: string, usage: TokenUsage | null | undefined): void {
   if (!usage) return;
   rollover();
-  spentTodayUsd += estimateCostUsd(model, usage);
+  const cost = estimateCostUsd(model, usage);
+  spentTodayUsd += cost;
+  // Also accrue to the shared store (fire-and-forget) for a global cap.
+  void recordGlobalSpendUsd(cost);
 }
 
-export function aiBudgetSnapshot(): { day: string; spentUsd: number; capUsd: number; killed: boolean } {
+// Short cache of the shared-store total so we don't add a round-trip per request.
+let globalCache = { at: 0, usd: 0 };
+
+/**
+ * Async budget gate for the route layer: enforces the kill switch, the shared
+ * GLOBAL daily cap (exact across instances, when a store is configured), and the
+ * local in-memory cap as a backstop. Routes await this; deep call sites keep the
+ * sync aiBudgetAvailable() check.
+ */
+export async function aiBudgetAvailableGlobal(): Promise<boolean> {
+  if (!aiBudgetAvailable()) return false; // key present, not killed, under local cap
+  const cap = dailyCapUsd();
+  if (cap <= 0 || !hasSharedUsageStore()) return true;
+  const now = Date.now();
+  if (now - globalCache.at > 15_000) {
+    const total = await getGlobalSpendUsd();
+    if (total !== null) globalCache = { at: now, usd: total };
+  }
+  return globalCache.usd < cap;
+}
+
+export function aiBudgetSnapshot(): {
+  day: string;
+  spentUsd: number;
+  capUsd: number;
+  killed: boolean;
+  sharedStore: boolean;
+} {
   rollover();
-  return { day: currentDay, spentUsd: Number(spentTodayUsd.toFixed(4)), capUsd: dailyCapUsd(), killed: killSwitchEngaged() };
+  return {
+    day: currentDay,
+    spentUsd: Number(spentTodayUsd.toFixed(4)),
+    capUsd: dailyCapUsd(),
+    killed: killSwitchEngaged(),
+    sharedStore: hasSharedUsageStore(),
+  };
 }

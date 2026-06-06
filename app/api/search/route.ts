@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiBudgetAvailableGlobal } from '@/lib/ai-budget';
 import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
 import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
@@ -216,8 +217,8 @@ function catalogKindFor({
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as SearchBody;
-  // Per-client rate limit: when exceeded, search uses the free heuristic path.
-  const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed;
+  // Per-client rate limit + global daily cap: either tripping uses the free path.
+  const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed && (await aiBudgetAvailableGlobal());
   const query = (body.query || '').slice(0, 200);
   const category = body.category;
   const frame = normalizeSearchFrame(body.frame);

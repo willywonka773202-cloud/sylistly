@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiBudgetAvailableGlobal } from '@/lib/ai-budget';
 import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { composeOutfitLook, type StylistProfileInput } from '@/lib/stylist/outfit-composer';
 import { hasProductCommerceLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
@@ -148,6 +149,9 @@ export async function POST(req: NextRequest) {
     ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds : []),
   ]));
 
+  // Rate limit per client AND the global daily spend cap; either tripping
+  // degrades this request to the free deterministic engine.
+  const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed && (await aiBudgetAvailableGlobal());
   const result = await composeOutfitLook({
     vibe,
     frame,
@@ -167,8 +171,7 @@ export async function POST(req: NextRequest) {
     targetSlots,
     transparentOnly: true,
     profile: sanitizeProfile(body.profile),
-    // Per-client rate limit: when exceeded, compose with the free engine instead.
-    allowAi: allowAiCall(clientKeyFromRequest(req)).allowed,
+    allowAi,
   });
   const renderableProducts = Object.fromEntries(
     Object.entries(result.products).filter((entry): entry is [Category, Product] =>
