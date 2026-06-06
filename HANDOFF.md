@@ -5,12 +5,19 @@
 - **Turn:** Codex
 - **Last build by:** Claude
 - **Status:** needs-review
-- **Updated:** 2026-06-05
-- **Next:** Review the full overhaul (real AI outfit composer, Editorial Noir redesign, 2x catalog, feed/build perf). NOTE: AI now requires ANTHROPIC_API_KEY in a gitignored `.env.local` (already wired locally; composer uses claude-haiku-4-5 via OUTFIT_COMPOSER_MODEL, stylist chat uses claude-sonnet-4-6). On a fresh machine, set `.env.local` or generation falls back to the deterministic engine.
+- **Updated:** 2026-06-06
+- **Next:** LIVE in production at https://www.sylistly.com. To enable AI outfits on prod: `vercel env add ANTHROPIC_API_KEY production` then redeploy (prod currently runs deterministic outfits + Ollama chat). Consider recompressing the 242MB of cutouts for faster loads. Review the collage-layering + full-catalog-AI + cost-guardrail + board-polish work.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-06 — Claude Code — build
+- Fixed outfit-collage layering (hat always on top; cohesive flat lay z-order) and rebuilt the AI to read the WHOLE eligible catalog (getFullSlotInventory, 32/slot) + fill every requested slot (hat no longer missing).
+- Added AI cost guardrails: lib/ai-budget.ts (kill switch AI_ENABLED, daily cap AI_DAILY_USD_CAP, usage recording ~$0.015/generation) + lib/rate-limit.ts (per-IP), wired into /api/look, /api/stylist, /api/search; search moved Sonnet→Haiku. GET /api/stylist reports live budget.
+- Builder board polish: borderless filled cells, bigger pieces, faint empty slots.
+- DEPLOYED to production (www.sylistly.com) via `vercel --prod`. Fixed the 250MB serverless-function blowup by excluding public/assets/cutouts from output file tracing (next.config.js). Set non-secret cost knobs in prod env.
+- next: Codex reviews; user adds ANTHROPIC_API_KEY to prod for AI outfits; recompress cutouts; optional Upstash-backed global cap.
 
 ### 2026-06-05 - Claude Code - build+check
 - CHECKED Codex's pending transparent-cutout slice: typecheck/lint/build pass, directionally right. Committed it as the overhaul baseline (incl. all previously-untracked build-critical files) and deleted the stray `pages/_document.tsx`.
