@@ -83,6 +83,9 @@ const STACKED_FIT_IMAGE_CLASSES: Record<Category, string> = {
 };
 
 const FITS_AI_FLATLAY_ORDER: Category[] = ['bottom', 'top', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
+// Grid display order — the lead category (top, else outer) fills the big 2x2
+// hero cell; everything else flows into uniform cells after it.
+const FLATLAY_GRID_ORDER: Category[] = ['top', 'outer', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 
 // Cohesive "worn silhouette" flat lay: a centered head-to-toe column (hat → top
 // → bottom → shoes) with outerwear layered to the left and accessories tucked to
@@ -489,7 +492,7 @@ export function FitsAiOutfitCanvas({
   // non-overlapping cells around it. A fixed grid keeps every fit's layout
   // identical regardless of how tall/wide each piece's image happens to be —
   // no more colliding garments or a model photo spilling over the board.
-  const renderSlots = BOARD_ORDER
+  const renderSlots = FLATLAY_GRID_ORDER
     .filter((category) => byCategory.has(category))
     .slice(0, compact ? 6 : 8);
   const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Editorial transparent outfit flat lay';
