@@ -66,6 +66,7 @@ export interface EditorialImageResult {
   ok: boolean;
   image?: string; // data URL
   reason?: string;
+  detail?: string;
 }
 
 export async function generateEditorialLookImage(input: EditorialLookInput): Promise<EditorialImageResult> {
@@ -86,7 +87,14 @@ export async function generateEditorialLookImage(input: EditorialLookInput): Pro
       TIMEOUT_MS,
     );
     if (!res.ok) {
-      return { ok: false, reason: `provider-${res.status}` };
+      let detail = '';
+      try {
+        const errBody = (await res.json()) as { error?: { message?: string; status?: string } };
+        detail = errBody?.error?.message || errBody?.error?.status || '';
+      } catch {
+        detail = await res.text().catch(() => '');
+      }
+      return { ok: false, reason: `provider-${res.status}`, detail: detail.slice(0, 300) };
     }
     const data = (await res.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ inlineData?: { mimeType?: string; data?: string }; inline_data?: { mime_type?: string; data?: string } }> } }>;
