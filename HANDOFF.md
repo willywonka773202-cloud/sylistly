@@ -12,6 +12,11 @@
 
 ## Log (newest first)
 
+### 2026-06-07 — Claude Code — build (flat-lay → consistent grid)
+- User feedback on the flat-lay: "clothing shown wrong and not placed consistently" (model photos overlapping/cropped/wildly different sizes across fits). Root cause: `FitsAiOutfitCanvas` used absolute-positioned slots that overlapped top/bottom/outer in a center column to fake a worn stack — collapses when a full-body model photo lands in one of those slots.
+- REWROTE `FitsAiOutfitCanvas` to a fixed CSS GRID (`grid-cols-3`, `auto-rows 1fr`): the lead piece (top, else outer — `FLATLAY_GRID_ORDER`) fills a `col-span-2 row-span-2` hero cell; every other piece sits in its own uniform `object-contain` cell. No overlap, identical structure on every fit; a model photo just fills its cell instead of spilling. Removed the layout-variant logic (sneaker-led/hero-top/etc.); old FITS_AI_FLATLAY_*_SLOT_STYLES + isSneakerLed/HeroTopFormula now dead (noUnusedLocals is off, harmless).
+- Verified on PROD (deploys 18+19): feed renders the model as a clean 2x2 hero with hoodie/pants/shoes/bag/sunglasses/ring in tidy cells around it — the msg1 "model hero + pieces" look, now consistent. Stylist starter fit also a clean grid.
+
 ### 2026-06-07 — Claude Code — build (revert mannequin → Fits flat-lay)
 - User: "the mannequin feature just doesn't work — do the Pinterest-style layout like Fits AI and our old version." Reverted feed/profile/stylist fit cards from `presentation="studio"` → `"flatlay"` (the `FitsAiOutfitCanvas` collage = the Fits-style / old-version look). Studio + silhouette presentations are now unused (left in place as dead options).
 - Added a clean-cutout filter at the `OutfitLookCard` entry (all presentations): `outfitBoardProducts(items).filter(isEditorialCutoutProduct)` so the flat-lay only shows clean garment cutouts, not "image unavailable" tiles or flagged model photos. Feed already gates posts to ≥3 transparent-renderable products (`postMeetsFeedQuality`), so cards stay full.
