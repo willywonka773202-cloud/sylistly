@@ -6,11 +6,20 @@
 - **Last build by:** Claude
 - **Status:** needs-review
 - **Updated:** 2026-06-07
-- **Next:** SHIPPED onboarding (+ auto-generated first fit), chunk-loading hardening, dev-jargon copy cleanup, and a global route transition — all live on www.sylistly.com. Codex: review the onboarding flow (components/Onboarding.tsx + app/page.tsx), the builder auto-gen effect (app/build/page.tsx), and app/template.tsx. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
+- **Next:** SHIPPED a big polish run — onboarding (+ auto-generated first fit), chunk-loading hardening, dev-jargon copy cleanup app-wide, global route transition, builder fit-reveal, studio model-photo/gap filter, animated+de-jargoned checkout, discover entrance — all live on www.sylistly.com (deploys 11–16, all exit 0, prod-verified). Codex: review the 4-area UI polish (Mannequin.tsx, OutfitBoard.tsx studio branch, CheckoutSheet.tsx, app/checkout, app/discover) + the onboarding/auto-gen flow. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-07 — Claude Code — build (deep UI polish: 4 areas, vs Fits)
+- GENERATION & REVEAL: builder plays a staggered per-piece reveal as a fit lands (`sy-piece-in` keyed on product.id; hero pieces first; locked pieces don't re-animate). Plays exactly as the loading veil lifts since `replaceItems` commits in one shot. Verified rendering a real fit via real-time CDP capture.
+- STUDIO CONSISTENCY: `OutfitLookCard` studio branch filters products through `isEditorialCutoutProduct` (excludes body-model/full-body/multi-item/bad-cutout) so the dress form never shows a stray model photo or a gap; `<3` clean cutouts → falls back to the flat lay. Verified feed + stylist still render clean studios.
+- SHOPPING & CHECKOUT: `CheckoutSheet` slides up (`sy-sheet-enter`) with a fading backdrop; de-jargoned the sheet AND `/checkout` ("Checkout helper"/"exact merchant product pages"/"search fallback links"/"Exact product page" → "Shop the look", "real product page at the retailer", "Exact match", "Nothing to shop yet").
+- FEED & DISCOVERY: both were already richly polished (like-burst, snap scroll, gradient story rings, card lifts) — added a gentle staggered entrance to the discover content (`sy-enter`) and verified studios render post-filter.
+- Benchmarked vs Fits (fits-app.com): clean/minimal/light, drag-and-drop, "accessible not luxury". Kept our editorial-dark identity; out-polished on motion + the AI wow rather than copying their look.
+- verified: `npx tsc --noEmit` clean throughout; per-area real-time CDP dev screenshots; DEPLOYED — deploy 15 (reveal+studio) + deploy 16 (checkout+discover) to www.sylistly.com (both exit 0). Prod copy + studio confirmed live.
+- next: Codex reviews the 4-area polish (Mannequin.tsx reveal, OutfitBoard.tsx studio filter, CheckoutSheet.tsx, app/checkout + app/discover).
 
 ### 2026-06-07 — Claude Code — build (UI polish round)
 - Onboarding "wow": the builder now AUTO-GENERATES the first fit on the onboarding hand-off (`app/build/page.tsx` effect — fires once when `source=onboarding`, gated on the picked vibe being applied so there's no default-vibe race). New users land on a finished, vibe-matched look instead of an empty board. Verified: `?vibe=street&frame=fem&source=onboarding` auto-composes a full streetwear fit ($743, street vibe).
