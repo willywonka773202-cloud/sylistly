@@ -76,8 +76,15 @@ body {
   to { opacity: 1; }
 }
 
+/* Per-piece reveal as a freshly generated fit lands on the builder board. */
+@keyframes sy-piece-in {
+  from { opacity: 0; transform: translateY(9px) scale(.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @layer utilities {
   .sy-route-enter { animation: sy-route-in 200ms ease both; }
+  .sy-piece-in { animation: sy-piece-in 440ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-enter { animation: sy-rise-in 280ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-sheet-enter { animation: sy-sheet-up 260ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-fit-float { animation: sy-fit-float 5.8s ease-in-out infinite both; will-change: transform, filter; }
@@ -184,6 +191,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .sy-route-enter,
+  .sy-piece-in,
   .sy-enter,
   .sy-sheet-enter,
   .sy-fit-float,

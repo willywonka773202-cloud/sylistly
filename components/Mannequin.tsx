@@ -73,6 +73,19 @@ const LONG_BOTTOM_TERMS = ['jean', 'jeans', 'pant', 'pants', 'trouser', 'trouser
 const JEWELRY_SMALL_TERMS = ['ring', 'earring', 'earrings', 'bracelet'];
 const JEWELRY_TALL_TERMS = ['necklace', 'chain', 'pendant'];
 
+// Staggered reveal order as a freshly generated fit lands on the board — hero
+// pieces (top/bottom) materialize first, accessories cascade in after.
+const REVEAL_DELAY: Partial<Record<Category, number>> = {
+  top: 0,
+  bottom: 70,
+  outer: 120,
+  shoes: 170,
+  bag: 210,
+  hat: 250,
+  eyewear: 280,
+  jewelry: 300,
+};
+
 export function Mannequin({
   items,
   skinTone,
@@ -247,7 +260,11 @@ function FrontCanvas({
           </span>
         ) : null}
         <div className={`mb-0.5 max-w-[calc(100%-28px)] truncate text-left text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#9f8878]'}`}>{CATEGORY_LABELS[category]}</div>
-        <div className={innerFrameClassName}>
+        <div
+          key={product.id}
+          className={`${innerFrameClassName} sy-piece-in`}
+          style={{ animationDelay: `${REVEAL_DELAY[category] ?? 0}ms` }}
+        >
           <PreviewImage
             product={product}
             wrapperClassName="h-full w-full"
