@@ -353,9 +353,19 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
     perSlotLimit: PER_SLOT_LIMIT,
   });
 
+  const client = getClient();
+  // Cost governor: skip the paid call (use the free engine) when rate-limited,
+  // the kill switch is on, or the daily spend cap is reached.
+  const aiPermitted = params.allowAi !== false && aiBudgetAvailable();
+  if (!client || !aiPermitted) {
+    // Deterministic path (incl. the optimistic `fast` preview) — skip the
+    // expensive full-inventory build entirely so it returns quickly.
+    return assembleFallback(shortlists, params);
+  }
+
   // Give the model the FULL eligible inventory per slot (hard constraints only),
   // so it reads the whole catalog and makes the styling call — not a vibe-scored
-  // shortlist that pre-decides for it.
+  // shortlist that pre-decides for it. Computed only when the AI will actually run.
   const inventory = getFullSlotInventory({
     targetSlots: shortlists.targetSlots,
     budget: params.budget,
@@ -371,11 +381,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
   });
 
   const slotsWithCandidates = Object.values(inventory).filter((pool) => pool && pool.length).length;
-  const client = getClient();
-  // Cost governor: skip the paid call (use the free engine) when rate-limited,
-  // the kill switch is on, or the daily spend cap is reached.
-  const aiPermitted = params.allowAi !== false && aiBudgetAvailable();
-  if (!client || slotsWithCandidates === 0 || !aiPermitted) {
+  if (slotsWithCandidates === 0) {
     return assembleFallback(shortlists, params);
   }
 
