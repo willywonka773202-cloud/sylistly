@@ -4,6 +4,7 @@ import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import {
   hasHighCategoryConfidence,
+  isEditorialCutoutProduct,
   isFeedHeroCandidate,
   isRenderableProductForFeed,
   sortTransparentFeedRenderableProducts,
@@ -329,19 +330,27 @@ export function OutfitLookCard({
   }
 
   if (presentation === 'studio') {
-    return (
-      <StudioFitCard
-        products={products}
-        title={title}
-        subtitle={subtitle}
-        className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
-        productLinks={productLinks}
-        showMeta={showMeta}
-        loading={loading}
-        ariaLabel={label}
-        onImageUnavailable={onImageUnavailable}
-      />
-    );
+    // Only place clean GARMENT cutouts on the form (isEditorialCutoutProduct
+    // excludes body-model/full-body/bad-cutout images) so the studio is never
+    // gappy and never shows a stray model photo. If there aren't enough for a
+    // complete look, fall through to the flat lay, which composes a sparse set
+    // more gracefully than a dress form with holes.
+    const studioProducts = products.filter((product) => isEditorialCutoutProduct(product));
+    if (studioProducts.length >= 3) {
+      return (
+        <StudioFitCard
+          products={studioProducts}
+          title={title}
+          subtitle={subtitle}
+          className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
+          productLinks={productLinks}
+          showMeta={showMeta}
+          loading={loading}
+          ariaLabel={label}
+          onImageUnavailable={onImageUnavailable}
+        />
+      );
+    }
   }
 
   return (
