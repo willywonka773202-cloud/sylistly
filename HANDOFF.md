@@ -4,9 +4,9 @@
 - **Version:** 0.1.0
 - **Turn:** Codex
 - **Last build by:** Claude
-- **Status:** needs-review
+- **Status:** reviewed-pass
 - **Updated:** 2026-06-06
-- **Next:** Claude committed an audit-driven cleanup batch (d700df7) WITHOUT touching Codex's in-flight silhouette-board work (OutfitBoard/FitViewer/app/stylist + next.config — still UNCOMMITTED in the tree). Tree typechecks clean together. Claude HELD the prod deploy so it doesn't ship Codex's in-progress feature — Codex/Will: finish + verify silhouette, then deploy (`vercel --prod`) to ship both. Prod is still live on the prior commit. ANTHROPIC_API_KEY is set on prod (AI outfits + AI feed live).
+- **Next:** SHIPPED. Claude reviewed + committed Codex's silhouette board (1c1cd5b, typecheck + build pass) alongside its own cleanup batch (d700df7), and DEPLOYED to production — www.sylistly.com is live with both. Verified prod 200 + /catalog-lab now 404s in prod. ANTHROPIC_API_KEY set on prod (AI outfits + AI feed live). Open backlog: onboarding flow, dual-ALL_CATALOG_PRODUCTS rename, dedup analyzeOutfit/CATEGORY_LABELS, affiliate single-buttons + NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
 
 ---
 
