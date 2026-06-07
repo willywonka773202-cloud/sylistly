@@ -28,7 +28,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function CheckoutSheet({ open, title = 'Checkout helper', products, onClose }: Props) {
+export function CheckoutSheet({ open, title = 'This fit', products, onClose }: Props) {
   const router = useRouter();
   const setCheckout = useCheckout((state) => state.setCheckout);
   const [batchMessage, setBatchMessage] = useState<string | null>(null);
@@ -99,20 +99,20 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
 
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-[100] mx-auto max-h-[92dvh] max-w-[440px] rounded-t-3xl border-t border-hairline-2 bg-surface-1 px-4 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 shadow-[0_-24px_70px_rgba(0,0,0,.58)]">
+      <div className="sy-route-enter fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="sy-sheet-enter fixed inset-x-0 bottom-0 z-[100] mx-auto max-h-[92dvh] max-w-[440px] rounded-t-3xl border-t border-hairline-2 bg-surface-1 px-4 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 shadow-[0_-24px_70px_rgba(0,0,0,.58)]">
         <div className="mx-auto h-1 w-10 rounded-full bg-white/20" />
         <div className="flex items-start justify-between gap-4 pb-3 pt-2">
           <div>
-            <div className="text-[9px] uppercase tracking-[.18em] text-muted">Checkout helper</div>
+            <div className="text-[9px] uppercase tracking-[.18em] text-muted">Shop the look</div>
             <div className="mt-1 font-serif text-lg font-semibold text-ink">
-              {title} <em className="italic text-accent">links</em>
+              Shop <em className="italic text-accent">{title}</em>
             </div>
             <div className="mt-1 text-[11px] text-muted-2">
               {exactProducts.length} item{exactProducts.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - {formatCheckoutPrice(totalCents)}
             </div>
             <div className="mt-2 max-w-[300px] text-[11px] leading-relaxed text-muted">
-              Every opened piece is an exact merchant product page. Older search fallback links are held back until the fit is refreshed.
+              Each link opens the item&rsquo;s real product page at the retailer.
             </div>
           </div>
           <button
@@ -164,7 +164,7 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
             className="mb-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
             data-checkout-withheld-search-links={withheldCount}
           >
-            {withheldCount} legacy search fallback link{withheldCount !== 1 ? 's were' : ' was'} withheld. Reopen this fit from Feed or Editor to refresh exact product pages.
+            {withheldCount} link{withheldCount !== 1 ? 's need' : ' needs'} refreshing. Reopen this fit from the Feed to update {withheldCount !== 1 ? 'them' : 'it'}.
           </div>
         ) : null}
 
@@ -200,7 +200,7 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
                           ? 'bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20'
                           : 'bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/20'
                       }`}>
-                        {isExactProductUrl(product.url) ? 'Exact product page' : 'Needs refresh'}
+                        {isExactProductUrl(product.url) ? 'Exact match' : 'Needs refresh'}
                       </span>
                     </div>
                     <a

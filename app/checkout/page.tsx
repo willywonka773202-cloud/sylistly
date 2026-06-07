@@ -53,9 +53,9 @@ export default function CheckoutPage() {
   return (
     <PlaceholderScreen
       eyebrow="Checkout"
-      title="Retailer"
-      accent="links"
-      description="Use this page as a multi-store checkout helper. Sylistly only opens exact merchant product pages here; stale search fallback links are held for refresh."
+      title="Shop the"
+      accent="look"
+      description="Shop every piece in one place — each link opens its real product page at the retailer."
     >
       {linkedProducts.length ? (
         <div className="grid gap-3">
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
                 className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
                 data-checkout-withheld-search-links={withheldCount}
               >
-                {withheldCount} legacy search fallback link{withheldCount !== 1 ? 's were' : ' was'} withheld. Refresh the fit from Feed or Editor to rebuild exact product pages.
+                {withheldCount} link{withheldCount !== 1 ? 's need' : ' needs'} refreshing. Reopen this fit from the Feed to update {withheldCount !== 1 ? 'them' : 'it'}.
               </div>
             ) : null}
           </section>
@@ -156,9 +156,9 @@ export default function CheckoutPage() {
         </div>
       ) : (
         <section className="rounded-3xl border border-hairline bg-surface-1 p-5">
-          <h2 className="font-serif text-[20px] font-semibold text-ink">No checkout session yet</h2>
+          <h2 className="font-serif text-[20px] font-semibold text-ink">Nothing to shop yet</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
-            Open a fit from the builder or Saved tab, then use the checkout helper to review every store link in one place.
+            Open a fit from Builder or your Saved tab, then tap Shop to gather every piece&rsquo;s store link in one place.
           </p>
           <Link
             href="/saved"
