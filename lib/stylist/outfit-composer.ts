@@ -14,16 +14,14 @@ import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
 
-// Haiku 4.5 keeps generation FAST (~4-6s vs ~15s for Sonnet on this task — the
-// installed SDK is too old for Sonnet's `effort:'low'` speed knob). Set
-// OUTFIT_COMPOSER_MODEL=claude-sonnet-4-6 for noticeably better taste at ~15s.
-const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
-const COMPOSE_TIMEOUT_MS = 13_000;
+// Sonnet 4.6 for genuinely good, cohesive styling. The UI shows an instant
+// deterministic fit first and swaps in this AI-styled look when it lands, so
+// Sonnet's ~15s runs in the BACKGROUND and never blocks the user. Override with
+// OUTFIT_COMPOSER_MODEL=claude-haiku-4-5 for ~10s if you'd rather skip the wait.
+const DEFAULT_MODEL = 'claude-sonnet-4-6';
+const COMPOSE_TIMEOUT_MS = 25_000; // backgrounded — give Sonnet room before deterministic fallback (route maxDuration is 30)
 const PER_SLOT_LIMIT = 10; // deterministic shortlist (fallback base only)
-// Trimmed from 32: ~half the prompt tokens → faster generation AND far less
-// timeout-fallback to the deterministic engine, so more fits are actually
-// AI-styled. 18 pre-sorted candidates/slot is ample choice for the model.
-const FULL_INVENTORY_PER_SLOT = 18; // how much of the real catalog the model reads per slot
+const FULL_INVENTORY_PER_SLOT = 24; // how much of the real catalog the model reads per slot
 const COMPOSE_MAX_TOKENS = 900;
 
 /** Optional, privacy-safe styling profile the composer can personalize against. */

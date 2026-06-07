@@ -438,6 +438,9 @@ function BuilderPageContent({
   const [generatorBudget, setGeneratorBudget] = useState<GeneratorBudget>('under250');
   const [customBudgetInput, setCustomBudgetInput] = useState('');
   const [generatorLoading, setGeneratorLoading] = useState(false);
+  // True while the instant deterministic fit is shown and the AI-styled look is
+  // still composing in the background (optimistic generation).
+  const [aiRefining, setAiRefining] = useState(false);
   const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
   const recentRequiredComboRef = useRef<string[]>([]);
@@ -779,36 +782,65 @@ function BuilderPageContent({
       ]));
       const avoidedGeneratedIds = new Set(avoidProductIds);
 
+      const lookBody = {
+        vibe: vibeId,
+        frame: generatorFrame,
+        budget: generatorBudget,
+        customMaxCents: customBudgetCents,
+        seed: Date.now(),
+        avoidProductIds,
+        avoidComboSignatures: [
+          ...recentRequiredComboRef.current,
+          ...recentFullComboRef.current,
+        ],
+        recentShoeIds: recentShoeIdsRef.current.filter((id) => !lockedProductIds.has(id)),
+        recentBrandCounts: recentBrandCountsRef.current,
+        recentFormulaIds: recentFormulaIdsRef.current,
+        diversityStrength: 'high',
+        mode,
+        currentItems: items,
+        lockedItems,
+        targetSlots,
+        profile: {
+          skinTone,
+          bodyType,
+          preferredBrands: stylePrefs?.brands,
+          preferredVibes: stylePrefs?.vibes,
+          budgetTier: stylePrefs?.budget,
+        },
+      };
+
+      // OPTIMISTIC: drop an instant deterministic fit onto the board, then let
+      // the AI-styled look (Sonnet, ~15s) swap in below. New full/starter builds
+      // only — refresh/missing already have a board worth keeping on screen.
+      if (mode === 'full' || mode === 'starter') {
+        try {
+          const fastRes = await fetch('/api/look', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ ...lookBody, fast: true }),
+          });
+          const fastData = await fastRes.json();
+          if (fastRes.ok && fastData?.products && typeof fastData.products === 'object') {
+            const fastItems: Partial<Record<Category, Product>> = { ...lockedItems };
+            for (const [slot, product] of Object.entries(fastData.products) as Array<[Category, Product]>) {
+              if (targetSlots.includes(slot) && isBuildReadySlotProduct(product, slot)) fastItems[slot] = product;
+            }
+            if (Object.keys(fastItems).length >= 3) {
+              replaceItems(fastItems);
+              setGeneratorLoading(false); // board is on screen — hide the full-board spinner
+              setAiRefining(true); // show the subtle "refining" badge until the AI look lands
+            }
+          }
+        } catch {
+          /* deterministic preview is best-effort — fall through to the blocking AI path */
+        }
+      }
+
       const lookResponse = await fetch('/api/look', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          vibe: vibeId,
-          frame: generatorFrame,
-          budget: generatorBudget,
-          customMaxCents: customBudgetCents,
-          seed: Date.now(),
-          avoidProductIds,
-          avoidComboSignatures: [
-            ...recentRequiredComboRef.current,
-            ...recentFullComboRef.current,
-          ],
-          recentShoeIds: recentShoeIdsRef.current.filter((id) => !lockedProductIds.has(id)),
-          recentBrandCounts: recentBrandCountsRef.current,
-          recentFormulaIds: recentFormulaIdsRef.current,
-          diversityStrength: 'high',
-          mode,
-          currentItems: items,
-          lockedItems,
-          targetSlots,
-          profile: {
-            skinTone,
-            bodyType,
-            preferredBrands: stylePrefs?.brands,
-            preferredVibes: stylePrefs?.vibes,
-            budgetTier: stylePrefs?.budget,
-          },
-        }),
+        body: JSON.stringify(lookBody),
       });
       const lookData = await lookResponse.json();
 
@@ -931,6 +963,7 @@ function BuilderPageContent({
       setStatusMessage(error instanceof Error ? error.message : 'Could not generate a look right now.');
     } finally {
       setGeneratorLoading(false);
+      setAiRefining(false);
     }
   }
 
@@ -1307,6 +1340,14 @@ function BuilderPageContent({
                       <div className="mt-1 max-w-[80%] font-serif text-[18px] font-semibold leading-tight text-white">
                         {EDITORIAL_LOADING_LINES[loadingPhraseIndex]}
                       </div>
+                    </div>
+                  </div>
+                ) : null}
+                {aiRefining && !generatorLoading ? (
+                  <div className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2">
+                    <div className="sy-enter flex items-center gap-1.5 rounded-full border border-accent/40 bg-[#0a0707]/82 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow backdrop-blur-md">
+                      <Sparkles size={12} className="animate-pulse text-accent" />
+                      Syli is styling your fit&hellip;
                     </div>
                   </div>
                 ) : null}

@@ -25,10 +25,11 @@ interface LookBody {
   targetSlots?: Category[];
   selectedSlots?: Category[];
   profile?: StylistProfileInput | null;
+  fast?: boolean;
 }
 
 export const runtime = 'nodejs';
-export const maxDuration = 20;
+export const maxDuration = 30;
 
 function sanitizeProfile(value: unknown): StylistProfileInput | null {
   if (!value || typeof value !== 'object') return null;
@@ -149,9 +150,15 @@ export async function POST(req: NextRequest) {
     ...(mode === 'starter' || mode === 'refresh' || mode === 'full' ? currentProductIds : []),
   ]));
 
-  // Rate limit per client AND the global daily spend cap; either tripping
-  // degrades this request to the free deterministic engine.
-  const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed && (await aiBudgetAvailableGlobal());
+  // `fast` mode (optimistic UI): return the instant deterministic fit without
+  // touching the AI, rate limiter, or budget — the client shows it immediately,
+  // then re-requests the full AI-styled look in the background.
+  // Otherwise: rate limit per client AND the global daily spend cap; either
+  // tripping degrades this request to the free deterministic engine.
+  const fast = body.fast === true;
+  const allowAi = fast
+    ? false
+    : allowAiCall(clientKeyFromRequest(req)).allowed && (await aiBudgetAvailableGlobal());
   const result = await composeOutfitLook({
     vibe,
     frame,
