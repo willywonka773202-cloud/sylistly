@@ -6,11 +6,17 @@
 - **Last build by:** Claude
 - **Status:** needs-review
 - **Updated:** 2026-06-07
-- **Next:** SHIPPED a big polish run — onboarding (+ auto-generated first fit), chunk-loading hardening, dev-jargon copy cleanup app-wide, global route transition, builder fit-reveal, studio model-photo/gap filter, animated+de-jargoned checkout, discover entrance — all live on www.sylistly.com (deploys 11–16, all exit 0, prod-verified). Codex: review the 4-area UI polish (Mannequin.tsx, OutfitBoard.tsx studio branch, CheckoutSheet.tsx, app/checkout, app/discover) + the onboarding/auto-gen flow. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
+- **Next:** Reverted the mannequin/studio fit display back to the Fits-style FLAT-LAY (Pinterest) across feed/profile/stylist per user request — live + prod-verified (deploy 17). Plus the earlier polish run: onboarding (+ auto-gen first fit), chunk-loading hardening, dev-jargon copy cleanup, global route transition, builder fit-reveal, animated+de-jargoned checkout, discover entrance (deploys 11–16). KNOWN GAP: unflagged model-photo catalog rows show large in the flat-lay (data fix — flag body-model / NON_GARMENT_CUTOUT_PRODUCT_IDS). Codex: review the 4-area UI polish (Mannequin.tsx, OutfitBoard.tsx studio branch, CheckoutSheet.tsx, app/checkout, app/discover) + the onboarding/auto-gen flow. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-07 — Claude Code — build (revert mannequin → Fits flat-lay)
+- User: "the mannequin feature just doesn't work — do the Pinterest-style layout like Fits AI and our old version." Reverted feed/profile/stylist fit cards from `presentation="studio"` → `"flatlay"` (the `FitsAiOutfitCanvas` collage = the Fits-style / old-version look). Studio + silhouette presentations are now unused (left in place as dead options).
+- Added a clean-cutout filter at the `OutfitLookCard` entry (all presentations): `outfitBoardProducts(items).filter(isEditorialCutoutProduct)` so the flat-lay only shows clean garment cutouts, not "image unavailable" tiles or flagged model photos. Feed already gates posts to ≥3 transparent-renderable products (`postMeetsFeedQuality`), so cards stay full.
+- Verified on PROD (deploy 17, exit 0): the feed flat-lay renders a clean Pinterest/Fits collage (hoodie/shirt/pants/bag/shoes/sunglasses on a light canvas) — no mannequin, no broken tiles. The dev "image unavailable" was a headless image-load flake (prod CDN loads fine).
+- KNOWN GAP for Codex/next: a few catalog products are full-body MODEL PHOTOS that aren't flagged `body-model`, so `isEditorialCutoutProduct` lets them through and they show large in the flat-lay (e.g. the stylist "starter fit"). Fix is data-side: set `imageQualityFlags` (body-model/full-body) on those rows or add them to `NON_GARMENT_CUTOUT_PRODUCT_IDS`. The studio used to hide this behind the dress form.
 
 ### 2026-06-07 — Claude Code — build (deep UI polish: 4 areas, vs Fits)
 - GENERATION & REVEAL: builder plays a staggered per-piece reveal as a fit lands (`sy-piece-in` keyed on product.id; hero pieces first; locked pieces don't re-animate). Plays exactly as the loading veil lifts since `replaceItems` commits in one shot. Verified rendering a real fit via real-time CDP capture.
