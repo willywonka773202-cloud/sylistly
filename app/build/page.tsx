@@ -426,6 +426,10 @@ function BuilderPageContent({
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [stylingNote, setStylingNote] = useState<{ notes?: string; palette?: string[] } | null>(null);
+  const [editorialConfigured, setEditorialConfigured] = useState(false);
+  const [editorialLoading, setEditorialLoading] = useState(false);
+  const [editorialImage, setEditorialImage] = useState<string | null>(null);
+  const [editorialError, setEditorialError] = useState<string | null>(null);
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [selectedVibe, setSelectedVibe] = useState<VibeId>('clean');
   const [selectedGenerationSlots, setSelectedGenerationSlots] = useState<Category[]>(() =>
@@ -526,6 +530,16 @@ function BuilderPageContent({
 
   useEffect(() => {
     setHasMounted(true);
+  }, []);
+
+  // Is the optional AI editorial-photo feature available? (only show the button if so)
+  useEffect(() => {
+    let active = true;
+    fetch('/api/editorial-look')
+      .then((res) => res.json())
+      .then((data) => { if (active) setEditorialConfigured(Boolean(data?.configured)); })
+      .catch(() => {});
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -1129,6 +1143,33 @@ function BuilderPageContent({
   const activeSwipeCue = swipeFeedback || dragIntent || swipeCoachLabel;
   const nextBuildAction = computeNextBestAction(renderItems, lockedSlots, renderN);
   const builderProducts = Object.values(renderItems).filter((product): product is Product => Boolean(product));
+
+  const makeEditorial = async () => {
+    if (editorialLoading || builderProducts.length < 2) return;
+    setEditorialError(null);
+    setEditorialImage(null);
+    setEditorialLoading(true);
+    try {
+      const res = await fetch('/api/editorial-look', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          products: builderProducts,
+          vibe: activeVibe.label,
+          frame: generatorFrame,
+          stylingNotes: stylingNote?.notes,
+          palette: stylingNote?.palette,
+        }),
+      });
+      const data = await res.json();
+      if (data?.ok && data.image) setEditorialImage(data.image as string);
+      else setEditorialError(data?.reason === 'rate-limited' ? 'Too many requests — try again in a minute.' : 'Could not create the editorial photo. Try again.');
+    } catch {
+      setEditorialError('Could not create the editorial photo. Try again.');
+    } finally {
+      setEditorialLoading(false);
+    }
+  };
   const builderTransparentCount = builderProducts.filter(hasTransparentProductImage).length;
   const builderLinkedCount = builderProducts.filter((product) => Boolean(getProductOutboundUrl(product))).length;
   const builderExactLinkedCount = builderProducts.filter(hasExactProductLink).length;
@@ -1373,6 +1414,22 @@ function BuilderPageContent({
                 </div>
               ) : null}
             </div>
+          ) : null}
+
+          {editorialConfigured && builderProducts.length >= 2 ? (
+            <button
+              type="button"
+              onClick={makeEditorial}
+              disabled={editorialLoading}
+              className="sy-press inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-3 text-[12px] font-bold uppercase tracking-[.12em] text-accent transition hover:border-accent/60 disabled:opacity-60"
+            >
+              <Sparkles size={14} />
+              {editorialLoading ? 'Creating editorial photo…' : 'Make it editorial'}
+            </button>
+          ) : null}
+
+          {editorialError ? (
+            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">{editorialError}</div>
           ) : null}
 
           {statusMessage ? (
@@ -1721,6 +1778,33 @@ function BuilderPageContent({
         products={checkoutProducts || []}
         onClose={() => setCheckoutProducts(null)}
       />
+
+      {editorialImage ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-5 backdrop-blur-sm"
+          onClick={() => setEditorialImage(null)}
+          role="dialog"
+          aria-label="Editorial look"
+        >
+          <div className="sy-sheet-enter relative w-full max-w-[440px]" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[.18em] text-accent">Editorial · {activeVibe.label}</span>
+              <button type="button" onClick={() => setEditorialImage(null)} className="sy-press rounded-full border border-white/15 px-3 py-1 text-[11px] font-semibold text-muted-2">
+                Close
+              </button>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={editorialImage} alt="AI editorial photo of the outfit" className="w-full rounded-card-lg border border-white/10 shadow-float" />
+            <a
+              href={editorialImage}
+              download="sylistly-editorial.png"
+              className="sy-cta-secondary mt-3 w-full px-4 py-3 text-[12px] font-bold uppercase tracking-[.12em]"
+            >
+              Save photo
+            </a>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
