@@ -14,12 +14,15 @@ import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
 
-// Haiku is fast + strong at this constrained, structured selection task, keeping
-// generation snappy. Override with OUTFIT_COMPOSER_MODEL (e.g. a Sonnet for max taste).
-const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
+// Sonnet 4.6 for genuinely good, cohesive styling (this is a taste task, not just
+// constrained selection). The smaller per-slot inventory below keeps it fast.
+// Override with OUTFIT_COMPOSER_MODEL (e.g. claude-haiku-4-5 for max speed/cost).
+const DEFAULT_MODEL = 'claude-sonnet-4-6';
 const COMPOSE_TIMEOUT_MS = 13_000;
 const PER_SLOT_LIMIT = 10; // deterministic shortlist (fallback base only)
-const FULL_INVENTORY_PER_SLOT = 32; // how much of the real catalog the model reads per slot
+// Halved from 32: ~half the prompt tokens → ~2x faster + less timeout-fallback to
+// the deterministic engine, while 16 pre-sorted candidates/slot is ample choice.
+const FULL_INVENTORY_PER_SLOT = 16; // how much of the real catalog the model reads per slot
 const COMPOSE_MAX_TOKENS = 900;
 
 /** Optional, privacy-safe styling profile the composer can personalize against. */
