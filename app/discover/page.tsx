@@ -481,7 +481,7 @@ export default function DiscoverPage() {
             </div>
           </div>
           <p className="mt-3 max-w-[46ch] text-[12px] leading-relaxed text-muted-2">
-            Rails use catalog-backed feed products, real catalog entries, and your local closet/wishlist state. No fake trend counts, sponsored blocks, or placeholder items.
+            Every piece here is real and shoppable — drawn from your feed, your closet, and the live catalog. No fake trends, sponsored slots, or filler.
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2">
             <ContextChip label="Closet" value={closetCount.toString()} />
@@ -496,9 +496,9 @@ export default function DiscoverPage() {
         </section>
 
         <ProductRail
-          title="Transparent-ready pieces"
-          subtitle="Registered cutout assets shown first so you can verify the real transparent image pipeline."
-          badge="Cutout assets"
+          title="Ready to style"
+          subtitle="Clean studio cutouts that drop straight into any look you build."
+          badge="Studio-ready"
           products={transparentReadyProducts}
           wardrobeProductIds={wardrobeProductIds}
           onWishlist={(product) => {

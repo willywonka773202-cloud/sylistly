@@ -655,7 +655,7 @@ function SyliCatalogStrip({
           <OutfitLookCard
             items={previewProducts}
             title="Syli starter fit"
-            subtitle="Real cutouts"
+            subtitle="Real, shoppable pieces"
             compact
             presentation="studio"
             className="h-[260px]"

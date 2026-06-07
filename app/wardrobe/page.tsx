@@ -369,8 +369,8 @@ function ClothesTab({
           </div>
           <div className="mt-1 text-[12px] leading-relaxed text-white/86">
             Missing: <strong className="text-white">{gapCategories.join(', ')}</strong>. Add pieces from
-            <Link href="/feed" className="ml-1 underline decoration-accent decoration-[1.5px] underline-offset-2">/feed</Link> or
-            <Link href="/build" className="ml-1 underline decoration-accent decoration-[1.5px] underline-offset-2">/build</Link>.
+            <Link href="/feed" className="ml-1 underline decoration-accent decoration-[1.5px] underline-offset-2">the Feed</Link> or
+            <Link href="/build" className="ml-1 underline decoration-accent decoration-[1.5px] underline-offset-2">Builder</Link>.
           </div>
         </section>
       ) : null}
@@ -382,7 +382,7 @@ function ClothesTab({
           body={
             isWishlist
               ? 'Tap the heart on any product to save it here for later.'
-              : 'Add pieces from /feed, saved fits, or the /build catalog suggestions.'
+              : 'Add pieces from the Feed, your saved fits, or Builder suggestions.'
           }
           primaryHref="/feed"
           primaryLabel="Browse feed"
