@@ -6,7 +6,7 @@
 - **Last build by:** Claude
 - **Status:** needs-review
 - **Updated:** 2026-06-06
-- **Next:** LIVE in production at https://www.sylistly.com. To enable AI outfits on prod: `vercel env add ANTHROPIC_API_KEY production` then redeploy (prod currently runs deterministic outfits + Ollama chat). Consider recompressing the 242MB of cutouts for faster loads. Review the collage-layering + full-catalog-AI + cost-guardrail + board-polish work.
+- **Next:** Claude committed an audit-driven cleanup batch (d700df7) WITHOUT touching Codex's in-flight silhouette-board work (OutfitBoard/FitViewer/app/stylist + next.config — still UNCOMMITTED in the tree). Tree typechecks clean together. Claude HELD the prod deploy so it doesn't ship Codex's in-progress feature — Codex/Will: finish + verify silhouette, then deploy (`vercel --prod`) to ship both. Prod is still live on the prior commit. ANTHROPIC_API_KEY is set on prod (AI outfits + AI feed live).
 
 ---
 
