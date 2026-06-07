@@ -181,7 +181,7 @@ type FeedContext = {
   layoutVariant?: FeedLayoutVariant;
 };
 
-type OutfitPresentation = 'flatlay' | 'stacked';
+type OutfitPresentation = 'flatlay' | 'stacked' | 'silhouette';
 
 const SNEAKER_LED_FORMULAS = new Set([
   'streetwear-sneaker-led',
@@ -303,6 +303,22 @@ export function OutfitLookCard({
         subtitle={subtitle}
         className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
         compact={compact}
+        productLinks={productLinks}
+        showMeta={showMeta}
+        loading={loading}
+        ariaLabel={label}
+        onImageUnavailable={onImageUnavailable}
+      />
+    );
+  }
+
+  if (presentation === 'silhouette') {
+    return (
+      <SilhouetteFitCard
+        products={products}
+        title={title}
+        subtitle={subtitle}
+        className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
         productLinks={productLinks}
         showMeta={showMeta}
         loading={loading}
@@ -504,6 +520,168 @@ export function FitsAiOutfitCanvas({
 
       {showMeta && (title || subtitle) ? (
         <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[20px] border border-black/5 bg-white/72 px-3 py-2 text-[#171118] shadow-[0_14px_32px_rgba(40,28,54,.1)] backdrop-blur-md">
+          {subtitle ? (
+            <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div>
+          ) : null}
+          {title ? <div className="mt-0.5 truncate text-[14px] font-semibold tracking-tight">{title}</div> : null}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Ghost-mannequin / silhouette outfit card
+// ─────────────────────────────────────────────────────────
+
+// Zone geometry: percentage of the card container.
+// Outer is widest (shoulder-to-shoulder + arm area); top sits inside it;
+// bottom continues below the waist; shoes anchor the bottom.
+// z-order: bottom(20) < outer(30) < top(40) < shoes(55) < bag(60) < jewelry(64) < hat(70) < eyewear(74)
+const SILHOUETTE_SLOT: Record<Category, string> = {
+  outer:   'left-[3%]  top-[18%] h-[42%] w-[94%] z-[30]',
+  top:     'left-[20%] top-[20%] h-[32%] w-[60%] z-[40]',
+  bottom:  'left-[21%] top-[47%] h-[34%] w-[58%] z-[20]',
+  shoes:   'left-[15%] top-[78%] h-[22%] w-[70%] z-[55]',
+  bag:     'left-[65%] top-[27%] h-[30%] w-[32%] z-[60]',
+  hat:     'left-[29%] top-[0%]  h-[18%] w-[42%] z-[70]',
+  eyewear: 'left-[31%] top-[7%]  h-[10%] w-[38%] z-[74]',
+  jewelry: 'left-[33%] top-[13%] h-[9%]  w-[34%] z-[64]',
+};
+
+// Slight per-slot drop shadows so items feel layered / 3-D
+const SILHOUETTE_SHADOW: Record<Category, string> = {
+  outer:   'drop-shadow-[0_28px_22px_rgba(0,0,0,.28)]',
+  top:     'drop-shadow-[0_22px_18px_rgba(0,0,0,.26)]',
+  bottom:  'drop-shadow-[0_24px_18px_rgba(0,0,0,.22)]',
+  shoes:   'drop-shadow-[0_18px_14px_rgba(0,0,0,.3)]',
+  bag:     'drop-shadow-[0_20px_16px_rgba(0,0,0,.28)]',
+  hat:     'drop-shadow-[0_14px_12px_rgba(0,0,0,.22)]',
+  eyewear: 'drop-shadow-[0_10px_8px_rgba(0,0,0,.18)]',
+  jewelry: 'drop-shadow-[0_10px_8px_rgba(0,0,0,.18)]',
+};
+
+// Minimal SVG mannequin body — ghost silhouette, 8 % opacity
+function MannequinSvg() {
+  return (
+    <svg
+      viewBox="0 0 100 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="h-full w-full"
+    >
+      {/* head */}
+      <ellipse cx="50" cy="14" rx="14.5" ry="16" />
+      {/* neck */}
+      <path d="M44.5 28.5 L55.5 28.5 L57 37 L43 37 Z" />
+      {/* left shoulder / arm */}
+      <path d="M43 37 L38 37 Q22 40 16 52 L18 100 Q24 97 30 100 L34 46 Z" />
+      {/* right shoulder / arm */}
+      <path d="M57 37 L62 37 Q78 40 84 52 L82 100 Q76 97 70 100 L66 46 Z" />
+      {/* torso center */}
+      <path d="M38 37 L62 37 L64 100 L36 100 Z" />
+      {/* waist → hip flare */}
+      <path d="M34 100 L66 100 L70 118 L30 118 Z" />
+      {/* left leg */}
+      <path d="M30 118 L50 118 L51 205 L28 205 Z" />
+      {/* right leg */}
+      <path d="M50 118 L70 118 L72 205 L49 205 Z" />
+      {/* left foot */}
+      <ellipse cx="40" cy="208" rx="13" ry="5.5" />
+      {/* right foot */}
+      <ellipse cx="60" cy="208" rx="13" ry="5.5" />
+    </svg>
+  );
+}
+
+const SILHOUETTE_RENDER_ORDER: Category[] = ['bottom', 'outer', 'top', 'shoes', 'bag', 'jewelry', 'hat', 'eyewear'];
+
+export function SilhouetteFitCard({
+  products,
+  title,
+  subtitle,
+  className = '',
+  productLinks = true,
+  showMeta = false,
+  loading = 'lazy',
+  ariaLabel,
+  onImageUnavailable,
+}: {
+  products: Product[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  productLinks?: boolean;
+  showMeta?: boolean;
+  loading?: 'lazy' | 'eager';
+  ariaLabel?: string;
+  onImageUnavailable?: (product: Product) => void;
+}) {
+  const byCategory = new Map(products.map((p) => [p.category, p]));
+  const renderSlots = SILHOUETTE_RENDER_ORDER.filter((cat) => byCategory.has(cat));
+  const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Outfit on mannequin';
+
+  if (renderSlots.length < 3) return null;
+
+  return (
+    <article
+      className={`relative isolate h-full min-h-[260px] overflow-hidden rounded-[30px] border border-[#ede5da] bg-[linear-gradient(175deg,#fffdf9_0%,#f7f0e8_55%,#ede4d8_100%)] shadow-[0_24px_54px_rgba(42,28,21,.18)] ${className}`}
+      aria-label={label}
+      data-silhouette-fit-card
+      data-silhouette-count={renderSlots.length}
+    >
+      {/* ambient glow layers */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,rgba(255,245,230,.88)_0%,transparent_58%)]" />
+      <div className="pointer-events-none absolute inset-x-[22%] bottom-[6%] h-[14%] rounded-full bg-[#2d1a10]/8 blur-2xl" />
+
+      {/* ghost mannequin body */}
+      <div
+        className="pointer-events-none absolute inset-x-[26%] top-[2%] h-[94%] opacity-[0.07]"
+        style={{ fill: '#6b4f3a' }}
+      >
+        <MannequinSvg />
+      </div>
+
+      {/* clothing items layered on the body */}
+      {renderSlots.map((category) => {
+        const product = byCategory.get(category);
+        if (!product) return null;
+        const outboundUrl = productLinks ? getProductOutboundUrl(product) : null;
+        const imageEl = (
+          <ProductImage
+            product={product}
+            transparentOnly
+            loading={loading}
+            displayMode="moodboard"
+            wrapperClassName="h-full w-full overflow-visible bg-transparent"
+            className={`h-full w-full object-contain p-0 ${SILHOUETTE_SHADOW[category]}`}
+            onUnavailable={onImageUnavailable}
+          />
+        );
+        return outboundUrl ? (
+          <a
+            key={`${category}-${product.id}-sil`}
+            href={outboundUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Shop ${product.brand} ${product.name}`}
+            className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${SILHOUETTE_SLOT[category]}`}
+          >
+            {imageEl}
+          </a>
+        ) : (
+          <div
+            key={`${category}-${product.id}-sil`}
+            className={`absolute overflow-visible ${SILHOUETTE_SLOT[category]}`}
+          >
+            {imageEl}
+          </div>
+        );
+      })}
+
+      {/* meta overlay */}
+      {showMeta && (title || subtitle) ? (
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[20px] border border-black/6 bg-white/70 px-3 py-2 text-[#171118] shadow-[0_12px_28px_rgba(40,28,54,.12)] backdrop-blur-md">
           {subtitle ? (
             <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div>
           ) : null}

@@ -11,6 +11,7 @@ import {
   Grid3X3,
   Heart,
   Layers,
+  LayoutTemplate,
   PackageCheck,
   RotateCcw,
   Share2,
@@ -160,6 +161,7 @@ export function FitViewer({
   const [occasion, setOccasion] = useState<(typeof OCCASIONS)[number]>('Today');
   const [shared, setShared] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [outfitView, setOutfitView] = useState<'silhouette' | 'flatlay'>('silhouette');
 
   const products = useMemo(() => sortTransparentFeedRenderableProducts(rawProducts), [rawProducts]);
   const dates = useMemo(buildDateStrip, []);
@@ -266,11 +268,36 @@ export function FitViewer({
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
           <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(246,48,107,.14),transparent_34%),linear-gradient(180deg,#1a1513_0%,#0c0b0a_100%)] p-3">
+            {/* view toggle */}
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <span className="text-[9px] font-black uppercase tracking-[.18em] text-accent">
+                {outfitView === 'silhouette' ? 'Outfit on body' : 'Flat lay'}
+              </span>
+              <div className="flex gap-1">
+                {(['silhouette', 'flatlay'] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setOutfitView(v)}
+                    aria-label={v === 'silhouette' ? 'Show outfit on body' : 'Show flat lay'}
+                    className={`grid h-7 w-7 place-items-center rounded-full border text-[10px] transition active:scale-90 ${
+                      outfitView === v
+                        ? 'border-accent bg-accent text-white shadow-pink-glow'
+                        : 'border-white/12 bg-white/[0.04] text-white/55 hover:border-accent/55 hover:text-white'
+                    }`}
+                  >
+                    <LayoutTemplate size={12} />
+                  </button>
+                ))}
+              </div>
+            </div>
             <OutfitLookCard
               items={products}
               title={post.title}
               subtitle={post.formulaLabel || post.vibe}
               className="h-[348px]"
+              presentation={outfitView}
+              showMeta
               onImageUnavailable={onImageUnavailable}
             />
           </div>
