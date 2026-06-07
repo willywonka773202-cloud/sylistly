@@ -1,3 +1,4 @@
+import { wrapAffiliate } from '@/lib/affiliate';
 import type { CheckoutProduct } from '@/components/CheckoutSheet';
 
 export interface RetailerGroup {
@@ -79,7 +80,7 @@ export function openCheckoutUrls(urls: string[]): {
   openedWindows.forEach((popup, index) => {
     try {
       popup.opener = null;
-      popup.location.replace(uniqueUrls[index]);
+      popup.location.replace(wrapAffiliate(uniqueUrls[index]));
     } catch {
       popup.close();
     }

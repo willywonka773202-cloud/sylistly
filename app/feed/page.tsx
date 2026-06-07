@@ -826,19 +826,6 @@ export default function FitFeedPage() {
                           <div className="absolute left-1 top-1 max-w-[calc(100%-8px)] truncate rounded-full bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.1em] text-white">
                             {CATEGORY_LABELS[product.category]}
                           </div>
-                          <div
-                            className={`absolute right-1 top-1 h-2.5 w-2.5 rounded-full ring-2 ring-black/45 ${
-                              isExactLink ? 'bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,.7)]' : 'bg-amber-300 shadow-[0_0_10px_rgba(252,211,77,.55)]'
-                            }`}
-                            aria-hidden="true"
-                          />
-                          <div
-                            className={`absolute bottom-1 left-1 rounded-full px-1.5 py-0.5 text-[6px] font-black uppercase tracking-[.08em] ring-1 ring-black/35 ${
-                              isExactLink ? 'bg-emerald-300/90 text-[#052617]' : 'bg-amber-300/90 text-[#2d1a03]'
-                            }`}
-                          >
-                            {isExactLink ? 'Exact' : 'Refresh'}
-                          </div>
                           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,.55)_100%)] opacity-0 transition group-hover:opacity-100" />
                         </button>
                       );

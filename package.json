@@ -14,6 +14,7 @@
     "catalog:ingest-drops": "node --experimental-strip-types --env-file-if-exists=.env.local scripts/ingest-new-drops.ts",
     "catalog:import-searchapi-quality": "node --experimental-strip-types scripts/import-searchapi-quality-catalog.ts",
     "catalog:client": "jiti scripts/build-client-catalog.ts",
+    "feed:generate-ai": "node scripts/generate-ai-feed.mjs",
     "catalog:refresh": "npm run catalog:ingest-drops -- --apply && npm run catalog:client",
     "catalog:enrich": "jiti scripts/enrich-catalog-tags.ts",
     "catalog:vision": "jiti scripts/analyze-catalog-vision.ts --apply",

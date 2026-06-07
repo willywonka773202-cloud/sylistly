@@ -8,6 +8,8 @@ interface FitState {
   items: Partial<Record<Category, Product>>;
   setItem: (cat: Category, product: Product) => void;
   replaceItems: (items: Partial<Record<Category, Product>>) => void;
+  /** Merge items into the current fit (does NOT discard existing slots). */
+  mergeItems: (items: Partial<Record<Category, Product>>) => void;
   removeItem: (cat: Category) => void;
   clear: () => void;
   totalCents: () => number;
@@ -31,6 +33,7 @@ export const useFit = create<FitState>()(
         set((s) => ({ items: { ...s.items, [cat]: product } }));
       },
       replaceItems: (items) => set({ items: transparentItemsOnly(items) }),
+      mergeItems: (items) => set((s) => ({ items: { ...s.items, ...transparentItemsOnly(items) } })),
       removeItem: (cat) =>
         set((s) => {
           const next = { ...s.items };

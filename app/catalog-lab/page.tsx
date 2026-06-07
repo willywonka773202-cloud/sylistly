@@ -1,9 +1,14 @@
+import { notFound } from 'next/navigation';
 import { ALL_CATALOG_PRODUCTS } from '@/lib/catalog';
 import { validateProduct } from '@/lib/catalog-schemas/product.v2';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ReactNode } from 'react';
+
+// Internal catalog-QA diagnostics — never expose on the public production site.
+const CATALOG_LAB_ENABLED =
+  process.env.NODE_ENV !== 'production' || process.env.CATALOG_LAB_ENABLED === '1';
 
 const imageBlockingCodes = new Set([
   'IMAGE_URL_DATA_URL',
@@ -99,6 +104,7 @@ function matchesStyleFamily(product: Product, family: string): boolean {
 }
 
 export default function CatalogLabPage() {
+  if (!CATALOG_LAB_ENABLED) notFound();
   const products = ALL_CATALOG_PRODUCTS as Product[];
   const safeProducts = products.filter((product) => !isUnsafeImage(product));
   const transparentProducts = products.filter((product) => Boolean(product.imageTransparentUrl));

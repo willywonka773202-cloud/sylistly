@@ -1,3 +1,4 @@
+import { wrapAffiliate } from './affiliate';
 import type { Product } from './types';
 
 function isValidHttpUrl(value?: string): value is string {
@@ -28,4 +29,14 @@ export function getProductOutboundUrl(product: Product): string {
   if (isValidHttpUrl(fallbackUrl)) return fallbackUrl;
 
   return `https://www.google.com/search?tbm=shop&q=${encodeURIComponent(`${product.brand} ${product.name}`)}`;
+}
+
+/**
+ * The URL to actually NAVIGATE to when a user shops a product — the raw outbound
+ * URL wrapped with affiliate tracking. Use this for hrefs / window.open / the
+ * checkout flow. Use getProductOutboundUrl (raw) for display + link-quality
+ * checks (host, isExactProductUrl), which must see the real retailer URL.
+ */
+export function getShoppableUrl(product: Product): string {
+  return wrapAffiliate(getProductOutboundUrl(product));
 }

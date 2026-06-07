@@ -964,8 +964,8 @@ function BuilderPageContent({
       if (!res.ok) {
         setStatusMessage(
           localFit
-            ? `Saved locally as "${localFit.title}". Cloud sync can turn on once Supabase is wired.`
-            : 'Save is not wired all the way yet. Finish Supabase setup to store fits.',
+            ? `Saved "${localFit.title}" to your fits.`
+            : 'Could not save that fit just now — please try again.',
         );
         return;
       }

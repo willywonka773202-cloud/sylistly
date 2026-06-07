@@ -62,7 +62,7 @@ export default function HomePage() {
   const addToCloset = useWardrobe((state) => state.addToCloset);
   const addToWishlist = useWardrobe((state) => state.addToWishlist);
   const feedPosts = useSocialFeed((state) => state.posts);
-  const replaceItems = useFit((state) => state.replaceItems);
+  const mergeItems = useFit((state) => state.mergeItems);
 
   // Counts derive from real state — never seeded, never inflated.
   const savedCount = hasMounted ? savedFits.length : 0;
@@ -123,7 +123,8 @@ export default function HomePage() {
   }
 
   function buildAround(product: Product) {
-    replaceItems(itemsFromProduct(product));
+    // Merge the anchor into any in-progress fit instead of wiping it.
+    mergeItems(itemsFromProduct(product));
     router.push(`/build?lock=${encodeURIComponent(product.category)}`);
   }
 
@@ -344,7 +345,7 @@ export default function HomePage() {
           {basicSuggestions.length === 0 ? (
             <div className="mx-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-4">
               <p className="text-[12px] leading-relaxed text-muted-2">
-                Suggestions appear once the feed loads catalog products.
+                Style a fit or browse the feed and your picks will show up here.
               </p>
             </div>
           ) : (

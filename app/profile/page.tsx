@@ -443,9 +443,9 @@ export default function ProfilePage() {
             <div className="min-w-0">
               <div className="text-[20px] font-bold leading-tight text-white">{displayName}</div>
               <div className="mt-3 grid max-w-[230px] grid-cols-3 gap-5">
-                <SocialStat label="Posts" value={hasMounted ? savedFitCount : 0} />
+                <SocialStat label="Fits" value={hasMounted ? savedFitCount : 0} />
                 <SocialStat label="Likes" value={likedCount} />
-                <SocialStat label="Following" value={0} />
+                <SocialStat label="Closet" value={hasMounted ? wardrobeItems.filter((entry) => entry.status === 'closet').length : 0} />
               </div>
             </div>
           </div>

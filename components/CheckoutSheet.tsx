@@ -9,6 +9,7 @@ import {
   isExactProductUrl,
   openCheckoutUrls,
 } from '@/lib/checkout';
+import { wrapAffiliate } from '@/lib/affiliate';
 import { useCheckout } from '@/store/checkout';
 
 export interface CheckoutProduct {
@@ -203,7 +204,7 @@ export function CheckoutSheet({ open, title = 'Checkout helper', products, onClo
                       </span>
                     </div>
                     <a
-                      href={product.url}
+                      href={wrapAffiliate(product.url)}
                       target="_blank"
                       rel="noreferrer"
                       data-product-link-kind={isExactProductUrl(product.url) ? 'exact' : 'blocked'}
