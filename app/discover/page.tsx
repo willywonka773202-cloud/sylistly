@@ -469,7 +469,7 @@ export default function DiscoverPage() {
       description="Formula rails and closet-aware shopping suggestions built from real Sylistly products."
       maxWidthClassName="max-w-[680px]"
     >
-      <div className="space-y-6">
+      <div className="sy-enter space-y-6">
         <section className="sy-card-strong rounded-[28px] p-4">
           <div className="flex items-center gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/14 text-accent">
