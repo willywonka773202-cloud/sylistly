@@ -12,6 +12,12 @@
 
 ## Log (newest first)
 
+### 2026-06-07 — Claude Code — build (centered layout + optimistic AI generation)
+- LAYOUT: per user ref ("Street layers"), `FitsAiOutfitCanvas` now centers the hero piece (top/model shot) with the rest flanking in left+right columns (`flex` 25%/center/25%), instead of a top-left grid hero. Consistent on every fit. Live + verified.
+- OPTIMISTIC GENERATION (the real "takes forever" fix): AI styling is ~10s (Haiku) / ~15s (Sonnet) inherently — can't prompt-tune it away. So stop blocking on it. `/api/look` gains a `fast` mode (deterministic, skips AI/rate-limit/budget AND the full-inventory build → ~2s warm). `app/build/page.tsx generateLook` now shows that instant fit, hides the spinner, shows a "Syli is styling…" badge, then swaps in the real AI look when it lands. Time-to-first-fit ~16s → ~2s (8x). Composer → **Sonnet 4.6** (genuinely better, cohesive outfits — verified e.g. cohesive Arc'teryx/Dickies street fit) since its ~15s now runs in the background. Route maxDuration 20→30, COMPOSE_TIMEOUT 13→25s.
+- KNOWN: the instant deterministic fit can be sparse (3 slots) before the AI fills it; Sonnet ~3x Haiku cost (still ~550 gens/day under the $10 cap). The "Syli is styling" badge logic is in but wasn't visible in finicky headless caps — verify in a real browser.
+- next (Task #7, user picked all four): make AI visible (labels/notes), stylist front & center, fix/remove the "search" feature, AI on home/feed.
+
 ### 2026-06-07 — Claude Code — build (flat-lay → consistent grid)
 - User feedback on the flat-lay: "clothing shown wrong and not placed consistently" (model photos overlapping/cropped/wildly different sizes across fits). Root cause: `FitsAiOutfitCanvas` used absolute-positioned slots that overlapped top/bottom/outer in a center column to fake a worn stack — collapses when a full-body model photo lands in one of those slots.
 - REWROTE `FitsAiOutfitCanvas` to a fixed CSS GRID (`grid-cols-3`, `auto-rows 1fr`): the lead piece (top, else outer — `FLATLAY_GRID_ORDER`) fills a `col-span-2 row-span-2` hero cell; every other piece sits in its own uniform `object-contain` cell. No overlap, identical structure on every fit; a model photo just fills its cell instead of spilling. Removed the layout-variant logic (sneaker-led/hero-top/etc.); old FITS_AI_FLATLAY_*_SLOT_STYLES + isSneakerLed/HeroTopFormula now dead (noUnusedLocals is off, harmless).
