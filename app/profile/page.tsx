@@ -583,7 +583,7 @@ export default function ProfilePage() {
                         title={post.title}
                         subtitle={post.formulaLabel || post.vibe}
                         compact
-                        presentation="stacked"
+                        presentation="studio"
                         loading={index < 2 ? 'eager' : 'lazy'}
                         className="h-full"
                         onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}

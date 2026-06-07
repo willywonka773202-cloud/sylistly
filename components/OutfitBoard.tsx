@@ -181,7 +181,7 @@ type FeedContext = {
   layoutVariant?: FeedLayoutVariant;
 };
 
-type OutfitPresentation = 'flatlay' | 'stacked' | 'silhouette';
+type OutfitPresentation = 'flatlay' | 'stacked' | 'silhouette' | 'studio';
 
 const SNEAKER_LED_FORMULAS = new Set([
   'streetwear-sneaker-led',
@@ -315,6 +315,22 @@ export function OutfitLookCard({
   if (presentation === 'silhouette') {
     return (
       <SilhouetteFitCard
+        products={products}
+        title={title}
+        subtitle={subtitle}
+        className={`${tilt ? 'rotate-[-1deg]' : ''} ${className}`}
+        productLinks={productLinks}
+        showMeta={showMeta}
+        loading={loading}
+        ariaLabel={label}
+        onImageUnavailable={onImageUnavailable}
+      />
+    );
+  }
+
+  if (presentation === 'studio') {
+    return (
+      <StudioFitCard
         products={products}
         title={title}
         subtitle={subtitle}
@@ -685,6 +701,162 @@ export function SilhouetteFitCard({
           {subtitle ? (
             <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div>
           ) : null}
+          {title ? <div className="mt-0.5 truncate text-[14px] font-semibold tracking-tight">{title}</div> : null}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Studio "retail display" presentation
+// Garments worn on a tailor's dress form (centre-left); shoes + bag float on
+// cream pedestals (right rail); hat/eyewear/jewelry sit as accents. Cream studio
+// backdrop + spotlight + soft floor shadow → the editorial look from the mockups.
+// ─────────────────────────────────────────────────────────
+
+// Worn garments are CENTRED on the form (the form spans ~22-66% horizontally).
+const STUDIO_WORN_SLOT: Partial<Record<Category, string>> = {
+  outer:  'left-[13%] top-[15%] h-[52%] w-[62%] z-[30]',
+  top:    'left-[24%] top-[17%] h-[42%] w-[40%] z-[40]',
+  bottom: 'left-[25%] top-[46%] h-[40%] w-[38%] z-[20]',
+};
+
+const STUDIO_ACCENT_SLOT: Partial<Record<Category, string>> = {
+  hat:     'left-[30%] top-[1%]  h-[16%] w-[28%] z-[70]',
+  eyewear: 'left-[32%] top-[8%]  h-[8%]  w-[24%] z-[74]',
+  jewelry: 'left-[34%] top-[14%] h-[7%]  w-[20%] z-[64]',
+};
+
+// Right-rail pedestals: { item placement, pedestal-disc placement }.
+const STUDIO_PEDESTAL: Partial<Record<Category, { item: string; disc: string }>> = {
+  bag:   { item: 'right-[6%] top-[22%] h-[24%] w-[28%] z-[60]', disc: 'right-[4%] top-[44%] h-[7%] w-[32%]' },
+  shoes: { item: 'right-[5%] top-[56%] h-[17%] w-[33%] z-[60]', disc: 'right-[3%] top-[71%] h-[7%] w-[36%]' },
+};
+
+const STUDIO_RENDER_ORDER: Category[] = ['bottom', 'outer', 'top', 'jewelry', 'hat', 'eyewear', 'bag', 'shoes'];
+
+// Tailor's dress form + thin gold stand. Subtle so it reads as a display even
+// when a garment cutout doesn't perfectly align to it.
+function DressFormSvg() {
+  const torso = 'M45 30 Q31 31 28 45 Q25 61 31 79 Q34 92 40 100 L60 100 Q66 92 69 79 Q75 61 72 45 Q69 31 55 30 Z';
+  return (
+    <svg viewBox="0 0 100 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-full w-full">
+      <defs>
+        <linearGradient id="dressFormShade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#f0e3cf" />
+          <stop offset="55%" stopColor="#e6d6bd" />
+          <stop offset="100%" stopColor="#d4bf9f" />
+        </linearGradient>
+      </defs>
+      {/* neck stub */}
+      <path d="M46 18 L54 18 L55 30 L45 30 Z" fill="#e2d0b6" />
+      {/* slim tailor's dress form: rounded shoulders → narrow waist, lit from the left */}
+      <path d={torso} fill="url(#dressFormShade)" />
+      <path d={torso} fill="none" stroke="#c6ad8c" strokeWidth="0.6" />
+      {/* gold stand + base */}
+      <rect x="48.7" y="100" width="2.6" height="92" rx="1.3" fill="#c9a45a" />
+      <ellipse cx="50" cy="195" rx="17" ry="4.6" fill="#c9a45a" />
+      <ellipse cx="50" cy="193.4" rx="17" ry="4.6" fill="#ddb96f" />
+    </svg>
+  );
+}
+
+function StudioPedestal({ className }: { className: string }) {
+  return (
+    <div className={`pointer-events-none absolute ${className}`} aria-hidden="true">
+      <div className="absolute inset-0 rounded-[50%] bg-[radial-gradient(ellipse_at_50%_38%,#fffdf9,#efe4d4_72%,#e3d4bf)] shadow-[0_14px_26px_rgba(60,42,28,.22)]" />
+      <div className="absolute inset-x-[8%] top-[-3px] h-[6px] rounded-[50%] bg-white/70 blur-[1px]" />
+    </div>
+  );
+}
+
+export function StudioFitCard({
+  products,
+  title,
+  subtitle,
+  className = '',
+  productLinks = true,
+  showMeta = false,
+  loading = 'lazy',
+  ariaLabel,
+  onImageUnavailable,
+}: {
+  products: Product[];
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  productLinks?: boolean;
+  showMeta?: boolean;
+  loading?: 'lazy' | 'eager';
+  ariaLabel?: string;
+  onImageUnavailable?: (product: Product) => void;
+}) {
+  const byCategory = new Map(products.map((p) => [p.category, p]));
+  const renderSlots = STUDIO_RENDER_ORDER.filter((cat) => byCategory.has(cat));
+  const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Outfit studio display';
+
+  if (renderSlots.length < 3) return null;
+
+  return (
+    <article
+      className={`relative isolate h-full min-h-[300px] overflow-hidden rounded-[30px] border border-[#ece2d4] bg-[linear-gradient(180deg,#fffdf9_0%,#f8f1e8_52%,#ece0d0_100%)] shadow-[0_24px_56px_rgba(42,28,21,.2)] ${className}`}
+      aria-label={label}
+      data-studio-fit-card
+      data-studio-count={renderSlots.length}
+    >
+      {/* spotlight + floor */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_44%_18%,rgba(255,248,236,.95)_0%,transparent_56%)]" />
+      <div className="pointer-events-none absolute inset-x-[12%] bottom-[5%] h-[12%] rounded-[50%] bg-[#3a2414]/12 blur-2xl" />
+
+      {/* dress form behind the worn garments (centre-left; right rail is for pedestals) */}
+      <div className="pointer-events-none absolute left-[19%] top-[3%] h-[94%] w-[46%] drop-shadow-[0_18px_24px_rgba(60,42,28,.14)]">
+        <DressFormSvg />
+      </div>
+
+      {/* pedestals (behind their items) */}
+      {(['bag', 'shoes'] as const).map((cat) =>
+        byCategory.has(cat) && STUDIO_PEDESTAL[cat] ? <StudioPedestal key={`ped-${cat}`} className={STUDIO_PEDESTAL[cat]!.disc} /> : null,
+      )}
+
+      {renderSlots.map((category) => {
+        const product = byCategory.get(category);
+        if (!product) return null;
+        const placement = STUDIO_WORN_SLOT[category] || STUDIO_ACCENT_SLOT[category] || STUDIO_PEDESTAL[category]?.item;
+        if (!placement) return null;
+        const outboundUrl = productLinks ? getProductOutboundUrl(product) : null;
+        const imageEl = (
+          <ProductImage
+            product={product}
+            transparentOnly
+            loading={loading}
+            displayMode="moodboard"
+            wrapperClassName="h-full w-full overflow-visible bg-transparent"
+            className="h-full w-full object-contain p-0 drop-shadow-[0_20px_18px_rgba(0,0,0,.24)]"
+            onUnavailable={onImageUnavailable}
+          />
+        );
+        return outboundUrl ? (
+          <a
+            key={`${category}-${product.id}-studio`}
+            href={outboundUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Shop ${product.brand} ${product.name}`}
+            className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${placement}`}
+          >
+            {imageEl}
+          </a>
+        ) : (
+          <div key={`${category}-${product.id}-studio`} className={`absolute overflow-visible ${placement}`}>
+            {imageEl}
+          </div>
+        );
+      })}
+
+      {showMeta && (title || subtitle) ? (
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[20px] border border-black/6 bg-white/75 px-3 py-2 text-[#171118] shadow-[0_12px_28px_rgba(40,28,54,.12)] backdrop-blur-md">
+          {subtitle ? <div className="truncate text-[8px] font-black uppercase tracking-[.18em] text-accent">{subtitle}</div> : null}
           {title ? <div className="mt-0.5 truncate text-[14px] font-semibold tracking-tight">{title}</div> : null}
         </div>
       ) : null}

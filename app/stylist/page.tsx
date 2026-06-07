@@ -657,8 +657,8 @@ function SyliCatalogStrip({
             title="Syli starter fit"
             subtitle="Real cutouts"
             compact
-            presentation="silhouette"
-            className="h-[220px]"
+            presentation="studio"
+            className="h-[260px]"
           />
           <div className="mt-2 grid grid-cols-3 gap-2">
             <button
@@ -814,8 +814,8 @@ function RecommendedProducts({
               title="Syli outfit preview"
               subtitle="Real catalog pick"
               compact
-              presentation="silhouette"
-              className="h-[220px]"
+              presentation="studio"
+              className="h-[260px]"
             />
         </div>
       ) : null}
