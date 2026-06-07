@@ -488,56 +488,64 @@ export function FitsAiOutfitCanvas({
   feedContext?: FeedContext;
 }) {
   const byCategory = new Map(products.map((product) => [product.category, product]));
-  // Hero piece (outer, else top) leads in a 2x2 cell; the rest fill uniform,
-  // non-overlapping cells around it. A fixed grid keeps every fit's layout
-  // identical regardless of how tall/wide each piece's image happens to be —
-  // no more colliding garments or a model photo spilling over the board.
-  const renderSlots = FLATLAY_GRID_ORDER
-    .filter((category) => byCategory.has(category))
-    .slice(0, compact ? 6 : 8);
+  // Center the hero (top, else outer — usually the on-model shot) with the
+  // remaining pieces flanking it in left + right columns. The "model + pieces"
+  // editorial look, identical on every fit: each piece is contained, nothing
+  // overlaps, and a full-body photo simply fills the tall center column.
+  const ordered = FLATLAY_GRID_ORDER.filter((category) => byCategory.has(category)).slice(0, compact ? 7 : 9);
+  const [heroCategory, ...flankCategories] = ordered;
+  const leftCategories = flankCategories.filter((_, i) => i % 2 === 0);
+  const rightCategories = flankCategories.filter((_, i) => i % 2 === 1);
   const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Editorial transparent outfit flat lay';
 
-  if (renderSlots.length < 3) return null;
+  if (ordered.length < 3) return null;
+
+  const renderPiece = (category: Category, isHero: boolean) => {
+    const product = byCategory.get(category);
+    if (!product) return null;
+    return (
+      <ProductTileLink
+        key={`${category}-${product.id}-fits-ai`}
+        product={product}
+        className={`group relative flex min-h-0 min-w-0 items-center justify-center overflow-visible transition-transform duration-200 ease-out hover:scale-[1.04] ${isHero ? 'h-full w-full' : 'w-full flex-1'}`}
+        disabled={!productLinks}
+      >
+        <ProductImage
+          product={product}
+          transparentOnly
+          loading={loading}
+          displayMode="moodboard"
+          wrapperClassName="flex h-full w-full items-center justify-center overflow-visible bg-transparent"
+          className={`h-full w-full object-contain ${isHero ? 'p-1 drop-shadow-[0_22px_24px_rgba(0,0,0,.18)]' : 'p-0.5 drop-shadow-[0_12px_14px_rgba(0,0,0,.15)]'}`}
+          onUnavailable={onImageUnavailable}
+        />
+        <span className="sr-only">{product.brand} {product.name}</span>
+      </ProductTileLink>
+    );
+  };
 
   return (
     <article
       className={`relative isolate h-full min-h-[220px] overflow-hidden rounded-[30px] border border-[#ece7df] bg-[linear-gradient(180deg,#fff_0%,#fbfaf7_58%,#f4efe8_100%)] shadow-[0_24px_54px_rgba(42,28,21,.14)] ${className}`}
       aria-label={label}
       data-fits-ai-canvas
-      data-fits-ai-canvas-count={renderSlots.length}
+      data-fits-ai-canvas-count={ordered.length}
       data-fits-ai-transparent="true"
-      data-fits-ai-layout="grid"
+      data-fits-ai-layout="center-hero"
       data-fits-ai-formula={feedContext?.formulaId || 'unknown'}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_26%,rgba(255,248,240,.9)_0%,rgba(255,255,255,0)_60%)]" />
-      <div
-        className="relative grid h-full w-full gap-2 p-4"
-        style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridAutoRows: 'minmax(0, 1fr)' }}
-      >
-        {renderSlots.map((category, index) => {
-          const product = byCategory.get(category);
-          if (!product) return null;
-          const hero = index === 0;
-          return (
-            <ProductTileLink
-              key={`${category}-${product.id}-fits-ai`}
-              product={product}
-              className={`group relative flex min-h-0 min-w-0 items-center justify-center overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${hero ? 'col-span-2 row-span-2' : ''}`}
-              disabled={!productLinks}
-            >
-              <ProductImage
-                product={product}
-                transparentOnly
-                loading={loading}
-                displayMode="moodboard"
-                wrapperClassName="flex h-full w-full items-center justify-center overflow-visible bg-transparent"
-                className={`h-full w-full object-contain ${hero ? 'p-1.5 drop-shadow-[0_18px_20px_rgba(0,0,0,.17)]' : 'p-1 drop-shadow-[0_11px_13px_rgba(0,0,0,.15)]'}`}
-                onUnavailable={onImageUnavailable}
-              />
-              <span className="sr-only">{product.brand} {product.name}</span>
-            </ProductTileLink>
-          );
-        })}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_24%,rgba(255,248,240,.92)_0%,rgba(255,255,255,0)_62%)]" />
+      <div className="pointer-events-none absolute inset-x-[24%] bottom-[6%] h-px bg-black/5" />
+      <div className="relative flex h-full w-full items-stretch gap-1 px-3 py-4">
+        <div className="flex w-[25%] flex-col items-center justify-around gap-1.5">
+          {leftCategories.map((category) => renderPiece(category, false))}
+        </div>
+        <div className="flex flex-1 items-center justify-center px-1">
+          {heroCategory ? renderPiece(heroCategory, true) : null}
+        </div>
+        <div className="flex w-[25%] flex-col items-center justify-around gap-1.5">
+          {rightCategories.map((category) => renderPiece(category, false))}
+        </div>
       </div>
 
       {showMeta && (title || subtitle) ? (
