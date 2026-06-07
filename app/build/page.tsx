@@ -643,6 +643,20 @@ function BuilderPageContent({
     quickLockProcessedRef.current = true;
   }, [quickLock, hasMounted, items]);
 
+  // First-run onboarding hand-off: once the user's picked vibe is applied,
+  // auto-generate their very first fit so they land on a finished look — not an
+  // empty board. Fires once; the vibe-match guard avoids a default-vibe race.
+  const onboardingGenRef = useRef(false);
+  useEffect(() => {
+    if (onboardingGenRef.current) return;
+    if (quickSource !== 'onboarding') return;
+    if (!hasMounted || n > 0 || generatorLoading) return;
+    if (quickVibe && VIBES.some((vibe) => vibe.id === quickVibe) && selectedVibe !== quickVibe) return;
+    onboardingGenRef.current = true;
+    void generateLook('full', { sourceLabel: 'Your first fit — styled from your vibe.' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quickSource, hasMounted, n, generatorLoading, selectedVibe, quickVibe]);
+
   function closeSearchSheet() {
     setSearchFor(null);
     setActiveEditSlot(null);

@@ -70,7 +70,14 @@ body {
   50% { transform: translateY(-3px) scale(1.006); filter: saturate(1.035); }
 }
 
+/* Opacity-only on purpose — a transform here would break fixed positioning. */
+@keyframes sy-route-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @layer utilities {
+  .sy-route-enter { animation: sy-route-in 200ms ease both; }
   .sy-enter { animation: sy-rise-in 280ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-sheet-enter { animation: sy-sheet-up 260ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-fit-float { animation: sy-fit-float 5.8s ease-in-out infinite both; will-change: transform, filter; }
@@ -176,6 +183,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sy-route-enter,
   .sy-enter,
   .sy-sheet-enter,
   .sy-fit-float,

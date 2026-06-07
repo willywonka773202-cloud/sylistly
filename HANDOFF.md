@@ -6,11 +6,18 @@
 - **Last build by:** Claude
 - **Status:** needs-review
 - **Updated:** 2026-06-07
-- **Next:** SHIPPED onboarding + chunk-loading hardening — live on www.sylistly.com (deploy exit 0, prod verified). Codex: review the first-run onboarding (components/Onboarding.tsx + app/page.tsx wiring) and the lazy-modal gating (feed/profile/saved). Open backlog: editorial AI photo is built but gated on Gemini billing (free tier grants $0 image-gen quota — needs paid key or a swap to Replicate/FLUX); dual-ALL_CATALOG_PRODUCTS rename, dedup analyzeOutfit/CATEGORY_LABELS, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
+- **Next:** SHIPPED onboarding (+ auto-generated first fit), chunk-loading hardening, dev-jargon copy cleanup, and a global route transition — all live on www.sylistly.com. Codex: review the onboarding flow (components/Onboarding.tsx + app/page.tsx), the builder auto-gen effect (app/build/page.tsx), and app/template.tsx. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-07 — Claude Code — build (UI polish round)
+- Onboarding "wow": the builder now AUTO-GENERATES the first fit on the onboarding hand-off (`app/build/page.tsx` effect — fires once when `source=onboarding`, gated on the picked vibe being applied so there's no default-vibe race). New users land on a finished, vibe-matched look instead of an empty board. Verified: `?vibe=street&frame=fem&source=onboarding` auto-composes a full streetwear fit ($743, street vibe).
+- Global ROUTE TRANSITION: new `app/template.tsx` wraps every route in a subtle opacity fade-in (`.sy-route-enter`, 200ms, prefers-reduced-motion-safe). Opacity-only on purpose — a transform would establish a containing block and break every `fixed` element (bottom nav, modals, onboarding). Smoother navigation app-wide.
+- Competitor framing: researched Fits (fits-app.com) — clean/minimal/light, drag-and-drop, "accessible not luxury." We lean INTO our distinctive editorial-dark identity + the AI-composed-from-real-pieces wow rather than copying their look; polishing motion to match their smoothness.
+- verified: `npx tsc --noEmit` clean; `npm run build` exit 0 (template.tsx clean across all 26 routes); onboarding auto-gen confirmed rendering a real fit in dev.
+- next: Codex reviews onboarding auto-gen + route transition; further polish candidates — bottom-nav active-state, fit-reveal animation, press-state audit.
 
 ### 2026-06-07 — Claude Code — build
 - Built first-run ONBOARDING (was on the backlog): `components/Onboarding.tsx` — a 2-step welcome → frame (Womenswear/Menswear/Everything) + vibe picker. Shown once to genuinely new users on home (`app/page.tsx`, gated by `localStorage sylistly.onboarded.v1` + a fresh-state check: no saved fits, empty wardrobe). Completing sets profile `bodyType`+`vibe` and routes to `/build?vibe=&frame=` pre-configured. Verified live on prod (welcome screen renders).
