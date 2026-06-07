@@ -674,7 +674,7 @@ export default function FitFeedPage() {
                     title={post.title}
                     subtitle={post.formulaLabel || post.vibe}
                     loading={index === 0 ? 'eager' : 'lazy'}
-                    presentation="studio"
+                    presentation="flatlay"
                     productLinks={false}
                     className="h-[clamp(320px,45dvh,430px)] min-[390px]:h-[clamp(340px,47dvh,460px)]"
                     feedContext={{ formulaId: post.formulaId, formulaLabel: post.formulaLabel }}

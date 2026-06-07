@@ -288,7 +288,11 @@ export function OutfitLookCard({
   feedContext?: FeedContext;
   presentation?: OutfitPresentation;
 }) {
-  const products = outfitBoardProducts(items);
+  // Every presentation renders bare cutouts on a light canvas (flat lay /
+  // stacked / studio), so only surface clean garment cutouts — never a
+  // full-body model photo or a product whose cutout is missing/low quality.
+  // (This is what makes the flat-lay / Pinterest look read as clean.)
+  const products = outfitBoardProducts(items).filter((product) => isEditorialCutoutProduct(product));
   const byCategory = new Map(products.map((product) => [product.category, product]));
   const visibleSlots = BOARD_ORDER.filter((category) => byCategory.has(category));
 
