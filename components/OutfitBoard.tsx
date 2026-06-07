@@ -485,22 +485,11 @@ export function FitsAiOutfitCanvas({
   feedContext?: FeedContext;
 }) {
   const byCategory = new Map(products.map((product) => [product.category, product]));
-  const hasOuter = byCategory.has('outer');
-  const forcedSneakerLed = feedContext?.layoutVariant === 'sneaker-led' || isSneakerLedFormula(feedContext?.formulaId);
-  const forcedHeroTop = feedContext?.layoutVariant === 'hero-top' || isHeroTopFormula(feedContext?.formulaId);
-  const sneakerLed = byCategory.has('shoes') && (forcedSneakerLed || !byCategory.has('top') || !byCategory.has('bottom'));
-  const heroTop = !sneakerLed && forcedHeroTop && (byCategory.has('top') || byCategory.has('outer'));
-  const resolvedLayout = sneakerLed ? 'sneaker-led' : heroTop ? 'hero-top' : hasOuter ? 'hero-left' : 'no-outer';
-  const slotStyles = sneakerLed
-    ? FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES
-    : heroTop
-      ? FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES
-      : compact
-        ? FITS_AI_FLATLAY_COMPACT_SLOT_STYLES
-        : hasOuter
-          ? FITS_AI_FLATLAY_SLOT_STYLES
-          : FITS_AI_FLATLAY_NO_OUTER_SLOT_STYLES;
-  const renderSlots = FITS_AI_FLATLAY_ORDER
+  // Hero piece (outer, else top) leads in a 2x2 cell; the rest fill uniform,
+  // non-overlapping cells around it. A fixed grid keeps every fit's layout
+  // identical regardless of how tall/wide each piece's image happens to be —
+  // no more colliding garments or a model photo spilling over the board.
+  const renderSlots = BOARD_ORDER
     .filter((category) => byCategory.has(category))
     .slice(0, compact ? 6 : 8);
   const label = ariaLabel || [title, subtitle].filter(Boolean).join(' ') || 'Editorial transparent outfit flat lay';
@@ -514,38 +503,39 @@ export function FitsAiOutfitCanvas({
       data-fits-ai-canvas
       data-fits-ai-canvas-count={renderSlots.length}
       data-fits-ai-transparent="true"
-      data-fits-ai-sneaker-led={sneakerLed ? 'true' : 'false'}
-      data-fits-ai-layout={resolvedLayout}
+      data-fits-ai-layout="grid"
       data-fits-ai-formula={feedContext?.formulaId || 'unknown'}
-      data-fit-scale-system="silhouette-v3"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_48%_34%,rgba(255,247,239,.92)_0%,rgba(255,255,255,0)_45%)]" />
-      <div className="pointer-events-none absolute inset-x-[18%] bottom-[7%] h-[15%] rounded-full bg-[#241622]/10 blur-2xl" />
-      <div className="pointer-events-none absolute inset-x-[24%] bottom-[6%] h-px bg-black/5" />
-
-      {renderSlots.map((category) => {
-        const product = byCategory.get(category);
-        if (!product) return null;
-        return (
-          <ProductTileLink
-            key={`${category}-${product.id}-fits-ai`}
-            product={product}
-            className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.025] ${slotStyles[category]}`}
-            disabled={!productLinks}
-          >
-            <ProductImage
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_26%,rgba(255,248,240,.9)_0%,rgba(255,255,255,0)_60%)]" />
+      <div
+        className="relative grid h-full w-full gap-2 p-4"
+        style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridAutoRows: 'minmax(0, 1fr)' }}
+      >
+        {renderSlots.map((category, index) => {
+          const product = byCategory.get(category);
+          if (!product) return null;
+          const hero = index === 0;
+          return (
+            <ProductTileLink
+              key={`${category}-${product.id}-fits-ai`}
               product={product}
-              transparentOnly
-              loading={loading}
-              displayMode={compact ? 'thumbnail' : 'moodboard'}
-              wrapperClassName="h-full w-full overflow-visible bg-transparent"
-              className={flatlayImageClass(product)}
-              onUnavailable={onImageUnavailable}
-            />
-            <span className="sr-only">{product.brand} {product.name}</span>
-          </ProductTileLink>
-        );
-      })}
+              className={`group relative flex min-h-0 min-w-0 items-center justify-center overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${hero ? 'col-span-2 row-span-2' : ''}`}
+              disabled={!productLinks}
+            >
+              <ProductImage
+                product={product}
+                transparentOnly
+                loading={loading}
+                displayMode="moodboard"
+                wrapperClassName="flex h-full w-full items-center justify-center overflow-visible bg-transparent"
+                className={`h-full w-full object-contain ${hero ? 'p-1.5 drop-shadow-[0_18px_20px_rgba(0,0,0,.17)]' : 'p-1 drop-shadow-[0_11px_13px_rgba(0,0,0,.15)]'}`}
+                onUnavailable={onImageUnavailable}
+              />
+              <span className="sr-only">{product.brand} {product.name}</span>
+            </ProductTileLink>
+          );
+        })}
+      </div>
 
       {showMeta && (title || subtitle) ? (
         <div className="pointer-events-none absolute inset-x-4 bottom-4 rounded-[20px] border border-black/5 bg-white/72 px-3 py-2 text-[#171118] shadow-[0_14px_32px_rgba(40,28,54,.1)] backdrop-blur-md">
