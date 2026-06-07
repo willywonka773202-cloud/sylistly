@@ -298,9 +298,9 @@ export default function HomePage() {
             <div className="mx-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-4">
               <p className="text-[12px] leading-relaxed text-muted-2">
                 No saved fits yet. Save looks from{' '}
-                <Link href="/feed" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">/feed</Link>{' '}
+                <Link href="/feed" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">the Feed</Link>{' '}
                 or build one in{' '}
-                <Link href="/build" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">/build</Link>.
+                <Link href="/build" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">Builder</Link>.
               </p>
             </div>
           ) : (
