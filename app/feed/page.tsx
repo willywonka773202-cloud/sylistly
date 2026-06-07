@@ -906,6 +906,7 @@ export default function FitFeedPage() {
         </div>
       ) : null}
 
+      {whyPost ? (
       <FitViewer
         post={whyPost}
         products={whyPost ? visibleProducts(whyPost) : []}
@@ -932,13 +933,16 @@ export default function FitFeedPage() {
         }}
         onJumpToPost={jumpToPost}
       />
+      ) : null}
 
+      {checkoutProducts ? (
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
         title={checkoutTitle}
         products={checkoutProducts || []}
         onClose={() => setCheckoutProducts(null)}
       />
+      ) : null}
     </main>
   );
 }

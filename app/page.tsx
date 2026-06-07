@@ -13,16 +13,21 @@ import {
   WandSparkles,
 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
+import { Onboarding } from '@/components/Onboarding';
 import { ProductImage } from '@/components/ProductImage';
 import { isExactProductUrl } from '@/lib/checkout';
 import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { getStylistCatalogProducts, getStylistStarterProducts } from '@/lib/client-catalog';
 import type { Category, Product } from '@/lib/types';
+import type { GeneratorFrame, VibeId } from '@/lib/vibes';
 import { useFit } from '@/store/fit';
+import { useProfile } from '@/store/profile';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
+
+const ONBOARDED_KEY = 'sylistly.onboarded.v1';
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
@@ -55,7 +60,7 @@ export default function HomePage() {
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  useEffect(() => setHasMounted(true), []);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const savedFits = useSavedFits((state) => state.fits);
   const wardrobeItems = useWardrobe(selectWardrobeItems);
@@ -63,6 +68,45 @@ export default function HomePage() {
   const addToWishlist = useWardrobe((state) => state.addToWishlist);
   const feedPosts = useSocialFeed((state) => state.posts);
   const mergeItems = useFit((state) => state.mergeItems);
+  const setBodyType = useProfile((state) => state.setBodyType);
+  const setVibesFromText = useProfile((state) => state.setVibesFromText);
+
+  // First-run onboarding: show once for genuinely new users (no saved fits,
+  // empty wardrobe) who haven't seen it. The flag persists the dismissal.
+  useEffect(() => {
+    setHasMounted(true);
+    try {
+      if (localStorage.getItem(ONBOARDED_KEY)) return;
+      const fresh =
+        useSavedFits.getState().fits.length === 0 &&
+        selectWardrobeItems(useWardrobe.getState()).length === 0;
+      if (fresh) setShowOnboarding(true);
+      else localStorage.setItem(ONBOARDED_KEY, '1');
+    } catch {
+      /* localStorage unavailable — skip onboarding silently */
+    }
+  }, []);
+
+  const completeOnboarding = (frame: GeneratorFrame, vibe: VibeId) => {
+    setBodyType(frame);
+    setVibesFromText(vibe);
+    try {
+      localStorage.setItem(ONBOARDED_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    setShowOnboarding(false);
+    router.push(`/build?vibe=${vibe}&frame=${frame}&source=onboarding`);
+  };
+
+  const dismissOnboarding = () => {
+    try {
+      localStorage.setItem(ONBOARDED_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    setShowOnboarding(false);
+  };
 
   // Counts derive from real state — never seeded, never inflated.
   const savedCount = hasMounted ? savedFits.length : 0;
@@ -129,6 +173,8 @@ export default function HomePage() {
   }
 
   return (
+    <>
+    {showOnboarding ? <Onboarding onComplete={completeOnboarding} onSkip={dismissOnboarding} /> : null}
     <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <header className="px-5 pb-4 pt-[calc(env(safe-area-inset-top)+18px)]">
         <div className="flex items-end justify-between">
@@ -447,6 +493,7 @@ export default function HomePage() {
 
       <BottomNav />
     </main>
+    </>
   );
 }
 

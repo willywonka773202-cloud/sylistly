@@ -4,13 +4,19 @@
 - **Version:** 0.1.0
 - **Turn:** Codex
 - **Last build by:** Claude
-- **Status:** reviewed-pass
-- **Updated:** 2026-06-06
-- **Next:** SHIPPED. Claude reviewed + committed Codex's silhouette board (1c1cd5b, typecheck + build pass) alongside its own cleanup batch (d700df7), and DEPLOYED to production — www.sylistly.com is live with both. Verified prod 200 + /catalog-lab now 404s in prod. ANTHROPIC_API_KEY set on prod (AI outfits + AI feed live). Open backlog: onboarding flow, dual-ALL_CATALOG_PRODUCTS rename, dedup analyzeOutfit/CATEGORY_LABELS, affiliate single-buttons + NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
+- **Status:** needs-review
+- **Updated:** 2026-06-07
+- **Next:** SHIPPED onboarding + chunk-loading hardening — live on www.sylistly.com (deploy exit 0, prod verified). Codex: review the first-run onboarding (components/Onboarding.tsx + app/page.tsx wiring) and the lazy-modal gating (feed/profile/saved). Open backlog: editorial AI photo is built but gated on Gemini billing (free tier grants $0 image-gen quota — needs paid key or a swap to Replicate/FLUX); dual-ALL_CATALOG_PRODUCTS rename, dedup analyzeOutfit/CATEGORY_LABELS, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-07 — Claude Code — build
+- Built first-run ONBOARDING (was on the backlog): `components/Onboarding.tsx` — a 2-step welcome → frame (Womenswear/Menswear/Everything) + vibe picker. Shown once to genuinely new users on home (`app/page.tsx`, gated by `localStorage sylistly.onboarded.v1` + a fresh-state check: no saved fits, empty wardrobe). Completing sets profile `bodyType`+`vibe` and routes to `/build?vibe=&frame=` pre-configured. Verified live on prod (welcome screen renders).
+- Hardened CHUNK LOADING (the long-noted headless ChunkLoadError, now also real-user-safe): `app/error.tsx` auto-reloads once on a ChunkLoadError (10s timestamp guard against loops; "Try again" hard-reloads for chunk errors) — seamlessly recovers the stale-chunk-after-deploy case for real users. Gated the always-mounted dynamic modals so their chunks leave the initial critical path: FitViewer + CheckoutSheet in `app/feed` (mount only when `whyPost`/`checkoutProducts` set), `app/profile` (`resolvedActivePost`/`checkoutProducts`), CheckoutSheet in `app/saved`. All three already `return null` when closed, so behavior is identical — pure win.
+- verified: `npx tsc --noEmit` clean; `npm run build` exit 0; DEPLOYED to www.sylistly.com (deploy exit 0). Prod home shows onboarding; `/feed` + `/profile` 200; prod `/feed` console now clean across 4 repeated headless loads (the intermittent ChunkLoadError is gone).
+- next: Codex reviews onboarding UX + lazy-modal gating; possible follow-up — auto-generate the first fit on the onboarding→builder handoff (currently lands pre-configured and the user taps Build, intentionally avoiding a vibe-state race).
 
 ### 2026-06-06 — Claude Code — build
 - Fixed outfit-collage layering (hat always on top; cohesive flat lay z-order) and rebuilt the AI to read the WHOLE eligible catalog (getFullSlotInventory, 32/slot) + fill every requested slot (hat no longer missing).

@@ -315,12 +315,14 @@ export default function SavedPage() {
         />
       ) : null}
 
+      {checkoutProducts ? (
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
         title={checkoutTitle}
         products={checkoutProducts || []}
         onClose={() => setCheckoutProducts(null)}
       />
+      ) : null}
     </PlaceholderScreen>
   );
 }

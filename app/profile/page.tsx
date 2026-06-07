@@ -779,6 +779,7 @@ export default function ProfilePage() {
 
       <BottomNav />
 
+      {resolvedActivePost ? (
       <FitViewer
         post={resolvedActivePost}
         products={activePostProducts}
@@ -809,8 +810,11 @@ export default function ProfilePage() {
         }}
         onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
       />
+      ) : null}
 
+      {checkoutProducts ? (
       <CheckoutSheet open={Boolean(checkoutProducts)} title={checkoutTitle} products={checkoutProducts || []} onClose={() => setCheckoutProducts(null)} />
+      ) : null}
     </main>
   );
 }
