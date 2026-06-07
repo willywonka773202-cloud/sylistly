@@ -810,31 +810,34 @@ function BuilderPageContent({
         },
       };
 
-      // OPTIMISTIC: drop an instant deterministic fit onto the board, then let
-      // the AI-styled look (Sonnet, ~15s) swap in below. New full/starter builds
-      // only — refresh/missing already have a board worth keeping on screen.
-      if (mode === 'full' || mode === 'starter') {
-        try {
-          const fastRes = await fetch('/api/look', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ ...lookBody, fast: true }),
-          });
-          const fastData = await fastRes.json();
-          if (fastRes.ok && fastData?.products && typeof fastData.products === 'object') {
-            const fastItems: Partial<Record<Category, Product>> = { ...lockedItems };
-            for (const [slot, product] of Object.entries(fastData.products) as Array<[Category, Product]>) {
-              if (targetSlots.includes(slot) && isBuildReadySlotProduct(product, slot)) fastItems[slot] = product;
-            }
-            if (Object.keys(fastItems).length >= 3) {
-              replaceItems(fastItems);
-              setGeneratorLoading(false); // board is on screen — hide the full-board spinner
-              setAiRefining(true); // show the subtle "refining" badge until the AI look lands
-            }
+      // OPTIMISTIC: drop an instant deterministic fit onto the board first, then
+      // let the AI-styled look (Sonnet, ~15s) swap in below — so generation never
+      // blocks on a spinner. Applies to EVERY regenerate path (full / refresh /
+      // swipe / starter / missing). The base matches the main pass below so locks
+      // (and, for `missing`, the existing pieces) are honored.
+      try {
+        const fastBase: Partial<Record<Category, Product>> = mode === 'missing' ? { ...items } : { ...lockedItems };
+        const fastRes = await fetch('/api/look', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ ...lookBody, fast: true }),
+        });
+        const fastData = await fastRes.json();
+        if (fastRes.ok && fastData?.products && typeof fastData.products === 'object') {
+          const fastItems: Partial<Record<Category, Product>> = { ...fastBase };
+          for (const [slot, product] of Object.entries(fastData.products) as Array<[Category, Product]>) {
+            if (!targetSlots.includes(slot)) continue;
+            if (!isBuildReadySlotProduct(product, slot)) continue;
+            fastItems[slot] = product;
           }
-        } catch {
-          /* deterministic preview is best-effort — fall through to the blocking AI path */
+          if (Object.keys(fastItems).length >= 3) {
+            replaceItems(fastItems);
+            setGeneratorLoading(false); // board is on screen — hide the full-board spinner
+            setAiRefining(true); // show the "refining" badge until the AI look lands
+          }
         }
+      } catch {
+        /* deterministic preview is best-effort — fall through to the blocking AI path */
       }
 
       const lookResponse = await fetch('/api/look', {
