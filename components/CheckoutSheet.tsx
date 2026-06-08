@@ -118,6 +118,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="grid h-8 w-8 flex-none place-items-center rounded-full bg-surface-3 text-muted-2 transition hover:text-ink active:scale-90"
           >
             <X size={14} />

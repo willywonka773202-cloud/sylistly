@@ -406,7 +406,7 @@ export function SearchSheet({
               <div className="font-serif font-semibold text-lg">
                 Add <em className="italic text-accent">{CATEGORY_LABELS[currentCategory]}</em>
               </div>
-              <button onClick={onClose} className="w-7 h-7 rounded-full bg-surface-3 grid place-items-center">
+              <button onClick={onClose} aria-label="Close" className="w-7 h-7 rounded-full bg-surface-3 grid place-items-center">
                 <X size={14} className="text-muted-2" />
               </button>
             </div>

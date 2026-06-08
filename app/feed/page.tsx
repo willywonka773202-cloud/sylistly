@@ -898,7 +898,7 @@ export default function FitFeedPage() {
                 placeholder="Add a comment"
                 className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-ink outline-none focus:border-accent"
               />
-              <button onClick={() => submitComment()} className="grid h-11 w-11 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
+              <button onClick={() => submitComment()} aria-label="Send comment" className="grid h-11 w-11 place-items-center rounded-full bg-accent text-white shadow-pink-glow">
                 <Send size={15} />
               </button>
             </div>
