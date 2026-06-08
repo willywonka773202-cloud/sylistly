@@ -13,6 +13,7 @@ import { useSavedFits } from '@/store/saved-fits';
 import { useSocialFeed } from '@/store/social-feed';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
+  buildCatalogLook,
   collectOutfitProductIds,
   getClientCatalogProducts,
   getBrandOrMerchant,
@@ -814,18 +815,50 @@ function BuilderPageContent({
         },
       };
 
-      // Generate is INSTANT + deterministic by default (`fast: true`) so the
-      // builder never blocks on the ~17s Sonnet pass. AI styling is opt-in via
-      // the "Refine with AI" action (useAi), which runs the model and swaps the
-      // styled look in while the current board stays on screen.
-      const lookResponse = await fetch('/api/look', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...lookBody, fast: !useAi }),
-      });
-      const lookData = await lookResponse.json();
+      // Generate is INSTANT and $0 by default: compose the look CLIENT-SIDE from
+      // the bundled catalog — the exact same engine the feed uses — so there's
+      // no network round-trip and no API cost, with effectively infinite
+      // variety (seed + avoid-lists rotate the picks). AI styling is opt-in via
+      // the "Refine with AI" action (useAi), which calls the model server-side
+      // and swaps the styled look in while the current board stays on screen.
+      let lookData: {
+        products?: Partial<Record<Category, Product>>;
+        collection?: { label?: string } | null;
+        formula?: { id?: string } | null;
+        assistantMode?: string;
+        stylingNotes?: unknown;
+        palette?: unknown;
+      } | null = null;
 
-      if (lookResponse.ok && lookData.products && typeof lookData.products === 'object') {
+      if (useAi) {
+        const lookResponse = await fetch('/api/look', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(lookBody),
+        });
+        lookData = lookResponse.ok ? await lookResponse.json() : null;
+      } else {
+        lookData = buildCatalogLook({
+          vibe: vibeId,
+          frame: generatorFrame,
+          budget: generatorBudget,
+          customMaxCents: customBudgetCents,
+          mode,
+          seed: lookBody.seed,
+          avoidProductIds,
+          avoidComboSignatures: lookBody.avoidComboSignatures,
+          recentShoeIds: lookBody.recentShoeIds,
+          recentBrandCounts: lookBody.recentBrandCounts,
+          recentFormulaIds: lookBody.recentFormulaIds,
+          diversityStrength: 'high',
+          currentItems: items,
+          lockedItems,
+          targetSlots,
+          transparentOnly: true,
+        });
+      }
+
+      if (lookData && lookData.products && typeof lookData.products === 'object') {
         for (const [slot, product] of Object.entries(lookData.products) as Array<[Category, Product]>) {
           if (!targetSlots.includes(slot)) continue;
           if (avoidedGeneratedIds.has(product.id) && !lockedProductIds.has(product.id)) continue;
