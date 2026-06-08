@@ -32,8 +32,8 @@ const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
 const BUDGETS = ['low', 'mid', 'high', 'luxury'] as const;
 type ProfileArchiveTab = 'posted' | 'saved' | 'liked' | 'inspo';
 const PROFILE_ARCHIVE_TABS: Array<{ id: ProfileArchiveTab; label: string; empty: string }> = [
-  { id: 'posted', label: 'Posted', empty: 'Post from Builder to replace this inspo grid.' },
-  { id: 'saved', label: 'Saved', empty: 'Save looks from Feed, Builder, or Editor.' },
+  { id: 'posted', label: 'Posted', empty: 'Publish a saved fit (Saved tab → open a fit → Publish) to show it here.' },
+  { id: 'saved', label: 'Saved', empty: 'Save looks from Feed or Builder — they land in your Saved tab.' },
   { id: 'liked', label: 'Liked', empty: 'Like outfits in Feed or Builder to build this archive.' },
   { id: 'inspo', label: 'Inspo', empty: 'Catalog-backed outfit inspiration.' },
 ];
@@ -139,6 +139,7 @@ export default function ProfilePage() {
   const [activeArchiveTab, setActiveArchiveTab] = useState<ProfileArchiveTab>('posted');
   const [archiveImageReady, setArchiveImageReady] = useState(false);
   const [visibleArchiveCount, setVisibleArchiveCount] = useState(PROFILE_INITIAL_ARCHIVE_COUNT);
+  const [shareLabel, setShareLabel] = useState('Share profile');
 
   useEffect(() => setHasMounted(true), []);
   useEffect(() => {
@@ -457,12 +458,26 @@ export default function ProfilePage() {
             >
               Edit profile
             </a>
-            <Link
-              href="/feed"
+            <button
+              type="button"
+              onClick={async () => {
+                const url = `${window.location.origin}/profile`;
+                try {
+                  if (typeof navigator !== 'undefined' && navigator.share) {
+                    await navigator.share({ title: `@${displayHandle} on Sylistly`, text: 'My looks on Sylistly', url });
+                  } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    await navigator.clipboard.writeText(url);
+                    setShareLabel('Link copied!');
+                    window.setTimeout(() => setShareLabel('Share profile'), 1600);
+                  }
+                } catch {
+                  /* user dismissed the share sheet */
+                }
+              }}
               className="rounded-[16px] bg-accent px-4 py-3 text-center text-[15px] font-bold text-white shadow-pink-glow transition active:scale-[0.98]"
             >
-              Share profile
-            </Link>
+              {shareLabel}
+            </button>
           </div>
 
           <div className="mt-4 rounded-[24px] border border-accent/22 bg-[radial-gradient(circle_at_20%_0%,rgba(246,48,107,.24),transparent_44%),rgba(255,255,255,.045)] p-4 shadow-[0_20px_54px_rgba(0,0,0,.32)]">

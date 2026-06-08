@@ -107,11 +107,12 @@ function messageFromResponse(id: string, text: string, actions: StylistAction[])
   };
 }
 
-async function requestStylistResponse(prompt: string, context: StylistContext) {
+async function requestStylistResponse(prompt: string, context: StylistContext, signal?: AbortSignal) {
   const response = await fetch('/api/stylist', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: prompt, context }),
+    signal,
   });
   if (!response.ok) throw new Error(`Syli API failed with ${response.status}`);
   return (await response.json()) as ReturnType<typeof generateLocalStylistResponse>;
@@ -123,6 +124,8 @@ export default function StylistPage() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<StylistMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
+  const [isSlowRequest, setIsSlowRequest] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const [apiMode, setApiMode] = useState<'api' | 'local' | 'unknown'>('unknown');
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState('Syli recommendations');
@@ -191,8 +194,15 @@ export default function StylistPage() {
     ]);
     setInput('');
     setIsThinking(true);
+    setIsSlowRequest(false);
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const slowTimer = setTimeout(() => setIsSlowRequest(true), 3500);
+    const timeoutTimer = setTimeout(() => controller.abort(), 18_000);
+
     try {
-      const response = await requestStylistResponse(trimmed, context);
+      const response = await requestStylistResponse(trimmed, context, controller.signal);
       setMessages((current) => [
         ...current,
         {
@@ -201,20 +211,34 @@ export default function StylistPage() {
           recommendedProducts: response.recommendedProducts,
         },
       ]);
-    } catch {
+    } catch (error) {
+      // On timeout/cancel/error, fall back to the real local context — never a blank hang.
       const response = generateLocalStylistResponse(trimmed, context);
+      const note = error instanceof DOMException && error.name === 'AbortError'
+        ? ' (Syli was taking too long, so here’s a pick from your saved fits and closet.)'
+        : '';
       setMessages((current) => [
         ...current,
         {
-          ...messageFromResponse(`syli-${now}`, response.message, response.actions),
+          ...messageFromResponse(`syli-${now}`, `${response.message}${note}`, response.actions),
           mode: response.mode,
           recommendedProducts: response.recommendedProducts,
         },
       ]);
     } finally {
+      clearTimeout(slowTimer);
+      clearTimeout(timeoutTimer);
+      abortControllerRef.current = null;
       setIsThinking(false);
+      setIsSlowRequest(false);
     }
   }, [context, isThinking]);
+
+  const cancelRequest = useCallback(() => {
+    abortControllerRef.current?.abort();
+    setIsThinking(false);
+    setIsSlowRequest(false);
+  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -325,7 +349,7 @@ export default function StylistPage() {
           </span>
         </div>
         <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
-          Syli now calls the server stylist API. If a provider key is unavailable or times out, it falls back to the same real local context instead of inventing answers.
+          Syli uses AI to style you. If it&rsquo;s ever briefly unavailable, you&rsquo;ll still get suggestions from your saved fits and closet — never made-up picks.
         </p>
       </header>
 
@@ -448,7 +472,21 @@ export default function StylistPage() {
           {isThinking ? (
             <div className="syli-message flex justify-start">
               <div className="max-w-[88%] rounded-[24px] border border-accent/25 bg-accent/10 px-4 py-3 text-[12px] font-semibold text-accent shadow-[0_12px_28px_rgba(0,0,0,.22)]">
-                Syli is reading your current fit, closet, saved fits, and catalog context...
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+                  {isSlowRequest
+                    ? 'Syli is taking a little longer than usual…'
+                    : 'Syli is reading your current fit, closet, saved fits, and catalog context…'}
+                </div>
+                {isSlowRequest ? (
+                  <button
+                    type="button"
+                    onClick={cancelRequest}
+                    className="mt-2 rounded-full border border-accent/50 bg-accent/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-accent transition active:scale-95 hover:bg-accent/30"
+                  >
+                    Cancel
+                  </button>
+                ) : null}
               </div>
             </div>
           ) : null}

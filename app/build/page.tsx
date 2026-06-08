@@ -880,6 +880,9 @@ function BuilderPageContent({
           if (!targetSlots.includes(slot)) continue;
           if (avoidedGeneratedIds.has(product.id) && !lockedProductIds.has(product.id)) continue;
           if (!isBuildReadySlotProduct(product, slot)) continue;
+          // Final hard frame gate: nothing gender-mismatched ever reaches the board,
+          // regardless of which path (library / live compose / AI) produced it.
+          if (generatorFrame !== 'androgynous' && hasFrameMismatch(product, generatorFrame)) continue;
           nextItems[slot] = product;
           addedCount += 1;
         }
@@ -1071,7 +1074,7 @@ function BuilderPageContent({
     } catch {
       setStatusMessage(
         localFit
-          ? `Saved locally as "${localFit.title}". Cloud save is unavailable right now.`
+          ? `Saved "${localFit.title}" to this device. It'll sync to your account when you're back online.`
           : 'Could not save this fit right now.',
       );
     }
@@ -1262,6 +1265,7 @@ function BuilderPageContent({
       data-build-exact-linked-count={builderExactLinkedCount}
     >
       <header className="relative flex items-center justify-between px-4 pb-2.5 pt-10">
+        <h1 className="sr-only">Outfit Builder</h1>
         <button
           type="button"
           onClick={() => router.back()}
@@ -1300,7 +1304,7 @@ function BuilderPageContent({
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pb-56 pt-2">
+        <div className="flex flex-col gap-4 px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-2">
           <section className="flex flex-col gap-3">
             <div className="relative">
               {saveBurst ? (
@@ -1474,14 +1478,14 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('refine')}
-                className="rounded-full border border-hairline bg-surface-2 px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                className="rounded-full border border-hairline bg-surface-2 px-3 py-4 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Refine
               </button>
               <button
                 type="button"
                 onClick={() => setActiveBuildOverlay('details')}
-                className="rounded-full border border-hairline bg-surface-2 px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+                className="rounded-full border border-hairline bg-surface-2 px-3 py-4 text-[10px] font-black uppercase tracking-[.14em] text-muted-2 transition hover:border-accent/50 hover:text-ink active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
               >
                 Details
               </button>
@@ -1489,7 +1493,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={shopAll}
                 disabled={renderN === 0}
-                className="rounded-full bg-accent px-3 py-3 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none disabled:active:scale-100"
+                className="rounded-full bg-accent px-3 py-4 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none disabled:active:scale-100"
               >
                 Shop
               </button>

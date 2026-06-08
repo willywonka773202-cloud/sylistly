@@ -254,7 +254,7 @@ function postMatches(post: FeedPost, filter: string): boolean {
   if (filter === 'For You') return true;
   if (filter === 'Trending') return post.likeCount >= 250;
   if (filter === 'Following') return post.username !== '@you';
-  if (filter === 'Under $100') return post.totalCents / Math.max(1, post.itemCount) <= 10000;
+  if (filter === 'Under $100') return post.totalCents <= 10000;
   const needle = filter.toLowerCase().replace(' out', '');
   return [post.vibe, ...post.tags].some((tag) => tag.toLowerCase().includes(needle));
 }
@@ -560,9 +560,9 @@ export default function FitFeedPage() {
           <div className="pointer-events-auto rounded-[22px] border border-black/8 bg-white/88 px-3 py-2.5 shadow-[0_16px_38px_rgba(42,28,21,.16)] backdrop-blur-xl">
             <div className="text-center">
               <div className="text-[8px] font-black uppercase tracking-[.2em] text-[#8a766b]">Community</div>
-              <div className="font-serif text-[20px] font-semibold leading-none text-[#171118]">
+              <h1 className="font-serif text-[20px] font-semibold leading-none text-[#171118]">
                 Fit <em className="italic text-accent">feed</em>
-              </div>
+              </h1>
             </div>
             <div className="mt-2 flex justify-center">
               <div className="flex max-w-full justify-start gap-2 overflow-x-auto px-1 scrollbar-hide">
@@ -673,9 +673,9 @@ export default function FitFeedPage() {
                         like(post);
                       }}
                       aria-label="Like fit"
-                      className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/85 text-[#171118] shadow-[0_6px_16px_rgba(0,0,0,.18)] backdrop-blur-md transition active:scale-90 motion-safe:[@media(hover:hover)]:hover:scale-[1.08]"
+                      className="absolute right-1.5 top-1.5 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/85 text-[#171118] shadow-[0_6px_16px_rgba(0,0,0,.18)] backdrop-blur-md transition active:scale-90 motion-safe:[@media(hover:hover)]:hover:scale-[1.08]"
                     >
-                      <Heart size={15} fill={post.liked ? 'currentColor' : 'none'} className={post.liked ? 'text-accent' : ''} />
+                      <Heart size={18} fill={post.liked ? 'currentColor' : 'none'} className={post.liked ? 'text-accent' : ''} />
                     </button>
                     {linkStats.exactCount > 0 ? (
                       <span className="absolute bottom-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-[#171118]/82 px-2 py-1 text-[8px] font-bold uppercase tracking-[.12em] text-white backdrop-blur-md">
@@ -710,10 +710,22 @@ export default function FitFeedPage() {
             })}
           </div>
           <div ref={sentinelRef} className="grid min-h-[28dvh] place-items-center px-6 pb-28 pt-4 text-center">
-            <div>
-              <div className="font-serif text-[20px] text-[#171118]">{loadingMore ? 'Loading more fits…' : 'More fits are coming'}</div>
-              <p className="mt-2 text-[13px] text-[#8a766b]">New boards are on deck.</p>
-            </div>
+            {!hasMounted ? (
+              <div className="flex items-center gap-2 text-[14px] font-semibold text-[#8a766b]">
+                <LoaderCircle size={16} className="animate-spin" />
+                Loading your feed…
+              </div>
+            ) : renderedPosts.length === 0 ? (
+              <div>
+                <div className="font-serif text-[20px] text-[#171118]">No fits match this filter yet</div>
+                <p className="mt-2 text-[13px] text-[#8a766b]">Try another tab — fresh looks are always being styled.</p>
+              </div>
+            ) : (
+              <div>
+                <div className="font-serif text-[20px] text-[#171118]">{loadingMore ? 'Loading more fits…' : 'More fits are coming'}</div>
+                <p className="mt-2 text-[13px] text-[#8a766b]">New boards are on deck.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

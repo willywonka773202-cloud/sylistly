@@ -5,6 +5,7 @@ import {
   isMultiItemSetProduct,
   sortTransparentFeedRenderableProducts,
 } from '@/lib/product-image-quality';
+import { hasFrameMismatch } from '@/lib/frame-inference';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { getBudgetMaxCents, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 
@@ -502,6 +503,10 @@ function scoreProduct(product: Product, {
 }): number {
   if (category && product.category !== category) return -10_000;
   if (usedIds?.has(product.id) || avoidIds?.has(product.id)) return -9_000;
+  // HARD frame constraint: a gender-mismatched product (e.g. a skirt/heels for a
+  // masc frame) is REMOVED from the pool, not merely de-ranked — so menswear can
+  // never compose a women-only piece, and vice versa. Androgynous allows all.
+  if (frame !== 'all' && hasFrameMismatch(product, frame)) return -10_000;
 
   const text = productText(product);
   const maxCents = getBudgetMaxCents(budget, customMaxCents);

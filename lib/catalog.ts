@@ -2666,7 +2666,10 @@ export function getFullSlotInventory({
           && !hasExplicitOppositeFrameTerm(product, frame)
           && !genderMismatchReasons(product, frame).length,
         );
-    const usable = frameMatched.length >= 5 ? frameMatched : pool;
+    // HARD constraint: never fall back to the unfiltered pool — that's the leak
+    // that let women-only pieces into a masc fit. A thin/empty frame pool means
+    // the slot is simply left lighter, never gender-wrong.
+    const usable = frameMatched;
 
     const ordered = usable
       .map((product) => ({

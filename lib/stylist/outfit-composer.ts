@@ -163,7 +163,7 @@ const STYLIST_RUBRIC = [
   '• FORMALITY: keep the formality levels within ~1 point of each other. Never mix athletic pieces (formality 1-2: gym, sweats, running shoes) with tailored pieces (formality 4-5: blazers, trousers, heels).',
   '• SILHOUETTE: balance proportion — pair a relaxed/oversized top with a slimmer or structured bottom (and vice versa). Avoid baggy-on-baggy unless the vibe is explicitly oversized/street.',
   '• VIBE: every piece must read as the requested vibe. A "clean"/minimal look avoids loud graphics; "street" leans bolder; "office"/"preppy" stays polished. Because the lists are unfiltered, actively skip off-vibe items (e.g. no gym shorts in an office look) — pick the ones that fit.',
-  '• FRAME: respect the requested frame (masc/fem/androgynous) and keep proportions appropriate.',
+  "• FRAME: HARD CONSTRAINT. masc = menswear — NEVER pick women-only pieces (skirts, dresses, heels, sports bras, camisoles, halters, bodysuits, bralettes, earrings). fem = womenswear — NEVER pick men-only pieces (men's-cut suiting, boxers). androgynous = neutral + mixed is fine. The candidate lists are already frame-filtered; if you ever see an off-frame piece, skip it.",
   '• BUDGET: stay at or under budget across the whole outfit when possible; spend where it matters (shoes, outerwear).',
   '',
   'Fill EVERY slot that has a candidate list — the user explicitly chose to include these slots, so do not skip one (including hat, bag, eyewear, jewelry). For each, pick the single option that best completes the look; if a slot is genuinely hard, still choose the most on-palette, on-vibe piece available. One statement piece per outfit, maximum.',

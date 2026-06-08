@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
   const transparentOnly = Boolean(body.transparentOnly);
   const exactOnly = body.exactOnly !== undefined ? Boolean(body.exactOnly) : transparentOnly;
   const effectiveQuery = withFrameBias(query, category, frame);
-  const cacheKey = `${transparentOnly ? 'cutout' : 'real'}::${exactOnly ? 'exact' : 'linked'}::${frame}::${category || 'any'}::${query.trim().toLowerCase()}`;
+  const cacheKey = `${transparentOnly ? 'cutout' : 'real'}::${exactOnly ? 'exact' : 'linked'}::${frame}::${category || 'any'}::${explicitPriceMin ?? 'min-any'}::${explicitPriceMax ?? 'max-any'}::${query.trim().toLowerCase()}`;
   const liveSearchKey = process.env.SEARCHAPI_KEY || process.env.SERPAPI_KEY;
   const searchMode = getSearchMode();
   const catalogOnlyMode = searchMode === 'catalog-only';

@@ -953,7 +953,7 @@ function generateFeedBatch(existingPosts: FeedPost[], startCursor: number, count
       avoidComboSignatures: [
         ...Array.from(requiredSignatures),
         ...Array.from(fullSignatures),
-      ].slice(-80),
+      ].slice(-240),
       recentShoeIds: Array.from(shoeCounts.entries())
         .sort((left, right) => right[1] - left[1])
         .slice(0, 18)

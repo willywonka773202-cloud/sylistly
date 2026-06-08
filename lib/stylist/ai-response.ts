@@ -14,7 +14,7 @@ import type {
 const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-6';
 const DEFAULT_OLLAMA_MODEL = 'gpt-oss:120b';
 const DEFAULT_OLLAMA_BASE_URL = 'https://ollama.com/api';
-const STYLIST_TIMEOUT_MS = 8_000;
+const STYLIST_TIMEOUT_MS = 10_000;
 
 const VALID_INTENTS: StylistUserIntent[] = [
   'outfit_request',

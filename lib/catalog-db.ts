@@ -80,7 +80,7 @@ export async function searchDatabaseCatalog(
   const client = getSupabaseCatalogClient();
   if (!client) return [];
 
-  const cacheKey = `${intent.category}:${query.toLowerCase()}:${limit}`;
+  const cacheKey = `${intent.category}:${intent.priceMin ?? 'min-any'}:${intent.priceMax ?? 'max-any'}:${query.toLowerCase()}:${limit}`;
   const cached = dbCatalogCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.products;
   if (cached) dbCatalogCache.delete(cacheKey);

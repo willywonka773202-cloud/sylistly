@@ -22,7 +22,7 @@ import {
   Wand2,
   X,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { OutfitLookCard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
 import { getCheckoutUrlHost, isExactProductUrl } from '@/lib/checkout';
@@ -177,6 +177,41 @@ export function FitViewer({
   const heroOutboundUrl = hero ? getProductOutboundUrl(hero) : '';
   const heroExact = hero ? isExactProductUrl(heroOutboundUrl) : false;
 
+  const dialogRef = useRef<HTMLElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Accessible modal: Escape to close, Tab focus trap, and focus restore on close.
+  useEffect(() => {
+    previousFocusRef.current = (document.activeElement as HTMLElement) ?? null;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusables || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    dialogRef.current?.querySelector<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')?.focus();
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      previousFocusRef.current?.focus?.();
+    };
+  }, [onClose]);
+
   if (!post) return null;
   const viewerPost = post;
 
@@ -204,6 +239,9 @@ export function FitViewer({
   return (
     <div
       className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/72 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fit-viewer-title"
       data-fit-viewer
       data-fit-viewer-source={source}
       data-fit-viewer-product-count={products.length}
@@ -213,7 +251,7 @@ export function FitViewer({
       data-fit-viewer-link-quality={`${linkAudit.exactCount}/${linkAudit.linkedProducts.length}`}
     >
       <button className="absolute inset-0" aria-label="Close fit viewer" onClick={onClose} />
-      <section className="relative z-10 flex max-h-[calc(100dvh-18px)] w-full flex-col overflow-hidden rounded-t-[32px] border border-white/12 bg-[#100f0e] shadow-[0_-24px_70px_rgba(0,0,0,.58)]">
+      <section ref={dialogRef} className="relative z-10 flex max-h-[calc(100dvh-18px)] w-full flex-col overflow-hidden rounded-t-[32px] border border-white/12 bg-[#100f0e] shadow-[0_-24px_70px_rgba(0,0,0,.58)]">
         <div className="flex-none border-b border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(246,48,107,.18),transparent_36%),linear-gradient(180deg,#1a1513_0%,#100f0e_100%)] px-4 pb-3 pt-3">
           <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
           <div className="flex items-start justify-between gap-3">
@@ -222,7 +260,7 @@ export function FitViewer({
                 <Eye size={11} />
                 {source === 'profile' ? 'Profile viewer' : 'Fit viewer'}
               </div>
-              <h2 className="mt-1 line-clamp-2 font-serif text-[27px] font-semibold leading-[.96] text-ink">{post.title}</h2>
+              <h2 id="fit-viewer-title" className="mt-1 line-clamp-2 font-serif text-[27px] font-semibold leading-[.96] text-ink">{post.title}</h2>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <span className="rounded-full border border-accent/38 bg-accent/12 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-accent">
                   {post.formulaLabel || post.vibe}

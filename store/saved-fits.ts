@@ -11,12 +11,19 @@ export interface SavedFitRecord {
   totalCents: number;
   itemCount: number;
   items: Partial<Record<Category, Product>>;
+  /** Saved fits are PRIVATE by default (absent ⇒ private); only `public` fits appear on the public profile + feed. */
+  visibility?: 'private' | 'public';
+  /** Set once the fit is published to the profile + public feed. */
+  publishedPostId?: string;
+  publishedAt?: string;
 }
 
 interface SavedFitsState {
   fits: SavedFitRecord[];
   saveFit: (items: Partial<Record<Category, Product>>) => SavedFitRecord | null;
   removeFit: (id: string) => void;
+  /** Mark a saved fit as published, linking it to the feed/profile post it created. */
+  markPublished: (fitId: string, postId: string) => void;
 }
 
 function createTitle(items: Partial<Record<Category, Product>>, itemCount: number): string {
@@ -62,6 +69,7 @@ export const useSavedFits = create<SavedFitsState>()(
           totalCents,
           itemCount,
           items: selected,
+          visibility: 'private',
         };
 
         set((state) => ({ fits: [savedFit, ...state.fits].slice(0, 24) }));
@@ -69,6 +77,14 @@ export const useSavedFits = create<SavedFitsState>()(
       },
       removeFit: (id) =>
         set((state) => ({ fits: state.fits.filter((fit) => fit.id !== id) })),
+      markPublished: (fitId, postId) =>
+        set((state) => ({
+          fits: state.fits.map((fit) =>
+            fit.id === fitId
+              ? { ...fit, visibility: 'public', publishedPostId: postId, publishedAt: new Date().toISOString() }
+              : fit,
+          ),
+        })),
     }),
     {
       name: 'sylistly.saved-fits.v1',
