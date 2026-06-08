@@ -28,7 +28,7 @@
 - [x] Motion/a11y (round 2): consistent keyboard-only `:focus-visible` accent rings added globally. (Press states `sy-press` + hover `sy-lift` are already applied broadly across CTAs/cards from earlier work; full easing-token unification left as low-priority since it'd touch many files.)
 - [x] Typography rhythm (round 3): global `text-wrap: balance` on display headings (no orphan words) + `text-wrap: pretty` on body copy (no widows). Progressive enhancement.
 - [x] Empty-state polish (round 4): elevated the wardrobe `EmptyState` (radial glow, glowing icon ring, larger title, generous spacing) to match the "saved" gold standard. (saved/discover/checkout empties already strong from earlier work.)
-- [ ] Loading skeletons (shimmer) for feed + profile while data hydrates, instead of blank/spinner flashes.
+- [~] Loading skeletons (shimmer) for feed + profile — DEFERRED for owner review: needs wiring into feed/profile render logic (more involved than pure CSS, riskier to do unattended). Good next feature.
 - [ ] Bottom-nav active-state refinement: subtle active pill/indicator + smoother icon transitions.
 - [ ] Feed polish: story-ring spacing/labels, reaction-button rhythm, the "WHY" pill, formula chip styling.
 - [ ] Discover polish: rail heading rhythm, card press states, context chips.
@@ -38,10 +38,14 @@
 - [ ] Accessibility/focus pass: visible focus rings, aria-labels on icon buttons, prefers-reduced-motion coverage.
 - [ ] Dead-code cleanup: remove the now-unused studio/silhouette mannequin presentation components + constants (bundle trim) — verify nothing imports them first.
 - [ ] Color/contrast consistency: audit text-on-bg contrast; tune any low-contrast muted text.
-- [ ] 404 / error boundary visual polish.
+- [x] 404 / error boundary visual polish (round 5): editorial radial accent glow + larger serif title on both `not-found.tsx` and `error.tsx`.
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 5 — 04:17 CDT — 404 / error boundary polish
+- `app/not-found.tsx` + `app/error.tsx`: radial accent-glow background + relative content wrappers + larger serif title (34px) — consistent with onboarding/empty states. Deferred the loading-skeleton item (needs render-logic wiring, riskier unattended) for owner review.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200; a bogus route correctly 404s.
 
 ### Round 4 — 03:43 CDT — Wardrobe empty-state polish
 - `app/wardrobe/page.tsx` EmptyState: radial accent-glow bg, glowing/ringed icon (h-14), larger serif title (21px), centered max-w body, more padding (p-7) + rhythm. Matches the saved-tab gold standard.
