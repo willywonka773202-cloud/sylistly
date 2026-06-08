@@ -118,9 +118,16 @@ p {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Active-tab underline draws in from center instead of popping. */
+@keyframes sy-underline-in {
+  from { opacity: 0; transform: scaleX(.3); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
 @layer utilities {
   .sy-route-enter { animation: sy-route-in 200ms ease both; }
   .sy-piece-in { animation: sy-piece-in 440ms cubic-bezier(.2, .8, .2, 1) both; }
+  .sy-underline-in { animation: sy-underline-in 240ms cubic-bezier(.2, .8, .2, 1) both; transform-origin: center; }
   .sy-enter { animation: sy-rise-in 280ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-sheet-enter { animation: sy-sheet-up 260ms cubic-bezier(.2, .8, .2, 1) both; }
   .sy-fit-float { animation: sy-fit-float 5.8s ease-in-out infinite both; will-change: transform, filter; }
@@ -228,6 +235,7 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .sy-route-enter,
   .sy-piece-in,
+  .sy-underline-in,
   .sy-enter,
   .sy-sheet-enter,
   .sy-fit-float,

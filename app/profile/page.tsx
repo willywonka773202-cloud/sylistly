@@ -495,7 +495,7 @@ export default function ProfilePage() {
                 >
                   {tab.label}
                   {activeArchiveTab === tab.id ? (
-                    <span className="absolute inset-x-5 bottom-0 h-[3px] rounded-full bg-accent shadow-pink-glow" />
+                    <span className="sy-underline-in absolute inset-x-5 bottom-0 h-[3px] rounded-full bg-accent shadow-pink-glow" />
                   ) : null}
                 </button>
               ))}
