@@ -6,7 +6,7 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-08T14:40:00-05:00
-- **Next:** Launch BLOCKERS are fixed + deployed (see latest log). Remaining is the product-direction PHASE 2 (enhancements, not blockers): TikTok-style /swipe route, public profile route /u/[handle] (+ enforce published-only public view), mixed feed card types + trending hero + captions/avatars, Home dashboard polish, perf (lazy-load data/outfit-library.json on /build, defer social-feed module-load generation, skeletons over null loading states), PWA PNG/maskable icons, dead studio-presentation code removal. Codex: re-check the blocker fixes before treating as launch-ready.
+- **Next:** Launch BLOCKERS fixed + deployed; TikTok /swipe mode shipped. Remaining PHASE 2: public profile route /u/[handle] (+ enforce published-only public view), mixed feed card types + trending hero + captions/avatars, Home dashboard polish, perf (lazy-load data/outfit-library.json on /build, defer social-feed module-load generation, skeletons over null loading states), PWA PNG/maskable icons, dead studio-presentation code removal. Codex: re-check the blocker fixes before treating as launch-ready.
 
 ---
 
