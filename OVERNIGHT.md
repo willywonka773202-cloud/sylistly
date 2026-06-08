@@ -34,7 +34,7 @@
 - [x] Discover polish (round 8): added a soft horizontal edge-fade to the product rails (cards melt into the gutter / "more to scroll" cue). Heading rhythm, card press states (hover-lift + accent shadow + active scale), and context chips were already strong from earlier work.
 - [x] Checkout/shop flow visual polish (round 9): consistent tactile press feedback (`active:scale`) on all checkout-sheet buttons + a hover pink-glow on the two primary CTAs. Retailer cards + exact/refresh badges were already well-styled.
 - [x] Profile/closet/wardrobe visual polish (round 10): profile archive tab underline now draws in smoothly (sy-underline-in) instead of popping. Wardrobe empty-state was elevated in round 4; profile header/stats/story-rings were already strong.
-- [ ] Onboarding micro-polish (entrance stagger, copy, button feel).
+- [x] Onboarding micro-polish (round 11): welcome step now has a staggered entrance (icon → eyebrow → headline → copy → buttons cascade in) via a new reusable `.sy-stagger` utility. Copy + button feel (sy-cta-primary) were already strong.
 - [ ] Accessibility/focus pass: visible focus rings, aria-labels on icon buttons, prefers-reduced-motion coverage.
 - [ ] Dead-code cleanup: remove the now-unused studio/silhouette mannequin presentation components + constants (bundle trim) — verify nothing imports them first.
 - [ ] Color/contrast consistency: audit text-on-bg contrast; tune any low-contrast muted text.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 11 — 07:43 CDT — Onboarding staggered entrance
+- `app/globals.css`: new reusable `.sy-stagger` utility — direct children rise in (`sy-rise-in`) with incremental nth-child delays (60→410ms); reduced-motion covered. `components/Onboarding.tsx`: wrapped step 0's headline group (icon/eyebrow/headline/copy) and button group in `.sy-stagger` so they cascade in instead of the whole block fading at once. Verified the flex-1 spacers still center the content identically (wrappers are flex:0, so layout is unchanged). CSS + JSX-wrapping only.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 10 — 07:09 CDT — Profile tab underline draw-in
 - `app/globals.css`: new `sy-underline-in` keyframe (scaleX .3→1 from center + fade) + utility + reduced-motion coverage. `app/profile/page.tsx`: applied it to the active archive-tab underline so switching tabs draws the accent indicator in smoothly instead of popping. The span remounts on tab change, so the animation replays each switch — a subtle confirmation of the selection. CSS only.
