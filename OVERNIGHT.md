@@ -27,7 +27,7 @@
 - [x] Make AI visible (builder): "Styled by Syli ✨" board badge + "AI-styled" chip on Syli's take. (round 1) — feed-card AI labeling still open.
 - [x] Motion/a11y (round 2): consistent keyboard-only `:focus-visible` accent rings added globally. (Press states `sy-press` + hover `sy-lift` are already applied broadly across CTAs/cards from earlier work; full easing-token unification left as low-priority since it'd touch many files.)
 - [x] Typography rhythm (round 3): global `text-wrap: balance` on display headings (no orphan words) + `text-wrap: pretty` on body copy (no widows). Progressive enhancement.
-- [ ] Empty-state polish across screens (saved is the gold standard) — make feed/closet/discover/checkout empties equally inviting.
+- [x] Empty-state polish (round 4): elevated the wardrobe `EmptyState` (radial glow, glowing icon ring, larger title, generous spacing) to match the "saved" gold standard. (saved/discover/checkout empties already strong from earlier work.)
 - [ ] Loading skeletons (shimmer) for feed + profile while data hydrates, instead of blank/spinner flashes.
 - [ ] Bottom-nav active-state refinement: subtle active pill/indicator + smoother icon transitions.
 - [ ] Feed polish: story-ring spacing/labels, reaction-button rhythm, the "WHY" pill, formula chip styling.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 4 — 03:43 CDT — Wardrobe empty-state polish
+- `app/wardrobe/page.tsx` EmptyState: radial accent-glow bg, glowing/ringed icon (h-14), larger serif title (21px), centered max-w body, more padding (p-7) + rhythm. Matches the saved-tab gold standard.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build, /wardrobe all 200.
 
 ### Round 3 — 03:09 CDT — Typography line-breaking
 - `app/globals.css`: `text-wrap: balance` on h1-h4 + `.font-serif` (balanced display headings, no lone last-line word) and `text-wrap: pretty` on `p` (avoid widows/orphans).
