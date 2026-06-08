@@ -24,7 +24,7 @@
 - Keep prod healthy: if a post-deploy curl is not 200, investigate/roll back before continuing.
 
 ## Backlog (work top-down; check off when shipped)
-- [ ] Make AI visible: a clean "Styled by Syli ✨" badge on AI-styled fits (builder + feed cards), and surface the styling note more prominently.
+- [x] Make AI visible (builder): "Styled by Syli ✨" board badge + "AI-styled" chip on Syli's take. (round 1) — feed-card AI labeling still open.
 - [ ] Global motion consistency: unify easing/durations into shared tokens; ensure every CTA has a press state (`sy-press`) and every card a consistent hover lift.
 - [ ] Typography rhythm pass: consistent heading scale, line-heights, letter-spacing across screens; fix any cramped/loose spots.
 - [ ] Empty-state polish across screens (saved is the gold standard) — make feed/closet/discover/checkout empties equally inviting.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 1 — 01:58 CDT — Make AI visible (builder)
+- `app/build/page.tsx`: subtle "✨ Styled by Syli" badge on the board for AI-styled fits (top-left, shows when stylingNote present & not loading/refining) + an "AI-styled" chip on the "Syli's take" card header.
+- verify: tsc clean, `npm run build` exit 0. Deployed (deploy exit 0). Prod /, /build, /feed all 200.
 
 ## Morning summary (filled at the end)
 <!-- final round writes a tight summary of everything shipped overnight + anything needing review -->
