@@ -26,7 +26,7 @@ export default {
         champagne:   '#E7C79B',
         'champagne-soft':'rgba(231,199,155,.12)',
         ink:         '#FBF7F2',
-        muted:       'rgba(251,247,242,.46)',
+        muted:       'rgba(251,247,242,.55)',
         'muted-2':   'rgba(251,247,242,.68)',
         hairline:    'rgba(251,247,242,.08)',
         'hairline-2':'rgba(251,247,242,.15)',
