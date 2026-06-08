@@ -88,12 +88,15 @@ function inferGender(p) {
   if (womens && mens) return 'neutral';           // unisex sizing ("Mens 5.5 / Womens 7")
   // female-specific garments — strip "dress shirt/pant/shoe" so they don't read as a dress
   const s = raw.replace(/dress\s+(shirt|pant|pants|shoe|shoes|trouser|trousers|sock|socks|code)/g, 'x');
-  const femGarment = /\bskirt\b|\bblouse\b|\bcami\b|bodysuit|\bhalter\b|\bromper\b|jumpsuit|\bcorset\b|bustier|\bmidi\b|\bmaxi\b|slingback|ballet flat|\bpumps?\b|stiletto|\bdress(es)?\b/.test(s);
+  // Women-leaning brands (overwhelmingly womenswear in this catalog).
+  const femBrand = /\balo yoga\b|set active|reformation|\bganni\b|free people|\bvarley\b|beyond yoga|girlfriend collective|outdoor voices|good american|\bspanx\b|princess polly|white fox|\bmeshki\b|oh polly|house of cb|cult gaia|\bstaud\b|edikted|\bskims\b|aritzia|babaton|wilfred/.test(raw);
+  // Women-coded garments + lines (mirrors lib/frame-inference FEM_ONLY_TERMS).
+  const femGarment = /\bskirt\b|\bskort\b|\bblouse\b|\bcami\b|camisole|bodysuit|\bhalter\b|bandeau|\bcorset\b|bustier|\bromper\b|playsuit|catsuit|jumpsuit|\bmidi\b|\bmaxi\b|\bdress(es)?\b|crop top|cropped top|cropped polo|cropped tee|cropped cami|cropped tank|tube top|tube dress|scoop neck|scoop tank|square neck|sweetheart|off.?shoulder|one.?shoulder|wrap top|wrap dress|peplum|ruched|smocked|milkmaid|sports bra|bralette|bra top|align tank|aspire tank|\blegging|jegging|airbrush|airlift|alosoft|biker short|micro short|booty short|slingback|ballet flat|ballerina flat|kitten heel|\bmule\b|mary jane|stiletto|\bpumps?\b|\bheels?\b/.test(s);
   // catalog jewelry skews feminine (earrings, dainty/delicate rings) — keep it out of male fits
   const femJewelry = p.category === 'jewelry'
     && /earring|dainty|delicate|birthstone|\bcharm|pearl|dewdrop|moonstone|stacking|huggie|\bstud|solitaire|ombre/.test(raw);
   const tag = (p.gender || [])[0];
-  if (womens || femGarment || femJewelry || tag === 'fem') return 'female';
+  if (womens || femBrand || femGarment || femJewelry || tag === 'fem') return 'female';
   if (mens || tag === 'masc') return 'male';
   return 'neutral';
 }

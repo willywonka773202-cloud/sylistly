@@ -16,18 +16,20 @@ const cat = JSON.parse(readFileSync(join(ROOT, 'data/client-catalog.json'), 'utf
 const arr = Array.isArray(cat) ? cat : cat.products || Object.values(cat)[0];
 const byId = new Map(arr.map((p) => [p.id, p]));
 
+// INDEPENDENT comprehensive detector — intentionally broader than the generator's
+// classifier so it catches anything that slips through (the whole point of a test).
+const WOMEN = /\bwomen'?s?\b|\bwmns\b|\bladies\b|\bgirls?\b|\bskirt\b|\bskort\b|\bblouse\b|\bcami\b|camisole|bodysuit|\bhalter\b|bandeau|\bcorset\b|bustier|\bromper\b|playsuit|catsuit|\bmidi\b|\bmaxi\b|\bdress(es)?\b|crop top|cropped top|cropped polo|cropped tee|cropped cami|cropped tank|tube top|tube dress|scoop neck|scoop tank|square neck|sweetheart|off.?shoulder|one.?shoulder|wrap top|wrap dress|peplum|ruched|smocked|milkmaid|sports bra|bralette|bra top|align tank|aspire tank|\blegging|jegging|airbrush|airlift|alosoft|biker short|micro short|booty short|slingback|ballet flat|ballerina flat|kitten heel|\bmule\b|mary jane|stiletto|\bpumps?\b|\bheels?\b|\balo yoga\b|set active|reformation|\bganni\b|free people|\bvarley\b|beyond yoga|girlfriend collective|outdoor voices|good american|\bspanx\b|princess polly|white fox|\bmeshki\b|oh polly|house of cb|cult gaia|\bstaud\b|edikted|\bskims\b|aritzia|babaton|wilfred/;
+const MEN = /\bmen'?s?\b|\bmens\b|\bboys?\b|\bboxer|necktie|tuxedo/;
+
 function inferGender(p) {
   const raw = `${p.brand || ''} ${p.name || ''}`.toLowerCase();
-  const womens = /\bwomen'?s?\b|\bwmns\b|\bwomens\b|\bladies\b|\bgirls?\b/.test(raw);
-  const mens = /\bmen'?s?\b|\bmens\b|\bboys?\b/.test(raw);
-  if (womens && mens) return 'neutral';
   const s = raw.replace(/dress\s+(shirt|pant|pants|shoe|shoes|trouser|trousers|sock|socks|code)/g, 'x');
-  const femGarment = /\bskirt\b|\bblouse\b|\bcami\b|bodysuit|\bhalter\b|\bromper\b|jumpsuit|\bcorset\b|bustier|\bmidi\b|\bmaxi\b|slingback|ballet flat|\bpumps?\b|stiletto|\bdress(es)?\b/.test(s);
-  const femJewelry = p.category === 'jewelry'
-    && /earring|dainty|delicate|birthstone|\bcharm|pearl|dewdrop|moonstone|stacking|huggie|\bstud|solitaire|ombre/.test(raw);
+  const w = WOMEN.test(s);
+  const m = MEN.test(s);
+  if (w && m) return 'neutral';
   const tag = (p.gender || [])[0];
-  if (womens || femGarment || femJewelry || tag === 'fem') return 'female';
-  if (mens || tag === 'masc') return 'male';
+  if (w || tag === 'fem') return 'female';
+  if (m || tag === 'masc') return 'male';
   return 'neutral';
 }
 

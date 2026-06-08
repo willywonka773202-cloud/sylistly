@@ -4,12 +4,28 @@ import type { GeneratorFrame } from './vibes';
 export type FrameTag = 'masc' | 'fem' | 'androgynous';
 
 const FEM_ONLY_TERMS = [
+  // explicit
   'women', 'womens', 'wmns', 'woman', 'ladies', 'lady', 'girl', 'girls',
-  'mini dress', 'slip dress', 'bodycon dress', 'mini skirt', 'pleated skirt', 'skirt', 'heels', 'heel', 'pumps', 'pump',
-  'sports bra', 'bralette', 'bra ', 'crop top', 'cropped top', 'cropped cami', 'cami tank',
-  'cami', 'camisole', 'scoop bra', 'micro scoop bra', 'deep plunge', 'plunge top',
-  'halter', 'bandeau', 'align tank', 'baby tee', 'tube top', 'bodysuit', 'corset',
-  'ditsy floral', 'skims', 'aritzia', 'babaton', 'wilfred',
+  // dresses / skirts
+  'mini dress', 'slip dress', 'bodycon dress', 'wrap dress', 'maxi dress', 'midi dress',
+  'mini skirt', 'pleated skirt', 'maxi skirt', 'midi skirt', 'skort', 'skirt',
+  // tops (women-coded)
+  'crop top', 'cropped top', 'cropped cami', 'cropped polo', 'cropped tee', 'cropped', 'crop ',
+  'cami tank', 'cami', 'camisole', 'tube top', 'tube dress', 'bandeau', 'halter', 'corset', 'bustier',
+  'bodysuit', 'scoop tank', 'scoop neck', 'square neck', 'sweetheart', 'off shoulder', 'one shoulder',
+  'wrap top', 'peplum', 'ruched', 'smocked', 'milkmaid', 'baby tee', 'deep plunge', 'plunge top',
+  // lingerie / activewear (women)
+  'sports bra', 'bralette', 'bra top', 'scoop bra', 'micro scoop bra', 'align tank', 'aspire tank',
+  'legging', 'leggings', 'jegging', 'airbrush', 'airlift', 'alosoft', 'biker short', 'micro short', 'booty short',
+  // shoes (women)
+  'heels', 'heel', 'pumps', 'pump', 'slingback', 'stiletto', 'mule', 'mary jane', 'ballet flat', 'ballerina flat', 'kitten heel', 'espadrille wedge',
+  // one-pieces
+  'romper', 'playsuit', 'catsuit',
+  // women-leaning brands / lines
+  'ditsy floral', 'skims', 'aritzia', 'babaton', 'wilfred', 'alo yoga', 'set active', 'reformation',
+  'ganni', 'free people', 'varley', 'beyond yoga', 'girlfriend collective', 'outdoor voices',
+  'good american', 'spanx', 'princess polly', 'white fox', 'meshki', 'oh polly', 'house of cb',
+  'cult gaia', 'staud', 'edikted',
 ];
 
 const MASC_ONLY_TERMS = [
@@ -109,7 +125,8 @@ export function genderMismatchReasons(product: Product, requestedFrame: Generato
 
   if (requestedFrame === 'masc') {
     if (tags.includes('fem') && !tags.includes('androgynous') && !tags.includes('masc')) reasons.push('fem-only tag');
-    if (hasAny(haystack, ['women', 'womens', 'wmns', 'ladies', 'mini dress', 'slip dress', 'skirt', 'sports bra', 'bralette', 'bodysuit', 'heels', 'pumps', 'baby tee', 'crop top', 'cropped top', 'cami', 'camisole', 'cami tank', 'align tank', 'cropped cami', 'tube top', 'deep plunge', 'plunge top', 'halter', 'bandeau', 'scoop bra', 'ditsy floral', 'skims', 'aritzia', 'babaton', 'wilfred'])) {
+    // Single comprehensive women's signal set (brands + garment terms) — shared with inferProductGender.
+    if (hasAny(haystack, FEM_ONLY_TERMS)) {
       reasons.push('obvious fem keyword');
     }
   }
