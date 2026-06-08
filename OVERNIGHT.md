@@ -35,13 +35,17 @@
 - [x] Checkout/shop flow visual polish (round 9): consistent tactile press feedback (`active:scale`) on all checkout-sheet buttons + a hover pink-glow on the two primary CTAs. Retailer cards + exact/refresh badges were already well-styled.
 - [x] Profile/closet/wardrobe visual polish (round 10): profile archive tab underline now draws in smoothly (sy-underline-in) instead of popping. Wardrobe empty-state was elevated in round 4; profile header/stats/story-rings were already strong.
 - [x] Onboarding micro-polish (round 11): welcome step now has a staggered entrance (icon → eyebrow → headline → copy → buttons cascade in) via a new reusable `.sy-stagger` utility. Copy + button feel (sy-cta-primary) were already strong.
-- [ ] Accessibility/focus pass: visible focus rings, aria-labels on icon buttons, prefers-reduced-motion coverage.
+- [x] Accessibility pass (round 12): audited every button in app/ + components/ for icon-only controls lacking an accessible name. Found the app already well-labeled; closed the only 3 real gaps (feed comment-send + CheckoutSheet/SearchSheet close X). Focus rings (round 2) and reduced-motion (ongoing, all new keyframes covered) were already in place.
 - [ ] Dead-code cleanup: remove the now-unused studio/silhouette mannequin presentation components + constants (bundle trim) — verify nothing imports them first.
 - [ ] Color/contrast consistency: audit text-on-bg contrast; tune any low-contrast muted text.
 - [x] 404 / error boundary visual polish (round 5): editorial radial accent glow + larger serif title on both `not-found.tsx` and `error.tsx`.
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 12 — 08:18 CDT — Accessibility: icon-button names
+- Ran a comprehensive audit (Node script over every `<button>` in app/ + components/) for icon-only buttons missing an accessible name. The app was already strong (feed 19/20, FitViewer/discover/saved/build all use icon+text labels). Closed the only 3 genuine gaps: `app/feed/page.tsx` comment-composer Send button (`aria-label="Send comment"`), and the close (X) buttons in `components/CheckoutSheet.tsx` + `components/SearchSheet.tsx` (`aria-label="Close"`). Screen-reader-only change — no visual or logic impact.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 11 — 07:43 CDT — Onboarding staggered entrance
 - `app/globals.css`: new reusable `.sy-stagger` utility — direct children rise in (`sy-rise-in`) with incremental nth-child delays (60→410ms); reduced-motion covered. `components/Onboarding.tsx`: wrapped step 0's headline group (icon/eyebrow/headline/copy) and button group in `.sy-stagger` so they cascade in instead of the whole block fading at once. Verified the flex-1 spacers still center the content identically (wrappers are flex:0, so layout is unchanged). CSS + JSX-wrapping only.
