@@ -33,17 +33,18 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error, chunkError]);
 
   return (
-    <main className="mx-auto flex min-h-[100dvh] max-w-[480px] flex-col items-center justify-center gap-6 bg-bg px-8 text-center">
-      <div>
+    <main className="relative mx-auto flex min-h-[100dvh] max-w-[480px] flex-col items-center justify-center gap-6 overflow-hidden bg-bg px-8 text-center">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,59,99,.18),transparent_46%)]" />
+      <div className="relative">
         <div className="sy-eyebrow">Something slipped</div>
-        <h1 className="mt-2 font-serif text-[32px] font-semibold leading-tight text-ink">
+        <h1 className="mt-2 font-serif text-[34px] font-semibold leading-tight text-ink">
           That look didn&rsquo;t load.
         </h1>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-2">
           A hiccup on our end — your saved fits and closet are safe. Give it another try.
         </p>
       </div>
-      <div className="flex w-full max-w-[260px] flex-col gap-2.5">
+      <div className="relative flex w-full max-w-[260px] flex-col gap-2.5">
         <button
           type="button"
           onClick={() => (chunkError && typeof window !== 'undefined' ? window.location.reload() : reset())}
