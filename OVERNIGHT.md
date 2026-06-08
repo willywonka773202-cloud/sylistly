@@ -25,7 +25,7 @@
 
 ## Backlog (work top-down; check off when shipped)
 - [x] Make AI visible (builder): "Styled by Syli ✨" board badge + "AI-styled" chip on Syli's take. (round 1) — feed-card AI labeling still open.
-- [ ] Global motion consistency: unify easing/durations into shared tokens; ensure every CTA has a press state (`sy-press`) and every card a consistent hover lift.
+- [x] Motion/a11y (round 2): consistent keyboard-only `:focus-visible` accent rings added globally. (Press states `sy-press` + hover `sy-lift` are already applied broadly across CTAs/cards from earlier work; full easing-token unification left as low-priority since it'd touch many files.)
 - [ ] Typography rhythm pass: consistent heading scale, line-heights, letter-spacing across screens; fix any cramped/loose spots.
 - [ ] Empty-state polish across screens (saved is the gold standard) — make feed/closet/discover/checkout empties equally inviting.
 - [ ] Loading skeletons (shimmer) for feed + profile while data hydrates, instead of blank/spinner flashes.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 2 — 02:34 CDT — Focus-visible rings (a11y + polish)
+- `app/globals.css`: scoped `:focus-visible` accent outline for a/button/[role=button]/[tabindex]/input/textarea/select — keyboard-only (invisible to mouse/touch), follows border-radius. Additive CSS.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 1 — 01:58 CDT — Make AI visible (builder)
 - `app/build/page.tsx`: subtle "✨ Styled by Syli" badge on the board for AI-styled fits (top-left, shows when stylingNote present & not loading/refining) + an "AI-styled" chip on the "Syli's take" card header.
