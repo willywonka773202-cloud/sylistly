@@ -60,9 +60,11 @@ const OUTPUT_PATH = path.resolve(process.cwd(), 'data/generated-catalog.json');
 const PHOTO_CATALOG_PATH = path.resolve(process.cwd(), 'data/photo-catalog.json');
 const SEARCHAPI_ENDPOINT = 'https://www.searchapi.io/api/v1/search';
 const SEARCH_SCOPE = process.env.SEARCH_SCOPE || 'missing-vibes';
-const DEFAULT_MAX_SEARCHES = SEARCH_SCOPE === 'all' ? '40' : '16';
+const DEFAULT_MAX_SEARCHES = SEARCH_SCOPE === 'all' ? '40' : SEARCH_SCOPE === 'gaps' ? '50' : '16';
 const MAX_SEARCHES = Number.parseInt(process.env.MAX_SEARCHES || DEFAULT_MAX_SEARCHES, 10);
-const RESULTS_PER_QUERY = Number.parseInt(process.env.RESULTS_PER_QUERY || '8', 10);
+// Extract more candidates per search (SerpApi returns ~60 shopping results per
+// query) so each paid search goes further. ~36 keeps the high-relevance results.
+const RESULTS_PER_QUERY = Number.parseInt(process.env.RESULTS_PER_QUERY || '36', 10);
 const DRY_RUN = process.env.DRY_RUN === '1';
 const DEBUG_SEARCHAPI = process.env.DEBUG_SEARCHAPI === '1' || process.argv.includes('--debug');
 
@@ -155,7 +157,73 @@ const TARGETED_MISSING_VIBE_PLAN: SearchPlanItem[] = [
   { id: 116, query: 'women preppy outfit cardigan pleated skirt loafers headband', targetVibes: ['preppy', 'business casual', 'office'], targetOccasions: ['office', 'everyday'], targetCategories: ['outer', 'bottom', 'shoes', 'hat'], targetGender: ['fem'] },
 ];
 
-const ACTIVE_SEARCH_PLAN = SEARCH_SCOPE === 'all' ? SEARCH_PLAN : TARGETED_MISSING_VIBE_PLAN;
+// ── GAP plan (SEARCH_SCOPE=gaps) ──────────────────────────────────
+// Targets the holes the live app exposed, with brand-specific queries (brand
+// product pages have clean white-background shots → best rembg cutout yield).
+// Heavily weighted to MEN'S (the catalog skews women's once gendered) + the
+// thinnest slots (eyewear:16, men's gym, men's dressy shoes, non-Telfar bags).
+// targetGender drives how new products are tagged, so men's queries → masc.
+const GAP_PLAN: SearchPlanItem[] = [
+  // ── Men's gym / athletic (the worst gap — athletic bottoms/tops/trainers) ──
+  { id: 201, query: 'mens gym training shorts 7 inch lined Nike Adidas Lululemon black grey navy', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  { id: 202, query: 'mens athletic joggers tapered sweatpants training Nike Adidas Vuori black grey', targetVibes: ['gym', 'athletic', 'casual'], targetOccasions: ['workout', 'everyday'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  { id: 203, query: 'mens running training shoes Nike Pegasus Adidas Ultraboost ASICS Gel Hoka black white', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['shoes'], targetGender: ['masc', 'androgynous'] },
+  { id: 204, query: 'mens dri-fit training t-shirt performance tee gym Nike Adidas Under Armour black grey', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['top'], targetGender: ['masc'] },
+  { id: 205, query: 'mens gym tank top stringer muscle workout black grey white', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['top'], targetGender: ['masc'] },
+  { id: 206, query: 'mens tech fleece performance hoodie gym training Nike Adidas black grey', targetVibes: ['gym', 'athletic', 'casual'], targetOccasions: ['workout', 'everyday'], targetCategories: ['top', 'outer'], targetGender: ['masc'] },
+  { id: 207, query: 'mens running shorts split 5 inch lightweight Nike Adidas black', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  { id: 208, query: 'mens gym cap duffel bag water resistant black training accessories', targetVibes: ['gym', 'athletic'], targetOccasions: ['workout'], targetCategories: ['hat', 'bag'], targetGender: ['masc', 'androgynous'] },
+  // ── Men's dressy night/date shoes (night masc shoes were ~5) ──
+  { id: 211, query: 'mens leather penny loafers horsebit black brown dress shoe', targetVibes: ['night', 'date', 'office', 'old money'], targetOccasions: ['night out', 'date', 'office'], targetCategories: ['shoes'], targetGender: ['masc'] },
+  { id: 212, query: 'mens chelsea boots leather suede black brown', targetVibes: ['night', 'edgy', 'office', 'date'], targetOccasions: ['night out', 'office'], targetCategories: ['shoes'], targetGender: ['masc'] },
+  { id: 213, query: 'mens derby oxford dress shoes black brown leather', targetVibes: ['office', 'night', 'date', 'old money'], targetOccasions: ['office', 'night out'], targetCategories: ['shoes'], targetGender: ['masc'] },
+  { id: 214, query: 'mens minimalist leather sneakers white Common Projects Koio Oliver Cabell', targetVibes: ['clean', 'date', 'office', 'night'], targetOccasions: ['everyday', 'date'], targetCategories: ['shoes'], targetGender: ['masc', 'androgynous'] },
+  // ── Eyewear (only 16 total — biggest accessory gap, both genders) ──
+  { id: 221, query: 'mens sunglasses Ray-Ban Oakley rectangular black matte fashion', targetVibes: ['clean', 'streetwear', 'night'], targetOccasions: ['everyday'], targetCategories: ['eyewear'], targetGender: ['masc', 'androgynous'] },
+  { id: 222, query: 'womens sunglasses oversized cat eye black brown tortoise fashion', targetVibes: ['clean', 'date', 'night', 'summer'], targetOccasions: ['everyday', 'date'], targetCategories: ['eyewear'], targetGender: ['fem'] },
+  { id: 223, query: 'sunglasses round metal aviator gold silver black unisex fashion', targetVibes: ['clean', 'streetwear', 'vacation'], targetOccasions: ['everyday', 'vacation'], targetCategories: ['eyewear'], targetGender: ['androgynous'] },
+  { id: 224, query: 'designer sunglasses black tortoise Gentle Monster Le Specs Bottega', targetVibes: ['clean', 'night', 'date', 'luxury'], targetOccasions: ['everyday', 'night out'], targetCategories: ['eyewear'], targetGender: ['androgynous'] },
+  // ── Men's bags (Telfar dominated bags; need non-Telfar men's variety) ──
+  { id: 231, query: 'mens crossbody sling bag black nylon fashion', targetVibes: ['streetwear', 'clean', 'techwear'], targetOccasions: ['everyday'], targetCategories: ['bag'], targetGender: ['masc', 'androgynous'] },
+  { id: 232, query: 'mens leather messenger work bag briefcase brown black', targetVibes: ['office', 'clean', 'old money'], targetOccasions: ['office'], targetCategories: ['bag'], targetGender: ['masc'] },
+  { id: 233, query: 'mens commuter backpack minimalist black grey leather', targetVibes: ['clean', 'office', 'streetwear'], targetOccasions: ['everyday', 'office'], targetCategories: ['bag'], targetGender: ['masc', 'androgynous'] },
+  { id: 234, query: 'unisex tote bag canvas leather black cream tan fashion', targetVibes: ['clean', 'office', 'casual'], targetOccasions: ['everyday'], targetCategories: ['bag'], targetGender: ['androgynous'] },
+  // ── Men's tops (catalog skews women's) ──
+  { id: 241, query: 'mens crewneck sweater knit merino lambswool black grey navy cream', targetVibes: ['clean', 'office', 'preppy', 'date', 'cozy'], targetOccasions: ['everyday', 'office'], targetCategories: ['top'], targetGender: ['masc'] },
+  { id: 242, query: 'mens oxford shirt button down white blue striped', targetVibes: ['office', 'preppy', 'clean', 'old money'], targetOccasions: ['office', 'everyday'], targetCategories: ['top'], targetGender: ['masc'] },
+  { id: 243, query: 'mens heavyweight premium t-shirt boxy cotton black white grey', targetVibes: ['clean', 'streetwear', 'casual', 'minimal'], targetOccasions: ['everyday'], targetCategories: ['top'], targetGender: ['masc'] },
+  { id: 244, query: 'mens overshirt shacket flannel wool brown black grey', targetVibes: ['casual', 'cozy', 'streetwear', 'clean'], targetOccasions: ['everyday'], targetCategories: ['top', 'outer'], targetGender: ['masc'] },
+  { id: 245, query: 'mens knit polo pique short sleeve navy black cream', targetVibes: ['date', 'preppy', 'old money', 'clean'], targetOccasions: ['date', 'everyday'], targetCategories: ['top'], targetGender: ['masc'] },
+  // ── Men's bottoms ──
+  { id: 251, query: 'mens tailored trousers pleated straight leg black grey charcoal', targetVibes: ['office', 'night', 'date', 'clean'], targetOccasions: ['office', 'night out'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  { id: 252, query: 'mens selvedge denim jeans slim straight indigo black raw', targetVibes: ['streetwear', 'clean', 'casual', 'edgy'], targetOccasions: ['everyday'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  { id: 253, query: 'mens chinos slim tapered khaki navy stone', targetVibes: ['preppy', 'clean', 'office', 'casual'], targetOccasions: ['everyday', 'office'], targetCategories: ['bottom'], targetGender: ['masc'] },
+  // ── Men's outerwear ──
+  { id: 261, query: 'mens bomber jacket black nylon MA-1', targetVibes: ['streetwear', 'clean', 'edgy'], targetOccasions: ['everyday'], targetCategories: ['outer'], targetGender: ['masc'] },
+  { id: 262, query: 'mens wool overcoat topcoat camel black charcoal', targetVibes: ['office', 'clean', 'old money', 'winter'], targetOccasions: ['office', 'winter'], targetCategories: ['outer'], targetGender: ['masc'] },
+  { id: 263, query: 'mens harrington jacket bomber navy black tan', targetVibes: ['clean', 'preppy', 'casual'], targetOccasions: ['everyday'], targetCategories: ['outer'], targetGender: ['masc'] },
+  { id: 264, query: 'mens leather jacket biker black brown', targetVibes: ['edgy', 'night', 'streetwear'], targetOccasions: ['night out', 'everyday'], targetCategories: ['outer'], targetGender: ['masc'] },
+  // ── Men's street (more sneakers + graphics for variety) ──
+  { id: 271, query: 'Air Jordan 1 Dunk Low New Balance 550 990 sneakers black white grey', targetVibes: ['streetwear', 'clean', 'casual'], targetOccasions: ['everyday'], targetCategories: ['shoes'], targetGender: ['masc', 'androgynous'] },
+  { id: 272, query: 'mens graphic hoodie streetwear oversized black brand', targetVibes: ['streetwear', 'edgy', 'casual'], targetOccasions: ['everyday'], targetCategories: ['top', 'outer'], targetGender: ['masc'] },
+  { id: 273, query: 'mens cargo pants techwear nylon black tactical', targetVibes: ['techwear', 'streetwear', 'edgy'], targetOccasions: ['everyday'], targetCategories: ['bottom'], targetGender: ['masc', 'androgynous'] },
+  // ── Men's night-out tops ──
+  { id: 281, query: 'mens silk camp collar shirt black going out night', targetVibes: ['night', 'date', 'edgy'], targetOccasions: ['night out', 'date'], targetCategories: ['top'], targetGender: ['masc'] },
+  // ── Hats (thin: 20) + men's jewelry (thin) ──
+  { id: 291, query: 'cuffed beanie black grey cream merino unisex', targetVibes: ['cozy', 'winter', 'streetwear', 'casual'], targetOccasions: ['winter', 'everyday'], targetCategories: ['hat'], targetGender: ['androgynous'] },
+  { id: 292, query: 'dad hat baseball cap black white tan neutral unisex', targetVibes: ['clean', 'streetwear', 'casual'], targetOccasions: ['everyday'], targetCategories: ['hat'], targetGender: ['androgynous'] },
+  { id: 293, query: 'mens silver gold chain necklace bracelet signet ring minimalist', targetVibes: ['streetwear', 'night', 'edgy', 'clean'], targetOccasions: ['night out', 'everyday'], targetCategories: ['jewelry'], targetGender: ['masc'] },
+  // ── A few women's gap fills (keep the catalog balanced) ──
+  { id: 295, query: 'womens leather shoulder bag baguette black cream tan The Row Polene', targetVibes: ['clean', 'night', 'date', 'office'], targetOccasions: ['everyday', 'date'], targetCategories: ['bag'], targetGender: ['fem'] },
+  { id: 296, query: 'womens ballet flats slingback loafers black beige', targetVibes: ['clean', 'office', 'date', 'old money'], targetOccasions: ['office', 'date'], targetCategories: ['shoes'], targetGender: ['fem'] },
+  { id: 297, query: 'womens tailored trousers wide leg black cream', targetVibes: ['office', 'clean', 'night', 'date'], targetOccasions: ['office', 'night out'], targetCategories: ['bottom'], targetGender: ['fem'] },
+];
+
+const ACTIVE_SEARCH_PLAN = SEARCH_SCOPE === 'all'
+  ? SEARCH_PLAN
+  : SEARCH_SCOPE === 'gaps'
+  ? GAP_PLAN
+  : TARGETED_MISSING_VIBE_PLAN;
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
