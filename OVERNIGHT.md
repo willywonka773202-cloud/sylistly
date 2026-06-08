@@ -37,11 +37,16 @@
 - [x] Onboarding micro-polish (round 11): welcome step now has a staggered entrance (icon → eyebrow → headline → copy → buttons cascade in) via a new reusable `.sy-stagger` utility. Copy + button feel (sy-cta-primary) were already strong.
 - [x] Accessibility pass (round 12): audited every button in app/ + components/ for icon-only controls lacking an accessible name. Found the app already well-labeled; closed the only 3 real gaps (feed comment-send + CheckoutSheet/SearchSheet close X). Focus rings (round 2) and reduced-motion (ongoing, all new keyframes covered) were already in place.
 - [~] Dead-code cleanup — DEFERRED for owner review. Investigated (round 13): confirmed the `presentation === 'studio'` path in `components/OutfitBoard.tsx` is genuinely dead (no caller passes "studio"; FitViewer's outfitView is typed 'silhouette'|'flatlay'; silhouette + stacked are still in use). The studio-only code (StudioFitCard, StudioPedestal, STUDIO_WORN_SLOT/ACCENT_SLOT/PEDESTAL/RENDER_ORDER) is referenced only within OutfitBoard, BUT it's interleaved with shared helpers (hero selector, productText, heroCategoryBoost), so a clean bulk-delete needs careful interactive surgery — too fiddly to do safely unattended. Safe to remove the union member + dead branch (lines 188 + 339-361) and the ~6 studio symbols (725-~918) in one reviewed pass. ~Note: `.sy-studio` CSS + discover's 'studio' keyword are unrelated — keep.
-- [ ] Color/contrast consistency: audit text-on-bg contrast; tune any low-contrast muted text.
+- [x] Color/contrast consistency (round 13): lifted the most-used low-contrast token `muted` from .46 → .55 opacity (one tailwind token, app-wide), nudging secondary text over WCAG AA on the dark surfaces while keeping it clearly muted and distinct from `muted-2` (.68).
 - [x] 404 / error boundary visual polish (round 5): editorial radial accent glow + larger serif title on both `not-found.tsx` and `error.tsx`.
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 13 — 08:55 CDT — Contrast lift + dead-code triage
+- `tailwind.config.ts`: bumped the `muted` text token `rgba(251,247,242,.46)` → `.55`. It's the most-used low-contrast token (small secondary labels/captions) and sat just under WCAG AA on the dark surfaces; .55 lifts it over AA app-wide while staying clearly muted and distinct from `muted-2` (.68). Single-token, easily revertible.
+- Triaged the dead-code/studio cleanup item: confirmed `presentation === 'studio'` is genuinely dead, but the studio code is interleaved with shared helpers in OutfitBoard, so a safe removal needs interactive surgery — DEFERRED with full notes for the owner rather than risk an unattended bulk-delete.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 12 — 08:18 CDT — Accessibility: icon-button names
 - Ran a comprehensive audit (Node script over every `<button>` in app/ + components/) for icon-only buttons missing an accessible name. The app was already strong (feed 19/20, FitViewer/discover/saved/build all use icon+text labels). Closed the only 3 genuine gaps: `app/feed/page.tsx` comment-composer Send button (`aria-label="Send comment"`), and the close (X) buttons in `components/CheckoutSheet.tsx` + `components/SearchSheet.tsx` (`aria-label="Close"`). Screen-reader-only change — no visual or logic impact.
