@@ -46,6 +46,20 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+/* Typographic line-breaking polish (progressive enhancement — ignored where
+   unsupported, no layout risk): balance display headings so they never leave a
+   lone word on the last line; pretty body copy to avoid widows/orphans. */
+h1,
+h2,
+h3,
+h4,
+.font-serif {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
 .skin {
   background:
     radial-gradient(circle at 35% 18%, rgba(255, 255, 255, 0.22), transparent 28%),
