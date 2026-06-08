@@ -72,8 +72,8 @@ function NavTool({
       }`}
     >
       <span
-        className={`grid h-7 w-7 place-items-center rounded-full transition ${
-          active ? 'bg-accent-soft text-accent' : 'text-current'
+        className={`grid h-7 w-7 place-items-center rounded-full transition-all duration-200 ease-out ${
+          active ? 'scale-110 bg-accent-soft text-accent shadow-[0_0_16px_rgba(255,59,99,.22)]' : 'text-current'
         }`}
       >
         <Icon size={20} strokeWidth={active ? 2.5 : 2} />
@@ -81,6 +81,11 @@ function NavTool({
       <span className={`max-w-full truncate text-[10px] font-semibold tracking-wide ${active ? 'text-ink' : ''}`}>
         {label}
       </span>
+      <span
+        className={`h-[3px] w-[3px] rounded-full bg-accent transition-all duration-200 ease-out ${
+          active ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+        }`}
+      />
     </Link>
   );
 }
