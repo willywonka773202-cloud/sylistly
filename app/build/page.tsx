@@ -23,6 +23,7 @@ import {
   outfitFullSignature,
   outfitRequiredSignature,
 } from '@/lib/client-catalog';
+import { getLibraryLook } from '@/lib/outfit-library';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { hasFrameMismatch } from '@/lib/frame-inference';
 import {
@@ -838,24 +839,40 @@ function BuilderPageContent({
         });
         lookData = lookResponse.ok ? await lookResponse.json() : null;
       } else {
-        lookData = buildCatalogLook({
-          vibe: vibeId,
-          frame: generatorFrame,
-          budget: generatorBudget,
-          customMaxCents: customBudgetCents,
-          mode,
-          seed: lookBody.seed,
-          avoidProductIds,
-          avoidComboSignatures: lookBody.avoidComboSignatures,
-          recentShoeIds: lookBody.recentShoeIds,
-          recentBrandCounts: lookBody.recentBrandCounts,
-          recentFormulaIds: lookBody.recentFormulaIds,
-          diversityStrength: 'high',
-          currentItems: items,
-          lockedItems,
-          targetSlots,
-          transparentOnly: true,
-        });
+        // Prefer a pre-generated, coordination-scored library look for fresh
+        // whole-outfit generation (Build / swipe / vibe-select). For fill-
+        // around-existing ("missing") or when slots are locked, use the
+        // anchor-aware live composer so the result coordinates with what's
+        // already on the board. Both are instant and $0.
+        const wholeOutfit =
+          (mode === 'full' || mode === 'refresh' || mode === 'starter') && Object.keys(lockedItems).length === 0;
+        const libMaxItemCents =
+          generatorBudget === 'any' ? null
+            : generatorBudget === 'custom' ? customBudgetCents
+            : getBudgetMaxCents(generatorBudget);
+        const libLook = wholeOutfit
+          ? getLibraryLook(vibeId, generatorFrame, { seed: lookBody.seed, avoidProductIds, maxItemCents: libMaxItemCents })
+          : null;
+        lookData = libLook
+          ? { products: libLook.products, formula: { id: libLook.formulaId } }
+          : buildCatalogLook({
+              vibe: vibeId,
+              frame: generatorFrame,
+              budget: generatorBudget,
+              customMaxCents: customBudgetCents,
+              mode,
+              seed: lookBody.seed,
+              avoidProductIds,
+              avoidComboSignatures: lookBody.avoidComboSignatures,
+              recentShoeIds: lookBody.recentShoeIds,
+              recentBrandCounts: lookBody.recentBrandCounts,
+              recentFormulaIds: lookBody.recentFormulaIds,
+              diversityStrength: 'high',
+              currentItems: items,
+              lockedItems,
+              targetSlots,
+              transparentOnly: true,
+            });
       }
 
       if (lookData && lookData.products && typeof lookData.products === 'object') {
