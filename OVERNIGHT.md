@@ -32,7 +32,7 @@
 - [x] Bottom-nav active-state refinement (round 6): active tab icon scales up with a soft accent glow + a subtle active indicator dot below the label; transition-all/ease-out for smoother tab switches.
 - [~] Feed polish (round 7): reaction-rail buttons got a touch-safe, motion-safe hover lift (matching the Formula/"Why" pill's hover language). Story rings, WHY pill, and formula chips were already polished in earlier work — marking this good-enough so the loop advances; revisit if owner wants more.
 - [x] Discover polish (round 8): added a soft horizontal edge-fade to the product rails (cards melt into the gutter / "more to scroll" cue). Heading rhythm, card press states (hover-lift + accent shadow + active scale), and context chips were already strong from earlier work.
-- [ ] Checkout/shop flow visual polish (retailer cards, badges, buttons).
+- [x] Checkout/shop flow visual polish (round 9): consistent tactile press feedback (`active:scale`) on all checkout-sheet buttons + a hover pink-glow on the two primary CTAs. Retailer cards + exact/refresh badges were already well-styled.
 - [ ] Profile/closet/wardrobe visual polish + real-state empties.
 - [ ] Onboarding micro-polish (entrance stagger, copy, button feel).
 - [ ] Accessibility/focus pass: visible focus rings, aria-labels on icon buttons, prefers-reduced-motion coverage.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 9 — 06:35 CDT — Checkout button tactile polish
+- `components/CheckoutSheet.tsx`: added `active:scale` press feedback to every button in the shop flow — the two primary accent CTAs (Open all tabs / Review checkout, which also got a `hover:shadow-pink-glow`), the Copy-links button, the close (X) button, and each product card's "Open real link" CTA. Brings the checkout sheet in line with the app's tactile button language (it previously had none). Styling only.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build, /checkout all 200.
 
 ### Round 8 — 06:01 CDT — Discover rail edge-fade
 - `app/globals.css`: new reusable `.sy-edge-fade-x` utility (mask-image with `-webkit-` prefix for older iOS Safari; degrades to no fade where unsupported). `app/discover/page.tsx`: applied it to the `ProductRail` horizontal scroller so all discover rails fade softly at the gutters instead of hard-clipping — the premium "more to scroll" carousel cue. Verified the cards' existing hover-lift stays within the scroller's `pb-2` padding so no clip/scrollbar regression. CSS only.
