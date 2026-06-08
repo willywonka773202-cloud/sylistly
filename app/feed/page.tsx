@@ -686,7 +686,7 @@ export default function FitFeedPage() {
                 <div className="absolute right-2 top-[39%] z-20 flex -translate-y-1/2 flex-col items-center gap-2 min-[390px]:right-3 min-[390px]:top-[41%] min-[390px]:gap-3">
                   <button
                     onClick={() => like(post)}
-                    className={`grid h-10 w-10 place-items-center rounded-full border shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 ${
+                    className={`grid h-10 w-10 place-items-center rounded-full border shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 motion-safe:[@media(hover:hover)]:hover:scale-[1.07] ${
                       post.liked ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-black/8 bg-white/74 text-[#171118]'
                     }`}
                     aria-label="Like fit"
@@ -696,14 +696,14 @@ export default function FitFeedPage() {
                   <div className="-mt-2 text-center text-[10px] font-semibold text-[#171118]/78">{post.likeCount}</div>
                   <button
                     onClick={() => setCommentPost(post)}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-black/8 bg-white/74 text-[#171118] shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-black/8 bg-white/74 text-[#171118] shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 motion-safe:[@media(hover:hover)]:hover:scale-[1.07]"
                     aria-label="Open comments"
                   >
                     <MessageCircle size={18} />
                   </button>
                   <button
                     onClick={() => savePost(post)}
-                    className={`grid h-10 w-10 place-items-center rounded-full border shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 ${
+                    className={`grid h-10 w-10 place-items-center rounded-full border shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 motion-safe:[@media(hover:hover)]:hover:scale-[1.07] ${
                       post.saved ? 'border-accent bg-accent/18 text-accent' : 'border-black/8 bg-white/74 text-[#171118]'
                     } ${savedPulsePostId === post.id ? 'motion-safe:animate-[pulse_.42s_ease-out_1] scale-110' : ''}`}
                     aria-label="Save fit"
@@ -713,14 +713,14 @@ export default function FitFeedPage() {
                   <button
                     onClick={() => remix(post)}
                     disabled={remixingPostId === post.id}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-accent/45 bg-accent text-white shadow-pink-glow transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 disabled:opacity-70"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-accent/45 bg-accent text-white shadow-pink-glow transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 motion-safe:[@media(hover:hover)]:hover:scale-[1.07] disabled:opacity-70"
                     aria-label="Remix in Builder"
                   >
                     {remixingPostId === post.id ? <LoaderCircle size={18} className="animate-spin" /> : <RotateCcw size={18} />}
                   </button>
                   <button
                     onClick={() => shop(post)}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-black/8 bg-white/74 text-[#171118] shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-black/8 bg-white/74 text-[#171118] shadow-[0_12px_28px_rgba(42,28,21,.16)] backdrop-blur-md transition active:scale-90 min-[390px]:h-12 min-[390px]:w-12 motion-safe:transition-transform motion-safe:duration-150 motion-safe:[@media(hover:hover)]:hover:scale-[1.07]"
                     aria-label="Shop fit"
                   >
                     <ShoppingBag size={18} />
