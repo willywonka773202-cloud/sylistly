@@ -29,7 +29,7 @@
 - [x] Typography rhythm (round 3): global `text-wrap: balance` on display headings (no orphan words) + `text-wrap: pretty` on body copy (no widows). Progressive enhancement.
 - [x] Empty-state polish (round 4): elevated the wardrobe `EmptyState` (radial glow, glowing icon ring, larger title, generous spacing) to match the "saved" gold standard. (saved/discover/checkout empties already strong from earlier work.)
 - [~] Loading skeletons (shimmer) for feed + profile — DEFERRED for owner review: needs wiring into feed/profile render logic (more involved than pure CSS, riskier to do unattended). Good next feature.
-- [ ] Bottom-nav active-state refinement: subtle active pill/indicator + smoother icon transitions.
+- [x] Bottom-nav active-state refinement (round 6): active tab icon scales up with a soft accent glow + a subtle active indicator dot below the label; transition-all/ease-out for smoother tab switches.
 - [ ] Feed polish: story-ring spacing/labels, reaction-button rhythm, the "WHY" pill, formula chip styling.
 - [ ] Discover polish: rail heading rhythm, card press states, context chips.
 - [ ] Checkout/shop flow visual polish (retailer cards, badges, buttons).
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 6 — 04:52 CDT — Bottom-nav active-state refinement
+- `components/BottomNav.tsx` NavTool: active icon circle now `scale-110` with a soft accent glow (`shadow-[0_0_16px_...]`) and `transition-all duration-200 ease-out` for a smoother active/inactive switch; added a subtle 3px accent indicator dot below the label that scales+fades in only when active. Styling only — no nav logic touched.
+- verify: tsc clean, build exit 0. Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 5 — 04:17 CDT — 404 / error boundary polish
 - `app/not-found.tsx` + `app/error.tsx`: radial accent-glow background + relative content wrappers + larger serif title (34px) — consistent with onboarding/empty states. Deferred the loading-skeleton item (needs render-logic wiring, riskier unattended) for owner review.
