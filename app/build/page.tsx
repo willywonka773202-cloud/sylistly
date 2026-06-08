@@ -1354,6 +1354,14 @@ function BuilderPageContent({
                     </div>
                   </div>
                 ) : null}
+                {stylingNote && !aiRefining && !generatorLoading ? (
+                  <div className="pointer-events-none absolute left-4 top-4 z-30">
+                    <div className="sy-enter flex items-center gap-1.5 rounded-full border border-accent/35 bg-[#0a0707]/78 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-white shadow-[0_8px_20px_rgba(0,0,0,.32)] backdrop-blur-md">
+                      <Sparkles size={11} className="text-accent" />
+                      Styled by Syli
+                    </div>
+                  </div>
+                ) : null}
                 <Mannequin
                   items={renderItems}
                   skinTone={skinTone}
@@ -1458,6 +1466,7 @@ function BuilderPageContent({
                   <Sparkles size={13} />
                 </span>
                 <span className="text-[11px] font-bold uppercase tracking-[.16em] text-accent">Syli&rsquo;s take</span>
+                <span className="ml-auto rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-[.16em] text-accent">AI-styled</span>
               </div>
               {stylingNote.notes ? (
                 <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink">{stylingNote.notes}</p>
