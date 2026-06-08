@@ -35,31 +35,35 @@ export function Onboarding({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,59,99,.2),transparent_46%)]" />
       <div className="relative mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-[calc(env(safe-area-inset-top)+40px)]">
         {step === 0 ? (
-          <div className="sy-enter flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col">
             <div className="flex-1" />
-            <span className="grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
-              <Sparkles size={26} />
-            </span>
-            <div className="sy-eyebrow mt-7">Welcome to Sylistly</div>
-            <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[0.95] tracking-[-0.02em] text-ink">
-              Real outfits,
-              <br />
-              <span className="italic text-accent">styled by AI.</span>
-            </h1>
-            <p className="mt-4 max-w-[32ch] text-[15px] leading-relaxed text-muted-2">
-              Pick a vibe and Syli composes a complete, color-matched fit from real, shoppable pieces — then save it, shop it, or remix it.
-            </p>
+            <div className="sy-stagger flex flex-col">
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
+                <Sparkles size={26} />
+              </span>
+              <div className="sy-eyebrow mt-7">Welcome to Sylistly</div>
+              <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[0.95] tracking-[-0.02em] text-ink">
+                Real outfits,
+                <br />
+                <span className="italic text-accent">styled by AI.</span>
+              </h1>
+              <p className="mt-4 max-w-[32ch] text-[15px] leading-relaxed text-muted-2">
+                Pick a vibe and Syli composes a complete, color-matched fit from real, shoppable pieces — then save it, shop it, or remix it.
+              </p>
+            </div>
             <div className="flex-1" />
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="sy-cta-primary w-full px-5 py-4 text-[13px] font-bold uppercase tracking-[.14em]"
-            >
-              Get started
-            </button>
-            <button type="button" onClick={onSkip} className="mt-3 py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
-              Skip for now
-            </button>
+            <div className="sy-stagger flex flex-col">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="sy-cta-primary w-full px-5 py-4 text-[13px] font-bold uppercase tracking-[.14em]"
+              >
+                Get started
+              </button>
+              <button type="button" onClick={onSkip} className="mt-3 py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
+                Skip for now
+              </button>
+            </div>
           </div>
         ) : (
           <div className="sy-enter flex flex-1 flex-col">
