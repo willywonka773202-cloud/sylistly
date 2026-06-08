@@ -693,7 +693,7 @@ function ProductRail({
           {products.length} pieces
         </div>
       </div>
-      <div className="flex gap-3 overflow-x-auto px-1 pb-2 scrollbar-hide">
+      <div className="sy-edge-fade-x flex gap-3 overflow-x-auto px-1 pb-2 scrollbar-hide">
         {products.map((product) => (
           <DiscoverProductCard
             key={`${title}-${product.id}`}

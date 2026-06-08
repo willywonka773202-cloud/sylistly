@@ -76,6 +76,14 @@ p {
   display: none;
 }
 
+/* Soft edge fade for horizontal carousels — cards melt into the gutter
+   instead of hard-clipping, signaling there's more to scroll. -webkit-
+   prefixed for older iOS Safari; degrades to no fade where unsupported. */
+.sy-edge-fade-x {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+}
+
 /* A light "studio" surface for product cutouts so transparent PNGs always read. */
 .sy-studio {
   background:
