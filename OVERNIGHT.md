@@ -102,5 +102,31 @@
 - `app/build/page.tsx`: subtle "✨ Styled by Syli" badge on the board for AI-styled fits (top-left, shows when stylingNote present & not loading/refining) + an "AI-styled" chip on the "Syli's take" card header.
 - verify: tsc clean, `npm run build` exit 0. Deployed (deploy exit 0). Prod /, /build, /feed all 200.
 
-## Morning summary (filled at the end)
-<!-- final round writes a tight summary of everything shipped overnight + anything needing review -->
+## Morning summary
+
+**Loop retired early at 09:46 CDT** — owner woke up and took over driving, so the autonomous cosmetic loop was stopped (no further self-scheduled rounds). 13 verified polish rounds shipped overnight; then a real builder-speed fix shipped with the owner awake.
+
+### Overnight rounds (all live, each tsc-clean + build-green + deployed + health-checked)
+1. Builder: "Styled by Syli ✨" badge + AI-styled chip (make AI visible)
+2. Global keyboard-only `:focus-visible` accent rings (a11y)
+3. Typography: balance display headings + pretty body copy
+4. Wardrobe empty-state premium polish (glow, ringed icon, rhythm)
+5. 404 / error boundary: editorial radial-glow + serif title
+6. Bottom-nav active state: scale+glow icon + indicator dot
+7. Feed reaction-rail: touch-safe, motion-safe hover lift
+8. Discover rails: soft edge-fade (`.sy-edge-fade-x` utility)
+9. Checkout sheet: tactile press feedback on all buttons + CTA glow
+10. Profile: active-tab underline draw-in animation
+11. Onboarding: staggered entrance (`.sy-stagger` utility)
+12. a11y: aria-labels on the 3 remaining icon-only buttons (full audit)
+13. Contrast: `muted` token .46 → .55 (WCAG AA lift)
+
+### Morning (owner awake) — the important one
+- **Builder speed fix shipped.** The builder was blocking on a ~17s Sonnet pass every generate (measured live: deterministic 1.8s warm, AI 16.8s). Per owner's call ("Instant + AI on demand"): `generateLook` now returns the instant deterministic fit and stops; AI styling moved to an explicit **"Refine with AI"** button. No more 17s board swap. Verified + deployed + confirmed live in the /build HTML.
+
+### ⚠️ Needs owner / follow-up
+- **Builder still ~1.8s warm** on generate — per-request catalog scoring in `buildCatalogLook`. Optimizable toward sub-second, but core matching logic → do with before/after timing.
+- **Default-fit quality.** Instant default is now the *deterministic* composer (previously flagged "not that good"). Worth improving its heuristics so the instant fit is already wearable.
+- **DEFERRED — loading skeletons** (feed/profile): needs render-logic wiring, intentionally not done unattended.
+- **DEFERRED — dead-code/studio cleanup**: confirmed dead but interleaved with shared helpers in `OutfitBoard.tsx`; needs a careful interactive pass.
+- **Note:** most overnight changes are subtle (hover/press/contrast/motion). Hard-refresh to clear cached CSS/JS before judging.
