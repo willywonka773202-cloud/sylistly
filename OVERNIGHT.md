@@ -40,6 +40,12 @@
 - [x] Color/contrast consistency (round 13): lifted the most-used low-contrast token `muted` from .46 → .55 opacity (one tailwind token, app-wide), nudging secondary text over WCAG AA on the dark surfaces while keeping it clearly muted and distinct from `muted-2` (.68).
 - [x] 404 / error boundary visual polish (round 5): editorial radial accent glow + larger serif title on both `not-found.tsx` and `error.tsx`.
 
+## Backlog — round 2 (fresh items added round 13, original list cleared)
+- [ ] Carousel consistency: apply the round-8 `.sy-edge-fade-x` utility to the app's other horizontal rails (feed story rail, profile story rail/category row, stylist prompt scroller) so edge-fade is consistent everywhere, not just Discover.
+- [ ] Home page (app/page.tsx) visual micro-polish: hero rhythm, CTA feel, section spacing.
+- [ ] Stylist page polish: header/eyebrow rhythm, prompt-card press/hover consistency.
+- [ ] Toast/feedback polish: entrance + timing consistency across surfaces.
+
 ## Progress log (newest first)
 <!-- each round appends here -->
 
