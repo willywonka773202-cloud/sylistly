@@ -118,7 +118,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
           <button
             type="button"
             onClick={onClose}
-            className="grid h-8 w-8 flex-none place-items-center rounded-full bg-surface-3 text-muted-2"
+            className="grid h-8 w-8 flex-none place-items-center rounded-full bg-surface-3 text-muted-2 transition hover:text-ink active:scale-90"
           >
             <X size={14} />
           </button>
@@ -128,7 +128,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
           <button
             type="button"
             onClick={openAllTabs}
-            className="inline-flex rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+            className="inline-flex rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white transition active:scale-[0.97] hover:shadow-pink-glow"
           >
             Open all tabs
           </button>
@@ -139,14 +139,14 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
               onClose();
               router.push('/checkout');
             }}
-            className="inline-flex rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white"
+            className="inline-flex rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-white transition active:scale-[0.97] hover:shadow-pink-glow"
           >
             Review checkout
           </button>
           <button
             type="button"
             onClick={copyLinks}
-            className="inline-flex items-center gap-2 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-full border border-hairline-2 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink active:scale-[0.97]"
           >
             <Copy size={12} />
             Copy links
@@ -208,7 +208,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
                       target="_blank"
                       rel="noreferrer"
                       data-product-link-kind={isExactProductUrl(product.url) ? 'exact' : 'blocked'}
-                      className="mt-3 inline-flex items-center gap-2 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"
+                      className="mt-3 inline-flex items-center gap-2 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white active:scale-[0.97]"
                     >
                       Open real link
                       <ExternalLink size={12} />
