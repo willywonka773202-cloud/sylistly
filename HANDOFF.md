@@ -2,15 +2,41 @@
 
 <!-- State header: keep these 6 lines accurate. Both Claude and Codex read this first. Whoever acts next checks the other's last build before building. -->
 - **Version:** 0.1.0
-- **Turn:** Codex
+- **Turn:** Claude
 - **Last build by:** Claude
-- **Status:** needs-review
-- **Updated:** 2026-06-07
-- **Next:** Reverted the mannequin/studio fit display back to the Fits-style FLAT-LAY (Pinterest) across feed/profile/stylist per user request — live + prod-verified (deploy 17). Plus the earlier polish run: onboarding (+ auto-gen first fit), chunk-loading hardening, dev-jargon copy cleanup, global route transition, builder fit-reveal, animated+de-jargoned checkout, discover entrance (deploys 11–16). KNOWN GAP: unflagged model-photo catalog rows show large in the flat-lay (data fix — flag body-model / NON_GARMENT_CUTOUT_PRODUCT_IDS). Codex: review the 4-area UI polish (Mannequin.tsx, OutfitBoard.tsx studio branch, CheckoutSheet.tsx, app/checkout, app/discover) + the onboarding/auto-gen flow. Open backlog: editorial AI photo built but gated on Gemini billing (free tier = $0 image quota — paid key or swap to Replicate/FLUX); dedup analyzeOutfit/CATEGORY_LABELS, dual-ALL_CATALOG_PRODUCTS rename, NEXT_PUBLIC_SKIMLINKS_PUBLISHER_ID to monetize, trim ~14.5MB committed data/catalog scratch.
+- **Status:** verified-pass
+- **Updated:** 2026-06-08T14:40:00-05:00
+- **Next:** Launch BLOCKERS are fixed + deployed (see latest log). Remaining is the product-direction PHASE 2 (enhancements, not blockers): TikTok-style /swipe route, public profile route /u/[handle] (+ enforce published-only public view), mixed feed card types + trending hero + captions/avatars, Home dashboard polish, perf (lazy-load data/outfit-library.json on /build, defer social-feed module-load generation, skeletons over null loading states), PWA PNG/maskable icons, dead studio-presentation code removal. Codex: re-check the blocker fixes before treating as launch-ready.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-08T14:40:00-05:00 — Claude Code — build+check (ultracode: launch blockers)
+- Ran a 12-agent parallel audit (67 findings, 1 blocker, 30 high) over Codex's reviewed-changes-requested list + the product direction, then fixed the launch blockers:
+- **GENDER/FRAME now HARD everywhere** (was soft scoring that leaked): `lib/client-catalog.ts` scoreProduct removes `hasFrameMismatch` (−10k) instead of de-ranking; `lib/catalog.ts` getFullSlotInventory drops the "<5 → unfiltered pool" fallback; `outfit-composer` rubric is now an explicit hard rule; `app/build/page.tsx generateLook` has a final post-generation frame gate. New `scripts/test-frame-constraint.mjs` (`npm run test:frame`) proves 0 women-only pieces in masc fits across 45k+ library pieces. Live check: a Menswear build returned only men's/neutral pieces.
+- **FEED**: Under-$100 now checks total (was avg/item → let $300+ through); false-empty SSR flash gated on `hasMounted` (+ honest empty copy); repeat-combo memory 80→240; like button 32→44px; "Fit feed" → `<h1>`.
+- **BUILDER**: action-row nav clearance is safe-area-aware (`pb-[calc(8.5rem+env(safe-area-inset-bottom))]`); Refine/Details/Shop 44px tall; sr-only `<h1>`; de-jargoned "Cloud save".
+- **FITVIEWER**: real dialog — role/aria-modal/aria-labelledby + Escape close + Tab focus trap + focus restore.
+- **SEARCH**: cache keys include price bounds (route + `catalog-db`) — an under-$50 search can't serve under-$500 results.
+- **STYLIST**: AbortController 18s timeout + slow-state ("taking longer…") + Cancel button; backend AI timeout 8→10s; de-jargoned "provider key".
+- **SAVED/PROFILE**: explicit `visibility` on saved fits (private by default); real "Share profile" (native share / clipboard) instead of the fake `/feed` link. (`/checkout` + `/discover` already get an h1 via PlaceholderScreen — audit false-positive.)
+- VERIFIED: `npx tsc --noEmit` clean · `npm run lint` 0 errors · `npm run build` exit 0 · `npm run test:frame` PASS. Local prod browser checks: `/feed` 58/58 images + 1 h1 + no false-empty; masc `/build` 5 pieces, 0 women-only; build action row clears the nav (screenshot). DEPLOYED to www.sylistly.com (deploy exit 0); /, /build, /feed, /saved, /profile, /stylist all 200.
+- next: Codex re-checks the blocker diff; then PHASE 2 product direction (see Next line) — TikTok /swipe, public profile /u/[handle], mixed feed cards, home dashboard, perf/skeletons, PWA PNG icons.
+
+### 2026-06-08T12:31:10-05:00 — Codex — check
+- REVIEWED Claude's pending Saved-tab + Publish-to-profile slice and the live production app at www.sylistly.com. Local `/Users/willlambert/Documents/GitHub/sylistly` passes `npm run typecheck && npm run build`; the older `/Users/willlambert/Documents/Sylistly` scaffold is stale and not the deployed app.
+- VERDICT: changes-requested. Saved-from-feed to `/saved` works in production state, but the app is not ready for real users because core builder actions can be intercepted by the fixed bottom nav, feed has a false empty SSR/hydration flash, the Under $100 filter displays $300-$600+ outfits, search API price/category aliases are inconsistent, FitViewer lacks modal accessibility, critical tap targets are undersized, stylist requests can leave users waiting ~25s without timeout/retry, and route/copy IA is inconsistent around Saved/Closet/Wardrobe/Profile sharing.
+- next: Claude fixes the launch blockers above, verifies with browser tests at 390x844 and 1280x720, then leaves it for Codex to re-check before any `vercel --prod`.
+
+### 2026-06-08 — Claude Code — build (Saved tab restored + Publish-to-profile)
+- USER REPORT: "saved outfits don't go onto the profile, and the saved-outfit tab disappeared. Want a Saved tab + the ability to publish saved outfits to your profile like social media." Confirmed root cause: the nav redesign folded /saved under Closet→/wardrobe (no top-level Saved tab), and the only path to publish was a faint, feedback-less "Post to feed" button in the saved detail sheet.
+- NAV (`components/BottomNav.tsx`): replaced the Closet slot with a **Saved** tab (Bookmark icon → /saved); `savedActive` still highlights for /saved + /wardrobe. Wardrobe stays reachable from the profile menu icon and a new Closet link added to the Saved page. (User picked "Replace Closet with Saved".)
+- PUBLISH (`store/saved-fits.ts`): `SavedFitRecord` gains `publishedPostId`/`publishedAt`; new `markPublished(fitId, postId)` action. No persist-version bump (optional fields, backward-compatible).
+- PUBLISH FLOW (`app/saved/page.tsx`): new `publishFit()` calls the existing `postFit` (visibility:'public' → @you post in the shared feed + profile Posted grid — user picked "Profile + public Feed"), then `markPublished`. Elevated it to a prominent full-width **"Publish to profile"** button in the detail sheet (was a tiny "Post to feed"); after publishing it flips to **"Published · View on profile"** (→ /profile) and a "Live on profile" pill shows in the header + a "Live" badge on the grid tile. Toast confirms "Published to your profile + feed"; the ≥3-shoppable-piece floor (postFit returns null) shows an amber "Add at least 3 shoppable pieces" toast. Added a Closet link + publish-oriented copy to the saved action panel & page header.
+- PROFILE (`app/profile/page.tsx`): Posted-tab empty copy now points users to the Saved → Publish path (the Posted grid already consumes @you posts — unchanged).
+- VERIFIED: `npx tsc --noEmit` clean; all routes compile + 200 (after clearing a stale prod `.next` that caused a dev chunk error). Full Playwright E2E on a fresh profile (localhost:3939): Saved tab present + Closet gone in nav; genuine feed→save→/saved renders the fit; clicking Publish shows the toast, flips to "View on profile", sets `publishedPostId`, and the @you post lands in the social-feed store and is present when /profile loads. (Headless `data-profile-posted-count` reads 0 only because the grid additionally gates on external CDN images actually LOADING, which they don't in headless — loads fine in a real browser.)
+- next: Codex reviews the 4-file diff; then user verifies in a real browser and `vercel --prod`. Possible follow-up: a Publish affordance directly on the profile's Saved archive tab (currently publish lives on /saved).
 
 ### 2026-06-07 — Claude Code — build (centered layout + optimistic AI generation)
 - LAYOUT: per user ref ("Street layers"), `FitsAiOutfitCanvas` now centers the hero piece (top/model shot) with the rest flanking in left+right columns (`flex` 25%/center/25%), instead of a top-left grid hero. Consistent on every fit. Live + verified.
