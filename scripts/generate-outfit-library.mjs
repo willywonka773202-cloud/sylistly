@@ -75,13 +75,34 @@ function mulberry32(a) {
   };
 }
 
-// Gender consistency: androgynous frame uses androgynous-only items (so we
-// never mix a masc-specific piece with a fem-specific one in the same outfit).
-const genderOk = (p, frame) => {
-  const g = p.gender || ['androgynous'];
-  if (frame === 'androgynous') return g.includes('androgynous');
-  return g.includes('androgynous') || g.includes(frame);
-};
+// ── Gender taxonomy: male / female / neutral ──────────────────────
+// Infer from product name (the catalog over-tags "androgynous"), so the
+// female/male libraries are genuinely deep & gendered, and "neutral" stays
+// truly unisex. Each gender's pool = its own items + neutral (unisex), which
+// also guarantees no outfit mixes a women's-specific with a men's-specific piece.
+const FRAME_TO_GENDER = { androgynous: 'neutral', fem: 'female', masc: 'male' };
+function inferGender(p) {
+  const raw = `${p.brand || ''} ${p.name || ''}`.toLowerCase();
+  const womens = /\bwomen'?s?\b|\bwmns\b|\bwomens\b|\bladies\b|\bgirls?\b/.test(raw);
+  const mens = /\bmen'?s?\b|\bmens\b|\bboys?\b/.test(raw);
+  if (womens && mens) return 'neutral';           // unisex sizing ("Mens 5.5 / Womens 7")
+  // female-specific garments — strip "dress shirt/pant/shoe" so they don't read as a dress
+  const s = raw.replace(/dress\s+(shirt|pant|pants|shoe|shoes|trouser|trousers|sock|socks|code)/g, 'x');
+  const femGarment = /\bskirt\b|\bblouse\b|\bcami\b|bodysuit|\bhalter\b|\bromper\b|jumpsuit|\bcorset\b|bustier|\bmidi\b|\bmaxi\b|slingback|ballet flat|\bpumps?\b|stiletto|\bdress(es)?\b/.test(s);
+  // catalog jewelry skews feminine (earrings, dainty/delicate rings) — keep it out of male fits
+  const femJewelry = p.category === 'jewelry'
+    && /earring|dainty|delicate|birthstone|\bcharm|pearl|dewdrop|moonstone|stacking|huggie|\bstud|solitaire|ombre/.test(raw);
+  const tag = (p.gender || [])[0];
+  if (womens || femGarment || femJewelry || tag === 'fem') return 'female';
+  if (mens || tag === 'masc') return 'male';
+  return 'neutral';
+}
+function genderOk(p, frame) {
+  const want = FRAME_TO_GENDER[frame] || 'neutral';
+  const g = inferGender(p);
+  if (want === 'neutral') return g === 'neutral'; // truly unisex only
+  return g === want || g === 'neutral';            // gendered + unisex
+}
 const vibeMatch = (p, vibe, adj) => {
   const v = p.vibes || [];
   if (v.includes(vibe)) return 1;
@@ -219,8 +240,8 @@ function buildPools(vibe, cfg, frame) {
 
 // ── Generate library ──────────────────────────────────────────────
 const QUALITY_BAR = 0.62;
-const CAP_PER_COMBO = 160; // plenty — rotation makes it feel infinite
-const SAMPLES_PER_COMBO = 6000;
+const CAP_PER_COMBO = 500;   // deepen as much as the catalog supports per gender × style
+const SAMPLES_PER_COMBO = 60000;
 
 const library = [];
 const stats = [];
