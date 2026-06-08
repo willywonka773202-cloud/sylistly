@@ -30,7 +30,7 @@
 - [x] Empty-state polish (round 4): elevated the wardrobe `EmptyState` (radial glow, glowing icon ring, larger title, generous spacing) to match the "saved" gold standard. (saved/discover/checkout empties already strong from earlier work.)
 - [~] Loading skeletons (shimmer) for feed + profile — DEFERRED for owner review: needs wiring into feed/profile render logic (more involved than pure CSS, riskier to do unattended). Good next feature.
 - [x] Bottom-nav active-state refinement (round 6): active tab icon scales up with a soft accent glow + a subtle active indicator dot below the label; transition-all/ease-out for smoother tab switches.
-- [ ] Feed polish: story-ring spacing/labels, reaction-button rhythm, the "WHY" pill, formula chip styling.
+- [~] Feed polish (round 7): reaction-rail buttons got a touch-safe, motion-safe hover lift (matching the Formula/"Why" pill's hover language). Story rings, WHY pill, and formula chips were already polished in earlier work — marking this good-enough so the loop advances; revisit if owner wants more.
 - [ ] Discover polish: rail heading rhythm, card press states, context chips.
 - [ ] Checkout/shop flow visual polish (retailer cards, badges, buttons).
 - [ ] Profile/closet/wardrobe visual polish + real-state empties.
@@ -42,6 +42,10 @@
 
 ## Progress log (newest first)
 <!-- each round appends here -->
+
+### Round 7 — 05:27 CDT — Feed reaction-rail hover rhythm
+- `app/feed/page.tsx`: the five right-side reaction buttons (like/comment/save/remix/shop) had press feedback (`active:scale-90`) but no hover feedback. Added a uniform `scale-[1.07]` hover lift via `replace_all` on their shared class substring, gated with `motion-safe:[@media(hover:hover)]:hover:` so it (a) never sticks after a tap on touch devices and (b) respects reduced-motion. Brings them in line with the Formula/"Why" pill's hover language. Styling only.
+- verify: tsc clean, build exit 0 (arbitrary `[@media(hover:hover)]` variant compiled fine, 5 occurrences). Deployed (exit 0). Prod /, /feed, /build all 200.
 
 ### Round 6 — 04:52 CDT — Bottom-nav active-state refinement
 - `components/BottomNav.tsx` NavTool: active icon circle now `scale-110` with a soft accent glow (`shadow-[0_0_16px_...]`) and `transition-all duration-200 ease-out` for a smoother active/inactive switch; added a subtle 3px accent indicator dot below the label that scales+fades in only when active. Styling only — no nav logic touched.
