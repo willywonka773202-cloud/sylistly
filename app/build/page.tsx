@@ -715,9 +715,10 @@ function BuilderPageContent({
 
   async function generateLook(
     mode: 'starter' | 'missing' | 'full' | 'refresh',
-    options?: { vibeId?: VibeId; sourceLabel?: string },
+    options?: { vibeId?: VibeId; sourceLabel?: string; useAi?: boolean },
   ) {
-    if (generatorLoading) return;
+    const useAi = options?.useAi === true;
+    if (generatorLoading || aiRefining) return;
     if (generatorBudget === 'custom' && (!customBudgetCents || customBudgetCents <= 0)) {
       setStatusMessage('Enter a custom max price first.');
       return;
@@ -760,7 +761,10 @@ function BuilderPageContent({
       return;
     }
 
-    setGeneratorLoading(true);
+    // Default generate is INSTANT — keep the board visible if we're only
+    // AI-refining; show the full-board spinner only for a fresh deterministic build.
+    if (useAi) setAiRefining(true);
+    else setGeneratorLoading(true);
     setStatusMessage(null);
 
     try {
@@ -810,40 +814,14 @@ function BuilderPageContent({
         },
       };
 
-      // OPTIMISTIC: drop an instant deterministic fit onto the board first, then
-      // let the AI-styled look (Sonnet, ~15s) swap in below — so generation never
-      // blocks on a spinner. Applies to EVERY regenerate path (full / refresh /
-      // swipe / starter / missing). The base matches the main pass below so locks
-      // (and, for `missing`, the existing pieces) are honored.
-      try {
-        const fastBase: Partial<Record<Category, Product>> = mode === 'missing' ? { ...items } : { ...lockedItems };
-        const fastRes = await fetch('/api/look', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ ...lookBody, fast: true }),
-        });
-        const fastData = await fastRes.json();
-        if (fastRes.ok && fastData?.products && typeof fastData.products === 'object') {
-          const fastItems: Partial<Record<Category, Product>> = { ...fastBase };
-          for (const [slot, product] of Object.entries(fastData.products) as Array<[Category, Product]>) {
-            if (!targetSlots.includes(slot)) continue;
-            if (!isBuildReadySlotProduct(product, slot)) continue;
-            fastItems[slot] = product;
-          }
-          if (Object.keys(fastItems).length >= 3) {
-            replaceItems(fastItems);
-            setGeneratorLoading(false); // board is on screen — hide the full-board spinner
-            setAiRefining(true); // show the "refining" badge until the AI look lands
-          }
-        }
-      } catch {
-        /* deterministic preview is best-effort — fall through to the blocking AI path */
-      }
-
+      // Generate is INSTANT + deterministic by default (`fast: true`) so the
+      // builder never blocks on the ~17s Sonnet pass. AI styling is opt-in via
+      // the "Refine with AI" action (useAi), which runs the model and swaps the
+      // styled look in while the current board stays on screen.
       const lookResponse = await fetch('/api/look', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(lookBody),
+        body: JSON.stringify({ ...lookBody, fast: !useAi }),
       });
       const lookData = await lookResponse.json();
 
@@ -1413,7 +1391,7 @@ function BuilderPageContent({
                 <button
                   type="button"
                   onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
-                  disabled={generatorLoading || selectedGenerationSlots.length === 0}
+                  disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
                   className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(246,48,107,.42)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
                 >
                   {generatorLoading ? <LoaderCircle size={12} className="animate-spin" /> : <Sparkles size={12} />}
@@ -1422,12 +1400,21 @@ function BuilderPageContent({
                 <button
                   type="button"
                   onClick={() => void performBoardSwipe('right')}
-                  disabled={generatorLoading || renderN === 0}
+                  disabled={generatorLoading || aiRefining || renderN === 0}
                   className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
                 >
                   Save
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={() => void generateLook('refresh', { useAi: true, sourceLabel: 'AI-refined.' })}
+                disabled={generatorLoading || aiRefining || renderN === 0}
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-2.5 text-[11px] font-black uppercase tracking-[.14em] text-accent transition hover:border-accent/60 active:scale-[0.98] disabled:opacity-50"
+              >
+                {aiRefining ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                {aiRefining ? 'Styling your fit…' : 'Refine with AI'}
+              </button>
             </div>
           </section>
 
