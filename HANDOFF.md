@@ -12,6 +12,12 @@
 
 ## Log (newest first)
 
+### 2026-06-08T15:20:00-05:00 — Claude Code — build+check (gender leak fix)
+- User caught REAL gender leaks the prior keyword lists missed: women's athleisure (Alo Yoga leggings/airbrush/airlift/alosoft shorts/tanks), tube tops, scoop/wrap tops, cropped polos — all classified "neutral" → landing in masc fits. (My earlier test passed because it reused the generator's own list.)
+- FIX: `lib/frame-inference.ts` — unified the 3 divergent gender lists into ONE comprehensive `FEM_ONLY_TERMS` (women brands: Alo Yoga, Set Active, Reformation, Ganni, Free People, SKIMS, Aritzia, … + terms: legging, tube top, cropped, scoop, wrap top, bralette, romper, skort, micro/biker short, mule, ballet flat, …) and pointed `genderMismatchReasons` (the runtime hard gate) at it. Mirrored the signals in `scripts/generate-outfit-library.mjs inferGender`; regenerated `data/outfit-library.json`. `test-frame-constraint.mjs` now uses an INDEPENDENT broad detector.
+- VERIFIED: tsc clean · lint 0 errors · build exit 0 · `npm run test:frame` PASS (0 cross-gender across 45k+ pieces) · LIVE: 8 builds (5 masc vibes + 3 fem) returned 0 cross-gender pieces; masc/street screenshot is all-menswear. DEPLOYED (exit 0), /build 200.
+- next: PHASE 2 — mixed feed card types (model/hero + captions + avatars + trending hero), public profile /u/[handle], home dashboard, perf (lazy outfit-library + skeletons), PWA PNG icons.
+
 ### 2026-06-08T14:40:00-05:00 — Claude Code — build+check (ultracode: launch blockers)
 - Ran a 12-agent parallel audit (67 findings, 1 blocker, 30 high) over Codex's reviewed-changes-requested list + the product direction, then fixed the launch blockers:
 - **GENDER/FRAME now HARD everywhere** (was soft scoring that leaked): `lib/client-catalog.ts` scoreProduct removes `hasFrameMismatch` (−10k) instead of de-ranking; `lib/catalog.ts` getFullSlotInventory drops the "<5 → unfiltered pool" fallback; `outfit-composer` rubric is now an explicit hard rule; `app/build/page.tsx generateLook` has a final post-generation frame gate. New `scripts/test-frame-constraint.mjs` (`npm run test:frame`) proves 0 women-only pieces in masc fits across 45k+ library pieces. Live check: a Menswear build returned only men's/neutral pieces.
