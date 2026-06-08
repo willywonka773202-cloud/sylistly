@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Bookmark, Check, ChevronRight, Heart, Info, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, X } from 'lucide-react';
+import { Bookmark, Check, ChevronRight, GalleryVerticalEnd, Heart, Info, LoaderCircle, MessageCircle, RotateCcw, Send, ShoppingBag, Sparkles, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
@@ -584,6 +584,16 @@ export default function FitFeedPage() {
             </div>
           </div>
         </header>
+
+        <button
+          type="button"
+          onClick={() => router.push('/swipe')}
+          aria-label="Switch to swipe mode"
+          className="pointer-events-auto absolute bottom-[calc(env(safe-area-inset-bottom)+98px)] right-4 z-40 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-[#171118]/92 px-4 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-[0_14px_34px_rgba(0,0,0,.42)] backdrop-blur-md transition active:scale-95"
+        >
+          <GalleryVerticalEnd size={15} className="text-accent" />
+          Swipe
+        </button>
 
         {storyPosts.length ? (
           <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+106px)] z-20 px-3">
