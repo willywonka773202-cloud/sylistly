@@ -516,7 +516,7 @@ export function FitsAiOutfitCanvas({
           loading={loading}
           displayMode="moodboard"
           wrapperClassName="flex h-full w-full items-center justify-center overflow-visible bg-transparent"
-          className={`h-full w-full object-contain ${isHero ? 'p-1 drop-shadow-[0_22px_24px_rgba(0,0,0,.18)]' : 'p-0.5 drop-shadow-[0_12px_14px_rgba(0,0,0,.15)]'}`}
+          className={`h-full w-full object-contain ${isHero ? 'p-0.5 drop-shadow-[0_18px_20px_rgba(0,0,0,.16)]' : 'p-0 drop-shadow-[0_10px_12px_rgba(0,0,0,.14)]'}`}
           onUnavailable={onImageUnavailable}
         />
         <span className="sr-only">{product.brand} {product.name}</span>
@@ -536,14 +536,14 @@ export function FitsAiOutfitCanvas({
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_24%,rgba(255,248,240,.92)_0%,rgba(255,255,255,0)_62%)]" />
       <div className="pointer-events-none absolute inset-x-[24%] bottom-[6%] h-px bg-black/5" />
-      <div className="relative flex h-full w-full items-stretch gap-1 px-3 py-4">
-        <div className="flex w-[25%] flex-col items-center justify-around gap-1.5">
+      <div className={`relative flex h-full w-full items-stretch ${compact ? 'gap-0.5 px-1.5 py-2' : 'gap-1 px-2.5 py-3'}`}>
+        <div className="flex w-[31%] flex-col items-center justify-evenly gap-0.5">
           {leftCategories.map((category) => renderPiece(category, false))}
         </div>
-        <div className="flex flex-1 items-center justify-center px-1">
+        <div className="flex flex-1 items-center justify-center px-0.5">
           {heroCategory ? renderPiece(heroCategory, true) : null}
         </div>
-        <div className="flex w-[25%] flex-col items-center justify-around gap-1.5">
+        <div className="flex w-[31%] flex-col items-center justify-evenly gap-0.5">
           {rightCategories.map((category) => renderPiece(category, false))}
         </div>
       </div>
