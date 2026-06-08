@@ -80,7 +80,11 @@ export function getLibraryLook(
       }
     }
     if (overBudget) continue; // respect the user's budget cap
-    const freshness = -overlap * 2 + jitter(i); // prefer low overlap, randomized
+    // Library rows are sorted best-first (index 0 = highest coordination score).
+    // Bias toward the top so users see the BEST fits — with jitter + overlap
+    // avoidance keeping it varied and non-repeating.
+    const positionBias = (i / pool.length) * 1.7;
+    const freshness = -overlap * 2 + jitter(i) - positionBias;
     if (freshness > bestScore) {
       bestScore = freshness;
       best = row;

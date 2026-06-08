@@ -217,10 +217,16 @@ function scoreOutfit(pieces, vibe, cfg) {
   const preferredFilled = cfg.slots.filter((s) => !REQUIRED.includes(s) && have.has(s)).length;
   const completeness = (reqOk ? 0.7 : 0) + Math.min(0.3, preferredFilled * 0.1);
 
-  // Color data is sparse in the catalog, so weight it modestly and lean on
-  // vibe + formality cohesion (and the type-appropriate pools) for coordination.
-  const total = vibe01 * 0.34 + formality * 0.28 + color * 0.22 + completeness * 0.16;
-  return { total, color, vibe01, formality, completeness, distinctAccents };
+  // Brand diversity — penalize repeating the same label across an outfit
+  // (the catalog is brand-concentrated, so this spreads brands).
+  const brands = pieces.map((p) => (p.brand || '').toLowerCase()).filter(Boolean);
+  const dupBrands = brands.length - new Set(brands).size;
+  const brandDiversity = Math.max(0, 1 - dupBrands * 0.5);
+
+  // Color data is sparse, so weight it modestly and lean on vibe + formality
+  // cohesion (and the type-appropriate pools) + brand diversity for coordination.
+  const total = vibe01 * 0.36 + formality * 0.24 + color * 0.16 + completeness * 0.12 + brandDiversity * 0.12;
+  return { total, color, vibe01, formality, completeness, brandDiversity, distinctAccents };
 }
 
 // ── Build slot pools (with coverage widening) ─────────────────────
@@ -242,8 +248,8 @@ function buildPools(vibe, cfg, frame) {
 }
 
 // ── Generate library ──────────────────────────────────────────────
-const QUALITY_BAR = 0.62;
-const CAP_PER_COMBO = 500;   // deepen as much as the catalog supports per gender × style
+const QUALITY_BAR = 0.64;
+const CAP_PER_COMBO = 400;   // fewer, higher-quality per gender × style (rotation biases to the best)
 const SAMPLES_PER_COMBO = 60000;
 
 const library = [];
@@ -266,8 +272,14 @@ for (const vibe of Object.keys(VIBE_CONFIG)) {
       for (const slot of cfg.slots) {
         const pool = pools[slot];
         if (!pool || !pool.length) continue;
-        // optional slots: include probabilistically so outfits vary in richness
-        if (!REQUIRED.includes(slot) && rand() < 0.32) continue;
+        // Optional slots: include probabilistically so outfits vary in richness.
+        // Skip bag/eyewear MORE — the catalog is brand-concentrated there
+        // (Telfar = 65% of bags, only ~16 eyewear), so over-including them
+        // makes every fit look same-brand.
+        if (!REQUIRED.includes(slot)) {
+          const skipProb = slot === 'bag' || slot === 'eyewear' ? 0.62 : 0.42;
+          if (rand() < skipProb) continue;
+        }
         pieces.push(pool[Math.floor(rand() * pool.length)]);
       }
       if (!REQUIRED.every((s) => pieces.some((p) => p.category === s))) continue;
