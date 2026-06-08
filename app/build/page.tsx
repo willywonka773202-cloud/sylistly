@@ -26,6 +26,7 @@ import {
 import { getLibraryLook } from '@/lib/outfit-library';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { hasFrameMismatch } from '@/lib/frame-inference';
+import { isVibeAppropriate } from '@/lib/vibe-fit';
 import {
   getTransparentProductImageUrl,
   hasHighCategoryConfidence,
@@ -883,6 +884,8 @@ function BuilderPageContent({
           // Final hard frame gate: nothing gender-mismatched ever reaches the board,
           // regardless of which path (library / live compose / AI) produced it.
           if (generatorFrame !== 'androgynous' && hasFrameMismatch(product, generatorFrame)) continue;
+          // Vibe-appropriateness gate: e.g. no jeans/denim jacket in a gym fit.
+          if (!isVibeAppropriate(product, vibeId, slot)) continue;
           nextItems[slot] = product;
           addedCount += 1;
         }
@@ -931,6 +934,9 @@ function BuilderPageContent({
 
         for (const result of results) {
           if (result.status !== 'fulfilled' || !isBuildReadySlotProduct(result.value.product, result.value.slot)) continue;
+          // The fallback (search/live-compose) bypassed the gates — apply them here too.
+          if (generatorFrame !== 'androgynous' && hasFrameMismatch(result.value.product, generatorFrame)) continue;
+          if (!isVibeAppropriate(result.value.product, vibeId, result.value.slot)) continue;
           nextItems[result.value.slot] = result.value.product;
           addedCount += 1;
         }
