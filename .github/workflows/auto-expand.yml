@@ -1,0 +1,72 @@
+name: Auto-expand catalog & outfit library
+
+# Grows the clothing catalog (when SEARCHAPI_KEY is configured) and always
+# regenerates the pre-made, coordinated outfit library from it — then verifies
+# and deploys only if the build is green. Runs weekly, or on demand.
+#
+# NOTE: scheduled runs only fire when this file is on the repository's DEFAULT
+# branch. Manual runs (workflow_dispatch) work from any branch. See AUTOMATION.md.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '17 9 * * 1' # Mondays 09:17 UTC
+
+permissions:
+  contents: write
+
+env:
+  VERCEL_ORG_ID: team_Jr5ljSGJQA9YHH5jkvgoOk5j
+  VERCEL_PROJECT_ID: prj_Th1hzGmRh5rbqr1QVYOC2tKwCCcN
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Grow catalog + regenerate outfit library
+        env:
+          SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
+        run: node scripts/auto-expand.mjs
+
+      - name: Verify (typecheck + production build)
+        run: |
+          npx tsc --noEmit
+          npm run build
+
+      - name: Commit regenerated data
+        id: commit
+        run: |
+          git config user.name "sylistly-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/client-catalog.json data/outfit-library.json data/generated-catalog.json data/photo-catalog.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No catalog/outfit changes this run."
+          else
+            git commit -m "auto-expand: refresh catalog + outfit library [skip ci]"
+            git push origin "${{ github.ref_name }}"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Vercel (production)
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "No VERCEL_TOKEN secret set — skipping CLI deploy. (Add it to deploy automatically, or rely on Vercel Git integration.)"
+            exit 0
+          fi
+          npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
