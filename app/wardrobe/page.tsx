@@ -777,13 +777,13 @@ function EmptyState({
   secondaryLabel?: string;
 }) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent/15 text-accent">
-        <Icon size={20} />
+    <section className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(120%_80%_at_50%_-12%,rgba(255,59,99,.14),transparent_52%),rgba(255,255,255,0.04)] p-7 text-center">
+      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/15 text-accent shadow-[0_0_30px_rgba(255,59,99,.3)] ring-1 ring-accent/25">
+        <Icon size={22} />
       </div>
-      <div className="mt-3 font-serif text-[20px] font-semibold text-ink">{title}</div>
-      <p className="mt-1 text-[12px] leading-relaxed text-muted-2">{body}</p>
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 font-serif text-[21px] font-semibold text-ink">{title}</div>
+      <p className="mx-auto mt-1.5 max-w-[34ch] text-[12.5px] leading-relaxed text-muted-2">{body}</p>
+      <div className="mt-5 grid grid-cols-2 gap-2">
         <Link
           href={primaryHref}
           className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
