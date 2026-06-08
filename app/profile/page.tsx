@@ -584,7 +584,7 @@ export default function ProfilePage() {
                         subtitle={post.formulaLabel || post.vibe}
                         compact
                         presentation="flatlay"
-                        loading={index < 2 ? 'eager' : 'lazy'}
+                        loading="eager"
                         className="h-full"
                         onImageUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
                       />
