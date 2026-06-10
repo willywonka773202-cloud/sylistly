@@ -36,6 +36,11 @@ const LIMIT = Number.parseInt(process.env.CLIENT_CATALOG_LIMIT || '560', 10);
 const BALANCED_CATEGORY_ORDER: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const BRAND_CAP_PASSES = [3, 6, 10, Number.POSITIVE_INFINITY];
 const CATEGORY_BRAND_CAP_PASSES = [2, 3, 5, Number.POSITIVE_INFINITY];
+// Hard per-category ceilings. Without these, a category whose eligible pool
+// balloons (e.g. outer after a cutout expansion) absorbs the global limit's
+// slack and crowds out REQUIRED-slot categories — brand-concentrated shoes
+// lose picks to brand-diverse outerwear under the brand-cap passes.
+const CATEGORY_MAX: Partial<Record<Category, number>> = { outer: 96, bag: 75 };
 
 function localCutoutExists(product: Product): boolean {
   const url = product.imageTransparentUrl || product.imageCutoutUrl || '';
@@ -105,7 +110,11 @@ function selectBalancedClientCatalogProducts(sortedProducts: Product[], limit: n
     categoryBrandCounts.set(categoryBrandKey, (categoryBrandCounts.get(categoryBrandKey) || 0) + 1);
   };
 
+  const categoryCounts = new Map<Category, number>();
+
   const pickFromCategory = (category: Category, brandCap: number, categoryBrandCap: number): boolean => {
+    const categoryMax = CATEGORY_MAX[category];
+    if (categoryMax !== undefined && (categoryCounts.get(category) || 0) >= categoryMax) return false;
     const pool = pools.get(category) || [];
     const product = pool.find((candidate) => {
       if (usedIds.has(candidate.id)) return false;
@@ -117,6 +126,7 @@ function selectBalancedClientCatalogProducts(sortedProducts: Product[], limit: n
     });
     if (!product) return false;
     addProduct(product);
+    categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
     return true;
   };
 
