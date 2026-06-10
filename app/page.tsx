@@ -19,6 +19,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { Onboarding } from '@/components/Onboarding';
 import { ProductImage } from '@/components/ProductImage';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { getAiLook } from '@/lib/ai-look-library';
 import { track } from '@/lib/analytics';
 import { buildCatalogLook } from '@/lib/client-catalog';
 import { getLibraryLook } from '@/lib/outfit-library';
@@ -34,6 +35,7 @@ import { useSavedFits } from '@/store/saved-fits';
 const ONBOARDED_KEY = 'sylistly.onboarded.v1';
 const SLOT_PREFS_KEY = 'sylistly.scroll-slots.v1';
 const VIBE_LIKES_KEY = 'sylistly.vibe-likes.v1';
+const SEEN_AI_KEY = 'sylistly.seen-ai-looks.v1';
 
 /** Curated rotation so consecutive cards feel like turning magazine pages. */
 const VIBE_ROTATION: VibeId[] = [
@@ -63,6 +65,12 @@ interface ScrollLook {
   vibe: VibeId;
   items: Partial<Record<Category, Product>>;
   gen: number;
+  /** 'syli' = genuinely Claude-composed (from the baked AI library). */
+  source: 'syli' | 'engine';
+  /** Claude's real styling note — only present on 'syli' looks. */
+  note?: string;
+  /** The baked library id — marked seen only when the card is viewed. */
+  aiId?: string;
 }
 
 function lookProducts(items: Partial<Record<Category, Product>>): Product[] {
@@ -187,6 +195,7 @@ export default function ScrollPage() {
   const locksRef = useRef(lockedItems);
   const disabledRef = useRef(disabledSlots);
   const vibeLikesRef = useRef<Record<string, number>>({});
+  const seenAiIdsRef = useRef<Set<string>>(new Set());
   const toastTimer = useRef<number | null>(null);
 
   locksRef.current = lockedItems;
@@ -208,6 +217,11 @@ export default function ScrollPage() {
   const makeLooks = useCallback(
     (count: number, useFrame: GeneratorFrame, filter: VibeId | 'all'): ScrollLook[] => {
       const fresh: ScrollLook[] = [];
+      // Batch-local picks: dedupes within this deal WITHOUT mutating the
+      // persistent seen-set (makeLooks runs inside state initializers, which
+      // React StrictMode double-invokes — side effects here would silently
+      // consume the AI library). Looks are marked seen only when VIEWED.
+      const batchPicked = new Set<string>();
       let attempts = 0;
       const topLikedVibe = (Object.entries(vibeLikesRef.current).sort((a, b) => b[1] - a[1])[0] ||
         [])[0] as VibeId | undefined;
@@ -227,13 +241,39 @@ export default function ScrollPage() {
           Object.values(locksRef.current).map((product) => product?.id).filter(Boolean),
         );
         const avoid = recentIdsRef.current.filter((id) => !lockedIds.has(id));
+
+        // Claude-baked looks first (only when nothing is pinned — locks and
+        // slot prefs need the live engine). The badge is earned, never faked.
+        if (lockedIds.size === 0 && disabledRef.current.size === 0) {
+          const aiLook = getAiLook(filter === 'all' ? vibe : filter, useFrame, {
+            seed: seedRef.current,
+            seenLookIds: new Set([...seenAiIdsRef.current, ...batchPicked]),
+            avoidProductIds: avoid,
+          });
+          if (aiLook) {
+            batchPicked.add(aiLook.id);
+            const ids = lookProducts(aiLook.products).map((product) => product.id);
+            recentIdsRef.current = [...recentIdsRef.current, ...ids].slice(-80);
+            fresh.push({
+              key: `look-${seedRef.current}`,
+              vibe: aiLook.vibe,
+              items: aiLook.products,
+              gen: 0,
+              source: 'syli',
+              note: aiLook.note,
+              aiId: aiLook.id,
+            });
+            continue;
+          }
+        }
+
         const items = composeScrollLook(
           vibe, useFrame, seedRef.current, avoid, locksRef.current, disabledRef.current,
         );
         if (!items) continue;
         const ids = lookProducts(items).map((product) => product.id);
         recentIdsRef.current = [...recentIdsRef.current, ...ids].slice(-80);
-        fresh.push({ key: `look-${seedRef.current}`, vibe, items, gen: 0 });
+        fresh.push({ key: `look-${seedRef.current}`, vibe, items, gen: 0, source: 'engine' });
       }
       return fresh;
     },
@@ -252,6 +292,9 @@ export default function ScrollPage() {
       const slots = JSON.parse(window.localStorage.getItem(SLOT_PREFS_KEY) || '[]') as Category[];
       if (slots.length) setDisabledSlots(new Set(slots));
       vibeLikesRef.current = JSON.parse(window.localStorage.getItem(VIBE_LIKES_KEY) || '{}');
+      seenAiIdsRef.current = new Set(
+        JSON.parse(window.localStorage.getItem(SEEN_AI_KEY) || '[]') as string[],
+      );
     } catch {
       /* corrupted prefs — start fresh */
     }
@@ -289,7 +332,16 @@ export default function ScrollPage() {
   useEffect(() => {
     if (!activeKey) return;
     const look = looks.find((entry) => entry.key === activeKey);
-    if (look) track('look_viewed', { vibe: look.vibe, pieces: lookProducts(look.items).length });
+    if (!look) return;
+    track('look_viewed', { vibe: look.vibe, pieces: lookProducts(look.items).length, source: look.source });
+    // Mark a baked AI look as seen only once it has actually been on screen.
+    if (look.source === 'syli' && look.aiId && !seenAiIdsRef.current.has(look.aiId)) {
+      seenAiIdsRef.current.add(look.aiId);
+      window.localStorage.setItem(
+        SEEN_AI_KEY,
+        JSON.stringify(Array.from(seenAiIdsRef.current).slice(-300)),
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
 
@@ -359,9 +411,13 @@ export default function ScrollPage() {
       ...lookProducts(items).map((product) => product.id),
     ].slice(-80);
     track('look_restyled', { vibe: look.vibe, locks: Object.keys(lockedItems).length });
+    // A restyled look came from the live engine — it no longer carries
+    // Claude's badge or note.
     setLooks((prev) =>
       prev.map((entry) =>
-        entry.key === look.key ? { ...entry, items, gen: entry.gen + 1 } : entry,
+        entry.key === look.key
+          ? { ...entry, items, gen: entry.gen + 1, source: 'engine' as const, note: undefined, aiId: undefined }
+          : entry,
       ),
     );
   }
@@ -637,29 +693,37 @@ export default function ScrollPage() {
 
               {/* Meta */}
               <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-10 px-4 pr-[70px]">
-                {/* Formula pill + WHY */}
-                <button
-                  type="button"
-                  onClick={() => setWhyOpenKey(whyOpen ? null : look.key)}
-                  aria-expanded={whyOpen}
-                  className="sy-press inline-flex items-center gap-2 rounded-full border border-hairline-2 bg-surface-2/80 py-1.5 pl-1.5 pr-3 backdrop-blur-md"
-                >
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
-                    <Sparkles size={12} />
-                  </span>
-                  <span className="text-[10px] font-extrabold uppercase tracking-[.16em] text-accent">Formula</span>
-                  <span className="text-[12px] font-semibold text-ink">
-                    {look.vibe} / {densityLabel(products.length)}
-                  </span>
-                  <span className="flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2">
-                    Why
-                    <ChevronDown size={11} className={`transition-transform ${whyOpen ? 'rotate-180' : ''}`} />
-                  </span>
-                </button>
+                {/* Formula pill + WHY (+ the earned AI badge) */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWhyOpenKey(whyOpen ? null : look.key)}
+                    aria-expanded={whyOpen}
+                    className="sy-press inline-flex items-center gap-2 rounded-full border border-hairline-2 bg-surface-2/80 py-1.5 pl-1.5 pr-3 backdrop-blur-md"
+                  >
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
+                      <Sparkles size={12} />
+                    </span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-[.16em] text-accent">Formula</span>
+                    <span className="text-[12px] font-semibold text-ink">
+                      {look.vibe} / {densityLabel(products.length)}
+                    </span>
+                    <span className="flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2">
+                      Why
+                      <ChevronDown size={11} className={`transition-transform ${whyOpen ? 'rotate-180' : ''}`} />
+                    </span>
+                  </button>
+                  {look.source === 'syli' ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow">
+                      <Sparkles size={11} />
+                      Styled by Syli
+                    </span>
+                  ) : null}
+                </div>
                 {whyOpen ? (
                   <p className="mt-2 max-w-[36ch] animate-sy-rise text-[13px] font-medium leading-snug text-muted-2">
                     <span className="font-bold uppercase tracking-[.14em] text-champagne">Syli&apos;s note · </span>
-                    {syliNote(look)}
+                    {look.source === 'syli' && look.note ? look.note : syliNote(look)}
                   </p>
                 ) : null}
 

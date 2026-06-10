@@ -28,6 +28,8 @@
     "library:generate": "node scripts/generate-outfit-library.mjs",
     "auto:expand": "node scripts/auto-expand.mjs",
     "auto:ship": "node scripts/auto-expand-ship.mjs",
+    "bake:ai": "node scripts/bake-ai-looks.mjs",
+    "bake:ship": "node scripts/bake-ai-ship.mjs",
     "test:frame": "node scripts/test-frame-constraint.mjs"
   },
   "dependencies": {

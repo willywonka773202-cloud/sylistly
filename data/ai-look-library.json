@@ -1,0 +1,487 @@
+{
+  "version": 1,
+  "looks": [
+    {
+      "id": "syli-2026-06-10-163242266",
+      "vibe": "clean",
+      "frame": "masc",
+      "slots": {
+        "outer": "drop-f2aa4850ca8554b2",
+        "top": "drop-f1f3c6969d86c0c6",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-501-original-fit-denim-jeans-6f329aa8d1b9fd",
+        "shoes": "drop-093f29efd827e2a5",
+        "bag": "drop-da9dfc31d2ee0584",
+        "eyewear": "drop-8b49c4dfd62a1e33",
+        "jewelry": "561d375c28389500"
+      },
+      "stylingNotes": "Old-money knit elevated with heritage denim and ALD pieces—textured sweater balances structured 501s, while minimal silver and black accessories keep the look intentional and effortless.",
+      "palette": [
+        "navy",
+        "cream",
+        "grey"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242303",
+      "vibe": "clean",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-f8d223bc4cb98659",
+        "outer": "drop-8c1806170fd31316",
+        "top": "drop-56938ecfcb1c8abf",
+        "bottom": "searchapi-quality-bottoms-aritzia-effortless-women-s-effortless-pant-261f9bd5cdd69f",
+        "shoes": "drop-625b02faeb3320f8",
+        "bag": "drop-c1393cf9ff02e148"
+      },
+      "stylingNotes": "Layered knit pieces in neutral tones create Old Money ease—merino beanie, mesh hoodie, and cardigan stack with minimal effort while effortless pants and classic New Balance keep the vibe grounded and clean.",
+      "palette": [
+        "black",
+        "ivory",
+        "tan",
+        "grey"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242340",
+      "vibe": "night",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-3a808e2b40bdb4ed",
+        "outer": "drop-51a89ede10d6f271",
+        "top": "generated-ff800081d78419b4",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-874-work-pants-black-b87c0e3541ca8e",
+        "shoes": "drop-d477ca577d1f346e",
+        "bag": "drop-051e0fcf97fac95c",
+        "jewelry": "drop-1483a1cef42d85fa"
+      },
+      "stylingNotes": "Premium moto jacket anchors an androgynous night-out look: edgy camp collar top meets structured workwear bottoms, patent leather sneakers, and a statement oxblood bag for understated luxury.",
+      "palette": [
+        "black",
+        "oxblood",
+        "silver"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242377",
+      "vibe": "night",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-c94745f295e8a719",
+        "top": "generated-904d55dfcb886a10",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-501-preshrunk-jean-black-6eaee4c1ed9d64",
+        "shoes": "generated-76b2ba3dbd4e1ab6",
+        "bag": "drop-32afafe68b742df6",
+        "eyewear": "generated-509ca28e64d3778f"
+      },
+      "stylingNotes": "All-black foundation with a silk shirt and leather shoes creates elevated nightlife energy—the Pit Viper hat and Bottega shades inject the edge and polish needed for a memorable night out.",
+      "palette": [
+        "black",
+        "chocolate",
+        "luxury"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242414",
+      "vibe": "night",
+      "frame": "fem",
+      "slots": {
+        "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+        "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-pants-f57cdbd6b897fe",
+        "shoes": "catalog-shoes-stevemadden-heel",
+        "bag": "drop-fce8eac901f8a2e1",
+        "eyewear": "generated-3c7722ad04f616df",
+        "jewelry": "5f0c9a42e1eb6cd1"
+      },
+      "stylingNotes": "Red blazer and black trousers create a classic night-out silhouette, elevated with pointed heels and silver jewelry for polished edge.",
+      "palette": [
+        "red",
+        "black",
+        "silver"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242451",
+      "vibe": "cozy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-61b817e60515ae62",
+        "outer": "drop-5de729717652a99f",
+        "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-oversized-half-sleeve-t-shirt-44604ff3b6c959",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-black-30-771e3db31eaad8",
+        "shoes": "drop-75b4abc8d934f50a",
+        "bag": "generated-3d2deffc6ded97df"
+      },
+      "stylingNotes": "Cozy, functional airport outfit balances layered comfort with clean utility wear—fleece + merino beanie keep you warm, Dickies work pants and minimal sneakers deliver practical streetwear, and the sling bag provides hands-free travel carry.",
+      "palette": [
+        "black",
+        "grey",
+        "white",
+        "neutral"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242488",
+      "vibe": "cozy",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-77b2ef9cdfcd762f",
+        "outer": "generated-2f1bfa27a4583c16",
+        "top": "generated-127620ae2bde4132",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-501-original-men-s-jeans-black-x-34-c3187f970682ac",
+        "shoes": "drop-b7c655ef9785325e",
+        "bag": "generated-cc5a592e65a1f88d",
+        "jewelry": "drop-aa1f3ed5ae3eb698"
+      },
+      "stylingNotes": "Neutral base in black denim and off-white sneaker with a merino beanie and cozy hoodie layering creates a relaxed-but-put-together travel uniform—practical, warm, and effortlessly stylish for the airport.",
+      "palette": [
+        "black",
+        "cream",
+        "grey"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242525",
+      "vibe": "cozy",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-a3d9b589513ffaf9",
+        "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-t-shirt-784441e66db8af",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-women-s-original-874-work-pants-fbf8084cf446c3",
+        "shoes": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
+        "bag": "17ecdf2c6939f890",
+        "eyewear": "generated-87977830b2f181be"
+      },
+      "stylingNotes": "Relaxed monochromatic base with utilitarian pieces that feel effortless and travel-ready—oversized tee balances structured work pants, classic sneakers keep it grounded, and accessories stay minimal and functional.",
+      "palette": [
+        "black",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242562",
+      "vibe": "date",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "drop-45cea998b25d57a2",
+        "top": "drop-2e16164e8878c1a7",
+        "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-new-agency-lo-rise-pants-1b9f5c1c78c299",
+        "shoes": "drop-aca0d9cd19822b6c",
+        "bag": "drop-0a48f1226427b537",
+        "eyewear": "drop-d36288d25687c3c1",
+        "jewelry": "drop-76f8b0c619820c23"
+      },
+      "stylingNotes": "A refined night-date look balancing preppy polish with modern cool—structured jacket, crisp stripes, and sleek black pants elevated by luxury sneakers and a Telfar bag for effortless confidence.",
+      "palette": [
+        "navy",
+        "white",
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242599",
+      "vibe": "date",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-f8ea2186dd502fa9",
+        "outer": "drop-35ce33edd6616448",
+        "top": "generated-b2f4ef84d3ff7a1c",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-men-s-501-original-fit-jeans-c89073e32791e0",
+        "shoes": "drop-3fea251ec11c7a63",
+        "bag": "drop-80290f9ed95e74f4"
+      },
+      "stylingNotes": "Sophisticated date-night look that balances preppy polish with modern streetwear edge: premium utility jacket and pique polo elevate classic denim, while Jordan silhouette and TELFAR bag add cool-factor cool without sacrificing refinement.",
+      "palette": [
+        "navy",
+        "black",
+        "tan",
+        "white"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242636",
+      "vibe": "date",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-cbd15d68fbaaed11",
+        "bottom": "searchapi-quality-bottoms-aritzia-effortless-effortless-pants-women-s-pants-2bc4ab4c7ce930",
+        "shoes": "drop-eaf33c3edd384e65",
+        "bag": "drop-417c3f839b9ae940",
+        "jewelry": "drop-1a0f90e0596fd314",
+        "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb",
+        "top": "drop-852707c24a9d9703"
+      },
+      "stylingNotes": "Monochrome base with elevated casual essentials—white ribbed tank, black tailored pants, crisp white sneakers, and gold accessories create a poised night-out look that feels both put-together and effortlessly cool.",
+      "palette": [
+        "white",
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242673",
+      "vibe": "edgy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-d0dad86fa61690c5",
+        "top": "generated-9d0abb6b8a4443f1",
+        "bottom": "searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-cargo-straight-pants-ed27b74d922a1d",
+        "shoes": "drop-22d260d85e98ab1c",
+        "bag": "generated-e84568147f40668e",
+        "eyewear": "drop-d6b445c3b7a9c48f"
+      },
+      "stylingNotes": "Black silk camp shirt paired with cargo pants and technical sling bag creates an edgy, utility-forward look grounded by clean streetwear staples and luxury eyewear.",
+      "palette": [
+        "black",
+        "olive",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242710",
+      "vibe": "edgy",
+      "frame": "masc",
+      "slots": {
+        "outer": "drop-b75b5f66eaa5ec1d",
+        "top": "generated-5f38ef633de1082a",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117",
+        "shoes": "drop-a8c65ca302798c2c",
+        "bag": "generated-8b2ea1104cb757de",
+        "eyewear": "generated-0e1e6aa12957b634",
+        "jewelry": "7fb598eee85fa4a6"
+      },
+      "stylingNotes": "Monochromatic black base with utility-forward pieces—mechanic jacket, workwear bottoms, and street sneakers—creates authentic techwear edge that feels intentional rather than costume.",
+      "palette": [
+        "black",
+        "charcoal",
+        "gold"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242747",
+      "vibe": "edgy",
+      "frame": "fem",
+      "slots": {
+        "hat": "drop-324047f016b9a2f5",
+        "outer": "drop-5bd328249a5ff1ff",
+        "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-cotton-t-shirt-f7722590f3c129",
+        "bottom": "searchapi-quality-bottom-denim-casual-madewell-women-s-relaxed-cargo-pants-1b2325b1d20419",
+        "shoes": "drop-00cd2debba354113",
+        "bag": "drop-31aa3db8f7e8001a"
+      },
+      "stylingNotes": "Techwear utility base: grey track jacket over black tee with cargo pants and minimal white/black sneakers, anchored by an olive Telfar bag—clean, functional, edgy.",
+      "palette": [
+        "black",
+        "grey",
+        "olive"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242784",
+      "vibe": "office",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-473385718f5417aa",
+        "outer": "drop-308d9613a88aabae",
+        "top": "generated-35b7019fff4357eb",
+        "bottom": "searchapi-quality-bottoms-abercrombie-sloane-abercrombie-and-fitch-women-s-sloane-lightweight-crepe-pants-99b84c678478ba",
+        "shoes": "searchapi-quality-shoes-clean-sneakers-new-balance-men-s-bb550-in-white-black-leather-60ccc114c4d66b",
+        "bag": "generated-7aae6575aefe9980",
+        "jewelry": "drop-83a2c8a40ab5b2f3"
+      },
+      "stylingNotes": "A refined office smart casual look that balances preppy polish (polo, windbreaker) with modern edge (clean-lined sneaker and minimal gold accent), staying under budget at $434.",
+      "palette": [
+        "navy",
+        "black",
+        "white",
+        "gold"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242821",
+      "vibe": "office",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-830080ddfd38687c",
+        "top": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-wrinkle-free-dress-shirt-6406dfb7bd3fe6",
+        "bottom": "generated-de7d7fa0912bedd2",
+        "shoes": "drop-42fb5e7c9b25ccb5",
+        "bag": "generated-61631f4a8a4b6911",
+        "eyewear": "generated-647f291bbec69d0d"
+      },
+      "stylingNotes": "Crisp white oxford and tailored suit pants create a polished office foundation, grounded with neutral accessories and a classic boat shoe for approachable smart casual.",
+      "palette": [
+        "white",
+        "black",
+        "tan"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242858",
+      "vibe": "office",
+      "frame": "fem",
+      "slots": {
+        "top": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-3x-8d248b4ccdc54c",
+        "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-wilfred-women-s-thesis-pant-e9f67721813ddf",
+        "shoes": "drop-ebcebdea81be425f",
+        "bag": "generated-c1df9317dbaeff46",
+        "eyewear": "generated-b1119060a321f992",
+        "jewelry": "drop-05793dd760e9ddbc",
+        "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb"
+      },
+      "stylingNotes": "A lightweight oxford paired with tailored trousers and neutral sneakers creates an approachable office-smart look—elevated by warm gold jewelry and a minimal structured tote for an effortless professional edge.",
+      "palette": [
+        "white",
+        "black",
+        "grey",
+        "gold"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242895",
+      "vibe": "preppy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-422653ac39d10e4b",
+        "outer": "drop-dc4c8e6f86f4f9a7",
+        "top": "generated-b1ccefd6f472628c",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-women-s-501-original-jeans-5f3745f408af7e",
+        "shoes": "drop-8148277f12771c11",
+        "bag": "drop-a0b0a8d1f2000283"
+      },
+      "stylingNotes": "Crisp white polo layered under an elevated preppy windbreaker with structured 501 jeans and premium New Balance sneakers creates an effortlessly polished look—elevated basics in a cohesive neutral palette.",
+      "palette": [
+        "white",
+        "navy",
+        "cream",
+        "tan"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242932",
+      "vibe": "preppy",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-7195d240b9fc0f8e",
+        "outer": "drop-f5ebb99db1f47f0a",
+        "top": "searchapi-quality-tops-jcrew-oxford-j-crew-men-s-tall-bowery-performance-stretch-dress-shirt-44703355dd5d23",
+        "bottom": "searchapi-quality-bottoms-levis-501-levi-s-501-pre-washed-jeans-pre-washed-black-40-x-30-287e823803465a",
+        "shoes": "drop-b2bf4d0c167f95ba",
+        "bag": "generated-a08f5cc9b8f11647",
+        "jewelry": "0e0b0d3079442b71"
+      },
+      "stylingNotes": "Classic preppy foundation with elevated basics: crisp white oxford, black jeans, and premium New Balance sneaker signal clean elevated taste, anchored by ALD jacket and neutral accessories.",
+      "palette": [
+        "white",
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163242969",
+      "vibe": "preppy",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-1ea7e1ff86cb33c5",
+        "top": "drop-801c170d2ea55154",
+        "bottom": "searchapi-quality-bottoms-levis-501-original-straight-leg-jeans-7ebb4d44e5f249",
+        "shoes": "drop-2ca0f430ab769aec",
+        "bag": "catalog-bag-longchamp-lepliage",
+        "eyewear": "drop-8663a61076d67ff5"
+      },
+      "stylingNotes": "Preppy-elevated foundation: classic blue jeans and tan mesh top anchor the look, while ALD sneakers and Longchamp tote bring that clean, old-money sportswear sensibility that defines contemporary prep.",
+      "palette": [
+        "tan",
+        "blue",
+        "cream",
+        "gold"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163243006",
+      "vibe": "vacation",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "drop-b480d297ee83c852",
+        "top": "drop-745cbb5a4c57a65f",
+        "bottom": "drop-929248d4365be5aa",
+        "shoes": "drop-f904887ace26ed2b",
+        "bag": "drop-dd825db9fdc7c457",
+        "eyewear": "drop-7f9a3f503a6e7b40",
+        "jewelry": "drop-aa86bf2cba7b3025"
+      },
+      "stylingNotes": "A polished airport utility look: reversible windbreaker layers over a cozy neutral hoodie with track trousers and clean-lined sneakers. Marble sunglasses and a utility tote add quiet luxury without fuss.",
+      "palette": [
+        "grey",
+        "white",
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-10"
+    },
+    {
+      "id": "syli-2026-06-10-163243043",
+      "vibe": "vacation",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-a1a725bebf4d9a53",
+        "outer": "drop-a70c332b6921fb2e",
+        "top": "drop-88b05cd4b4c0bac8",
+        "bottom": "drop-3ae9091e99c3dbfb",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+        "bag": "generated-08b249a2fb473b3b"
+      },
+      "stylingNotes": "This resort-ready outfit balances lightweight layers (linen hat, breathable tee, pullover jacket) with relaxed essentials (shorts, sandals, beach bag) for effortless vacation style that actually works.",
+      "palette": [
+        "neutral cream",
+        "warm sand",
+        "soft pink"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-06-10"
+    }
+  ]
+}

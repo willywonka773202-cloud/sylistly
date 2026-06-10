@@ -12,6 +12,17 @@
 
 ## Log (newest first)
 
+### 2026-06-10 (night) — Claude Code — build+check (NIGHTLY AI BAKE: "Styled by Syli" is now TRUE, ~$10/mo)
+- Will approved the $10/mo budget. The scroll now serves GENUINELY Claude-composed looks at $0 marginal cost:
+- **scripts/bake-ai-looks.mjs**: drives /api/look against a local server (Haiku composer via .env.local), stores ONLY source==='ai' responses into data/ai-look-library.json; validates ids against the client catalog + requires top/bottom/shoes + ≥4 pieces; dedupes by combo signature; HARD CAPS: AI_BAKE_LOOKS=22/run, AI_BAKE_MAX_USD=0.40/run, aborts after 4 consecutive non-AI responses (key/budget failure). Library capped at 600 (oldest dropped).
+- **First bake done**: 22/22 looks across 8 vibes × 3 frames, $0.33, with real Claude styling notes + palettes + formula labels ("Old-Money Knit", "Airport Utility").
+- **lib/ai-look-library.ts**: hydrates baked looks against CLIENT_CATALOG_PRODUCTS (+ isEditorialCutoutProduct gate); getAiLook(vibe, frame, {seen, avoid}).
+- **Scroll integration (app/page.tsx)**: AI looks served FIRST when nothing is locked/disabled; "STYLED BY SYLI" gradient badge + Claude's real note in WHY — ONLY on baked looks (restyle demotes to engine + drops badge, honest). Seen-marking happens on VIEW (IntersectionObserver effect), NOT inside makeLooks — React StrictMode double-invokes state initializers and was silently consuming the library (real bug found via window.__aiDebug probe; batch-local dedupe set added).
+- **Nightly automation**: scripts/bake-ai-ship.mjs (boot dev server on :3939 → bake → kill → commit data file → push → vercel --prod; failed deploy = previous deployment keeps serving) + launchd job com.sylistly.aibake at 02:45 daily (installed + loaded; logs at ~/Library/Logs/sylistly-ai-bake.log; launchd fires missed runs on wake).
+- GOTCHA logged: running `next build` while `next dev` shares .next corrupts dev CSS — restart dev server with rm -rf .next.
+- VERIFIED: tsc clean · build exit 0 · preview: badge renders on baked cards (case-sensitive innerText check was a red herring — CSS uppercase), Claude note in WHY, engine cards unbadged. DEPLOYED.
+- next: shareable public fit pages w/ flat-lay OG (Instagram engine) · montage sweep (task chip pending) · Skimlinks IDs when approved.
+
 ### 2026-06-10 (later) — Claude Code — build+check (SCROLL v2: worn silhouette + rich chrome + PostHog live)
 - Will's design review w/ Fits-AI references + 8 pinned answers: worn-silhouette layout, bright studio plate, honest heart (no fake counts), full rich chrome, scroll-first stays, full 7-8-piece styling, staggered settle-in motion. Plus HIS killer mechanic upgrade: **locks persist across the scroll** — lock the pants, swipe, next look composes around them.
 - **components/WornFlatlay.tsx** (new): outfit arranged as worn — headwear top, outer+top layered at torso, bottoms tucked under, shoes grounded by a floor shadow; per-piece rotations, drop shadows, dress-order stagger (sy-piece-in) triggered by IntersectionObserver when a card snaps in.
