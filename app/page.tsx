@@ -1,510 +1,523 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
 import {
-  ChevronRight,
-  ExternalLink,
-  Flame,
-  Heart,
+  Bookmark,
+  Check,
+  Lock,
+  Share2,
   ShoppingBag,
-  Sparkles,
+  SlidersHorizontal,
   WandSparkles,
+  X,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { Onboarding } from '@/components/Onboarding';
+import { OutfitLookCard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
-import { isExactProductUrl } from '@/lib/checkout';
-import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
+import { buildCatalogLook } from '@/lib/client-catalog';
+import { getLibraryLook } from '@/lib/outfit-library';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { getStylistCatalogProducts, getStylistStarterProducts } from '@/lib/client-catalog';
 import type { Category, Product } from '@/lib/types';
-import type { GeneratorFrame, VibeId } from '@/lib/vibes';
+import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
+import { useCheckout } from '@/store/checkout';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
-import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
-import { useSocialFeed } from '@/store/social-feed';
-import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
+import { useSavedFits } from '@/store/saved-fits';
 
 const ONBOARDED_KEY = 'sylistly.onboarded.v1';
 
+/** Curated rotation so consecutive cards feel like turning magazine pages. */
+const VIBE_ROTATION: VibeId[] = [
+  'street', 'clean', 'night', 'cozy', 'date', 'edgy', 'office', 'preppy', 'vacation', 'gym',
+];
+
+const VIBE_META = new Map(VIBES.map((vibe) => [vibe.id, vibe]));
+
+const CATEGORY_NOUN: Record<Category, string> = {
+  hat: 'hat',
+  outer: 'layer',
+  top: 'top',
+  bottom: 'bottoms',
+  shoes: 'shoes',
+  bag: 'bag',
+  eyewear: 'frames',
+  jewelry: 'jewelry',
+};
+
+const MAX_LOOKS = 60;
+
+interface ScrollLook {
+  key: string;
+  vibe: VibeId;
+  items: Partial<Record<Category, Product>>;
+  /** bumped on every restyle so the plate can remount with a fade */
+  gen: number;
+}
+
+function lookProducts(items: Partial<Record<Category, Product>>): Product[] {
+  return Object.values(items).filter((product): product is Product => Boolean(product));
+}
+
+function lookTotalCents(items: Partial<Record<Category, Product>>): number {
+  return lookProducts(items).reduce((sum, product) => sum + (product.priceCents || 0), 0);
+}
+
 function formatPrice(cents: number): string {
-  return `$${(cents / 100).toLocaleString()}`;
+  return `$${Math.round(cents / 100).toLocaleString()}`;
 }
 
-function fitCoverProduct(fit: SavedFitRecord): Product | null {
-  const items = fit.items;
-  return [items.outer, items.top, items.bottom, items.shoes, ...Object.values(items)]
-    .find((product): product is Product => isLinkedCutoutProduct(product)) || null;
-}
-
-function itemsFromProduct(product: Product): Partial<Record<Category, Product>> {
-  return { [product.category]: product } as Partial<Record<Category, Product>>;
-}
-
-function isLinkedCutoutProduct(product?: Product | null): product is Product {
-  return Boolean(product && isEditorialCutoutProduct(product) && hasExactProductLink(product));
-}
-
-function merchantHost(product: Product): string {
-  const url = getProductOutboundUrl(product);
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return product.retailer || 'merchant';
+/**
+ * One look, instantly: pre-generated library first (best coordination scores),
+ * live client-side compose as fallback — and always live compose when pieces
+ * are locked, because locks are the one thing the library can't honor.
+ */
+function composeScrollLook(
+  vibe: VibeId,
+  frame: GeneratorFrame,
+  seed: number,
+  avoidProductIds: string[],
+  lockedItems?: Partial<Record<Category, Product>>,
+): Partial<Record<Category, Product>> | null {
+  const hasLocks = lockedItems && Object.keys(lockedItems).length > 0;
+  if (!hasLocks) {
+    const library = getLibraryLook(vibe, frame, { seed, avoidProductIds });
+    if (library) return library.products;
   }
+  const built = buildCatalogLook({
+    vibe,
+    frame,
+    budget: 'any',
+    mode: 'full',
+    seed,
+    avoidProductIds,
+    lockedItems,
+    currentItems: lockedItems,
+    // Same gate the pre-generated library passes through — clean garment
+    // cutouts only, never a model photo on the plate.
+    transparentOnly: true,
+  });
+  return lookProducts(built.products).length >= 3 ? built.products : null;
 }
 
-export default function HomePage() {
+/** Honest stylist note derived from what's actually in the look. */
+function syliNote(look: ScrollLook): string {
+  const meta = VIBE_META.get(look.vibe);
+  const products = lookProducts(look.items);
+  if (!products.length || !meta) return '';
+  const hero = products.reduce((best, candidate) =>
+    (candidate.priceCents || 0) > (best.priceCents || 0) ? candidate : best,
+  );
+  const blurb = meta.blurb.charAt(0).toUpperCase() + meta.blurb.slice(1);
+  return `${blurb} — anchored by the ${hero.brand} ${CATEGORY_NOUN[hero.category] || 'piece'}.`;
+}
+
+export default function ScrollPage() {
   const router = useRouter();
-  const [hasMounted, setHasMounted] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  const savedFits = useSavedFits((state) => state.fits);
-  const wardrobeItems = useWardrobe(selectWardrobeItems);
-  const addToCloset = useWardrobe((state) => state.addToCloset);
-  const addToWishlist = useWardrobe((state) => state.addToWishlist);
-  const feedPosts = useSocialFeed((state) => state.posts);
-  const mergeItems = useFit((state) => state.mergeItems);
+  const replaceItems = useFit((state) => state.replaceItems);
+  const saveFit = useSavedFits((state) => state.saveFit);
+  const setCheckout = useCheckout((state) => state.setCheckout);
+  const profileFrame = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
-  const setVibesFromText = useProfile((state) => state.setVibesFromText);
 
-  // First-run onboarding: show once for genuinely new users (no saved fits,
-  // empty wardrobe) who haven't seen it. The flag persists the dismissal.
+  const frame: GeneratorFrame = profileFrame === 'custom' ? 'androgynous' : profileFrame;
+
+  const [hasMounted, setHasMounted] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [vibeFilter, setVibeFilter] = useState<VibeId | 'all'>('all');
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [locks, setLocks] = useState<Record<string, Category[]>>({});
+  const [toast, setToast] = useState<string | null>(null);
+
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const seedRef = useRef(101);
+  const indexRef = useRef(0);
+  const recentIdsRef = useRef<string[]>([]);
+  const toastTimer = useRef<number | null>(null);
+
+  const makeLooks = useCallback(
+    (count: number, useFrame: GeneratorFrame, filter: VibeId | 'all'): ScrollLook[] => {
+      const fresh: ScrollLook[] = [];
+      let attempts = 0;
+      while (fresh.length < count && attempts < count * 4) {
+        attempts += 1;
+        const vibe = filter === 'all' ? VIBE_ROTATION[indexRef.current % VIBE_ROTATION.length] : filter;
+        indexRef.current += 1;
+        seedRef.current += 17;
+        const items = composeScrollLook(vibe, useFrame, seedRef.current, recentIdsRef.current);
+        if (!items) continue;
+        const ids = lookProducts(items).map((product) => product.id);
+        recentIdsRef.current = [...recentIdsRef.current, ...ids].slice(-80);
+        fresh.push({ key: `look-${seedRef.current}`, vibe, items, gen: 0 });
+      }
+      return fresh;
+    },
+    [],
+  );
+
+  // Deterministic first render (default frame, no filter) so SSR HTML and the
+  // first client paint match; personalization re-rolls after mount.
+  const [looks, setLooks] = useState<ScrollLook[]>(() => makeLooks(4, 'androgynous', 'all'));
+
   useEffect(() => {
     setHasMounted(true);
-    try {
-      if (localStorage.getItem(ONBOARDED_KEY)) return;
-      const fresh =
-        useSavedFits.getState().fits.length === 0 &&
-        selectWardrobeItems(useWardrobe.getState()).length === 0;
-      if (fresh) setShowOnboarding(true);
-      else localStorage.setItem(ONBOARDED_KEY, '1');
-    } catch {
-      /* localStorage unavailable — skip onboarding silently */
+    if (typeof window !== 'undefined' && !window.localStorage.getItem(ONBOARDED_KEY)) {
+      setShowOnboarding(true);
     }
   }, []);
 
-  const completeOnboarding = (frame: GeneratorFrame, vibe: VibeId) => {
-    setBodyType(frame);
-    setVibesFromText(vibe);
-    try {
-      localStorage.setItem(ONBOARDED_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-    setShowOnboarding(false);
-    router.push(`/build?vibe=${vibe}&frame=${frame}&source=onboarding`);
-  };
+  // Re-roll the deck when the user's frame or vibe filter changes (post-mount).
+  useEffect(() => {
+    if (!hasMounted) return;
+    recentIdsRef.current = [];
+    setLocks({});
+    setLooks(makeLooks(4, frame, vibeFilter));
+    scrollerRef.current?.scrollTo({ top: 0 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frame, vibeFilter, hasMounted]);
 
-  const dismissOnboarding = () => {
-    try {
-      localStorage.setItem(ONBOARDED_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-    setShowOnboarding(false);
-  };
-
-  // Counts derive from real state — never seeded, never inflated.
-  const savedCount = hasMounted ? savedFits.length : 0;
-  const closetCount = hasMounted ? wardrobeItems.filter((entry) => entry.status === 'closet').length : 0;
-  const wishlistCount = hasMounted ? wardrobeItems.filter((entry) => entry.status === 'wishlist').length : 0;
-  const likedFeedCount = hasMounted ? feedPosts.filter((post) => post.liked).length : 0;
-
-  const recentSavedFits = hasMounted ? savedFits.slice(0, 6) : [];
-  const recentWardrobe = useMemo(
-    () => (hasMounted ? wardrobeItems.filter((item) => isLinkedCutoutProduct(item.product)).slice(0, 6) : []),
-    [wardrobeItems, hasMounted],
-  );
-  const homeStories = useMemo(
-    () => (hasMounted ? feedPosts
-      .filter((post) => Object.values(post.items).some(isLinkedCutoutProduct))
-      .slice(0, 8) : []),
-    [feedPosts, hasMounted],
-  );
-
-  // "Basics" suggestions come from the feed posts the user has already
-  // generated/loaded, then fall back to the strict real cutout catalog.
-  // No fake "you might need" copy and no non-linked product cards.
-  const basicSuggestions = useMemo<Product[]>(() => {
-    const closetProductIds = new Set(
-      wardrobeItems.filter((entry) => entry.status === 'closet').map((entry) => entry.productId),
-    );
-    const targetCategories: Category[] = ['top', 'outer', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
-    const seenIds = new Set<string>();
-    const suggestions: Product[] = [];
-
-    function addSuggestion(product?: Product | null) {
-      if (!isLinkedCutoutProduct(product)) return;
-      if (closetProductIds.has(product.id)) return;
-      if (seenIds.has(product.id)) return;
-      seenIds.add(product.id);
-      suggestions.push(product);
-    }
-
-    for (const post of feedPosts) {
-      for (const category of targetCategories) {
-        addSuggestion(post.items[category]);
-        if (suggestions.length >= 8) return suggestions;
-      }
-    }
-
-    const catalogFallback = [...getStylistStarterProducts(8), ...getStylistCatalogProducts()];
-    for (const product of catalogFallback) {
-      addSuggestion(product);
-      if (suggestions.length >= 8) break;
-    }
-
-    return suggestions;
-  }, [feedPosts, wardrobeItems]);
-
-  function showToast(message: string) {
+  const showToast = useCallback((message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(null), 1800);
+    if (toastTimer.current) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 1600);
+  }, []);
+
+  function onScroll() {
+    const el = scrollerRef.current;
+    if (!el) return;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < el.clientHeight * 2) {
+      setLooks((prev) =>
+        prev.length >= MAX_LOOKS ? prev : [...prev, ...makeLooks(3, frame, vibeFilter)],
+      );
+    }
   }
 
-  function buildAround(product: Product) {
-    // Merge the anchor into any in-progress fit instead of wiping it.
-    mergeItems(itemsFromProduct(product));
-    router.push(`/build?lock=${encodeURIComponent(product.category)}`);
+  function toggleLock(lookKey: string, category: Category) {
+    setLocks((prev) => {
+      const current = prev[lookKey] || [];
+      const next = current.includes(category)
+        ? current.filter((entry) => entry !== category)
+        : [...current, category];
+      return { ...prev, [lookKey]: next };
+    });
+  }
+
+  function restyle(look: ScrollLook) {
+    const lockedCategories = locks[look.key] || [];
+    const lockedItems: Partial<Record<Category, Product>> = {};
+    for (const category of lockedCategories) {
+      const product = look.items[category];
+      if (product) lockedItems[category] = product;
+    }
+    const lockedIds = new Set(Object.values(lockedItems).map((product) => product?.id));
+    seedRef.current += 17;
+    const avoid = recentIdsRef.current.filter((id) => !lockedIds.has(id));
+    const items = composeScrollLook(look.vibe, frame, seedRef.current, avoid, lockedItems);
+    if (!items) {
+      showToast('No fresh take found — try unlocking a piece');
+      return;
+    }
+    recentIdsRef.current = [
+      ...recentIdsRef.current,
+      ...lookProducts(items).map((product) => product.id),
+    ].slice(-80);
+    setLooks((prev) =>
+      prev.map((entry) =>
+        entry.key === look.key ? { ...entry, items, gen: entry.gen + 1 } : entry,
+      ),
+    );
+  }
+
+  function save(look: ScrollLook) {
+    const record = saveFit(look.items);
+    showToast(record ? 'Saved to your looks' : 'Could not save this one');
+  }
+
+  function remix(look: ScrollLook) {
+    replaceItems(look.items);
+    router.push('/build');
+  }
+
+  function shop(look: ScrollLook) {
+    const meta = VIBE_META.get(look.vibe);
+    const products = lookProducts(look.items)
+      .map((product) => ({
+        id: product.id,
+        brand: product.brand,
+        name: product.name,
+        retailer: product.retailer,
+        url: getProductOutboundUrl(product),
+        priceCents: product.priceCents,
+      }))
+      .filter((product) => Boolean(product.url));
+    setCheckout({ title: `${meta?.label || 'Sylistly'} fit`, products });
+    router.push('/checkout');
+  }
+
+  async function share(look: ScrollLook) {
+    const meta = VIBE_META.get(look.vibe);
+    const products = lookProducts(look.items);
+    const text = `${meta?.label || 'A'} fit on Sylistly — ${products
+      .slice(0, 3)
+      .map((product) => product.brand)
+      .join(', ')} + ${Math.max(0, products.length - 3)} more, ${formatPrice(lookTotalCents(look.items))} total.`;
+    const url = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Sylistly', text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      showToast('Copied to clipboard');
+    } catch {
+      /* user dismissed the share sheet */
+    }
+  }
+
+  function completeOnboarding(pickedFrame: GeneratorFrame, vibe: VibeId) {
+    window.localStorage.setItem(ONBOARDED_KEY, '1');
+    setShowOnboarding(false);
+    setBodyType(pickedFrame);
+    setVibeFilter(vibe);
+  }
+
+  function skipOnboarding() {
+    window.localStorage.setItem(ONBOARDED_KEY, '1');
+    setShowOnboarding(false);
   }
 
   return (
-    <>
-    {showOnboarding ? <Onboarding onComplete={completeOnboarding} onSkip={dismissOnboarding} /> : null}
-    <main className="mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg">
-      <header className="px-5 pb-4 pt-[calc(env(safe-area-inset-top)+18px)]">
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="sy-eyebrow">Sylistly</div>
-            <h1 className="mt-1 font-serif text-[34px] font-semibold leading-[0.95] tracking-[-0.02em] text-ink">
-              Today&rsquo;s <span className="italic text-accent">looks</span>
-            </h1>
-          </div>
-          <Link
-            href="/stylist"
-            className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent-soft px-3.5 py-2 text-[11px] font-bold uppercase tracking-[.12em] text-accent transition active:scale-95 hover:border-accent/55"
-          >
-            <WandSparkles size={13} />
-            Syli
-          </Link>
+    <main className="relative mx-auto h-[100dvh] max-w-[480px] overflow-hidden bg-bg">
+      <h1 className="sr-only">Sylistly — endless outfits from real products</h1>
+
+      {/* Top chrome */}
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
+        <div className="flex items-center gap-2">
+          <span className="h-[2px] w-6 rounded-full bg-accent" aria-hidden />
+          <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
         </div>
-        <div className="sy-rule mt-4" />
+        <button
+          type="button"
+          onClick={() => setFilterOpen((open) => !open)}
+          aria-expanded={filterOpen}
+          aria-label="Filter vibes"
+          className="sy-press pointer-events-auto grid h-10 w-10 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+        >
+          {filterOpen ? <X size={17} /> : <SlidersHorizontal size={17} />}
+        </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto pb-32">
-        <section className="px-4 pt-4">
-          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide" data-home-story-rail>
-            <button
-              type="button"
-              onClick={() => router.push('/build')}
-              className="w-[70px] flex-none text-center transition active:scale-95"
-              aria-label="Create your outfit of the day"
-            >
-              <span className="relative mx-auto grid h-[66px] w-[66px] place-items-center rounded-full bg-[linear-gradient(135deg,#ff3b63,#ff6e8a)] text-white shadow-[0_14px_30px_rgba(255,59,99,.4)]">
-                <Sparkles size={26} strokeWidth={2.1} />
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-bg bg-ink text-[16px] leading-none text-bg">+</span>
-              </span>
-              <span className="mt-1.5 block truncate text-[11px] font-semibold text-ink">Your OOTD</span>
-            </button>
-            {homeStories.map((post, index) => {
-              const preview = Object.values(post.items).find(isLinkedCutoutProduct);
-              if (!preview) return null;
-              return (
-                <button
-                  key={`home-story-${post.id}`}
-                  type="button"
-                  onClick={() => router.push('/feed')}
-                  className="w-[68px] flex-none text-center transition active:scale-95"
-                  aria-label={`Open ${post.title} story in feed`}
-                >
-                  <span className="mx-auto block rounded-full bg-gradient-to-br from-[#9d78d7] via-accent to-[#eadbd2] p-[3px] shadow-[0_12px_28px_rgba(0,0,0,.25)]">
-                    <span className="grid h-[58px] w-[58px] place-items-center overflow-hidden rounded-full border border-white/20 bg-[#f8f4ef]">
-                      <ProductImage
-                        product={preview}
-                        transparentOnly
-                        displayMode="thumbnail"
-                        wrapperClassName="h-full w-full bg-transparent"
-                        className="h-full w-full object-contain p-1.5"
-                      />
-                    </span>
-                  </span>
-                  <span className="mt-1 block truncate text-[11px] font-semibold text-muted-2">
-                    {post.username.replace(/^@/, '') || `style${index + 1}`}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Focused launch */}
-        <section className="px-5 pt-5">
-          <div className="sy-card-strong sy-enter overflow-hidden rounded-card-lg p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="sy-eyebrow">AI Stylist</div>
-                <h2 className="mt-2.5 font-serif text-[40px] font-semibold leading-[0.9] tracking-[-0.025em] text-ink">
-                  Style a fit
-                  <br />
-                  <span className="italic text-accent">in seconds.</span>
-                </h2>
-                <p className="mt-3.5 max-w-[30ch] text-[14px] leading-relaxed text-muted-2">
-                  Pick a vibe and Syli composes a complete, color-matched outfit from real, shoppable pieces.
-                </p>
-              </div>
-              <span className="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
-                <Sparkles size={22} />
-              </span>
-            </div>
-
-            <div className="mt-6 grid grid-cols-[1.25fr_.75fr] gap-2.5">
-              <Link href="/build" className="sy-cta-primary px-4 py-3.5 text-[12px] font-bold uppercase tracking-[.12em]">
-                <Sparkles size={15} />
-                Style my fit
-              </Link>
-              <Link href="/feed" className="sy-cta-secondary px-4 py-3.5 text-[12px] font-bold uppercase tracking-[.12em]">
-                <Flame size={14} />
-                Feed
-              </Link>
-            </div>
-
-            <div className="mt-5 grid grid-cols-4 gap-2">
-              <HeroMetric label="Saved" value={savedCount} href="/saved" />
-              <HeroMetric label="Closet" value={closetCount} href="/wardrobe" />
-              <HeroMetric label="Wish" value={wishlistCount} href="/wardrobe?status=wishlist" />
-              <HeroMetric label="Liked" value={likedFeedCount} href="/feed" />
-            </div>
-          </div>
-        </section>
-
-        {/* Recent outfits */}
-        <section className="mt-6">
-          <div className="mb-2 flex items-center justify-between px-4">
-            <div>
-              <div className="sy-eyebrow">Recent</div>
-              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Saved outfits</div>
-            </div>
-            {recentSavedFits.length > 0 ? (
-              <Link href="/saved" className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
-                See all <ChevronRight size={11} />
-              </Link>
-            ) : null}
-          </div>
-          {recentSavedFits.length === 0 ? (
-            <div className="mx-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-[12px] leading-relaxed text-muted-2">
-                No saved fits yet. Save looks from{' '}
-                <Link href="/feed" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">the Feed</Link>{' '}
-                or build one in{' '}
-                <Link href="/build" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">Builder</Link>.
-              </p>
-            </div>
-          ) : (
-            <div className="flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
-              {recentSavedFits.map((fit) => {
-                const cover = fitCoverProduct(fit);
-                return (
-                  <Link
-                    key={fit.id}
-                    href="/saved"
-                    className="group relative h-[160px] w-[124px] flex-none overflow-hidden rounded-[20px] border border-white/12 bg-black/24 shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_20px_38px_rgba(246,48,107,.4)] motion-safe:transition-all motion-safe:duration-200"
-                  >
-                    {cover ? (
-                      <ProductImage
-                        product={cover}
-                        transparentOnly
-                        wrapperClassName="h-full w-full"
-                        className="h-full w-full object-contain p-3"
-                      />
-                    ) : (
-                      <div className="grid h-full w-full place-items-center bg-white/[0.04] text-[10px] text-muted">No cover</div>
-                    )}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,.78)_100%)]" />
-                    <div className="pointer-events-none absolute inset-x-2 bottom-1.5 truncate text-[9px] font-bold uppercase tracking-[.14em] text-white">
-                      {formatPrice(fit.totalCents)} · {fit.itemCount}p
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Recently added wardrobe */}
-        <section className="mt-6">
-          <div className="mb-2 flex items-center justify-between px-4">
-            <div>
-              <div className="sy-eyebrow">Recently added</div>
-              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Your closet</div>
-            </div>
-            <Link href="/wardrobe" className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
-              Open closet <ChevronRight size={11} />
-            </Link>
-          </div>
-          {recentWardrobe.length === 0 ? (
-            <div className="mx-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-[12px] leading-relaxed text-muted-2">
-                Closet&apos;s empty.{' '}
-                <Link href="/feed" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">Browse the feed</Link>{' '}
-                or{' '}
-                <Link href="/build" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">build a fit</Link>{' '}
-                and tap the wardrobe action.
-              </p>
-            </div>
-          ) : (
-            <div className="flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
-              {recentWardrobe.map((item) => (
-                <Link
-                  key={item.id}
-                  href="/wardrobe"
-                  className="group relative h-[110px] w-[94px] flex-none overflow-hidden rounded-[18px] border border-white/12 bg-black/24 shadow-[0_10px_22px_rgba(0,0,0,.28)] transition active:scale-95 hover:-translate-y-1 hover:border-accent/60 motion-safe:transition-all motion-safe:duration-200"
-                >
-                  <ProductImage
-                    product={item.product}
-                    transparentOnly
-                    wrapperClassName="h-full w-full"
-                    className="h-full w-full object-contain p-2"
-                  />
-                  {item.status === 'wishlist' ? (
-                    <div className="absolute left-1.5 top-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow">
-                      Wish
-                    </div>
-                  ) : null}
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Catalog spotlight */}
-        <section className="mt-6 pb-6">
-          <div className="mb-2 flex items-center justify-between px-4">
-            <div>
-              <div className="sy-eyebrow">Catalog spotlight</div>
-              <div className="mt-0.5 font-serif text-[18px] font-semibold leading-tight text-ink">Real pieces to act on</div>
-            </div>
-          </div>
-          {basicSuggestions.length === 0 ? (
-            <div className="mx-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-[12px] leading-relaxed text-muted-2">
-                Style a fit or browse the feed and your picks will show up here.
-              </p>
-            </div>
-          ) : (
-            <div className="flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
-              {basicSuggestions.map((product) => {
-                const outboundUrl = getProductOutboundUrl(product);
-                const exact = isExactProductUrl(outboundUrl);
-                return (
-                <article
-                  key={`basic-${product.id}`}
-                  className="sy-lift group w-[152px] flex-none overflow-hidden rounded-card border border-hairline-2 bg-surface-1 shadow-card transition hover:border-accent/50"
-                  data-home-real-piece
-                >
-                  <button
-                    type="button"
-                    onClick={() => buildAround(product)}
-                    className="block w-full text-left"
-                    aria-label={`Build around ${product.name}`}
-                  >
-                    <div className="sy-studio relative h-[150px]">
-                      <ProductImage
-                        product={product}
-                        transparentOnly
-                        wrapperClassName="h-full w-full bg-transparent"
-                        className="h-full w-full object-contain p-3"
-                      />
-                      <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[.1em] text-white backdrop-blur-md">
-                        {product.category}
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <div className="truncate text-[10px] font-bold uppercase tracking-[.12em] text-accent">{product.brand}</div>
-                      <div className="mt-1 line-clamp-2 min-h-[34px] text-[13px] font-semibold leading-snug text-ink">{product.name}</div>
-                      <div className="mt-1.5 flex items-center justify-between gap-1">
-                        <span className="text-[14px] font-bold text-ink">{formatPrice(product.priceCents)}</span>
-                        <span className="truncate text-[9px] font-medium uppercase tracking-[.08em] text-muted">{merchantHost(product)}</span>
-                      </div>
-                    </div>
-                  </button>
-                  <div className="flex items-center gap-1.5 px-3 pb-3">
-                    <button
-                      type="button"
-                      onClick={() => buildAround(product)}
-                      className="sy-cta-primary flex-1 px-3 py-2 text-[11px] font-bold uppercase tracking-[.1em]"
-                    >
-                      Build
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Save to wishlist"
-                      onClick={() => {
-                        addToWishlist(product, 'catalog');
-                        showToast('Added to wishlist');
-                      }}
-                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-hairline-2 text-muted-2 transition hover:border-accent/50 hover:text-accent"
-                    >
-                      <Heart size={15} />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Add to closet"
-                      onClick={() => {
-                        addToCloset(product, 'catalog');
-                        showToast('Added to closet');
-                      }}
-                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-hairline-2 text-muted-2 transition hover:border-accent/50 hover:text-accent"
-                    >
-                      <ShoppingBag size={15} />
-                    </button>
-                    <a
-                      href={outboundUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Open real product link"
-                      data-home-product-link-kind={exact ? 'exact' : 'blocked'}
-                      className="sy-press grid h-9 w-9 flex-none place-items-center rounded-full border border-accent/35 bg-accent-soft text-accent transition hover:border-accent/60"
-                    >
-                      <ExternalLink size={15} />
-                    </a>
-                  </div>
-                </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        <div className="h-6" />
-      </div>
-
-      {toast ? (
-        <div className="fixed inset-x-0 bottom-[86px] z-[70] mx-auto flex max-w-[480px] justify-center px-4">
-          <div className="flex items-center gap-2 rounded-full border border-accent/35 bg-[#15110f]/95 px-4 py-2 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_42px_rgba(246,48,107,.35)] backdrop-blur-md">
-            <ShoppingBag size={13} className="text-accent" />
-            {toast}
+      {/* Vibe filter rail */}
+      {filterOpen ? (
+        <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+62px)] z-30 animate-sy-rise px-4">
+          <div className="flex gap-2 overflow-x-auto rounded-card border border-hairline bg-surface-1/90 p-2 backdrop-blur-xl scrollbar-hide">
+            <VibeChip
+              label="For you"
+              active={vibeFilter === 'all'}
+              onClick={() => { setVibeFilter('all'); setFilterOpen(false); }}
+            />
+            {VIBES.map((vibe) => (
+              <VibeChip
+                key={vibe.id}
+                label={vibe.label}
+                active={vibeFilter === vibe.id}
+                onClick={() => { setVibeFilter(vibe.id); setFilterOpen(false); }}
+              />
+            ))}
           </div>
         </div>
       ) : null}
 
+      {/* The scroll */}
+      <div
+        ref={scrollerRef}
+        onScroll={onScroll}
+        className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain scrollbar-hide"
+      >
+        {looks.map((look, index) => {
+          const meta = VIBE_META.get(look.vibe);
+          const products = lookProducts(look.items);
+          const lockedCategories = locks[look.key] || [];
+          const total = lookTotalCents(look.items);
+          return (
+            <section
+              key={look.key}
+              aria-label={`${meta?.label || 'Outfit'} look`}
+              className="relative h-[100dvh] snap-start snap-always overflow-hidden"
+            >
+              {/* Atmosphere: alternating accent/champagne spotlight + film grain */}
+              <div
+                aria-hidden
+                className={`absolute inset-0 ${
+                  index % 2 === 0
+                    ? 'bg-[radial-gradient(120%_72%_at_50%_24%,rgba(255,59,99,.09),transparent_62%)]'
+                    : 'bg-[radial-gradient(120%_72%_at_50%_24%,rgba(231,199,155,.08),transparent_62%)]'
+                }`}
+              />
+              <div aria-hidden className="sy-grain absolute inset-0 opacity-[.05] mix-blend-overlay" />
+
+              {/* The plate */}
+              <div className="absolute inset-x-4 top-[calc(env(safe-area-inset-top)+58px)] bottom-[268px]">
+                <div
+                  key={`${look.key}-gen-${look.gen}`}
+                  className="h-full animate-sy-fade overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card-strong"
+                >
+                  <OutfitLookCard
+                    items={products}
+                    presentation="flatlay"
+                    productLinks={false}
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    className="h-full"
+                  />
+                </div>
+              </div>
+
+              {/* Legibility gradient */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[320px] bg-[linear-gradient(180deg,transparent,rgba(10,10,12,.88)_58%,#0A0A0C_92%)]"
+              />
+
+              {/* Right action rail */}
+              <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+196px)] right-3 z-20 flex flex-col items-center gap-3.5">
+                <RailAction label="Save" onClick={() => save(look)}>
+                  <Bookmark size={19} />
+                </RailAction>
+                <RailAction label="Remix in builder" onClick={() => remix(look)} accent>
+                  <WandSparkles size={19} />
+                </RailAction>
+                <RailAction label={`Shop all pieces, ${formatPrice(total)} total`} onClick={() => shop(look)}>
+                  <ShoppingBag size={19} />
+                </RailAction>
+                <RailAction label="Share" onClick={() => share(look)}>
+                  <Share2 size={19} />
+                </RailAction>
+              </div>
+
+              {/* Meta */}
+              <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+88px)] z-10 px-4 pr-[72px]">
+                <p className="text-eyebrow font-extrabold uppercase text-champagne">Syli&apos;s note</p>
+                <p className="mt-1 max-w-[34ch] text-[13px] font-medium leading-snug text-muted-2">
+                  {syliNote(look)}
+                </p>
+                <div className="mt-2 flex items-baseline gap-3">
+                  <h2 className="font-serif text-[34px] font-semibold italic leading-[.95] text-ink">
+                    {meta?.label || 'The look'}
+                  </h2>
+                  <span className="text-[14px] font-bold text-money">{formatPrice(total)}</span>
+                </div>
+
+                {/* Piece chips — tap to lock, then restyle around what you love */}
+                <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
+                  {products.map((product) => {
+                    const locked = lockedCategories.includes(product.category);
+                    return (
+                      <button
+                        key={product.id}
+                        type="button"
+                        onClick={() => toggleLock(look.key, product.category)}
+                        aria-pressed={locked}
+                        aria-label={`${locked ? 'Unlock' : 'Lock'} ${product.brand} ${CATEGORY_NOUN[product.category]}`}
+                        className={`sy-press flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 backdrop-blur-md transition ${
+                          locked
+                            ? 'border-accent bg-accent-soft text-ink shadow-pink-glow'
+                            : 'border-hairline-2 bg-surface-2/70 text-muted-2'
+                        }`}
+                      >
+                        <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-ink/95">
+                          <ProductImage
+                            product={product}
+                            wrapperClassName="h-6 w-6"
+                            className="h-6 w-6 object-contain"
+                            transparentOnly
+                          />
+                        </span>
+                        <span className="text-[11px] font-semibold capitalize">
+                          {CATEGORY_NOUN[product.category]}
+                        </span>
+                        <span className="text-[11px] font-medium text-muted">
+                          {formatPrice(product.priceCents || 0)}
+                        </span>
+                        {locked ? <Lock size={11} className="text-accent" /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {lockedCategories.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => restyle(look)}
+                    className="sy-press mt-3 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-4 py-2.5 text-[13px] font-bold text-white shadow-pink-glow"
+                  >
+                    <WandSparkles size={15} />
+                    Restyle around {lockedCategories.length} locked
+                  </button>
+                ) : null}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {/* Toast */}
+      {toast ? (
+        <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+64px)] z-40 flex justify-center">
+          <span className="flex animate-sy-rise items-center gap-1.5 rounded-full border border-hairline-2 bg-surface-2/95 px-4 py-2 text-[12px] font-semibold text-ink shadow-card backdrop-blur-md">
+            <Check size={13} className="text-money" />
+            {toast}
+          </span>
+        </div>
+      ) : null}
+
+      {hasMounted && showOnboarding ? (
+        <Onboarding onComplete={completeOnboarding} onSkip={skipOnboarding} />
+      ) : null}
+
       <BottomNav />
     </main>
-    </>
   );
 }
 
-function HeroMetric({ label, value, href }: { label: string; value: number; href: string }) {
+function VibeChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
-    <Link
-      href={href}
-      className="sy-press rounded-2xl border border-white/10 bg-black/20 px-2 py-2.5 text-center transition hover:border-accent/40"
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`sy-press shrink-0 rounded-full px-3.5 py-2 text-[12px] font-semibold transition ${
+        active ? 'bg-accent text-white shadow-pink-glow' : 'bg-surface-3 text-muted-2'
+      }`}
     >
-      <div className="font-serif text-[22px] font-semibold leading-none text-ink">{value}</div>
-      <div className="mt-1 text-[9px] font-bold uppercase tracking-[.14em] text-muted">{label}</div>
-    </Link>
+      {label}
+    </button>
+  );
+}
+
+function RailAction({
+  label,
+  onClick,
+  accent = false,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  accent?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={`sy-press grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition active:scale-90 ${
+        accent
+          ? 'border-accent/50 bg-accent text-white shadow-pink-glow'
+          : 'border-hairline-2 bg-surface-2/70 text-ink'
+      }`}
+    >
+      {children}
+    </button>
   );
 }

@@ -10,7 +10,6 @@ import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet'
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
-import { useSocialFeed } from '@/store/social-feed';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
   buildCatalogLook,
@@ -425,7 +424,6 @@ function BuilderPageContent({
   const setBodyType = useProfile((state) => state.setBodyType);
   const stylePrefs = useProfile((state) => state.profile.stylePrefs);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
-  const postFitToFeed = useSocialFeed((state) => state.postFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [stylingNote, setStylingNote] = useState<{ notes?: string; palette?: string[] } | null>(null);
@@ -469,7 +467,6 @@ function BuilderPageContent({
   const [recentChangedSlots, setRecentChangedSlots] = useState<Category[]>([]);
   const recentChangedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const quickSourceProcessedRef = useRef(false);
-  const [postVisibility, setPostVisibility] = useState<'public' | 'private'>('public');
   const boardControls = useAnimation();
   const router = useRouter();
   const total = totalCents();
@@ -1043,47 +1040,16 @@ function BuilderPageContent({
     setSearchFor(category);
   }
 
-  async function saveFit() {
+  function saveFit() {
     if (!n) return;
+    // Saves are local-only today (no account system) — say exactly that.
     const localFit = saveLocalFit(items);
     recordBuilderPreferenceEvent('save', items, selectedVibe);
     setStatusMessage(
       localFit
-        ? `Saved to your fits as "${localFit.title}".`
-        : 'Saved to your fits.',
+        ? `Saved "${localFit.title}" to your looks on this device.`
+        : 'Could not save this fit — add a few pieces first.',
     );
-    const ids = Object.fromEntries(
-      Object.entries(items).map(([k, v]) => [k, v?.id]).filter(([, id]) => id),
-    );
-    try {
-      const res = await fetch('/api/fit', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ items: ids }),
-      });
-      const d = await res.json();
-      if (!res.ok) {
-        setStatusMessage(
-          localFit
-            ? `Saved "${localFit.title}" to your fits.`
-            : 'Could not save that fit just now — please try again.',
-        );
-        return;
-      }
-      if (d.id) {
-        setStatusMessage(
-          localFit
-            ? `Saved "${localFit.title}" locally and synced fit ${d.id.slice(0, 8)}.`
-            : `Saved fit ${d.id.slice(0, 8)}.`,
-        );
-      }
-    } catch {
-      setStatusMessage(
-        localFit
-          ? `Saved "${localFit.title}" to this device. It'll sync to your account when you're back online.`
-          : 'Could not save this fit right now.',
-      );
-    }
   }
 
   async function shopAll() {
@@ -1107,19 +1073,6 @@ function BuilderPageContent({
 
     setStatusMessage(null);
     setCheckoutProducts(links);
-  }
-
-  function postCurrentFit() {
-    const posted = postFitToFeed(items, {
-      title: `${activeVibe.label} fit`,
-      vibe: activeVibe.label,
-      visibility: postVisibility,
-    });
-    setStatusMessage(
-      posted
-        ? `Posted "${posted.title}" to Fit Feed as ${postVisibility}.`
-        : 'Build a fit before posting to Fit Feed.',
-    );
   }
 
   function focusRefineCategory(category: Category) {
@@ -1840,31 +1793,6 @@ function BuilderPageContent({
                     Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
-                  <div className="grid grid-cols-[1fr_1fr_1.2fr] gap-2">
-                    {(['public', 'private'] as const).map((visibility) => (
-                      <button
-                        key={visibility}
-                        type="button"
-                        onClick={() => setPostVisibility(visibility)}
-                        className={`rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[.12em] transition ${
-                          postVisibility === visibility
-                            ? 'border-accent bg-accent/15 text-accent'
-                            : 'border-white/10 bg-white/[0.04] text-muted-2'
-                        }`}
-                      >
-                        {visibility}
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={postCurrentFit}
-                      disabled={renderN === 0}
-                      className="inline-flex items-center justify-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-40"
-                    >
-                      <Send size={12} />
-                      Post
-                    </button>
-                  </div>
                   <button onClick={clearFit} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
                     Clear fit
                   </button>

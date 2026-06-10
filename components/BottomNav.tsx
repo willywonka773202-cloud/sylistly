@@ -1,21 +1,18 @@
 'use client';
 
-import { Bookmark, House, Images, Plus, User, WandSparkles } from 'lucide-react';
+import { Bookmark, GalleryVerticalEnd, User, WandSparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /**
- * Sylistly primary navigation — a floating editorial pill with five
- * destinations and a center Create action. Active state reflects the section
- * the user is actually in (each tab owns its own routes).
+ * Sylistly primary navigation — a floating editorial pill with the four real
+ * surfaces: the Scroll (home), the Remix board, Saved looks, and You.
  */
 export function BottomNav() {
   const pathname = usePathname() ?? '';
-  const homeActive = pathname === '/';
-  const feedActive = pathname.startsWith('/feed') || pathname.startsWith('/discover');
-  const createActive = pathname.startsWith('/build') || pathname.startsWith('/canvas');
-  const stylistActive = pathname.startsWith('/stylist');
-  const savedActive = pathname.startsWith('/saved') || pathname.startsWith('/wardrobe');
+  const scrollActive = pathname === '/';
+  const remixActive = pathname.startsWith('/build') || pathname.startsWith('/checkout');
+  const savedActive = pathname.startsWith('/saved');
   const profileActive = pathname.startsWith('/profile');
 
   return (
@@ -23,28 +20,10 @@ export function BottomNav() {
       aria-label="Primary navigation"
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[480px] justify-center px-5 pb-[calc(env(safe-area-inset-bottom)+12px)]"
     >
-      <div className="pointer-events-auto relative grid h-[72px] w-full max-w-[460px] grid-cols-[1fr_1fr_72px_1fr_1fr_1fr] items-center rounded-full border border-hairline-2 bg-[linear-gradient(180deg,rgba(27,26,33,.92),rgba(12,11,14,.94))] px-2 shadow-[0_18px_56px_rgba(0,0,0,.5)] backdrop-blur-2xl">
+      <div className="pointer-events-auto relative grid h-[68px] w-full max-w-[420px] grid-cols-4 items-center rounded-full border border-hairline-2 bg-[linear-gradient(180deg,rgba(27,26,33,.92),rgba(12,11,14,.94))] px-3 shadow-float backdrop-blur-2xl">
         <span className="pointer-events-none absolute inset-x-7 top-0 h-px rounded-full bg-[linear-gradient(90deg,transparent,rgba(255,110,138,.5),transparent)]" />
-        <NavTool href="/" label="Home" icon={House} active={homeActive} />
-        <NavTool href="/feed" label="Feed" icon={Images} active={feedActive} />
-        <Link
-          href="/build"
-          aria-label="Create an outfit"
-          aria-current={createActive ? 'page' : undefined}
-          className="sy-press mx-auto -mt-7 flex flex-col items-center"
-        >
-          <span
-            className={`grid h-[58px] w-[58px] place-items-center rounded-full text-white ring-1 ring-white/15 transition ${
-              createActive
-                ? 'bg-[linear-gradient(135deg,#ff3b63,#ff6e8a)] shadow-[0_16px_38px_rgba(255,59,99,.5)]'
-                : 'bg-[radial-gradient(circle_at_34%_22%,#ff7c9b,rgba(255,59,99,.62)_52%,rgba(120,30,52,.78))] shadow-[0_14px_30px_rgba(255,59,99,.34)]'
-            }`}
-          >
-            <Plus size={30} strokeWidth={2.2} />
-          </span>
-          <span className="mt-1 text-[10px] font-bold uppercase tracking-[.14em] text-accent">Create</span>
-        </Link>
-        <NavTool href="/stylist" label="Syli" icon={WandSparkles} active={stylistActive} />
+        <NavTool href="/" label="Scroll" icon={GalleryVerticalEnd} active={scrollActive} />
+        <NavTool href="/build" label="Remix" icon={WandSparkles} active={remixActive} accent />
         <NavTool href="/saved" label="Saved" icon={Bookmark} active={savedActive} />
         <NavTool href="/profile" label="You" icon={User} active={profileActive} />
       </div>
@@ -57,11 +36,13 @@ function NavTool({
   label,
   icon: Icon,
   active,
+  accent = false,
 }: {
   href: string;
   label: string;
-  icon: typeof House;
+  icon: typeof User;
   active: boolean;
+  accent?: boolean;
 }) {
   return (
     <Link
@@ -73,12 +54,16 @@ function NavTool({
     >
       <span
         className={`grid h-7 w-7 place-items-center rounded-full transition-all duration-200 ease-out ${
-          active ? 'scale-110 bg-accent-soft text-accent shadow-[0_0_16px_rgba(255,59,99,.22)]' : 'text-current'
+          active
+            ? 'scale-110 bg-accent-soft text-accent shadow-[0_0_16px_rgba(255,59,99,.22)]'
+            : accent
+              ? 'text-accent/80'
+              : 'text-current'
         }`}
       >
         <Icon size={20} strokeWidth={active ? 2.5 : 2} />
       </span>
-      <span className={`max-w-full truncate text-[10px] font-semibold tracking-wide ${active ? 'text-ink' : ''}`}>
+      <span className={`max-w-full truncate text-[11px] font-semibold tracking-wide ${active ? 'text-ink' : ''}`}>
         {label}
       </span>
       <span

@@ -4,11 +4,13 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Sylistly',
     short_name: 'Sylistly',
-    description: 'Build and shop complete outfits from real products.',
+    description: 'Endless outfits from real products. Lock what you love, restyle the rest.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#f7f2ee',
-    theme_color: '#e8365d',
+    // Match the Editorial Noir app shell so the PWA splash and status bar
+    // are seamless with the UI (was cream/#e8365d — a different app's colors).
+    background_color: '#0A0A0C',
+    theme_color: '#0A0A0C',
     icons: [
       {
         src: '/icon.svg',

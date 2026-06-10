@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-dm-sans',
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800', '900'],
 });
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -14,20 +14,28 @@ const playfair = Playfair_Display({
   weight: ['500', '600', '700'],
 });
 
+export const viewport: Viewport = {
+  themeColor: '#0A0A0C',
+  viewportFit: 'cover',
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: {
     default: 'Sylistly',
     template: '%s | Sylistly',
   },
-  description: 'Build polished outfits from real products, save full looks, and shop every piece in one premium flow.',
+  description: 'An endless scroll of complete outfits from real products. Lock the piece you love, restyle the rest, shop the whole fit.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sylistly.com'),
   applicationName: 'Sylistly',
   keywords: [
     'fashion app',
+    'outfit ideas',
+    'AI stylist',
     'outfit builder',
-    'virtual styling',
-    'closet app',
     'shop outfits',
+    'streetwear fits',
     'lookbook',
   ],
   alternates: {
@@ -35,17 +43,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Sylistly',
-    description: 'Build and shop complete outfits from real products.',
+    description: 'Endless outfits from real products. Lock what you love, restyle the rest.',
     url: '/',
     siteName: 'Sylistly',
-    images: ['/og.svg'],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sylistly',
-    description: 'Build and shop complete outfits from real products.',
-    images: ['/og.svg'],
+    description: 'Endless outfits from real products. Lock what you love, restyle the rest.',
   },
   icons: {
     icon: [

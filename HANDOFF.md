@@ -1,16 +1,26 @@
 # HANDOFF - sylistly
 
-<!-- State header: keep these 6 lines accurate. Both Claude and Codex read this first. Whoever acts next checks the other's last build before building. -->
-- **Version:** 0.1.0
+<!-- State header: keep these 6 lines accurate. Claude-solo workflow (Codex retired). -->
+- **Version:** 0.2.0
 - **Turn:** Claude
 - **Last build by:** Claude
 - **Status:** verified-pass
-- **Updated:** 2026-06-08T19:40:00-05:00
-- **Next:** Clothing PRESENTATION pass shipped (43 model photos purged + flat-lay rebalanced). Continue presentation polish: (a) cutout edge/halo audit, (b) per-category sizing in FitsAiOutfitCanvas (shoes wider, accessories smaller), (c) 1-2 borderline model-photo stragglers remain — extend blocklist if spotted. Then PHASE 2: public profile /u/[handle], mixed feed card types, home dashboard, perf (lazy outfit-library + skeletons), PWA PNG icons, dead studio-code removal in OutfitBoard.tsx. NOTE: SearchAPI key shared in chat earlier (FiyDgAiDJ8b…) is compromised — user must rotate it.
+- **Updated:** 2026-06-10
+- **Next:** THE SCROLL shipped (see 2026-06-10 entry + vault "Rebuild Strategy 2026-06-10"). Week-1 plan: (1) Will: Skimlinks/Sovrn IDs into Vercel + PostHog key + Upstash; (2) wire PostHog provider + outbound-click event; (3) nightly AI bake script for outfit-library (Haiku batch, ~$10/mo) so "Styled by Syli" is true everywhere; (4) shareable public fit pages with flat-lay OG images (the Instagram engine); (5) purge the 129 Google-search-URL products + make merchant-PDP a hard catalog gate; (6) run the body-model montage sweep again (1 new straggler found+blocked today; more likely remain). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 — Claude Code — build+check (THE SCROLL: full UI overhaul, IA cut 12→5 surfaces, honesty pass)
+- North star pinned with Will (4 explicit decisions): Editorial Noir everywhere · app opens straight into a TikTok-style scroll · Syli = voice not chat · delete the dead surfaces.
+- **NEW `/` = the Scroll** (app/page.tsx rewritten): full-screen snap-scroll of complete fits, infinite + instant ($0 — pre-gen library first, live client compose fallback, both transparentOnly-gated). Per-fit: gallery plate (flat-lay on light card over noir field + grain), honest derived "Syli's note", serif vibe title, total price, piece chips with thumbs. **Lock-and-restyle mechanic**: tap chips to lock pieces → "Restyle around N locked" regenerates around them via buildCatalogLook(lockedItems). Right rail: Save/Remix/Shop/Share. Vibe filter rail. Onboarding (frame+vibe) feeds the deck.
+- **DELETED** (git history keeps them): /feed /swipe /discover /wardrobe /canvas /stylist pages, /api/stylist, store/social-feed.ts (1,118-line synthetic feed: fake users/likes), FitViewer, OutfitCanvasEditor, lib/stylist/{ai-response,local-response,context}.ts. next.config redirects map old routes home. BottomNav → 4 tabs (Scroll/Remix/Saved/You).
+- **HONESTY PASS**: removed the lying "sync to your account" copy + fire-and-forget /api/fit call in build saveFit; removed publish-to-fake-feed from build + saved; profile rewritten as honest settings (frame/skin/sizes/vibes/budget) + saved looks — no fake posts/stats. "Styled by Syli" badge in build kept (only renders on real AI stylingNote).
+- **FOUNDATIONS**: viewport export (themeColor #0A0A0C, viewportFit cover — 29 safe-area paddings now live on iOS), DM Sans 800/900 loaded (196 font-black uses now render), PNG OG image via next/og (replaces scraper-rejected og.svg), manifest → noir colors, sitemap → real routes, .sy-grain utility.
+- **DATA**: new body-model straggler purged (Quince linen pants person-cutout, id …e219daf1717ab4) → blocklist 44; catalog:client + library:generate rerun (511 products, 12k looks, avg coord 0.745).
+- VERIFIED: tsc clean · next build exit 0 (19 routes; / = 342kB first load) · live preview (mobile 375px): scroll renders, lock→restyle keeps locked piece + updates note/total, /feed→/ redirect works, profile renders, ZERO console errors. DEPLOYED to www.sylistly.com.
+- next: Week-1 monetization+measurement list in the header above.
 
 ### 2026-06-08T19:40:00-05:00 — Claude Code — build+check (clothing presentation: model-photo purge + flat-lay rebalance)
 - User: "the database isn't showing the clothing in the best way, and that's the whole point of the app." Two presentation fixes:

@@ -1,6 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Retired surfaces from the pre-scroll era — keep old links working.
+  async redirects() {
+    return [
+      { source: '/feed', destination: '/', permanent: false },
+      { source: '/swipe', destination: '/', permanent: false },
+      { source: '/stylist', destination: '/', permanent: false },
+      { source: '/discover', destination: '/saved', permanent: false },
+      { source: '/wardrobe', destination: '/saved', permanent: false },
+      { source: '/canvas', destination: '/build', permanent: false },
+    ];
+  },
   eslint: {
     // Pre-existing lint warnings in error.tsx / catalog.ts — don't block deploys
     ignoreDuringBuilds: true,
