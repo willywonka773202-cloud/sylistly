@@ -6,11 +6,20 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-10
-- **Next:** THE SCROLL shipped (see 2026-06-10 entry + vault "Rebuild Strategy 2026-06-10"). Week-1 plan: (1) Will: Skimlinks/Sovrn IDs into Vercel + PostHog key + Upstash; (2) wire PostHog provider + outbound-click event; (3) nightly AI bake script for outfit-library (Haiku batch, ~$10/mo) so "Styled by Syli" is true everywhere; (4) shareable public fit pages with flat-lay OG images (the Instagram engine); (5) purge the 129 Google-search-URL products + make merchant-PDP a hard catalog gate; (6) run the body-model montage sweep again (1 new straggler found+blocked today; more likely remain). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Next:** Body-model sweep DONE (catalog fully eyeballed, blocklist 45→143, see top entry) — (1) RE-RUN THE NIGHTLY BAKE: 11/22 baked AI looks reference purged products and hydrate to null (graceful engine fallback, but "Styled by Syli" coverage is halved until `node scripts/bake-ai-ship.mjs` runs against the clean catalog); (2) CATALOG GROWTH: bottoms are thin (113→40 — 64% were person photos); next cutout expansion should target clean flat-lay bottoms; (3) shareable public fit pages with flat-lay OG images; (4) purge the 129 Google-search-URL products + merchant-PDP hard gate; (5) Will: Skimlinks/Sovrn IDs + Upstash. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 (late) — Claude Code — build+check (BODY-MODEL FULL SWEEP: +98 person cutouts purged, blocklist 45→143)
+- The "2 stragglers in 2 sessions" smell was right, massively: a full visual review of ALL 509 client cutouts found **98 more person/worn-on-body photos** the prior heuristic-led passes missed. Whole e-comm scrape families were rotten: Dickies 874, Levi's 501/cargo, Aritzia Effortless/Agency/Babaton, Lululemon Align, J.Crew oxford, Uniqlo Airism — 64% of "bottoms" (113→40) were people wearing the pants.
+- **METHOD LESSON (replaces the old one)**: heuristics rank but CANNOT clear — tan fabric/sandals/gold rings max out skin scores while dark-on-dark worn crops score low. And montage thumbnails below ~300px MISS dark worn shots (my own 170px first pass cleared ~38 cutouts that 300px re-passes caught, incl. a wrong "flat jeans" call double-checked at full size). Reliable recipe: 300px-minimum montage of EVERY garment cutout + full-size zoom on anything ambiguous + a confirmation montage of all proposed blocks before applying.
+- data/catalog-body-model-blocklist.json 45→143 · lib/product-image-quality.ts +3 non-garments (beach towel sold as "jewelry", ring box as "top", a Dickies 874 whose cutout is a GOLF logo graphic) · category fixes in source: 4 rings+ring box "top"→jewelry, 2 Hermès bracelets "bag"→jewelry, Fendi Baguette "bottom"→bag (was rendering as the Bottoms chip on the live scroll!), Cap Pochette Bag "hat"→bag.
+- Client catalog 509→409; library regenerated (full 1200/vibe, coord 0.743 unchanged — quality held with 20% fewer products).
+- KNOWN: 11/22 baked AI looks now hydrate to null (purged products) — graceful fallback to engine, but the bake must re-run (Next #1). Bottoms inventory now thin (Next #2).
+- VERIFIED: tsc clean · next build exit 0 · preview scroll renders only clean flat garments, 0 blocklisted ids on screen (eval-checked rendered img ids against the blocklist) · committed (3fba805), pushed, DEPLOYED via vercel --prod (READY, aliased www.sylistly.com, 200).
+- next: re-run nightly bake against the clean catalog, then catalog growth for bottoms.
 
 ### 2026-06-10 (night) — Claude Code — build+check (NIGHTLY AI BAKE: "Styled by Syli" is now TRUE, ~$10/mo)
 - Will approved the $10/mo budget. The scroll now serves GENUINELY Claude-composed looks at $0 marginal cost:
