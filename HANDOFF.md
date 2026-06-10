@@ -6,11 +6,18 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-10
-- **Next:** Bottoms growth DONE (40→118, see top entry) + share pages DONE — (1) purge the 129 Google-search-URL products + merchant-PDP hard gate (check overlap with the new bottoms first: many `generated-` sources have weak productUrls); (2) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (3) Will: Skimlinks/Sovrn IDs + Upstash; (4) optional next growth target: tops (95) and outer (39) via the same triage→cut→re-review pipeline. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Next:** Google-URL item CLOSED as shoppability-weighted generation (94% of looks now ≥3 exact links — see top entry; a literal purge would have killed 211/487 products). Remaining: (1) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (2) Will: Skimlinks/Sovrn IDs + Upstash (the 94%-shoppable library is ready to earn the moment IDs land); (3) optional growth: tops (95) and outer (39) via the triage→cut→re-review pipeline; (4) longer-term: recover real merchant PDPs for the 211 link-less products (would push shoppability to ~100%). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 (cont.) — Claude Code — build+check (SHOPPABILITY-WEIGHTED LIBRARY: 94% of looks ≥3 exact links)
+- RE-SCOPED the audit's "purge 129 Google-search-URL products + merchant-PDP hard gate": post-sweep + post-growth, 211 of 487 products have NO merchant link (86 of them today's new bottoms) — a hard purge/gate would crater the catalog to 276 and bottoms to 32. The app already detects + honestly labels non-exact links (`hasExactProductLink` → green dots, "n/n shoppable"), and the runtime composer already biases +22 for exact links. The REAL gap was the pre-gen library: 26% of looks had <3 affiliate-wrappable pieces (revenue dead-ends).
+- **scripts/generate-outfit-library.mjs**: `hasExactLink` mirroring lib/product-image-quality's detector · `scoreOutfit` gains a 0.10 shoppability term (exact share + ≥3-exact floor bonus, matching the feed's existing floor) · slot sampling draws from the exact-link subset at p=0.65 (full pool otherwise) · shoppability stats printed per run.
+- RESULT: pieces with exact merchant links 76%→92% · looks with ≥3 exact 76.6%→94.0% · full 1200/vibe coverage held · all 118 bottoms (incl. all 78 new) still used (435/487 products in rotation) · coordination 0.75.
+- VERIFIED: tsc clean · build exit 0 · preview first look "4/4 shoppable", 0 broken cutouts · committed (b8d7fc7), pushed, DEPLOYED (READY, www.sylistly.com 200).
+- next: when Skimlinks/Sovrn IDs land, this library is the earning surface; longer-term, recover real PDPs for the 211 link-less products.
 
 ### 2026-06-10 (cont.) — Claude Code — build+check (CATALOG GROWTH: +78 clean flat-lay bottoms, 40→118)
 - Executed Next #1 with the sweep's method lesson baked in, as a THREE-stage visual pipeline: (1) triaged 445 candidate SOURCE images by eye at 300px (only ~23% of shopping-scrape bottoms are flat product shots — Blue Owl/H&M/Zara/MR PORTER/techwear-ghost families reliable, Nike/Lululemon/Aritzia/Madewell/Gap all worn); (2) rembg-cut the 104 approved (isnet-general-use, 1600px); (3) re-reviewed every generated CUTOUT and deleted 25 more person crops — source triage misses worn shots whose white tops vanish into white backgrounds; the post-cutout pass is NOT optional.
