@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-06-10T16:09:58.711Z",
+  "generatedAt": "2026-06-10T21:21:10.425Z",
   "runtimeProducts": 4419,
-  "eligibleProducts": 409,
-  "emittedProducts": 409,
+  "eligibleProducts": 487,
+  "emittedProducts": 487,
   "limit": 560,
   "byCategory": {
     "hat": 35,
     "outer": 39,
     "top": 95,
-    "bottom": 40,
+    "bottom": 118,
     "shoes": 83,
     "bag": 75,
     "eyewear": 24,
     "jewelry": 18
   },
   "rejected": {
-    "noTransparentCutout": 3726,
+    "noTransparentCutout": 3648,
     "failedEditorialGate": 284,
     "blockedStatusOrFlags": 0,
     "noCommerceLink": 0,
