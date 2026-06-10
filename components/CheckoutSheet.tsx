@@ -10,6 +10,7 @@ import {
   openCheckoutUrls,
 } from '@/lib/checkout';
 import { wrapAffiliate } from '@/lib/affiliate';
+import { track } from '@/lib/analytics';
 import { useCheckout } from '@/store/checkout';
 
 export interface CheckoutProduct {
@@ -209,6 +210,16 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
                       target="_blank"
                       rel="noreferrer"
                       data-product-link-kind={isExactProductUrl(product.url) ? 'exact' : 'blocked'}
+                      onClick={() =>
+                        track('shop_link_clicked', {
+                          brand: product.brand,
+                          retailer: product.retailer,
+                          priceCents: product.priceCents,
+                          exact: isExactProductUrl(product.url),
+                          wrapped: wrapAffiliate(product.url) !== product.url,
+                          surface: 'checkout-sheet',
+                        })
+                      }
                       className="mt-3 inline-flex items-center gap-2 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white active:scale-[0.97]"
                     >
                       Open real link

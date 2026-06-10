@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -67,7 +68,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
-      <body className="bg-bg text-ink">{children}</body>
+      <body className="bg-bg text-ink">
+        <AnalyticsProvider />
+        {children}
+      </body>
     </html>
   );
 }

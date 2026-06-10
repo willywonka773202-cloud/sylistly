@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { wrapAffiliate } from '@/lib/affiliate';
+import { track } from '@/lib/analytics';
 import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
 
@@ -138,9 +140,19 @@ export default function CheckoutPage() {
 
                       <div className="mt-3 flex flex-wrap gap-2">
                         <a
-                          href={product.url}
+                          href={wrapAffiliate(product.url)}
                           target="_blank"
                           rel="noreferrer"
+                          onClick={() =>
+                            track('shop_link_clicked', {
+                              brand: product.brand,
+                              retailer: product.retailer,
+                              priceCents: product.priceCents,
+                              exact,
+                              wrapped: wrapAffiliate(product.url) !== product.url,
+                              surface: 'checkout-page',
+                            })
+                          }
                           className="inline-flex items-center gap-2 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-medium text-accent transition hover:bg-accent hover:text-white"
                         >
                           Open item

@@ -12,6 +12,16 @@
 
 ## Log (newest first)
 
+### 2026-06-10 (later) — Claude Code — build+check (SCROLL v2: worn silhouette + rich chrome + PostHog live)
+- Will's design review w/ Fits-AI references + 8 pinned answers: worn-silhouette layout, bright studio plate, honest heart (no fake counts), full rich chrome, scroll-first stays, full 7-8-piece styling, staggered settle-in motion. Plus HIS killer mechanic upgrade: **locks persist across the scroll** — lock the pants, swipe, next look composes around them.
+- **components/WornFlatlay.tsx** (new): outfit arranged as worn — headwear top, outer+top layered at torso, bottoms tucked under, shoes grounded by a floor shadow; per-piece rotations, drop shadows, dress-order stagger (sy-piece-in) triggered by IntersectionObserver when a card snaps in.
+- **app/page.tsx v2**: vibe STORY RAIL (pink-gradient rings, real product thumbs via getLibraryLook seed 7) · FORMULA pill ("street / capsule — WHY" expands Syli's note) · "$X" money chip + "n/n shoppable" + green exact dots on chips (hasExactProductLink) · HEART trains taste (vibe-likes persisted, gently steers rotation; no fake counts) · global lockedItems + slot prefs ("never hats" panel; targetSlots) — locking trims pre-dealt cards below current so the next swipe honors the lock.
+- **PostHog LIVE**: lib/analytics.ts + AnalyticsProvider in layout; key in .env.local AND Vercel prod (verified via vercel env ls). Events: look_viewed/liked/saved/restyled/remixed/shopped/shared, lock_toggled, vibe_selected, slot_toggled, shop_link_clicked (brand/retailer/price/exact/wrapped/surface).
+- **MONETIZATION BUG FIX**: app/checkout/page.tsx linked out with RAW urls — never applied wrapAffiliate. Now wrapped + click-tracked (CheckoutSheet too).
+- **DATA**: 2 more catalog bugs caught on-camera: Dickies 874 person-cutout → blocklist (45 ids); Radial HEMP bucket hat was category "top" → fixed to "hat" in data/drop-catalog.json (NOTE: re-running ingest-drops may revert — durable fix is the vision pass). New title-vs-category sanity gate in the scroll keeps obvious miscategorizations off the plate. catalog:client + library:generate rerun (coord 0.744).
+- VERIFIED: tsc clean · next build exit 0 · preview: worn layout reads correctly, rail clear of plate, lock→restyle works, zero console errors. DEPLOYED.
+- next: body-model MONTAGE SWEEP (2 stragglers found in 2 sessions — more exist), then nightly AI bake + shareable fit pages.
+
 ### 2026-06-10 — Claude Code — build+check (THE SCROLL: full UI overhaul, IA cut 12→5 surfaces, honesty pass)
 - North star pinned with Will (4 explicit decisions): Editorial Noir everywhere · app opens straight into a TikTok-style scroll · Syli = voice not chat · delete the dead surfaces.
 - **NEW `/` = the Scroll** (app/page.tsx rewritten): full-screen snap-scroll of complete fits, infinite + instant ($0 — pre-gen library first, live client compose fallback, both transparentOnly-gated). Per-fit: gallery plate (flat-lay on light card over noir field + grain), honest derived "Syli's note", serif vibe title, total price, piece chips with thumbs. **Lock-and-restyle mechanic**: tap chips to lock pieces → "Restyle around N locked" regenerates around them via buildCatalogLook(lockedItems). Right rail: Save/Remix/Shop/Share. Vibe filter rail. Onboarding (frame+vibe) feeds the deck.

@@ -3,10 +3,13 @@
 import {
   Bookmark,
   Check,
+  ChevronDown,
+  Heart,
   Lock,
   Share2,
   ShoppingBag,
   SlidersHorizontal,
+  Sparkles,
   WandSparkles,
   X,
 } from 'lucide-react';
@@ -14,10 +17,12 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { Onboarding } from '@/components/Onboarding';
-import { OutfitLookCard } from '@/components/OutfitBoard';
 import { ProductImage } from '@/components/ProductImage';
+import { WornFlatlay } from '@/components/WornFlatlay';
+import { track } from '@/lib/analytics';
 import { buildCatalogLook } from '@/lib/client-catalog';
 import { getLibraryLook } from '@/lib/outfit-library';
+import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
@@ -27,6 +32,8 @@ import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 
 const ONBOARDED_KEY = 'sylistly.onboarded.v1';
+const SLOT_PREFS_KEY = 'sylistly.scroll-slots.v1';
+const VIBE_LIKES_KEY = 'sylistly.vibe-likes.v1';
 
 /** Curated rotation so consecutive cards feel like turning magazine pages. */
 const VIBE_ROTATION: VibeId[] = [
@@ -34,6 +41,9 @@ const VIBE_ROTATION: VibeId[] = [
 ];
 
 const VIBE_META = new Map(VIBES.map((vibe) => [vibe.id, vibe]));
+
+/** Accessory slots the user can switch off ("never generate hats"). */
+const OPTIONAL_SLOTS: Category[] = ['hat', 'eyewear', 'jewelry', 'bag'];
 
 const CATEGORY_NOUN: Record<Category, string> = {
   hat: 'hat',
@@ -52,7 +62,6 @@ interface ScrollLook {
   key: string;
   vibe: VibeId;
   items: Partial<Record<Category, Product>>;
-  /** bumped on every restyle so the plate can remount with a fade */
   gen: number;
 }
 
@@ -68,23 +77,54 @@ function formatPrice(cents: number): string {
   return `$${Math.round(cents / 100).toLocaleString()}`;
 }
 
+function densityLabel(pieceCount: number): string {
+  if (pieceCount >= 7) return 'full styling';
+  if (pieceCount >= 6) return 'layered';
+  if (pieceCount >= 5) return 'capsule';
+  return 'essentials';
+}
+
 /**
- * One look, instantly: pre-generated library first (best coordination scores),
- * live client-side compose as fallback — and always live compose when pieces
- * are locked, because locks are the one thing the library can't honor.
+ * Cheap title-vs-category sanity gate: a bucket hat tagged as a "top" (real
+ * catalog bug) wrecks the worn silhouette. The durable fix is the vision
+ * enrichment pass; until then, obviously miscategorized garments stay off
+ * the plate.
+ */
+const GARMENT_SLOTS = new Set<Category>(['top', 'bottom', 'outer']);
+const NON_GARMENT_TERMS = /\b(bucket hat|beanie|cap|hat|sunglasses|eyeglass|necklace|earring|bracelet|tote|handbag)\b/i;
+
+function isCategorySane(product: Product): boolean {
+  if (!GARMENT_SLOTS.has(product.category)) return true;
+  return !NON_GARMENT_TERMS.test(product.name || '');
+}
+
+/**
+ * One look, instantly: pre-generated library when nothing is pinned (best
+ * coordination scores), live client-side compose whenever the user has locked
+ * pieces or switched slots off — the two things the library can't honor.
  */
 function composeScrollLook(
   vibe: VibeId,
   frame: GeneratorFrame,
   seed: number,
   avoidProductIds: string[],
-  lockedItems?: Partial<Record<Category, Product>>,
+  lockedItems: Partial<Record<Category, Product>>,
+  disabledSlots: Set<Category>,
 ): Partial<Record<Category, Product>> | null {
-  const hasLocks = lockedItems && Object.keys(lockedItems).length > 0;
-  if (!hasLocks) {
+  const hasLocks = Object.keys(lockedItems).length > 0;
+  const hasSlotPrefs = disabledSlots.size > 0;
+  if (!hasLocks && !hasSlotPrefs) {
     const library = getLibraryLook(vibe, frame, { seed, avoidProductIds });
-    if (library) return library.products;
+    if (library) {
+      const sane: Partial<Record<Category, Product>> = {};
+      for (const [category, product] of Object.entries(library.products)) {
+        if (product && isCategorySane(product)) sane[category as Category] = product;
+      }
+      if (lookProducts(sane).length >= 3) return sane;
+    }
   }
+  const vibeSlots = VIBE_META.get(vibe)?.slots || [];
+  const targetSlots = vibeSlots.filter((slot) => !disabledSlots.has(slot));
   const built = buildCatalogLook({
     vibe,
     frame,
@@ -92,13 +132,18 @@ function composeScrollLook(
     mode: 'full',
     seed,
     avoidProductIds,
-    lockedItems,
-    currentItems: lockedItems,
-    // Same gate the pre-generated library passes through — clean garment
-    // cutouts only, never a model photo on the plate.
+    lockedItems: hasLocks ? lockedItems : undefined,
+    currentItems: hasLocks ? lockedItems : undefined,
+    targetSlots: targetSlots.length >= 3 ? targetSlots : undefined,
     transparentOnly: true,
   });
-  return lookProducts(built.products).length >= 3 ? built.products : null;
+  const products: Partial<Record<Category, Product>> = {};
+  for (const [category, product] of Object.entries(built.products)) {
+    if (product && !disabledSlots.has(category as Category) && isCategorySane(product)) {
+      products[category as Category] = product;
+    }
+  }
+  return lookProducts(products).length >= 3 ? products : null;
 }
 
 /** Honest stylist note derived from what's actually in the look. */
@@ -126,26 +171,65 @@ export default function ScrollPage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [vibeFilter, setVibeFilter] = useState<VibeId | 'all'>('all');
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [locks, setLocks] = useState<Record<string, Category[]>>({});
+  const [tuneOpen, setTuneOpen] = useState(false);
+  const [lockedItems, setLockedItems] = useState<Partial<Record<Category, Product>>>({});
+  const [disabledSlots, setDisabledSlots] = useState<Set<Category>>(new Set());
+  const [likedKeys, setLikedKeys] = useState<Set<string>>(new Set());
+  const [burstKey, setBurstKey] = useState<string | null>(null);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [whyOpenKey, setWhyOpenKey] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const seedRef = useRef(101);
   const indexRef = useRef(0);
   const recentIdsRef = useRef<string[]>([]);
+  const locksRef = useRef(lockedItems);
+  const disabledRef = useRef(disabledSlots);
+  const vibeLikesRef = useRef<Record<string, number>>({});
   const toastTimer = useRef<number | null>(null);
+
+  locksRef.current = lockedItems;
+  disabledRef.current = disabledSlots;
+
+  /** Representative thumbnail per vibe for the story rail (deterministic). */
+  const vibeThumbs = useMemo(() => {
+    const thumbs = new Map<VibeId, Product>();
+    for (const vibe of VIBES) {
+      const look = getLibraryLook(vibe.id, 'androgynous', { seed: 7 });
+      if (!look) continue;
+      const byCat = look.products;
+      const pick = byCat.top || byCat.outer || byCat.shoes || lookProducts(byCat)[0];
+      if (pick) thumbs.set(vibe.id, pick);
+    }
+    return thumbs;
+  }, []);
 
   const makeLooks = useCallback(
     (count: number, useFrame: GeneratorFrame, filter: VibeId | 'all'): ScrollLook[] => {
       const fresh: ScrollLook[] = [];
       let attempts = 0;
+      const topLikedVibe = (Object.entries(vibeLikesRef.current).sort((a, b) => b[1] - a[1])[0] ||
+        [])[0] as VibeId | undefined;
       while (fresh.length < count && attempts < count * 4) {
         attempts += 1;
-        const vibe = filter === 'all' ? VIBE_ROTATION[indexRef.current % VIBE_ROTATION.length] : filter;
+        let vibe: VibeId;
+        if (filter !== 'all') {
+          vibe = filter;
+        } else if (topLikedVibe && indexRef.current % 3 === 2) {
+          vibe = topLikedVibe; // your hearts gently steer the rotation
+        } else {
+          vibe = VIBE_ROTATION[indexRef.current % VIBE_ROTATION.length];
+        }
         indexRef.current += 1;
         seedRef.current += 17;
-        const items = composeScrollLook(vibe, useFrame, seedRef.current, recentIdsRef.current);
+        const lockedIds = new Set(
+          Object.values(locksRef.current).map((product) => product?.id).filter(Boolean),
+        );
+        const avoid = recentIdsRef.current.filter((id) => !lockedIds.has(id));
+        const items = composeScrollLook(
+          vibe, useFrame, seedRef.current, avoid, locksRef.current, disabledRef.current,
+        );
         if (!items) continue;
         const ids = lookProducts(items).map((product) => product.id);
         recentIdsRef.current = [...recentIdsRef.current, ...ids].slice(-80);
@@ -162,20 +246,52 @@ export default function ScrollPage() {
 
   useEffect(() => {
     setHasMounted(true);
-    if (typeof window !== 'undefined' && !window.localStorage.getItem(ONBOARDED_KEY)) {
-      setShowOnboarding(true);
+    if (typeof window === 'undefined') return;
+    if (!window.localStorage.getItem(ONBOARDED_KEY)) setShowOnboarding(true);
+    try {
+      const slots = JSON.parse(window.localStorage.getItem(SLOT_PREFS_KEY) || '[]') as Category[];
+      if (slots.length) setDisabledSlots(new Set(slots));
+      vibeLikesRef.current = JSON.parse(window.localStorage.getItem(VIBE_LIKES_KEY) || '{}');
+    } catch {
+      /* corrupted prefs — start fresh */
     }
   }, []);
 
-  // Re-roll the deck when the user's frame or vibe filter changes (post-mount).
+  // Re-roll the deck when frame, vibe filter, or slot prefs change (post-mount).
   useEffect(() => {
     if (!hasMounted) return;
     recentIdsRef.current = [];
-    setLocks({});
     setLooks(makeLooks(4, frame, vibeFilter));
+    setActiveKey(null);
     scrollerRef.current?.scrollTo({ top: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frame, vibeFilter, hasMounted]);
+  }, [frame, vibeFilter, disabledSlots, hasMounted]);
+
+  // Which card is on screen — drives the settle-in stagger + view analytics.
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const key = entry.target.getAttribute('data-look-key');
+            if (key) setActiveKey(key);
+          }
+        }
+      },
+      { root, threshold: 0.6 },
+    );
+    root.querySelectorAll('[data-look-key]').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [looks]);
+
+  useEffect(() => {
+    if (!activeKey) return;
+    const look = looks.find((entry) => entry.key === activeKey);
+    if (look) track('look_viewed', { vibe: look.vibe, pieces: lookProducts(look.items).length });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey]);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -193,27 +309,47 @@ export default function ScrollPage() {
     }
   }
 
-  function toggleLock(lookKey: string, category: Category) {
-    setLocks((prev) => {
-      const current = prev[lookKey] || [];
-      const next = current.includes(category)
-        ? current.filter((entry) => entry !== category)
-        : [...current, category];
-      return { ...prev, [lookKey]: next };
+  /**
+   * Lock = "keep this piece as I scroll." Locks persist into every future
+   * card; cards below the current one are re-dealt so the very next swipe
+   * already honors the lock.
+   */
+  function toggleLock(look: ScrollLook, product: Product) {
+    const currentlyLocked = lockedItems[product.category]?.id === product.id;
+    const next = { ...lockedItems };
+    if (currentlyLocked) delete next[product.category];
+    else next[product.category] = product;
+    setLockedItems(next);
+    locksRef.current = next;
+    track('lock_toggled', { category: product.category, locked: !currentlyLocked });
+    setLooks((prev) => {
+      const index = prev.findIndex((entry) => entry.key === look.key);
+      return index === -1 ? prev : prev.slice(0, index + 1);
     });
+    showToast(
+      currentlyLocked
+        ? `Unlocked the ${CATEGORY_NOUN[product.category]}`
+        : `Locked — keep scrolling, the ${CATEGORY_NOUN[product.category]} stays`,
+    );
+  }
+
+  function clearLocks(look: ScrollLook) {
+    setLockedItems({});
+    locksRef.current = {};
+    setLooks((prev) => {
+      const index = prev.findIndex((entry) => entry.key === look.key);
+      return index === -1 ? prev : prev.slice(0, index + 1);
+    });
+    showToast('Locks cleared');
   }
 
   function restyle(look: ScrollLook) {
-    const lockedCategories = locks[look.key] || [];
-    const lockedItems: Partial<Record<Category, Product>> = {};
-    for (const category of lockedCategories) {
-      const product = look.items[category];
-      if (product) lockedItems[category] = product;
-    }
-    const lockedIds = new Set(Object.values(lockedItems).map((product) => product?.id));
     seedRef.current += 17;
+    const lockedIds = new Set(Object.values(lockedItems).map((product) => product?.id));
     const avoid = recentIdsRef.current.filter((id) => !lockedIds.has(id));
-    const items = composeScrollLook(look.vibe, frame, seedRef.current, avoid, lockedItems);
+    const items = composeScrollLook(
+      look.vibe, frame, seedRef.current, avoid, lockedItems, disabledSlots,
+    );
     if (!items) {
       showToast('No fresh take found — try unlocking a piece');
       return;
@@ -222,6 +358,7 @@ export default function ScrollPage() {
       ...recentIdsRef.current,
       ...lookProducts(items).map((product) => product.id),
     ].slice(-80);
+    track('look_restyled', { vibe: look.vibe, locks: Object.keys(lockedItems).length });
     setLooks((prev) =>
       prev.map((entry) =>
         entry.key === look.key ? { ...entry, items, gen: entry.gen + 1 } : entry,
@@ -229,13 +366,32 @@ export default function ScrollPage() {
     );
   }
 
+  function like(look: ScrollLook) {
+    const already = likedKeys.has(look.key);
+    setLikedKeys((prev) => {
+      const next = new Set(prev);
+      if (already) next.delete(look.key);
+      else next.add(look.key);
+      return next;
+    });
+    if (!already) {
+      vibeLikesRef.current[look.vibe] = (vibeLikesRef.current[look.vibe] || 0) + 1;
+      window.localStorage.setItem(VIBE_LIKES_KEY, JSON.stringify(vibeLikesRef.current));
+      setBurstKey(look.key);
+      window.setTimeout(() => setBurstKey((key) => (key === look.key ? null : key)), 650);
+      track('look_liked', { vibe: look.vibe });
+    }
+  }
+
   function save(look: ScrollLook) {
     const record = saveFit(look.items);
+    track('look_saved', { vibe: look.vibe, pieces: lookProducts(look.items).length });
     showToast(record ? 'Saved to your looks' : 'Could not save this one');
   }
 
   function remix(look: ScrollLook) {
     replaceItems(look.items);
+    track('look_remixed', { vibe: look.vibe });
     router.push('/build');
   }
 
@@ -251,6 +407,11 @@ export default function ScrollPage() {
         priceCents: product.priceCents,
       }))
       .filter((product) => Boolean(product.url));
+    track('look_shopped', {
+      vibe: look.vibe,
+      totalCents: lookTotalCents(look.items),
+      pieces: products.length,
+    });
     setCheckout({ title: `${meta?.label || 'Sylistly'} fit`, products });
     router.push('/checkout');
   }
@@ -263,6 +424,7 @@ export default function ScrollPage() {
       .map((product) => product.brand)
       .join(', ')} + ${Math.max(0, products.length - 3)} more, ${formatPrice(lookTotalCents(look.items))} total.`;
     const url = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    track('look_shared', { vibe: look.vibe });
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Sylistly', text, url });
@@ -273,6 +435,18 @@ export default function ScrollPage() {
     } catch {
       /* user dismissed the share sheet */
     }
+  }
+
+  function toggleSlot(category: Category) {
+    setDisabledSlots((prev) => {
+      const next = new Set(prev);
+      const enabling = next.has(category);
+      if (enabling) next.delete(category);
+      else next.add(category);
+      window.localStorage.setItem(SLOT_PREFS_KEY, JSON.stringify(Array.from(next)));
+      track('slot_toggled', { category, enabled: enabling });
+      return next;
+    });
   }
 
   function completeOnboarding(pickedFrame: GeneratorFrame, vibe: VibeId) {
@@ -287,47 +461,98 @@ export default function ScrollPage() {
     setShowOnboarding(false);
   }
 
+  const lockCount = Object.keys(lockedItems).length;
+
   return (
     <main className="relative mx-auto h-[100dvh] max-w-[480px] overflow-hidden bg-bg">
       <h1 className="sr-only">Sylistly — endless outfits from real products</h1>
 
-      {/* Top chrome */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
-        <div className="flex items-center gap-2">
-          <span className="h-[2px] w-6 rounded-full bg-accent" aria-hidden />
-          <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+      {/* Top chrome: wordmark + tune, then the vibe story rail */}
+      <header className="absolute inset-x-0 top-0 z-30 bg-[linear-gradient(180deg,rgba(10,10,12,.94)_0%,rgba(10,10,12,.78)_70%,transparent_100%)] pb-5 pt-[calc(env(safe-area-inset-top)+12px)]">
+        <div className="flex items-center justify-between px-4">
+          <div className="flex items-baseline gap-2">
+            <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
+            <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+            <span className="font-serif text-[17px] font-semibold italic leading-none text-ink">
+              Fit <span className="text-accent">scroll</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTuneOpen((open) => !open)}
+            aria-expanded={tuneOpen}
+            aria-label="Tune what gets generated"
+            className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+          >
+            {tuneOpen ? <X size={15} /> : <SlidersHorizontal size={15} />}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setFilterOpen((open) => !open)}
-          aria-expanded={filterOpen}
-          aria-label="Filter vibes"
-          className="sy-press pointer-events-auto grid h-10 w-10 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
-        >
-          {filterOpen ? <X size={17} /> : <SlidersHorizontal size={17} />}
-        </button>
-      </header>
 
-      {/* Vibe filter rail */}
-      {filterOpen ? (
-        <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+62px)] z-30 animate-sy-rise px-4">
-          <div className="flex gap-2 overflow-x-auto rounded-card border border-hairline bg-surface-1/90 p-2 backdrop-blur-xl scrollbar-hide">
-            <VibeChip
-              label="For you"
-              active={vibeFilter === 'all'}
-              onClick={() => { setVibeFilter('all'); setFilterOpen(false); }}
-            />
-            {VIBES.map((vibe) => (
-              <VibeChip
+        {/* Story rail — pink gradient rings, real product thumbs */}
+        <div className="mt-3 flex gap-3 overflow-x-auto px-4 scrollbar-hide">
+          <StoryCircle
+            label="For you"
+            active={vibeFilter === 'all'}
+            onClick={() => { setVibeFilter('all'); track('vibe_selected', { vibe: 'all' }); }}
+          >
+            <span className="grid h-full w-full place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#ff7c9b,rgba(255,59,99,.6)_56%,rgba(120,30,52,.8))] text-white">
+              <Sparkles size={19} />
+            </span>
+          </StoryCircle>
+          {VIBES.map((vibe) => {
+            const thumb = vibeThumbs.get(vibe.id);
+            return (
+              <StoryCircle
                 key={vibe.id}
                 label={vibe.label}
                 active={vibeFilter === vibe.id}
-                onClick={() => { setVibeFilter(vibe.id); setFilterOpen(false); }}
-              />
-            ))}
-          </div>
+                onClick={() => { setVibeFilter(vibe.id); track('vibe_selected', { vibe: vibe.id }); }}
+              >
+                <span className="grid h-full w-full place-items-center overflow-hidden rounded-full bg-[#FBF7F2]">
+                  {thumb ? (
+                    <ProductImage
+                      product={thumb}
+                      transparentOnly
+                      wrapperClassName="h-[78%] w-[78%]"
+                      className="h-full w-full object-contain"
+                    />
+                  ) : null}
+                </span>
+              </StoryCircle>
+            );
+          })}
         </div>
-      ) : null}
+
+        {/* Tune panel: switch accessory slots off ("never hats") */}
+        {tuneOpen ? (
+          <div className="mx-4 mt-3 animate-sy-rise rounded-card border border-hairline bg-surface-1/95 p-3 backdrop-blur-xl">
+            <p className="text-eyebrow font-extrabold uppercase text-muted">Generate with</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {OPTIONAL_SLOTS.map((slot) => {
+                const enabled = !disabledSlots.has(slot);
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => toggleSlot(slot)}
+                    aria-pressed={enabled}
+                    className={`sy-press rounded-full border px-3.5 py-2 text-[12px] font-semibold capitalize transition ${
+                      enabled
+                        ? 'border-accent/60 bg-accent-soft text-ink'
+                        : 'border-hairline bg-surface-2 text-muted line-through'
+                    }`}
+                  >
+                    {CATEGORY_NOUN[slot]}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[11px] leading-relaxed text-muted">
+              Switched-off pieces stop appearing in new fits. Core four (top, bottoms, shoes, layer) always style.
+            </p>
+          </div>
+        ) : null}
+      </header>
 
       {/* The scroll */}
       <div
@@ -338,11 +563,15 @@ export default function ScrollPage() {
         {looks.map((look, index) => {
           const meta = VIBE_META.get(look.vibe);
           const products = lookProducts(look.items);
-          const lockedCategories = locks[look.key] || [];
           const total = lookTotalCents(look.items);
+          const exactCount = products.filter((product) => hasExactProductLink(product)).length;
+          const isActive = activeKey ? activeKey === look.key : index === 0;
+          const liked = likedKeys.has(look.key);
+          const whyOpen = whyOpenKey === look.key;
           return (
             <section
               key={look.key}
+              data-look-key={look.key}
               aria-label={`${meta?.label || 'Outfit'} look`}
               className="relative h-[100dvh] snap-start snap-always overflow-hidden"
             >
@@ -357,30 +586,41 @@ export default function ScrollPage() {
               />
               <div aria-hidden className="sy-grain absolute inset-0 opacity-[.05] mix-blend-overlay" />
 
-              {/* The plate */}
-              <div className="absolute inset-x-4 top-[calc(env(safe-area-inset-top)+58px)] bottom-[268px]">
+              {/* The plate — worn silhouette */}
+              <div className="absolute inset-x-4 top-[calc(env(safe-area-inset-top)+156px)] bottom-[248px]">
                 <div
                   key={`${look.key}-gen-${look.gen}`}
-                  className="h-full animate-sy-fade overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card-strong"
+                  className="relative h-full animate-sy-fade overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card-strong"
                 >
-                  <OutfitLookCard
+                  <WornFlatlay
                     items={products}
-                    presentation="flatlay"
-                    productLinks={false}
+                    active={isActive}
                     loading={index < 2 ? 'eager' : 'lazy'}
-                    className="h-full"
+                    className="h-full w-full"
                   />
+                  {burstKey === look.key ? (
+                    <span className="pointer-events-none absolute inset-0 z-40 grid place-items-center">
+                      <Heart
+                        size={110}
+                        fill="currentColor"
+                        className="animate-ping text-accent drop-shadow-[0_0_28px_rgba(255,59,99,.85)]"
+                      />
+                    </span>
+                  ) : null}
                 </div>
               </div>
 
               {/* Legibility gradient */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[320px] bg-[linear-gradient(180deg,transparent,rgba(10,10,12,.88)_58%,#0A0A0C_92%)]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px] bg-[linear-gradient(180deg,transparent,rgba(10,10,12,.9)_58%,#0A0A0C_92%)]"
               />
 
               {/* Right action rail */}
-              <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+196px)] right-3 z-20 flex flex-col items-center gap-3.5">
+              <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+186px)] right-3 z-20 flex flex-col items-center gap-3">
+                <RailAction label={liked ? 'Unlike' : 'Like — trains your taste'} onClick={() => like(look)} filled={liked}>
+                  <Heart size={19} fill={liked ? 'currentColor' : 'none'} />
+                </RailAction>
                 <RailAction label="Save" onClick={() => save(look)}>
                   <Bookmark size={19} />
                 </RailAction>
@@ -396,27 +636,55 @@ export default function ScrollPage() {
               </div>
 
               {/* Meta */}
-              <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+88px)] z-10 px-4 pr-[72px]">
-                <p className="text-eyebrow font-extrabold uppercase text-champagne">Syli&apos;s note</p>
-                <p className="mt-1 max-w-[34ch] text-[13px] font-medium leading-snug text-muted-2">
-                  {syliNote(look)}
-                </p>
+              <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-10 px-4 pr-[70px]">
+                {/* Formula pill + WHY */}
+                <button
+                  type="button"
+                  onClick={() => setWhyOpenKey(whyOpen ? null : look.key)}
+                  aria-expanded={whyOpen}
+                  className="sy-press inline-flex items-center gap-2 rounded-full border border-hairline-2 bg-surface-2/80 py-1.5 pl-1.5 pr-3 backdrop-blur-md"
+                >
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
+                    <Sparkles size={12} />
+                  </span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-[.16em] text-accent">Formula</span>
+                  <span className="text-[12px] font-semibold text-ink">
+                    {look.vibe} / {densityLabel(products.length)}
+                  </span>
+                  <span className="flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2">
+                    Why
+                    <ChevronDown size={11} className={`transition-transform ${whyOpen ? 'rotate-180' : ''}`} />
+                  </span>
+                </button>
+                {whyOpen ? (
+                  <p className="mt-2 max-w-[36ch] animate-sy-rise text-[13px] font-medium leading-snug text-muted-2">
+                    <span className="font-bold uppercase tracking-[.14em] text-champagne">Syli&apos;s note · </span>
+                    {syliNote(look)}
+                  </p>
+                ) : null}
+
                 <div className="mt-2 flex items-baseline gap-3">
-                  <h2 className="font-serif text-[34px] font-semibold italic leading-[.95] text-ink">
+                  <h2 className="font-serif text-[32px] font-semibold italic leading-[.95] text-ink">
                     {meta?.label || 'The look'}
                   </h2>
-                  <span className="text-[14px] font-bold text-money">{formatPrice(total)}</span>
+                  <span className="rounded-full border border-money/35 bg-money/10 px-2.5 py-1 text-[12px] font-bold text-money">
+                    {formatPrice(total)}
+                  </span>
+                  <span className="text-[11px] font-semibold text-muted">
+                    {exactCount}/{products.length} shoppable
+                  </span>
                 </div>
 
-                {/* Piece chips — tap to lock, then restyle around what you love */}
-                <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
+                {/* Piece chips — tap to lock; locked pieces ride along as you scroll */}
+                <div className="-mx-4 mt-2.5 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
                   {products.map((product) => {
-                    const locked = lockedCategories.includes(product.category);
+                    const locked = lockedItems[product.category]?.id === product.id;
+                    const exact = hasExactProductLink(product);
                     return (
                       <button
                         key={product.id}
                         type="button"
-                        onClick={() => toggleLock(look.key, product.category)}
+                        onClick={() => toggleLock(look, product)}
                         aria-pressed={locked}
                         aria-label={`${locked ? 'Unlock' : 'Lock'} ${product.brand} ${CATEGORY_NOUN[product.category]}`}
                         className={`sy-press flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 backdrop-blur-md transition ${
@@ -425,7 +693,7 @@ export default function ScrollPage() {
                             : 'border-hairline-2 bg-surface-2/70 text-muted-2'
                         }`}
                       >
-                        <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-ink/95">
+                        <span className="relative grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-ink/95">
                           <ProductImage
                             product={product}
                             wrapperClassName="h-6 w-6"
@@ -439,21 +707,31 @@ export default function ScrollPage() {
                         <span className="text-[11px] font-medium text-muted">
                           {formatPrice(product.priceCents || 0)}
                         </span>
+                        {exact ? <span aria-label="Shoppable" className="h-1.5 w-1.5 rounded-full bg-money" /> : null}
                         {locked ? <Lock size={11} className="text-accent" /> : null}
                       </button>
                     );
                   })}
                 </div>
 
-                {lockedCategories.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => restyle(look)}
-                    className="sy-press mt-3 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-4 py-2.5 text-[13px] font-bold text-white shadow-pink-glow"
-                  >
-                    <WandSparkles size={15} />
-                    Restyle around {lockedCategories.length} locked
-                  </button>
+                {lockCount > 0 ? (
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => restyle(look)}
+                      className="sy-press inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-4 py-2.5 text-[13px] font-bold text-white shadow-pink-glow"
+                    >
+                      <WandSparkles size={15} />
+                      New take with {lockCount} locked
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => clearLocks(look)}
+                      className="sy-press rounded-full border border-hairline-2 bg-surface-2/70 px-3.5 py-2.5 text-[12px] font-semibold text-muted-2 backdrop-blur-md"
+                    >
+                      Clear
+                    </button>
+                  </div>
                 ) : null}
               </div>
             </section>
@@ -463,7 +741,7 @@ export default function ScrollPage() {
 
       {/* Toast */}
       {toast ? (
-        <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+64px)] z-40 flex justify-center">
+        <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+128px)] z-40 flex justify-center">
           <span className="flex animate-sy-rise items-center gap-1.5 rounded-full border border-hairline-2 bg-surface-2/95 px-4 py-2 text-[12px] font-semibold text-ink shadow-card backdrop-blur-md">
             <Check size={13} className="text-money" />
             {toast}
@@ -480,17 +758,33 @@ export default function ScrollPage() {
   );
 }
 
-function VibeChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function StoryCircle({
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`sy-press shrink-0 rounded-full px-3.5 py-2 text-[12px] font-semibold transition ${
-        active ? 'bg-accent text-white shadow-pink-glow' : 'bg-surface-3 text-muted-2'
-      }`}
-    >
-      {label}
+    <button type="button" onClick={onClick} aria-pressed={active} className="sy-press flex shrink-0 flex-col items-center gap-1">
+      <span
+        className={`grid h-[56px] w-[56px] place-items-center rounded-full p-[2.5px] ${
+          active
+            ? 'bg-[linear-gradient(140deg,#FF3B63_0%,#FF6E8A_45%,#E7C79B_100%)] shadow-pink-glow'
+            : 'bg-hairline-2'
+        }`}
+      >
+        <span className="grid h-full w-full place-items-center overflow-hidden rounded-full border-2 border-bg">
+          {children}
+        </span>
+      </span>
+      <span className={`max-w-[64px] truncate text-[10px] font-semibold ${active ? 'text-ink' : 'text-muted'}`}>
+        {label}
+      </span>
     </button>
   );
 }
@@ -499,11 +793,13 @@ function RailAction({
   label,
   onClick,
   accent = false,
+  filled = false,
   children,
 }: {
   label: string;
   onClick: () => void;
   accent?: boolean;
+  filled?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -511,10 +807,12 @@ function RailAction({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className={`sy-press grid h-12 w-12 place-items-center rounded-full border backdrop-blur-md transition active:scale-90 ${
+      className={`sy-press grid h-11 w-11 place-items-center rounded-full border backdrop-blur-md transition active:scale-90 ${
         accent
           ? 'border-accent/50 bg-accent text-white shadow-pink-glow'
-          : 'border-hairline-2 bg-surface-2/70 text-ink'
+          : filled
+            ? 'border-accent bg-accent-soft text-accent shadow-pink-glow'
+            : 'border-hairline-2 bg-surface-2/70 text-ink'
       }`}
     >
       {children}
