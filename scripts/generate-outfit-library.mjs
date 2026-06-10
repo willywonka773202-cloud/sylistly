@@ -24,6 +24,45 @@ const PRODUCTS = (Array.isArray(catalog) ? catalog : catalog.products || Object.
   (p) => p && p.imageTransparentUrl && p.category,
 );
 
+// ── Shoppability (mirrors lib/product-image-quality hasExactProductLink) ──
+// A piece is "exact" when productUrl/retailerUrl points at a real merchant
+// PDP — not a search/aggregator URL. Exact links are what affiliate wrapping
+// can actually monetize; google-search fallbacks earn nothing.
+function isSearchOrAggregatorUrl(url) {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+    const pathname = parsed.pathname.toLowerCase();
+    const params = parsed.searchParams;
+    const hash = parsed.hash.toLowerCase();
+    const isNordstromProductPath =
+      (hostname === 'nordstrom.com' || hostname === 'nordstromrack.com') &&
+      /^\/s\/[^/]+\/\d+/.test(pathname);
+    if (hostname.includes('google.') && (pathname.includes('/search') || pathname.includes('/shopping'))) return true;
+    if (hash.includes('oshopproduct')) return true;
+    if (pathname.includes('/search') || (pathname.includes('/s/') && !isNordstromProductPath) || pathname.includes('search-result')) return true;
+    return params.has('q') || params.has('query') || params.has('search')
+      || params.has('searchTerm') || params.has('text') || params.has('keyword');
+  } catch {
+    return true;
+  }
+}
+
+function hasExactLink(p) {
+  for (const field of ['productUrl', 'retailerUrl']) {
+    const u = (p[field] || '').trim();
+    if (!u) continue;
+    try {
+      const pathname = new URL(u).pathname;
+      if (!pathname || pathname === '/') continue;
+    } catch { continue; }
+    if (!isSearchOrAggregatorUrl(u)) return true;
+  }
+  return false;
+}
+
+const EXACT_LINK_IDS = new Set(PRODUCTS.filter(hasExactLink).map((p) => p.id));
+
 // ── Color taxonomy ────────────────────────────────────────────────
 const NEUTRALS = new Set(['black', 'white', 'tan', 'beige', 'grey', 'gray', 'brown', 'navy', 'ivory', 'cream', 'olive']);
 const METALLICS = new Set(['gold', 'silver']);
@@ -223,10 +262,17 @@ function scoreOutfit(pieces, vibe, cfg) {
   const dupBrands = brands.length - new Set(brands).size;
   const brandDiversity = Math.max(0, 1 - dupBrands * 0.5);
 
+  // Shoppability — share of pieces with a real merchant PDP link (what
+  // affiliate wrapping can monetize), plus a bonus once the look clears the
+  // ≥3-exact floor the feed already uses. Soft weight, not a gate: thin slots
+  // (e.g. bottoms are mostly link-less) must still fill.
+  const exactCount = pieces.filter((p) => EXACT_LINK_IDS.has(p.id)).length;
+  const shoppability = (exactCount / pieces.length) * 0.8 + (exactCount >= 3 ? 0.2 : 0);
+
   // Color data is sparse, so weight it modestly and lean on vibe + formality
   // cohesion (and the type-appropriate pools) + brand diversity for coordination.
-  const total = vibe01 * 0.36 + formality * 0.24 + color * 0.16 + completeness * 0.12 + brandDiversity * 0.12;
-  return { total, color, vibe01, formality, completeness, brandDiversity, distinctAccents };
+  const total = vibe01 * 0.33 + formality * 0.22 + color * 0.14 + completeness * 0.11 + brandDiversity * 0.10 + shoppability * 0.10;
+  return { total, color, vibe01, formality, completeness, brandDiversity, shoppability, distinctAccents };
 }
 
 // ── Build slot pools (with coverage widening) ─────────────────────
@@ -243,9 +289,16 @@ function buildPools(vibe, cfg, frame) {
       pool = pool.concat(extra);
     }
     pools[slot] = pool;
+    // Pre-split for shoppability-weighted sampling (see sampling loop).
+    pools[`${slot}:exact`] = pool.filter((p) => EXACT_LINK_IDS.has(p.id));
   }
   return pools;
 }
+
+// Probability that a slot draw comes from the exact-link subset (when it has
+// any). Lifts monetizable pieces without starving variety — the full pool
+// still supplies ~1/3 of draws and the coherence scorer does the rest.
+const EXACT_DRAW_PROB = 0.65;
 
 // ── Generate library ──────────────────────────────────────────────
 const QUALITY_BAR = 0.64;
@@ -280,7 +333,9 @@ for (const vibe of Object.keys(VIBE_CONFIG)) {
           const skipProb = slot === 'bag' || slot === 'eyewear' ? 0.62 : 0.42;
           if (rand() < skipProb) continue;
         }
-        pieces.push(pool[Math.floor(rand() * pool.length)]);
+        const exactPool = pools[`${slot}:exact`];
+        const drawPool = exactPool && exactPool.length && rand() < EXACT_DRAW_PROB ? exactPool : pool;
+        pieces.push(drawPool[Math.floor(rand() * drawPool.length)]);
       }
       if (!REQUIRED.every((s) => pieces.some((p) => p.category === s))) continue;
       const sig = pieces.map((p) => p.id).sort().join('|');
@@ -340,3 +395,12 @@ for (const o of library) byVibe[o.vibe] = (byVibe[o.vibe] || 0) + 1;
 console.log('\nper-vibe totals:', JSON.stringify(byVibe));
 const avgScore = library.reduce((s, o) => s + o.score, 0) / (library.length || 1);
 console.log('avg coordination score:', Math.round(avgScore * 1000) / 1000);
+
+let shopPieces = 0, shopExact = 0, shopFloor = 0;
+for (const o of library) {
+  const ids = Object.values(o.items);
+  const exact = ids.filter((id) => EXACT_LINK_IDS.has(id)).length;
+  shopPieces += ids.length; shopExact += exact;
+  if (exact >= 3) shopFloor += 1;
+}
+console.log(`shoppability: ${(shopExact / shopPieces * 100).toFixed(1)}% of pieces exact-link · ${(shopFloor / library.length * 100).toFixed(1)}% of looks have >=3 exact pieces (catalog: ${EXACT_LINK_IDS.size}/${PRODUCTS.length} exact)`);
