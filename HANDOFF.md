@@ -5,12 +5,19 @@
 - **Turn:** Claude
 - **Last build by:** Claude
 - **Status:** verified-pass
-- **Updated:** 2026-06-08T14:40:00-05:00
-- **Next:** Launch BLOCKERS fixed + deployed; TikTok /swipe mode shipped. Remaining PHASE 2: public profile route /u/[handle] (+ enforce published-only public view), mixed feed card types + trending hero + captions/avatars, Home dashboard polish, perf (lazy-load data/outfit-library.json on /build, defer social-feed module-load generation, skeletons over null loading states), PWA PNG/maskable icons, dead studio-presentation code removal. Codex: re-check the blocker fixes before treating as launch-ready.
+- **Updated:** 2026-06-08T19:40:00-05:00
+- **Next:** Clothing PRESENTATION pass shipped (43 model photos purged + flat-lay rebalanced). Continue presentation polish: (a) cutout edge/halo audit, (b) per-category sizing in FitsAiOutfitCanvas (shoes wider, accessories smaller), (c) 1-2 borderline model-photo stragglers remain — extend blocklist if spotted. Then PHASE 2: public profile /u/[handle], mixed feed card types, home dashboard, perf (lazy outfit-library + skeletons), PWA PNG icons, dead studio-code removal in OutfitBoard.tsx. NOTE: SearchAPI key shared in chat earlier (FiyDgAiDJ8b…) is compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-08T19:40:00-05:00 — Claude Code — build+check (clothing presentation: model-photo purge + flat-lay rebalance)
+- User: "the database isn't showing the clothing in the best way, and that's the whole point of the app." Two presentation fixes:
+- **MODEL-PHOTO PURGE**: the catalog still held full-body MODEL PHOTOS (a person standing) cut out as "garments" — a tiny floating person inside an outfit collage looks terrible. Pixel heuristics alone were too noisy (tan leather/beige fabric trips skin-tone; Haar face detect trips on pant-pocket texture), so I combined heuristics (tall+narrow aspect, skin-in-top-band, narrow-head-widens-to-shoulders, high overall skin for torso shots) with VISUAL montage confirmation across 3 passes → confirmed 43 real model photos. New `data/catalog-body-model-blocklist.json` (id list) applied in `lib/catalog.ts` via `applyBodyModelBlocklistToProducts` (tags them `body-model` so `isEditorialCutoutProduct` drops them from the client catalog, feed flat-lays, AND the pre-gen library — reversible). Client catalog 554→511; library regenerated (avg coord 0.745, full 1200/vibe coverage).
+- **FLAT-LAY REBALANCE** (`components/OutfitBoard.tsx FitsAiOutfitCanvas`): with model photos gone the "hero" is now a flat garment, so the extreme center-hero (one huge piece, tiny flanks) was unbalanced. Columns 31%→33%, hero col flex-1→34%, `justify-evenly gap-0.5`→`justify-center gap-1.5`, a touch more padding. flex-1 flank pieces now fill column height (no whitespace); every piece reads clearly at a comparable size.
+- VERIFIED: `npx tsc --noEmit` clean · `npm run lint` 0 errors · `npm run build` exit 0 (all routes static incl /feed,/build,/swipe) · `npm run test:frame` PASS (0 cross-gender across 33k pieces after catalog change) · DEPLOYED to www.sylistly.com (exit 0). Live CDP screenshots: /feed + /swipe show clean balanced flat-lays, ZERO model photos, all cutouts 200. (Local `next dev`/`next start` 404 every route but `/` — environment quirk, NOT code: build manifests list all routes + Vercel serves them; verified via live screenshots as all session.)
+- next: cutout halo audit · per-category sizing in flat-lay · extend blocklist if stragglers appear · then PHASE 2.
 
 ### 2026-06-08T15:20:00-05:00 — Claude Code — build+check (gender leak fix)
 - User caught REAL gender leaks the prior keyword lists missed: women's athleisure (Alo Yoga leggings/airbrush/airlift/alosoft shorts/tanks), tube tops, scoop/wrap tops, cropped polos — all classified "neutral" → landing in masc fits. (My earlier test passed because it reused the generator's own list.)

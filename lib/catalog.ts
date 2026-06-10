@@ -12,6 +12,7 @@ import { applyCatalogUrlOverridesToProducts } from './catalog-url-overrides';
 import { applyCatalogTagOverridesToProducts } from './catalog-tag-overrides';
 import { applyCatalogCutoutOverridesToProducts } from './catalog-cutout-overrides';
 import { applyCatalogVisionCacheToProducts } from './catalog-vision-cache';
+import bodyModelBlocklist from '../data/catalog-body-model-blocklist.json';
 import { frameCompatibilityScore, genderMismatchReasons, hasFrameMismatch } from './frame-inference';
 import { hasHighCategoryConfidence, hasUsableProductImage, isEditorialCutoutProduct, isRealCommerceProductForFeed, isRenderableProduct } from './product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product, type SearchIntent } from './types';
@@ -1348,10 +1349,27 @@ export const LAUNCH_COLLECTIONS: CatalogCollection[] = [
   },
 ];
 
+// Product IDs confirmed (by visual montage review) to be full-body MODEL PHOTOS,
+// not clean flat-lay cutouts. Tagging them `body-model` makes isEditorialCutoutProduct
+// drop them from the client catalog, feed flat-lays, and the pre-generated library —
+// so a tiny standing person never floats inside an outfit collage.
+const BODY_MODEL_BLOCKLIST = new Set<string>(bodyModelBlocklist.ids);
+
+function applyBodyModelBlocklistToProducts(products: Product[]): Product[] {
+  return products.map((product) => {
+    if (!BODY_MODEL_BLOCKLIST.has(product.id)) return product;
+    const flags = product.imageQualityFlags || [];
+    if (flags.includes('body-model')) return product;
+    return { ...product, imageQualityFlags: [...flags, 'body-model'] };
+  });
+}
+
 function applyRuntimeCatalogOverrides(products: Product[]): Product[] {
-  return applyCatalogVisionCacheToProducts(
-    applyCatalogCutoutOverridesToProducts(
-      applyCatalogTagOverridesToProducts(applyCatalogUrlOverridesToProducts(products)),
+  return applyBodyModelBlocklistToProducts(
+    applyCatalogVisionCacheToProducts(
+      applyCatalogCutoutOverridesToProducts(
+        applyCatalogTagOverridesToProducts(applyCatalogUrlOverridesToProducts(products)),
+      ),
     ),
   );
 }

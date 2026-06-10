@@ -1,6 +1,6 @@
 'use client';
 
-import { House, Images, Plus, Shirt, User, WandSparkles } from 'lucide-react';
+import { Bookmark, House, Images, Plus, User, WandSparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export function BottomNav() {
   const feedActive = pathname.startsWith('/feed') || pathname.startsWith('/discover');
   const createActive = pathname.startsWith('/build') || pathname.startsWith('/canvas');
   const stylistActive = pathname.startsWith('/stylist');
-  const closetActive = pathname.startsWith('/wardrobe') || pathname.startsWith('/saved');
+  const savedActive = pathname.startsWith('/saved') || pathname.startsWith('/wardrobe');
   const profileActive = pathname.startsWith('/profile');
 
   return (
@@ -45,7 +45,7 @@ export function BottomNav() {
           <span className="mt-1 text-[10px] font-bold uppercase tracking-[.14em] text-accent">Create</span>
         </Link>
         <NavTool href="/stylist" label="Syli" icon={WandSparkles} active={stylistActive} />
-        <NavTool href="/wardrobe" label="Closet" icon={Shirt} active={closetActive} />
+        <NavTool href="/saved" label="Saved" icon={Bookmark} active={savedActive} />
         <NavTool href="/profile" label="You" icon={User} active={profileActive} />
       </div>
     </nav>

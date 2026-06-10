@@ -1,12 +1,14 @@
 'use client';
 import dynamic from 'next/dynamic';
 import {
+  BadgeCheck,
   Bookmark,
   Check,
   Heart,
   Layers,
   RotateCcw,
   Send,
+  Shirt,
   ShoppingBag,
   Sparkles,
   Trash2,
@@ -82,6 +84,7 @@ function inferCollection(fit: SavedFitRecord): Collection {
 export default function SavedPage() {
   const fits = useSavedFits((state) => state.fits);
   const removeFit = useSavedFits((state) => state.removeFit);
+  const markPublished = useSavedFits((state) => state.markPublished);
   const postFit = useSocialFeed((state) => state.postFit);
   const replaceItems = useFit((state) => state.replaceItems);
   const addToCloset = useWardrobe((state) => state.addToCloset);
@@ -93,7 +96,9 @@ export default function SavedPage() {
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState<Collection>('All');
   const [detailFitId, setDetailFitId] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState<{ kind: 'closet' | 'wishlist'; count: number } | null>(null);
+  const [confirmation, setConfirmation] = useState<
+    { kind: 'closet' | 'wishlist'; count: number } | { kind: 'published' | 'publish-error'; count?: number } | null
+  >(null);
 
   // Compute renderable view per fit once. Used by the grid, the
   // collection filter, and the stats card so collection-inference
@@ -202,20 +207,62 @@ export default function SavedPage() {
     window.setTimeout(() => setConfirmation(null), 1600);
   }
 
+  // Publish a saved fit to the public feed + the user's profile (@you).
+  // postFit enforces a ≥3 shoppable-piece floor and returns null below it.
+  function publishFit(
+    fit: SavedFitRecord,
+    visualItems: Partial<Record<Category, Product>>,
+    collection: Collection,
+  ) {
+    const post = postFit(visualItems, {
+      title: fit.title,
+      vibe: collection.toLowerCase(),
+      visibility: 'public',
+    });
+    if (!post) {
+      setConfirmation({ kind: 'publish-error' });
+      window.setTimeout(() => setConfirmation(null), 2600);
+      return;
+    }
+    markPublished(fit.id, post.id);
+    setConfirmation({ kind: 'published' });
+    window.setTimeout(() => setConfirmation(null), 2200);
+  }
+
   return (
     <PlaceholderScreen
       eyebrow="Saved"
       title="Fits"
       accent="saved"
-      description="Saved looks persist locally and can be remixed in Builder, shopped, or added to your closet."
+      description="Saved looks persist locally — publish any fit to your profile + feed, remix it in Builder, shop it, or add it to your closet."
     >
       {confirmation ? (
         <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(246,48,107,.55)] backdrop-blur-md">
-            <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
-              <Check size={13} strokeWidth={3} />
+          <div
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-[12px] font-semibold text-white backdrop-blur-md ${
+              confirmation.kind === 'publish-error'
+                ? 'border-amber-300/50 bg-[#1c160f]/95 shadow-[0_18px_44px_rgba(0,0,0,.5)]'
+                : 'border-accent/45 bg-[#1c0f15]/95 shadow-[0_18px_44px_rgba(246,48,107,.55)]'
+            }`}
+          >
+            <span
+              className={`grid h-5 w-5 place-items-center rounded-full text-white ${
+                confirmation.kind === 'publish-error' ? 'bg-amber-400 text-[#1c160f]' : 'bg-accent'
+              }`}
+            >
+              {confirmation.kind === 'published' ? (
+                <BadgeCheck size={13} strokeWidth={3} />
+              ) : (
+                <Check size={13} strokeWidth={3} />
+              )}
             </span>
-            Added {confirmation.count} piece{confirmation.count === 1 ? '' : 's'} to {confirmation.kind === 'closet' ? 'closet' : 'wishlist'}
+            {confirmation.kind === 'published'
+              ? 'Published to your profile + feed'
+              : confirmation.kind === 'publish-error'
+              ? 'Add at least 3 shoppable pieces to publish'
+              : `Added ${confirmation.count} piece${confirmation.count === 1 ? '' : 's'} to ${
+                  confirmation.kind === 'closet' ? 'closet' : 'wishlist'
+                }`}
           </div>
         </div>
       ) : null}
@@ -277,6 +324,12 @@ export default function SavedPage() {
                     <div className="absolute left-2 top-2 rounded-full bg-black/60 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
                       {collection}
                     </div>
+                    {fit.publishedPostId ? (
+                      <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-accent/90 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
+                        <BadgeCheck size={9} />
+                        Live
+                      </div>
+                    ) : null}
                   </div>
                   <div className="px-3 pb-3 pt-2">
                     <div className="line-clamp-1 font-serif text-[14px] font-semibold leading-tight text-[#fff5ee]">{fit.title}</div>
@@ -299,11 +352,13 @@ export default function SavedPage() {
           visualProducts={detail.visualProducts}
           collection={detail.collection}
           onClose={() => setDetailFitId(null)}
+          published={Boolean(detail.fit.publishedPostId)}
           onLoadInBuilder={() => loadInBuilder(detail.visualItems)}
           onShop={() => shopAll(detail.fit, detail.visualProducts)}
-          onPost={() => {
-            postFit(detail.visualItems, { title: detail.fit.title, vibe: detail.collection.toLowerCase(), visibility: 'public' });
+          onPublish={() => publishFit(detail.fit, detail.visualItems, detail.collection)}
+          onViewProfile={() => {
             setDetailFitId(null);
+            router.push('/profile');
           }}
           onAddAllToCloset={() => addAllToCloset(detail.visualProducts)}
           onAddAllToWishlist={() => addAllToWishlist(detail.visualProducts)}
@@ -410,24 +465,34 @@ function SavedActionPanel() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Saved actions</div>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">Turn saved fits into the next build, feed post, or shopping session.</p>
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <p className="mt-1 text-[12px] leading-relaxed text-muted-2">Open a fit to publish it to your profile, remix it in Builder, or shop the pieces. Closet lives here too.</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
             <Link
               href="/build"
-              className="inline-flex items-center justify-center rounded-full bg-accent px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-95"
             >
+              <Wand2 size={11} />
               Build
             </Link>
             <Link
-              href="/feed"
-              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+              href="/wardrobe"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
             >
+              <Shirt size={11} />
+              Closet
+            </Link>
+            <Link
+              href="/feed"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+            >
+              <Sparkles size={11} />
               Feed
             </Link>
             <Link
               href="/discover"
-              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
             >
+              <ShoppingBag size={11} />
               Shop
             </Link>
           </div>
@@ -443,9 +508,11 @@ function SavedDetailSheet({
   visualProducts,
   collection,
   onClose,
+  published,
   onLoadInBuilder,
   onShop,
-  onPost,
+  onPublish,
+  onViewProfile,
   onAddAllToCloset,
   onAddAllToWishlist,
   onRemove,
@@ -456,9 +523,11 @@ function SavedDetailSheet({
   visualProducts: Product[];
   collection: Collection;
   onClose: () => void;
+  published: boolean;
   onLoadInBuilder: () => void;
   onShop: () => void;
-  onPost: () => void;
+  onPublish: () => void;
+  onViewProfile: () => void;
   onAddAllToCloset: () => void;
   onAddAllToWishlist: () => void;
   onRemove: () => void;
@@ -472,9 +541,17 @@ function SavedDetailSheet({
 
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-[.22em] text-accent">
-              <Bookmark size={11} />
-              Saved fit · {collection}
+            <div className="flex flex-wrap items-center gap-2 text-[8px] font-bold uppercase tracking-[.22em] text-accent">
+              <span className="inline-flex items-center gap-1">
+                <Bookmark size={11} />
+                Saved fit · {collection}
+              </span>
+              {published ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 py-0.5 text-emerald-200">
+                  <BadgeCheck size={10} />
+                  Live on profile
+                </span>
+              ) : null}
             </div>
             <h2 className="mt-1 line-clamp-2 font-serif text-[24px] font-semibold leading-tight text-ink">{fit.title}</h2>
             <div className="mt-1 text-[11px] text-muted-2">
@@ -560,6 +637,27 @@ function SavedDetailSheet({
           </button>
         </div>
 
+        {/* Publish — headline social action: pushes this fit to your profile + the public feed */}
+        {published ? (
+          <button
+            type="button"
+            onClick={onViewProfile}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/12 px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-emerald-200 transition active:scale-[0.98] motion-safe:transition-transform motion-safe:duration-150 hover:border-emerald-300/60 hover:text-emerald-100"
+          >
+            <BadgeCheck size={14} />
+            Published · View on profile
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onPublish}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.16em] text-white shadow-[0_14px_32px_rgba(246,48,107,.5)] transition hover:bg-right active:scale-[0.98] motion-safe:transition-all motion-safe:duration-300"
+          >
+            <Send size={14} />
+            Publish to profile
+          </button>
+        )}
+
         {/* Cross-store actions */}
         <div className="mt-2 grid grid-cols-2 gap-2">
           <button
@@ -581,22 +679,14 @@ function SavedDetailSheet({
         </div>
 
         {/* Secondary actions */}
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={onPost}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/75 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/45 hover:text-white"
-          >
-            <Send size={12} />
-            Post to feed
-          </button>
+        <div className="mt-2">
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-red-400/55 hover:text-red-300"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-red-400/55 hover:text-red-300"
           >
             <Trash2 size={12} />
-            Remove
+            Remove from saved
           </button>
         </div>
       </article>
