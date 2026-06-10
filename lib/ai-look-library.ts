@@ -60,6 +60,11 @@ export function aiLibrarySize(): number {
   return HYDRATED.length;
 }
 
+/** Look up a baked look by its id (share pages: /look/syli-…). */
+export function getAiLookById(id: string): AiLook | null {
+  return HYDRATED.find((look) => look.id === id) || null;
+}
+
 function jitter(seed: number, n: number): number {
   const x = Math.sin((seed + n) * 12.9898) * 43758.5453;
   return x - Math.floor(x);

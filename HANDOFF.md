@@ -12,6 +12,17 @@
 
 ## Log (newest first)
 
+### 2026-06-10 (cont.) — Claude Code — build+check (SHAREABLE FIT PAGES — the Instagram engine is live)
+- Every fit now has its own URL with a real preview image. Two slug families on /look/[id]:
+  - `syli-<id>` — baked AI looks straight from the library (badge + Claude's note on the page)
+  - `c-<code>.<code>…` — ANY composed fit, encoded piece-by-piece via lib/share-codes.ts (fnv1a content-hash per product id → survives catalog reordering; dies only if a product is purged). No database needed.
+- **app/look/[id]/page.tsx** (server): worn-silhouette plate, Syli's note, serif title + price + n/n shoppable, per-piece rows with affiliate-WRAPPED Shop links (server-side wrapAffiliate), ShareActions client CTAs ("Remix this fit" → fit store → /build; "Lock the hero & scroll" → pending-lock → /). generateMetadata per look.
+- **app/look/[id]/opengraph-image.tsx** (nodejs runtime, NOT edge — catalog JSON ~1MB): real share card — noir panel (wordmark/title/price chip/pieces) + white plate with up to 6 actual cutouts. GOTCHA ×2: (a) Satori silently drops remote <img> URLs → inline as base64 data URIs; (b) NEXT_PUBLIC_APP_URL in .env.local is localhost:3000 → never use it as asset base; read cutouts from local fs first (dev), canonical-domain HTTP fallback (prod lambdas exclude public/assets/cutouts via outputFileTracingExcludes).
+- **Scroll share()** now shares /look/<slug> URLs (aiId or encoded) — every share is a mini storefront. Plus: Claude's PALETTE as swatch dots under Syli's note (PALETTE_HEX word→hex map), loading.tsx skeletons for /browse + /look.
+- Repeated the .next gotcha (build during dev → vendor-chunk 500s) — fix remains stop server + rm -rf .next; this deploy used Vercel REMOTE build to avoid it.
+- VERIFIED: tsc clean · build exit 0 (/look/[id] 3.16kB) · dev: syli + c- slugs 200, bad slug → branded not-found, OG 155KB WITH cutouts, badge + 4 palette dots on scroll, zero console errors. DEPLOYED (remote build).
+- next: catalog growth for bottoms (40 left) · Skimlinks IDs when approved · later: per-share subId tracking on share-page Shop links (server components can't onClick — needs a tiny client wrapper or redirect route).
+
 ### 2026-06-10 (latest) — Claude Code — build+check (DESIGN SYSTEM ADOPTED + /browse + re-bake)
 - Will delivered a full "Fit Scroll — Consistent Layout System" spec sheet. Adopted everything honestly buildable:
 - **TOKENS**: accent #FF3B63→#FF2D6D, bg #0A0A0C→#0D0D0F, surfaces →#17171A/#1F1F23/#2A2A2F (tailwind.config + sed sweep of every hardcoded pink/bg hex across app/components — the earlier token unification made this a one-pass change). **Satoshi variable (300-900)** via next/font/local (Fontshare download, app/fonts/) replaces DM Sans as font-sans; Playfair stays for headings.

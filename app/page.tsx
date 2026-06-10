@@ -28,6 +28,7 @@ import { buildCatalogLook } from '@/lib/client-catalog';
 import { getLibraryLook } from '@/lib/outfit-library';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
+import { encodeLookSlug } from '@/lib/share-codes';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 import { useCheckout } from '@/store/checkout';
@@ -76,7 +77,22 @@ interface ScrollLook {
   note?: string;
   /** The baked library id — marked seen only when the card is viewed. */
   aiId?: string;
+  /** Claude's palette words ('navy', 'cream') — rendered as swatch dots. */
+  palette?: string[];
 }
+
+/** Palette-word → swatch hex for the WHY row dots (unknown words skipped). */
+const PALETTE_HEX: Record<string, string> = {
+  black: '#16161A', white: '#F6F2EC', ivory: '#F1EAD9', cream: '#F0E6D4',
+  grey: '#8E8E96', gray: '#8E8E96', charcoal: '#3C3C44', silver: '#C8C8D2',
+  navy: '#1F2A44', blue: '#3B5BA5', denim: '#46618C', tan: '#C9A77C',
+  beige: '#D9C3A3', camel: '#B98C55', khaki: '#A39264', taupe: '#A99685',
+  brown: '#6F4A2F', chocolate: '#4E3220', espresso: '#3B2418',
+  olive: '#6B6B3F', green: '#3F6B4A', sage: '#9CAD8E', red: '#B3322E',
+  burgundy: '#6E1F2E', oxblood: '#4A1118', wine: '#5C1F33', pink: '#E58CA6',
+  blush: '#E8B4BC', gold: '#C9A227', mustard: '#C9962B', orange: '#C76B2E',
+  rust: '#A0522D', purple: '#6C4E8E', lavender: '#A98FC9', neutral: '#B9AFA2',
+};
 
 function lookProducts(items: Partial<Record<Category, Product>>): Product[] {
   return Object.values(items).filter((product): product is Product => Boolean(product));
@@ -267,6 +283,7 @@ export default function ScrollPage() {
               source: 'syli',
               note: aiLook.note,
               aiId: aiLook.id,
+              palette: aiLook.palette,
             });
             continue;
           }
@@ -492,19 +509,20 @@ export default function ScrollPage() {
   async function share(look: ScrollLook) {
     const meta = VIBE_META.get(look.vibe);
     const products = lookProducts(look.items);
-    const text = `${meta?.label || 'A'} fit on Sylistly — ${products
-      .slice(0, 3)
-      .map((product) => product.brand)
-      .join(', ')} + ${Math.max(0, products.length - 3)} more, ${formatPrice(lookTotalCents(look.items))} total.`;
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
-    track('look_shared', { vibe: look.vibe });
+    const text = `${meta?.label || 'A'} fit on Sylistly — ${products.length} real pieces, ${formatPrice(lookTotalCents(look.items))} total, every one shoppable.`;
+    // Every fit gets its own page with a real preview image — AI looks by
+    // library id, everything else encoded piece-by-piece.
+    const slug = look.aiId || encodeLookSlug(look.items);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const url = slug ? `${origin}/look/${slug}` : origin;
+    track('look_shared', { vibe: look.vibe, source: look.source });
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Sylistly', text, url });
         return;
       }
       await navigator.clipboard.writeText(`${text} ${url}`);
-      showToast('Copied to clipboard');
+      showToast('Fit link copied');
     } catch {
       /* user dismissed the share sheet */
     }
@@ -758,10 +776,27 @@ export default function ScrollPage() {
                   ) : null}
                 </div>
                 {whyOpen ? (
-                  <p className="mt-2 max-w-[36ch] animate-sy-rise text-[13px] font-medium leading-snug text-muted-2">
-                    <span className="font-bold uppercase tracking-[.14em] text-champagne">Syli&apos;s note · </span>
-                    {look.source === 'syli' && look.note ? look.note : syliNote(look)}
-                  </p>
+                  <div className="mt-2 animate-sy-rise">
+                    <p className="max-w-[36ch] text-[13px] font-medium leading-snug text-muted-2">
+                      <span className="font-bold uppercase tracking-[.14em] text-champagne">Syli&apos;s note · </span>
+                      {look.source === 'syli' && look.note ? look.note : syliNote(look)}
+                    </p>
+                    {look.source === 'syli' && look.palette?.length ? (
+                      <span className="mt-2 flex items-center gap-1.5" aria-label={`Palette: ${look.palette.join(', ')}`}>
+                        {look.palette.map((name) => {
+                          const hex = PALETTE_HEX[name.toLowerCase()];
+                          return hex ? (
+                            <span
+                              key={name}
+                              title={name}
+                              className="h-3.5 w-3.5 rounded-full ring-1 ring-hairline-2"
+                              style={{ backgroundColor: hex }}
+                            />
+                          ) : null;
+                        })}
+                      </span>
+                    ) : null}
+                  </div>
                 ) : null}
 
                 <div className="mt-2 flex items-baseline gap-3">
