@@ -12,16 +12,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg:          '#0A0A0C',
-        'surface-1': '#131318',
-        'surface-2': '#1B1A21',
-        'surface-3': '#26242E',
-        'surface-4': '#322F3C',
-        // One unified, confident accent (replaces the old #e8365d / #f6306b split).
-        accent:      '#FF3B63',
-        'accent-hot':'#FF6E8A',
-        'accent-deep':'#C61E45',
-        'accent-soft':'rgba(255,59,99,.14)',
+        // Fit Scroll design-system ramp (founder spec 2026-06-10).
+        bg:          '#0D0D0F',
+        'surface-1': '#17171A',
+        'surface-2': '#1F1F23',
+        'surface-3': '#2A2A2F',
+        'surface-4': '#34343A',
+        // One unified, confident accent.
+        accent:      '#FF2D6D',
+        'accent-hot':'#FF5C8A',
+        'accent-deep':'#C5174F',
+        'accent-soft':'rgba(255,45,109,.14)',
         // Champagne — the luxe secondary used sparingly for premium cues.
         champagne:   '#E7C79B',
         'champagne-soft':'rgba(231,199,155,.12)',
@@ -35,7 +36,7 @@ export default {
       },
       fontFamily: {
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],
-        sans:  ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        sans:  ['var(--font-satoshi)', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Editorial scale — larger, calmer, intentional.
@@ -52,7 +53,7 @@ export default {
         sheet: '1.75rem',
       },
       boxShadow: {
-        'pink-glow': '0 10px 30px -8px rgba(255,59,99,.55)',
+        'pink-glow': '0 10px 30px -8px rgba(255,45,109,.55)',
         card: '0 18px 44px rgba(0,0,0,.34)',
         'card-strong': '0 26px 64px rgba(0,0,0,.46)',
         float: '0 22px 60px rgba(0,0,0,.5)',

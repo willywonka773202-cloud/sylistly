@@ -1,12 +1,17 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, Playfair_Display } from 'next/font/google';
+import { Playfair_Display } from 'next/font/google';
+import localFont from 'next/font/local';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import './globals.css';
 
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
-  weight: ['400', '500', '600', '700', '800', '900'],
+// Satoshi (variable 300-900) for all UI text — per the Fit Scroll design
+// system. Playfair Display stays the editorial headline serif.
+const satoshi = localFont({
+  src: [
+    { path: './fonts/Satoshi-Variable.woff2', weight: '300 900', style: 'normal' },
+    { path: './fonts/Satoshi-VariableItalic.woff2', weight: '300 900', style: 'italic' },
+  ],
+  variable: '--font-satoshi',
 });
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -16,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#0A0A0C',
+  themeColor: '#0D0D0F',
   viewportFit: 'cover',
   width: 'device-width',
   initialScale: 1,
@@ -67,7 +72,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${satoshi.variable} ${playfair.variable}`}>
       <body className="bg-bg text-ink">
         <AnalyticsProvider />
         {children}

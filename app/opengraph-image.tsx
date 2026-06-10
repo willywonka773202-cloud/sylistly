@@ -18,9 +18,9 @@ export default function OpengraphImage() {
           flexDirection: 'column',
           justifyContent: 'center',
           padding: '80px 96px',
-          backgroundColor: '#0A0A0C',
+          backgroundColor: '#0D0D0F',
           backgroundImage:
-            'radial-gradient(900px 500px at 85% 10%, rgba(255,59,99,.16), transparent 60%), radial-gradient(700px 420px at 8% 95%, rgba(231,199,155,.10), transparent 60%)',
+            'radial-gradient(900px 500px at 85% 10%, rgba(255,45,109,.16), transparent 60%), radial-gradient(700px 420px at 8% 95%, rgba(231,199,155,.10), transparent 60%)',
           fontFamily: 'sans-serif',
         }}
       >
@@ -35,7 +35,7 @@ export default function OpengraphImage() {
             fontWeight: 700,
           }}
         >
-          <div style={{ width: 54, height: 3, backgroundColor: '#FF3B63', display: 'flex' }} />
+          <div style={{ width: 54, height: 3, backgroundColor: '#FF2D6D', display: 'flex' }} />
           SYLISTLY
         </div>
         <div
@@ -52,7 +52,7 @@ export default function OpengraphImage() {
         >
           <span>Endless outfits</span>
           <span style={{ display: 'flex' }}>
-            from&nbsp;<span style={{ color: '#FF3B63' }}>real products.</span>
+            from&nbsp;<span style={{ color: '#FF2D6D' }}>real products.</span>
           </span>
         </div>
         <div

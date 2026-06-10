@@ -34,7 +34,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
   return (
     <main className="relative mx-auto flex min-h-[100dvh] max-w-[480px] flex-col items-center justify-center gap-6 overflow-hidden bg-bg px-8 text-center">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,59,99,.18),transparent_46%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,45,109,.18),transparent_46%)]" />
       <div className="relative">
         <div className="sy-eyebrow">Something slipped</div>
         <h1 className="mt-2 font-serif text-[34px] font-semibold leading-tight text-ink">

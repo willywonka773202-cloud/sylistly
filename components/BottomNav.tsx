@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
  */
 export function BottomNav() {
   const pathname = usePathname() ?? '';
-  const scrollActive = pathname === '/';
+  const scrollActive = pathname === '/' || pathname.startsWith('/browse');
   const remixActive = pathname.startsWith('/build') || pathname.startsWith('/checkout');
   const savedActive = pathname.startsWith('/saved');
   const profileActive = pathname.startsWith('/profile');
@@ -55,7 +55,7 @@ function NavTool({
       <span
         className={`grid h-7 w-7 place-items-center rounded-full transition-all duration-200 ease-out ${
           active
-            ? 'scale-110 bg-accent-soft text-accent shadow-[0_0_16px_rgba(255,59,99,.22)]'
+            ? 'scale-110 bg-accent-soft text-accent shadow-[0_0_16px_rgba(255,45,109,.22)]'
             : accent
               ? 'text-accent/80'
               : 'text-current'

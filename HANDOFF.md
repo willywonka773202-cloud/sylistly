@@ -6,11 +6,20 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-10
-- **Next:** Body-model sweep DONE (catalog fully eyeballed, blocklist 45→143, see top entry) — (1) RE-RUN THE NIGHTLY BAKE: 11/22 baked AI looks reference purged products and hydrate to null (graceful engine fallback, but "Styled by Syli" coverage is halved until `node scripts/bake-ai-ship.mjs` runs against the clean catalog); (2) CATALOG GROWTH: bottoms are thin (113→40 — 64% were person photos); next cutout expansion should target clean flat-lay bottoms; (3) shareable public fit pages with flat-lay OG images; (4) purge the 129 Google-search-URL products + merchant-PDP hard gate; (5) Will: Skimlinks/Sovrn IDs + Upstash. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Next:** (1) CATALOG GROWTH: bottoms are thin (40 left — 64% were person photos); next cutout expansion targets clean flat-lay bottoms; (2) shareable public fit pages with flat-lay OG images (the spec's "Outfit Detail" screen = these); (3) purge the 129 Google-search-URL products + merchant-PDP hard gate; (4) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (5) Will: Skimlinks/Sovrn IDs + Upstash. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 (latest) — Claude Code — build+check (DESIGN SYSTEM ADOPTED + /browse + re-bake)
+- Will delivered a full "Fit Scroll — Consistent Layout System" spec sheet. Adopted everything honestly buildable:
+- **TOKENS**: accent #FF3B63→#FF2D6D, bg #0A0A0C→#0D0D0F, surfaces →#17171A/#1F1F23/#2A2A2F (tailwind.config + sed sweep of every hardcoded pink/bg hex across app/components — the earlier token unification made this a one-pass change). **Satoshi variable (300-900)** via next/font/local (Fontshare download, app/fonts/) replaces DM Sans as font-sans; Playfair stays for headings.
+- **NEW /browse** (spec screen 3): every clean catalog piece by category (All/Tops/Bottoms/Shoes/Outerwear/Bags/Accessories), white-plate cards w/ brand/name/price/shoppable-dot, heart→wishlist (wardrobe store), and **tap = "Style this" → locks the piece into the scroll** via localStorage PENDING_LOCK handoff (verified end-to-end: browsed NikeSKIMS tank → all 4 dealt scroll cards carry it locked + restyle pill live). Entry: LayoutGrid button in scroll header; BottomNav keeps Scroll tab active on /browse.
+- **Header consistency** (spec screen 2): vibe-filtered scroll shows a back chevron → For you.
+- **RE-BAKE after the sweep**: pruned dead AI looks 22→4 (purged products), re-baked +20 against the clean 409-catalog ($0.30) → library 24. Nightly launchd job keeps growing it.
+- DEFERRED from spec, honestly: Outfit Detail page == the upcoming shareable fit pages; Profile w/ followers needs real Supabase accounts (no fake counts); prop styling (candelabras) needs prop assets.
+- VERIFIED: tsc clean · build exit 0 (/browse 3.95kB) · preview: new pink+Satoshi render, badge on baked card, /browse grid + style-this→lock loop works, zero console errors. DEPLOYED.
 
 ### 2026-06-10 (late) — Claude Code — build+check (BODY-MODEL FULL SWEEP: +98 person cutouts purged, blocklist 45→143)
 - The "2 stragglers in 2 sessions" smell was right, massively: a full visual review of ALL 509 client cutouts found **98 more person/worn-on-body photos** the prior heuristic-led passes missed. Whole e-comm scrape families were rotten: Dickies 874, Levi's 501/cargo, Aritzia Effortless/Agency/Babaton, Lululemon Align, J.Crew oxford, Uniqlo Airism — 64% of "bottoms" (113→40) were people wearing the pants.

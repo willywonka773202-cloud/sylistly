@@ -419,7 +419,7 @@ export function StackedFitCanvas({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,.12),transparent_42%),linear-gradient(140deg,rgba(255,255,255,.13)_0%,transparent_34%,rgba(0,0,0,.2)_100%)]" />
       <div className="pointer-events-none absolute left-[30%] top-[11%] h-[78%] w-[43%] rounded-full border border-white/[.055] bg-white/[.025] blur-[1px]" />
       <div className="pointer-events-none absolute left-[5%] top-[18%] h-[48%] w-[36%] rounded-[42px] bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,.06),transparent_68%)]" />
-      <div className="pointer-events-none absolute right-[4%] top-[32%] h-[42%] w-[30%] rounded-[42px] bg-[radial-gradient(circle_at_50%_45%,rgba(246,48,107,.1),transparent_68%)]" />
+      <div className="pointer-events-none absolute right-[4%] top-[32%] h-[42%] w-[30%] rounded-[42px] bg-[radial-gradient(circle_at_50%_45%,rgba(255,45,109,.1),transparent_68%)]" />
       <div className="pointer-events-none absolute inset-x-[19%] bottom-[5%] h-[17%] rounded-full bg-black/35 blur-2xl" />
       <div className="pointer-events-none absolute inset-x-[25%] bottom-[2%] h-px bg-white/10" />
 

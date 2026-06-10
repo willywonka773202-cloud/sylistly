@@ -1327,7 +1327,7 @@ function BuilderPageContent({
                     <div className="relative grid h-24 w-24 place-items-center">
                       <span className="absolute inset-0 animate-ping rounded-full bg-accent/35" />
                       <span className="absolute inset-3 rounded-full bg-accent/20" />
-                      <LoaderCircle size={44} className="relative animate-spin text-white drop-shadow-[0_0_22px_rgba(246,48,107,.9)]" />
+                      <LoaderCircle size={44} className="relative animate-spin text-white drop-shadow-[0_0_22px_rgba(255,45,109,.9)]" />
                     </div>
                     <div className="text-center">
                       <div className="text-[10px] font-bold uppercase tracking-[.24em] text-accent">Styling your fit</div>
@@ -1369,7 +1369,7 @@ function BuilderPageContent({
               </motion.div>
             </div>
             <div className="border-t border-hairline px-1 pt-4">
-              <div className="mb-3 flex items-center justify-center rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(246,48,107,.18)]">
+              <div className="mb-3 flex items-center justify-center rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(255,45,109,.18)]">
                 Drag the fit sideways · left passes · right saves
               </div>
               <div className="flex items-start justify-between gap-3">
@@ -1405,7 +1405,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
                   disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(246,48,107,.42)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
                 >
                   {generatorLoading ? <LoaderCircle size={12} className="animate-spin" /> : <Sparkles size={12} />}
                   Build
@@ -1460,7 +1460,7 @@ function BuilderPageContent({
           </section>
 
           {stylingNote && (stylingNote.notes || stylingNote.palette?.length) ? (
-            <div className="sy-enter overflow-hidden rounded-card border border-accent/25 bg-[radial-gradient(120%_80%_at_12%_-10%,rgba(255,59,99,.16),transparent_46%),linear-gradient(180deg,rgba(251,247,242,.06),rgba(251,247,242,.02))] p-4">
+            <div className="sy-enter overflow-hidden rounded-card border border-accent/25 bg-[radial-gradient(120%_80%_at_12%_-10%,rgba(255,45,109,.16),transparent_46%),linear-gradient(180deg,rgba(251,247,242,.06),rgba(251,247,242,.02))] p-4">
               <div className="flex items-center gap-2">
                 <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
                   <Sparkles size={13} />
@@ -1515,7 +1515,7 @@ function BuilderPageContent({
         >
           {activeBuildOverlay === 'settings' ? (
             <div className="flex flex-col gap-3">
-              <section className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(246,48,107,.18),transparent_44%),linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025))] p-4 shadow-[0_24px_56px_rgba(246,48,107,.18)]">
+              <section className="rounded-[30px] border-2 border-accent/35 bg-[radial-gradient(circle_at_18%_12%,rgba(255,45,109,.18),transparent_44%),linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025))] p-4 shadow-[0_24px_56px_rgba(255,45,109,.18)]">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="text-[10px] font-black uppercase tracking-[.22em] text-accent">Generation</div>

@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display: 'standalone',
     // Match the Editorial Noir app shell so the PWA splash and status bar
     // are seamless with the UI (was cream/#e8365d — a different app's colors).
-    background_color: '#0A0A0C',
-    theme_color: '#0A0A0C',
+    background_color: '#0D0D0F',
+    theme_color: '#0D0D0F',
     icons: [
       {
         src: '/icon.svg',

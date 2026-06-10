@@ -32,7 +32,7 @@ export function Onboarding({
 
   return (
     <div className="fixed inset-0 z-[90] flex flex-col bg-bg">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,59,99,.2),transparent_46%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,45,109,.2),transparent_46%)]" />
       <div className="relative mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-[calc(env(safe-area-inset-top)+40px)]">
         {step === 0 ? (
           <div className="flex flex-1 flex-col">

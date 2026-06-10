@@ -4,7 +4,9 @@ import {
   Bookmark,
   Check,
   ChevronDown,
+  ChevronLeft,
   Heart,
+  LayoutGrid,
   Lock,
   Share2,
   ShoppingBag,
@@ -13,6 +15,7 @@ import {
   WandSparkles,
   X,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
@@ -36,6 +39,8 @@ const ONBOARDED_KEY = 'sylistly.onboarded.v1';
 const SLOT_PREFS_KEY = 'sylistly.scroll-slots.v1';
 const VIBE_LIKES_KEY = 'sylistly.vibe-likes.v1';
 const SEEN_AI_KEY = 'sylistly.seen-ai-looks.v1';
+/** Handoff from /browse: "style this piece" locks it into the scroll. */
+const PENDING_LOCK_KEY = 'sylistly.pending-lock.v1';
 
 /** Curated rotation so consecutive cards feel like turning magazine pages. */
 const VIBE_ROTATION: VibeId[] = [
@@ -295,6 +300,18 @@ export default function ScrollPage() {
       seenAiIdsRef.current = new Set(
         JSON.parse(window.localStorage.getItem(SEEN_AI_KEY) || '[]') as string[],
       );
+      // "Style this piece" arriving from /browse — lock it before the deck deals.
+      const pendingRaw = window.localStorage.getItem(PENDING_LOCK_KEY);
+      if (pendingRaw) {
+        window.localStorage.removeItem(PENDING_LOCK_KEY);
+        const product = JSON.parse(pendingRaw) as Product;
+        if (product?.id && product?.category) {
+          const next = { [product.category]: product } as Partial<Record<Category, Product>>;
+          setLockedItems(next);
+          locksRef.current = next;
+          showToast(`Locked — every fit styles around the ${CATEGORY_NOUN[product.category]}`);
+        }
+      }
     } catch {
       /* corrupted prefs — start fresh */
     }
@@ -524,24 +541,44 @@ export default function ScrollPage() {
       <h1 className="sr-only">Sylistly — endless outfits from real products</h1>
 
       {/* Top chrome: wordmark + tune, then the vibe story rail */}
-      <header className="absolute inset-x-0 top-0 z-30 bg-[linear-gradient(180deg,rgba(10,10,12,.94)_0%,rgba(10,10,12,.78)_70%,transparent_100%)] pb-5 pt-[calc(env(safe-area-inset-top)+12px)]">
+      <header className="absolute inset-x-0 top-0 z-30 bg-[linear-gradient(180deg,rgba(13,13,15,.94)_0%,rgba(13,13,15,.78)_70%,transparent_100%)] pb-5 pt-[calc(env(safe-area-inset-top)+12px)]">
         <div className="flex items-center justify-between px-4">
           <div className="flex items-baseline gap-2">
-            <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
+            {vibeFilter !== 'all' ? (
+              <button
+                type="button"
+                onClick={() => setVibeFilter('all')}
+                aria-label="Back to For you"
+                className="sy-press grid h-7 w-7 self-center place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink"
+              >
+                <ChevronLeft size={15} />
+              </button>
+            ) : (
+              <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
+            )}
             <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink">
               Fit <span className="text-accent">scroll</span>
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setTuneOpen((open) => !open)}
-            aria-expanded={tuneOpen}
-            aria-label="Tune what gets generated"
-            className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
-          >
-            {tuneOpen ? <X size={15} /> : <SlidersHorizontal size={15} />}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/browse"
+              aria-label="Browse every piece"
+              className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+            >
+              <LayoutGrid size={15} />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setTuneOpen((open) => !open)}
+              aria-expanded={tuneOpen}
+              aria-label="Tune what gets generated"
+              className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+            >
+              {tuneOpen ? <X size={15} /> : <SlidersHorizontal size={15} />}
+            </button>
+          </div>
         </div>
 
         {/* Story rail — pink gradient rings, real product thumbs */}
@@ -551,7 +588,7 @@ export default function ScrollPage() {
             active={vibeFilter === 'all'}
             onClick={() => { setVibeFilter('all'); track('vibe_selected', { vibe: 'all' }); }}
           >
-            <span className="grid h-full w-full place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#ff7c9b,rgba(255,59,99,.6)_56%,rgba(120,30,52,.8))] text-white">
+            <span className="grid h-full w-full place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#FF7CA0,rgba(255,45,109,.6)_56%,rgba(120,30,52,.8))] text-white">
               <Sparkles size={19} />
             </span>
           </StoryCircle>
@@ -636,7 +673,7 @@ export default function ScrollPage() {
                 aria-hidden
                 className={`absolute inset-0 ${
                   index % 2 === 0
-                    ? 'bg-[radial-gradient(120%_72%_at_50%_24%,rgba(255,59,99,.09),transparent_62%)]'
+                    ? 'bg-[radial-gradient(120%_72%_at_50%_24%,rgba(255,45,109,.09),transparent_62%)]'
                     : 'bg-[radial-gradient(120%_72%_at_50%_24%,rgba(231,199,155,.08),transparent_62%)]'
                 }`}
               />
@@ -659,7 +696,7 @@ export default function ScrollPage() {
                       <Heart
                         size={110}
                         fill="currentColor"
-                        className="animate-ping text-accent drop-shadow-[0_0_28px_rgba(255,59,99,.85)]"
+                        className="animate-ping text-accent drop-shadow-[0_0_28px_rgba(255,45,109,.85)]"
                       />
                     </span>
                   ) : null}
@@ -669,7 +706,7 @@ export default function ScrollPage() {
               {/* Legibility gradient */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px] bg-[linear-gradient(180deg,transparent,rgba(10,10,12,.9)_58%,#0A0A0C_92%)]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px] bg-[linear-gradient(180deg,transparent,rgba(13,13,15,.9)_58%,#0D0D0F_92%)]"
               />
 
               {/* Right action rail */}
@@ -714,7 +751,7 @@ export default function ScrollPage() {
                     </span>
                   </button>
                   {look.source === 'syli' ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow">
                       <Sparkles size={11} />
                       Styled by Syli
                     </span>
@@ -783,7 +820,7 @@ export default function ScrollPage() {
                     <button
                       type="button"
                       onClick={() => restyle(look)}
-                      className="sy-press inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF3B63,#FF6E8A)] px-4 py-2.5 text-[13px] font-bold text-white shadow-pink-glow"
+                      className="sy-press inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-2.5 text-[13px] font-bold text-white shadow-pink-glow"
                     >
                       <WandSparkles size={15} />
                       New take with {lockCount} locked
@@ -838,7 +875,7 @@ function StoryCircle({
       <span
         className={`grid h-[56px] w-[56px] place-items-center rounded-full p-[2.5px] ${
           active
-            ? 'bg-[linear-gradient(140deg,#FF3B63_0%,#FF6E8A_45%,#E7C79B_100%)] shadow-pink-glow'
+            ? 'bg-[linear-gradient(140deg,#FF2D6D_0%,#FF5C8A_45%,#E7C79B_100%)] shadow-pink-glow'
             : 'bg-hairline-2'
         }`}
       >

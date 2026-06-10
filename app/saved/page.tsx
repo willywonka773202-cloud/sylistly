@@ -210,7 +210,7 @@ export default function SavedPage() {
     >
       {confirmation ? (
         <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,59,99,.55)] backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,45,109,.55)] backdrop-blur-md">
             <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
               <Check size={13} strokeWidth={3} />
             </span>
@@ -258,7 +258,7 @@ export default function SavedPage() {
                   type="button"
                   aria-label={`Open saved fit ${fit.title}`}
                   onClick={() => setDetailFitId(fit.id)}
-                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] text-left shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(246,48,107,.32)]"
+                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] text-left shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.32)]"
                 >
                   <div className="relative aspect-[3/4] grid grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden bg-[#fff7ef] p-1.5">
                     {visualProducts.slice(0, 6).map((product, index) => (
@@ -381,7 +381,7 @@ function CollectionFilters({
             disabled={!hasMatches && label !== 'All'}
             className={`flex-none rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.95] motion-safe:transition-all motion-safe:duration-200 ${
               active
-                ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_8px_22px_rgba(246,48,107,.5)] ring-1 ring-white/30'
+                ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_8px_22px_rgba(255,45,109,.5)] ring-1 ring-white/30'
                 : hasMatches
                 ? 'border-white/12 bg-white/[0.04] text-white/80 hover:border-accent/55 hover:bg-white/[0.08]'
                 : 'cursor-not-allowed border-white/8 bg-white/[0.02] text-muted opacity-50'
@@ -538,7 +538,7 @@ function SavedDetailSheet({
           <button
             type="button"
             onClick={onLoadInBuilder}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f6306b_0%,#ff7099_60%,#f6306b_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_32px_rgba(246,48,107,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_32px_rgba(255,45,109,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300"
           >
             <RotateCcw size={13} />
             Remix in Builder
