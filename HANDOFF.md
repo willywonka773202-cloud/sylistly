@@ -6,11 +6,18 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-10
-- **Next:** (1) CATALOG GROWTH: bottoms are thin (40 left — 64% were person photos); next cutout expansion targets clean flat-lay bottoms; (2) shareable public fit pages with flat-lay OG images (the spec's "Outfit Detail" screen = these); (3) purge the 129 Google-search-URL products + merchant-PDP hard gate; (4) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (5) Will: Skimlinks/Sovrn IDs + Upstash. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Next:** Bottoms growth DONE (40→118, see top entry) + share pages DONE — (1) purge the 129 Google-search-URL products + merchant-PDP hard gate (check overlap with the new bottoms first: many `generated-` sources have weak productUrls); (2) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (3) Will: Skimlinks/Sovrn IDs + Upstash; (4) optional next growth target: tops (95) and outer (39) via the same triage→cut→re-review pipeline. NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 (cont.) — Claude Code — build+check (CATALOG GROWTH: +78 clean flat-lay bottoms, 40→118)
+- Executed Next #1 with the sweep's method lesson baked in, as a THREE-stage visual pipeline: (1) triaged 445 candidate SOURCE images by eye at 300px (only ~23% of shopping-scrape bottoms are flat product shots — Blue Owl/H&M/Zara/MR PORTER/techwear-ghost families reliable, Nike/Lululemon/Aritzia/Madewell/Gap all worn); (2) rembg-cut the 104 approved (isnet-general-use, 1600px); (3) re-reviewed every generated CUTOUT and deleted 25 more person crops — source triage misses worn shots whose white tops vanish into white backgrounds; the post-cutout pass is NOT optional.
+- +78 PNGs registered (cutout-overrides 775 entries) · client catalog 409→487 (bottom 40→118, all other categories unchanged) · library regenerated full 1200/vibe, coord 0.742.
+- Tonight's 02:45 bake will compose against the wider catalog automatically.
+- VERIFIED: tsc clean · build exit 0 · preview scroll deals flat-lay jeans in the bottom slot, 62 cutout imgs rendered 0 broken · committed (0afab6b), pushed, DEPLOYED (READY, www.sylistly.com 200).
+- next: Google-search-URL purge (Next #1) — note overlap risk with the new `generated-` bottoms' weak productUrls.
 
 ### 2026-06-10 (cont.) — Claude Code — build+check (SHAREABLE FIT PAGES — the Instagram engine is live)
 - Every fit now has its own URL with a real preview image. Two slug families on /look/[id]:
