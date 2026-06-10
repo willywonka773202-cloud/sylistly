@@ -235,6 +235,11 @@ const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
   'generated-efea7e82501f92dd',
   'ba8f3b445e60ac75',
   'bc78a561ef3414cd',
+  // Non-wearable products that slipped into the drop catalog (not garments at all)
+  'drop-1efc45f13d67a1f7', // Striped Beach Towel (was categorized "jewelry")
+  'drop-0f54676d64f945de', // Fancy Velvet Ring Box (a box, not a wearable)
+  // Cutout is a GOLF logo graphic, not the pants the product claims to be
+  'searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-501ff70f6f38bd',
 ]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
