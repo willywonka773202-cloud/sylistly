@@ -6,11 +6,18 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-10
-- **Next:** Google-URL item CLOSED as shoppability-weighted generation (94% of looks now ≥3 exact links — see top entry; a literal purge would have killed 211/487 products). Remaining: (1) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (2) Will: Skimlinks/Sovrn IDs + Upstash (the 94%-shoppable library is ready to earn the moment IDs land); (3) optional growth: tops (95) and outer (39) via the triage→cut→re-review pipeline; (4) longer-term: recover real merchant PDPs for the 211 link-less products (would push shoppability to ~100%). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Next:** Outer growth DONE (39→96 served, 233 eligible — see top entry; catalog 544). Remaining: (1) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (2) Will: Skimlinks/Sovrn IDs + Upstash (the ~93%-shoppable library is ready to earn the moment IDs land); (3) optional growth: tops (95) via the triage→cut→re-review pipeline; also 137 reviewed-clean outer cutouts sit ready beyond the 96 cap if outer ever needs more; (4) longer-term: recover real merchant PDPs for the link-less generated- products (would push shoppability to ~100%). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-10 (cont.) — Claude Code — build+check (CATALOG GROWTH: +194 outer cutouts, 39→96 served + CATEGORY_MAX balancer fix)
+- Same 3-stage visual pipeline as the bottoms run, on outerwear: triaged 550 source images at 300px (~42% flat — puffers/bombers/leather-ghosts/fleeces are far flatter than bottoms' 23%), rembg-cut 231 approved, post-cutout review deleted 37 (person crops incl. heads the source triage missed at distance, two jacket+pants set images, one fragmented cutout).
+- **BALANCER BUG found & fixed** (scripts/build-client-catalog.ts): with 233 eligible outers the 560-limit balancer crowded out REQUIRED-slot categories — shoes fell 83→51 (brand caps throttle Nike/adidas-concentrated shoes while brand-diverse outer filled freely). New `CATEGORY_MAX` ceilings (outer 96, bag 75) → outer serves its best-scored 96, shoes/bottoms/tops fully intact, catalog 487→544. 137 reviewed-clean outers sit ready beyond the cap.
+- Library regenerated: full 1200/vibe · coordination 0.753 · shoppability held (89% pieces, 92.7% looks ≥3 exact).
+- VERIFIED: tsc clean · build exit 0 · preview scroll clean, first look 4/4 shoppable, 0 broken imgs · committed (dd213c1), pushed, DEPLOYED (READY, www.sylistly.com 200).
+- next: tops growth optional; Skimlinks IDs are the real unlock.
 
 ### 2026-06-10 (cont.) — Claude Code — build+check (SHOPPABILITY-WEIGHTED LIBRARY: 94% of looks ≥3 exact links)
 - RE-SCOPED the audit's "purge 129 Google-search-URL products + merchant-PDP hard gate": post-sweep + post-growth, 211 of 487 products have NO merchant link (86 of them today's new bottoms) — a hard purge/gate would crater the catalog to 276 and bottoms to 32. The app already detects + honestly labels non-exact links (`hasExactProductLink` → green dots, "n/n shoppable"), and the runtime composer already biases +22 for exact links. The REAL gap was the pre-gen library: 26% of looks had <3 affiliate-wrappable pieces (revenue dead-ends).
