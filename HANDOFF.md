@@ -6,11 +6,18 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-11
-- **Next:** Competitive teardown done (vault: "Competitive Teardown 2026-06-11" — full ranked roadmap + protect-list + traps). Shipped from it: premium shadows/plate + slot-swap. TOP REMAINING from the teardown: (1) **shop-the-look hotspots** (tap a garment in the plate → its affiliate link) — highest commercial, do when Skimlinks lands; (2) **upgrade the /look/ share card** to a gorgeous 9:16 Polyvore set (cheapest growth lever); (3) **paste-a-link to style around it**; (4) **35-sec style quiz → shareable identity** (Style DNA model). Also still: Skimlinks/Sovrn IDs + Upstash (Will); profile/social needs real accounts; SearchAPI key (FiyDgAiDJ8b…) still compromised — rotate it.
+- **Next:** Competitive teardown (vault: "Competitive Teardown 2026-06-11"). Shipped from it: premium shadows/plate, slot-swap, shop-the-look peek, worn-silhouette share card. TOP REMAINING: (1) **paste-a-link to style around it** (Doji); (2) **35-sec style quiz → shareable identity** (Style DNA); (3) **weekly outfit challenge + light voting** (Combyne, needs tiny edge KV); (4) **daily-drop framing** of the nightly bake. Also: Skimlinks/Sovrn IDs + Upstash (Will) — shop links are affiliate-wrap-ready and tracked, they earn the moment the ID lands; profile/social needs real accounts; SearchAPI key (FiyDgAiDJ8b…) compromised — rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-11 (cont.) — Claude Code — build+check (SHOP-THE-LOOK hotspots + worn-silhouette SHARE CARD)
+- Continued down the teardown roadmap (Will: "yes"). Two more shipped:
+- **Shop-the-look peek** (components/PiecePeek.tsx + WornFlatlay `onPieceClick` + app/page.tsx): tapping ANY garment on the scroll plate opens a bottom sheet — big image, brand/name, price + shoppable, primary **Shop at {retailer}** (affiliate-wrapped via wrapAffiliate, target _blank rel="noreferrer sponsored", tracked `shop_link_clicked` surface:'piece-peek') + secondary Swap/Lock. WornFlatlay pieces become `<button>`s only when onPieceClick is passed (share page's server-rendered plate stays inert; its rows handle shop). Hint updated: "tap the outfit to shop · tap a chip to swap". VERIFIED: tap hoodie→peek, Shop href = real ALD PDP (raw today, auto-wraps when Skimlinks ID lands), in-peek Swap changes only that piece + closes.
+- **Worn-silhouette share card** (app/look/[id]/opengraph-image.tsx): replaced the scattered flex-wrap grid with the REAL worn silhouette — local ZONES map (mirrors WornFlatlay) → each cutout absolutely positioned at computed px (left/top/w/h = zone% × PLATE_W/H), back-to-front by z, on the same radial-vignette plate + contact shadow. Left panel now shows Claude's actual note + "n/m shoppable". The /look OG now looks exactly like the in-app plate (a designed "set"). VERIFIED: OG 200, 178KB, renders the silhouette correctly (beanie/tank/shorts/bag/sandals grounded).
+- VERIFIED: tsc clean · next build "Compiled successfully" · preview: peek + shop link + in-peek swap all work, OG card correct, 0 console errors. Deploying via Vercel remote build.
+- next: paste-a-link styling · 35-sec style quiz · weekly challenge · daily-drop framing.
 
 ### 2026-06-11 — Claude Code — build+check (COMPETITIVE TEARDOWN → premium presentation + slot-swap)
 - Ran 2 parallel research agents (category scan + Fits AI deep-dive) → durable findings in vault "Competitive Teardown 2026-06-11" (landscape, protect-list, traps, ranked roadmap). Net read: our wedge = instant/account-free scrollable outfit discovery + lock-and-restyle + shareable Polyvore-style cards; funded rivals chase expensive avatars/chat — leave it. Both agents' #1 win = FINISH the outfit presentation; #1 loop-completer = slot-swap.

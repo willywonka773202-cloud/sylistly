@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { Onboarding } from '@/components/Onboarding';
+import { PiecePeek } from '@/components/PiecePeek';
 import { ProductImage } from '@/components/ProductImage';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { getAiLook } from '@/lib/ai-look-library';
@@ -209,6 +210,7 @@ export default function ScrollPage() {
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [whyOpenKey, setWhyOpenKey] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [peek, setPeek] = useState<{ look: ScrollLook; product: Product } | null>(null);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const seedRef = useRef(101);
@@ -778,6 +780,7 @@ export default function ScrollPage() {
                     active={isActive}
                     loading={index < 2 ? 'eager' : 'lazy'}
                     className="h-full w-full"
+                    onPieceClick={(product) => setPeek({ look, product })}
                   />
                   {burstKey === look.key ? (
                     <span className="pointer-events-none absolute inset-0 z-40 grid place-items-center">
@@ -882,9 +885,9 @@ export default function ScrollPage() {
                 </div>
 
                 {/* Piece chips — tap a chip to swap just that piece; lock to
-                    keep it as you scroll. Two affordances, two tap targets. */}
+                    keep it. (Tapping a garment on the plate opens shop/swap.) */}
                 <p className="mt-2.5 text-[10px] font-medium uppercase tracking-[.12em] text-muted">
-                  Tap a piece to swap · lock to keep
+                  Tap the outfit to shop · tap a chip to swap
                 </p>
                 <div className="-mx-4 mt-1.5 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
                   {products.map((product) => {
@@ -971,6 +974,24 @@ export default function ScrollPage() {
             {toast}
           </span>
         </div>
+      ) : null}
+
+      {/* Shop-the-look peek — tap any garment on the plate */}
+      {peek ? (
+        <PiecePeek
+          product={peek.product}
+          locked={lockedItems[peek.product.category]?.id === peek.product.id}
+          onShop={() => setPeek(null)}
+          onSwap={() => {
+            swapPiece(peek.look, peek.product.category);
+            setPeek(null);
+          }}
+          onLock={() => {
+            toggleLock(peek.look, peek.product);
+            setPeek(null);
+          }}
+          onClose={() => setPeek(null)}
+        />
       ) : null}
 
       {hasMounted && showOnboarding ? (

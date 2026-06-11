@@ -53,12 +53,15 @@ export function WornFlatlay({
   active = true,
   loading = 'lazy',
   className = '',
+  onPieceClick,
 }: {
   items: Partial<Record<Category, Product>> | Product[];
   /** When the card snaps into view, pieces settle in with a stagger. */
   active?: boolean;
   loading?: 'lazy' | 'eager';
   className?: string;
+  /** When set, each garment becomes a tappable "shop the look" hotspot. */
+  onPieceClick?: (product: Product) => void;
 }) {
   const list = Array.isArray(items)
     ? items
@@ -87,6 +90,17 @@ export function WornFlatlay({
       {staggered.map((product, index) => {
         const zone = ZONES[product.category];
         if (!zone) return null;
+        const image = (
+          <ProductImage
+            product={product}
+            transparentOnly
+            loading={loading}
+            wrapperClassName="h-full w-full"
+            className={`h-full w-full object-contain ${
+              LIFTED.has(product.category) ? 'sy-piece-shadow-lifted' : 'sy-piece-shadow'
+            }`}
+          />
+        );
         return (
           <div
             key={product.id}
@@ -104,15 +118,18 @@ export function WornFlatlay({
               className={active ? 'sy-piece-in h-full w-full' : 'h-full w-full'}
               style={active ? { animationDelay: `${index * 70}ms` } : undefined}
             >
-              <ProductImage
-                product={product}
-                transparentOnly
-                loading={loading}
-                wrapperClassName="h-full w-full"
-                className={`h-full w-full object-contain ${
-                  LIFTED.has(product.category) ? 'sy-piece-shadow-lifted' : 'sy-piece-shadow'
-                }`}
-              />
+              {onPieceClick ? (
+                <button
+                  type="button"
+                  onClick={() => onPieceClick(product)}
+                  aria-label={`Shop the ${product.brand} ${product.category}`}
+                  className="sy-press block h-full w-full"
+                >
+                  {image}
+                </button>
+              ) : (
+                image
+              )}
             </div>
           </div>
         );
