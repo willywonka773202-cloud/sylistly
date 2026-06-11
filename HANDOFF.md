@@ -12,6 +12,15 @@
 
 ## Log (newest first)
 
+### 2026-06-11 (cont.) — Claude Code — build+check (BUILDER → worn silhouette; the last "two apps" gap closed)
+- Will picked "Silhouette + simplify" for the builder direction (+ "just keep polishing", no new features).
+- **NEW components/BuilderBoard.tsx**: the /build board now renders the SAME WornFlatlay worn-silhouette plate as scroll/saved/share (aspect-[4/5] + vignette + contact shadow), with an editable slot-chip strip below — tap a chip (or tap the piece on the plate, via WornFlatlay onPieceClick→onOpenSlot) to swap/add that slot, tap its lock to keep it. Empty state: "Your fit, here." Replaces the old dashed slot-grid Mannequin (now unused).
+- **Killed the Tinder swipe**: converted the `motion.div drag="x"` board to a plain div; removed the Pass/Save swipe cues, swipe-feedback overlay, "Drag the fit sideways" banner, and swipe copy. (performBoardSwipe/handleBoardDragEnd/generateNextSwipeFit now unused-but-harmless.)
+- **Consolidated generate buttons**: the Pass / Build / Save trio → one full-width "New look" (Generate look when empty). Header already has Save; per-slot swap is on the chips.
+- VERIFIED on prod server (next start): empty state silhouette plate + dashed add-chips; after generate, the OUTFIT renders on the worn silhouette (hoodie/shorts/sneakers/tote) identical to the scroll, chips show pieces+price+lock, tapping a chip opens the search/swap sheet (2 inputs), single NEW LOOK button, no swipe, zero console errors. (Caught + fixed: BuilderBoard plate needed aspect-[4/5] not flex-1 — flex-1 collapsed to 0 height with no parent height.)
+- tsc clean · next build compiled. Deploying via Vercel remote build. Next per Will: keep polishing (PlaceholderScreen "Builder" back-link + rename; Saved "Top vibe" taxonomy; image skeletons; align empty states).
+
+
 ### 2026-06-11 (cont.) — Claude Code — build+check (MVP FINALIZATION: closet dead-end closed + critical loading.tsx hydration bug fixed)
 - "Make it a full MVP" → ran an Explore agent + grep MVP-readiness sweep. Findings + fixes:
 - **P0 closet/wishlist dead-end**: Browse's heart + Saved's "add to closet/wishlist" wrote to the wardrobe store with NO screen to view it. FIXED: Saved page now has a **Fits / Pieces toggle**; Pieces = the wardrobe items (new `PiecesGrid` — image/brand/price/shoppable-dot, affiliate-wrapped Shop link + tracked, remove X, empty-state → Browse). Collapsed the confusing two-button closet+wishlist in the fit detail sheet into ONE "Save these pieces" (→ wishlist). Removed all "closet" copy. VERIFIED end-to-end: heart a piece in Browse → "Pieces (1)" tab → card renders with Shop.

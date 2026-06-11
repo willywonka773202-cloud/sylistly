@@ -3,7 +3,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type React
 import { Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mannequin } from '@/components/Mannequin';
+import { BuilderBoard } from '@/components/BuilderBoard';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
@@ -1264,54 +1264,7 @@ function BuilderPageContent({
               {saveBurst ? (
                 <div className="pointer-events-none absolute -inset-4 z-0 rounded-[38px] bg-accent/25 blur-2xl" />
               ) : null}
-              <div
-                className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
-                  activeSwipeCue === 'pass'
-                    ? 'border-white/25 bg-black/78 text-white shadow-[0_12px_30px_rgba(0,0,0,.32)]'
-                    : 'border-white/10 bg-black/28 text-white/42 opacity-0'
-                }`}
-              >
-                Pass
-              </div>
-              <div
-                className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
-                  activeSwipeCue === 'save'
-                    ? 'border-accent bg-accent text-white shadow-pink-glow'
-                    : 'border-accent/20 bg-accent/10 text-white/48 opacity-0'
-                }`}
-              >
-                Save
-              </div>
-              <motion.div
-                animate={boardControls}
-                className="relative z-10 touch-pan-y"
-                drag="x"
-                dragConstraints={{ left: -220, right: 220 }}
-                dragElastic={0.12}
-                dragTransition={{ bounceStiffness: 260, bounceDamping: 22 }}
-                onDragStart={() => {
-                  dismissSwipeHint();
-                  setBoardDragging(true);
-                  setActiveEditSlot(null);
-                }}
-                onDrag={(_, info) => {
-                  setDragIntent(info.offset.x > 22 ? 'save' : info.offset.x < -22 ? 'pass' : null);
-                }}
-                onDragEnd={(event, info) => void handleBoardDragEnd(event, info)}
-                onDoubleClick={handleBoardDoubleTap}
-                whileDrag={{ rotate: 2, scale: 0.985 }}
-              >
-                {swipeFeedback ? (
-                  <div
-                    className={`pointer-events-none absolute left-5 top-5 z-30 rounded-full border px-4 py-2 text-[11px] font-black uppercase tracking-[.18em] shadow-[0_14px_34px_rgba(0,0,0,.28)] ${
-                      swipeFeedback === 'save'
-                        ? 'rotate-[-8deg] border-accent bg-accent text-white shadow-pink-glow'
-                        : 'rotate-[8deg] border-white/18 bg-black/72 text-white'
-                    }`}
-                  >
-                    {swipeFeedback === 'save' ? 'Saved' : 'Pass'}
-                  </div>
-                ) : null}
+              <div className="relative z-10">
                 {saveBurst ? (
                   <div className="pointer-events-none absolute right-5 top-5 z-30 grid h-11 w-11 animate-pulse place-items-center rounded-full bg-accent text-white shadow-pink-glow">
                     <Bookmark size={17} fill="currentColor" />
@@ -1348,25 +1301,18 @@ function BuilderPageContent({
                     </div>
                   </div>
                 ) : null}
-                <Mannequin
+                <BuilderBoard
                   items={renderItems}
-                  skinTone={skinTone}
-                  bodyType={generatorFrame}
-                  vibeLabel={activeVibe.label}
-                  vibeBlurb={activeVibe.blurb}
-                  selectedGenerationSlots={selectedGenerationSlots}
+                  generationSlots={selectedGenerationSlots}
                   lockedSlots={lockedSlots}
                   onToggleSlotLock={toggleLockedSlot}
                   onOpenSlot={openBoardSlot}
-                  slotInteractionDisabled={boardDragging || generatorLoading}
                   activeEditSlot={activeEditSlot}
+                  disabled={generatorLoading}
                 />
-              </motion.div>
+              </div>
             </div>
             <div className="border-t border-hairline px-1 pt-4">
-              <div className="mb-3 flex items-center justify-center rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(255,45,109,.18)]">
-                Drag the fit sideways · left passes · right saves
-              </div>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 text-left">
                   <div className="text-[10px] font-black uppercase tracking-[.18em] text-accent">Generate</div>
@@ -1374,7 +1320,7 @@ function BuilderPageContent({
                     {activeVibe.label} · {selectedGenerationSlots.length} slots · {renderN ? totalDisplay : 'ready'}
                   </div>
                   <div className="mt-1 text-[11px] leading-relaxed text-muted">
-                    Tap any slot to swap it, or swipe the card back and forth for the next look. Settings controls the categories.
+                    Tap a slot to swap it, lock to keep it. Settings controls the categories.
                     {lockedSlots.length ? ` ${lockedSlots.length} locked.` : ''}
                   </div>
                 </div>
@@ -1387,33 +1333,15 @@ function BuilderPageContent({
                   Settings
                 </button>
               </div>
-              <div className="mt-3 grid grid-cols-[.9fr_1.3fr_.9fr] gap-2">
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('left')}
-                  disabled={generatorLoading}
-                  className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:border-white/25 hover:text-ink disabled:opacity-50"
-                >
-                  Pass
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
-                  disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-3 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
-                >
-                  {generatorLoading ? <LoaderCircle size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                  Build
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void performBoardSwipe('right')}
-                  disabled={generatorLoading || aiRefining || renderN === 0}
-                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(255,45,109,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
-                >
-                  Save
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
+                disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3.5 text-[12px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.98] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
+              >
+                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {renderN ? 'New look' : 'Generate look'}
+              </button>
               <button
                 type="button"
                 onClick={() => void generateLook('refresh', { useAi: true, sourceLabel: 'AI-refined.' })}
