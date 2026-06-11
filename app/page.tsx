@@ -334,6 +334,27 @@ export default function ScrollPage() {
     }
   }, []);
 
+  // iOS one-swipe-per-card fix. The dynamic Safari toolbar makes `100dvh`
+  // sections taller than the visible area on first load, so a swipe first
+  // collapses the toolbar instead of advancing — the "two swipes per card"
+  // bug. We (a) lock the document so the toolbar stops resizing mid-scroll,
+  // and (b) size the shell to the *measured* visible height so each slide
+  // exactly fills the screen and snaps cleanly.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('sy-app-locked');
+    const setHeight = () => root.style.setProperty('--app-h', `${window.innerHeight}px`);
+    setHeight();
+    window.addEventListener('resize', setHeight);
+    window.addEventListener('orientationchange', setHeight);
+    return () => {
+      root.classList.remove('sy-app-locked');
+      root.style.removeProperty('--app-h');
+      window.removeEventListener('resize', setHeight);
+      window.removeEventListener('orientationchange', setHeight);
+    };
+  }, []);
+
   // Re-roll the deck when frame, vibe filter, or slot prefs change (post-mount).
   useEffect(() => {
     if (!hasMounted) return;
@@ -555,7 +576,7 @@ export default function ScrollPage() {
   const lockCount = Object.keys(lockedItems).length;
 
   return (
-    <main className="relative mx-auto h-[100dvh] max-w-[480px] overflow-hidden bg-bg">
+    <main className="relative mx-auto h-[var(--app-h,100dvh)] max-w-[480px] overflow-hidden bg-bg">
       <h1 className="sr-only">Sylistly — endless outfits from real products</h1>
 
       {/* Top chrome: wordmark + tune, then the vibe story rail */}
@@ -684,7 +705,7 @@ export default function ScrollPage() {
               key={look.key}
               data-look-key={look.key}
               aria-label={`${meta?.label || 'Outfit'} look`}
-              className="relative h-[100dvh] snap-start snap-always overflow-hidden"
+              className="relative h-[var(--app-h,100dvh)] snap-start snap-always overflow-hidden"
             >
               {/* Atmosphere: alternating accent/champagne spotlight + film grain */}
               <div

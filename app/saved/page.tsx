@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { WornFlatlay } from '@/components/WornFlatlay';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { ProductImage } from '@/components/ProductImage';
@@ -252,38 +253,44 @@ export default function SavedPage() {
             </section>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {visibleFits.map(({ fit, visualProducts, collection }) => (
+              {visibleFits.map(({ fit, visualItems, visualProducts, collection }) => (
                 <button
                   key={fit.id}
                   type="button"
                   aria-label={`Open saved fit ${fit.title}`}
                   onClick={() => setDetailFitId(fit.id)}
-                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,#171512_0%,#0f0e0d_100%)] text-left shadow-[0_14px_30px_rgba(0,0,0,.32)] transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.32)]"
+                  className="group relative overflow-hidden rounded-card border border-hairline bg-surface-1 text-left shadow-card transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.28)]"
                 >
-                  <div className="relative aspect-[3/4] grid grid-cols-2 grid-rows-3 gap-1.5 overflow-hidden bg-[#fff7ef] p-1.5">
-                    {visualProducts.slice(0, 6).map((product, index) => (
-                      <div
-                        key={`${fit.id}-tile-${product.id}`}
-                        className={`overflow-hidden rounded-[12px] bg-white/80 ring-1 ring-[#eadfd5] ${index === 0 ? 'row-span-2' : ''}`}
-                      >
-                        <ProductImage
-                          product={product}
-                          transparentOnly
-                          wrapperClassName="h-full w-full"
-                          className="h-full w-full object-contain p-1.5 motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.04]"
-                          onUnavailable={(failedProduct) => setFailedImageIds((current) => new Set(current).add(failedProduct.id))}
-                        />
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    {visualProducts.length >= 3 ? (
+                      <WornFlatlay items={visualItems} active={false} className="h-full w-full" />
+                    ) : (
+                      <div className="grid h-full grid-cols-2 gap-1.5 bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-3">
+                        {visualProducts.slice(0, 4).map((product) => (
+                          <ProductImage
+                            key={`${fit.id}-tile-${product.id}`}
+                            product={product}
+                            transparentOnly
+                            wrapperClassName="h-full w-full"
+                            className="h-full w-full object-contain"
+                            onUnavailable={(failedProduct) =>
+                              setFailedImageIds((current) => new Set(current).add(failedProduct.id))
+                            }
+                          />
+                        ))}
                       </div>
-                    ))}
-                    <div className="absolute left-2 top-2 rounded-full bg-black/60 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
+                    )}
+                    <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
                       {collection}
                     </div>
                   </div>
-                  <div className="px-3 pb-3 pt-2">
-                    <div className="line-clamp-1 font-serif text-[14px] font-semibold leading-tight text-[#fff5ee]">{fit.title}</div>
-                    <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] text-muted-2">
+                  <div className="px-3 pb-3 pt-2.5">
+                    <div className="line-clamp-1 font-serif text-[15px] font-semibold italic leading-tight text-ink">
+                      {fit.title}
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-muted">
                       <span>{visualProducts.length} pieces</span>
-                      <span className="font-semibold text-accent">{formatPrice(fit.totalCents)}</span>
+                      <span className="font-bold text-accent">{formatPrice(fit.totalCents)}</span>
                     </div>
                   </div>
                 </button>
@@ -490,23 +497,24 @@ function SavedDetailSheet({
           <DetailStat label="Saved" value={formatDate(fit.createdAt).split(',')[0]} />
         </div>
 
-        {/* Large preview */}
-        <div className="mt-4 rounded-[24px] border border-[#eadfd5] bg-[#fff7ef] p-2">
-          <div className="grid h-[300px] grid-cols-2 grid-rows-3 gap-2 overflow-hidden rounded-[20px] bg-[#fffaf5] p-2">
-            {visualProducts.slice(0, 6).map((product, index) => (
-              <div
-                key={`${fit.id}-detail-${product.id}`}
-                className={`overflow-hidden rounded-[14px] ${index === 0 ? 'row-span-2' : ''}`}
-              >
+        {/* Large preview — same worn plate as the scroll */}
+        <div className="mt-4 overflow-hidden rounded-card-lg ring-1 ring-hairline">
+          {visualProducts.length >= 3 ? (
+            <WornFlatlay items={visualItems} active={false} className="aspect-[4/5] w-full" />
+          ) : (
+            <div className="grid aspect-[4/5] grid-cols-2 gap-2 bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-4">
+              {visualProducts.slice(0, 4).map((product) => (
                 <ProductImage
+                  key={`${fit.id}-detail-${product.id}`}
                   product={product}
                   transparentOnly
-                  displayMode="moodboard"
+                  wrapperClassName="h-full w-full"
+                  className="h-full w-full object-contain"
                   onUnavailable={onProductFailed}
                 />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Key pieces strip */}

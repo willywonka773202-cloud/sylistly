@@ -6,14 +6,17 @@ import type { Category, Product } from '@/lib/types';
 
 /**
  * Worn-silhouette flat lay — the outfit arranged as if an invisible person is
- * wearing it: headwear up top, outer + top layered side-by-side at the torso,
- * bottoms flowing down the middle, shoes at the feet, bag/jewelry floating at
- * the sides. Subtle rotations + drop shadows give each piece weight; pieces
- * settle in with a dress-order stagger when the card becomes active.
+ * wearing it. Every slot has a FIXED band and size regardless of which pieces
+ * the outfit contains, so the silhouette never jumps or resizes between looks:
+ * headwear up top, a centered torso (jacket behind, tee in front), bottoms
+ * tucked under, shoes grounded at the feet, bag + jewelry floating at the
+ * sides. Pieces settle in with a dress-order stagger when the card is active.
  */
 
 interface Zone {
+  /** left edge, % of plate width */
   left: number;
+  /** top edge, % of plate height */
   top: number;
   w: number;
   h: number;
@@ -24,23 +27,23 @@ interface Zone {
 /** The order a person gets dressed — drives the entrance stagger. */
 const DRESS_ORDER: Category[] = ['outer', 'top', 'bottom', 'shoes', 'hat', 'eyewear', 'bag', 'jewelry'];
 
-function zonesFor(hasOuter: boolean, hasHeadwear: boolean): Partial<Record<Category, Zone>> {
-  const torsoTop = hasHeadwear ? 20 : 8;
-  const bottomTop = torsoTop + 27; // pants tuck up under the torso layers
-  const shoesTop = Math.min(86.5, bottomTop + 34);
-  return {
-    hat: { left: 36, top: 1, w: 28, h: 13, z: 30, rot: 0 },
-    eyewear: { left: 39, top: 14.5, w: 22, h: 7.5, z: 31, rot: 1.5 },
-    outer: { left: 1, top: torsoTop, w: 51, h: 37, z: 21, rot: -2 },
-    top: hasOuter
-      ? { left: 45, top: torsoTop + 1.5, w: 49, h: 36, z: 22, rot: 2 }
-      : { left: 27, top: torsoTop, w: 46, h: 38, z: 22, rot: 0 },
-    jewelry: { left: 3.5, top: torsoTop + 31, w: 14, h: 10, z: 33, rot: -6 },
-    bag: { left: 77, top: torsoTop + 28, w: 21, h: 18, z: 26, rot: 4 },
-    bottom: { left: 28, top: bottomTop, w: 42, h: 40, z: 12, rot: 0 },
-    shoes: { left: 37, top: shoesTop, w: 27, h: 12.5, z: 18, rot: -2 },
-  };
-}
+/**
+ * Fixed placement — identical for every outfit. A missing piece just leaves its
+ * band empty; nothing else moves. Centered torso/bottom/shoes form the spine;
+ * hat/eyewear stack on top; bag + jewelry float at the sides. (object-contain
+ * keeps each cutout proportional within its box, so wide shoes and tall pants
+ * both read at a consistent, intentional scale.)
+ */
+const ZONES: Record<Category, Zone> = {
+  hat:     { left: 37, top: 1,  w: 26, h: 11, z: 30, rot: 0 },
+  eyewear: { left: 41, top: 12, w: 18, h: 6.5, z: 31, rot: 1.5 },
+  outer:   { left: 21, top: 17, w: 58, h: 33, z: 18, rot: -1 },
+  top:     { left: 32, top: 20, w: 36, h: 28, z: 24, rot: 1 },
+  jewelry: { left: 2,  top: 40, w: 14, h: 11, z: 33, rot: -5 },
+  bag:     { left: 76, top: 43, w: 22, h: 18, z: 26, rot: 4 },
+  bottom:  { left: 31, top: 47, w: 38, h: 31, z: 12, rot: 0 },
+  shoes:   { left: 27, top: 79, w: 46, h: 18, z: 20, rot: -1 },
+};
 
 export function WornFlatlay({
   items,
@@ -61,7 +64,6 @@ export function WornFlatlay({
   const byCategory = new Map(products.map((product) => [product.category, product]));
   if (products.length < 3) return null;
 
-  const zones = zonesFor(byCategory.has('outer'), byCategory.has('hat') || byCategory.has('eyewear'));
   const staggered = DRESS_ORDER.map((category) => byCategory.get(category)).filter(
     (product): product is Product => Boolean(product),
   );
@@ -75,11 +77,11 @@ export function WornFlatlay({
       {/* floor shadow under the shoes grounds the whole silhouette */}
       <div
         aria-hidden
-        className="absolute bottom-[2.5%] left-1/2 h-[3.5%] w-[56%] -translate-x-1/2 rounded-[100%] bg-[#1c120d]/[.07] blur-md"
+        className="absolute bottom-[2.5%] left-1/2 h-[3.5%] w-[52%] -translate-x-1/2 rounded-[100%] bg-[#1c120d]/[.07] blur-md"
         style={{ zIndex: 5 }}
       />
       {staggered.map((product, index) => {
-        const zone = zones[product.category];
+        const zone = ZONES[product.category];
         if (!zone) return null;
         return (
           <div
@@ -95,7 +97,7 @@ export function WornFlatlay({
             }}
           >
             <div
-              className={active ? 'sy-piece-in h-full w-full' : 'h-full w-full opacity-0'}
+              className={active ? 'sy-piece-in h-full w-full' : 'h-full w-full'}
               style={active ? { animationDelay: `${index * 70}ms` } : undefined}
             >
               <ProductImage
@@ -103,7 +105,7 @@ export function WornFlatlay({
                 transparentOnly
                 loading={loading}
                 wrapperClassName="h-full w-full"
-                className="h-full w-full object-contain drop-shadow-[0_18px_22px_rgba(24,12,10,.16)]"
+                className="h-full w-full object-contain drop-shadow-[0_16px_20px_rgba(24,12,10,.15)]"
               />
             </div>
           </div>
