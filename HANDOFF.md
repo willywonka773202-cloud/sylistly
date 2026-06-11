@@ -6,11 +6,21 @@
 - **Last build by:** Claude
 - **Status:** verified-pass
 - **Updated:** 2026-06-11
-- **Next:** Competitive teardown (vault: "Competitive Teardown 2026-06-11"). Shipped from it: premium shadows/plate, slot-swap, shop-the-look peek, worn-silhouette share card. TOP REMAINING: (1) **paste-a-link to style around it** (Doji); (2) **35-sec style quiz → shareable identity** (Style DNA); (3) **weekly outfit challenge + light voting** (Combyne, needs tiny edge KV); (4) **daily-drop framing** of the nightly bake. Also: Skimlinks/Sovrn IDs + Upstash (Will) — shop links are affiliate-wrap-ready and tracked, they earn the moment the ID lands; profile/social needs real accounts; SearchAPI key (FiyDgAiDJ8b…) compromised — rotate it.
+- **Next:** Competitive teardown (vault: "Competitive Teardown 2026-06-11"). Shipped from it: premium shadows/plate, slot-swap, shop-the-look peek, worn-silhouette share card, style quiz → identity. TOP REMAINING: (1) **paste-a-link to style around it** (Doji — needs server-side URL fetch/parse, more involved); (2) **weekly outfit challenge + light voting** (Combyne, needs tiny edge KV); (3) **daily-drop framing** of the nightly bake; (4) a per-identity OG share PAGE (/style/[id]) to make the quiz identity virally shareable (today it shares as text only). Also: Skimlinks/Sovrn IDs + Upstash (Will) — shop links are affiliate-wrap-ready + tracked, earn the moment the ID lands; profile/social needs real accounts; SearchAPI key (FiyDgAiDJ8b…) compromised — rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-11 (cont.) — Claude Code — build+check (STYLE QUIZ → shareable identity, autonomous)
+- User away ("keep working on what u can") → built the next no-dependency roadmap item: the Style-DNA-style identity quiz.
+- **lib/style-identity.ts**: 8 personas (Street Minimalist, Noir Edge, Editorial Clean, Soft Romantic, Night Luxe, Luxe Sport, Earthy Roamer, Bold Statement), each w/ tagline + favored vibes. `deriveIdentity(answers)` = deterministic lane×palette map (every combo resolves). save/loadIdentity to localStorage.
+- **components/Onboarding.tsx** rewritten from the 2-step picker into a 5-tap quiz (lane/palette/fit/budget/frame), tap-to-auto-advance, progress dots, Back/Skip on every step → result card w/ persona name + tagline + feed-vibe chips + "Share my style" + "Style my feed". STILL SKIPPABLE at welcome + every step (protects the no-onboarding instant-value edge).
+- **app/page.tsx** `completeOnboarding(answers, identity)`: sets profile frame+budget+vibes, saveIdentity, and SEEDS vibe-likes (primary vibe weighted highest) so "For you" leans into the persona from the first scroll; re-deals the deck.
+- **app/profile/page.tsx**: "Your style" card (persona name/tagline + Share + Retake quiz → clears ONBOARDED_KEY + routes to /). Empty-state CTA when no identity yet.
+- Analytics: quiz_completed (identity/lane/palette), quiz_shared.
+- VERIFIED end-to-end in preview: Street+All-black → "Noir Edge" (correct), saved to localStorage, vibe-likes {edgy:3,night:2,street:1}, profile→masc/mid/[edgy,night,street], FIRST scroll look already "Edgy" (steering works), profile identity card renders w/ Share+Retake. tsc clean · build "Compiled successfully" · 0 console errors. (Test-harness note: scope plate/quiz button queries to the overlay — the scroll's "Streetwear" story circle collides with naive text matches.) Deploying via Vercel remote build.
+- next: paste-a-link (server fetch) · per-identity OG share page · weekly challenge.
 
 ### 2026-06-11 (cont.) — Claude Code — build+check (SHOP-THE-LOOK hotspots + worn-silhouette SHARE CARD)
 - Continued down the teardown roadmap (Will: "yes"). Two more shipped:

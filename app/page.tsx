@@ -31,6 +31,7 @@ import { getLibraryLook } from '@/lib/outfit-library';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { encodeLookSlug } from '@/lib/share-codes';
+import { saveIdentity, type StyleAnswers, type StyleIdentity } from '@/lib/style-identity';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 import { useCheckout } from '@/store/checkout';
@@ -196,6 +197,8 @@ export default function ScrollPage() {
   const setCheckout = useCheckout((state) => state.setCheckout);
   const profileFrame = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
+  const setBudget = useProfile((state) => state.setBudget);
+  const setVibesFromText = useProfile((state) => state.setVibesFromText);
 
   const frame: GeneratorFrame = profileFrame === 'custom' ? 'androgynous' : profileFrame;
 
@@ -612,11 +615,25 @@ export default function ScrollPage() {
     });
   }
 
-  function completeOnboarding(pickedFrame: GeneratorFrame, vibe: VibeId) {
+  function completeOnboarding(answers: StyleAnswers, identity: StyleIdentity) {
     window.localStorage.setItem(ONBOARDED_KEY, '1');
     setShowOnboarding(false);
-    setBodyType(pickedFrame);
-    setVibeFilter(vibe);
+    // Apply the quiz to the profile (steers generation) and persist the identity.
+    setBodyType(answers.frame);
+    setBudget(answers.budget);
+    setVibesFromText(identity.vibes.join(', '));
+    saveIdentity(answers, identity);
+    // Seed the feed-steering weights so "For you" leans into the persona's
+    // vibes from the very first scroll (primary vibe weighted highest).
+    const seeded: Record<string, number> = {};
+    identity.vibes.forEach((vibe, index) => {
+      seeded[vibe] = identity.vibes.length - index;
+    });
+    vibeLikesRef.current = seeded;
+    window.localStorage.setItem(VIBE_LIKES_KEY, JSON.stringify(seeded));
+    setVibeFilter('all');
+    recentIdsRef.current = [];
+    setLooks(makeLooks(4, answers.frame, 'all'));
   }
 
   function skipOnboarding() {

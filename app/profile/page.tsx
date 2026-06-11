@@ -1,14 +1,19 @@
 'use client';
 
-import { ArrowRight, Bookmark, Check } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, Share2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { OutfitLookCard } from '@/components/OutfitBoard';
+import { track } from '@/lib/analytics';
+import { loadIdentity, type StyleIdentity } from '@/lib/style-identity';
 import type { Profile } from '@/lib/types';
 import { VIBES } from '@/lib/vibes';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
+
+const ONBOARDED_KEY = 'sylistly.onboarded.v1';
 
 const SKIN_TONES = ['#f2d6c0', '#e4b894', '#c9a98a', '#a87f5e', '#8a5f3f', '#5d3f29'];
 
@@ -40,9 +45,38 @@ export default function ProfilePage() {
   const setBudget = useProfile((state) => state.setBudget);
   const setVibesFromText = useProfile((state) => state.setVibesFromText);
   const fits = useSavedFits((state) => state.fits);
+  const router = useRouter();
 
   const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => setHasMounted(true), []);
+  const [identity, setIdentity] = useState<StyleIdentity | null>(null);
+  const [shared, setShared] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+    setIdentity(loadIdentity()?.identity ?? null);
+  }, []);
+
+  function retakeQuiz() {
+    window.localStorage.removeItem(ONBOARDED_KEY);
+    router.push('/');
+  }
+
+  async function shareIdentity() {
+    if (!identity) return;
+    const url = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const text = `I'm a ${identity.name} on Sylistly ✨ what's your style?`;
+    track('quiz_shared', { identity: identity.id, surface: 'profile' });
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Sylistly', text, url });
+      } else {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        setShared(true);
+        window.setTimeout(() => setShared(false), 1600);
+      }
+    } catch {
+      /* dismissed */
+    }
+  }
 
   // Stored prefs are free text (legacy setVibesFromText), so match either the
   // vibe id ('street') or its label ('Streetwear').
@@ -71,6 +105,55 @@ export default function ProfilePage() {
           These settings steer every look in your scroll and builder. Stored on this device.
         </p>
       </header>
+
+      {/* Style identity */}
+      {hasMounted ? (
+        <section className="mt-7 overflow-hidden rounded-card-lg border border-hairline bg-[radial-gradient(130%_90%_at_15%_0%,rgba(255,45,109,.16),transparent_60%)] p-5">
+          <p className="inline-flex items-center gap-1.5 text-eyebrow font-extrabold uppercase text-accent">
+            <Sparkles size={12} />
+            Your style
+          </p>
+          {identity ? (
+            <>
+              <h2 className="mt-3 font-serif text-[30px] font-semibold italic leading-[.95] text-ink">
+                {identity.name}
+              </h2>
+              <p className="mt-2 max-w-[40ch] text-[13px] leading-relaxed text-muted-2">{identity.tagline}</p>
+              <div className="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  onClick={shareIdentity}
+                  className="sy-press inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-2.5 text-[12px] font-bold text-white shadow-pink-glow"
+                >
+                  {shared ? <Check size={14} /> : <Share2 size={14} />}
+                  {shared ? 'Copied' : 'Share'}
+                </button>
+                <button
+                  type="button"
+                  onClick={retakeQuiz}
+                  className="sy-press inline-flex items-center gap-2 rounded-full border border-hairline-2 bg-surface-2 px-4 py-2.5 text-[12px] font-semibold text-ink"
+                >
+                  Retake quiz
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 max-w-[38ch] text-[13px] leading-relaxed text-muted-2">
+                Take the 5-tap quiz to get your style identity and tune your feed.
+              </p>
+              <button
+                type="button"
+                onClick={retakeQuiz}
+                className="sy-press mt-4 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-2.5 text-[12px] font-bold text-white shadow-pink-glow"
+              >
+                <Sparkles size={14} />
+                Find my style
+              </button>
+            </>
+          )}
+        </section>
+      ) : null}
 
       {/* Frame */}
       <Section title="Frame">
