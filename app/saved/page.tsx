@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic';
 import {
   Bookmark,
   Check,
+  ExternalLink,
   Heart,
-  Layers,
   RotateCcw,
   ShoppingBag,
   Sparkles,
@@ -18,13 +18,15 @@ import { useMemo, useState } from 'react';
 import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { wrapAffiliate } from '@/lib/affiliate';
+import { track } from '@/lib/analytics';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
-import { hasTransparentProductImage, isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import { hasExactProductLink, hasTransparentProductImage, isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
-import { useWardrobe } from '@/store/wardrobe';
+import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
 const COLLECTIONS = ['All', 'Clean', 'Streetwear', 'Gym', 'Date', 'Travel', 'Work'] as const;
 type Collection = (typeof COLLECTIONS)[number];
@@ -82,18 +84,18 @@ export default function SavedPage() {
   const fits = useSavedFits((state) => state.fits);
   const removeFit = useSavedFits((state) => state.removeFit);
   const replaceItems = useFit((state) => state.replaceItems);
-  const addToCloset = useWardrobe((state) => state.addToCloset);
   const addToWishlist = useWardrobe((state) => state.addToWishlist);
+  const wardrobeItems = useWardrobe(selectWardrobeItems);
+  const removeWardrobeItem = useWardrobe((state) => state.removeItem);
   const router = useRouter();
 
+  const [view, setView] = useState<'fits' | 'pieces'>('fits');
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState<string>('Saved fit');
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState<Collection>('All');
   const [detailFitId, setDetailFitId] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState<
-    { kind: 'closet' | 'wishlist'; count: number } | null
-  >(null);
+  const [confirmation, setConfirmation] = useState<{ count: number } | null>(null);
 
   // Compute renderable view per fit once. Used by the grid, the
   // collection filter, and the stats card so collection-inference
@@ -182,23 +184,14 @@ export default function SavedPage() {
     setCheckoutProducts(items);
   }
 
-  function addAllToCloset(products: Product[]) {
-    let added = 0;
-    for (const product of products) {
-      addToCloset(product, 'saved-fit');
-      added += 1;
-    }
-    setConfirmation({ kind: 'closet', count: added });
-    window.setTimeout(() => setConfirmation(null), 1600);
-  }
-
-  function addAllToWishlist(products: Product[]) {
+  function savePieces(products: Product[]) {
     let added = 0;
     for (const product of products) {
       addToWishlist(product, 'saved-fit');
       added += 1;
     }
-    setConfirmation({ kind: 'wishlist', count: added });
+    track('pieces_saved', { count: added, from: 'saved-fit' });
+    setConfirmation({ count: added });
     window.setTimeout(() => setConfirmation(null), 1600);
   }
 
@@ -207,7 +200,7 @@ export default function SavedPage() {
       eyebrow="Saved"
       title="Fits"
       accent="saved"
-      description="Saved looks live on this device — remix any fit in the builder, shop every piece, or move it into your closet."
+      description="Saved looks live on this device — remix any fit in the builder, shop every piece, or save the pieces you love."
     >
       {confirmation ? (
         <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">
@@ -215,14 +208,31 @@ export default function SavedPage() {
             <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
               <Check size={13} strokeWidth={3} />
             </span>
-            {`Added ${confirmation.count} piece${confirmation.count === 1 ? '' : 's'} to ${
-              confirmation.kind === 'closet' ? 'closet' : 'wishlist'
-            }`}
+            {`Saved ${confirmation.count} piece${confirmation.count === 1 ? '' : 's'}`}
           </div>
         </div>
       ) : null}
 
-      {displayFits.length === 0 ? (
+      {/* Fits / Pieces toggle */}
+      <div className="mb-4 grid grid-cols-2 gap-1 rounded-full border border-hairline bg-surface-1 p-1">
+        {(['fits', 'pieces'] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setView(tab)}
+            aria-pressed={view === tab}
+            className={`sy-press rounded-full py-2.5 text-[12px] font-bold uppercase tracking-[.12em] transition ${
+              view === tab ? 'bg-accent text-white shadow-pink-glow' : 'text-muted-2'
+            }`}
+          >
+            {tab === 'fits' ? `Fits${displayFits.length ? ` (${displayFits.length})` : ''}` : `Pieces${wardrobeItems.length ? ` (${wardrobeItems.length})` : ''}`}
+          </button>
+        ))}
+      </div>
+
+      {view === 'pieces' ? (
+        <PiecesGrid items={wardrobeItems} onRemove={removeWardrobeItem} />
+      ) : displayFits.length === 0 ? (
         <SavedEmptyState />
       ) : (
         <div className="grid gap-4">
@@ -309,8 +319,7 @@ export default function SavedPage() {
           onClose={() => setDetailFitId(null)}
           onLoadInBuilder={() => loadInBuilder(detail.visualItems)}
           onShop={() => shopAll(detail.fit, detail.visualProducts)}
-          onAddAllToCloset={() => addAllToCloset(detail.visualProducts)}
-          onAddAllToWishlist={() => addAllToWishlist(detail.visualProducts)}
+          onSavePieces={() => savePieces(detail.visualProducts)}
           onRemove={() => {
             removeFit(detail.fit.id);
             setDetailFitId(null);
@@ -405,12 +414,103 @@ function CollectionFilters({
   );
 }
 
+interface WardrobePiece {
+  id: string;
+  productId: string;
+  product: Product;
+}
+
+/** Saved individual pieces (the wishlist) — each shoppable, removable. */
+function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (productId: string) => void }) {
+  if (items.length === 0) {
+    return (
+      <section className="sy-card-strong rounded-[26px] p-6 text-center">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/15 text-accent shadow-pink-glow">
+          <Heart size={22} />
+        </div>
+        <h2 className="mt-3 font-serif text-[22px] font-semibold text-ink">No saved pieces yet</h2>
+        <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
+          Tap the heart on any piece in Browse, or save the pieces from a fit — they all land here, ready to shop.
+        </p>
+        <Link
+          href="/browse"
+          className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97]"
+        >
+          <Sparkles size={11} />
+          Browse pieces
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {items.map(({ product }) => {
+        const url = wrapAffiliate(getProductOutboundUrl(product));
+        const exact = hasExactProductLink(product);
+        return (
+          <div
+            key={product.id}
+            className="group relative overflow-hidden rounded-card border border-hairline bg-surface-1 shadow-card"
+          >
+            <button
+              type="button"
+              onClick={() => onRemove(product.id)}
+              aria-label={`Remove ${product.brand} ${product.name}`}
+              className="sy-press absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full border border-hairline-2 bg-bg/70 text-muted backdrop-blur-md transition hover:text-ink"
+            >
+              <X size={13} />
+            </button>
+            <div className="bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-4">
+              <ProductImage
+                product={product}
+                transparentOnly
+                wrapperClassName="h-[140px] w-full"
+                className="h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(24,12,10,.12)]"
+              />
+            </div>
+            <div className="px-3 pb-3 pt-2.5">
+              <p className="truncate text-[10px] font-bold uppercase tracking-[.12em] text-muted">{product.brand}</p>
+              <p className="mt-0.5 line-clamp-1 text-[12px] font-semibold text-ink">{product.name}</p>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <span className="flex items-center gap-1.5 text-[12px] font-bold text-accent">
+                  {formatPrice(product.priceCents || 0)}
+                  {exact ? <span aria-label="Shoppable" className="h-1.5 w-1.5 rounded-full bg-money" /> : null}
+                </span>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer sponsored"
+                  onClick={() =>
+                    track('shop_link_clicked', {
+                      brand: product.brand,
+                      retailer: product.retailer,
+                      priceCents: product.priceCents,
+                      exact,
+                      wrapped: url !== getProductOutboundUrl(product),
+                      surface: 'saved-pieces',
+                    })
+                  }
+                  className="sy-press inline-flex items-center gap-1 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-bold text-accent transition hover:bg-accent hover:text-white"
+                >
+                  Shop
+                  <ExternalLink size={11} />
+                </a>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function SavedActionPanel() {
   return (
     <section className="rounded-[20px] border border-dashed border-white/12 bg-white/[0.025] p-4">
       <div className="flex items-start gap-3">
         <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent/12 text-accent">
-          <Layers size={16} />
+          <Sparkles size={16} />
         </span>
         <div className="min-w-0 flex-1">
           <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Saved actions</div>
@@ -445,8 +545,7 @@ function SavedDetailSheet({
   onClose,
   onLoadInBuilder,
   onShop,
-  onAddAllToCloset,
-  onAddAllToWishlist,
+  onSavePieces,
   onRemove,
   onProductFailed,
 }: {
@@ -457,8 +556,7 @@ function SavedDetailSheet({
   onClose: () => void;
   onLoadInBuilder: () => void;
   onShop: () => void;
-  onAddAllToCloset: () => void;
-  onAddAllToWishlist: () => void;
+  onSavePieces: () => void;
   onRemove: () => void;
   onProductFailed: (product: Product) => void;
 }) {
@@ -561,25 +659,15 @@ function SavedDetailSheet({
           </button>
         </div>
 
-        {/* Cross-store actions */}
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={onAddAllToCloset}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-accent/20"
-          >
-            <Layers size={12} className="text-accent" />
-            Add all to closet
-          </button>
-          <button
-            type="button"
-            onClick={onAddAllToWishlist}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55"
-          >
-            <Heart size={12} className="text-accent" />
-            Add to wishlist
-          </button>
-        </div>
+        {/* Save the individual pieces to your Pieces tab */}
+        <button
+          type="button"
+          onClick={onSavePieces}
+          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white transition active:scale-[0.97] hover:bg-accent/20"
+        >
+          <Heart size={13} className="text-accent" />
+          Save these pieces
+        </button>
 
         {/* Secondary actions */}
         <div className="mt-2">
@@ -614,7 +702,7 @@ function SavedEmptyState() {
       </div>
       <h2 className="mt-3 font-serif text-[22px] font-semibold text-ink">No saved fits yet</h2>
       <p className="mt-2 text-[12px] leading-relaxed text-muted-2">
-        Save a look from the scroll or build one yourself — every fit lands here ready to remix, shop, or move to your closet.
+        Save a look from the scroll or build one yourself — every fit lands here ready to remix, shop, or pull pieces from.
       </p>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Link

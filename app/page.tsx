@@ -868,7 +868,9 @@ export default function ScrollPage() {
                 {whyOpen ? (
                   <div className="mt-2 animate-sy-rise">
                     <p className="max-w-[36ch] text-[13px] font-medium leading-snug text-muted-2">
-                      <span className="font-bold uppercase tracking-[.14em] text-champagne">Syli&apos;s note · </span>
+                      <span className="font-bold uppercase tracking-[.14em] text-champagne">
+                        {look.source === 'syli' ? 'Syli’s note · ' : 'Why this look · '}
+                      </span>
                       {look.source === 'syli' && look.note ? look.note : syliNote(look)}
                     </p>
                     {look.source === 'syli' && look.palette?.length ? (

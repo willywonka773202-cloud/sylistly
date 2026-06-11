@@ -41,6 +41,10 @@ export default function BrowsePage() {
 
   const [hasMounted, setHasMounted] = useState(false);
   const [filterId, setFilterId] = useState('all');
+  // Page the grid — rendering all ~544 cutout cards at once is a heavy DOM
+  // (slow mobile paint + sluggish hydration). Reveal in chunks instead.
+  const PAGE = 48;
+  const [visibleCount, setVisibleCount] = useState(PAGE);
   useEffect(() => setHasMounted(true), []);
 
   const allProducts = useMemo(
@@ -56,6 +60,12 @@ export default function BrowsePage() {
         : allProducts,
     [allProducts, filter],
   );
+  const visible = products.slice(0, visibleCount);
+
+  function selectFilter(id: string) {
+    setFilterId(id);
+    setVisibleCount(PAGE); // reset paging when the category changes
+  }
 
   function styleThis(product: Product) {
     window.localStorage.setItem(PENDING_LOCK_KEY, JSON.stringify(product));
@@ -105,7 +115,7 @@ export default function BrowsePage() {
               <button
                 key={entry.id}
                 type="button"
-                onClick={() => setFilterId(entry.id)}
+                onClick={() => selectFilter(entry.id)}
                 aria-pressed={active}
                 className={`sy-press shrink-0 rounded-full px-3.5 py-2 text-[12px] font-semibold transition ${
                   active ? 'bg-accent text-white shadow-pink-glow' : 'bg-surface-2 text-muted-2'
@@ -120,7 +130,7 @@ export default function BrowsePage() {
 
       {/* Product grid */}
       <div className="grid grid-cols-2 gap-3 px-4">
-        {products.map((product) => {
+        {visible.map((product) => {
           const wishlisted = hasMounted && isInWishlist(product.id);
           const exact = hasExactProductLink(product);
           return (
@@ -176,6 +186,18 @@ export default function BrowsePage() {
           );
         })}
       </div>
+
+      {visible.length < products.length ? (
+        <div className="mt-5 flex justify-center px-4">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((count) => count + PAGE)}
+            className="sy-press rounded-full border border-hairline-2 bg-surface-2 px-6 py-3 text-[12px] font-bold uppercase tracking-[.14em] text-ink"
+          >
+            Load more ({products.length - visible.length} left)
+          </button>
+        </div>
+      ) : null}
 
       <BottomNav />
     </main>

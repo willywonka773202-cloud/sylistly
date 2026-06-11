@@ -14,11 +14,11 @@ export default function NotFound() {
         </p>
       </div>
       <div className="relative flex w-full max-w-[260px] flex-col gap-2.5">
-        <Link href="/build" className="sy-cta-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[.14em]">
-          Style a fit
+        <Link href="/" className="sy-cta-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[.14em]">
+          Back to the scroll
         </Link>
-        <Link href="/feed" className="sy-cta-secondary px-5 py-3 text-[12px] font-bold uppercase tracking-[.14em]">
-          Browse the feed
+        <Link href="/browse" className="sy-cta-secondary px-5 py-3 text-[12px] font-bold uppercase tracking-[.14em]">
+          Browse pieces
         </Link>
       </div>
     </main>
