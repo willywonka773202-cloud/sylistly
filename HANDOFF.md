@@ -5,12 +5,19 @@
 - **Turn:** Claude
 - **Last build by:** Claude
 - **Status:** verified-pass
-- **Updated:** 2026-06-10
-- **Next:** Outer growth DONE (39→96 served, 233 eligible — see top entry; catalog 544). Remaining: (1) profile/social screens from the spec wait for REAL accounts (Supabase) — no fake followers; (2) Will: Skimlinks/Sovrn IDs + Upstash (the ~93%-shoppable library is ready to earn the moment IDs land); (3) optional growth: tops (95) via the triage→cut→re-review pipeline; also 137 reviewed-clean outer cutouts sit ready beyond the 96 cap if outer ever needs more; (4) longer-term: recover real merchant PDPs for the link-less generated- products (would push shoppability to ~100%). NOTE: SearchAPI key (FiyDgAiDJ8b…) still compromised — user must rotate it.
+- **Updated:** 2026-06-11
+- **Next:** Competitive teardown done (vault: "Competitive Teardown 2026-06-11" — full ranked roadmap + protect-list + traps). Shipped from it: premium shadows/plate + slot-swap. TOP REMAINING from the teardown: (1) **shop-the-look hotspots** (tap a garment in the plate → its affiliate link) — highest commercial, do when Skimlinks lands; (2) **upgrade the /look/ share card** to a gorgeous 9:16 Polyvore set (cheapest growth lever); (3) **paste-a-link to style around it**; (4) **35-sec style quiz → shareable identity** (Style DNA model). Also still: Skimlinks/Sovrn IDs + Upstash (Will); profile/social needs real accounts; SearchAPI key (FiyDgAiDJ8b…) still compromised — rotate it.
 
 ---
 
 ## Log (newest first)
+
+### 2026-06-11 — Claude Code — build+check (COMPETITIVE TEARDOWN → premium presentation + slot-swap)
+- Ran 2 parallel research agents (category scan + Fits AI deep-dive) → durable findings in vault "Competitive Teardown 2026-06-11" (landscape, protect-list, traps, ranked roadmap). Net read: our wedge = instant/account-free scrollable outfit discovery + lock-and-restyle + shareable Polyvore-style cards; funded rivals chase expensive avatars/chat — leave it. Both agents' #1 win = FINISH the outfit presentation; #1 loop-completer = slot-swap.
+- **Premium presentation** (components/WornFlatlay.tsx + globals.css): replaced the single flat drop-shadow with TWO tiered, warm-hue-matched (hsl 38° 32%) shadow classes — `.sy-piece-shadow` (base: jacket/bottom) and `.sy-piece-shadow-lifted` (deeper/softer: top/shoes/hat/eyewear/bag/jewelry) so layering reads as depth. Plate is now a radial vignette (#FFFDF9→#ECE5D8) instead of a flat gradient, with a real warm-tinted blurred CONTACT shadow ellipse under the shoes so the silhouette sits ON the plate. (Kept FIXED placement per Will's last-turn consistency ask — added depth, not random jitter.)
+- **Slot-swap** (app/page.tsx `swapPiece`): tap any piece chip → recomposes JUST that slot (all others locked via buildCatalogLook lockedItems+targetSlots, avoiding the current id) — "fix the one piece you don't like." Chips redesigned into two tap targets: chip body = swap (⟲ icon), lock button = keep. Hint line "tap a piece to swap · lock to keep". Swapping demotes a Syli look to engine (drops badge — honest hand-edit). Verified: swapped the top, ALL other pieces held identical, badge dropped, price/shoppable updated.
+- VERIFIED: tsc clean · next build "Compiled successfully" · preview: depth upgrade visible, slot-swap keeps other pieces frozen (eval-confirmed alt text), 0 console errors. Deploying via Vercel remote build.
+- next: shop-the-look hotspots (commercial #1, on Skimlinks) · richer 9:16 share card · paste-a-link · style quiz.
 
 ### 2026-06-11 — Claude Code — build+check (SCROLL + SAVED UI fixes: consistent worn layout, bigger shoes, iOS one-swipe)
 - Will's 4 complaints, all fixed:

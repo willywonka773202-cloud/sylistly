@@ -279,3 +279,20 @@ html.sy-app-locked body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+/* Garment depth on the worn plate — stacked, warm-hued, light-from-top-left
+   shadows read far more premium than one flat drop shadow (the single biggest
+   "looks expensive" lever per the competitive teardown). Two tiers: base
+   pieces (jacket, bottoms) sit on the plate; lifted pieces (the tee over the
+   jacket, shoes, accessories) cast a deeper, softer shadow so layering reads. */
+.sy-piece-shadow {
+  filter:
+    drop-shadow(1px 2px 2px hsl(38 32% 36% / 0.18))
+    drop-shadow(2px 5px 7px hsl(38 32% 36% / 0.12));
+}
+.sy-piece-shadow-lifted {
+  filter:
+    drop-shadow(2px 4px 6px hsl(38 32% 36% / 0.16))
+    drop-shadow(4px 9px 15px hsl(38 32% 36% / 0.10))
+    drop-shadow(9px 17px 28px hsl(38 32% 36% / 0.07));
+}

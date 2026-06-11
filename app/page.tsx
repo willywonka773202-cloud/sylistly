@@ -8,6 +8,7 @@ import {
   Heart,
   LayoutGrid,
   Lock,
+  RefreshCw,
   Share2,
   ShoppingBag,
   SlidersHorizontal,
@@ -450,6 +451,54 @@ export default function ScrollPage() {
     showToast('Locks cleared');
   }
 
+  /**
+   * Swap a single piece in place — the "fix the one thing you don't like"
+   * move (Pinterest/Doji's slot swap). Everything else freezes; only this
+   * slot gets a fresh pick. The look drops the AI badge since it's now a
+   * hand-edit, not a Claude-composed look.
+   */
+  function swapPiece(look: ScrollLook, category: Category) {
+    const others: Partial<Record<Category, Product>> = {};
+    for (const [cat, product] of Object.entries(look.items)) {
+      if (cat !== category && product) others[cat as Category] = product;
+    }
+    const currentId = look.items[category]?.id;
+    seedRef.current += 17;
+    const built = buildCatalogLook({
+      vibe: look.vibe,
+      frame,
+      budget: 'any',
+      mode: 'full',
+      seed: seedRef.current,
+      lockedItems: others,
+      currentItems: others,
+      targetSlots: [category],
+      avoidProductIds: [currentId, ...recentIdsRef.current].filter((id): id is string => Boolean(id)),
+      transparentOnly: true,
+    });
+    const next = built.products[category];
+    if (!next || next.id === currentId) {
+      showToast(`No other ${CATEGORY_NOUN[category]} to swap to`);
+      return;
+    }
+    recentIdsRef.current = [...recentIdsRef.current, next.id].slice(-80);
+    track('piece_swapped', { category, vibe: look.vibe });
+    setLooks((prev) =>
+      prev.map((entry) =>
+        entry.key === look.key
+          ? {
+              ...entry,
+              items: { ...entry.items, [category]: next },
+              gen: entry.gen + 1,
+              source: 'engine' as const,
+              note: undefined,
+              aiId: undefined,
+            }
+          : entry,
+      ),
+    );
+  }
+
   function restyle(look: ScrollLook) {
     seedRef.current += 17;
     const lockedIds = new Set(Object.values(lockedItems).map((product) => product?.id));
@@ -832,41 +881,59 @@ export default function ScrollPage() {
                   </span>
                 </div>
 
-                {/* Piece chips — tap to lock; locked pieces ride along as you scroll */}
-                <div className="-mx-4 mt-2.5 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
+                {/* Piece chips — tap a chip to swap just that piece; lock to
+                    keep it as you scroll. Two affordances, two tap targets. */}
+                <p className="mt-2.5 text-[10px] font-medium uppercase tracking-[.12em] text-muted">
+                  Tap a piece to swap · lock to keep
+                </p>
+                <div className="-mx-4 mt-1.5 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
                   {products.map((product) => {
                     const locked = lockedItems[product.category]?.id === product.id;
                     const exact = hasExactProductLink(product);
                     return (
-                      <button
+                      <div
                         key={product.id}
-                        type="button"
-                        onClick={() => toggleLock(look, product)}
-                        aria-pressed={locked}
-                        aria-label={`${locked ? 'Unlock' : 'Lock'} ${product.brand} ${CATEGORY_NOUN[product.category]}`}
-                        className={`sy-press flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 backdrop-blur-md transition ${
+                        className={`flex shrink-0 items-center gap-1 rounded-full border py-1 pl-1.5 pr-1 backdrop-blur-md transition ${
                           locked
                             ? 'border-accent bg-accent-soft text-ink shadow-pink-glow'
                             : 'border-hairline-2 bg-surface-2/70 text-muted-2'
                         }`}
                       >
-                        <span className="relative grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-ink/95">
-                          <ProductImage
-                            product={product}
-                            wrapperClassName="h-6 w-6"
-                            className="h-6 w-6 object-contain"
-                            transparentOnly
-                          />
-                        </span>
-                        <span className="text-[11px] font-semibold capitalize">
-                          {CATEGORY_NOUN[product.category]}
-                        </span>
-                        <span className="text-[11px] font-medium text-muted">
-                          {formatPrice(product.priceCents || 0)}
-                        </span>
-                        {exact ? <span aria-label="Shoppable" className="h-1.5 w-1.5 rounded-full bg-money" /> : null}
-                        {locked ? <Lock size={11} className="text-accent" /> : null}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => swapPiece(look, product.category)}
+                          aria-label={`Swap the ${product.brand} ${CATEGORY_NOUN[product.category]}`}
+                          className="sy-press flex items-center gap-2"
+                        >
+                          <span className="relative grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-ink/95">
+                            <ProductImage
+                              product={product}
+                              wrapperClassName="h-6 w-6"
+                              className="h-6 w-6 object-contain"
+                              transparentOnly
+                            />
+                          </span>
+                          <span className="text-[11px] font-semibold capitalize">
+                            {CATEGORY_NOUN[product.category]}
+                          </span>
+                          <span className="text-[11px] font-medium text-muted">
+                            {formatPrice(product.priceCents || 0)}
+                          </span>
+                          {exact ? <span aria-label="Shoppable" className="h-1.5 w-1.5 rounded-full bg-money" /> : null}
+                          <RefreshCw size={11} className="text-muted" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleLock(look, product)}
+                          aria-pressed={locked}
+                          aria-label={`${locked ? 'Unlock' : 'Lock'} the ${CATEGORY_NOUN[product.category]}`}
+                          className={`sy-press grid h-7 w-7 shrink-0 place-items-center rounded-full transition ${
+                            locked ? 'bg-accent text-white' : 'text-muted hover:text-ink'
+                          }`}
+                        >
+                          <Lock size={12} />
+                        </button>
+                      </div>
                     );
                   })}
                 </div>

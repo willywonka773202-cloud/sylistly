@@ -45,6 +45,9 @@ const ZONES: Record<Category, Zone> = {
   shoes:   { left: 27, top: 79, w: 46, h: 18, z: 20, rot: -1 },
 };
 
+/** Pieces that sit ON TOP of others get the deeper, softer shadow tier. */
+const LIFTED = new Set<Category>(['top', 'shoes', 'hat', 'eyewear', 'bag', 'jewelry']);
+
 export function WornFlatlay({
   items,
   active = true,
@@ -72,12 +75,13 @@ export function WornFlatlay({
     <div
       role="img"
       aria-label={`Outfit of ${products.length} pieces laid out as worn`}
-      className={`relative overflow-hidden bg-[linear-gradient(180deg,#FFFFFF_0%,#FAF5EF_100%)] ${className}`}
+      className={`relative overflow-hidden bg-[radial-gradient(125%_92%_at_50%_36%,#FFFDF9_0%,#F5F0E7_74%,#ECE5D8_100%)] ${className}`}
     >
-      {/* floor shadow under the shoes grounds the whole silhouette */}
+      {/* contact shadow under the shoes — grounds the silhouette so pieces sit
+          ON the plate rather than floating */}
       <div
         aria-hidden
-        className="absolute bottom-[2.5%] left-1/2 h-[3.5%] w-[52%] -translate-x-1/2 rounded-[100%] bg-[#1c120d]/[.07] blur-md"
+        className="absolute bottom-[3%] left-1/2 h-[4%] w-[46%] -translate-x-1/2 rounded-[100%] bg-[#3a2418]/20 blur-[10px]"
         style={{ zIndex: 5 }}
       />
       {staggered.map((product, index) => {
@@ -105,7 +109,9 @@ export function WornFlatlay({
                 transparentOnly
                 loading={loading}
                 wrapperClassName="h-full w-full"
-                className="h-full w-full object-contain drop-shadow-[0_16px_20px_rgba(24,12,10,.15)]"
+                className={`h-full w-full object-contain ${
+                  LIFTED.has(product.category) ? 'sy-piece-shadow-lifted' : 'sy-piece-shadow'
+                }`}
               />
             </div>
           </div>
