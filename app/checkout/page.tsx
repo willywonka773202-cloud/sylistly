@@ -96,9 +96,8 @@ export default function CheckoutPage() {
             {withheldCount > 0 ? (
               <div
                 className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
-                data-checkout-withheld-search-links={withheldCount}
               >
-                {withheldCount} item{withheldCount !== 1 ? 's' : ''} may have changed at the store. Reopen this fit from the Feed to refresh {withheldCount !== 1 ? 'them' : 'it'}.
+                {withheldCount} item{withheldCount !== 1 ? 's' : ''} may have changed at the store. Reopen this fit from the Scroll to refresh {withheldCount !== 1 ? 'them' : 'it'}.
               </div>
             ) : null}
           </section>

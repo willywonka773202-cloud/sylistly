@@ -426,7 +426,7 @@ export function SearchSheet({
                         onClick={() => chooseCategory(slot)}
                         className={`relative flex w-[96px] flex-none flex-col rounded-[16px] border p-1.5 text-left transition ${
                           active
-                            ? 'border-accent/65 bg-[linear-gradient(180deg,rgba(232,54,93,.12),rgba(255,255,255,.04))] shadow-pink-glow'
+                            ? 'border-accent/65 bg-[linear-gradient(180deg,rgba(255,45,109,.12),rgba(255,255,255,.04))] shadow-pink-glow'
                             : product
                             ? 'border-white/10 bg-white/[0.05]'
                             : 'border-white/8 bg-[#151311]'

@@ -1,6 +1,6 @@
 'use client';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Bookmark, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mannequin } from '@/components/Mannequin';
@@ -1217,28 +1217,23 @@ function BuilderPageContent({
   return (
     <main
       className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
-      data-build-route="true"
-      data-build-product-count={builderProducts.length}
-      data-build-transparent-count={builderTransparentCount}
-      data-build-linked-count={builderLinkedCount}
-      data-build-exact-linked-count={builderExactLinkedCount}
     >
       <header className="relative flex items-center justify-between px-4 pb-2.5 pt-10">
-        <h1 className="sr-only">Outfit Builder</h1>
+        <h1 className="sr-only">Remix your outfit</h1>
         <button
           type="button"
           onClick={() => router.back()}
           className="relative z-10 grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
           aria-label="Back"
         >
-          <ArrowUpRight size={15} className="rotate-[225deg]" />
+          <ChevronLeft size={17} />
         </button>
-        <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[160px] -translate-x-1/2 text-center min-[380px]:w-[190px]">
-          <div className="truncate font-serif text-[17px] font-semibold leading-none text-ink min-[380px]:text-[18px]">
-            Sylistly <em className="italic text-accent">Builder</em>
-          </div>
-          <div className="mt-1 text-[9px] font-semibold uppercase tracking-[.16em] text-muted">
-            Build. Refine. Wear.
+        <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[170px] -translate-x-1/2 text-center min-[380px]:w-[200px]">
+          <div className="flex items-baseline justify-center gap-2">
+            <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+            <span className="font-serif text-[17px] font-semibold italic leading-none text-ink min-[380px]:text-[18px]">
+              <span className="text-accent">Remix</span>
+            </span>
           </div>
         </div>
         <div className="relative z-10 flex items-center gap-2">
@@ -1414,7 +1409,7 @@ function BuilderPageContent({
                   type="button"
                   onClick={() => void performBoardSwipe('right')}
                   disabled={generatorLoading || aiRefining || renderN === 0}
-                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(232,54,93,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
+                  className="rounded-full border border-accent/50 bg-accent/14 px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-[0_0_18px_rgba(255,45,109,.2)] transition hover:bg-accent hover:shadow-pink-glow disabled:opacity-50"
                 >
                   Save
                 </button>
@@ -1688,9 +1683,9 @@ function BuilderPageContent({
                   <div className="text-[10px] font-black uppercase tracking-[.18em] text-muted">Style frame</div>
                   <div className="flex flex-wrap justify-center gap-2">
                     {[
-                      { value: 'masc', label: 'Male' },
-                      { value: 'fem', label: 'Female' },
-                      { value: 'androgynous', label: 'Neutral' },
+                      { value: 'masc', label: 'Masc' },
+                      { value: 'fem', label: 'Fem' },
+                      { value: 'androgynous', label: 'Fluid' },
                     ].map((option) => (
                       <button
                         key={option.value}
@@ -1736,7 +1731,7 @@ function BuilderPageContent({
                         onClick={() => toggleGenerationSlot(category)}
                         className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.1em] transition ${
                           selected
-                            ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(232,54,93,.24)]'
+                            ? 'border-accent bg-accent/15 text-white shadow-[0_0_16px_rgba(255,45,109,.24)]'
                             : 'border-white/10 bg-white/[0.03] text-muted-2 hover:border-accent/60 hover:text-ink'
                         }`}
                       >
@@ -1906,14 +1901,14 @@ function FocusedRefinePanel({
                 onClick={() => onFocusCategory(category)}
                 className={`relative w-[68px] flex-none rounded-[16px] border-2 p-1.5 text-left transition active:scale-95 motion-safe:transition-all motion-safe:duration-200 ${
                   lockedSlots.includes(category)
-                    ? 'border-accent bg-accent/18 ring-2 ring-accent/45 shadow-[0_0_28px_rgba(232,54,93,.55)] scale-[1.04]'
+                    ? 'border-accent bg-accent/18 ring-2 ring-accent/45 shadow-[0_0_28px_rgba(255,45,109,.55)] scale-[1.04]'
                     : active
-                    ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(232,54,93,.26)]'
+                    ? 'border-accent bg-accent/12 shadow-[0_0_18px_rgba(255,45,109,.26)]'
                     : 'border-white/8 bg-white/[0.035] hover:border-accent/45'
-                } ${recentChangedSlots.includes(category) ? 'motion-safe:animate-[pulse_.7s_ease-out_1] ring-2 ring-accent/70 shadow-[0_0_26px_rgba(232,54,93,.65)]' : ''}`}
+                } ${recentChangedSlots.includes(category) ? 'motion-safe:animate-[pulse_.7s_ease-out_1] ring-2 ring-accent/70 shadow-[0_0_26px_rgba(255,45,109,.65)]' : ''}`}
               >
                 {lockedSlots.includes(category) ? (
-                  <span className="absolute -right-1.5 -top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.65)] ring-2 ring-[#0e0c0b]">
+                  <span className="absolute -right-1.5 -top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(255,45,109,.65)] ring-2 ring-[#0e0c0b]">
                     <Lock size={11} strokeWidth={3} />
                   </span>
                 ) : null}
@@ -1967,7 +1962,7 @@ function FocusedRefinePanel({
               onClick={() => onToggleLock(activeCategory)}
               className={`absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] transition active:scale-90 motion-safe:transition-all motion-safe:duration-200 ${
                 activeLocked
-                  ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_10px_28px_rgba(232,54,93,.55)] ring-2 ring-white/30'
+                  ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_10px_28px_rgba(255,45,109,.55)] ring-2 ring-white/30'
                   : 'border-[#d8c7b8] bg-white/90 text-[#6c5c52] hover:border-accent hover:text-accent'
               }`}
             >
@@ -2069,7 +2064,7 @@ function BuildOverlay({
               className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-2 transition hover:border-accent hover:text-ink"
               aria-label="Close"
             >
-              x
+              <X size={15} />
             </button>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
@@ -2130,18 +2125,10 @@ function FitDiagnosticsPanel({
 
   return (
     <section className="rounded-[24px] border border-white/8 bg-white/[0.04] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.05)] backdrop-blur">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="font-serif text-[18px] font-semibold text-[#fff6f0]">Fit insight</div>
-          <div className="mt-1 text-[11px] leading-relaxed text-[#a8968b]">
-            {vibeLabel} · {itemCount} piece{itemCount === 1 ? '' : 's'} · real-time feedback.
-          </div>
-        </div>
-        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-accent bg-accent/10 text-center shadow-pink-glow">
-          <div>
-            <div className="font-serif text-[18px] font-semibold leading-none text-white">{analysis.score}</div>
-            <div className="text-[7px] uppercase tracking-[.08em] text-accent">Fit</div>
-          </div>
+      <div>
+        <div className="font-serif text-[18px] font-semibold text-[#fff6f0]">Your look</div>
+        <div className="mt-1 text-[11px] leading-relaxed text-[#a8968b]">
+          {vibeLabel} · {itemCount} piece{itemCount === 1 ? '' : 's'}.
         </div>
       </div>
 
@@ -2157,30 +2144,21 @@ function FitDiagnosticsPanel({
         </div>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <MetricChip label="Color harmony" value={analysis.colorHarmony} detail={analysis.harmonyLabel} />
-        <MetricChip label="Silhouette" value={analysis.silhouette} detail={analysis.silhouetteLabel} />
-        <MetricChip label="Occasion match" value={analysis.layering} detail={analysis.styleDna[0] || 'Styled'} />
-        <MetricChip label="Budget fit" value={analysis.proportions} detail="On target" />
-      </div>
-
-      <div className="mt-3 rounded-[18px] border border-white/8 bg-[#141210] p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex gap-1.5">
-            <HeatChip label="Upper" value={analysis.crowding.upper} />
-            <HeatChip label="Mid" value={analysis.crowding.mid} />
-            <HeatChip label="Lower" value={analysis.crowding.lower} />
+      {analysis.upgradeNote ? (
+        <div className="mt-3 rounded-[18px] border border-white/8 bg-[#141210] p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[.16em] text-champagne">Syli&apos;s tip</span>
+            <button
+              type="button"
+              onClick={onToggleBagLayer}
+              className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9px] uppercase tracking-[.16em] text-[#d7c6bc] transition hover:border-accent"
+            >
+              Bag {bagLayer === 'front' ? 'front' : 'behind'}
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onToggleBagLayer}
-            className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9px] uppercase tracking-[.16em] text-[#d7c6bc] transition hover:border-accent"
-          >
-            Bag {bagLayer === 'front' ? 'front' : 'behind'}
-          </button>
+          <div className="mt-2 text-[11px] leading-relaxed text-[#c7b8ae]">{analysis.upgradeNote}</div>
         </div>
-        <div className="mt-3 text-[11px] leading-relaxed text-[#c7b8ae]">{analysis.upgradeNote}</div>
-      </div>
+      ) : null}
 
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         {analysis.missing.length ? (
@@ -2201,46 +2179,6 @@ function FitDiagnosticsPanel({
         )}
       </div>
     </section>
-  );
-}
-
-function MetricChip({ label, value, detail }: { label: string; value: number; detail: string }) {
-  const isStrong = value >= 74;
-  return (
-    <div className="rounded-[16px] border border-white/8 bg-[#141210] p-2.5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="truncate text-[9px] uppercase tracking-[.14em] text-[#a8968b]">{label}</div>
-        <div className={isStrong ? 'text-[9px] font-semibold text-emerald-300' : 'text-[9px] font-semibold text-accent'}>
-          {isStrong ? 'Great' : 'Refine'}
-        </div>
-      </div>
-      <div className="mt-2 h-1.5 rounded-full bg-white/[0.06]">
-        <div className="h-full rounded-full bg-[linear-gradient(90deg,#e8365d_0%,#ffc9d4_100%)]" style={{ width: `${Math.max(8, Math.min(100, value))}%` }} />
-      </div>
-      <div className="mt-1 truncate text-[10px] text-[#c7b8ae]">{detail}</div>
-    </div>
-  );
-}
-
-function HeatChip({
-  label,
-  value,
-}: {
-  label: string;
-  value: 'calm' | 'balanced' | 'crowded';
-}) {
-  const styles =
-    value === 'crowded'
-      ? 'border-rose-400/35 bg-rose-500/12 text-rose-100'
-      : value === 'balanced'
-      ? 'border-emerald-400/35 bg-emerald-500/12 text-emerald-100'
-      : 'border-white/10 bg-white/[0.05] text-[#eee2da]';
-
-  return (
-    <div className={`rounded-[18px] border px-2.5 py-2 text-center ${styles}`}>
-      <div className="text-[9px] uppercase tracking-[.18em]">{label}</div>
-      <div className="mt-1 text-[11px] font-semibold capitalize">{value}</div>
-    </div>
   );
 }
 

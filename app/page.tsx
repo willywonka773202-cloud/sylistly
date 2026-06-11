@@ -849,9 +849,9 @@ export default function ScrollPage() {
                     <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
                       <Sparkles size={12} />
                     </span>
-                    <span className="text-[10px] font-extrabold uppercase tracking-[.16em] text-accent">Formula</span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-[.16em] text-accent">The fit</span>
                     <span className="text-[12px] font-semibold text-ink">
-                      {look.vibe} / {densityLabel(products.length)}
+                      {meta?.label || 'Look'} · {products.length} pieces
                     </span>
                     <span className="flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2">
                       Why

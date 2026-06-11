@@ -164,9 +164,8 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
         {withheldCount > 0 ? (
           <div
             className="mb-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
-            data-checkout-withheld-search-links={withheldCount}
           >
-            {withheldCount} link{withheldCount !== 1 ? 's need' : ' needs'} refreshing. Reopen this fit from the Feed to update {withheldCount !== 1 ? 'them' : 'it'}.
+            {withheldCount} link{withheldCount !== 1 ? 's need' : ' needs'} refreshing. Reopen this fit from the Scroll to update {withheldCount !== 1 ? 'them' : 'it'}.
           </div>
         ) : null}
 
@@ -209,7 +208,6 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
                       href={wrapAffiliate(product.url)}
                       target="_blank"
                       rel="noreferrer"
-                      data-product-link-kind={isExactProductUrl(product.url) ? 'exact' : 'blocked'}
                       onClick={() =>
                         track('shop_link_clicked', {
                           brand: product.brand,

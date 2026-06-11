@@ -184,9 +184,9 @@ function FrontCanvas({
       onToggleGenerationSlot?.(category);
     };
     const selectedClassName = locked
-      ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.74),0_0_30px_rgba(232,54,93,.36),0_14px_28px_rgba(40,18,22,.14)]'
+      ? 'border-accent shadow-[0_0_0_1px_rgba(255,45,109,.74),0_0_30px_rgba(255,45,109,.36),0_14px_28px_rgba(40,18,22,.14)]'
       : selected
-      ? 'border-accent shadow-[0_0_0_1px_rgba(232,54,93,.58),0_0_26px_rgba(232,54,93,.32),0_14px_28px_rgba(40,18,22,.14)]'
+      ? 'border-accent shadow-[0_0_0_1px_rgba(255,45,109,.58),0_0_26px_rgba(255,45,109,.32),0_14px_28px_rgba(40,18,22,.14)]'
       : product
       // Filled pieces float borderless on the board so the outfit reads as one
       // cohesive flat lay; empty/editable slots keep only a faint outline.
@@ -195,9 +195,9 @@ function FrontCanvas({
     const filledSlotClassName = product
       ? 'bg-transparent shadow-none'
       : 'bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)]';
-    const wrapperClassName = `relative h-full w-full overflow-visible rounded-[20px] border-2 p-1.5 transition ${filledSlotClassName} ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(232,54,93,.42),0_0_24px_rgba(232,54,93,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
+    const wrapperClassName = `relative h-full w-full overflow-visible rounded-[20px] border-2 p-1.5 transition ${filledSlotClassName} ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(255,45,109,.42),0_0_24px_rgba(255,45,109,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
-      <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.42)]">
+      <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(255,45,109,.42)]">
         {locked ? <Lock size={12} strokeWidth={3} /> : <Check size={13} strokeWidth={3} />}
       </span>
     ) : null;
@@ -252,7 +252,7 @@ function FrontCanvas({
             }}
             className={`absolute bottom-1.5 right-1.5 z-10 grid h-6 w-6 place-items-center rounded-full border text-[10px] transition ${
               locked
-                ? 'border-accent bg-accent text-white shadow-[0_6px_16px_rgba(232,54,93,.36)]'
+                ? 'border-accent bg-accent text-white shadow-[0_6px_16px_rgba(255,45,109,.36)]'
                 : 'border-[#d9c9bb] bg-white/82 text-[#6c5c52] hover:border-accent hover:text-accent'
             }`}
           >
@@ -282,9 +282,6 @@ function FrontCanvas({
   return (
     <div
       className="relative h-[390px] overflow-hidden rounded-[24px] border border-[#e8ddd5] bg-[linear-gradient(180deg,#fffdfa_0%,#f7f1eb_100%)] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.92),0_14px_34px_rgba(0,0,0,.1)] min-[390px]:h-[430px]"
-      data-builder-canvas="true"
-      data-builder-scale-system="silhouette-v3"
-      data-builder-transparent-count={transparentCount}
     >
       <div
         className="grid h-full gap-2.5"
@@ -396,7 +393,6 @@ function PreviewImage({
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
-        data-builder-product-image="true"
         data-image-kind="transparent"
         data-product-id={product.id}
         data-product-category={product.category}
@@ -597,7 +593,7 @@ function isColorToken(token: string): boolean {
 
 function hexToRgba(hex: string, alpha: number): string {
   const normalized = hex.replace('#', '');
-  if (normalized.length !== 6) return `rgba(232, 54, 93, ${alpha})`;
+  if (normalized.length !== 6) return `rgba(255,45,109, ${alpha})`;
   const r = Number.parseInt(normalized.slice(0, 2), 16);
   const g = Number.parseInt(normalized.slice(2, 4), 16);
   const b = Number.parseInt(normalized.slice(4, 6), 16);

@@ -41,7 +41,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           That look didn&rsquo;t load.
         </h1>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-2">
-          A hiccup on our end — your saved fits and closet are safe. Give it another try.
+          A hiccup on our end — your saved fits and pieces are safe. Give it another try.
         </p>
       </div>
       <div className="relative flex w-full max-w-[260px] flex-col gap-2.5">
