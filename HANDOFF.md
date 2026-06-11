@@ -12,6 +12,10 @@
 
 ## Log (newest first)
 
+### 2026-06-11 (cont.) — Claude Code — build+check (identity share PAGE → closes the quiz viral loop)
+- Made the quiz identity actually shareable: NEW `/style/[id]` (server page: persona name/tagline/vibe chips + "Find your style" CTA → /) + `/style/[id]/opengraph-image.tsx` (edge; noir typographic identity card). Share text in Onboarding + Profile now links to `${origin}/style/${id}` instead of the app root. Loop: take quiz → share /style/noir-edge → recipient sees branded OG card → taps Find your style → takes quiz → shares theirs.
+- VERIFIED: /style/noir-edge renders, unknown id → 404, OG 200 (86KB, looks premium). tsc clean · build "Compiled successfully" · 0 console errors. Deploying via Vercel remote build.
+
 ### 2026-06-11 (cont.) — Claude Code — build+check (STYLE QUIZ → shareable identity, autonomous)
 - User away ("keep working on what u can") → built the next no-dependency roadmap item: the Style-DNA-style identity quiz.
 - **lib/style-identity.ts**: 8 personas (Street Minimalist, Noir Edge, Editorial Clean, Soft Romantic, Night Luxe, Luxe Sport, Earthy Roamer, Bold Statement), each w/ tagline + favored vibes. `deriveIdentity(answers)` = deterministic lane×palette map (every combo resolves). save/loadIdentity to localStorage.

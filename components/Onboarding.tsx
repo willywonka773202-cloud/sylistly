@@ -111,7 +111,8 @@ export function Onboarding({
 
   async function shareIdentity() {
     if (!identity) return;
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const url = `${origin}/style/${identity.id}`;
     const text = `I'm a ${identity.name} on Sylistly ✨ what's your style?`;
     track('quiz_shared', { identity: identity.id });
     try {
