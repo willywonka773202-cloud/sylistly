@@ -2042,6 +2042,473 @@
       ],
       "formulaLabel": "Campus Cozy",
       "bakedAt": "2026-06-14"
+    },
+    {
+      "id": "syli-2026-06-15-163281861",
+      "vibe": "cozy",
+      "frame": "androgynous",
+      "slots": {
+        "top": "generated-defab0044c18b0b5",
+        "bottom": "generated-0db5a61113828891",
+        "shoes": "drop-ac9095f6e93a7998",
+        "bag": "generated-cc5a592e65a1f88d",
+        "eyewear": "drop-8663a61076d67ff5",
+        "jewelry": "7fb598eee85fa4a6"
+      },
+      "stylingNotes": "A layered, comfortable airport look: soft fleece over a neutral tee and clean black jeans, grounded by walkable Samba sneakers and a compact utility sling—practical, effortless, and warm.",
+      "palette": [
+        "black",
+        "grey",
+        "neutral",
+        "warm"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163281898",
+      "vibe": "cozy",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-61b817e60515ae62",
+        "top": "generated-014ab665198ab354",
+        "bottom": "generated-013d9b4c8cf75eeb",
+        "shoes": "drop-a0e943062190c684",
+        "bag": "generated-34f1213cb358c8a4"
+      },
+      "stylingNotes": "Neutral, functional layers with soft-structured pieces create effortless airport utility—cozy without being sloppy, practical without sacrificing style.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163281935",
+      "vibe": "cozy",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-f8d223bc4cb98659",
+        "top": "drop-f62cb71635fbbbec",
+        "bottom": "drop-d9b8c2bf9f7dae12",
+        "shoes": "drop-e5b6fc99636c992b",
+        "bag": "drop-3f49cd420fb4f308",
+        "jewelry": "drop-1a0f90e0596fd314"
+      },
+      "stylingNotes": "A neutral, layered travel uniform with cozy textures and strategic utility pieces—stretchy pant, capacious tote, and sneakers keep you comfortable through the airport while the cream cardigan and soft beanie add warmth without bulk.",
+      "palette": [
+        "cream",
+        "grey",
+        "black",
+        "tan"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163281972",
+      "vibe": "date",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-c94745f295e8a719",
+        "top": "generated-03e2e80cdff4624f",
+        "bottom": "generated-ff701347a4dc9ded",
+        "shoes": "generated-76b2ba3dbd4e1ab6",
+        "bag": "drop-7e229f66ed316645",
+        "eyewear": "drop-d6b445c3b7a9c48f"
+      },
+      "stylingNotes": "A confident date-night look balancing edgy streetwear (vintage cap, silk shirt) with tailored sophistication (pleated trousers, Italian leather shoes) for a modern, sharp aesthetic.",
+      "palette": [
+        "black",
+        "white",
+        "cream"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282009",
+      "vibe": "date",
+      "frame": "masc",
+      "slots": {
+        "top": "generated-ff800081d78419b4",
+        "bottom": "generated-c92828b35c87e428",
+        "shoes": "drop-a8c65ca302798c2c",
+        "bag": "drop-fce8eac901f8a2e1",
+        "eyewear": "generated-0705a4e40bb11ef7",
+        "jewelry": "drop-83a2c8a40ab5b2f3"
+      },
+      "stylingNotes": "Black leather biker jacket and silk camp shirt anchor an edgy-but-polished night-out date look, grounded by black denim and completed with premium sneakers for effortless cool.",
+      "palette": [
+        "black",
+        "brown",
+        "tan"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282046",
+      "vibe": "date",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-7788ea56c2c2841a",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-ribbed-knit-jersey-tank-women-white-tops-xxl-a7552e267ec5c0",
+        "bottom": "drop-743b276f967a19d3",
+        "shoes": "drop-f0e6802dc43745e9",
+        "bag": "drop-25fcf47bfd59d0f8"
+      },
+      "stylingNotes": "Layered black leather jacket over a crisp white tank with elevated gold shorts and beige ballet flats creates refined date polish—feminine and put-together without trying too hard.",
+      "palette": [
+        "black",
+        "cream",
+        "tan",
+        "gold"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282083",
+      "vibe": "edgy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-aced2433cf49a015",
+        "top": "generated-7dd8cd1b5917c88d",
+        "bottom": "generated-94099fe187498caf",
+        "shoes": "drop-bcf8734b21417213",
+        "bag": "generated-e84568147f40668e",
+        "jewelry": "561d375c28389500"
+      },
+      "stylingNotes": "Techwear silhouettes and cargo details anchor a clean street vibe, with the Air Max providing the sneaker-led foundation—silver jewelry keeps it sharp and minimal.",
+      "palette": [
+        "black",
+        "silver",
+        "blue"
+      ],
+      "formulaLabel": "Sneaker-Led Street",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282120",
+      "vibe": "edgy",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-e3a4ce83cb05a146",
+        "top": "generated-904d55dfcb886a10",
+        "bottom": "generated-d6f6578f74593256",
+        "shoes": "drop-40ca81bdd8aad08a",
+        "bag": "drop-31aa3db8f7e8001a",
+        "eyewear": "generated-0705a4e40bb11ef7"
+      },
+      "stylingNotes": "Black silk and selvedge denim create a sleek foundation; Jordan 14s and Telfar bag elevate the look into premium streetwear territory while the Stüssy cap seals the edgy, sneaker-led vibe.",
+      "palette": [
+        "black",
+        "olive"
+      ],
+      "formulaLabel": "Sneaker-Led Street",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282157",
+      "vibe": "edgy",
+      "frame": "fem",
+      "slots": {
+        "outer": "generated-eff9b32d401d04a0",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117",
+        "shoes": "drop-e4e08db1a6d56b38",
+        "bag": "drop-2cb235c0a68deb88",
+        "eyewear": "generated-b1119060a321f992",
+        "jewelry": "drop-6bf8ca0375829495"
+      },
+      "stylingNotes": "Black techwear base and workwear pants let the Air Max 95 sneaker shine, while oxblood bag and gold jewelry add edgy-luxe attitude to the street look.",
+      "palette": [
+        "black",
+        "burgundy",
+        "gold"
+      ],
+      "formulaLabel": "Sneaker-Led Street",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282194",
+      "vibe": "office",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-830080ddfd38687c",
+        "top": "generated-c8900c9b8c495f8f",
+        "bottom": "generated-3e7299a3d8ed3bef",
+        "shoes": "drop-e9fc67357736967e",
+        "bag": "generated-820f04af8223de06"
+      },
+      "stylingNotes": "Classic old-money knit layering—cable sweater under denim jacket with polished derby shoes and leather briefcase creates an effortlessly polished office look rooted in preppy heritage.",
+      "palette": [
+        "navy",
+        "cream",
+        "black",
+        "tan"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282231",
+      "vibe": "office",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-324047f016b9a2f5",
+        "top": "generated-a5f330aa2aef73b8",
+        "bottom": "generated-5a45df829d3dabd0",
+        "shoes": "drop-b2bf4d0c167f95ba",
+        "bag": "catalog-bag-longchamp-lepliage",
+        "jewelry": "drop-0c19f9538ef0b7be"
+      },
+      "stylingNotes": "A restrained, heritage-driven office look: navy merino crew over tailored grey pleats, anchored by a warm puffer and elevated by a classic Longchamp tote and discreet ALD sneaker.",
+      "palette": [
+        "navy",
+        "grey",
+        "cream"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282268",
+      "vibe": "office",
+      "frame": "fem",
+      "slots": {
+        "hat": "drop-ec01b592617c962f",
+        "top": "drop-46a43e4c174bdff0",
+        "bottom": "generated-2bba290f50bd218c",
+        "shoes": "drop-1a6a1daef1f7baf9",
+        "bag": "drop-7904a489bc3f8072",
+        "eyewear": "drop-8b49c4dfd62a1e33"
+      },
+      "stylingNotes": "Layered knit separates and tailored trousers create timeless, inherited-wealth polish—old-money office done right with iconic loafers and minimal accessories.",
+      "palette": [
+        "cream",
+        "black",
+        "grey",
+        "navy"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282305",
+      "vibe": "preppy",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "drop-cdfaf0a0429f1b9f",
+        "top": "generated-91f9415878d7301d",
+        "bottom": "generated-2e720488d4047c5c",
+        "shoes": "drop-625b02faeb3320f8",
+        "bag": "drop-80290f9ed95e74f4",
+        "eyewear": "drop-92e0d2673d4939a7",
+        "jewelry": "drop-f7c82ebd98b15a7a"
+      },
+      "stylingNotes": "A refined office-smart look that pairs heritage denim with a crisp oxford and trusted sneaker silhouettes, anchored by warm-toned accessories that feel both preppy and contemporary.",
+      "palette": [
+        "white",
+        "blue",
+        "grey",
+        "tan"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282342",
+      "vibe": "preppy",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-4be50de0a894949f",
+        "outer": "generated-e447da2df05695ac",
+        "top": "generated-b1ccefd6f472628c",
+        "bottom": "generated-84d14b00b0877218",
+        "shoes": "f5186afd2ae75287",
+        "bag": "generated-5f8af45b14e9df3d"
+      },
+      "stylingNotes": "A cohesive navy-and-grey palette grounds this outfit in classic preppy office smart-casual—layered pieces work together for polish without formality overreach.",
+      "palette": [
+        "navy",
+        "grey",
+        "white"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282379",
+      "vibe": "preppy",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-fc3ed530ee15b0e1",
+        "top": "drop-2e16164e8878c1a7",
+        "bottom": "drop-da43d14ed1876847",
+        "shoes": "drop-a9fde47f17fdce9e",
+        "bag": "drop-d40a795efab86a1c",
+        "jewelry": "0e0b0d3079442b71"
+      },
+      "stylingNotes": "Structured hat and derby shoes anchor an office-smart look, while the striped shirt and gold-toned jeans read effortlessly preppy; the ALD jacket and cream Telfar bag maintain polish without overdoing it.",
+      "palette": [
+        "tan",
+        "navy",
+        "cream",
+        "gold"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282416",
+      "vibe": "vacation",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-2f2b0aae5796c4da",
+        "top": "drop-8f8d0b34503d6260",
+        "bottom": "drop-3ae9091e99c3dbfb",
+        "shoes": "drop-c825757ba2060d79",
+        "bag": "f0e03ebf14dc8285",
+        "eyewear": "drop-7f9a3f503a6e7b40"
+      },
+      "stylingNotes": "Relaxed utility separates in a neutral palette—trucker hat, tank, ripstop shorts, and minimal sneaker create an effortless airport-to-vacation pipeline with modern polish.",
+      "palette": [
+        "white",
+        "navy",
+        "tan",
+        "grey"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282453",
+      "vibe": "vacation",
+      "frame": "masc",
+      "slots": {
+        "outer": "generated-ac0f8c27a054859b",
+        "top": "drop-801c170d2ea55154",
+        "bottom": "generated-7074a6ec01ba8a43",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9",
+        "bag": "generated-25b77889fee67693",
+        "eyewear": "generated-77f0a397370495bc",
+        "jewelry": "drop-0c19f9538ef0b7be"
+      },
+      "stylingNotes": "Warm earth tones and a cool blue accent create relaxed resort elegance—easy to layer, move in, and transition from day to evening.",
+      "palette": [
+        "tan",
+        "black",
+        "dusty blue"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282490",
+      "vibe": "vacation",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-3224e7e823112440",
+        "outer": "generated-4bf087f0e2cbd4f3",
+        "top": "drop-ba153cdc0bdadec8",
+        "bottom": "drop-5eb057ef0f65bb0b",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+        "bag": "drop-50c32da841acdeff"
+      },
+      "stylingNotes": "Western-inflected vacation look with coordinated denim, warm neutrals, and practical comfort for airport travel—the fringe denim jacket and cowboy hat anchor the vibe while Birkenstocks and a Telfar tote keep things easy and functional.",
+      "palette": [
+        "denim blue",
+        "tan",
+        "cream",
+        "soft pink"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282527",
+      "vibe": "gym",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-0c0ab1bae072e00f",
+        "outer": "searchapi-quality-outer-nike-tech-fleece-nike-men-s-sportswear-tech-fleece-full-zip-hoodie-acbc8321337a32",
+        "top": "drop-6eac646d67ac2356",
+        "bottom": "generated-c75d5b8632505287",
+        "shoes": "d855f06268e8998f",
+        "jewelry": "drop-4c4cada4af701202"
+      },
+      "stylingNotes": "Neutral black-and-grey athletic base with gold accent ring keeps this effortlessly gym-to-errands ready—comfortable, functional, and polished without trying too hard.",
+      "palette": [
+        "black",
+        "grey",
+        "gold"
+      ],
+      "formulaLabel": "Active Errands",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282564",
+      "vibe": "gym",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-1e21647068f4f002",
+        "top": "generated-174ab8837d351a75",
+        "bottom": "generated-a47a20e06a6a38b4",
+        "shoes": "cf644945808d11f8",
+        "bag": "generated-9fad9143c4be392e"
+      },
+      "stylingNotes": "Classic training-day look: athletic basics in black and white with Adidas staples create a cohesive, no-nonsense gym outfit that balances form and function.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282638",
+      "vibe": "street",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-511ac772c809e651",
+        "top": "drop-56938ecfcb1c8abf",
+        "bottom": "generated-b22894d89f039ce7",
+        "shoes": "drop-a3689647bcd29598",
+        "bag": "generated-b0f554833769b78d"
+      },
+      "stylingNotes": "Techwear utility street look: structured techwear coat + tactical cargo + mesh hoodie layers create a cohesive functional aesthetic, anchored in monochromatic darks with the chunky Air Max and nylon crossbody for practical edge.",
+      "palette": [
+        "black",
+        "navy",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-15"
+    },
+    {
+      "id": "syli-2026-06-15-163282675",
+      "vibe": "street",
+      "frame": "masc",
+      "slots": {
+        "top": "generated-6cf6ec203e6b07a9",
+        "bottom": "generated-59bbfa0e038bc22d",
+        "shoes": "catalog-shoes-nike-af1",
+        "bag": "generated-b6e71bd882dd8b5c",
+        "hat": "generated-830080ddfd38687c",
+        "jewelry": "5f0c9a42e1eb6cd1"
+      },
+      "stylingNotes": "Techwear utility streetwear grounded in black/grey with functional cargo silhouette, technical layers, and a sling that reads purpose-built—no statement piece, just clean execution.",
+      "palette": [
+        "black",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-15"
     }
   ]
 }
