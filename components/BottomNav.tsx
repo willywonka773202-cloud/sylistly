@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { dropClaimedToday } from '@/components/DailyDrop';
 import { feedback } from '@/lib/feedback';
+import { useSavedFits } from '@/store/saved-fits';
 
 /**
  * Sylistly primary navigation — a floating editorial pill with five surfaces:
@@ -23,6 +24,12 @@ export function BottomNav() {
   const dropActive = pathname.startsWith('/drop');
   const savedActive = pathname.startsWith('/saved');
   const profileActive = pathname.startsWith('/profile');
+
+  // Live count of saved fits — badges the Saved tab so the collection growing is
+  // visible from anywhere (mirrors the Drop's unclaimed dot). Keyed by count so
+  // it pops on change: the functional "it saved" confirmation. Defaults to 0
+  // pre-hydration (matches SSR), so no badge flashes before the store rehydrates.
+  const savedCount = useSavedFits((state) => state.fits.length);
 
   // Pulse the Drop until today's is claimed; re-check whenever the route changes
   // (so it stops pulsing right after you open it and come back).
@@ -88,7 +95,7 @@ export function BottomNav() {
         <NavTool href="/" label="Scroll" icon={GalleryVerticalEnd} active={scrollActive} />
         <NavTool href="/build" label="Remix" icon={WandSparkles} active={remixActive} />
         <DropTool active={dropActive} unclaimed={dropUnclaimed} />
-        <NavTool href="/saved" label="Saved" icon={Bookmark} active={savedActive} />
+        <NavTool href="/saved" label="Saved" icon={Bookmark} active={savedActive} badge={savedCount} />
         <NavTool href="/profile" label="You" icon={User} active={profileActive} />
       </div>
     </nav>
@@ -130,29 +137,43 @@ function NavTool({
   label,
   icon: Icon,
   active,
+  badge,
 }: {
   href: string;
   label: string;
   icon: typeof User;
   active: boolean;
+  /** Optional count badge (e.g. saved fits). Hidden when 0/undefined. */
+  badge?: number;
 }) {
   const reduce = useReducedMotion();
+  const showBadge = typeof badge === 'number' && badge > 0;
   return (
     <Link
       href={href}
       data-nav-active={active}
       aria-current={active ? 'page' : undefined}
+      aria-label={showBadge ? `${label} — ${badge} saved fit${badge !== 1 ? 's' : ''}` : undefined}
       onClick={() => { if (!active) feedback.save(); }}
       className={`sy-press relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-center transition ${
         active ? 'text-ink' : 'text-muted hover:text-muted-2'
       }`}
     >
       <motion.span
-        className={`grid h-7 w-7 place-items-center rounded-full ${active ? 'text-accent' : 'text-current'}`}
+        className={`relative grid h-7 w-7 place-items-center rounded-full ${active ? 'text-accent' : 'text-current'}`}
         animate={active && !reduce ? { scale: 1.12, y: -1 } : { scale: 1, y: 0 }}
         transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 16 }}
       >
         <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+        {showBadge ? (
+          <span
+            key={badge}
+            aria-hidden
+            className="sy-pop-in absolute -right-2.5 -top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-accent px-1 text-[9px] font-extrabold leading-none text-white ring-2 ring-[#141417]"
+          >
+            {badge > 99 ? '99+' : badge}
+          </span>
+        ) : null}
       </motion.span>
       <span className={`max-w-full truncate text-[11px] font-semibold tracking-wide ${active ? 'text-ink' : ''}`}>
         {label}
