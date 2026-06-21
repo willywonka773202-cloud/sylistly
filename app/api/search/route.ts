@@ -258,7 +258,7 @@ export async function POST(req: NextRequest) {
         .slice(0, SEARCH_RESULT_LIMIT)
         .map((product) => ({
         ...product,
-        affiliateUrl: wrapAffiliate(product.retailerUrl),
+        affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
       }));
 
       return NextResponse.json({
@@ -278,26 +278,26 @@ export async function POST(req: NextRequest) {
     fastIntent.priceMin = explicitPriceMin ?? fastIntent.priceMin ?? null;
     const photoCatalogProducts = searchPhotoCatalog(fastIntent, effectiveQuery).map((product) => ({
       ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
+      affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
     }));
     const dropCatalogProducts = searchDropCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 3).map((product) => ({
       ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
+      affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
     }));
     const searchApiQualityProducts = searchSearchApiQualityCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 4).map((product) => ({
       ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
+      affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
     }));
     const databaseCatalogProducts = (await searchDatabaseCatalog(fastIntent, effectiveQuery, SEARCH_RESULT_LIMIT * 4)).map((product) => ({
       ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
+      affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
     }));
     const useCatalogFirst =
       catalogOnlyMode ||
       (searchMode === 'hybrid' && shouldUseCatalogFirst(effectiveQuery, category, fastIntent.brand));
     const seededCatalogProducts = searchBrandCatalog(fastIntent, effectiveQuery).map((product) => ({
       ...product,
-      affiliateUrl: wrapAffiliate(product.retailerUrl),
+      affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
     }));
     const mergedCatalogProducts = applyExplicitPriceBounds(
       mergeCatalogCandidates(databaseCatalogProducts, dropCatalogProducts, searchApiQualityProducts, photoCatalogProducts, seededCatalogProducts),
@@ -377,7 +377,7 @@ export async function POST(req: NextRequest) {
         .slice(0, SEARCH_RESULT_LIMIT)
         .map((product) => ({
           ...product,
-          affiliateUrl: wrapAffiliate(product.retailerUrl),
+          affiliateUrl: wrapAffiliate(product.retailerUrl, product.id),
         }));
 
       if (categoryFallbackProducts.length) {
@@ -445,7 +445,7 @@ export async function POST(req: NextRequest) {
 
         const products: Product[] = realCommerceProducts(selected.map((p) => ({
           ...p,
-          affiliateUrl: wrapAffiliate(p.retailerUrl),
+          affiliateUrl: wrapAffiliate(p.retailerUrl, p.id),
         })), transparentOnly, exactOnly);
 
         if (products.length) {
