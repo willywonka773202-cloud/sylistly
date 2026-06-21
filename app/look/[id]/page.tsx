@@ -6,6 +6,7 @@ import { ProductImage } from '@/components/ProductImage';
 import { ShareActions } from '@/components/ShareActions';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { wrapAffiliate } from '@/lib/affiliate';
+import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { resolveSharedLook, sharedLookProducts, sharedLookTotalCents } from '@/lib/share-look';
@@ -43,6 +44,14 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
   const products = sharedLookProducts(look);
   const total = sharedLookTotalCents(look);
   const exactCount = products.filter((product) => hasExactProductLink(product)).length;
+  // The fit's colour story as editorial swatch dots — Syli's curated palette
+  // when shared, otherwise derived from the pieces (mirrors the feed).
+  const swatches = (look.palette?.length
+    ? look.palette
+    : derivePalette(products.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase()))
+    .map((word) => ({ word, hex: colorSwatch(word) }))
+    .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
+    .slice(0, 5);
 
   return (
     <main className="relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg px-4 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]">
@@ -86,6 +95,20 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
             {exactCount}/{products.length} shoppable
           </span>
         </div>
+        {swatches.length ? (
+          <div
+            className="mt-3 flex items-center gap-2"
+            aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
+          >
+            {swatches.map((s, i) => (
+              <span
+                key={`${s.word}-${i}`}
+                className="sy-pop-in h-3.5 w-3.5 rounded-full ring-1 ring-black/10 shadow-[0_1px_3px_rgba(0,0,0,.2)]"
+                style={{ background: s.hex, animationDelay: `${i * 70}ms` }}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {/* Pieces — every one a real link */}
