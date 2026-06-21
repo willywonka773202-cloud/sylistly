@@ -36,6 +36,7 @@ import { lookRarity } from '@/lib/look-rarity';
 import { bumpDaily, consumeLevelUp, type LevelState } from '@/lib/stylist-xp';
 import CelebrationBurst from '@/components/CelebrationBurst';
 import { getProductOutboundUrl } from '@/lib/product-links';
+import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { saveIdentity, type StyleAnswers, type StyleIdentity } from '@/lib/style-identity';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
@@ -893,6 +894,14 @@ export default function ScrollPage() {
             const total = lookTotalCents(look.items);
             const exactCount = products.filter((product) => hasExactProductLink(product)).length;
             const rarity = lookRarity(look.items, look.source);
+            // Colour story — Syli looks carry a curated palette; engine looks derive
+            // theirs from the pieces. Render as swatch dots so the fit's palette is visible.
+            const swatches = (look.palette?.length
+              ? look.palette
+              : derivePalette(products.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase()))
+              .map((word) => ({ word, hex: colorSwatch(word) }))
+              .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
+              .slice(0, 5);
             return (
               <div className="relative h-full w-full">
                 {/* Rarity aura — only the top card, only for real tiers */}
@@ -985,6 +994,20 @@ export default function ScrollPage() {
                         {formatPrice(total)}
                       </span>
                     </div>
+                    {swatches.length ? (
+                      <div
+                        className="mt-2 flex items-center gap-1.5"
+                        aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
+                      >
+                        {swatches.map((s, i) => (
+                          <span
+                            key={`${s.word}-${i}`}
+                            className="sy-pop-in h-3 w-3 rounded-full ring-1 ring-white/30 shadow-[0_1px_3px_rgba(0,0,0,.4)]"
+                            style={{ background: s.hex, animationDelay: `${i * 70}ms` }}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                     <p className="mt-1.5 max-w-[42ch] text-[12.5px] leading-snug text-muted-2">
                       {look.source === 'syli' ? (
                         <span className="font-bold uppercase tracking-[.12em] text-champagne">Syli · </span>

@@ -20,7 +20,7 @@ import { normalizeSearchFrame } from '../lib/search-frame';
 import { isVibeAppropriate } from '../lib/vibe-fit';
 import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudgetSnapshot } from '../lib/ai-budget';
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
-import { colorHarmonyScore, colorTokens, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
+import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
@@ -316,6 +316,16 @@ check('colorTokens: real "red dress" matches red', colorTokens('a red dress', AC
 check('colorTokens: "titanium watch" does NOT false-match tan', !colorTokens('titanium watch', NEUTRAL_COLORS).has('tan'));
 check('colorTokens: compound "navy-blue" → navy', colorTokens('navy-blue knit', NEUTRAL_COLORS).has('navy'));
 check('colorHarmony: brown is a NEUTRAL (earth tones coordinate, no clash)', colorHarmonyScore('brown leather boot', 'olive cargo rust knit') >= 0);
+// Palette swatch dots — the "show the colour story in the UI" surface.
+check('colorSwatch: known word → hex', colorSwatch('navy') === '#20304f');
+check('colorSwatch: case-insensitive', colorSwatch('Olive') === colorSwatch('olive'));
+check('colorSwatch: unknown word → null (dot skipped, never errors)', colorSwatch('xyzcolor') === null);
+check('colorSwatch: every scorer colour has a swatch', [...NEUTRAL_COLORS, ...ACCENT_COLORS].every((c) => colorSwatch(c) !== null));
+const derived = derivePalette('olive cargo pant, black tee, cream knit');
+check('derivePalette: accents lead the story (olive first)', derived[0] === 'olive');
+check('derivePalette: includes the neutrals too', derived.includes('black') && derived.includes('cream'));
+check('derivePalette: caps at max (default 4)', derivePalette('red orange green blue purple olive black white').length === 4);
+check('derivePalette: empty text → empty palette', derivePalette('plain pleated trouser').length === 0);
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────
 check('formalityLevel: blazer → 3 (formal)', formalityLevel('navy wool blazer') === 3);

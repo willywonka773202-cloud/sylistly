@@ -39,6 +39,50 @@ export function colorTokens(text: string, palette: string[]): Set<string> {
 }
 
 /**
+ * Representative swatch hex for a palette word — covers every NEUTRAL/ACCENT word
+ * plus the fashion words Syli's curated palettes tend to use. Unknown word → null
+ * so the caller skips that dot (the palette row degrades gracefully, never errors).
+ */
+const COLOR_SWATCH: Record<string, string> = {
+  // neutrals
+  black: '#1a1a1c', white: '#f4f1ea', cream: '#efe7d6', ivory: '#f0e9da',
+  beige: '#d8c7ad', tan: '#c8a878', khaki: '#b3a276', greige: '#c2b6a4',
+  grey: '#9a9a9e', gray: '#9a9a9e', charcoal: '#3a3a3e', stone: '#b8afa3',
+  camel: '#c19a6b', navy: '#20304f', denim: '#51688c', silver: '#c5c7cc',
+  nude: '#e3c4ab', sand: '#d8c4a0', oatmeal: '#ddd2bd', taupe: '#b09a86',
+  brown: '#6b4a33', chocolate: '#4a3122', espresso: '#3a281d', mocha: '#6f4e3a',
+  // accents
+  red: '#b5392f', crimson: '#b21f37', burgundy: '#6b2233', maroon: '#5c2230',
+  pink: '#e89ab0', fuchsia: '#c2317e', rose: '#d98a9a', orange: '#d9772f',
+  rust: '#9e4a2a', coral: '#e3735e', peach: '#f0b89a', yellow: '#e8c75a',
+  mustard: '#c9a234', gold: '#c2a04a', lime: '#a7c044', green: '#4a7c52',
+  olive: '#6b7340', sage: '#9aa988', emerald: '#2f7d5a', teal: '#2f7d80',
+  aqua: '#67c0c4', mint: '#a8d8c0', blue: '#3a6ea5', cobalt: '#2b4d9e',
+  indigo: '#3a3f7a', purple: '#6b4a8c', lavender: '#b9a8d8', lilac: '#c4aed4',
+  plum: '#6e3a5c', violet: '#7a4a9e',
+  // common Syli-palette extras (not in the scorer's word lists)
+  champagne: '#e6d3a8', forest: '#2c4a35', terracotta: '#b5613f', wine: '#5c2230',
+  slate: '#5a6470', blush: '#e8c2c8', cognac: '#9a5a32', caramel: '#b07a40',
+  butter: '#ecd9a0', ecru: '#dcd2bd',
+};
+
+/** Swatch hex for a palette word, or null when the word has no known colour. */
+export function colorSwatch(word: string): string | null {
+  return COLOR_SWATCH[word.toLowerCase()] ?? null;
+}
+
+/**
+ * The colour story of a look, derived from its pieces' text — accents lead (the
+ * statement colours), neutrals ground. Used to render palette swatch dots for
+ * engine looks, which (unlike Syli looks) carry no pre-curated palette.
+ */
+export function derivePalette(text: string, max = 4): string[] {
+  const accents = [...colorTokens(text, ACCENT_COLORS)];
+  const neutrals = [...colorTokens(text, NEUTRAL_COLORS)];
+  return [...accents, ...neutrals].slice(0, max);
+}
+
+/**
  * Score how well a candidate piece's colours coordinate with the colours already
  * in the look. Higher = more coordinated. Magnitudes are tie-breaker-sized (tens)
  * so colour coordinates AMONG vibe-appropriate candidates without overriding
