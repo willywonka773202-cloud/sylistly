@@ -325,6 +325,8 @@ check('formality: athletic-into-formal penalised (negative)', formalityClash < 0
 check('formality: cohesive beats the clash', cohesiveFormal > formalityClash);
 check('fabric: hot+cold weight clash penalised', fabricCoherenceScore('linen shirt', ['wool flannel coat']) < 0);
 check('fabric: same-season → neutral 0', fabricCoherenceScore('linen shirt', ['cotton tee']) === 0);
+check('fabric: "button-down" is NOT cold (no false down-match)', fabricCoherenceScore('button-down oxford', ['linen shorts']) === 0);
+check('fabric: a real puffer + linen IS a clash', fabricCoherenceScore('puffer jacket', ['linen shorts']) < 0);
 
 // ── Auto-ingestion normalizers (scripts/ingest · mapCategory + toCents) ──────
 // mapCategory must ONLY return valid Sylistly categories (no 'dress' — separates app).

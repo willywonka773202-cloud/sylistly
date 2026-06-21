@@ -40,7 +40,9 @@ export function formalityCoherenceScore(candidateText: string, selectedTexts: st
 
 // ── Fabric season: penalise a hot + cold weight clash (linen + flannel) ──────
 const HOT_FABRIC = ['linen', 'seersucker', 'chambray', 'poplin', 'mesh', 'eyelet', 'crochet', 'tropical wool', 'terry'];
-const COLD_FABRIC = ['wool', 'fleece', 'flannel', 'cashmere', 'corduroy', 'down', 'puffer', 'shearling', 'sherpa', 'tweed', 'velvet'];
+// NB no bare 'down' — it false-matches "button-down" (a shirt). Real down-weather
+// pieces are caught by puffer/shearling/fleece + the garment-level season check.
+const COLD_FABRIC = ['wool', 'fleece', 'flannel', 'cashmere', 'corduroy', 'puffer', 'shearling', 'sherpa', 'tweed', 'velvet'];
 
 export function fabricSeason(text: string): 'hot' | 'cold' | 'neutral' {
   if (COLD_FABRIC.some((w) => text.includes(w))) return 'cold';
