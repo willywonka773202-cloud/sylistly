@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy · Sylistly',
+  title: 'Privacy Policy',
   description: 'How Sylistly handles your data — most of it never leaves your device.',
 };
 

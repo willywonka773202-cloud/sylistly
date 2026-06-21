@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service · Sylistly',
+  title: 'Terms of Service',
   description: 'The terms for using Sylistly — a styling tool with real shoppable links.',
 };
 
