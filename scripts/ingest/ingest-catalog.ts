@@ -158,36 +158,45 @@ interface ShopifyProduct {
 /**
  * IMPACT.com Catalog API — Tier 1. Data + pre-tracked deep link (`Url`) together.
  * Env: IMPACT_ACCOUNT_SID, IMPACT_AUTH_TOKEN (HTTP Basic). Per-advertiser approval.
+ *
+ * ItemSearch is a SEARCH endpoint (needs a query), so to grow a BROAD catalog we
+ * sweep across category queries (not a single term). For the very broadest pull,
+ * use the full-catalog `Catalogs/{CatalogId}/Items` endpoint once you know your
+ * catalog ids — see README.
  */
-export async function fromImpact(query = 'dress', maxPages = 5): Promise<IngestRecord[]> {
+const IMPACT_QUERIES = ['shirt', 'sweater', 'knit', 'jacket', 'coat', 'pants', 'jeans', 'shorts', 'skirt', 'shoes', 'sneakers', 'boots', 'dress', 'bag', 'hat', 'sunglasses', 'jewelry'];
+
+export async function fromImpact(queries: string[] = IMPACT_QUERIES, maxPagesPerQuery = 2): Promise<IngestRecord[]> {
   const sid = process.env.IMPACT_ACCOUNT_SID;
   const token = process.env.IMPACT_AUTH_TOKEN;
   if (!sid || !token) return []; // not configured → skipped
   const auth = Buffer.from(`${sid}:${token}`).toString('base64');
   const out: IngestRecord[] = [];
-  for (let page = 1; page <= maxPages; page += 1) {
-    const res = await fetch(
-      `https://api.impact.com/Mediapartners/${sid}/Catalogs/ItemSearch?Query=${encodeURIComponent(query)}&Page=${page}`,
-      { headers: { Authorization: `Basic ${auth}`, Accept: 'application/json' } },
-    );
-    if (!res.ok) break;
-    const data = (await res.json()) as { Items?: ImpactItem[] };
-    const items = data.Items ?? [];
-    if (!items.length) break;
-    for (const it of items) {
-      out.push({
-        id: `impact:${it.CatalogItemId}`,
-        brand: normalizeBrand(it.Manufacturer ?? it.Brand),
-        name: it.Name,
-        priceCents: toCents(it.CurrentPrice),
-        currency: it.Currency || 'USD',
-        category: mapCategory(it.Category),
-        imageUrl: it.ImageUrl ?? '',
-        productUrl: it.Url, // already a tracking deep link
-        source: 'impact',
-        gtin: it.Gtin,
-        inStock: it.StockAvailability ? it.StockAvailability !== 'OutOfStock' : undefined,
-      });
+  for (const query of queries) {
+    for (let page = 1; page <= maxPagesPerQuery; page += 1) {
+      const res = await fetch(
+        `https://api.impact.com/Mediapartners/${sid}/Catalogs/ItemSearch?Query=${encodeURIComponent(query)}&Page=${page}`,
+        { headers: { Authorization: `Basic ${auth}`, Accept: 'application/json' } },
+      );
+      if (!res.ok) break;
+      const data = (await res.json()) as { Items?: ImpactItem[] };
+      const items = data.Items ?? [];
+      if (!items.length) break;
+      for (const it of items) {
+        out.push({
+          id: `impact:${it.CatalogItemId}`,
+          brand: normalizeBrand(it.Manufacturer ?? it.Brand),
+          name: it.Name,
+          priceCents: toCents(it.CurrentPrice),
+          currency: it.Currency || 'USD',
+          category: mapCategory(it.Category),
+          imageUrl: it.ImageUrl ?? '',
+          productUrl: it.Url, // already a tracking deep link
+          source: 'impact',
+          gtin: it.Gtin,
+          inStock: it.StockAvailability ? it.StockAvailability !== 'OutOfStock' : undefined,
+        });
+      }
     }
   }
   return out;
