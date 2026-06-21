@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, RotateCcw, X, Search as SearchIcon } from 'lucide-react';
 import { ProductImage } from './ProductImage';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
+import { cleanProductName } from '@/lib/product-name';
 import { useFit } from '@/store/fit';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
@@ -470,7 +471,7 @@ export function SearchSheet({
                           {renderableProduct ? (
                             <>
                               <div className="truncate text-[8px] uppercase tracking-[.12em] text-[#a9998f]">{renderableProduct.brand}</div>
-                              <div className="truncate text-[9px] text-[#fff6f0]">{renderableProduct.name}</div>
+                              <div className="truncate text-[9px] text-[#fff6f0]">{cleanProductName(renderableProduct.name, renderableProduct.brand)}</div>
                             </>
                           ) : (
                             <div className="text-[11px] leading-snug text-[#c8b9ae]">Search this slot</div>
@@ -769,7 +770,7 @@ export function SearchSheet({
                               <div className="min-w-0">
                                 <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeCandidate.brand}</div>
                                 <div className="mt-1 line-clamp-2 font-serif text-[18px] font-semibold leading-[1.08] text-ink">
-                                  {activeCandidate.name}
+                                  {cleanProductName(activeCandidate.name, activeCandidate.brand)}
                                 </div>
                                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted">
                                   <span className="rounded-full border border-white/10 px-2.5 py-1">{formatPrice(activeCandidate.priceCents)}</span>

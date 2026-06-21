@@ -22,6 +22,7 @@ import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudge
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
 import { tidyNote } from '../lib/note-format';
+import { cleanProductName } from '../lib/product-name';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
@@ -338,6 +339,16 @@ check('tidyNote: trims back to the last complete clause', tidied.endsWith('funct
 check('tidyNote: strips a stray "/> markup fragment', tidyNote('reads unmistakably edgy."/>') === 'reads unmistakably edgy.');
 check('tidyNote: is idempotent', tidyNote(tidied) === tidied);
 check('tidyNote: no-boundary truncation ellipsizes at a word', tidyNote('structuredtechwearsilhouette oversized relaxed contempo').endsWith('…'));
+// Product-name cleanup — 36% of names redundantly repeat their brand.
+check('cleanProductName: strips redundant leading brand', cleanProductName('Aritzia Babaton Notable Viscose Cardigan', 'Aritzia') === 'Babaton Notable Viscose Cardigan');
+check('cleanProductName: strips brand + separator', cleanProductName('New Balance - 550 sneakers', 'New Balance') === '550 sneakers');
+check('cleanProductName: case-insensitive brand match', cleanProductName('CIDER Faux Leather Jacket', 'Cider') === 'Faux Leather Jacket');
+check('cleanProductName: strips trailing size token', cleanProductName('Silk Camp Shirt - Black / XL') === 'Silk Camp Shirt - Black');
+check('cleanProductName: handles brand + size together', cleanProductName('NikeSKIMS MATTE Double Strap Tank - XL', 'NikeSKIMS MATTE') === 'Double Strap Tank');
+check('cleanProductName: leaves a name that does not start with brand', cleanProductName('Original Fit Jeans', "Levi's") === 'Original Fit Jeans');
+check('cleanProductName: never strips name down to empty (name === brand)', cleanProductName('Aritzia', 'Aritzia') === 'Aritzia');
+check('cleanProductName: does NOT strip model codes (MA-1)', cleanProductName('Schott MA-1 Flight Jacket', 'Schott') === 'MA-1 Flight Jacket');
+check('cleanProductName: is idempotent', cleanProductName(cleanProductName('Aritzia Babaton Cardigan', 'Aritzia'), 'Aritzia') === 'Babaton Cardigan');
 
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────

@@ -10,6 +10,7 @@ import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { getBudgetMaxCents, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 import { colorHarmonyScore } from '@/lib/color-harmony';
 import { formalityCoherenceScore, fabricCoherenceScore } from '@/lib/outfit-coherence';
+import { cleanProductName } from '@/lib/product-name';
 
 type GeneratorMode = 'starter' | 'missing' | 'refresh' | 'full';
 
@@ -468,7 +469,13 @@ export function isCleanClientCatalogProduct(product?: Product | null): product i
 }
 
 export const ALL_CATALOG_PRODUCTS: Product[] = sortTransparentFeedRenderableProducts(
-  (clientCatalogData as Product[]).filter(isCleanClientCatalogProduct),
+  (clientCatalogData as Product[])
+    .filter(isCleanClientCatalogProduct)
+    // Clean redundant brand-in-name (36% of names) + trailing size tokens once at
+    // the source, so every surface (feed, builder, saved, shared, AI looks — which
+    // resolve from this array by id) shows polished names. Scoring is unaffected:
+    // productText still has the brand via the separate brand field.
+    .map((product) => ({ ...product, name: cleanProductName(product.name, product.brand) })),
 );
 
 export const CLIENT_CATALOG_PRODUCTS = ALL_CATALOG_PRODUCTS;
