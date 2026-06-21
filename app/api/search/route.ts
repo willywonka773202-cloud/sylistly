@@ -216,7 +216,14 @@ function catalogKindFor({
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as SearchBody;
+  // Tolerate an empty/malformed body — a bad request should degrade to an empty
+  // search, not throw a 500 (and spam the logs with "Unexpected end of JSON input").
+  let body: SearchBody;
+  try {
+    body = (await req.json()) as SearchBody;
+  } catch {
+    body = {} as SearchBody;
+  }
   // Per-client rate limit + global daily cap: either tripping uses the free path.
   const allowAi = allowAiCall(clientKeyFromRequest(req)).allowed && (await aiBudgetAvailableGlobal());
   const query = (body.query || '').slice(0, 200);
