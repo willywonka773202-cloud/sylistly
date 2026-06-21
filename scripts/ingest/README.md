@@ -80,20 +80,32 @@ committed). The orchestrator pulls every enabled source in parallel, normalizes
 to one `IngestRecord`, dedupes GTIN-first (keeping the higher-commission source
 on conflict), and prints a by-source / by-category report.
 
-## Promote to live (the quality gate)
+## Two paths to live — the moat is NOT Higgsfield-gated
 
-Staging is **not** the live catalog, on purpose: raw retailer images are
-lifestyle/model shots, not the feed's premium cutouts. Before a staged product
-ships it must clear:
+A cutout is required ONLY to put a product on the premium worn-flatlay FEED
+(garments composited on the dark vitrine need transparent PNGs). It is NOT
+required to make an ingested product **shoppable** — and shoppable is what earns.
+
+**Path A — premium feed (Higgsfield, owner-supervised).** Best visuals; gated on
+Higgsfield credits + a human-reviewed batch.
 1. **Image → Higgsfield cutout** — `media_import → marketing_studio_image(2k,4:5)
    → remove_background → self-host` (see `sylistly-higgsfield-studio-pipeline`),
    producing `imageTransparentUrl`.
 2. **Quality gate** — `isCleanClientCatalogProduct` (transparent cutout + real
    commerce link + not a multi-item set).
 3. **Map → `Product`** + merge into `data/client-catalog.json`, then
-   `npm run catalog:client`.
+   `npm run catalog:client`. This gate keeps the feed editorial-grade at scale.
 
-That gate is why the live feed stays editorial-grade even as ingestion scales.
+**Path B — native-image "Explore / Shop Brands" surface (no Higgsfield, immediate).**
+The fastest "growth = revenue" path. Render ingested products on white cards
+(like the existing `/browse` grid) using their NATIVE retailer image + the
+affiliate-wrapped `productUrl`. No cutout needed → the catalog can grow
+**shoppable inventory (= commission) the day ingestion is wired**, while Path A is
+reserved for the hero feed. Minimal build: a new `/explore` route that reads a
+promoted subset of `data/ingested-staging.json` and reuses `wrapAffiliate` +
+the in-app browser. **This is the recommendation for turning the moat into
+revenue immediately** — it's a product/IA decision for the owner, so it's
+proposed here rather than built blind.
 
 ## What's left for the owner (turns this from infra → revenue)
 1. **Sign up as a publisher on Impact + Awin**, apply to fashion advertisers, set

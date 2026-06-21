@@ -24,8 +24,12 @@ and the catalog — and the commission base — grows automatically, nightly.
 
 - Data layer: Impact/Awin/Rakuten feeds + Shopify long-tail + aggregators.
 - Money layer: every link is commissionable (network deep link, or Skimlinks-wrapped).
-- Quality gate: ingested products pass through the Higgsfield cutout pipeline +
-  an editorial quality filter before they ship — so scale never cheapens the feed.
+- **Revenue is NOT gated on AI visuals.** A cutout is only needed for the premium
+  worn-flatlay feed; an ingested product is *shoppable* with its native image. So
+  a native-image "Explore / Shop Brands" surface earns commission the day
+  ingestion is wired (Path B), while the Higgsfield cutout pipeline (Path A) is
+  reserved for the hero feed's editorial polish. Growth → revenue starts now, not
+  after the visual pipeline. (See `scripts/ingest/README.md` → "Two paths to live".)
 - Detail: `scripts/ingest/README.md`.
 
 ### 2. Taste, not just a feed: genuinely smart outfit selection
