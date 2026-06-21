@@ -58,6 +58,19 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'components/InAppBrowser.tsx', text: 'wrapAffiliate', label: 'in-app browser opens the affiliate-wrapped page (commission-safe)' },
   { file: 'app/page.tsx', text: 'InAppBrowser', label: 'feed opens retailer links in the in-app browser sheet' },
   { file: 'app/build/page.tsx', text: 'shop_link_clicked', label: 'builder shop CTA tracks the revenue funnel' },
+  // FTC compliance — the affiliate disclosure is LEGALLY REQUIRED on every shop
+  // surface; a refactor must not silently drop it from any of them.
+  { file: 'components/AffiliateDisclosure.tsx', text: 'commission', label: 'affiliate disclosure carries the FTC copy' },
+  { file: 'components/PiecePeek.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the piece-peek shop CTA' },
+  { file: 'components/CheckoutSheet.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the checkout sheet' },
+  { file: 'app/checkout/page.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the checkout page' },
+  { file: 'app/look/[id]/page.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the shared-look page' },
+  { file: 'components/InAppBrowser.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the in-app browser' },
+  { file: 'components/SearchSheet.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure in the builder search' },
+  { file: 'app/build/page.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the builder shop' },
+  // Catalog display hygiene — names cleaned of redundant brand, feed shows the palette.
+  { file: 'lib/client-catalog.ts', text: 'cleanProductName', label: 'catalog cleans redundant brand-in-name' },
+  { file: 'app/page.tsx', text: 'lookSwatches', label: 'feed renders palette swatch dots + love-burst colours' },
   // The reveal count-up must keep its backstop so a stalled rAF never shows $0.
   { file: 'components/AnimatedNumber.tsx', text: 'setTimeout', label: 'AnimatedNumber keeps the $0-proof backstop' },
   // Load-bearing technical foundations — easy to break in a refactor.
