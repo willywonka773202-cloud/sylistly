@@ -109,7 +109,7 @@ export default function DiscoverPage() {
                   {swatches.length >= 2 ? (
                     <div
                       className="mb-1.5 flex items-center gap-1.5"
-                      aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
+                      aria-label={`Color palette: ${swatches.map((s) => s.word).join(', ')}`}
                     >
                       {swatches.map((s, di) => (
                         <span
