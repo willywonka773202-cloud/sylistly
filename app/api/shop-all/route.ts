@@ -7,10 +7,13 @@ import { getProductOutboundUrl } from '@/lib/product-links';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
-  const { fitId, productIds } = (await req.json()) as {
-    fitId?: string;
-    productIds?: string[];
-  };
+  let parsed: { fitId?: string; productIds?: string[] };
+  try {
+    parsed = (await req.json()) as { fitId?: string; productIds?: string[] };
+  } catch {
+    return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
+  }
+  const { fitId, productIds } = parsed;
 
   let ids: string[] = productIds || [];
 

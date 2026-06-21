@@ -126,7 +126,12 @@ function normalizeCategory(value: unknown): Category | null {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as LookBody;
+  let body: LookBody;
+  try {
+    body = (await req.json()) as LookBody;
+  } catch {
+    return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
+  }
   const vibe = normalizeVibe(body.vibe);
   const frame = normalizeFrame(body.frame);
   const budget = normalizeBudget(body.budget);

@@ -13,7 +13,12 @@ interface CreateFitBody {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as CreateFitBody;
+  let body: CreateFitBody;
+  try {
+    body = (await req.json()) as CreateFitBody;
+  } catch {
+    return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
+  }
   const ids = Object.values(body.items || {}).filter(Boolean) as string[];
   if (!ids.length) {
     return NextResponse.json({ error: 'empty_fit' }, { status: 400 });
