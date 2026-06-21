@@ -149,6 +149,8 @@ check(
   'wrapAffiliate: skimlinks env → wraps via go.skimresources',
   wrapAffiliate(rawUrl).startsWith('https://go.skimresources.com/?id=pub123&url='),
 );
+check('wrapAffiliate: subId → xcust attribution token appended', wrapAffiliate(rawUrl, 'prod-123').includes('&xcust=prod-123'));
+check('wrapAffiliate: no subId → no xcust (backward-compatible)', !wrapAffiliate(rawUrl).includes('xcust'));
 // Rakuten partner (nordstrom) still has a PLACEHOLDER advertiser id → must be
 // skipped (no broken linksynergy links), falling through to skimlinks.
 check(

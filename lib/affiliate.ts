@@ -28,11 +28,19 @@ function rakutenAffiliateId(): string | undefined {
   return process.env.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID?.trim() || process.env.RAKUTEN_AFFILIATE_ID?.trim();
 }
 
-export function wrapAffiliate(url: string): string {
+/**
+ * Wrap a raw retailer URL with affiliate tracking. `subId` (e.g. a product id)
+ * is passed through as the network's per-click custom tracking token — Skimlinks
+ * `xcust`, Rakuten `u1` — so once the keys are live you get CONVERSION
+ * ATTRIBUTION (which product/look actually drove the sale). Optional + appended
+ * only when present, so existing callers and links are unchanged.
+ */
+export function wrapAffiliate(url: string, subId?: string): string {
   try {
     const u = new URL(url);
     if (u.protocol !== 'http:' && u.protocol !== 'https:') return url;
     const host = u.hostname.replace(/^www\./, '');
+    const sub = subId ? subId.trim() : '';
 
     const rakutenId = Object.entries(RAKUTEN_PARTNERS).find(([domain]) => host.endsWith(domain))?.[1];
     const rakutenAffiliate = rakutenAffiliateId();
@@ -42,13 +50,15 @@ export function wrapAffiliate(url: string): string {
         `https://click.linksynergy.com/deeplink` +
         `?id=${rakutenAffiliate}` +
         `&mid=${rakutenId}` +
-        `&murl=${encodeURIComponent(url)}`
+        `&murl=${encodeURIComponent(url)}` +
+        (sub ? `&u1=${encodeURIComponent(sub)}` : '')
       );
     }
 
     const skim = skimlinksId();
     if (skim) {
-      return `https://go.skimresources.com/?id=${skim}&url=${encodeURIComponent(url)}`;
+      return `https://go.skimresources.com/?id=${skim}&url=${encodeURIComponent(url)}` +
+        (sub ? `&xcust=${encodeURIComponent(sub)}` : '');
     }
 
     return url;
@@ -58,5 +68,6 @@ export function wrapAffiliate(url: string): string {
 }
 
 export function wrapAll(urls: string[]): string[] {
-  return urls.map(wrapAffiliate);
+  // Explicit arrow — don't pass map's index as wrapAffiliate's subId.
+  return urls.map((url) => wrapAffiliate(url));
 }

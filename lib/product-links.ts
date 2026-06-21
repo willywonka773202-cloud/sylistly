@@ -38,5 +38,7 @@ export function getProductOutboundUrl(product: Product): string {
  * checks (host, isExactProductUrl), which must see the real retailer URL.
  */
 export function getShoppableUrl(product: Product): string {
-  return wrapAffiliate(getProductOutboundUrl(product));
+  // Pass the product id as the affiliate sub-id → per-product conversion
+  // attribution once the keys are live (which products actually sell).
+  return wrapAffiliate(getProductOutboundUrl(product), product.id);
 }
