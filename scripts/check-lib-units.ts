@@ -22,6 +22,7 @@ import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudge
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore } from '../lib/color-harmony';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
+import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
 
 // Minimal in-memory localStorage so the storage-backed XP/quest logic runs in
@@ -320,6 +321,20 @@ check('formality: athletic-into-formal penalised (negative)', formalityClash < 0
 check('formality: cohesive beats the clash', cohesiveFormal > formalityClash);
 check('fabric: hot+cold weight clash penalised', fabricCoherenceScore('linen shirt', ['wool flannel coat']) < 0);
 check('fabric: same-season → neutral 0', fabricCoherenceScore('linen shirt', ['cotton tee']) === 0);
+
+// ── Auto-ingestion normalizers (scripts/ingest · mapCategory + toCents) ──────
+// mapCategory must ONLY return valid Sylistly categories (no 'dress' — separates app).
+const VALID_CATS = new Set<string>(['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry']);
+for (const raw of ['Dresses', 'gown', 'jumpsuit', 'dress shirt', 'dress pant', 'dress boot', 'Sneakers', 'Handbags', 'Sunglasses', 'Beanie', 'qqzz']) {
+  check(`mapCategory("${raw}") → valid category`, VALID_CATS.has(mapCategory(raw)));
+}
+check('mapCategory: "dress shirt" → top (not dress)', mapCategory('dress shirt') === 'top');
+check('mapCategory: "dress pant" → bottom', mapCategory('dress pant') === 'bottom');
+check('mapCategory: "summer dress" → top (no dress category)', mapCategory('summer dress') === 'top');
+check('mapCategory: "leather handbag" → bag', mapCategory('leather handbag') === 'bag');
+check('toCents: "$19.99" → 1999', toCents('$19.99') === 1999);
+check('toCents: "1,250.00" → 125000', toCents('1,250.00') === 125000);
+check('toCents: undefined → 0', toCents(undefined) === 0);
 
 // NOTE: streak logic (lib/drop-vault) + isExactProductUrl (lib/checkout) are
 // covered by live QA, not here — they transitively import modules via the `@/`

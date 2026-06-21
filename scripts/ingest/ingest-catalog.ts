@@ -61,8 +61,10 @@ export function mapCategory(raw: string | undefined | null): string {
   if (/hat|cap|beanie|headwear|bucket/.test(t)) return 'hat';
   if (/sunglass|eyewear|glasses/.test(t)) return 'eyewear';
   if (/jewel|necklace|ring|bracelet|earring|watch/.test(t)) return 'jewelry';
-  if (/dress|gown|jumpsuit/.test(t)) return 'dress';
   if (/shirt|tee|top|sweater|knit|hoodie|blouse|cardigan|polo|tank/.test(t)) return 'top';
+  // NB Sylistly composes SEPARATES — there is no 'dress' category. Dresses/gowns/
+  // jumpsuits fall to 'top' (a valid placeholder); the promote step decides whether
+  // to keep them. ("dress shirt/pant/boot" already matched top/bottom/shoes above.)
   return 'top'; // safe default; the promote step can re-classify with vision
 }
 
