@@ -21,6 +21,7 @@ import { isVibeAppropriate } from '../lib/vibe-fit';
 import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudgetSnapshot } from '../lib/ai-budget';
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore } from '../lib/color-harmony';
+import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import type { Category, Product } from '../lib/types';
 
 // Minimal in-memory localStorage so the storage-backed XP/quest logic runs in
@@ -307,6 +308,18 @@ check('colorHarmony: neutral anchor scores positive', neutralAnchor > 0);
 check('colorHarmony: tonal repeat beats a 3-accent clash', tonalRepeat > thirdAccentClash);
 check('colorHarmony: a 3rd distinct accent is penalised (negative)', thirdAccentClash < 0);
 check('colorHarmony: neutral anchor beats the clash', neutralAnchor > thirdAccentClash);
+
+// ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────
+check('formalityLevel: blazer → 3 (formal)', formalityLevel('navy wool blazer') === 3);
+check('formalityLevel: hoodie → 0 (athletic)', formalityLevel('fleece hoodie') === 0);
+check('formalityLevel: unmatched → 1 (casual default)', formalityLevel('zzz wibble') === 1);
+const cohesiveFormal = formalityCoherenceScore('oxford shirt', ['tailored trouser', 'leather loafer']); // all formal
+const formalityClash = formalityCoherenceScore('running sneaker', ['tailored trouser', 'dress shirt']); // athletic into formal
+check('formality: cohesive band scores positive', cohesiveFormal > 0);
+check('formality: athletic-into-formal penalised (negative)', formalityClash < 0);
+check('formality: cohesive beats the clash', cohesiveFormal > formalityClash);
+check('fabric: hot+cold weight clash penalised', fabricCoherenceScore('linen shirt', ['wool flannel coat']) < 0);
+check('fabric: same-season → neutral 0', fabricCoherenceScore('linen shirt', ['cotton tee']) === 0);
 
 // NOTE: streak logic (lib/drop-vault) + isExactProductUrl (lib/checkout) are
 // covered by live QA, not here — they transitively import modules via the `@/`

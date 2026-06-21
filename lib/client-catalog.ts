@@ -9,6 +9,7 @@ import { hasFrameMismatch } from '@/lib/frame-inference';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { getBudgetMaxCents, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 import { colorHarmonyScore } from '@/lib/color-harmony';
+import { formalityCoherenceScore, fabricCoherenceScore } from '@/lib/outfit-coherence';
 
 type GeneratorMode = 'starter' | 'missing' | 'refresh' | 'full';
 
@@ -418,7 +419,8 @@ function scoreClientVibeFit(product: Product, vibe: VibeId): number {
 function scoreClientCompatibility(product: Product, vibe: VibeId, selectedProducts: Product[] = []): number {
   if (!selectedProducts.length) return 0;
   const text = productText(product);
-  const selected = selectedProducts.map(productText).join(' ');
+  const selectedTexts = selectedProducts.map(productText);
+  const selected = selectedTexts.join(' ');
   const selectedHas = (terms: string[]) => hasAnyTerm(selected, terms);
   const productHas = (terms: string[]) => hasAnyTerm(text, terms);
   let score = 0;
@@ -434,6 +436,8 @@ function scoreClientCompatibility(product: Product, vibe: VibeId, selectedProduc
   if ((vibe === 'night' || vibe === 'date') && productHas(['running', 'gym', 'workout', 'sweatpants'])) score -= 50;
 
   score += colorHarmonyScore(text, selected);
+  score += formalityCoherenceScore(text, selectedTexts);
+  score += fabricCoherenceScore(text, selectedTexts);
   return score;
 }
 
