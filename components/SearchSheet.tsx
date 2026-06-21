@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, RotateCcw, X, Search as SearchIcon } from 'lucide-react';
 import { ProductImage } from './ProductImage';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
-import { cleanProductName } from '@/lib/product-name';
+import { cleanProductName, cleanBrand } from '@/lib/product-name';
 import { useFit } from '@/store/fit';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
@@ -470,7 +470,7 @@ export function SearchSheet({
                         <div className="mt-1 min-h-[20px]">
                           {renderableProduct ? (
                             <>
-                              <div className="truncate text-[8px] uppercase tracking-[.12em] text-[#a9998f]">{renderableProduct.brand}</div>
+                              <div className="truncate text-[8px] uppercase tracking-[.12em] text-[#a9998f]">{cleanBrand(renderableProduct.brand)}</div>
                               <div className="truncate text-[9px] text-[#fff6f0]">{cleanProductName(renderableProduct.name, renderableProduct.brand)}</div>
                             </>
                           ) : (
@@ -768,7 +768,7 @@ export function SearchSheet({
                           <div className="px-4 pb-4 pt-0">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
-                                <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{activeCandidate.brand}</div>
+                                <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{cleanBrand(activeCandidate.brand)}</div>
                                 <div className="mt-1 line-clamp-2 font-serif text-[18px] font-semibold leading-[1.08] text-ink">
                                   {cleanProductName(activeCandidate.name, activeCandidate.brand)}
                                 </div>

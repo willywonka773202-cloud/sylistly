@@ -22,7 +22,7 @@ import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudge
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
 import { tidyNote } from '../lib/note-format';
-import { cleanProductName } from '../lib/product-name';
+import { cleanProductName, cleanBrand } from '../lib/product-name';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
@@ -349,6 +349,13 @@ check('cleanProductName: leaves a name that does not start with brand', cleanPro
 check('cleanProductName: never strips name down to empty (name === brand)', cleanProductName('Aritzia', 'Aritzia') === 'Aritzia');
 check('cleanProductName: does NOT strip model codes (MA-1)', cleanProductName('Schott MA-1 Flight Jacket', 'Schott') === 'MA-1 Flight Jacket');
 check('cleanProductName: is idempotent', cleanProductName(cleanProductName('Aritzia Babaton Cardigan', 'Aritzia'), 'Aritzia') === 'Babaton Cardigan');
+// Brand cleanup — 4.4% of brands are domains shown as brand names.
+check('cleanBrand: strips TLD + title-cases lowercase root', cleanBrand('farfetch.com') === 'Farfetch');
+check('cleanBrand: preserves camelCase root', cleanBrand('CustomLids.com') === 'CustomLids');
+check('cleanBrand: preserves legit lowercase brands (adidas)', cleanBrand('adidas') === 'adidas');
+check('cleanBrand: preserves dotted brands (A.P.C.)', cleanBrand('A.P.C.') === 'A.P.C.');
+check('cleanBrand: leaves a normal brand untouched', cleanBrand('New Balance') === 'New Balance');
+check('cleanBrand: is idempotent', cleanBrand(cleanBrand('farfetch.com')) === 'Farfetch');
 
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────

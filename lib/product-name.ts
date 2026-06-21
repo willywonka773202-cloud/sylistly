@@ -29,3 +29,20 @@ export function cleanProductName(name: string, brand?: string): string {
 
   return n || name;
 }
+
+/**
+ * Clean a brand for display. 4.4% of catalog brands are DOMAINS shown as brand
+ * names ("farfetch.com", "allvaron.com") — reads like scraped data next to the
+ * editorial eyebrow. Strip the TLD; title-case only an all-lowercase root (so
+ * "farfetch.com" → "Farfetch" but camel-cased "CustomLids.com" → "CustomLids").
+ * Non-domain brands pass through UNCHANGED — preserving legitimately stylised
+ * lowercase brands (adidas, lululemon) and dotted brands (A.P.C.).
+ */
+export function cleanBrand(brand: string): string {
+  const b = (brand || '').trim();
+  if (!b) return brand;
+  const m = b.match(/^([a-z0-9][a-z0-9-]*)\.(com|co|net|org|shop|store|us|io)\b.*$/i);
+  if (!m) return b;
+  const root = m[1];
+  return root === root.toLowerCase() ? root.charAt(0).toUpperCase() + root.slice(1) : root;
+}
