@@ -254,6 +254,14 @@ const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
   'generated-1d67b8e90048eb0f',     // Lorenzo Uomo Merino Crew Neck — faint ghost smudge, no garment
   'drop-8f8d0b34503d6260',          // Made Some "GREECE" Tank (white) — body removed, only blue trim+text left
   'catalog-bag-longchamp-lepliage', // Longchamp Le Pliage Tote — bag body removed, only handle+flap float
+  // Cap STORAGE cases/carriers mis-categorized as "hat" (their name starts with
+  // "Cap"). They're hard-shell luggage with handles/straps — not wearable — so the
+  // generator put a cap-carrying CASE on the head. Found via the generator-variety
+  // test (categoryMismatch). Hat is optional, so the 7 baked looks using one just
+  // drop the wrong hat and survive.
+  'generated-6047341e99203a19', // New Era 6-Pack Fitted Cap Carriers (hard case)
+  'generated-ca3f8766e86b9338', // Lids Cap Travel Case (open case w/ caps + strap)
+  'generated-1e21647068f4f002', // New Era Oakland A's 6-Pack Cap Carrier (case)
 ]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
