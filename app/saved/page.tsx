@@ -481,7 +481,7 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
   return (
     <div className="grid grid-cols-2 gap-3">
       {items.map(({ product }) => {
-        const url = wrapAffiliate(getProductOutboundUrl(product));
+        const url = wrapAffiliate(getProductOutboundUrl(product), product.id); // attribute saved-piece conversions
         const exact = hasExactProductLink(product);
         return (
           <div

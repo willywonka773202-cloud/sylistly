@@ -91,7 +91,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
       {/* Pieces — every one a real link */}
       <div className="mt-5 grid gap-2">
         {products.map((product) => {
-          const url = wrapAffiliate(getProductOutboundUrl(product));
+          const url = wrapAffiliate(getProductOutboundUrl(product), product.id); // attribute shared-look conversions
           return (
             <div
               key={product.id}
