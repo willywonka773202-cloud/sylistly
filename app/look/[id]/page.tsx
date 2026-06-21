@@ -8,6 +8,7 @@ import { WornFlatlay } from '@/components/WornFlatlay';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { colorSwatch, derivePalette } from '@/lib/color-harmony';
+import { tidyNote } from '@/lib/note-format';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { resolveSharedLook, sharedLookProducts, sharedLookTotalCents } from '@/lib/share-look';
@@ -27,7 +28,7 @@ export async function generateMetadata({
   const products = sharedLookProducts(look);
   const total = formatPrice(sharedLookTotalCents(look));
   const description =
-    look.note ||
+    (look.note && tidyNote(look.note)) ||
     `${products.length} real pieces, ${total} total — every one shoppable on Sylistly.`;
   return {
     title: `${look.title} · ${total}`,
@@ -84,7 +85,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
         {look.note ? (
           <>
             <p className="text-eyebrow font-extrabold uppercase text-champagne">Syli&apos;s note</p>
-            <p className="mt-1 text-[13px] font-medium leading-snug text-muted-2">{look.note}</p>
+            <p className="mt-1 text-[13px] font-medium leading-snug text-muted-2">{tidyNote(look.note)}</p>
           </>
         ) : null}
         <div className="mt-2 flex items-baseline gap-3">

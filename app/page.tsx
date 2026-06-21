@@ -37,6 +37,7 @@ import { bumpDaily, consumeLevelUp, type LevelState } from '@/lib/stylist-xp';
 import CelebrationBurst from '@/components/CelebrationBurst';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { colorSwatch, derivePalette } from '@/lib/color-harmony';
+import { tidyNote } from '@/lib/note-format';
 import { saveIdentity, type StyleAnswers, type StyleIdentity } from '@/lib/style-identity';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
@@ -1012,7 +1013,7 @@ export default function ScrollPage() {
                       {look.source === 'syli' ? (
                         <span className="font-bold uppercase tracking-[.12em] text-champagne">Syli · </span>
                       ) : null}
-                      {look.source === 'syli' && look.note ? look.note : syliNote(look)}
+                      {look.source === 'syli' && look.note ? tidyNote(look.note) : syliNote(look)}
                     </p>
                     <p className="mt-1.5 text-[11px] font-semibold text-muted">
                       {products.length} pieces · {exactCount}/{products.length} shoppable · tap a piece to shop

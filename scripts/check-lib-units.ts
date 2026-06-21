@@ -21,6 +21,7 @@ import { isVibeAppropriate } from '../lib/vibe-fit';
 import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudgetSnapshot } from '../lib/ai-budget';
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
+import { tidyNote } from '../lib/note-format';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
@@ -326,6 +327,18 @@ check('derivePalette: accents lead the story (olive first)', derived[0] === 'oli
 check('derivePalette: includes the neutrals too', derived.includes('black') && derived.includes('cream'));
 check('derivePalette: caps at max (default 4)', derivePalette('red orange green blue purple olive black white').length === 4);
 check('derivePalette: empty text → empty palette', derivePalette('plain pleated trouser').length === 0);
+// Styling-note tidy — a few baked notes were hard-cut to 240 chars mid-word.
+const cleanNote = 'Cool neutrals and nautical accents create a refined, understated old-money aesthetic.';
+check('tidyNote: a complete sentence passes through unchanged', tidyNote(cleanNote) === cleanNote);
+const cutNote = 'A cohesive techwear look grounded in black, oversized nylon pant balances structure, sling bag brings functional hardware, and oversized frames complete the edgy minim';
+const tidied = tidyNote(cutNote);
+check('tidyNote: drops the mid-word truncated tail ("minim")', !tidied.includes('minim'));
+check('tidyNote: ends on terminal punctuation', /[.!?…]$/.test(tidied));
+check('tidyNote: trims back to the last complete clause', tidied.endsWith('functional hardware.'));
+check('tidyNote: strips a stray "/> markup fragment', tidyNote('reads unmistakably edgy."/>') === 'reads unmistakably edgy.');
+check('tidyNote: is idempotent', tidyNote(tidied) === tidied);
+check('tidyNote: no-boundary truncation ellipsizes at a word', tidyNote('structuredtechwearsilhouette oversized relaxed contempo').endsWith('…'));
+
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────
 check('formalityLevel: blazer → 3 (formal)', formalityLevel('navy wool blazer') === 3);
