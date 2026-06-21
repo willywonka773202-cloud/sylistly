@@ -110,6 +110,9 @@ export function Onboarding({
   });
 
   function answer(question: Question, value: string) {
+    // Per-step funnel signal — reveals WHERE users drop off in onboarding
+    // (activation is the key early metric; quiz_completed only catches finishers).
+    track('quiz_step', { step: step + 1, total: QUESTIONS.length, key: question.key });
     const next = { ...answers, [question.key]: value } as Partial<StyleAnswers>;
     setAnswers(next);
     const isLast = step === QUESTIONS.length - 1;
@@ -180,12 +183,12 @@ export function Onboarding({
             <div className="sy-stagger flex flex-col">
               <button
                 type="button"
-                onClick={() => setStep(0)}
+                onClick={() => { track('quiz_started'); setStep(0); }}
                 className="sy-cta-primary w-full px-5 py-4 text-[13px] font-bold uppercase tracking-[.14em]"
               >
                 Find my style
               </button>
-              <button type="button" onClick={onSkip} className="mt-3 py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
+              <button type="button" onClick={() => { track('quiz_skipped', { step: 0 }); onSkip(); }} className="mt-3 py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
                 Skip — just start scrolling
               </button>
             </div>
@@ -247,7 +250,7 @@ export function Onboarding({
                     <ArrowLeft size={14} />
                     Back
                   </button>
-                  <button type="button" onClick={onSkip} className="py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
+                  <button type="button" onClick={() => { track('quiz_skipped', { step: step + 1 }); onSkip(); }} className="py-2 text-[12px] font-semibold uppercase tracking-[.14em] text-muted">
                     Skip
                   </button>
                 </div>
