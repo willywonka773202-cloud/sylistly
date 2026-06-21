@@ -1,5 +1,6 @@
 import clientCatalogData from '@/data/client-catalog.json';
 import {
+  hasExactProductLink,
   hasProductCommerceLink,
   isEditorialCutoutProduct,
   isMultiItemSetProduct,
@@ -532,6 +533,11 @@ function scoreProduct(product: Product, {
   if (Number.isFinite(maxCents) && product.priceCents > maxCents) score -= 80 + Math.min(60, Math.round((product.priceCents - maxCents) / 1500));
   if (product.priceCents > 0) score += 4;
   if (product.imageQuality === 'good') score += 18;
+  // Prefer directly-shoppable pieces (a real product page) over google-shopping
+  // search fallbacks, so generated looks have a higher "X/N shoppable" ratio —
+  // more pieces a user can actually buy (~55% of the catalog lacks a direct
+  // link). Modest (tie-breaker) so it never overrides vibe (+36) or coordination.
+  if (hasExactProductLink(product)) score += 14;
   if (product.metadata?.featured) score += 8;
   if (product.vibes?.includes(vibe) || product.occasions?.includes(vibe)) score += 36;
   if (text.includes(vibe)) score += 18;
