@@ -38,6 +38,7 @@ export function FitDeck<T extends DeckItem>({
   onSwipe,
   onShop,
   renderCard,
+  burstColors,
 }: {
   /** Visible window of the deck, top card first. */
   cards: T[];
@@ -46,6 +47,8 @@ export function FitDeck<T extends DeckItem>({
   /** Shop the top look (button); optional. */
   onShop?: (card: T) => void;
   renderCard: (card: T, isTop: boolean) => ReactNode;
+  /** Palette hexes for the love-commit burst, so a fit celebrates in its own colours. */
+  burstColors?: (card: T) => string[];
 }) {
   // The top card registers its fling fn here so the Pass/Love buttons can drive it.
   const flingRef = useRef<((dir: 'right' | 'left') => void) | null>(null);
@@ -79,6 +82,7 @@ export function FitDeck<T extends DeckItem>({
             isTop={depth === 0}
             onSwipe={(dir) => onSwipe(card, dir)}
             registerFling={depth === 0 ? (fn) => { flingRef.current = fn; } : undefined}
+            burstColors={depth === 0 ? burstColors?.(card) : undefined}
           >
             {renderCard(card, depth === 0)}
           </SwipeCard>
@@ -114,12 +118,14 @@ function SwipeCard({
   isTop,
   onSwipe,
   registerFling,
+  burstColors,
   children,
 }: {
   depth: number;
   isTop: boolean;
   onSwipe: (dir: 'right' | 'left') => void;
   registerFling?: (fn: (dir: 'right' | 'left') => void) => void;
+  burstColors?: string[];
   children: ReactNode;
 }) {
   const reduce = useReducedMotion();
@@ -233,6 +239,28 @@ function SwipeCard({
                 className="text-accent drop-shadow-[0_0_24px_rgba(255,45,109,.7)]"
                 style={{ animation: 'sy-heart-pop .6s ease-out both' }}
               />
+              {/* The fit celebrates in ITS OWN palette — colour particles spray from
+                  the heart, tying the love moment to the look's identity. */}
+              {(burstColors || []).length
+                ? Array.from({ length: 8 }).map((_, i) => {
+                    const colors = burstColors as string[];
+                    const angle = (i / 8) * Math.PI * 2;
+                    const dist = 64 + (i % 3) * 16;
+                    return (
+                      <span
+                        key={`burst-${i}`}
+                        className="absolute h-2 w-2 rounded-full"
+                        style={{
+                          background: colors[i % colors.length],
+                          '--dx': `${Math.round(Math.cos(angle) * dist)}px`,
+                          '--dy': `${Math.round(Math.sin(angle) * dist)}px`,
+                          '--rot': `${180 + i * 26}deg`,
+                          animation: `sy-confetti .62s cubic-bezier(.2,.7,.3,1) ${i * 14}ms both`,
+                        } as React.CSSProperties}
+                      />
+                    );
+                  })
+                : null}
             </div>
           ) : null}
         </>

@@ -208,6 +208,20 @@ function syliNote(look: ScrollLook): string {
   return `${blurb} — anchored by the ${hero.brand} ${CATEGORY_NOUN[hero.category] || 'piece'}.`;
 }
 
+/** The fit's colour story as swatches — Syli looks carry a curated palette;
+ *  engine looks derive theirs. Shared by the caption dots AND the love-burst,
+ *  so a loved fit celebrates in its OWN colours. */
+function lookSwatches(look: ScrollLook): { word: string; hex: string }[] {
+  const products = lookProducts(look.items);
+  const words = look.palette?.length
+    ? look.palette
+    : derivePalette(products.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase());
+  return words
+    .map((word) => ({ word, hex: colorSwatch(word) }))
+    .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
+    .slice(0, 5);
+}
+
 export default function ScrollPage() {
   const saveFit = useSavedFits((state) => state.saveFit);
   const setCheckout = useCheckout((state) => state.setCheckout);
@@ -889,20 +903,14 @@ export default function ScrollPage() {
           cards={looks.slice(topIndex)}
           onSwipe={onSwipe}
           onShop={shop}
+          burstColors={(look) => lookSwatches(look).map((s) => s.hex)}
           renderCard={(look, isTop) => {
             const meta = VIBE_META.get(look.vibe);
             const products = lookProducts(look.items);
             const total = lookTotalCents(look.items);
             const exactCount = products.filter((product) => hasExactProductLink(product)).length;
             const rarity = lookRarity(look.items, look.source);
-            // Colour story — Syli looks carry a curated palette; engine looks derive
-            // theirs from the pieces. Render as swatch dots so the fit's palette is visible.
-            const swatches = (look.palette?.length
-              ? look.palette
-              : derivePalette(products.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase()))
-              .map((word) => ({ word, hex: colorSwatch(word) }))
-              .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
-              .slice(0, 5);
+            const swatches = lookSwatches(look);
             return (
               <div className="relative h-full w-full">
                 {/* Rarity aura — only the top card, only for real tiers */}
