@@ -86,10 +86,39 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
 };
 
+// Site-level structured data (factual brand identity only — no Product/offer
+// claims, since Sylistly is an affiliate aggregator, not the merchant). Helps
+// search engines resolve the brand for sitelinks / knowledge panel.
+const SITE_JSONLD = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://www.sylistly.com/#org',
+      name: 'Sylistly',
+      url: 'https://www.sylistly.com',
+      logo: 'https://www.sylistly.com/apple-touch-icon.png',
+      description:
+        'An endless scroll of complete outfits from real products. Lock the piece you love, restyle the rest, shop the whole fit.',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://www.sylistly.com/#website',
+      name: 'Sylistly',
+      url: 'https://www.sylistly.com',
+      publisher: { '@id': 'https://www.sylistly.com/#org' },
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${satoshi.variable} ${playfair.variable}`}>
       <body className="bg-bg text-ink">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }}
+        />
         <SplashScreen />
         <AnalyticsProvider />
         {children}
