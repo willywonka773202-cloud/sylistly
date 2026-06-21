@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { ProductImage } from '@/components/ProductImage';
 import { ShareActions } from '@/components/ShareActions';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { hasExactProductLink } from '@/lib/product-image-quality';
@@ -152,6 +153,8 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
           );
         })}
       </div>
+
+      <AffiliateDisclosure className="mt-4 text-center" />
 
       {/* Pull it into the app */}
       <div className="mt-6">

@@ -10,6 +10,7 @@ import {
   openCheckoutUrls,
 } from '@/lib/checkout';
 import { wrapAffiliate } from '@/lib/affiliate';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { track } from '@/lib/analytics';
 import { useCheckout } from '@/store/checkout';
 import { useDialogBehavior } from '@/lib/use-dialog-behavior';
@@ -124,6 +125,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
             <div className="mt-2 max-w-[300px] text-[11px] leading-relaxed text-muted">
               Each link opens the item&rsquo;s real product page at the retailer.
             </div>
+            <AffiliateDisclosure className="mt-1.5 max-w-[300px]" />
           </div>
           <button
             type="button"

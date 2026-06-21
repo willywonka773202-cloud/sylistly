@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
@@ -88,6 +89,7 @@ export default function CheckoutPage() {
                 Open all tabs
               </button>
             </div>
+            <AffiliateDisclosure className="mt-3" />
             {batchMessage ? (
               <div className="mt-3 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] text-muted-2">
                 {batchMessage}

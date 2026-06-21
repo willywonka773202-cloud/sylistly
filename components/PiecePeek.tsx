@@ -1,6 +1,7 @@
 'use client';
 
 import { ExternalLink, Lock, RefreshCw, X } from 'lucide-react';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { ProductImage } from '@/components/ProductImage';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
@@ -98,6 +99,7 @@ export function PiecePeek({
           Shop at {merchantName(product)}
           <ExternalLink size={15} />
         </button>
+        <AffiliateDisclosure className="mt-2 text-center" />
 
         <div className="mt-2 grid grid-cols-2 gap-2">
           <button
