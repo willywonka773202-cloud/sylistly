@@ -3,6 +3,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type React
 import { ArrowLeftRight, Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
@@ -2031,6 +2032,7 @@ function FocusedRefinePanel({
               <ExternalLink size={12} />
             </button>
           </div>
+          <AffiliateDisclosure className="mt-2.5 px-1" />
         </div>
       </div>
     </section>

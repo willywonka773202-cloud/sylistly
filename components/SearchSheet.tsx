@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, RotateCcw, X, Search as SearchIcon } from 'lucide-react';
 import { ProductImage } from './ProductImage';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { useFit } from '@/store/fit';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import {
@@ -825,6 +826,7 @@ export function SearchSheet({
                                 <ChevronRight size={14} />
                               </button>
                             </div>
+                            <AffiliateDisclosure className="mt-2" />
                           </div>
                         </article>
                       )}

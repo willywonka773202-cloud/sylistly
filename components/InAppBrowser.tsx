@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, type PanInfo } from 'framer-motion';
 import { ArrowUpRight, Globe, Lock, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { ProductImage } from '@/components/ProductImage';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
@@ -147,6 +148,8 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
             </button>
           </div>
         </div>
+
+        <AffiliateDisclosure className="shrink-0 border-t border-hairline/60 bg-surface-1 px-3 py-1.5 text-center" />
 
         {/* The page (or the fallback) */}
         <div className="relative flex-1 bg-white">
