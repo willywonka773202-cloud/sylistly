@@ -12,6 +12,7 @@ import {
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
 import { useCheckout } from '@/store/checkout';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
 
 export interface CheckoutProduct {
   id: string;
@@ -33,6 +34,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
   const router = useRouter();
   const setCheckout = useCheckout((state) => state.setCheckout);
   const [batchMessage, setBatchMessage] = useState<string | null>(null);
+  const dialogRef = useDialogBehavior<HTMLDivElement>(onClose, open);
   const linkedProducts = products.filter((product) => Boolean(product.url));
   const exactProducts = linkedProducts.filter((product) => isExactProductUrl(product.url));
   const withheldCount = linkedProducts.length - exactProducts.length;
@@ -101,7 +103,14 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
   return (
     <>
       <div className="sy-route-enter fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="sy-sheet-enter fixed inset-x-0 bottom-0 z-[100] mx-auto max-h-[92dvh] max-w-[440px] rounded-t-3xl border-t border-hairline-2 bg-surface-1 px-4 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 shadow-[0_-24px_70px_rgba(0,0,0,.58)]">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Shop ${title}`}
+        tabIndex={-1}
+        className="sy-sheet-enter fixed inset-x-0 bottom-0 z-[100] mx-auto max-h-[92dvh] max-w-[440px] rounded-t-3xl border-t border-hairline-2 bg-surface-1 px-4 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 shadow-[0_-24px_70px_rgba(0,0,0,.58)] outline-none"
+      >
         <div className="mx-auto h-1 w-10 rounded-full bg-white/20" />
         <div className="flex items-start justify-between gap-4 pb-3 pt-2">
           <div>
@@ -156,7 +165,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
         </div>
 
         {batchMessage ? (
-          <div className="mb-4 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-muted-2">
+          <div role="status" aria-live="polite" className="mb-4 rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-muted-2">
             {batchMessage}
           </div>
         ) : null}
@@ -207,7 +216,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
                     <a
                       href={wrapAffiliate(product.url)}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noreferrer sponsored"
                       onClick={() =>
                         track('shop_link_clicked', {
                           brand: product.brand,

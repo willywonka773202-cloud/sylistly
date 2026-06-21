@@ -1,14 +1,17 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sylistly.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.sylistly.com';
   const now = new Date();
 
-  // Only the real, public surfaces: the scroll (home), the remix builder,
-  // and saved looks. Profile/checkout are personal utility pages.
+  // Public, content-rich surfaces (server-rendered, so crawlers see the content):
+  // the scroll (home), the Discover look-wall, the catalog, the remix builder,
+  // and saved looks. Profile/checkout are personal utility pages → excluded.
   return [
     { path: '', changeFrequency: 'daily' as const, priority: 1 },
-    { path: '/build', changeFrequency: 'weekly' as const, priority: 0.8 },
+    { path: '/discover', changeFrequency: 'daily' as const, priority: 0.8 },
+    { path: '/browse', changeFrequency: 'weekly' as const, priority: 0.7 },
+    { path: '/build', changeFrequency: 'weekly' as const, priority: 0.7 },
     { path: '/saved', changeFrequency: 'weekly' as const, priority: 0.5 },
   ].map(({ path, changeFrequency, priority }) => ({
     url: `${siteUrl}${path}`,

@@ -25,6 +25,7 @@ export default {
         'accent-soft':'rgba(255,45,109,.14)',
         // Champagne — the luxe secondary used sparingly for premium cues.
         champagne:   '#E7C79B',
+        'champagne-deep':'#B8945E',
         'champagne-soft':'rgba(231,199,155,.12)',
         ink:         '#FBF7F2',
         muted:       'rgba(251,247,242,.55)',

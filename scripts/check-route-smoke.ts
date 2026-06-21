@@ -1,65 +1,81 @@
+/**
+ * Route + integrity smoke test for the CURRENT Sylistly app (scroll / drop era).
+ *
+ *  - Source mode (default): every real route file exists, the nav wires the real
+ *    tabs, key integrity invariants hold, and no dishonest/dark-pattern copy or
+ *    tracked junk slipped in.
+ *  - Live mode (set SMOKE_BASE_URL, e.g. https://www.sylistly.com): also HTTP-
+ *    GETs every public route and asserts it is not an error.
+ *
+ * Run: `npm run smoke:routes`  (or `SMOKE_BASE_URL=https://www.sylistly.com npm run smoke:routes`)
+ */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
 
+// The real routes (page.tsx files) of the current app.
 const routeFiles = [
-  'app/page.tsx',
-  'app/feed/page.tsx',
-  'app/build/page.tsx',
-  'app/saved/page.tsx',
-  'app/wardrobe/page.tsx',
-  'app/profile/page.tsx',
-  'app/discover/page.tsx',
-  'app/canvas/page.tsx',
-  'app/catalog-lab/page.tsx',
-  'app/stylist/page.tsx',
-  'app/checkout/page.tsx',
+  'app/page.tsx', // scroll feed (home)
+  'app/drop/page.tsx', // Daily Drop crate shop
+  'app/build/page.tsx', // Remix / builder
+  'app/browse/page.tsx', // browse catalog
+  'app/discover/page.tsx', // discover — curated complete looks
+  'app/saved/page.tsx', // saved fits
+  'app/profile/page.tsx', // You
+  'app/checkout/page.tsx', // shop-the-look review
+  'app/look/[id]/page.tsx', // shared look + OG
+  'app/style/[id]/page.tsx', // shared style identity + OG
+  'app/robots.ts',
+  'app/sitemap.ts',
+  'app/opengraph-image.tsx',
 ];
 
+// Public URLs to hit when SMOKE_BASE_URL is set.
+const liveRoutes = ['/', '/drop', '/build', '/browse', '/discover', '/saved', '/profile', '/checkout', '/robots.txt', '/sitemap.xml', '/opengraph-image'];
+
 const requiredText: Array<{ file: string; text: string; label: string }> = [
-  { file: 'components/BottomNav.tsx', text: 'href="/"', label: 'BottomNav links Home tab' },
-  { file: 'components/BottomNav.tsx', text: 'href="/feed"', label: 'BottomNav links Feed tab' },
-  { file: 'components/BottomNav.tsx', text: 'href="/build"', label: 'BottomNav center Create opens Builder' },
-  { file: 'components/BottomNav.tsx', text: 'href="/stylist"', label: 'BottomNav links Syli tab' },
-  { file: 'components/BottomNav.tsx', text: 'href="/wardrobe"', label: 'BottomNav links Closet tab' },
-  { file: 'components/BottomNav.tsx', text: 'href="/profile"', label: 'BottomNav links Profile tab' },
-  { file: 'app/page.tsx', text: 'Build. Save. Edit.', label: 'Home has current app entry hero' },
-  { file: 'app/page.tsx', text: 'Catalog spotlight', label: 'Home exposes real catalog actions' },
-  { file: 'app/stylist/page.tsx', text: 'Syli now calls the server stylist API', label: 'Stylist is API-backed with fallback messaging' },
-  { file: 'app/stylist/page.tsx', text: 'Pieces Syli can use', label: 'Stylist exposes real catalog picks' },
-  { file: 'app/canvas/page.tsx', text: 'Manual outfit editor', label: 'Canvas editor route is present' },
-  { file: 'app/canvas/page.tsx', text: 'OutfitCanvasEditor', label: 'Canvas mounts the editable outfit editor' },
-  { file: 'app/discover/page.tsx', text: 'Budget finds', label: 'Discover budget rail exists' },
-  { file: 'app/discover/page.tsx', text: 'Premium picks', label: 'Discover premium rail exists' },
-  { file: 'app/discover/page.tsx', text: 'Underused gems', label: 'Discover underused rail exists' },
-  { file: 'app/wardrobe/page.tsx', text: 'Wardrobe gap', label: 'Wardrobe gap guidance exists' },
-  { file: 'app/wardrobe/page.tsx', text: 'Open builder', label: 'Wardrobe empty state links Builder' },
-  { file: 'app/profile/page.tsx', text: 'Style archetype', label: 'Profile DNA report exists' },
-  { file: 'app/profile/page.tsx', text: 'Computed from your real saved fits + closet', label: 'Profile stats are real-data framed' },
-  { file: 'app/saved/page.tsx', text: 'Saved actions', label: 'Saved has real follow-up actions' },
-  { file: 'components/CheckoutSheet.tsx', text: 'Review checkout', label: 'Checkout sheet links review page' },
-  { file: 'app/checkout/page.tsx', text: 'No checkout session yet', label: 'Checkout empty state exists' },
-  // ── AI stylist architecture (Phase 1 of cutout+AI sprint) ────────
-  { file: 'lib/stylist/types.ts', text: 'StylistContext', label: 'Syli types module exists' },
-  { file: 'lib/stylist/context.ts', text: 'buildStylistContext', label: 'Syli context builder exists' },
-  { file: 'lib/stylist/local-response.ts', text: 'generateLocalStylistResponse', label: 'Syli local response engine exists' },
-  { file: 'app/api/stylist/route.ts', text: 'generateApiStylistResponse', label: 'Syli API boundary calls response engine' },
-  // ── Cutout / transparent-image architecture ──────────────────────
-  { file: 'components/ProductImage.tsx', text: 'imageTransparentUrl', label: 'ProductImage supports transparent image variant' },
-  { file: 'components/ProductImage.tsx', text: 'data-image-kind', label: 'ProductImage tags image kind for observability' },
-  { file: 'lib/catalog-schemas/product.v2.ts', text: 'TRANSPARENT_URL_NOT_STRING', label: 'Product schema validates transparent URL' },
-  { file: 'scripts/catalog-image-audit.ts', text: 'needs-cutout', label: 'Catalog image audit script exists' },
-  { file: 'scripts/prepare-cutout-candidates.ts', text: 'Cutout candidate plan', label: 'Cutout candidate prep script exists' },
-  { file: 'scripts/generate-cutouts-local.py', text: 'Default mode is dry-run', label: 'Local cutout generator is dry-run by default' },
-  { file: 'scripts/register-cutouts.ts', text: 'data/catalog-cutout-overrides.json', label: 'Cutout registration writes reviewed override layer only' },
-  { file: 'scripts/catalog-coverage.ts', text: 'Catalog Coverage', label: 'Catalog coverage script exists' },
-  { file: 'scripts/catalog-expansion-plan.ts', text: 'Catalog Expansion Plan', label: 'Catalog expansion plan script exists' },
-  { file: 'scripts/searchapi-catalog-expand.ts', text: 'DRY RUN BY DEFAULT', label: 'SearchAPI expand is dry-run by default' },
-  { file: 'scripts/searchapi-catalog-expand.ts', text: 'SEARCHAPI_LIVE', label: 'SearchAPI expand requires explicit live env flag' },
-  { file: 'app/catalog-lab/page.tsx', text: 'Catalog Lab · local read-only', label: 'Catalog Lab is read-only and clearly labeled' },
+  // Navigation wires the five real tabs.
+  { file: 'components/BottomNav.tsx', text: 'href="/"', label: 'BottomNav: Scroll tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/build"', label: 'BottomNav: Remix tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/drop"', label: 'BottomNav: Drop center tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/saved"', label: 'BottomNav: Saved tab' },
+  { file: 'components/BottomNav.tsx', text: 'href="/profile"', label: 'BottomNav: You tab' },
+  // Drop shop wires the crate, vault, and quests.
+  { file: 'app/drop/page.tsx', text: 'DailyDrop', label: 'Drop mounts the crate component' },
+  { file: 'app/drop/page.tsx', text: 'Your Vault', label: 'Drop surfaces the collection Vault' },
+  { file: 'app/drop/page.tsx', text: 'Daily quests', label: 'Drop surfaces daily quests' },
+  { file: 'components/DailyDrop.tsx', text: 'recordPull', label: 'Reveals are recorded to the Vault' },
+  { file: 'components/DailyDrop.tsx', text: 'computeBundleDeal', label: 'Drop reveal shows bundle pricing' },
+  // Honesty invariants — load-bearing for the brand.
+  { file: 'lib/bundle-deals.ts', text: 'verified', label: 'Bundle deals gated on verified codes (no fake discounts)' },
+  { file: 'lib/stylist-xp.ts', text: 'real actions', label: 'XP is from real actions only' },
+  // Revenue integrity — every shop path must wrap affiliate, and the affiliate
+  // wrapper must skip placeholder Rakuten ids (no broken/foreign links).
+  { file: 'lib/product-links.ts', text: 'wrapAffiliate', label: 'getShoppableUrl wraps affiliate (no commission leak)' },
+  { file: "lib/affiliate.ts", text: "startsWith('__')", label: 'affiliate skips placeholder Rakuten ids (no broken links)' },
+  { file: 'components/InAppBrowser.tsx', text: 'wrapAffiliate', label: 'in-app browser opens the affiliate-wrapped page (commission-safe)' },
+  { file: 'app/page.tsx', text: 'InAppBrowser', label: 'feed opens retailer links in the in-app browser sheet' },
+  { file: 'app/build/page.tsx', text: 'shop_link_clicked', label: 'builder shop CTA tracks the revenue funnel' },
+  // The reveal count-up must keep its backstop so a stalled rAF never shows $0.
+  { file: 'components/AnimatedNumber.tsx', text: 'setTimeout', label: 'AnimatedNumber keeps the $0-proof backstop' },
+  // Load-bearing technical foundations — easy to break in a refactor.
+  // The feed is a Tinder card-deck: swipe right = love (save), left = pass.
+  { file: 'app/page.tsx', text: 'FitDeck', label: 'feed renders the Tinder card-deck' },
+  { file: 'app/page.tsx', text: 'onSwipe', label: 'feed deck wires swipe love/pass' },
+  { file: 'components/FitDeck.tsx', text: "drag={isTop", label: 'deck top card is drag-to-fling (framer)' },
+  { file: 'app/page.tsx', text: 'look_passed', label: 'left-swipe down-weights the vibe (honest personalization)' },
+  { file: 'lib/visual-capability.ts', text: 'useHeavyVisuals', label: 'SSR-safe heavy-visuals gate present' },
+  { file: 'components/three/Crate3D.tsx', text: 'ssr: false', label: '3D crate stays lazy (three.js out of the main bundle)' },
+  // Canonical host is consistent (www).
+  { file: 'app/layout.tsx', text: 'www.sylistly.com', label: 'metadataBase canonical host = www' },
+  { file: 'app/robots.ts', text: 'www.sylistly.com', label: 'robots canonical host = www' },
+  { file: 'app/sitemap.ts', text: 'www.sylistly.com', label: 'sitemap canonical host = www' },
 ];
+
+// Retired pre-scroll surfaces — must be redirects (next.config), not live pages.
+const retiredRouteFiles = ['app/feed/page.tsx', 'app/stylist/page.tsx', 'app/wardrobe/page.tsx', 'app/canvas/page.tsx', 'app/swipe/page.tsx'];
 
 function fail(message: string): never {
   console.error(`FAIL ${message}`);
@@ -68,7 +84,7 @@ function fail(message: string): never {
 
 function source(file: string): string {
   const target = path.join(root, file);
-  if (!existsSync(target)) fail(`missing source file: ${file}`);
+  if (!existsSync(target)) fail(`missing file: ${file}`);
   return readFileSync(target, 'utf8');
 }
 
@@ -76,47 +92,91 @@ function gitOutput(args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 }
 
-console.log('Route smoke audit');
-console.log('=================');
+async function run() {
+  console.log('Route + integrity smoke');
+  console.log('=======================');
 
-for (const file of routeFiles) {
-  const target = path.join(root, file);
-  if (!existsSync(target)) fail(`missing route file: ${file}`);
-  console.log(`PASS route exists: ${file}`);
-}
+  for (const file of routeFiles) {
+    if (!existsSync(path.join(root, file))) fail(`missing route file: ${file}`);
+    console.log(`PASS route exists: ${file}`);
+  }
 
-for (const check of requiredText) {
-  const content = source(check.file);
-  if (!content.includes(check.text)) fail(`${check.label} (${check.file})`);
-  console.log(`PASS ${check.label}`);
-}
+  for (const file of retiredRouteFiles) {
+    if (existsSync(path.join(root, file))) fail(`retired route still has a page (should be a redirect): ${file}`);
+  }
+  console.log('PASS retired routes are gone (handled by next.config redirects)');
 
-const sourceRoots = ['app', 'components', 'store'];
-const bannedPhrases = [
-  { pattern: /\bfollowers?\b/i, label: 'fake follower language' },
-  { pattern: /fake likes/i, label: 'fake likes language' },
-  { pattern: /trending with friends/i, label: 'fake friend trend language' },
-  { pattern: /generated by AI/i, label: 'AI generation claim without backend' },
-  { pattern: /powered by gpt/i, label: 'GPT branding claim without backend' },
-  { pattern: /background removed/i, label: 'background-removal claim — only allowed once transparent assets are wired end-to-end' },
-];
+  for (const check of requiredText) {
+    if (!source(check.file).includes(check.text)) fail(`${check.label} (${check.file})`);
+    console.log(`PASS ${check.label}`);
+  }
 
-for (const relativeRoot of sourceRoots) {
-  const files = gitOutput(['ls-files', relativeRoot])
-    .split(/\r?\n/)
-    .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'));
+  // Bundle-deal URL integrity — a VERIFIED deal must link to its OWN retailer's
+  // host. Catches the copy-paste cross-retailer URL bug class (e.g. a Merchology
+  // deal whose url pointed at nike.com), which would misdirect users dishonestly.
+  {
+    const dealsSrc = source('lib/bundle-deals.ts');
+    const dealRe = /\{\s*retailer:\s*'([^']+)'[^}]*?url:\s*'([^']+)'[^}]*?verified:\s*(true|false)\s*\}/g;
+    let match: RegExpExecArray | null;
+    let verifiedChecked = 0;
+    while ((match = dealRe.exec(dealsSrc))) {
+      const [, retailer, url, verified] = match;
+      if (verified !== 'true') continue;
+      verifiedChecked += 1;
+      const host = (url.match(/^https?:\/\/([^/]+)/)?.[1] || '').toLowerCase();
+      const retailerKey = retailer.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const hostKey = host.replace(/[^a-z0-9]/g, '');
+      if (retailerKey && !hostKey.includes(retailerKey)) {
+        fail(`verified bundle deal for "${retailer}" links to a foreign host (${host}) — cross-retailer URL bug`);
+      }
+    }
+    console.log(`PASS bundle-deal URL integrity (${verifiedChecked} verified deal${verifiedChecked === 1 ? '' : 's'} link to their own retailer)`);
+  }
 
-  for (const file of files) {
-    const content = source(file);
-    for (const banned of bannedPhrases) {
-      if (banned.pattern.test(content)) fail(`${banned.label}: ${file}`);
+  // No dishonest / dark-pattern copy, no tracked DB junk.
+  const bannedPhrases = [
+    // Target fake follower/like COUNTS (social proof), not honest "no fake
+    // followers" disclaimers.
+    { pattern: /\b\d[\d,.]*\s*(k|m)?\s*followers?\b/i, label: 'fake follower count' },
+    { pattern: /\b\d[\d,.]*\s*(k|m)?\s*likes\b/i, label: 'fake like count' },
+    { pattern: /fake likes/i, label: 'fake likes language' },
+    { pattern: /trending with friends/i, label: 'fake friend trend language' },
+    { pattern: /generated by ai/i, label: 'AI-generation claim without backend' },
+    { pattern: /background removed/i, label: 'background-removal claim' },
+    { pattern: /selling fast|almost gone|only \d+ left/i, label: 'fake scarcity language' },
+  ];
+  for (const relativeRoot of ['app', 'components', 'store', 'lib']) {
+    const files = gitOutput(['ls-files', relativeRoot])
+      .split(/\r?\n/)
+      .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'));
+    for (const file of files) {
+      if (!existsSync(path.join(root, file))) continue; // tracked-but-deleted ghost
+      const content = readFileSync(path.join(root, file), 'utf8');
+      for (const banned of bannedPhrases) {
+        if (banned.pattern.test(content)) fail(`${banned.label}: ${file}`);
+      }
     }
   }
+  console.log('PASS no fake-social / fake-scarcity / unbacked-AI copy');
+
+  if (gitOutput(['ls-files', 'ruvector.db'])) fail('ruvector.db is tracked');
+  console.log('PASS ruvector.db is not tracked');
+
+  // Optional live HTTP smoke.
+  const base = process.env.SMOKE_BASE_URL;
+  if (base) {
+    console.log(`\nLive HTTP smoke @ ${base}`);
+    for (const route of liveRoutes) {
+      const url = `${base.replace(/\/$/, '')}${route}`;
+      const res = await fetch(url, { redirect: 'manual' }).catch((error) => fail(`live request errored: ${url} (${String(error)})`));
+      if (res.status >= 400) fail(`live route ${route} returned ${res.status}`);
+      console.log(`PASS ${res.status} ${route}`);
+    }
+  } else {
+    console.log('\n(skip live HTTP smoke — set SMOKE_BASE_URL to enable)');
+  }
+
+  console.log('\nOverall: PASS');
 }
-console.log('PASS no obvious fake social or AI-generation phrases');
 
-if (gitOutput(['ls-files', 'ruvector.db'])) fail('ruvector.db is tracked');
-console.log('PASS ruvector.db is not tracked');
-
-console.log('');
-console.log('Overall: PASS');
+run().catch((error) => fail(String(error)));

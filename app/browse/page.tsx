@@ -1,16 +1,18 @@
 'use client';
 
-import { ChevronLeft, Heart, WandSparkles } from 'lucide-react';
+import { ChevronLeft, Heart, Search, WandSparkles, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AmbientField } from '@/components/AmbientField';
 import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
+import { Reveal } from '@/components/Reveal';
 import { track } from '@/lib/analytics';
 import { CLIENT_CATALOG_PRODUCTS } from '@/lib/client-catalog';
 import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
-import { useWardrobe } from '@/store/wardrobe';
+import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
 const PENDING_LOCK_KEY = 'sylistly.pending-lock.v1';
 
@@ -35,16 +37,28 @@ function formatPrice(cents: number): string {
  */
 export default function BrowsePage() {
   const router = useRouter();
-  const isInWishlist = useWardrobe((state) => state.isInWishlist);
+  // Subscribe to the items array (not just the isInWishlist method) so toggling
+  // a heart actually re-renders the grid — selecting only the method gives a
+  // stable ref that never triggers a re-render on mutation.
+  const wardrobeItems = useWardrobe(selectWardrobeItems);
   const addToWishlist = useWardrobe((state) => state.addToWishlist);
   const removeItem = useWardrobe((state) => state.removeItem);
+  const wishlistIds = useMemo(
+    () => new Set(wardrobeItems.filter((item) => item.status === 'wishlist').map((item) => item.productId)),
+    [wardrobeItems],
+  );
 
   const [hasMounted, setHasMounted] = useState(false);
   const [filterId, setFilterId] = useState('all');
+  const [query, setQuery] = useState('');
   // Page the grid — rendering all ~544 cutout cards at once is a heavy DOM
   // (slow mobile paint + sluggish hydration). Reveal in chunks instead.
   const PAGE = 48;
   const [visibleCount, setVisibleCount] = useState(PAGE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingMoreRef = useRef(false);
+  // The product id whose wishlist heart is mid "save-pop" (one-shot bounce).
+  const [poppedId, setPoppedId] = useState<string | null>(null);
   useEffect(() => setHasMounted(true), []);
 
   const allProducts = useMemo(
@@ -53,13 +67,23 @@ export default function BrowsePage() {
   );
 
   const filter = FILTERS.find((entry) => entry.id === filterId) || FILTERS[0];
-  const products = useMemo(
-    () =>
-      filter.categories
-        ? allProducts.filter((product) => filter.categories!.includes(product.category))
-        : allProducts,
-    [allProducts, filter],
-  );
+  const products = useMemo(() => {
+    const byCategory = filter.categories
+      ? allProducts.filter((product) => filter.categories!.includes(product.category))
+      : allProducts;
+    // Normalise punctuation to spaces so "air-force" / "t-shirt" match "Air
+    // Force" / "T Shirt", and so a stray symbol can't produce false negatives.
+    const norm = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const q = norm(query);
+    if (!q) return byCategory;
+    // Match brand, product name, or category — every term must appear somewhere,
+    // so "black nike" narrows instead of widening.
+    const terms = q.split(' ').filter(Boolean);
+    return byCategory.filter((product) => {
+      const haystack = norm(`${product.brand} ${product.name} ${product.category}`);
+      return terms.every((term) => haystack.includes(term));
+    });
+  }, [allProducts, filter, query]);
   const visible = products.slice(0, visibleCount);
 
   function selectFilter(id: string) {
@@ -67,14 +91,54 @@ export default function BrowsePage() {
     setVisibleCount(PAGE); // reset paging when the category changes
   }
 
+  function updateQuery(value: string) {
+    setQuery(value);
+    setVisibleCount(PAGE); // reset paging when the search changes
+  }
+
+  // Infinite scroll: auto-load the next page as the list nears the bottom. Uses a
+  // capture-phase scroll listener + getBoundingClientRect (NOT IntersectionObserver,
+  // which never fires in the headless preview). The "Load more" button stays as a
+  // keyboard/fallback affordance. loadingMoreRef debounces the scroll burst to one
+  // page per render; the sentinel moving out of range self-limits a fast fling.
+  useEffect(() => {
+    loadingMoreRef.current = false; // re-arm once the new page has rendered
+  }, [visibleCount]);
+
+  useEffect(() => {
+    if (visible.length >= products.length) return;
+    const maybeLoad = () => {
+      if (loadingMoreRef.current) return;
+      const el = sentinelRef.current;
+      if (!el) return;
+      if (el.getBoundingClientRect().top <= window.innerHeight + 600) {
+        loadingMoreRef.current = true;
+        setVisibleCount((count) => Math.min(count + PAGE, products.length));
+      }
+    };
+    maybeLoad();
+    window.addEventListener('scroll', maybeLoad, { capture: true, passive: true });
+    window.addEventListener('resize', maybeLoad, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', maybeLoad, { capture: true } as EventListenerOptions);
+      window.removeEventListener('resize', maybeLoad);
+    };
+  }, [visible.length, products.length, PAGE]);
+
   function styleThis(product: Product) {
-    window.localStorage.setItem(PENDING_LOCK_KEY, JSON.stringify(product));
+    // Guard the lock-write so the tap always navigates even if storage is
+    // blocked (matches the share-landing CTA) — a tap should never silently fail.
+    try {
+      window.localStorage.setItem(PENDING_LOCK_KEY, JSON.stringify(product));
+    } catch {
+      /* storage blocked — navigate anyway, no pre-lock */
+    }
     track('browse_style_this', { category: product.category, brand: product.brand });
     router.push('/');
   }
 
   function toggleWishlist(product: Product) {
-    if (isInWishlist(product.id)) {
+    if (wishlistIds.has(product.id)) {
       removeItem(product.id);
     } else {
       addToWishlist(product, 'manual');
@@ -83,7 +147,10 @@ export default function BrowsePage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg pb-[120px]">
+    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg pb-[120px]">
+      <h1 className="sr-only">Browse — every piece in the catalog</h1>
+      <AmbientField className="opacity-55" />
+      <div className="relative z-10">
       {/* Header */}
       <header className="px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
         <div className="flex items-center gap-3">
@@ -95,19 +162,44 @@ export default function BrowsePage() {
             <ChevronLeft size={16} />
           </Link>
           <div className="flex items-baseline gap-2">
-            <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+            <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink">
               Browse <span className="text-accent">pieces</span>
             </span>
           </div>
         </div>
         <p className="mt-2 text-[12px] text-muted">
-          {products.length} pieces · tap one to lock it into your scroll
+          {query.trim()
+            ? `${products.length} result${products.length === 1 ? '' : 's'} for “${query.trim()}”`
+            : `${products.length} pieces · tap one to lock it into your scroll`}
         </p>
       </header>
 
-      {/* Category chips — sticky under the notch */}
+      {/* Search + category chips — sticky under the notch */}
       <div className="sticky top-0 z-20 bg-[linear-gradient(180deg,#0D0D0F_72%,transparent)] px-4 pb-4 pt-3">
+        <div className="mb-2.5 flex items-center gap-2 rounded-full border border-hairline-2 bg-surface-1/90 px-3.5 py-2.5 backdrop-blur-xl focus-within:border-accent/60">
+          <Search size={15} className="shrink-0 text-muted" />
+          <input
+            type="text"
+            inputMode="search"
+            enterKeyHint="search"
+            value={query}
+            onChange={(event) => updateQuery(event.target.value)}
+            placeholder="Search brand or piece — adidas, denim, samba…"
+            aria-label="Search pieces"
+            className="min-w-0 flex-1 bg-transparent text-[14px] font-medium text-ink outline-none placeholder:text-muted/70"
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => updateQuery('')}
+              aria-label="Clear search"
+              className="sy-press grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-2 text-muted"
+            >
+              <X size={13} />
+            </button>
+          ) : null}
+        </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {FILTERS.map((entry) => {
             const active = entry.id === filterId;
@@ -130,23 +222,28 @@ export default function BrowsePage() {
 
       {/* Product grid */}
       <div className="grid grid-cols-2 gap-3 px-4">
-        {visible.map((product) => {
-          const wishlisted = hasMounted && isInWishlist(product.id);
+        {visible.map((product, i) => {
+          const wishlisted = hasMounted && wishlistIds.has(product.id);
           const exact = hasExactProductLink(product);
           return (
+            <Reveal key={product.id} delay={(i % 2) * 80}>
             <div
-              key={product.id}
               className="group overflow-hidden rounded-card bg-surface-1 ring-1 ring-hairline transition hover:ring-accent/40"
+              // Skip rendering off-screen cards on the long (~544-item) catalog
+              // grid — faster paint/scroll. `auto` intrinsic-size remembers the
+              // real height after first render, so there's no scroll jank.
+              style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 240px' }}
             >
               <button
                 type="button"
                 onClick={() => styleThis(product)}
                 aria-label={`Style a fit around ${product.brand} ${product.name}`}
-                className="relative block w-full bg-[linear-gradient(180deg,#FFFFFF_0%,#FAF5EF_100%)] p-4"
+                className="sy-press relative block w-full bg-[linear-gradient(180deg,#FFFFFF_0%,#FAF5EF_100%)] p-4"
               >
                 <ProductImage
                   product={product}
                   transparentOnly
+                  loading={i < 6 ? 'eager' : 'lazy'}
                   wrapperClassName="h-[128px] w-full"
                   className="h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(24,12,10,.12)] transition-transform duration-300 group-hover:scale-[1.05]"
                 />
@@ -170,7 +267,13 @@ export default function BrowsePage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => toggleWishlist(product)}
+                  onClick={() => {
+                    if (!wishlisted) {
+                      setPoppedId(product.id);
+                      window.setTimeout(() => setPoppedId((cur) => (cur === product.id ? null : cur)), 450);
+                    }
+                    toggleWishlist(product);
+                  }}
                   aria-pressed={wishlisted}
                   aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                   className={`sy-press grid h-8 w-8 shrink-0 place-items-center rounded-full border transition ${
@@ -179,13 +282,38 @@ export default function BrowsePage() {
                       : 'border-hairline-2 bg-surface-2 text-muted'
                   }`}
                 >
-                  <Heart size={14} fill={wishlisted ? 'currentColor' : 'none'} />
+                  <Heart size={14} fill={wishlisted ? 'currentColor' : 'none'} className={poppedId === product.id ? 'sy-save-pop' : undefined} />
                 </button>
               </div>
             </div>
+            </Reveal>
           );
         })}
       </div>
+
+      {products.length === 0 ? (
+        <div className="px-6 py-16 text-center">
+          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted">
+            <Search size={22} />
+          </div>
+          <p className="font-serif text-[20px] font-semibold text-ink">
+            No pieces match {query ? `“${query.trim()}”` : 'that'}
+          </p>
+          <p className="mx-auto mt-2 max-w-[30ch] text-[13px] leading-relaxed text-muted-2">
+            Try a brand (adidas, SKIMS) or a piece (denim, hoodie, samba) — or switch category.
+          </p>
+          <button
+            type="button"
+            onClick={() => updateQuery('')}
+            className="sy-press mt-5 rounded-full border border-hairline-2 bg-surface-2 px-5 py-2.5 text-[12px] font-bold uppercase tracking-[.14em] text-ink"
+          >
+            Clear search
+          </button>
+        </div>
+      ) : null}
+
+      {/* Sentinel — when this nears the viewport, the next page auto-loads */}
+      <div ref={sentinelRef} aria-hidden className="h-px w-full" />
 
       {visible.length < products.length ? (
         <div className="mt-5 flex justify-center px-4">
@@ -198,6 +326,7 @@ export default function BrowsePage() {
           </button>
         </div>
       ) : null}
+      </div>
 
       <BottomNav />
     </main>

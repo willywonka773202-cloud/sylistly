@@ -57,7 +57,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           onClick={() => { if (typeof window !== 'undefined') window.location.assign('/'); }}
           className="sy-cta-secondary px-5 py-3 text-[12px] font-bold uppercase tracking-[.14em]"
         >
-          Back to home
+          Back to the scroll
         </button>
       </div>
     </main>

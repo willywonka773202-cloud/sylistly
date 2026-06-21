@@ -1,10 +1,10 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="1200" height="630" fill="#F7F2EE"/>
-  <circle cx="948" cy="128" r="214" fill="#E8365D" fill-opacity="0.08"/>
-  <circle cx="246" cy="556" r="236" fill="#E8365D" fill-opacity="0.06"/>
+  <circle cx="948" cy="128" r="214" fill="#FF2D6D" fill-opacity="0.08"/>
+  <circle cx="246" cy="556" r="236" fill="#FF2D6D" fill-opacity="0.06"/>
   <rect x="78" y="78" width="1044" height="474" rx="44" fill="white"/>
   <rect x="114" y="114" width="975" height="402" rx="32" fill="url(#paint0_linear_123_2)"/>
-  <rect x="138" y="136" width="122" height="122" rx="28" fill="#E8365D"/>
+  <rect x="138" y="136" width="122" height="122" rx="28" fill="#FF2D6D"/>
   <path d="M212.315 171.786C203.844 165.321 192.872 162.089 179.397 162.089C167.94 162.089 158.135 164.359 149.981 168.9C141.827 173.44 137.75 180.122 137.75 188.944C137.75 194.785 139.501 199.617 143.004 203.44C146.507 207.201 150.823 210.315 155.951 212.781C161.08 215.186 166.936 217.393 173.519 219.4C180.102 221.344 185.535 223.076 189.819 224.596C194.164 226.116 197.783 228.047 200.676 230.389C203.631 232.668 205.108 235.601 205.108 239.188C205.108 243.812 203.059 247.357 198.959 249.824C194.921 252.228 189.819 253.431 183.652 253.431C176.796 253.431 170.334 251.704 164.265 248.252C158.257 244.737 153.642 240.1 150.422 234.341L132.898 243.34C137.182 251.038 143.504 257.073 151.864 261.445C160.224 265.817 170.834 268.003 183.768 268.003C196.95 268.003 207.829 264.991 216.407 258.967C225.048 252.942 229.368 244.737 229.368 234.355C229.368 228.047 227.546 222.84 223.902 218.733C220.258 214.563 215.777 211.214 210.458 208.686C205.139 206.158 199.127 203.919 192.42 201.969C185.775 199.962 180.287 198.23 175.958 196.773C171.69 195.253 168.113 193.379 165.227 191.151C162.408 188.872 160.999 186.063 160.999 182.724C160.999 178.771 162.776 175.684 166.331 173.464C169.953 171.182 174.558 170.041 180.147 170.041C185.945 170.041 191.257 171.404 196.081 174.13C200.973 176.857 204.555 180.45 206.827 184.909L223.197 175.763C220.78 170.297 217.153 166.053 212.315 163.03V171.786Z" fill="#FFFEFB"/>
   <text x="306" y="210" fill="#201916" font-family="Georgia, 'Times New Roman', serif" font-size="74" font-weight="700">Sylistly</text>
   <text x="307" y="274" fill="#6E615A" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0.16em">BUILD AND SHOP COMPLETE OUTFITS</text>
@@ -16,10 +16,10 @@
   <rect x="458" y="371" width="60" height="66" rx="18" fill="#EADAC8"/>
   <rect x="594" y="330" width="88" height="86" rx="18" fill="#EEE1DA"/>
   <rect x="636" y="350" width="92" height="112" rx="18" fill="#F3DCE4"/>
-  <rect x="724" y="356" width="34" height="32" rx="12" fill="#E8365D" fill-opacity="0.16"/>
+  <rect x="724" y="356" width="34" height="32" rx="12" fill="#FF2D6D" fill-opacity="0.16"/>
   <rect x="814" y="362" width="62" height="54" rx="18" fill="#F0E4D8"/>
   <rect x="844" y="350" width="64" height="100" rx="18" fill="#F2E9E3"/>
-  <rect x="920" y="390" width="22" height="22" rx="11" fill="#E8365D" fill-opacity="0.18"/>
+  <rect x="920" y="390" width="22" height="22" rx="11" fill="#FF2D6D" fill-opacity="0.18"/>
   <text x="309" y="516" fill="#3A302B" font-family="Arial, sans-serif" font-size="30" font-weight="700">Real products. Better outfit boards.</text>
   <defs>
     <linearGradient id="paint0_linear_123_2" x1="114" y1="114" x2="1089" y2="516" gradientUnits="userSpaceOnUse">

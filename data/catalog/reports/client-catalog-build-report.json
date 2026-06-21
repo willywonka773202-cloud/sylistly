@@ -1,22 +1,24 @@
 {
-  "generatedAt": "2026-06-10T22:05:35.444Z",
+  "generatedAt": "2026-06-11T17:59:49.225Z",
   "runtimeProducts": 4419,
-  "eligibleProducts": 675,
-  "emittedProducts": 544,
+  "eligibleProducts": 666,
+  "duplicatesCollapsed": 6,
+  "duplicateGroups": 5,
+  "emittedProducts": 535,
   "limit": 560,
   "byCategory": {
     "hat": 35,
     "outer": 96,
     "top": 95,
-    "bottom": 118,
-    "shoes": 83,
-    "bag": 75,
+    "bottom": 111,
+    "shoes": 82,
+    "bag": 74,
     "eyewear": 24,
     "jewelry": 18
   },
   "rejected": {
     "noTransparentCutout": 3459,
-    "failedEditorialGate": 285,
+    "failedEditorialGate": 294,
     "blockedStatusOrFlags": 0,
     "noCommerceLink": 0,
     "syntheticStudio": 0,
@@ -28,6 +30,7 @@
     "Products must pass the feed editorial transparent-cutout gate, have a real commerce/search outbound link, avoid failed/quarantined/bad cutout flags, and reference an existing local cutout file.",
     "The export intentionally shares the same visual quality floor as the feed and generator so noisy marketplace, costume, set, and category-mismatched items do not re-enter the UI.",
     "The emitted order is category- and brand-balanced so the first client slices do not collapse into one brand or two outfit formulas.",
+    "Near-duplicate scrape listings (same brand+colour+model) are collapsed to one product per group, keeping the cleanest cutout (lowest body-model score) so duplicates and worn-on-a-model twins do not re-enter the feed.",
     "Run this after catalog ingestion + cutout registration so the client UI stops relying on a small handpicked subset."
   ]
 }

@@ -52,6 +52,22 @@ A workflow is committed at `.github/workflows/auto-expand.yml`. To activate:
 2. Add repo **secrets** (Settings → Secrets → Actions): `VERCEL_TOKEN` (required to deploy), `SEARCHAPI_KEY` (optional, enables catalog growth).
 3. For the **weekly cron** to fire, the workflow file must be on the **default branch** — either set `overhaul/ai-redesign` as default, or merge it to `main`. `workflow_dispatch` (manual / `gh workflow run auto-expand.yml`) works from any branch immediately.
 
+## Quality gate (verify CI)
+
+A second workflow at `.github/workflows/verify.yml` runs the full gate —
+`npm run verify` (typecheck + lint + `test:units` + `smoke:routes`, ~63 checks) —
+on every push and PR. **No secrets needed.** It enforces the honesty/revenue/
+engagement invariants (verified-only discounts, affiliate wrapping, XP-from-real-
+actions, the iOS one-swipe touch-pager, canonical `www` host, no fake-social copy)
+so they can't silently regress. Run it locally with `npm run verify`.
+
+> ⚠️ It activates once the branch is pushed (Option B step 1), but will **fail
+> until the currently-untracked feature files are committed** — the smoke/build
+> expect `app/drop/page.tsx`, `components/DailyDrop.tsx`, `components/three/*`,
+> `lib/drop-vault.ts`, etc., which are deployed to prod but not yet in git
+> (`git status` shows ~23 untracked). Commit them (`git add -A`) before/with the
+> push so the repo matches production and CI can pass.
+
 ## Caveat — new products need transparent cutouts
 
 SearchAPI returns merchant image URLs, not transparent PNG cutouts. The app only shows products with usable transparent images, so newly-found products won't appear until cutouts are generated (`scripts/generate-cutouts-local.py` / the cutout pipeline). Until then, growth quietly adds candidates without changing the live experience — safe, but yield depends on the cutout step.

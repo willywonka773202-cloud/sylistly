@@ -9,8 +9,13 @@ import {
   frameDisplayLabel,
 } from '@/lib/search-frame';
 import { hasUsableProductImage, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getProductOutboundUrl, getShoppableUrl } from '@/lib/product-links';
 import type { GeneratorFrame } from '@/lib/vibes';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
+import { safeStorageGet, safeStorageSet } from '@/lib/safe-storage';
+
+const RECENT_SEARCHES_KEY = 'sylistly.recent-searches.v1';
+const MAX_RECENT = 6;
 
 const TRENDING: Record<GeneratorFrame, Record<Category, string[]>> = {
   masc: {
@@ -55,35 +60,6 @@ const CATEGORY_LABELS: Record<Category, string> = {
   eyewear: 'Eyewear',
   jewelry: 'Jewelry',
 };
-
-function useBodyScrollLock(locked: boolean) {
-  useEffect(() => {
-    if (!locked) return;
-    const scrollY = window.scrollY;
-    const previous = {
-      overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      top: document.body.style.top,
-      width: document.body.style.width,
-      overscrollBehavior: document.body.style.overscrollBehavior,
-    };
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.body.style.overscrollBehavior = 'none';
-
-    return () => {
-      document.body.style.overflow = previous.overflow;
-      document.body.style.position = previous.position;
-      document.body.style.top = previous.top;
-      document.body.style.width = previous.width;
-      document.body.style.overscrollBehavior = previous.overscrollBehavior;
-      window.scrollTo(0, scrollY);
-    };
-  }, [locked]);
-}
 
 function formatPrice(priceCents: number): string {
   if (!priceCents) return 'Price pending';
@@ -138,9 +114,10 @@ export function SearchSheet({
   onSelectProduct,
   onClose,
 }: Props) {
-  useBodyScrollLock(open);
+  const dialogRef = useDialogBehavior<HTMLDivElement>(onClose, open); // also locks background scroll
   const [activeCategory, setActiveCategory] = useState<Category | null>(category);
   const [query, setQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -280,6 +257,34 @@ export function SearchSheet({
     }
   }, [frame, searchPriceMax]);
 
+  // Recent searches — the user's last few typed queries, kept on-device so they
+  // don't retype. safe-storage so a strict in-app webview can't crash the sheet.
+  useEffect(() => {
+    const raw = safeStorageGet(RECENT_SEARCHES_KEY);
+    if (!raw) return;
+    try {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) setRecentSearches(arr.filter((x): x is string => typeof x === 'string').slice(0, MAX_RECENT));
+    } catch {
+      /* corrupt value — ignore */
+    }
+  }, []);
+
+  const recordRecent = useCallback((term: string) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => {
+      const next = [trimmed, ...prev.filter((x) => x.toLowerCase() !== trimmed.toLowerCase())].slice(0, MAX_RECENT);
+      safeStorageSet(RECENT_SEARCHES_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const clearRecents = useCallback(() => {
+    setRecentSearches([]);
+    safeStorageSet(RECENT_SEARCHES_KEY, '[]');
+  }, []);
+
   useEffect(() => {
     if (!open || !category) return;
     const product = displayItems[category];
@@ -380,7 +385,7 @@ export function SearchSheet({
 
   function shopActiveCandidate() {
     if (!activeCandidate) return;
-    const url = getProductOutboundUrl(activeCandidate);
+    const url = getShoppableUrl(activeCandidate);
     if (!url || url === '#') return;
     window.open(url, '_blank', 'noopener,noreferrer');
   }
@@ -395,7 +400,12 @@ export function SearchSheet({
         onClick={onClose}
       />
       <div
-        className="fixed inset-x-0 z-[80] mx-auto flex min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-1 shadow-[0_-22px_70px_rgba(0,0,0,.55)]"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search pieces"
+        tabIndex={-1}
+        className="fixed inset-x-0 z-[80] mx-auto flex min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-1 shadow-[0_-22px_70px_rgba(0,0,0,.55)] outline-none"
         style={{
           bottom: 'calc(env(safe-area-inset-bottom) + 8px)',
           maxHeight: 'calc(100dvh - env(safe-area-inset-bottom) - 16px)',
@@ -502,6 +512,7 @@ export function SearchSheet({
               className="relative px-4 pb-1.5"
               onSubmit={(event) => {
                 event.preventDefault();
+                recordRecent(query);
                 void runSearch(query, currentCategory);
               }}
             >
@@ -512,6 +523,7 @@ export function SearchSheet({
                   setQuery(e.target.value);
                   setError(null);
                 }}
+                aria-label="Search products to add"
                 placeholder={`try: ${suggestions[0]} or browse`}
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.04] py-3 pl-10 pr-24 text-sm text-ink outline-none focus:border-accent"
               />
@@ -556,10 +568,39 @@ export function SearchSheet({
                   setCustomPriceInput(cleaned);
                   setSearchPriceMax(cleaned ? Number(cleaned) : null);
                 }}
+                aria-label="Custom maximum price"
                 placeholder="Custom $"
                 className="min-w-[96px] rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
               />
             </div>
+
+            {recentSearches.length > 0 ? (
+              <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                <span className="flex-none text-[9px] font-bold uppercase tracking-[.16em] text-muted">Recent</span>
+                {recentSearches.map((term) => (
+                  <button
+                    key={`recent-${term}`}
+                    type="button"
+                    onClick={() => {
+                      setQuery(term);
+                      recordRecent(term);
+                      void runSearch(term, currentCategory);
+                    }}
+                    className="flex-none whitespace-nowrap rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[11.5px] text-ink hover:border-accent/55"
+                  >
+                    {term}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearRecents}
+                  aria-label="Clear recent searches"
+                  className="flex-none rounded-full border border-hairline bg-surface-2 p-1.5 text-muted-2 transition hover:text-ink"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ) : null}
 
             <div className="flex gap-1.5 overflow-x-auto px-4 pb-2 scrollbar-hide">
               {suggestions.map((c) => (
@@ -577,7 +618,7 @@ export function SearchSheet({
             </div>
 
             <div className="flex items-center justify-between px-4 pb-1.5 text-[10px] text-muted">
-              <span>{resultLabel}</span>
+              <span role="status" aria-live="polite">{resultLabel}</span>
               {activeCandidate ? (
                 <span>
                   {resultSource === 'catalog'
@@ -615,7 +656,7 @@ export function SearchSheet({
                 : error
                 ? (
                     <div className="py-10 text-center text-sm">
-                      <div className="text-rose-300">{error}</div>
+                      <div className="text-rose-300" role="alert">{error}</div>
                     </div>
                   )
                 : candidateResults === null

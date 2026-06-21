@@ -159,7 +159,7 @@ export function DiscoverLookCard({ look }: { look: DiscoverLookCardData }) {
             className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-accent px-4 py-4 text-[12px] font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot"
           >
             <Sparkles size={14} />
-            Open in Builder
+            Open in Remix
             <ArrowRight size={14} />
           </button>
           <button

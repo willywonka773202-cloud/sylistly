@@ -8,6 +8,7 @@ import {
 import { hasFrameMismatch } from '@/lib/frame-inference';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { getBudgetMaxCents, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
+import { colorHarmonyScore } from '@/lib/color-harmony';
 
 type GeneratorMode = 'starter' | 'missing' | 'refresh' | 'full';
 
@@ -432,8 +433,7 @@ function scoreClientCompatibility(product: Product, vibe: VibeId, selectedProduc
   if ((vibe === 'gym' || vibe === 'cozy') && productHas(['heel', 'pumps', 'satin', 'dressy'])) score -= 50;
   if ((vibe === 'night' || vibe === 'date') && productHas(['running', 'gym', 'workout', 'sweatpants'])) score -= 50;
 
-  const neutralTerms = ['black', 'white', 'cream', 'beige', 'grey', 'gray', 'navy', 'brown'];
-  if (selectedHas(neutralTerms) && productHas(neutralTerms)) score += 12;
+  score += colorHarmonyScore(text, selected);
   return score;
 }
 

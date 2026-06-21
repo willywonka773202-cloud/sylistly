@@ -67,7 +67,7 @@ export default function CheckoutPage() {
                 <div className="text-[11px] uppercase tracking-[.18em] text-muted">Ready to shop</div>
                 <h2 className="mt-2 font-serif text-[20px] font-semibold text-ink">{title}</h2>
                 <p className="mt-2 text-[12px] text-muted-2">
-                  {exactProducts.length} exact item{exactProducts.length !== 1 ? 's' : ''} - {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} - ${(totalCents / 100).toLocaleString()}
+                  {exactProducts.length} exact item{exactProducts.length !== 1 ? 's' : ''} · {retailerGroups.length} retailer{retailerGroups.length !== 1 ? 's' : ''} · ${(totalCents / 100).toLocaleString()}
                 </p>
               </div>
               <button
@@ -97,7 +97,7 @@ export default function CheckoutPage() {
               <div
                 className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] leading-relaxed text-amber-100"
               >
-                {withheldCount} item{withheldCount !== 1 ? 's' : ''} may have changed at the store. Reopen this fit from the Scroll to refresh {withheldCount !== 1 ? 'them' : 'it'}.
+                {withheldCount} item{withheldCount !== 1 ? 's' : ''} may have changed at the store. Reopen this fit from Saved to refresh {withheldCount !== 1 ? 'them' : 'it'}.
               </div>
             ) : null}
           </section>
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
                         <a
                           href={wrapAffiliate(product.url)}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noreferrer sponsored"
                           onClick={() =>
                             track('shop_link_clicked', {
                               brand: product.brand,
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
         <section className="rounded-3xl border border-hairline bg-surface-1 p-5">
           <h2 className="font-serif text-[20px] font-semibold text-ink">Nothing to shop yet</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-muted-2">
-            Open a fit from Builder or your Saved tab, then tap Shop to gather every piece&rsquo;s store link in one place.
+            Open a fit from Remix or your Saved tab, then tap Shop to gather every piece&rsquo;s store link in one place.
           </p>
           <Link
             href="/saved"

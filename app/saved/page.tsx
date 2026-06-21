@@ -5,7 +5,9 @@ import {
   Check,
   ExternalLink,
   Heart,
+  Pencil,
   RotateCcw,
+  Share2,
   ShoppingBag,
   Sparkles,
   Trash2,
@@ -14,22 +16,29 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { Reveal } from '@/components/Reveal';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
+import { encodeLookSlug } from '@/lib/share-codes';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { ProductImage } from '@/components/ProductImage';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { hasExactProductLink, hasTransparentProductImage, isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
+import { VIBES, type VibeId } from '@/lib/vibes';
 import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 
-const COLLECTIONS = ['All', 'Clean', 'Streetwear', 'Gym', 'Date', 'Travel', 'Work'] as const;
-type Collection = (typeof COLLECTIONS)[number];
+// Collections ARE the real vibes (one source of truth — no invented "Travel"/
+// "Work"). A fit's collection is the vibe it was generated under; legacy fits
+// saved before we persisted the vibe fall back to title inference.
+type Collection = string;
+const VIBE_LABEL = Object.fromEntries(VIBES.map((vibe) => [vibe.id, vibe.label])) as Record<VibeId, string>;
+const VIBE_LABEL_ORDER = VIBES.map((vibe) => vibe.label);
 
 const CheckoutSheet = dynamic(
   () => import('@/components/CheckoutSheet').then((module) => module.CheckoutSheet),
@@ -56,14 +65,12 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
-// Heuristic collection inference from real product titles + categories.
-// No fake tags — every classification is derived from what's actually
-// in the saved fit. `All` is the bucket for fits we can't confidently
-// classify; default fallback is `Clean` only when at least one normal
-// outfit term is present.
-function inferCollection(fit: SavedFitRecord): Collection {
+// Legacy fallback (fits saved before the vibe was persisted): infer a REAL
+// vibe label from product titles. Every result is a genuine vibe, never an
+// invented bucket.
+function inferVibeLabel(fit: SavedFitRecord): string {
   const products = Object.values(fit.items).filter((p): p is Product => Boolean(p));
-  if (products.length === 0) return 'All';
+  if (products.length === 0) return 'Clean';
   const titles = products.map((p) => `${p.brand} ${p.name}`).join(' ').toLowerCase();
 
   const hasAthletic = /\b(athletic|sport|training|gym|jogger|legging|hoodie|sweatpant|track)\b/.test(titles);
@@ -74,10 +81,15 @@ function inferCollection(fit: SavedFitRecord): Collection {
 
   if (hasAthletic) return 'Gym';
   if (hasStreet && !hasFormal) return 'Streetwear';
-  if (hasFormal && !hasAthletic) return 'Work';
-  if (hasDate) return 'Date';
-  if (hasTravel) return 'Travel';
+  if (hasFormal && !hasAthletic) return 'Office';
+  if (hasDate) return 'Date night';
+  if (hasTravel) return 'Vacation';
   return 'Clean';
+}
+
+// The fit's vibe — honest when persisted, inferred for legacy saves.
+function collectionOf(fit: SavedFitRecord): string {
+  return fit.vibe ? (VIBE_LABEL[fit.vibe] ?? inferVibeLabel(fit)) : inferVibeLabel(fit);
 }
 
 export default function SavedPage() {
@@ -110,7 +122,7 @@ export default function SavedPage() {
           );
           const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
           const visualProducts = visualEntries.map(([, product]) => product);
-          const collection = inferCollection(fit);
+          const collection = collectionOf(fit);
           return { fit, visualItems, visualProducts, collection };
         })
         .filter(({ visualProducts }) => visualProducts.length > 0),
@@ -154,6 +166,13 @@ export default function SavedPage() {
     return counts;
   }, [displayFits]);
 
+  // Only show chips for vibes the user actually has saved, in canonical VIBES
+  // order — no empty/invented buckets.
+  const orderedCollections = useMemo(() => {
+    const present = new Set(displayFits.map((entry) => entry.collection));
+    return ['All', ...VIBE_LABEL_ORDER.filter((label) => present.has(label))];
+  }, [displayFits]);
+
   const visibleFits = useMemo(
     () => (activeFilter === 'All' ? displayFits : displayFits.filter((entry) => entry.collection === activeFilter)),
     [displayFits, activeFilter],
@@ -192,8 +211,15 @@ export default function SavedPage() {
     }
     track('pieces_saved', { count: added, from: 'saved-fit' });
     setConfirmation({ count: added });
-    window.setTimeout(() => setConfirmation(null), 1600);
   }
+
+  // Auto-dismiss the confirmation toast — effect-managed so the timer is
+  // cleared on unmount (never setState on a torn-down component).
+  useEffect(() => {
+    if (!confirmation) return;
+    const id = window.setTimeout(() => setConfirmation(null), 1600);
+    return () => window.clearTimeout(id);
+  }, [confirmation]);
 
   return (
     <PlaceholderScreen
@@ -204,7 +230,7 @@ export default function SavedPage() {
     >
       {confirmation ? (
         <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,45,109,.55)] backdrop-blur-md">
+          <div className="animate-sy-rise inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,45,109,.55)] backdrop-blur-md">
             <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
               <Check size={13} strokeWidth={3} />
             </span>
@@ -214,7 +240,7 @@ export default function SavedPage() {
       ) : null}
 
       {/* Fits / Pieces toggle */}
-      <div className="mb-4 grid grid-cols-2 gap-1 rounded-full border border-hairline bg-surface-1 p-1">
+      <div className="sy-fade-up mb-4 grid grid-cols-2 gap-1 rounded-full border border-hairline bg-surface-1 p-1">
         {(['fits', 'pieces'] as const).map((tab) => (
           <button
             key={tab}
@@ -235,9 +261,10 @@ export default function SavedPage() {
       ) : displayFits.length === 0 ? (
         <SavedEmptyState />
       ) : (
-        <div className="grid gap-4">
+        <div className="sy-stagger grid gap-4">
           <SavedStats stats={stats} />
           <CollectionFilters
+            collections={orderedCollections}
             activeFilter={activeFilter}
             onChange={setActiveFilter}
             counts={collectionCounts}
@@ -263,17 +290,17 @@ export default function SavedPage() {
             </section>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {visibleFits.map(({ fit, visualItems, visualProducts, collection }) => (
+              {visibleFits.map(({ fit, visualItems, visualProducts, collection }, i) => (
+                <Reveal key={fit.id} as="div" delay={(i % 2) * 80}>
                 <button
-                  key={fit.id}
                   type="button"
                   aria-label={`Open saved fit ${fit.title}`}
                   onClick={() => setDetailFitId(fit.id)}
-                  className="group relative overflow-hidden rounded-card border border-hairline bg-surface-1 text-left shadow-card transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.28)]"
+                  className="group relative block w-full overflow-hidden rounded-card border border-hairline bg-surface-1 text-left shadow-card transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.28)]"
                 >
                   <div className="relative aspect-[4/5] overflow-hidden">
                     {visualProducts.length >= 3 ? (
-                      <WornFlatlay items={visualItems} active={false} className="h-full w-full" />
+                      <WornFlatlay items={visualItems} active={false} loading={i < 2 ? 'eager' : 'lazy'} className="h-full w-full" />
                     ) : (
                       <div className="grid h-full grid-cols-2 gap-1.5 bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-3">
                         {visualProducts.slice(0, 4).map((product) => (
@@ -281,6 +308,7 @@ export default function SavedPage() {
                             key={`${fit.id}-tile-${product.id}`}
                             product={product}
                             transparentOnly
+                            loading={i < 2 ? 'eager' : 'lazy'}
                             wrapperClassName="h-full w-full"
                             className="h-full w-full object-contain"
                             onUnavailable={(failedProduct) =>
@@ -290,9 +318,13 @@ export default function SavedPage() {
                         ))}
                       </div>
                     )}
-                    <div className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
+                    <div className="absolute left-2 top-2 z-10 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-md">
                       {collection}
                     </div>
+                    {/* champagne light-rake on the above-fold cards, matching Discover */}
+                    {i < 4 ? (
+                      <span aria-hidden className="sy-card-sheen" style={{ animationDelay: `${i * 85 + 220}ms` }} />
+                    ) : null}
                   </div>
                   <div className="px-3 pb-3 pt-2.5">
                     <div className="line-clamp-1 font-serif text-[15px] font-semibold italic leading-tight text-ink">
@@ -304,6 +336,7 @@ export default function SavedPage() {
                     </div>
                   </div>
                 </button>
+                </Reveal>
               ))}
             </div>
           )}
@@ -375,17 +408,19 @@ function SavedStats({
 }
 
 function CollectionFilters({
+  collections,
   activeFilter,
   onChange,
   counts,
 }: {
+  collections: string[];
   activeFilter: Collection;
   onChange: (filter: Collection) => void;
   counts: Map<Collection, number>;
 }) {
   return (
     <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-      {COLLECTIONS.map((label) => {
+      {collections.map((label) => {
         const active = activeFilter === label;
         const count = counts.get(label) || 0;
         const hasMatches = count > 0;
@@ -560,6 +595,33 @@ function SavedDetailSheet({
   onRemove: () => void;
   onProductFailed: (product: Product) => void;
 }) {
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const renameFit = useSavedFits((s) => s.renameFit);
+  function commitTitle(value: string) {
+    const next = value.trim().slice(0, 40);
+    if (next && next !== fit.title) renameFit(fit.id, next);
+    setEditingTitle(false);
+  }
+  // Encode the fit into a DB-free /look/c-… link; null when <3 catalog pieces.
+  const shareSlug = encodeLookSlug(visualItems);
+  async function handleShare() {
+    if (!shareSlug || typeof window === 'undefined') return;
+    const url = `${window.location.origin}/look/${shareSlug}`;
+    const text = `My ${fit.title} on Sylistly`;
+    track('saved_fit_shared', { pieces: visualProducts.length });
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Sylistly', text, url });
+      } else {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        setShareState('copied');
+        window.setTimeout(() => setShareState('idle'), 1600);
+      }
+    } catch {
+      /* share sheet dismissed, or clipboard blocked — no-op */
+    }
+  }
   return (
     <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/65 backdrop-blur-sm">
       <button className="absolute inset-0" aria-label="Close saved fit" onClick={onClose} />
@@ -574,7 +636,30 @@ function SavedDetailSheet({
                 Saved fit · {collection}
               </span>
             </div>
-            <h2 className="mt-1 line-clamp-2 font-serif text-[24px] font-semibold leading-tight text-ink">{fit.title}</h2>
+            {editingTitle ? (
+              <input
+                autoFocus
+                defaultValue={fit.title}
+                maxLength={40}
+                aria-label="Rename this fit"
+                onBlur={(event) => commitTitle(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') { event.preventDefault(); event.currentTarget.blur(); }
+                  else if (event.key === 'Escape') setEditingTitle(false);
+                }}
+                className="mt-1 w-full border-b border-accent/50 bg-transparent font-serif text-[24px] font-semibold leading-tight text-ink outline-none"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingTitle(true)}
+                aria-label={`Rename fit, currently ${fit.title}`}
+                className="group mt-1 flex items-start gap-1.5 text-left"
+              >
+                <h2 className="line-clamp-2 font-serif text-[24px] font-semibold leading-tight text-ink">{fit.title}</h2>
+                <Pencil size={13} className="mt-2 flex-none text-muted-2 transition group-hover:text-accent" />
+              </button>
+            )}
             <div className="mt-1 text-[11px] text-muted-2">
               {visualProducts.length} pieces · <span className="font-semibold text-accent">{formatPrice(fit.totalCents)}</span> · saved {formatDate(fit.createdAt)}
             </div>
@@ -644,10 +729,10 @@ function SavedDetailSheet({
           <button
             type="button"
             onClick={onLoadInBuilder}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_32px_rgba(255,45,109,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300"
+            className="sy-cta inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_32px_rgba(255,45,109,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300"
           >
             <RotateCcw size={13} />
-            Remix in Builder
+            Open in Remix
           </button>
           <button
             type="button"
@@ -668,6 +753,18 @@ function SavedDetailSheet({
           <Heart size={13} className="text-accent" />
           Save these pieces
         </button>
+
+        {/* Share the fit as a DB-free /look link — a growth loop for saved fits */}
+        {shareSlug ? (
+          <button
+            type="button"
+            onClick={handleShare}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white/90 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55 hover:text-white"
+          >
+            {shareState === 'copied' ? <Check size={13} className="text-money" /> : <Share2 size={13} />}
+            {shareState === 'copied' ? 'Link copied' : 'Share this fit'}
+          </button>
+        ) : null}
 
         {/* Secondary actions */}
         <div className="mt-2">
@@ -697,7 +794,7 @@ function DetailStat({ label, value }: { label: string; value: string }) {
 function SavedEmptyState() {
   return (
     <section className="sy-card-strong rounded-[26px] p-6 text-center">
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/15 text-accent shadow-pink-glow">
+      <div className="sy-glow-breathe mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/15 text-accent shadow-pink-glow">
         <Bookmark size={22} />
       </div>
       <h2 className="mt-3 font-serif text-[22px] font-semibold text-ink">No saved fits yet</h2>
@@ -717,7 +814,7 @@ function SavedEmptyState() {
           className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
         >
           <Wand2 size={11} />
-          Open builder
+          Open Remix
         </Link>
       </div>
     </section>

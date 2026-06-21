@@ -27,7 +27,15 @@ export function ShareActions({ items }: { items: Partial<Record<Category, Produc
 
   function lockHeroAndScroll() {
     if (hero) {
-      window.localStorage.setItem(PENDING_LOCK_KEY, JSON.stringify(hero));
+      // Guard the storage write: a shared link is often opened in a strict
+      // in-app webview (Instagram/TikTok) where localStorage can throw — the
+      // visitor must still reach the feed (just without the pre-lock) rather
+      // than have this conversion CTA silently fail.
+      try {
+        window.localStorage.setItem(PENDING_LOCK_KEY, JSON.stringify(hero));
+      } catch {
+        /* storage blocked — navigate anyway, no pre-lock */
+      }
       track('share_page_lock', { category: hero.category, brand: hero.brand });
     }
     router.push('/');

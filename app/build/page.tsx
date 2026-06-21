@@ -1,16 +1,21 @@
 'use client';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, Send, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import { ArrowLeftRight, Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BuilderBoard } from '@/components/BuilderBoard';
+import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import { BudgetPanel } from '@/components/BudgetPanel';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
-import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
+import {
+  loadRemixBudgetFromStorage,
+  persistRemixBudgetToStorage,
+} from '@/lib/remix-budget-storage';
+import { CATEGORY_ORDER, CATEGORY_LABELS, type Category, type Product } from '@/lib/types';
 import {
   buildCatalogLook,
   collectOutfitProductIds,
@@ -22,10 +27,14 @@ import {
   outfitFullSignature,
   outfitRequiredSignature,
 } from '@/lib/client-catalog';
+import { track } from '@/lib/analytics';
+import { useBodyScrollLock } from '@/lib/use-body-scroll-lock';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
 import { getLibraryLook } from '@/lib/outfit-library';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getProductOutboundUrl, getShoppableUrl } from '@/lib/product-links';
 import { hasFrameMismatch } from '@/lib/frame-inference';
 import { isVibeAppropriate } from '@/lib/vibe-fit';
+import { safeStorageGet, safeStorageSet } from '@/lib/safe-storage';
 import {
   getTransparentProductImageUrl,
   hasHighCategoryConfidence,
@@ -212,17 +221,6 @@ interface BuilderPreferenceHistory {
   products: Record<string, { saved: number; passed: number }>;
 }
 
-const CATEGORY_LABELS: Record<Category, string> = {
-  hat: 'Headwear',
-  outer: 'Outer',
-  top: 'Top',
-  bottom: 'Bottom',
-  shoes: 'Shoes',
-  bag: 'Bag',
-  eyewear: 'Eyewear',
-  jewelry: 'Jewelry',
-};
-
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v2';
@@ -298,35 +296,6 @@ function recordBuilderPreferenceEvent(
   } catch {
     // Local preference tracking should never block save/pass/generation flows.
   }
-}
-
-function useBodyScrollLock(locked: boolean) {
-  useEffect(() => {
-    if (!locked) return;
-    const scrollY = window.scrollY;
-    const previous = {
-      overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      top: document.body.style.top,
-      width: document.body.style.width,
-      overscrollBehavior: document.body.style.overscrollBehavior,
-    };
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.body.style.overscrollBehavior = 'none';
-
-    return () => {
-      document.body.style.overflow = previous.overflow;
-      document.body.style.position = previous.position;
-      document.body.style.top = previous.top;
-      document.body.style.width = previous.width;
-      document.body.style.overscrollBehavior = previous.overscrollBehavior;
-      window.scrollTo(0, scrollY);
-    };
-  }, [locked]);
 }
 
 interface OutfitAnalysis {
@@ -442,6 +411,11 @@ function BuilderPageContent({
   // True while the instant deterministic fit is shown and the AI-styled look is
   // still composing in the background (optimistic generation).
   const [aiRefining, setAiRefining] = useState(false);
+  // Per-device outfit budget cap (in dollars). When the "Only show picks within
+  // budget" toggle is on, the next generate / search is also gated on it via
+  // `generatorBudget='custom'` + `customBudgetInput`.
+  const [remixBudget, setRemixBudget] = useState(0);
+  const [remixBudgetFilterOn, setRemixBudgetFilterOn] = useState(true);
   const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const [recentGeneratedIds, setRecentGeneratedIds] = useState<string[]>([]);
   const recentRequiredComboRef = useRef<string[]>([]);
@@ -473,7 +447,9 @@ function BuilderPageContent({
   const n = count();
   const renderItems = useMemo<Partial<Record<Category, Product>>>(() => (hasMounted ? items : {}), [hasMounted, items]);
   const renderN = hasMounted ? n : 0;
-  const totalDisplay = `$${(total / 100).toFixed(2)}`;
+  // Match the app-wide price convention: comma-grouped, cents only when present
+  // (e.g. $1,680 / $229.94) — not a trailing .00 on round totals.
+  const totalDisplay = `$${(total / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
   const activeVibe = VIBES.find((vibe) => vibe.id === selectedVibe) || VIBES[0];
   const generatorFrame: GeneratorFrame =
     bodyType === 'custom' ? 'androgynous' : bodyType;
@@ -497,7 +473,7 @@ function BuilderPageContent({
 
   const playSwipeHint = useCallback(async () => {
     if (generatorLoading || boardDragging || searchFor) return;
-    if (window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1') {
+    if (safeStorageGet(SWIPE_HINT_STORAGE_KEY) === '1') {
       setSwipeHintDismissed(true);
       return;
     }
@@ -535,6 +511,17 @@ function BuilderPageContent({
     setHasMounted(true);
   }, []);
 
+  // Hydrate persisted budget on mount; persist whenever it changes after that.
+  // Mirrors the saved-fits + budget pattern (local-only, no backend).
+  useEffect(() => {
+    setRemixBudget(loadRemixBudgetFromStorage());
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
+    persistRemixBudgetToStorage(remixBudget);
+  }, [hasMounted, remixBudget]);
+
   // Is the optional AI editorial-photo feature available? (only show the button if so)
   useEffect(() => {
     let active = true;
@@ -546,7 +533,7 @@ function BuilderPageContent({
   }, []);
 
   useEffect(() => {
-    const seen = window.localStorage.getItem(SWIPE_HINT_STORAGE_KEY) === '1';
+    const seen = safeStorageGet(SWIPE_HINT_STORAGE_KEY) === '1';
     setSwipeHintDismissed(seen);
     if (seen) return;
     const timeout = window.setTimeout(() => void playSwipeHint(), 850);
@@ -607,7 +594,7 @@ function BuilderPageContent({
     if (quickSourceProcessedRef.current) return;
     if (quickSource !== 'syli') return;
     if (!hasMounted || n === 0) return;
-    setStatusMessage(`Loaded ${n} Syli recommendation${n === 1 ? '' : 's'} into Builder. Lock any piece you love, then remix or save.`);
+    setStatusMessage(`Loaded ${n} Syli recommendation${n === 1 ? '' : 's'} into Remix. Lock any piece you love, then remix or save.`);
     quickSourceProcessedRef.current = true;
     router.replace('/build');
   }, [hasMounted, n, quickSource, router]);
@@ -944,6 +931,18 @@ function BuilderPageContent({
         return;
       }
 
+      // Don't commit a stub: a single search-fallback slot can satisfy
+      // `addedCount` yet leave a 1–2 piece "outfit". Keep the prior board and
+      // ask for a retry unless the merged look has ≥3 renderable pieces (what
+      // the grid actually draws).
+      const renderableCount = Object.values(nextItems).filter(
+        (product): product is Product => Boolean(product) && hasTransparentProductImage(product),
+      ).length;
+      if (renderableCount < 3) {
+        setStatusMessage("Couldn't assemble a full look — try another vibe or loosen the budget.");
+        return;
+      }
+
       replaceItems(nextItems);
       // Surface which slots actually moved so the slot pills can play a
       // brief glow. Capture diff vs the `items` snapshot we read at the
@@ -1043,7 +1042,7 @@ function BuilderPageContent({
   function saveFit() {
     if (!n) return;
     // Saves are local-only today (no account system) — say exactly that.
-    const localFit = saveLocalFit(items);
+    const localFit = saveLocalFit(items, selectedVibe);
     recordBuilderPreferenceEvent('save', items, selectedVibe);
     setStatusMessage(
       localFit
@@ -1086,10 +1085,10 @@ function BuilderPageContent({
   }
 
   async function generateNextSwipeFit(direction: 'left' | 'right') {
-    if (generatorLoading) return;
+    if (generatorLoading || aiRefining) return;
     const hasCurrentFit = n > 0;
     if (direction === 'right' && hasCurrentFit) {
-      const saved = saveLocalFit(items);
+      const saved = saveLocalFit(items, selectedVibe);
       recordBuilderPreferenceEvent('save', items, selectedVibe);
       setSaveBurst(true);
       window.setTimeout(() => setSaveBurst(false), 850);
@@ -1106,14 +1105,14 @@ function BuilderPageContent({
 
   function dismissSwipeHint(persist = false) {
     if (persist) {
-      window.localStorage.setItem(SWIPE_HINT_STORAGE_KEY, '1');
+      safeStorageSet(SWIPE_HINT_STORAGE_KEY, '1');
     }
     setSwipeHintDismissed(true);
     setSwipeCoachLabel(null);
   }
 
   async function performBoardSwipe(direction: 'left' | 'right') {
-    if (generatorLoading) return;
+    if (generatorLoading || aiRefining) return;
     dismissSwipeHint(true);
     setBoardDragging(true);
     setActiveEditSlot(null);
@@ -1145,7 +1144,7 @@ function BuilderPageContent({
   }
 
   async function handleBoardDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
-    if (generatorLoading) {
+    if (generatorLoading || aiRefining) {
       await boardControls.start({ x: 0, rotate: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 320, damping: 26 } });
       setDragIntent(null);
       setBoardDragging(false);
@@ -1171,9 +1170,9 @@ function BuilderPageContent({
   }
 
   function handleBoardDoubleTap() {
-    if (boardDragging || n === 0) return;
+    if (boardDragging || generatorLoading || aiRefining || n === 0) return;
     dismissSwipeHint(true);
-    const saved = saveLocalFit(items);
+    const saved = saveLocalFit(items, selectedVibe);
     recordBuilderPreferenceEvent('save', items, selectedVibe);
     setSaveBurst(true);
     window.setTimeout(() => setSaveBurst(false), 850);
@@ -1210,19 +1209,20 @@ function BuilderPageContent({
       setEditorialLoading(false);
     }
   };
-  const builderTransparentCount = builderProducts.filter(hasTransparentProductImage).length;
-  const builderLinkedCount = builderProducts.filter((product) => Boolean(getProductOutboundUrl(product))).length;
-  const builderExactLinkedCount = builderProducts.filter(hasExactProductLink).length;
-
   return (
     <main
       className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
     >
-      <header className="relative flex items-center justify-between px-4 pb-2.5 pt-10">
+      <header className="sy-fade-up relative flex items-center justify-between px-4 pb-2.5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))]">
         <h1 className="sr-only">Remix your outfit</h1>
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => {
+            // Deep-links (OG share, cold load) have no in-app history — back
+            // would leave the site; fall through to the scroll instead.
+            if (typeof window !== 'undefined' && window.history.length > 1) router.back();
+            else router.push('/');
+          }}
           className="relative z-10 grid h-9 w-9 place-items-center rounded-full border border-hairline bg-surface-2 text-ink transition hover:border-accent"
           aria-label="Back"
         >
@@ -1230,7 +1230,7 @@ function BuilderPageContent({
         </button>
         <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[170px] -translate-x-1/2 text-center min-[380px]:w-[200px]">
           <div className="flex items-baseline justify-center gap-2">
-            <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+            <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink min-[380px]:text-[18px]">
               <span className="text-accent">Remix</span>
             </span>
@@ -1264,7 +1264,56 @@ function BuilderPageContent({
               {saveBurst ? (
                 <div className="pointer-events-none absolute -inset-4 z-0 rounded-[38px] bg-accent/25 blur-2xl" />
               ) : null}
-              <div className="relative z-10">
+              {/* Swipe cues at the card edges — light up as you drag. */}
+              <div
+                className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                  activeSwipeCue === 'pass'
+                    ? 'border-white/25 bg-black/78 text-white shadow-[0_12px_30px_rgba(0,0,0,.32)]'
+                    : 'border-white/10 bg-black/28 text-white/42 opacity-0'
+                }`}
+              >
+                Pass
+              </div>
+              <div
+                className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                  activeSwipeCue === 'save'
+                    ? 'border-accent bg-accent text-white shadow-pink-glow'
+                    : 'border-accent/20 bg-accent/10 text-white/48 opacity-0'
+                }`}
+              >
+                Save
+              </div>
+              <motion.div
+                animate={boardControls}
+                className="relative z-10 touch-pan-y"
+                drag="x"
+                dragListener={!aiRefining && !generatorLoading}
+                dragConstraints={{ left: -220, right: 220 }}
+                dragElastic={0.12}
+                dragTransition={{ bounceStiffness: 260, bounceDamping: 22 }}
+                onDragStart={() => {
+                  dismissSwipeHint();
+                  setBoardDragging(true);
+                  setActiveEditSlot(null);
+                }}
+                onDrag={(_, info) => {
+                  setDragIntent(info.offset.x > 22 ? 'save' : info.offset.x < -22 ? 'pass' : null);
+                }}
+                onDragEnd={(event, info) => void handleBoardDragEnd(event, info)}
+                onDoubleClick={handleBoardDoubleTap}
+                whileDrag={{ rotate: 2, scale: 0.985 }}
+              >
+                {swipeFeedback ? (
+                  <div
+                    className={`pointer-events-none absolute left-5 top-5 z-30 rounded-full border px-4 py-2 text-[11px] font-black uppercase tracking-[.18em] shadow-[0_14px_34px_rgba(0,0,0,.28)] ${
+                      swipeFeedback === 'save'
+                        ? 'rotate-[-8deg] border-accent bg-accent text-white shadow-pink-glow'
+                        : 'rotate-[8deg] border-white/18 bg-black/72 text-white'
+                    }`}
+                  >
+                    {swipeFeedback === 'save' ? 'Saved' : 'Pass'}
+                  </div>
+                ) : null}
                 {saveBurst ? (
                   <div className="pointer-events-none absolute right-5 top-5 z-30 grid h-11 w-11 animate-pulse place-items-center rounded-full bg-accent text-white shadow-pink-glow">
                     <Bookmark size={17} fill="currentColor" />
@@ -1301,18 +1350,28 @@ function BuilderPageContent({
                     </div>
                   </div>
                 ) : null}
-                <BuilderBoard
+                <Mannequin
                   items={renderItems}
-                  generationSlots={selectedGenerationSlots}
+                  skinTone={skinTone}
+                  bodyType={generatorFrame}
+                  vibeLabel={activeVibe.label}
+                  vibeBlurb={activeVibe.blurb}
+                  selectedGenerationSlots={selectedGenerationSlots}
                   lockedSlots={lockedSlots}
                   onToggleSlotLock={toggleLockedSlot}
                   onOpenSlot={openBoardSlot}
+                  slotInteractionDisabled={boardDragging || generatorLoading}
                   activeEditSlot={activeEditSlot}
-                  disabled={generatorLoading}
                 />
-              </div>
+              </motion.div>
             </div>
             <div className="border-t border-hairline px-1 pt-4">
+              {renderN ? (
+                <div className="mb-3 flex items-center justify-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(255,45,109,.18)]">
+                  <ArrowLeftRight size={12} className="text-accent" />
+                  Swipe the fit · ← pass · save →
+                </div>
+              ) : null}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 text-left">
                   <div className="text-[10px] font-black uppercase tracking-[.18em] text-accent">Generate</div>
@@ -1320,7 +1379,7 @@ function BuilderPageContent({
                     {activeVibe.label} · {selectedGenerationSlots.length} slots · {renderN ? totalDisplay : 'ready'}
                   </div>
                   <div className="mt-1 text-[11px] leading-relaxed text-muted">
-                    Tap a slot to swap it, lock to keep it. Settings controls the categories.
+                    Swipe the card to pass or save, tap a slot to swap, lock to keep.
                     {lockedSlots.length ? ` ${lockedSlots.length} locked.` : ''}
                   </div>
                 </div>
@@ -1337,7 +1396,7 @@ function BuilderPageContent({
                 type="button"
                 onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
                 disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
-                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3.5 text-[12px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.98] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
+                className="sy-cta mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3.5 text-[12px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.98] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
               >
                 {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 {renderN ? 'New look' : 'Generate look'}
@@ -1353,6 +1412,26 @@ function BuilderPageContent({
               </button>
             </div>
           </section>
+
+          <BudgetPanel
+            totalCents={total}
+            budget={remixBudget}
+            onBudgetChange={setRemixBudget}
+            filterOn={remixBudgetFilterOn}
+            onToggleFilter={(value) => {
+              setRemixBudgetFilterOn(value);
+              if (value && remixBudget > 0) {
+                // Wire the budget cap into the existing per-item price gate so
+                // the next generate / search filters to picks that fit.
+                setGeneratorBudget('custom');
+                setCustomBudgetInput(String(remixBudget));
+              }
+            }}
+            items={renderItems}
+            onJumpSlot={openBoardSlot}
+            itemCount={renderN}
+            loading={generatorLoading || aiRefining}
+          />
 
 
           <section className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))] p-3 shadow-[0_18px_42px_rgba(40,20,24,.16)]">
@@ -1423,7 +1502,7 @@ function BuilderPageContent({
           ) : null}
 
           {statusMessage ? (
-            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">
+            <div role="status" aria-live="polite" className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">
               {statusMessage}
             </div>
           ) : null}
@@ -1796,10 +1875,17 @@ function FocusedRefinePanel({
   const activeIndex = CATEGORY_ORDER.indexOf(activeCategory);
   const previousCategory = CATEGORY_ORDER[(activeIndex - 1 + CATEGORY_ORDER.length) % CATEGORY_ORDER.length];
   const nextCategory = CATEGORY_ORDER[(activeIndex + 1) % CATEGORY_ORDER.length];
-  const shopUrl = activeProduct ? getProductOutboundUrl(activeProduct) : '';
+  const shopUrl = activeProduct ? getShoppableUrl(activeProduct) : '';
 
   function openShop() {
     if (!shopUrl || shopUrl === '#') return;
+    // Track the builder shop-through so the revenue funnel is measured here too
+    // (it was the one shop CTA not firing shop_link_clicked).
+    track('shop_link_clicked', {
+      surface: 'builder',
+      category: activeProduct?.category,
+      brand: activeProduct?.brand,
+    });
     window.open(shopUrl, '_blank', 'noopener,noreferrer');
   }
 
@@ -1962,6 +2048,7 @@ function BuildOverlay({
   onChangeTab: (tab: Exclude<BuildSectionTab, 'build'>) => void;
   onClose: () => void;
 }) {
+  const dialogRef = useDialogBehavior<HTMLElement>(onClose);
   return (
     <div className="fixed inset-0 z-[80] mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
       <button
@@ -1971,11 +2058,16 @@ function BuildOverlay({
         onClick={onClose}
       />
       <motion.section
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Build panel"
+        tabIndex={-1}
         initial={{ y: 38, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 38, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)]"
+        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)] outline-none"
       >
         <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))] px-4 pb-3 pt-3">
           <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/18" />
@@ -2136,7 +2228,7 @@ function PanelPreviewImage({
         src={src}
         alt={`${product.brand} ${product.name}`}
         className={modeClassName}
-        style={{ filter: 'drop-shadow(0 10px 18px rgba(0,0,0,.08))' }}
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(45,32,20,.3)) drop-shadow(0 9px 16px rgba(45,32,20,.16))' }}
         loading="lazy"
         referrerPolicy="no-referrer"
         onError={() => setImageOk(false)}

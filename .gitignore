@@ -12,3 +12,10 @@ coverage
 *.tsbuildinfo
 
 .claude/
+.image-masters/
+
+# auto-ingestion staging output (retailer data — never commit; promote via Higgsfield pipeline)
+data/ingested-staging.json
+
+# catalog data backups (redundant, regenerable)
+data/*.backup-*.json

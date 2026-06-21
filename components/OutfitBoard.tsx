@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductImage } from '@/components/ProductImage';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getShoppableUrl } from '@/lib/product-links';
 import {
   hasHighCategoryConfidence,
   isEditorialCutoutProduct,
@@ -82,83 +82,9 @@ const STACKED_FIT_IMAGE_CLASSES: Record<Category, string> = {
   shoes: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_30px_20px_rgba(0,0,0,.34)]',
 };
 
-const FITS_AI_FLATLAY_ORDER: Category[] = ['bottom', 'top', 'outer', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 // Grid display order — the lead category (top, else outer) fills the big 2x2
 // hero cell; everything else flows into uniform cells after it.
 const FLATLAY_GRID_ORDER: Category[] = ['top', 'outer', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
-
-// Cohesive "worn silhouette" flat lay: a centered head-to-toe column (hat → top
-// → bottom → shoes) with outerwear layered to the left and accessories tucked to
-// the right. z-order is anatomical and CONSISTENT across every variant so the
-// hat and accessories always sit ON TOP and never disappear behind a garment.
-// Layering rule: bottom(20) < outer(30) < top(40) < shoes(55) < bag(60) <
-// jewelry(64) < hat(70) < eyewear(74).
-const FITS_AI_FLATLAY_SLOT_STYLES: Record<Category, string> = {
-  hat: 'left-[35%] top-[1%] h-[18%] w-[30%] rotate-[-3deg] z-[70]',
-  eyewear: 'right-[13%] top-[20%] h-[9%] w-[22%] rotate-[5deg] z-[74]',
-  outer: 'left-[3%] top-[23%] h-[44%] w-[40%] rotate-[-6deg] z-[30]',
-  top: 'left-[33%] top-[20%] h-[34%] w-[39%] rotate-[1deg] z-[40]',
-  bottom: 'left-[32%] top-[47%] h-[40%] w-[40%] rotate-[-1deg] z-[20]',
-  shoes: 'left-[27%] bottom-[2%] h-[19%] w-[46%] rotate-[1deg] z-[55]',
-  bag: 'right-[3%] top-[45%] h-[31%] w-[27%] rotate-[5deg] z-[60]',
-  jewelry: 'left-[7%] top-[70%] h-[12%] w-[16%] rotate-[-6deg] z-[64]',
-};
-
-// No outerwear: widen the top and recenter so the column stays balanced.
-const FITS_AI_FLATLAY_NO_OUTER_SLOT_STYLES: Record<Category, string> = {
-  outer: FITS_AI_FLATLAY_SLOT_STYLES.outer,
-  hat: 'left-[35%] top-[1%] h-[18%] w-[30%] rotate-[-3deg] z-[70]',
-  eyewear: 'right-[14%] top-[19%] h-[9%] w-[23%] rotate-[5deg] z-[74]',
-  top: 'left-[29%] top-[18%] h-[37%] w-[42%] rotate-[.5deg] z-[40]',
-  bottom: 'left-[30%] top-[48%] h-[40%] w-[40%] rotate-[-1deg] z-[20]',
-  shoes: 'left-[27%] bottom-[2%] h-[19%] w-[46%] rotate-[1deg] z-[55]',
-  bag: 'right-[4%] top-[44%] h-[30%] w-[26%] rotate-[5deg] z-[60]',
-  jewelry: 'left-[8%] top-[40%] h-[12%] w-[16%] rotate-[-6deg] z-[64]',
-};
-
-const FITS_AI_FLATLAY_COMPACT_SLOT_STYLES: Record<Category, string> = {
-  hat: 'left-[36%] top-[2%] h-[16%] w-[28%] rotate-[-3deg] z-[70]',
-  eyewear: 'right-[13%] top-[20%] h-[8%] w-[23%] rotate-[5deg] z-[74]',
-  outer: 'left-[3%] top-[24%] h-[42%] w-[40%] rotate-[-6deg] z-[30]',
-  top: 'left-[33%] top-[21%] h-[33%] w-[40%] rotate-[1deg] z-[40]',
-  bottom: 'left-[32%] top-[48%] h-[39%] w-[40%] rotate-[-1deg] z-[20]',
-  shoes: 'left-[28%] bottom-[2%] h-[18%] w-[44%] rotate-[1deg] z-[55]',
-  bag: 'right-[3%] top-[46%] h-[29%] w-[27%] rotate-[5deg] z-[60]',
-  jewelry: 'left-[8%] top-[70%] h-[11%] w-[16%] rotate-[-6deg] z-[64]',
-};
-
-const FITS_AI_FLATLAY_SNEAKER_LED_SLOT_STYLES: Record<Category, string> = {
-  outer: 'left-[9%] top-[34%] h-[34%] w-[34%] rotate-[-5deg] z-[28]',
-  top: 'left-[12%] top-[16%] h-[30%] w-[34%] rotate-[2deg] z-[36]',
-  bottom: 'right-[11%] top-[32%] h-[39%] w-[35%] rotate-[-.5deg] z-[22]',
-  shoes: 'left-[19%] bottom-[2%] h-[25%] w-[62%] rotate-[1deg] z-[58]',
-  bag: 'right-[8%] top-[10%] h-[23%] w-[27%] rotate-[5deg] z-[60]',
-  hat: 'left-[39%] top-[2%] h-[16%] w-[29%] rotate-[-3deg] z-[70]',
-  eyewear: 'right-[18%] top-[21%] h-[9%] w-[23%] rotate-[4deg] z-[74]',
-  jewelry: 'left-[13%] top-[57%] h-[12%] w-[17%] rotate-[-6deg] z-[64]',
-};
-
-const FITS_AI_FLATLAY_HERO_TOP_SLOT_STYLES: Record<Category, string> = {
-  outer: 'left-[10%] top-[18%] h-[42%] w-[39%] rotate-[-4deg] z-[28]',
-  top: 'right-[14%] top-[11%] h-[44%] w-[43%] rotate-[1deg] z-[40]',
-  bottom: 'left-[30%] top-[42%] h-[45%] w-[43%] rotate-[-.5deg] z-[22]',
-  shoes: 'left-[20%] bottom-[0%] h-[25%] w-[60%] rotate-[1deg] z-[56]',
-  bag: 'right-[4%] top-[43%] h-[29%] w-[28%] rotate-[5deg] z-[60]',
-  hat: 'left-[34%] top-[2%] h-[16%] w-[31%] rotate-[-3deg] z-[70]',
-  eyewear: 'right-[15%] top-[17%] h-[9%] w-[25%] rotate-[4deg] z-[74]',
-  jewelry: 'left-[12%] top-[58%] h-[12%] w-[18%] rotate-[-6deg] z-[64]',
-};
-
-const FITS_AI_FLATLAY_IMAGE_CLASSES: Record<Category, string> = {
-  hat: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_18px_15px_rgba(24,18,28,.18)]',
-  eyewear: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_14px_12px_rgba(24,18,28,.18)]',
-  outer: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_22px_rgba(24,18,28,.2)]',
-  top: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_23px_21px_rgba(24,18,28,.19)]',
-  bottom: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_22px_rgba(24,18,28,.18)]',
-  bag: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_24px_20px_rgba(24,18,28,.2)]',
-  jewelry: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_14px_12px_rgba(24,18,28,.17)]',
-  shoes: 'h-full w-full object-contain object-center p-0 drop-shadow-[0_25px_18px_rgba(24,18,28,.22)]',
-};
 
 const FEED_SUPPORT_ORDER: Category[] = ['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 const BOOT_TERMS = ['boot', 'boots', 'chelsea', 'ugg'];
@@ -676,7 +602,7 @@ export function SilhouetteFitCard({
       {renderSlots.map((category) => {
         const product = byCategory.get(category);
         if (!product) return null;
-        const outboundUrl = productLinks ? getProductOutboundUrl(product) : null;
+        const outboundUrl = productLinks ? getShoppableUrl(product) : null;
         const imageEl = (
           <ProductImage
             product={product}
@@ -693,7 +619,7 @@ export function SilhouetteFitCard({
             key={`${category}-${product.id}-sil`}
             href={outboundUrl}
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer sponsored"
             aria-label={`Shop ${product.brand} ${product.name}`}
             className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${SILHOUETTE_SLOT[category]}`}
           >
@@ -838,7 +764,7 @@ export function StudioFitCard({
         if (!product) return null;
         const placement = STUDIO_WORN_SLOT[category] || STUDIO_ACCENT_SLOT[category] || STUDIO_PEDESTAL[category]?.item;
         if (!placement) return null;
-        const outboundUrl = productLinks ? getProductOutboundUrl(product) : null;
+        const outboundUrl = productLinks ? getShoppableUrl(product) : null;
         const imageEl = (
           <ProductImage
             product={product}
@@ -855,7 +781,7 @@ export function StudioFitCard({
             key={`${category}-${product.id}-studio`}
             href={outboundUrl}
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer sponsored"
             aria-label={`Shop ${product.brand} ${product.name}`}
             className={`absolute block overflow-visible transition-transform duration-200 ease-out hover:scale-[1.03] ${placement}`}
           >
@@ -1079,27 +1005,6 @@ function stackedFitImageClass(product: Product): string {
   return base;
 }
 
-function flatlayImageClass(product: Product): string {
-  const base = FITS_AI_FLATLAY_IMAGE_CLASSES[product.category];
-  if (product.category === 'shoes') {
-    return adjustedShoeImageClass(product, base, 'flatlay');
-  }
-  if (product.category === 'hat') {
-    return adjustedHatImageClass(product, base, 'flatlay');
-  }
-  if (product.category === 'bag') {
-    return adjustedBagImageClass(product, base, 'flatlay');
-  }
-  if (product.category === 'bottom') {
-    return adjustedBottomImageClass(product, base, 'flatlay');
-  }
-  if (product.category === 'jewelry') {
-    return adjustedJewelryImageClass(product, base, 'flatlay');
-  }
-  if (product.category === 'eyewear') return `${base} scale-[.84]`;
-  return base;
-}
-
 function feedTileImageClass(product: Product, role: 'hero' | 'support'): string {
   const shadow = role === 'hero'
     ? 'drop-shadow-[0_34px_26px_rgba(0,0,0,.28)]'
@@ -1261,7 +1166,7 @@ function ProductTileLink({
   fitSlot?: Category;
   children: React.ReactNode;
 }) {
-  const outboundUrl = getProductOutboundUrl(product);
+  const outboundUrl = getShoppableUrl(product);
   if (disabled || !outboundUrl) {
     return <div className={className} data-stacked-fit-slot={fitSlot}>{children}</div>;
   }

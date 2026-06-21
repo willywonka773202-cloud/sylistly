@@ -5,6 +5,17 @@ export const CATEGORY_ORDER: Category[] = [
   'hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry',
 ];
 
+export const CATEGORY_LABELS: Record<Category, string> = {
+  hat: 'Headwear',
+  outer: 'Outer',
+  top: 'Top',
+  bottom: 'Bottom',
+  shoes: 'Shoes',
+  bag: 'Bag',
+  eyewear: 'Eyewear',
+  jewelry: 'Jewelry',
+};
+
 export interface SearchIntent {
   category: Category;
   color?: string[];

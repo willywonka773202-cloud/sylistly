@@ -2,11 +2,10 @@
 
 import { ExternalLink, Lock, RefreshCw, X } from 'lucide-react';
 import { ProductImage } from '@/components/ProductImage';
-import { wrapAffiliate } from '@/lib/affiliate';
-import { track } from '@/lib/analytics';
 import { hasExactProductLink } from '@/lib/product-image-quality';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import type { Product } from '@/lib/types';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
 
 function formatPrice(cents: number): string {
   return `$${Math.round(cents / 100).toLocaleString()}`;
@@ -23,8 +22,9 @@ function merchantName(product: Product): string {
 
 /**
  * Shop-the-look peek — tapping a garment on the plate opens this. Primary
- * action is Shop (the commercial goal; affiliate-wrapped + tracked); Swap
- * and Lock are secondary so the peek doubles as the per-piece control surface.
+ * action is Shop, which now opens the retailer in the in-app browser sheet
+ * (parent owns it); Swap and Lock are secondary so the peek doubles as the
+ * per-piece control surface.
  */
 export function PiecePeek({
   product,
@@ -36,18 +36,26 @@ export function PiecePeek({
 }: {
   product: Product;
   locked: boolean;
+  /** Opens the retailer inside the in-app browser sheet (parent-owned). */
   onShop: () => void;
   onSwap: () => void;
   onLock: () => void;
   onClose: () => void;
 }) {
-  const url = wrapAffiliate(getProductOutboundUrl(product));
   const exact = hasExactProductLink(product);
+  const dialogRef = useDialogBehavior<HTMLDivElement>(onClose);
 
   return (
     <div className="fixed inset-0 z-[80] mx-auto flex max-w-[480px] items-end">
       <button className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-label="Close" onClick={onClose} />
-      <div className="sy-sheet-enter relative z-10 w-full rounded-t-sheet border border-hairline-2 bg-surface-1 p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-float">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${product.brand} ${product.name}`}
+        tabIndex={-1}
+        className="sy-sheet-enter relative z-10 w-full rounded-t-sheet border border-hairline-2 bg-surface-1 p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-float outline-none"
+      >
         <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-hairline-2" />
         <button
           type="button"
@@ -82,26 +90,14 @@ export function PiecePeek({
           </div>
         </div>
 
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer sponsored"
-          onClick={() => {
-            track('shop_link_clicked', {
-              brand: product.brand,
-              retailer: product.retailer,
-              priceCents: product.priceCents,
-              exact,
-              wrapped: url !== getProductOutboundUrl(product),
-              surface: 'piece-peek',
-            });
-            onShop();
-          }}
+        <button
+          type="button"
+          onClick={onShop}
           className="sy-press mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-3.5 text-[14px] font-bold text-white shadow-pink-glow"
         >
           Shop at {merchantName(product)}
           <ExternalLink size={15} />
-        </a>
+        </button>
 
         <div className="mt-2 grid grid-cols-2 gap-2">
           <button

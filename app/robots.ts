@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sylistly.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.sylistly.com';
 
   return {
     rules: {

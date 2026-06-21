@@ -113,7 +113,11 @@ export interface StoredIdentity {
 export function saveIdentity(answers: StyleAnswers, identity: StyleIdentity): void {
   if (typeof window === 'undefined') return;
   const payload: StoredIdentity = { identityId: identity.id, answers };
-  window.localStorage.setItem(IDENTITY_KEY, JSON.stringify(payload));
+  try {
+    window.localStorage.setItem(IDENTITY_KEY, JSON.stringify(payload));
+  } catch {
+    /* private mode / blocked storage — identity still used in-session */
+  }
 }
 
 export function loadIdentity(): { identity: StyleIdentity; answers: StyleAnswers } | null {

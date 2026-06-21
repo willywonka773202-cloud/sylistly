@@ -50,7 +50,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
       <header className="flex items-center justify-between">
         <Link href="/" className="flex items-baseline gap-2">
           <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
-          <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+          <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
         </Link>
         {look.isSyli ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow">

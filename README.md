@@ -36,6 +36,29 @@ pnpm dev
 # open http://localhost:3000
 ```
 
+## Quality gate
+
+One command runs the full gate (also enforced in CI on every push/PR via
+`.github/workflows/verify.yml` — needs no secrets):
+
+```bash
+npm run verify   # typecheck + lint + unit tests + route/integrity smoke
+```
+
+Individually:
+
+```bash
+npm run typecheck      # tsc --noEmit
+npm run lint           # eslint
+npm run test:units     # pure-logic unit checks: XP levels, bundle pricing, affiliate wrap, rarity tiers
+npm run smoke:routes   # routes exist + honesty/revenue/foundation invariants
+SMOKE_BASE_URL=https://www.sylistly.com npm run smoke:routes  # + live HTTP check of prod
+```
+
+These lock in the honest-app invariants — no fake discounts (verified-only deals),
+affiliate-wrapped shop links, XP-from-real-actions, the iOS one-swipe touch-pager,
+canonical `www` host, no fake-social copy — so they can't silently regress.
+
 ## Environment
 
 Needed for full live functionality. Without paid search keys, `/api/search` still works from the local Sylistly catalog, so the core builder can run without API cost.
@@ -69,7 +92,7 @@ CATALOG_MAX_TASKS=10 npm run catalog:build
 
 This writes real product records into [`data/photo-catalog.json`](/Users/willlambert/Documents/GitHub/sylistly/data/photo-catalog.json). Once populated, `/api/search` prefers that photo-backed catalog before the starter merchant catalog.
 
-The importer now rotates through a saved queue cursor in [`data/catalog-build-state.json`](/Users/willlambert/Documents/Codex/2026-04-22-how-do-i-connect-my-github/sylistly/data/catalog-build-state.json), so repeated runs keep working through different brand/category queries instead of starting from the top every time.
+The importer now rotates through a saved queue cursor in [`data/catalog-build-state.json`](data/catalog-build-state.json), so repeated runs keep working through different brand/category queries instead of starting from the top every time.
 
 ## New Drop Catalog Refresh
 
@@ -105,7 +128,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 CRON_SECRET=
 CATALOG_REFRESH_TOKEN=
 ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=claude-sonnet-4-20250514
+ANTHROPIC_MODEL=claude-sonnet-4-6
 OLLAMA_API_KEY=
 OLLAMA_DEFAULT_MODEL=gpt-oss:120b
 OLLAMA_API_BASE_URL=https://ollama.com/api
@@ -134,64 +157,69 @@ Get keys:
 
 ## Architecture
 
+The scroll serves **pre-generated, coordinated outfits** from the local catalog
+(no per-view LLM/search call), and every shop link is affiliate-wrapped.
+
 ```
- user query ─► /api/search
+ client catalog (transparent cutouts) ─► outfit library / ai-look library
+                                              │  (coordinated, date-seeded looks)
+                                              ▼
+   SCROLL  ── WornFlatlay collage (vitrine plate)
+       │         │
+       │         └─ lock a piece ─► restyle the rest around it
+       ▼
+   DROP   ── date-seeded crate ─► reveal a look ─► bundle deal (verified-only)
+       │
+       ▼
+   SHOP   ── wrapAffiliate(productUrl)  (Skimlinks / Rakuten) ─► retailer
                  │
-                 ▼
-             Claude (parse intent)
-                 │
-                 ▼
-             SearchAPI Google Shopping
-                 │
-                 ▼
-             dedupe + trust-filter
-                 │
-                 ▼
-             Claude (re-rank top 6)
-                 │
-                 ▼
-             affiliate-wrap URLs
-                 │
-                 ▼
-             6 products ─► UI
+   engagement ──┴─ real actions ─► XP · levels · quests · streak · vault  (localStorage, honest)
 ```
+
+The catalog itself is built/refreshed offline (SearchAPI Google Shopping + a
+cutout pipeline → `data/*.json`); `/api/search` powers Browse and falls back to
+the local catalog when no paid key is set. See the catalog sections above.
 
 ## Directory
 
+The app is a full-screen **outfit scroll** + a **Daily Drop crate**, not a search
+box. The five tabs (BottomNav): Scroll (`/`), Remix (`/build`), Drop (`/drop`,
+centre), Saved (`/saved`), You (`/profile`).
+
 ```
 app/
-  layout.tsx             global chrome
-  page.tsx               builder (home)
-  discover/page.tsx      curated fits
-  saved/page.tsx         user's saved looks
-  profile/page.tsx       style profile
-  fit/[id]/page.tsx      public shareable fit
-  api/
-    search/route.ts      Claude + SearchAPI
-    fit/route.ts         create fit
-    fit/[id]/route.ts    read / share fit
-    shop-all/route.ts    wrap + return all buy links
-    tryon/route.ts       (phase 2) FASHN try-on
+  layout.tsx             global chrome (fonts, metadata, BottomNav)
+  page.tsx               the SCROLL — full-screen outfit feed (home); lock a piece → restyle
+  drop/page.tsx          the DAILY DROP — 3D crate shop: crates, streak, vault, XP, quests
+  build/page.tsx         REMIX — the outfit builder
+  browse/page.tsx        BROWSE — searchable catalog grid; tap to lock into the scroll
+  saved/page.tsx         Saved fits + pieces
+  profile/page.tsx       YOU — style settings + the collection card (level/streak/vault)
+  checkout/page.tsx      "Shop the look" — gathers affiliate-wrapped retailer links
+  look/[id]/             shareable look page + dynamic OG image
+  style/[id]/            shareable style-identity page + dynamic OG image
+  error.tsx / not-found.tsx / opengraph-image.tsx / robots.ts / sitemap.ts / manifest.ts
+  api/                   search · look · fit · image (cutout proxy + SSRF guard) · shop-all · catalog-*
 components/
-  Mannequin.tsx
-  SearchSheet.tsx
-  SlotList.tsx
-  ProductCard.tsx
-  Toast.tsx
-  BottomNav.tsx
+  WornFlatlay.tsx        the worn outfit collage plate (vitrine depth + sway)
+  OutfitBoard.tsx        outfit-card renderers (feed + saved)
+  DailyDrop.tsx          the crate: 3D intro → reel → reveal → shop the bundle
+  three/                 CrateScene.tsx + Crate3D.tsx (lazy WebGL 3D crate)
+  BottomNav.tsx          5-tab floating nav (spring sliding glow-lamp)
+  AmbientField.tsx · AnimatedNumber.tsx · Reveal.tsx · ProductImage.tsx
+  PiecePeek.tsx · CheckoutSheet.tsx · Onboarding.tsx · PlaceholderScreen.tsx · SearchSheet.tsx
 lib/
-  supabase.ts            server + browser clients
-  claude.ts              Anthropic SDK wrapper
-  serpapi.ts             shopping search
+  visual-capability.ts   SSR-safe heavy-visuals gate (reduced-motion / WebGL / low-power)
+  look-rarity.ts         honest rarity tiers (everyday/standout/showpiece/heat)
+  drop-vault.ts          streak (+ one freeze) + the collection vault
+  stylist-xp.ts          XP, levels, daily quests (from real actions only)
+  bundle-deals.ts        honest retailer offers (verified-only)
   affiliate.ts           Skimlinks/Rakuten URL wrapping
-  products.ts            DB queries
-  types.ts               shared types
-store/
-  fit.ts                 Zustand store for current fit
-supabase/
-  migrations/
-    0001_initial.sql     schema from MASTER_PROMPT §8
-    0002_products_catalog_expansion.sql
+  product-links.ts · checkout.ts · feedback.ts · analytics.ts · types.ts
+store/                   Zustand stores (fit, saved-fits, wardrobe, profile)
+scripts/
+  check-route-smoke.ts   route + honesty/revenue/foundation smoke (npm run smoke:routes)
+  check-lib-units.ts     pure-logic unit tests (npm run test:units)
 ```
 
 ## Deploy

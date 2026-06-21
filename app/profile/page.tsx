@@ -1,19 +1,41 @@
 'use client';
 
-import { ArrowRight, Bookmark, Check, Share2, Sparkles } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, Flame, Gift, Share2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AmbientField } from '@/components/AmbientField';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { BottomNav } from '@/components/BottomNav';
 import { OutfitLookCard } from '@/components/OutfitBoard';
+import { Reveal } from '@/components/Reveal';
 import { track } from '@/lib/analytics';
+import { isEditorialCutoutProduct } from '@/lib/product-image-quality';
+import { safeStorageRemove } from '@/lib/safe-storage';
 import { loadIdentity, type StyleIdentity } from '@/lib/style-identity';
-import type { Profile } from '@/lib/types';
+import type { Product, Profile } from '@/lib/types';
 import { VIBES } from '@/lib/vibes';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
+import {
+  bestStreak,
+  currentStreak,
+  dropClaimedToday,
+  vaultStats,
+  type VaultStats,
+} from '@/lib/drop-vault';
+import { getLevel, type LevelState } from '@/lib/stylist-xp';
 
 const ONBOARDED_KEY = 'sylistly.onboarded.v1';
+
+/** Rarity-tier hues — shared with the Drop shop so a vault tile reads the same
+ *  tier colour wherever it appears. */
+const TIER_META: Array<{ id: keyof VaultStats['byTier']; label: string; hue: string }> = [
+  { id: 'heat', label: 'Heat', hue: '#FFC24B' },
+  { id: 'showpiece', label: 'Showpiece', hue: '#FF2D6D' },
+  { id: 'standout', label: 'Standout', hue: '#5fa8ff' },
+  { id: 'everyday', label: 'Everyday', hue: '#b8b1a4' },
+];
 
 const SKIN_TONES = ['#f2d6c0', '#e4b894', '#c9a98a', '#a87f5e', '#8a5f3f', '#5d3f29'];
 
@@ -50,19 +72,43 @@ export default function ProfilePage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [identity, setIdentity] = useState<StyleIdentity | null>(null);
   const [shared, setShared] = useState(false);
+  // Brief "saved" checkmark per size field. Owned by the parent (which doesn't
+  // remount) so it survives SizeField's remount-on-commit (its key changes).
+  const [savedSizeField, setSavedSizeField] = useState<'top' | 'bottom' | 'shoe' | null>(null);
+  const sizeSaveTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (sizeSaveTimer.current) window.clearTimeout(sizeSaveTimer.current); }, []);
+  function flashSizeSaved(field: 'top' | 'bottom' | 'shoe') {
+    setSavedSizeField(field);
+    if (sizeSaveTimer.current) window.clearTimeout(sizeSaveTimer.current);
+    sizeSaveTimer.current = window.setTimeout(() => setSavedSizeField(null), 1400);
+  }
+  const [stats, setStats] = useState<{
+    level: LevelState;
+    streak: number;
+    best: number;
+    vault: VaultStats;
+    dropReady: boolean;
+  } | null>(null);
   useEffect(() => {
     setHasMounted(true);
     setIdentity(loadIdentity()?.identity ?? null);
+    setStats({
+      level: getLevel(),
+      streak: currentStreak(),
+      best: bestStreak(),
+      vault: vaultStats(),
+      dropReady: !dropClaimedToday(),
+    });
   }, []);
 
   function retakeQuiz() {
-    window.localStorage.removeItem(ONBOARDED_KEY);
+    safeStorageRemove(ONBOARDED_KEY);
     router.push('/');
   }
 
   async function shareIdentity() {
     if (!identity) return;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.sylistly.com';
     const url = `${origin}/style/${identity.id}`;
     const text = `I'm a ${identity.name} on Sylistly ✨ what's your style?`;
     track('quiz_shared', { identity: identity.id, surface: 'profile' });
@@ -95,17 +141,111 @@ export default function ProfilePage() {
     setVibesFromText(Array.from(next).join(', '));
   }
 
-  const recentFits = hasMounted ? fits.slice(0, 4) : [];
+  // Only show fits the card can actually render (≥3 editorial-cutout pieces) —
+  // OutfitLookCard returns null below that, which would leave blank, clickable
+  // boxes in the grid.
+  const recentFits = hasMounted
+    ? fits
+        .filter(
+          (fit) =>
+            Object.values(fit.items).filter(
+              (product): product is Product => Boolean(product) && isEditorialCutoutProduct(product),
+            ).length >= 3,
+        )
+        .slice(0, 4)
+    : [];
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg px-5 pb-[140px] pt-[calc(env(safe-area-inset-top)+22px)]">
+    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg px-5 pb-[140px] pt-[calc(env(safe-area-inset-top)+22px)]">
+      <AmbientField className="opacity-70" />
+      <div className="relative z-10 sy-stagger">
       <header>
-        <p className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly profile</p>
+        <p className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly profile</p>
         <h1 className="mt-2 font-serif text-display font-semibold text-ink">You</h1>
         <p className="mt-2 max-w-[36ch] text-[13px] leading-relaxed text-muted">
           These settings steer every look in your scroll and builder. Stored on this device.
         </p>
       </header>
+
+      {/* Your collection — surfaces the real engagement systems (level/XP from
+          actions, the Drop streak, vault pulls). All honest counts, device-local. */}
+      {stats ? (
+        <Reveal>
+          <section className="mt-7 overflow-hidden rounded-card-lg border border-hairline bg-[linear-gradient(160deg,rgba(255,45,109,.10),transparent_46%),linear-gradient(0deg,rgba(231,199,155,.06),rgba(231,199,155,.06))] p-5">
+            <div className="flex items-center justify-between">
+              <p className="inline-flex items-center gap-1.5 text-eyebrow font-extrabold uppercase text-champagne">
+                <Sparkles size={12} />
+                Your collection
+              </p>
+              {stats.dropReady ? (
+                <Link
+                  href="/drop"
+                  className="sy-press inline-flex items-center gap-1 rounded-full bg-accent-soft px-3 py-1.5 text-[11px] font-bold text-accent"
+                >
+                  <Gift size={12} />
+                  Drop ready
+                </Link>
+              ) : null}
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2.5">
+              <StatTile prefix="Lv " count={stats.level.level} label={stats.level.title} />
+              <StatTile
+                count={stats.streak}
+                label="day streak"
+                icon={<Flame size={13} className="text-accent" />}
+                hint={stats.best > stats.streak ? `best ${stats.best}` : undefined}
+              />
+              <StatTile count={stats.vault.total} label={stats.vault.total === 1 ? 'pull' : 'pulls'} />
+            </div>
+
+            {/* XP progress to next level */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-[11px] font-semibold">
+                <span className="text-muted-2">
+                  {stats.level.maxed ? 'Max level reached' : `${stats.level.intoLevel}/${stats.level.span} XP`}
+                </span>
+                <span className="text-muted">
+                  {stats.level.nextTitle ? `Next: ${stats.level.nextTitle}` : '★ Icon'}
+                </span>
+              </div>
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-2">
+                <div
+                  className="sy-bar-fill relative h-full overflow-hidden rounded-full bg-[linear-gradient(90deg,#FF2D6D,#E7C79B)] transition-[width] duration-700 ease-out"
+                  style={{ width: `${stats.level.pct}%` }}
+                >
+                  <span aria-hidden className="sy-xp-sheen pointer-events-none absolute inset-0 rounded-full" />
+                </div>
+              </div>
+            </div>
+
+            {/* Vault rarity breakdown / empty nudge */}
+            {stats.vault.total ? (
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5">
+                {TIER_META.filter((tier) => stats.vault.byTier[tier.id]).map((tier, i) => (
+                  <span key={tier.id} className="inline-flex items-center gap-1.5 text-[11px] font-semibold">
+                    <span
+                      className="sy-gem h-2 w-2 rounded-full"
+                      style={{ ['--gem']: tier.hue, background: tier.hue, animationDelay: `${i * 350}ms` } as React.CSSProperties}
+                    />
+                    <span className="text-muted-2">
+                      {stats.vault.byTier[tier.id]} {tier.label}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <Link
+                href="/drop"
+                className="sy-press mt-4 flex items-center justify-between rounded-card border border-dashed border-hairline-2 bg-surface-1/60 px-4 py-3 text-[12px]"
+              >
+                <span className="text-muted-2">Open Daily Drops to start your collection</span>
+                <ArrowRight size={14} className="text-accent" />
+              </Link>
+            )}
+          </section>
+        </Reveal>
+      ) : null}
 
       {/* Style identity */}
       {hasMounted ? (
@@ -207,25 +347,34 @@ export default function ProfilePage() {
       {/* Sizes — 16px inputs so iOS doesn't zoom on focus */}
       <Section title="Sizes">
         <div className="grid grid-cols-3 gap-2">
+          {/* key includes hasMounted + the stored value so the uncontrolled
+              input remounts to show the saved size once the store hydrates
+              (uncontrolled inputs ignore defaultValue changes after mount). */}
           <SizeField
+            key={`top-${hasMounted}-${profile.sizes.top || ''}`}
             label="Top"
             placeholder="M"
             defaultValue={hasMounted ? profile.sizes.top || '' : ''}
-            onCommit={setTopSize}
+            onCommit={(value) => { const changed = !!value && value !== (profile.sizes.top || ''); setTopSize(value); if (changed) flashSizeSaved('top'); }}
+            justSaved={savedSizeField === 'top'}
           />
           <SizeField
+            key={`waist-${hasMounted}-${profile.sizes.bottom?.waist || ''}`}
             label="Waist"
             placeholder="32"
             inputMode="numeric"
             defaultValue={hasMounted ? `${profile.sizes.bottom?.waist || ''}` : ''}
-            onCommit={setBottomSize}
+            onCommit={(value) => { const changed = !!value && value !== `${profile.sizes.bottom?.waist || ''}`; setBottomSize(value); if (changed) flashSizeSaved('bottom'); }}
+            justSaved={savedSizeField === 'bottom'}
           />
           <SizeField
+            key={`shoe-${hasMounted}-${profile.sizes.shoe || ''}`}
             label="Shoe"
             placeholder="10.5"
             inputMode="decimal"
             defaultValue={hasMounted ? profile.sizes.shoe || '' : ''}
-            onCommit={setShoeSize}
+            onCommit={(value) => { const changed = !!value && value !== (profile.sizes.shoe || ''); setShoeSize(value); if (changed) flashSizeSaved('shoe'); }}
+            justSaved={savedSizeField === 'shoe'}
           />
         </div>
       </Section>
@@ -293,14 +442,15 @@ export default function ProfilePage() {
       >
         {recentFits.length ? (
           <div className="grid grid-cols-2 gap-3">
-            {recentFits.map((fit) => (
+            {recentFits.map((fit, i) => (
+              <Reveal key={fit.id} delay={(i % 2) * 80}>
               <Link
-                key={fit.id}
                 href="/saved"
-                className="sy-press overflow-hidden rounded-card ring-1 ring-hairline"
+                className="sy-press block overflow-hidden rounded-card ring-1 ring-hairline"
               >
                 <OutfitLookCard items={fit.items} presentation="flatlay" productLinks={false} compact className="h-[150px]" />
               </Link>
+              </Reveal>
             ))}
           </div>
         ) : (
@@ -311,9 +461,47 @@ export default function ProfilePage() {
           </div>
         )}
       </Section>
+      </div>
 
       <BottomNav />
     </main>
+  );
+}
+
+function StatTile({
+  value,
+  count,
+  prefix,
+  label,
+  icon,
+  hint,
+}: {
+  /** Static display value (used when `count` is not provided). */
+  value?: string;
+  /** When set, the number counts up from 0 on mount (honest — real stat). */
+  count?: number;
+  /** Static text rendered before the count-up (e.g. "Lv "). */
+  prefix?: string;
+  label: string;
+  icon?: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-card border border-hairline bg-surface-1/70 px-3 py-3 text-center">
+      <p className="inline-flex items-center justify-center gap-1 font-serif text-[26px] font-semibold leading-none text-ink">
+        {icon}
+        {count != null ? (
+          <span>
+            {prefix}
+            <AnimatedNumber value={count} durationMs={900} />
+          </span>
+        ) : (
+          value
+        )}
+      </p>
+      <p className="mt-1.5 text-[11px] font-semibold text-muted-2">{label}</p>
+      {hint ? <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">{hint}</p> : null}
+    </div>
   );
 }
 
@@ -343,15 +531,20 @@ function SizeField({
   defaultValue,
   inputMode,
   onCommit,
+  justSaved,
 }: {
   label: string;
   placeholder: string;
   defaultValue: string;
   inputMode?: 'numeric' | 'decimal';
   onCommit: (value: string) => void;
+  justSaved?: boolean;
 }) {
+  // `justSaved` is parent-owned (survives this field's remount-on-commit) and
+  // briefly flashes a checkmark — sizes drive the fit recs, so a silent onBlur
+  // left users unsure it stuck.
   return (
-    <label className="block rounded-card border border-hairline bg-surface-1 px-3 py-2.5">
+    <label className="relative block rounded-card border border-hairline bg-surface-1 px-3 py-2.5">
       <span className="block text-[10px] font-bold uppercase tracking-[.14em] text-muted">{label}</span>
       <input
         type="text"
@@ -361,6 +554,13 @@ function SizeField({
         onBlur={(event) => onCommit(event.target.value.trim())}
         className="mt-1 w-full bg-transparent text-[16px] font-semibold text-ink outline-none placeholder:text-muted/60"
       />
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute right-2.5 top-2.5 text-money transition-opacity duration-300 ${justSaved ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <Check size={13} />
+      </span>
+      <span className="sr-only" aria-live="polite">{justSaved ? `${label} size saved` : ''}</span>
     </label>
   );
 }

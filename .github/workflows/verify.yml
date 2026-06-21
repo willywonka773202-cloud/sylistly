@@ -1,0 +1,31 @@
+name: Verify
+
+# Quality gate: typecheck + lint + unit tests + route/integrity smoke.
+# Runs on every push and PR so the honesty/revenue/engagement invariants
+# (verified-only discounts, affiliate wrapping, XP-from-real-actions, the
+# iOS touch-pager, canonical host, no fake-social copy, …) can't silently
+# regress. Source-only — needs no secrets. See scripts/check-*.ts.
+
+on:
+  push:
+    branches: ['**']
+  pull_request: {}
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # smoke scans tracked files via `git ls-files`
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verify (typecheck · lint · unit tests · smoke)
+        run: npm run verify

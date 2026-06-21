@@ -275,7 +275,7 @@ async function fetchShopifySource(source: DropSource): Promise<{ products: Produ
     cache: 'no-store',
     headers: {
       accept: 'application/json',
-      'user-agent': 'SylistlyCatalogBot/1.0 (+https://sylistly.com)',
+      'user-agent': 'SylistlyCatalogBot/1.0 (+https://www.sylistly.com)',
     },
   });
   if (!response.ok) throw new Error(`shopify ${response.status}`);

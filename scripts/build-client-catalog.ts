@@ -9,11 +9,14 @@ import {
   isSyntheticStudioProduct,
 } from '../lib/product-image-quality';
 import { CATEGORY_ORDER, type Category, type Product } from '../lib/types';
+import { cutoutModelScore } from './cutout-model-score';
 
 interface ClientCatalogReport {
   generatedAt: string;
   runtimeProducts: number;
   eligibleProducts: number;
+  duplicatesCollapsed: number;
+  duplicateGroups: number;
   emittedProducts: number;
   limit: number;
   byCategory: Record<Category, number>;
@@ -84,6 +87,83 @@ function normalizeBrand(product: Product): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+// ── Near-duplicate collapse (scrape spam) ───────────────────────────────────
+// SearchAPI / Google-Shopping scrapes list the SAME product many times (e.g. 15
+// Dickies 874 black listings, usually a MIX of clean cutouts and worn-on-a-model
+// shots). We group products by a normalized identity — brand + category + color
+// + distinctive name tokens — and keep ONE per group: the cleanest cutout (the
+// lowest body-model score). So duplicates de-clutter the feed AND the flat-lay
+// wins over the model photo whenever both were scraped, which stops worn shots
+// sneaking back in via a twin. Conservative on purpose: a too-generic name (no
+// model number and <2 distinctive tokens) is left unmerged.
+const COLOR_WORDS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'tan', 'khaki', 'camel', 'sand', 'stone', 'taupe', 'brown', 'chocolate', 'espresso', 'navy', 'blue', 'indigo', 'denim', 'cobalt', 'grey', 'gray', 'charcoal', 'slate', 'silver', 'green', 'olive', 'sage', 'forest', 'emerald', 'red', 'burgundy', 'maroon', 'crimson', 'pink', 'rose', 'blush', 'fuchsia', 'yellow', 'gold', 'mustard', 'orange', 'rust', 'terracotta', 'purple', 'lilac', 'lavender', 'violet', 'teal', 'mint', 'aqua', 'turquoise']);
+const GENDER_WORDS = new Set(['men', 'mens', 'man', 'women', 'womens', 'woman', 'ladies', 'lady', 'boys', 'boy', 'girls', 'girl', 'kids', 'kid', 'unisex', 'youth', 'junior']);
+const NOISE_WORDS = new Set(['the', 'a', 'an', 'original', 'originals', 'classic', 'new', 'genuine', 'authentic', 'official', 'premium', 'signature', 'style', 'fit', 'size', 'regular', 'standard', 'slim', 'relaxed', 'straight', 'tapered', 'cut', 'pro', 'series', 'edition', 'color', 'colour']);
+
+function dedupeIdentityKey(product: Product): string {
+  const brand = normalizeBrand(product);
+  const brandTokens = new Set(brand.split(' ').filter(Boolean));
+  const raw = (product.name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+  let color = '';
+  const sig: string[] = [];
+  for (const token of raw.split(' ')) {
+    if (!token) continue;
+    if (!color && COLOR_WORDS.has(token)) { color = token; continue; }
+    if (COLOR_WORDS.has(token)) continue;
+    if (brandTokens.has(token)) continue;
+    if (GENDER_WORDS.has(token)) continue;
+    if (NOISE_WORDS.has(token)) continue;
+    if (/^\d{1,2}$/.test(token)) continue; // waist / numeric size
+    if (/^\d{1,2}x\d{1,2}$/.test(token)) continue; // 32x32
+    if (/^(xs|s|m|l|xl|xxl|xxxl|2xl|3xl|4xl)$/.test(token)) continue; // letter size
+    sig.push(token);
+  }
+  const uniqueSig = Array.from(new Set(sig)).sort();
+  const hasModelNumber = uniqueSig.some((token) => /\d{3,}/.test(token));
+  if (uniqueSig.length < 2 && !hasModelNumber) return `uniq:${product.id}`;
+  return [brand, product.category, color, uniqueSig.join(' ')].join('|');
+}
+
+function cutoutAbsPath(product: Product): string {
+  const url = product.imageTransparentUrl || product.imageCutoutUrl || '';
+  if (!url.startsWith('/assets/cutouts/')) return '';
+  return join(ROOT, 'public', url.replace(/^\//, ''));
+}
+
+async function collapseNearDuplicates(
+  sortedProducts: Product[],
+): Promise<{ kept: Product[]; collapsed: number; groups: number }> {
+  const groups = new Map<string, Product[]>();
+  for (const product of sortedProducts) {
+    const key = dedupeIdentityKey(product);
+    const list = groups.get(key);
+    if (list) list.push(product);
+    else groups.set(key, [product]);
+  }
+
+  const dropped = new Set<string>();
+  let multiGroups = 0;
+  for (const [key, members] of groups) {
+    if (key.startsWith('uniq:') || members.length < 2) continue;
+    multiGroups += 1;
+    // Keep the cleanest cutout (lowest body-model score). Ties keep the earliest
+    // member — which is already the highest image-quality pick (sorted order).
+    const scored = await Promise.all(
+      members.map(async (product) => ({ product, model: await cutoutModelScore(cutoutAbsPath(product)) })),
+    );
+    let best = scored[0];
+    for (const entry of scored) {
+      if (entry.model < best.model - 0.5) best = entry;
+    }
+    for (const entry of scored) {
+      if (entry.product.id !== best.product.id) dropped.add(entry.product.id);
+    }
+  }
+
+  const kept = sortedProducts.filter((product) => !dropped.has(product.id));
+  return { kept, collapsed: dropped.size, groups: multiGroups };
 }
 
 function selectBalancedClientCatalogProducts(sortedProducts: Product[], limit: number): Product[] {
@@ -213,7 +293,7 @@ function emptyCategoryCounts(): Record<Category, number> {
   return Object.fromEntries(CATEGORY_ORDER.map((category) => [category, 0])) as Record<Category, number>;
 }
 
-function build(): { products: Product[]; report: ClientCatalogReport } {
+async function build(): Promise<{ products: Product[]; report: ClientCatalogReport }> {
   const runtimeProducts = ALL_CATALOG_PRODUCTS as Product[];
   const rejected = {
     noTransparentCutout: 0,
@@ -251,8 +331,10 @@ function build(): { products: Product[]; report: ClientCatalogReport } {
   }
 
   const sortedProducts = sortClientCatalogProducts(runtimeProducts);
+  const { kept: dedupedProducts, collapsed: duplicatesCollapsed, groups: duplicateGroups } =
+    await collapseNearDuplicates(sortedProducts);
   const effectiveLimit = Number.isFinite(LIMIT) && LIMIT > 0 ? LIMIT : 240;
-  const products = selectBalancedClientCatalogProducts(sortedProducts, effectiveLimit).map(cleanProduct);
+  const products = selectBalancedClientCatalogProducts(dedupedProducts, effectiveLimit).map(cleanProduct);
 
   const byCategory = emptyCategoryCounts();
   for (const product of products) byCategory[product.category] += 1;
@@ -263,6 +345,8 @@ function build(): { products: Product[]; report: ClientCatalogReport } {
       generatedAt: new Date().toISOString(),
       runtimeProducts: runtimeProducts.length,
       eligibleProducts: sortedProducts.length,
+      duplicatesCollapsed,
+      duplicateGroups,
       emittedProducts: products.length,
       limit: effectiveLimit,
       byCategory,
@@ -273,14 +357,15 @@ function build(): { products: Product[]; report: ClientCatalogReport } {
         'Products must pass the feed editorial transparent-cutout gate, have a real commerce/search outbound link, avoid failed/quarantined/bad cutout flags, and reference an existing local cutout file.',
         'The export intentionally shares the same visual quality floor as the feed and generator so noisy marketplace, costume, set, and category-mismatched items do not re-enter the UI.',
         'The emitted order is category- and brand-balanced so the first client slices do not collapse into one brand or two outfit formulas.',
+        'Near-duplicate scrape listings (same brand+colour+model) are collapsed to one product per group, keeping the cleanest cutout (lowest body-model score) so duplicates and worn-on-a-model twins do not re-enter the feed.',
         'Run this after catalog ingestion + cutout registration so the client UI stops relying on a small handpicked subset.',
       ],
     },
   };
 }
 
-function main(): void {
-  const { products, report } = build();
+async function main(): Promise<void> {
+  const { products, report } = await build();
   mkdirSync(join(ROOT, 'data', 'catalog', 'reports'), { recursive: true });
   writeFileSync(OUTPUT_PATH, `${JSON.stringify(products, null, 2)}\n`, 'utf8');
   writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
@@ -289,6 +374,7 @@ function main(): void {
   console.log('====================');
   console.log(`Runtime products : ${report.runtimeProducts}`);
   console.log(`Eligible products: ${report.eligibleProducts}`);
+  console.log(`Duplicates merged: ${report.duplicatesCollapsed} (across ${report.duplicateGroups} product groups — cleanest cutout kept)`);
   console.log(`Emitted products : ${report.emittedProducts}`);
   console.log('By category');
   for (const category of CATEGORY_ORDER) console.log(`  ${category}: ${report.byCategory[category]}`);

@@ -1,18 +1,18 @@
 'use client';
 
 import { ArrowLeft, Check, Share2, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { track } from '@/lib/analytics';
+import { getLibraryLook } from '@/lib/outfit-library';
 import {
   deriveIdentity,
-  type BudgetPref,
-  type FitPref,
-  type Lane,
-  type Palette,
   type StyleAnswers,
   type StyleIdentity,
 } from '@/lib/style-identity';
 import { VIBES, type GeneratorFrame } from '@/lib/vibes';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
+import { FloatingCutouts } from './FloatingCutouts';
+import { WornFlatlay } from './WornFlatlay';
 
 const VIBE_LABEL = new Map(VIBES.map((vibe) => [vibe.id, vibe.label]));
 
@@ -92,6 +92,23 @@ export function Onboarding({
   const [identity, setIdentity] = useState<StyleIdentity | null>(null);
   const [shared, setShared] = useState(false);
 
+  // A real outfit in the user's freshly-derived style — the payoff of finishing
+  // the quiz is SEEING a look, not just reading the persona name. Uses their own
+  // chosen frame; deterministic seed (per-identity) so it's stable.
+  const resultLook = useMemo(() => {
+    if (!identity) return null;
+    const seed = identity.id.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+    const frame = (answers.frame as GeneratorFrame) || 'androgynous';
+    return getLibraryLook(identity.vibes[0], frame, { seed });
+  }, [identity, answers.frame]);
+
+  // Modal behavior: focus moves into the flow, focus is trapped, background
+  // scroll is locked. Escape only skips from the WELCOME screen — never
+  // mid-quiz, so a stray keypress can't discard a half-finished quiz.
+  const dialogRef = useDialogBehavior<HTMLDivElement>(() => {
+    if (step === -1) onSkip();
+  });
+
   function answer(question: Question, value: string) {
     const next = { ...answers, [question.key]: value } as Partial<StyleAnswers>;
     setAnswers(next);
@@ -111,7 +128,7 @@ export function Onboarding({
 
   async function shareIdentity() {
     if (!identity) return;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://sylistly.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.sylistly.com';
     const url = `${origin}/style/${identity.id}`;
     const text = `I'm a ${identity.name} on Sylistly ✨ what's your style?`;
     track('quiz_shared', { identity: identity.id });
@@ -129,15 +146,23 @@ export function Onboarding({
   }
 
   return (
-    <div className="fixed inset-0 z-[90] flex flex-col bg-bg">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Style quiz — find your look"
+      tabIndex={-1}
+      className="fixed inset-0 z-[90] flex flex-col bg-bg outline-none"
+    >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,45,109,.2),transparent_46%)]" />
+      {step === -1 ? <FloatingCutouts /> : null}
       <div className="relative mx-auto flex w-full max-w-[480px] flex-1 flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-[calc(env(safe-area-inset-top)+40px)]">
         {/* Welcome */}
         {step === -1 ? (
           <div className="flex flex-1 flex-col">
             <div className="flex-1" />
             <div className="sy-stagger flex flex-col">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
+              <span className="sy-glow-breathe grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
                 <Sparkles size={26} />
               </span>
               <div className="sy-eyebrow mt-7">Welcome to Sylistly</div>
@@ -190,7 +215,7 @@ export function Onboarding({
                   {question.title}
                 </h2>
 
-                <div className={`mt-7 grid gap-2.5 ${question.cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className={`sy-stagger mt-7 grid gap-2.5 ${question.cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   {question.options.map((option) => {
                     const active = selected === option.value;
                     return (
@@ -251,6 +276,14 @@ export function Onboarding({
                   </span>
                 ))}
               </div>
+              {resultLook ? (
+                <div className="mt-6 w-full max-w-[168px] self-center">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card">
+                    <WornFlatlay items={resultLook.products} active loading="eager" className="h-full w-full" />
+                  </div>
+                  <p className="mt-2 text-center text-[11px] font-semibold text-muted">A look in your style</p>
+                </div>
+              ) : null}
             </div>
             <div className="flex-1" />
             <div className="sy-stagger flex flex-col gap-2.5">

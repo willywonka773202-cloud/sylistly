@@ -5,6 +5,38 @@ export const runtime = 'nodejs';
 
 const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
 const SUPPORTED_CATEGORIES = new Set(['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry']);
+const MAX_IMAGE_BYTES = 12 * 1024 * 1024; // 12MB — generous for product photos, caps abuse
+
+/**
+ * SSRF guard: refuse to proxy internal / private / loopback / link-local hosts
+ * (incl. the cloud metadata IP). The catalog only ever points this proxy at
+ * public retailer CDNs, so this costs nothing for legit traffic but stops the
+ * open proxy from being aimed at internal services. (Literal-IP + obvious
+ * internal-hostname checks; not full DNS-rebind protection, but proportionate.)
+ */
+function isDisallowedHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (!host) return true;
+  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) return true;
+  const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (v4) {
+    const a = Number(v4[1]);
+    const b = Number(v4[2]);
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 169 && b === 254) return true; // link-local + metadata
+    if (a === 192 && b === 168) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+    if (a >= 224) return true; // multicast / reserved
+    return false;
+  }
+  if (host.includes(':')) {
+    if (host === '::1' || host === '::') return true;
+    if (host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80') || host.startsWith('::ffff:')) return true;
+    return false;
+  }
+  return false;
+}
 
 export async function GET(req: NextRequest) {
   const rawUrl = req.nextUrl.searchParams.get('url');
@@ -26,6 +58,10 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Unsupported protocol', { status: 400 });
   }
 
+  if (isDisallowedHost(parsed.hostname)) {
+    return new NextResponse('Blocked host', { status: 400 });
+  }
+
   try {
     const upstream = await fetch(parsed.toString(), {
       headers: {
@@ -41,7 +77,19 @@ export async function GET(req: NextRequest) {
     }
 
     const contentType = upstream.headers.get('content-type') || 'image/jpeg';
+    // Defense-in-depth: never relay text/markup/JSON — only images/binary — so
+    // the proxy can't be used to read internal HTML/JSON responses.
+    if (/^(text\/|application\/(json|xml|xhtml|html|javascript|x-www-form))/i.test(contentType)) {
+      return new NextResponse('Unsupported content type', { status: 415 });
+    }
+    const declaredLength = Number(upstream.headers.get('content-length') || 0);
+    if (declaredLength && declaredLength > MAX_IMAGE_BYTES) {
+      return new NextResponse('Image too large', { status: 413 });
+    }
     const arrayBuffer = await upstream.arrayBuffer();
+    if (arrayBuffer.byteLength > MAX_IMAGE_BYTES) {
+      return new NextResponse('Image too large', { status: 413 });
+    }
     const source = Buffer.from(arrayBuffer);
 
     if (!cutout || contentType.includes('svg')) {

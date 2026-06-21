@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { hydrateItemsFromCatalog } from '@/lib/client-catalog';
 import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
+import type { VibeId } from '@/lib/vibes';
 
 export interface SavedFitRecord {
   id: string;
@@ -11,6 +12,9 @@ export interface SavedFitRecord {
   totalCents: number;
   itemCount: number;
   items: Partial<Record<Category, Product>>;
+  /** The vibe the fit was generated under — the honest source for grouping/stats
+   *  (legacy fits saved before this field fall back to title inference). */
+  vibe?: VibeId;
   /** Saved fits are PRIVATE by default (absent ⇒ private); only `public` fits appear on the public profile + feed. */
   visibility?: 'private' | 'public';
   /** Set once the fit is published to the profile + public feed. */
@@ -20,8 +24,10 @@ export interface SavedFitRecord {
 
 interface SavedFitsState {
   fits: SavedFitRecord[];
-  saveFit: (items: Partial<Record<Category, Product>>) => SavedFitRecord | null;
+  saveFit: (items: Partial<Record<Category, Product>>, vibe?: VibeId) => SavedFitRecord | null;
   removeFit: (id: string) => void;
+  /** Rename a saved fit (user-given title overrides the auto-generated one). */
+  renameFit: (id: string, title: string) => void;
   /** Mark a saved fit as published, linking it to the feed/profile post it created. */
   markPublished: (fitId: string, postId: string) => void;
 }
@@ -52,7 +58,7 @@ export const useSavedFits = create<SavedFitsState>()(
   persist(
     (set) => ({
       fits: [],
-      saveFit: (items) => {
+      saveFit: (items, vibe) => {
         const selected = transparentItemsOnly(items);
         const itemCount = Object.keys(selected).length;
 
@@ -69,6 +75,7 @@ export const useSavedFits = create<SavedFitsState>()(
           totalCents,
           itemCount,
           items: selected,
+          vibe,
           visibility: 'private',
         };
 
@@ -77,6 +84,10 @@ export const useSavedFits = create<SavedFitsState>()(
       },
       removeFit: (id) =>
         set((state) => ({ fits: state.fits.filter((fit) => fit.id !== id) })),
+      renameFit: (id, title) =>
+        set((state) => ({
+          fits: state.fits.map((fit) => (fit.id === id ? { ...fit, title } : fit)),
+        })),
       markPublished: (fitId, postId) =>
         set((state) => ({
           fits: state.fits.map((fit) =>

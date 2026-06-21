@@ -225,7 +225,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
                   justifyContent: 'center',
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <img src={piece.uri} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
             ))}

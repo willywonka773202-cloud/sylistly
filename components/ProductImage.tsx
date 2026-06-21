@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Footprints, Gem, Glasses, Layers, Shirt, ShoppingBag, Sparkles } from 'lucide-react';
 import { proxiedImageUrl } from '@/lib/image-url';
 import { getTransparentProductImageUrl, hasUsableProductImage } from '@/lib/product-image-quality';
@@ -199,6 +199,10 @@ export function ProductImage({
   );
   const [cutoutTried, setCutoutTried] = useState(false);
   const [transparentFailed, setTransparentFailed] = useState(false);
+  // Blur-up reveal: the image wrapper resolves from soft+dim+small → crisp as
+  // the cutout decodes (a premium load beat instead of a hard pop). Applied to
+  // the WRAPPER, not the <img>, so it never clobbers the img's drop-shadow filter.
+  const [loaded, setLoaded] = useState(false);
 
   // Resolve which URL to actually fetch this render. When `transparentOnly`
   // is set, this never falls back to the original merchant image.
@@ -220,7 +224,46 @@ export function ProductImage({
     );
     setCutoutTried(false);
     setTransparentFailed(false);
+    setLoaded(false);
   }, [product, transparentOnly]);
+
+  // Cached/preloaded images can finish before React attaches onLoad — without
+  // this they'd stay stuck at opacity:0. A callback ref re-checks .complete
+  // whenever the resolved src changes.
+  // Runs once on mount: a cached/preloaded image can already be complete before
+  // React attaches onLoad — catch that so it never stays stuck at opacity:0.
+  // Later src swaps (error fallback) are caught by the <img> onLoad handler.
+  const imgNodeRef = useRef<HTMLImageElement | null>(null);
+  const markIfComplete = useCallback((node: HTMLImageElement | null) => {
+    imgNodeRef.current = node;
+    if (node && node.complete && node.naturalWidth >= 32) setLoaded(true);
+  }, []);
+
+  // Backstop: if the image becomes complete but `onLoad` never fires (bfcache
+  // restore, warm memory cache where load completes between mount and listener
+  // attach, a backgrounded tab), the wrapper would stay stuck at opacity:0 and
+  // the garment never reveals. A few `complete` re-checks via setTimeout (which
+  // fires even when rAF is throttled) recover it. No-op once `loaded` is true,
+  // so the happy onLoad path is unchanged.
+  useEffect(() => {
+    if (loaded) return;
+    let cancelled = false;
+    let timer = 0;
+    const poll = (attempt: number) => {
+      if (cancelled) return;
+      const node = imgNodeRef.current;
+      if (node && node.complete && node.naturalWidth >= 32) {
+        setLoaded(true);
+        return;
+      }
+      if (attempt < 8) timer = window.setTimeout(() => poll(attempt + 1), 200);
+    };
+    timer = window.setTimeout(() => poll(0), 120);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [src, loaded]);
 
   const mode = MODE_STYLES[displayMode] ?? MODE_STYLES.default;
   const transparentMode = TRANSPARENT_MODE_STYLES[displayMode] ?? TRANSPARENT_MODE_STYLES.default;
@@ -250,9 +293,16 @@ export function ProductImage({
   }
 
   return (
-    <div className={resolvedWrapperClass} {...auditAttrs} data-image-kind={imageKind} data-display-mode={displayMode}>
+    <div
+      className={`${resolvedWrapperClass} sy-cutout-img`}
+      data-loaded={loaded ? 'true' : 'false'}
+      {...auditAttrs}
+      data-image-kind={imageKind}
+      data-display-mode={displayMode}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={markIfComplete}
         src={src}
         alt={`${product.brand} ${product.name}`}
         loading={loading}
@@ -271,6 +321,7 @@ export function ProductImage({
             setImageOk(false);
             return;
           }
+          setLoaded(true);
           onAvailable?.(product);
         }}
         onError={() => {

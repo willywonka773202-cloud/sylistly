@@ -2,6 +2,8 @@ import { Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { WornFlatlay } from '@/components/WornFlatlay';
+import { getLibraryLook } from '@/lib/outfit-library';
 import { IDENTITIES } from '@/lib/style-identity';
 import { VIBES } from '@/lib/vibes';
 
@@ -29,13 +31,20 @@ export default async function StyleIdentityPage({ params }: { params: Promise<{ 
   const identity = IDENTITIES[id];
   if (!identity) notFound();
 
+  // A representative outfit for this style — so a friend who lands here from a
+  // share SEES what the persona looks like, not just reads its name. Computed
+  // server-side with a deterministic seed (stable per identity, no hydration
+  // mismatch) from the same library generator the feed/Discover use.
+  const seed = id.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const sampleLook = getLibraryLook(identity.vibes[0], 'androgynous', { seed });
+
   return (
     <main className="relative mx-auto flex min-h-[100dvh] max-w-[480px] flex-col bg-bg px-6 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+28px)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,45,109,.2),transparent_46%)]" />
       <div className="relative flex flex-1 flex-col">
         <Link href="/" className="flex items-baseline gap-2">
           <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
-          <span className="text-eyebrow font-extrabold uppercase text-champagne">Sylistly</span>
+          <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
         </Link>
 
         <div className="flex-1" />
@@ -58,6 +67,15 @@ export default async function StyleIdentityPage({ params }: { params: Promise<{ 
             </span>
           ))}
         </div>
+
+        {sampleLook ? (
+          <div className="mt-8 w-full max-w-[260px] self-center">
+            <div className="text-eyebrow font-extrabold uppercase text-champagne">A {identity.name} look</div>
+            <div className="relative mt-2.5 aspect-[4/5] overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card">
+              <WornFlatlay items={sampleLook.products} active={false} loading="eager" className="h-full w-full" />
+            </div>
+          </div>
+        ) : null}
 
         <div className="flex-1" />
 
