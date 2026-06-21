@@ -24,7 +24,7 @@ import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLO
 import { tidyNote } from '../lib/note-format';
 import { cleanProductName, cleanBrand } from '../lib/product-name';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
-import { mapCategory, toCents } from './ingest/ingest-catalog';
+import { mapCategory, toCents, isHttpUrl } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
 
 // Minimal in-memory localStorage so the storage-backed XP/quest logic runs in
@@ -356,6 +356,13 @@ check('cleanBrand: preserves legit lowercase brands (adidas)', cleanBrand('adida
 check('cleanBrand: preserves dotted brands (A.P.C.)', cleanBrand('A.P.C.') === 'A.P.C.');
 check('cleanBrand: leaves a normal brand untouched', cleanBrand('New Balance') === 'New Balance');
 check('cleanBrand: is idempotent', cleanBrand(cleanBrand('farfetch.com')) === 'Farfetch');
+// Ingestion URL safety — reject untrusted-feed junk at the trust boundary.
+check('isHttpUrl: accepts https', isHttpUrl('https://shop.com/p/123') === true);
+check('isHttpUrl: accepts http', isHttpUrl('http://shop.com/p/123') === true);
+check('isHttpUrl: REJECTS javascript: (XSS vector)', isHttpUrl('javascript:alert(document.cookie)') === false);
+check('isHttpUrl: rejects data: URLs', isHttpUrl('data:text/html,<script>1</script>') === false);
+check('isHttpUrl: rejects relative paths', isHttpUrl('/products/123') === false);
+check('isHttpUrl: rejects empty/undefined', isHttpUrl('') === false && isHttpUrl(undefined) === false);
 
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────

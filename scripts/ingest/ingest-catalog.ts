@@ -243,6 +243,20 @@ export async function fromAwin(): Promise<IngestRecord[]> {
 
 // ── Dedupe + orchestrate ────────────────────────────────────────────────────
 
+/** A usable outbound URL must be http(s). External feeds are an UNTRUSTED
+ *  boundary, so reject javascript:/data:/relative junk before it can reach an
+ *  href downstream (defence-in-depth — the render layer also validates via
+ *  getProductOutboundUrl, but bad data shouldn't enter the catalog at all). */
+export function isHttpUrl(value?: string): boolean {
+  if (!value) return false;
+  try {
+    const proto = new URL(value).protocol;
+    return proto === 'http:' || proto === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 /** GTIN-first dedupe; on conflict keep the higher-commission source. */
 export function dedupe(records: IngestRecord[]): IngestRecord[] {
   const seen = new Map<string, IngestRecord>();
@@ -253,8 +267,11 @@ export function dedupe(records: IngestRecord[]): IngestRecord[] {
     const prev = seen.get(key);
     if (!prev || SOURCE_RANK[r.source] < SOURCE_RANK[prev.source]) seen.set(key, r);
   }
-  // Only keep records that are actually usable downstream.
-  return [...seen.values()].filter((r) => r.imageUrl && r.priceCents > 0 && r.name && r.productUrl);
+  // Only keep records that are actually usable downstream — and whose outbound
+  // URL is a real http(s) link (reject untrusted-feed junk at the boundary).
+  return [...seen.values()].filter(
+    (r) => r.imageUrl && r.priceCents > 0 && r.name && isHttpUrl(r.productUrl),
+  );
 }
 
 export interface IngestReport {
