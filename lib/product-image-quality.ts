@@ -245,6 +245,15 @@ const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
   // colors:["white"] which lies about the busy pastel print, so the scorer styled it
   // into dark/edgy outfits where it clashed. (BAMBI sibling bag is a clean cutout — kept.)
   'drop-934791e94b174385', // b.Eautiful SHELLS REUSABLE BAG XL
+  // Background-removal OVER-removed a light garment/body on a white backdrop,
+  // leaving a ghost or only the colored accents/trim. Found via a bbox-fill audit
+  // (sharp): these had the lowest opaque-pixel fill+coverage of all 545 cutouts and
+  // each was confirmed broken by eye. Removing them drops the few baked looks that
+  // used them below the 4-piece minimum (acceptable — a ghost garment reads worse
+  // than ~5% fewer looks). See [[sylistly-catalog-cutout-quality]].
+  'generated-1d67b8e90048eb0f',     // Lorenzo Uomo Merino Crew Neck — faint ghost smudge, no garment
+  'drop-8f8d0b34503d6260',          // Made Some "GREECE" Tank (white) — body removed, only blue trim+text left
+  'catalog-bag-longchamp-lepliage', // Longchamp Le Pliage Tote — bag body removed, only handle+flap float
 ]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
