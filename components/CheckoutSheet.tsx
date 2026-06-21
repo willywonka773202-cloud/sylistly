@@ -214,7 +214,7 @@ export function CheckoutSheet({ open, title = 'This fit', products, onClose }: P
                       </span>
                     </div>
                     <a
-                      href={wrapAffiliate(product.url)}
+                      href={wrapAffiliate(product.url, product.id)}
                       target="_blank"
                       rel="noreferrer sponsored"
                       onClick={() =>

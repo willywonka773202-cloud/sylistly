@@ -139,7 +139,7 @@ export default function CheckoutPage() {
 
                       <div className="mt-3 flex flex-wrap gap-2">
                         <a
-                          href={wrapAffiliate(product.url)}
+                          href={wrapAffiliate(product.url, product.id)}
                           target="_blank"
                           rel="noreferrer sponsored"
                           onClick={() =>
