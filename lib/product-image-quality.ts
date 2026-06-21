@@ -262,6 +262,11 @@ const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
   'generated-6047341e99203a19', // New Era 6-Pack Fitted Cap Carriers (hard case)
   'generated-ca3f8766e86b9338', // Lids Cap Travel Case (open case w/ caps + strap)
   'generated-1e21647068f4f002', // New Era Oakland A's 6-Pack Cap Carrier (case)
+  // Eyewear/glasses CASES tagged category:eyewear (a case shown as the glasses).
+  // Found via a systematic name-vs-category scan extending the cap-case pattern.
+  // Eyewear is optional → the 10 baked looks using one just drop the wrong piece.
+  'generated-0705a4e40bb11ef7', // "Embellished Sunglasses Case" — beaded keychain pouch
+  'generated-77f0a397370495bc', // "Eyewear & Jewelry Case" — black leather storage case
 ]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
