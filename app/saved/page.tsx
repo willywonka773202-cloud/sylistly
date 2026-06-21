@@ -21,6 +21,7 @@ import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { Reveal } from '@/components/Reveal';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
 import { encodeLookSlug } from '@/lib/share-codes';
@@ -123,7 +124,13 @@ export default function SavedPage() {
           const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
           const visualProducts = visualEntries.map(([, product]) => product);
           const collection = collectionOf(fit);
-          return { fit, visualItems, visualProducts, collection };
+          const swatches = derivePalette(
+            visualProducts.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase(),
+          )
+            .map((word) => ({ word, hex: colorSwatch(word) }))
+            .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
+            .slice(0, 4);
+          return { fit, visualItems, visualProducts, collection, swatches };
         })
         .filter(({ visualProducts }) => visualProducts.length > 0),
     [fits, failedImageIds],
@@ -290,7 +297,7 @@ export default function SavedPage() {
             </section>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {visibleFits.map(({ fit, visualItems, visualProducts, collection }, i) => (
+              {visibleFits.map(({ fit, visualItems, visualProducts, collection, swatches }, i) => (
                 <Reveal key={fit.id} as="div" delay={(i % 2) * 80}>
                 <button
                   type="button"
@@ -330,6 +337,20 @@ export default function SavedPage() {
                     <div className="line-clamp-1 font-serif text-[15px] font-semibold italic leading-tight text-ink">
                       {fit.title}
                     </div>
+                    {swatches.length >= 2 ? (
+                      <div
+                        className="mt-1.5 flex items-center gap-1.5"
+                        aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
+                      >
+                        {swatches.map((s, di) => (
+                          <span
+                            key={`${s.word}-${di}`}
+                            className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                            style={{ background: s.hex }}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                     <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-muted">
                       <span>{visualProducts.length} pieces</span>
                       <span className="font-bold text-accent">{formatPrice(fit.totalCents)}</span>

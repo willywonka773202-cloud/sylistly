@@ -994,7 +994,7 @@ export default function ScrollPage() {
                         {formatPrice(total)}
                       </span>
                     </div>
-                    {swatches.length ? (
+                    {swatches.length >= 2 ? (
                       <div
                         className="mt-2 flex items-center gap-1.5"
                         aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}

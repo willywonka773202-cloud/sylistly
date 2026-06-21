@@ -8,6 +8,7 @@ import { AmbientField } from '@/components/AmbientField';
 import { BottomNav } from '@/components/BottomNav';
 import { Reveal } from '@/components/Reveal';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { getLibraryLook } from '@/lib/outfit-library';
 import { track } from '@/lib/analytics';
 import { useFit } from '@/store/fit';
@@ -75,7 +76,18 @@ export default function DiscoverPage() {
         </header>
 
         <div className="mt-4 grid grid-cols-2 gap-3 px-4">
-          {looks.map(({ vibe, items }, i) => (
+          {looks.map(({ vibe, items }, i) => {
+            const swatches = derivePalette(
+              Object.values(items)
+                .filter((p): p is Product => Boolean(p))
+                .map((p) => `${p.name} ${(p.colors || []).join(' ')}`)
+                .join(' ')
+                .toLowerCase(),
+            )
+              .map((word) => ({ word, hex: colorSwatch(word) }))
+              .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
+              .slice(0, 4);
+            return (
             <Reveal key={vibe.id} delay={(i % 2) * 80}>
               <button
                 type="button"
@@ -93,15 +105,32 @@ export default function DiscoverPage() {
                   {/* champagne light-rake, cascading across the wall as it loads */}
                   <span aria-hidden className="sy-card-sheen" style={{ animationDelay: `${i * 85 + 220}ms` }} />
                 </div>
-                <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-2.5">
-                  <span className="min-w-0 line-clamp-2 text-[11px] leading-tight text-muted-2">{vibe.blurb}</span>
-                  <span className="grid h-7 w-7 flex-none place-items-center rounded-full bg-surface-2 text-accent transition group-hover:bg-accent group-hover:text-white">
-                    <ArrowUpRight size={14} />
-                  </span>
+                <div className="px-3 pb-3 pt-2.5">
+                  {swatches.length >= 2 ? (
+                    <div
+                      className="mb-1.5 flex items-center gap-1.5"
+                      aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
+                    >
+                      {swatches.map((s, di) => (
+                        <span
+                          key={`${s.word}-${di}`}
+                          className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                          style={{ background: s.hex }}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 line-clamp-2 text-[11px] leading-tight text-muted-2">{vibe.blurb}</span>
+                    <span className="grid h-7 w-7 flex-none place-items-center rounded-full bg-surface-2 text-accent transition group-hover:bg-accent group-hover:text-white">
+                      <ArrowUpRight size={14} />
+                    </span>
+                  </div>
                 </div>
               </button>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
       </div>
       <BottomNav />

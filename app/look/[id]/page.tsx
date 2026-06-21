@@ -95,7 +95,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
             {exactCount}/{products.length} shoppable
           </span>
         </div>
-        {swatches.length ? (
+        {swatches.length >= 2 ? (
           <div
             className="mt-3 flex items-center gap-2"
             aria-label={`Colour palette: ${swatches.map((s) => s.word).join(', ')}`}
