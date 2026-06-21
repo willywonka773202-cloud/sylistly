@@ -25,10 +25,16 @@ export const ACCENT_COLORS = [
   'lavender', 'lilac', 'plum', 'violet', 'brown', 'chocolate',
 ];
 
-/** Which palette colours appear as words in `text` (already lowercased upstream). */
+/**
+ * Which palette colours appear as WHOLE WORDS in `text` (lowercased upstream).
+ * Word-level (split on non-letters) not substring — so short colour words don't
+ * false-match inside other words ('red' in "shredded", 'tan' in "titanium"),
+ * while compounds with separators still hit ("navy-blue" → navy + blue).
+ */
 export function colorTokens(text: string, palette: string[]): Set<string> {
+  const words = new Set(text.split(/[^a-z]+/));
   const found = new Set<string>();
-  for (const color of palette) if (text.includes(color)) found.add(color);
+  for (const color of palette) if (words.has(color)) found.add(color);
   return found;
 }
 

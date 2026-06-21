@@ -20,7 +20,7 @@ import { normalizeSearchFrame } from '../lib/search-frame';
 import { isVibeAppropriate } from '../lib/vibe-fit';
 import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudgetSnapshot } from '../lib/ai-budget';
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
-import { colorHarmonyScore } from '../lib/color-harmony';
+import { colorHarmonyScore, colorTokens, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
 import { mapCategory, toCents } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
@@ -309,6 +309,10 @@ check('colorHarmony: neutral anchor scores positive', neutralAnchor > 0);
 check('colorHarmony: tonal repeat beats a 3-accent clash', tonalRepeat > thirdAccentClash);
 check('colorHarmony: a 3rd distinct accent is penalised (negative)', thirdAccentClash < 0);
 check('colorHarmony: neutral anchor beats the clash', neutralAnchor > thirdAccentClash);
+check('colorTokens: "shredded" does NOT false-match red (word-level)', !colorTokens('shredded denim jacket', ACCENT_COLORS).has('red'));
+check('colorTokens: real "red dress" matches red', colorTokens('a red dress', ACCENT_COLORS).has('red'));
+check('colorTokens: "titanium watch" does NOT false-match tan', !colorTokens('titanium watch', NEUTRAL_COLORS).has('tan'));
+check('colorTokens: compound "navy-blue" → navy', colorTokens('navy-blue knit', NEUTRAL_COLORS).has('navy'));
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────
 check('formalityLevel: blazer → 3 (formal)', formalityLevel('navy wool blazer') === 3);
