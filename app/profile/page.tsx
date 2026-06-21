@@ -461,6 +461,12 @@ export default function ProfilePage() {
           </div>
         )}
       </Section>
+
+      <footer className="mt-8 flex items-center justify-center gap-3 text-[11px] font-semibold text-muted">
+        <Link href="/privacy" className="transition hover:text-ink">Privacy</Link>
+        <span aria-hidden>·</span>
+        <Link href="/terms" className="transition hover:text-ink">Terms</Link>
+      </footer>
       </div>
 
       <BottomNav />
