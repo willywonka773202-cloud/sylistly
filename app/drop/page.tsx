@@ -518,9 +518,17 @@ function DailyQuests() {
                 {quest.label}
               </p>
               {quest.target > 1 && !quest.done ? (
-                <p className="text-[11px] text-muted">
-                  {quest.progress}/{quest.target}
-                </p>
+                <div className="mt-1 flex items-center gap-2">
+                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-hairline-2">
+                    <div
+                      className="sy-bar-fill h-full rounded-full bg-accent transition-all duration-500"
+                      style={{ width: `${Math.min(100, (quest.progress / quest.target) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 text-[11px] font-semibold tabular-nums text-muted">
+                    {quest.progress}/{quest.target}
+                  </span>
+                </div>
               ) : null}
             </div>
             {quest.done ? (
