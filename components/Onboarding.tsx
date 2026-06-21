@@ -208,33 +208,36 @@ export function Onboarding({
                     />
                   ))}
                 </div>
-                <div className="mt-6 sy-eyebrow">
-                  Step {step + 1} of {QUESTIONS.length}
-                </div>
-                <h2 className="mt-2 font-serif text-[32px] font-semibold leading-tight tracking-[-0.01em] text-ink">
-                  {question.title}
-                </h2>
+                {/* Centered between the progress dots (top) and Back/Skip (bottom),
+                    matching the welcome + result steps so the quiz never pools at
+                    the top with an empty void beneath on tall screens. */}
+                <div className="flex flex-1 flex-col justify-center">
+                  <div className="sy-eyebrow">
+                    Step {step + 1} of {QUESTIONS.length}
+                  </div>
+                  <h2 className="mt-2 font-serif text-[32px] font-semibold leading-tight tracking-[-0.01em] text-ink">
+                    {question.title}
+                  </h2>
 
-                <div className={`sy-stagger mt-7 grid gap-2.5 ${question.cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                  {question.options.map((option) => {
-                    const active = selected === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => answer(question, option.value)}
-                        className={`sy-press min-w-0 rounded-card border px-3 py-5 text-left transition ${
-                          active ? 'border-accent bg-accent-soft' : 'border-hairline-2 bg-surface-1'
-                        }`}
-                      >
-                        <div className={`text-[15px] font-bold ${active ? 'text-accent' : 'text-ink'}`}>{option.label}</div>
-                        {option.sub ? <div className="mt-0.5 text-[11px] text-muted">{option.sub}</div> : null}
-                      </button>
-                    );
-                  })}
+                  <div className={`sy-stagger mt-7 grid gap-2.5 ${question.cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    {question.options.map((option) => {
+                      const active = selected === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => answer(question, option.value)}
+                          className={`sy-press min-w-0 rounded-card border px-3 py-5 text-left transition ${
+                            active ? 'border-accent bg-accent-soft' : 'border-hairline-2 bg-surface-1'
+                          }`}
+                        >
+                          <div className={`text-[15px] font-bold ${active ? 'text-accent' : 'text-ink'}`}>{option.label}</div>
+                          {option.sub ? <div className="mt-0.5 text-[11px] text-muted">{option.sub}</div> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-
-                <div className="flex-1" />
                 <div className="flex items-center justify-between">
                   <button
                     type="button"
