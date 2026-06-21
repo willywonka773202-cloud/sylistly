@@ -60,6 +60,11 @@ export function aiLibrarySize(): number {
   return HYDRATED.length;
 }
 
+/** All hydrated baked-look ids — for the sitemap (every one is a renderable /look/[id]). */
+export function listAiLookIds(): string[] {
+  return HYDRATED.map((look) => look.id);
+}
+
 /** Look up a baked look by its id (share pages: /look/syli-…). */
 export function getAiLookById(id: string): AiLook | null {
   return HYDRATED.find((look) => look.id === id) || null;
