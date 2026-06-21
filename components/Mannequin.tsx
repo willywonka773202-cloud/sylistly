@@ -209,7 +209,7 @@ function FrontCanvas({
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
           {selectionBadge}
-          <span className={`max-w-full truncate text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          <span className={`max-w-full shrink-0 truncate leading-none text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
           {rawProduct && !hasTransparentProductImage(rawProduct) ? (
             <span className="mt-1 text-[7px] font-bold uppercase tracking-[.12em] text-[#c4aa9a]">Cutout queued</span>
           ) : null}
