@@ -242,20 +242,25 @@ function SwipeCard({
               {/* The fit celebrates in ITS OWN palette — colour particles spray from
                   the heart, tying the love moment to the look's identity. */}
               {(burstColors || []).length
-                ? Array.from({ length: 8 }).map((_, i) => {
+                ? Array.from({ length: 12 }).map((_, i) => {
                     const colors = burstColors as string[];
-                    const angle = (i / 8) * Math.PI * 2;
-                    const dist = 64 + (i % 3) * 16;
+                    // Slight per-particle angle jitter + varied size/distance so the
+                    // spray reads organic (real confetti), not a mechanical ring of dots.
+                    const angle = (i / 12) * Math.PI * 2 + (i % 2) * 0.26;
+                    const dist = 56 + (i % 4) * 15;
+                    const size = 5 + (i % 4) * 2.5; // 5–12.5px
                     return (
                       <span
                         key={`burst-${i}`}
-                        className="absolute h-2 w-2 rounded-full"
+                        className="absolute rounded-full"
                         style={{
+                          width: `${size}px`,
+                          height: `${size}px`,
                           background: colors[i % colors.length],
                           '--dx': `${Math.round(Math.cos(angle) * dist)}px`,
                           '--dy': `${Math.round(Math.sin(angle) * dist)}px`,
-                          '--rot': `${180 + i * 26}deg`,
-                          animation: `sy-confetti .62s cubic-bezier(.2,.7,.3,1) ${i * 14}ms both`,
+                          '--rot': `${180 + i * 24}deg`,
+                          animation: `sy-confetti .64s cubic-bezier(.2,.7,.3,1) ${i * 11}ms both`,
                         } as React.CSSProperties}
                       />
                     );
