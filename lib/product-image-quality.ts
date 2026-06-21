@@ -240,6 +240,11 @@ const NON_GARMENT_CUTOUT_PRODUCT_IDS = new Set([
   'drop-0f54676d64f945de', // Fancy Velvet Ring Box (a box, not a wearable)
   // Cutout is a GOLF logo graphic, not the pants the product claims to be
   'searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-501ff70f6f38bd',
+  // Translucent reusable bag with an all-over shell print: bg-removal kept only the
+  // print, so the cutout reads as scattered floating shells (barely a bag). Tagged
+  // colors:["white"] which lies about the busy pastel print, so the scorer styled it
+  // into dark/edgy outfits where it clashed. (BAMBI sibling bag is a clean cutout — kept.)
+  'drop-934791e94b174385', // b.Eautiful SHELLS REUSABLE BAG XL
 ]);
 
 const LOW_INFORMATION_PRODUCT_TERMS = [
