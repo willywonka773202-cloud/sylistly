@@ -15,14 +15,14 @@
 export const NEUTRAL_COLORS = [
   'black', 'white', 'cream', 'ivory', 'beige', 'tan', 'khaki', 'greige', 'grey',
   'gray', 'charcoal', 'stone', 'camel', 'navy', 'denim', 'silver', 'nude', 'sand',
-  'oatmeal', 'taupe',
+  'oatmeal', 'taupe', 'brown', 'chocolate', 'espresso', 'mocha',
 ];
 
 export const ACCENT_COLORS = [
   'red', 'crimson', 'burgundy', 'maroon', 'pink', 'fuchsia', 'rose', 'orange',
   'rust', 'coral', 'peach', 'yellow', 'mustard', 'gold', 'lime', 'green', 'olive',
   'sage', 'emerald', 'teal', 'aqua', 'mint', 'blue', 'cobalt', 'indigo', 'purple',
-  'lavender', 'lilac', 'plum', 'violet', 'brown', 'chocolate',
+  'lavender', 'lilac', 'plum', 'violet',
 ];
 
 /**

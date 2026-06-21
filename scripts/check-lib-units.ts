@@ -313,6 +313,7 @@ check('colorTokens: "shredded" does NOT false-match red (word-level)', !colorTok
 check('colorTokens: real "red dress" matches red', colorTokens('a red dress', ACCENT_COLORS).has('red'));
 check('colorTokens: "titanium watch" does NOT false-match tan', !colorTokens('titanium watch', NEUTRAL_COLORS).has('tan'));
 check('colorTokens: compound "navy-blue" → navy', colorTokens('navy-blue knit', NEUTRAL_COLORS).has('navy'));
+check('colorHarmony: brown is a NEUTRAL (earth tones coordinate, no clash)', colorHarmonyScore('brown leather boot', 'olive cargo rust knit') >= 0);
 
 // ── Outfit coherence (lib/outfit-coherence · formality + fabric) ─────────────
 check('formalityLevel: blazer → 3 (formal)', formalityLevel('navy wool blazer') === 3);
