@@ -19,6 +19,7 @@ import { hasDirectRetailerUrl } from '../lib/retailer-url';
 import { normalizeSearchFrame } from '../lib/search-frame';
 import { isVibeAppropriate } from '../lib/vibe-fit';
 import { dailyCapUsd, estimateCostUsd, recordAiUsage, aiBudgetAvailable, aiBudgetSnapshot } from '../lib/ai-budget';
+import { ollamaDailyCapUsd, estimateOllamaCostUsd, ollamaBudgetAvailable, ollamaBudgetSnapshot, recordOllamaUsage } from '../lib/ollama-budget';
 import { productSearchText, inferProductPresentation } from '../lib/presentation-score';
 import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLORS, NEUTRAL_COLORS } from '../lib/color-harmony';
 import { tidyNote } from '../lib/note-format';
@@ -294,6 +295,85 @@ check('aiBudgetSnapshot: capUsd reflects env override', snapAfter.capUsd === 20)
 check('aiBudgetSnapshot: killed false when AI not disabled', snapAfter.killed === false);
 check('aiBudgetSnapshot: spentUsd rises when usage is recorded', snapAfter.spentUsd > snapBefore.spentUsd);
 delete process.env.AI_DAILY_USD_CAP;
+
+// ── Ollama daily spend cap default + parsing (lib/ollama-budget · ollamaDailyCapUsd) ──
+// Same shape as Anthropic: $10 default, safe parsing, 0 = no-cap.
+delete process.env.OLLAMA_DAILY_USD_CAP;
+check('ollamaDailyCapUsd: unset → $10 default ceiling', ollamaDailyCapUsd() === 10);
+process.env.OLLAMA_DAILY_USD_CAP = '5';
+check('ollamaDailyCapUsd: valid value respected', ollamaDailyCapUsd() === 5);
+process.env.OLLAMA_DAILY_USD_CAP = 'abc';
+check('ollamaDailyCapUsd: non-numeric → $10 default', ollamaDailyCapUsd() === 10);
+process.env.OLLAMA_DAILY_USD_CAP = '-3';
+check('ollamaDailyCapUsd: negative → $10 default', ollamaDailyCapUsd() === 10);
+process.env.OLLAMA_DAILY_USD_CAP = '0';
+check('ollamaDailyCapUsd: explicit 0 (no-cap) respected', ollamaDailyCapUsd() === 0);
+delete process.env.OLLAMA_DAILY_USD_CAP;
+
+// ── Ollama cost estimation (lib/ollama-budget · estimateOllamaCostUsd) ────────
+// Falls back to flat-per-call ($0.01 default) when no token pricing is set.
+delete process.env.OLLAMA_USD_PER_1K_TOKENS_IN;
+delete process.env.OLLAMA_USD_PER_1K_TOKENS_OUT;
+delete process.env.OLLAMA_USD_PER_CALL;
+check('estimateOllamaCostUsd: no usage → flat $0.01 default', estimateOllamaCostUsd(null) === 0.01);
+check('estimateOllamaCostUsd: empty usage → flat $0.01 default', estimateOllamaCostUsd({}) === 0.01);
+process.env.OLLAMA_USD_PER_CALL = '0.005';
+check('estimateOllamaCostUsd: respects OLLAMA_USD_PER_CALL override', estimateOllamaCostUsd(null) === 0.005);
+process.env.OLLAMA_USD_PER_CALL = 'abc';
+check('estimateOllamaCostUsd: garbage OLLAMA_USD_PER_CALL → $0.01 default', estimateOllamaCostUsd(null) === 0.01);
+process.env.OLLAMA_USD_PER_CALL = '0.01';
+process.env.OLLAMA_USD_PER_1K_TOKENS_IN = '0.001';
+process.env.OLLAMA_USD_PER_1K_TOKENS_OUT = '0.002';
+// 2K in @ $0.001 + 1K out @ $0.002 = $0.002 + $0.002 = $0.004
+check('estimateOllamaCostUsd: token-based pricing preferred over flat', estimateOllamaCostUsd({ prompt_eval_count: 2000, eval_count: 1000 }) === 0.004);
+check('estimateOllamaCostUsd: zero tokens → falls back to flat', estimateOllamaCostUsd({ prompt_eval_count: 0, eval_count: 0 }) === 0.01);
+check('estimateOllamaCostUsd: negative tokens clamp to 0 (then flat)', estimateOllamaCostUsd({ prompt_eval_count: -5, eval_count: -5 }) === 0.01);
+delete process.env.OLLAMA_USD_PER_CALL;
+delete process.env.OLLAMA_USD_PER_1K_TOKENS_IN;
+delete process.env.OLLAMA_USD_PER_1K_TOKENS_OUT;
+
+// ── Ollama spend-cap ENFORCEMENT (recordOllamaUsage drives ollamaBudgetAvailable) ──
+// The actual protection: once today's spend exceeds the cap, Ollama is gated.
+delete process.env.OLLAMA_BUDGET_KILL; // kill switch off
+process.env.OLLAMA_DAILY_USD_CAP = '10';
+// Pre-condition: no spend yet → available.
+check('ollamaBudgetAvailable: true under the cap', ollamaBudgetAvailable() === true);
+// Spend > $10 → gated.
+recordOllamaUsage(null); // flat $0.01
+for (let i = 0; i < 1000; i += 1) recordOllamaUsage(null); // +$10.01 → > $10
+check('ollamaBudgetAvailable: false once spend exceeds the cap', ollamaBudgetAvailable() === false);
+// Reset for downstream tests.
+process.env.OLLAMA_DAILY_USD_CAP = '0'; // no-cap: should pass again regardless of spend
+check('ollamaBudgetAvailable: 0 cap (no-cap) → always available', ollamaBudgetAvailable() === true);
+delete process.env.OLLAMA_DAILY_USD_CAP;
+
+// ── Ollama budget kill switch (OLLAMA_BUDGET_KILL=1 hard-off) ─────────────────
+// High cap so prior spend doesn't make this assertion about the kill switch fail.
+process.env.OLLAMA_DAILY_USD_CAP = '1000';
+delete process.env.OLLAMA_BUDGET_KILL;
+check('ollamaBudgetAvailable: kill switch off → available (no cap)', ollamaBudgetAvailable() === true);
+process.env.OLLAMA_BUDGET_KILL = '1';
+check('ollamaBudgetAvailable: kill switch on → blocked', ollamaBudgetAvailable() === false);
+process.env.OLLAMA_BUDGET_KILL = 'true';
+check('ollamaBudgetAvailable: kill switch "true" → blocked', ollamaBudgetAvailable() === false);
+process.env.OLLAMA_BUDGET_KILL = 'on';
+check('ollamaBudgetAvailable: kill switch "on" → blocked', ollamaBudgetAvailable() === false);
+process.env.OLLAMA_BUDGET_KILL = 'OFF';
+check('ollamaBudgetAvailable: kill switch "OFF" (not on) → available', ollamaBudgetAvailable() === true);
+delete process.env.OLLAMA_BUDGET_KILL;
+delete process.env.OLLAMA_DAILY_USD_CAP;
+
+// ── Ollama spend reporting (lib/ollama-budget · ollamaBudgetSnapshot) ─────────
+process.env.OLLAMA_DAILY_USD_CAP = '20';
+delete process.env.OLLAMA_BUDGET_KILL;
+const oSnapBefore = ollamaBudgetSnapshot();
+recordOllamaUsage({ prompt_eval_count: 0, eval_count: 0 }); // flat $0.01
+const oSnapAfter = ollamaBudgetSnapshot();
+check('ollamaBudgetSnapshot: capUsd reflects env override', oSnapAfter.capUsd === 20);
+check('ollamaBudgetSnapshot: killed false when kill switch off', oSnapAfter.killed === false);
+check('ollamaBudgetSnapshot: spentUsd rises when usage is recorded', oSnapAfter.spentUsd > oSnapBefore.spentUsd);
+check('ollamaBudgetSnapshot: callsToday rises when usage is recorded', oSnapAfter.callsToday > oSnapBefore.callsToday);
+delete process.env.OLLAMA_DAILY_USD_CAP;
 
 // ── Search text builder (lib/presentation-score · productSearchText) ─────────
 // Lowercase inputs so the assertion is robust to the normalizer's casing.

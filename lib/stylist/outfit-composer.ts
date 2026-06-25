@@ -10,6 +10,7 @@ import {
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
+import { ollamaBudgetAvailable, recordOllamaUsage } from '@/lib/ollama-budget';
 
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
@@ -61,7 +62,7 @@ export interface ComposedLook {
   collection: CatalogCollection | null;
   missingSlots: Category[];
   formula: OutfitFormula;
-  assistantMode: 'ai-styled' | 'catalog';
+  assistantMode: 'ai-styled' | 'catalog' | 'budget';
   stylingNotes?: string;
   palette?: string[];
   reasons?: Partial<Record<Category, string>>;
@@ -360,7 +361,13 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
   if (!client || !aiPermitted) {
     // Deterministic path (incl. the optimistic `fast` preview) — skip the
     // expensive full-inventory build entirely so it returns quickly.
-    return assembleFallback(shortlists, params);
+    // If AI is unavailable specifically because of the budget (not a missing
+    // key, not the caller disabling it), tag the response so the feed/builder
+    // can show a quiet "AI composing paused" state.
+    const fallback = assembleFallback(shortlists, params);
+    const blockedByBudget = !!client && params.allowAi !== false && !aiBudgetAvailable();
+    if (blockedByBudget) fallback.assistantMode = 'budget';
+    return fallback;
   }
 
   // Give the model the FULL eligible inventory per slot (hard constraints only),

@@ -212,8 +212,11 @@ export async function POST(req: NextRequest) {
       structure: result.formula.structure,
       reason: result.formula.reason,
     },
-    source: result.assistantMode === 'ai-styled' ? 'ai' : 'catalog',
+    source: result.assistantMode === 'ai-styled' ? 'ai'
+      : result.assistantMode === 'budget' ? 'budget'
+      : 'catalog',
     assistantMode: result.assistantMode,
+    aiBudget: result.assistantMode === 'budget' ? 'capped' : 'ok',
     stylingNotes: result.stylingNotes,
     palette: result.palette,
     reasons,
