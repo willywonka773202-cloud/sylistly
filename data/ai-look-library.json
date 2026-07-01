@@ -2976,6 +2976,1067 @@
       ],
       "formulaLabel": "Airport Utility",
       "bakedAt": "2026-06-16"
+    },
+    {
+      "id": "syli-2026-06-24-163353132",
+      "vibe": "office",
+      "frame": "androgynous",
+      "slots": {
+        "top": "generated-ec13da11bee56ff2",
+        "bottom": "generated-093bc8acd03d7e07",
+        "shoes": "generated-76b2ba3dbd4e1ab6",
+        "bag": "generated-7aae6575aefe9980",
+        "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-ray-ban-original-wayfarer-black-polarized-84acf90f9537ed",
+        "jewelry": "drop-f6d9415730bf63fe"
+      },
+      "stylingNotes": "A crisp striped shirt, tailored trousers, and sleek leather pieces create a smart‑casual office ensemble anchored by neutral tones and a hint of blue.",
+      "palette": [
+        "black",
+        "white",
+        "blue"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353206",
+      "vibe": "office",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-6cd0d50564c592ff",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-ribbed-knit-jersey-tank-women-white-tops-xxl-a7552e267ec5c0",
+        "bottom": "generated-44e1078abf6e65e4",
+        "shoes": "searchapi-quality-shoes-converse-chuck70-converse-chuck-70-hi-canvas-sneakers-in-black-8c76c2c8c08a56",
+        "bag": "generated-c72e11f5d7fa450d",
+        "jewelry": "drop-41b56463e8247820"
+      },
+      "stylingNotes": "Neutral tones, structured jacket, and relaxed pieces create a smart‑casual office outfit under budget.",
+      "palette": [
+        "black",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353132",
+      "vibe": "office",
+      "frame": "androgynous",
+      "slots": {
+        "top": "generated-91f9415878d7301d",
+        "bottom": "generated-e622ffd61dfc0fa5",
+        "bag": "generated-61631f4a8a4b6911",
+        "eyewear": "drop-b1d86ef9bdab2a60",
+        "jewelry": "drop-48eb8ff3131e6e33",
+        "outer": "generated-965d1c876e17398d",
+        "shoes": "drop-f0e6802dc43745e9"
+      },
+      "stylingNotes": "Pair the crisp Oxford shirt and tailored suit trousers with a clean Aimé Leon Dore jacket, polished New Balance sneakers, and a black leather backpack for a refined office‑smart‑casual look.",
+      "palette": [
+        "white",
+        "black",
+        "grey",
+        "blue"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353169",
+      "vibe": "office",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-473385718f5417aa",
+        "top": "generated-a5f330aa2aef73b8",
+        "bottom": "generated-de7d7fa0912bedd2",
+        "shoes": "searchapi-quality-shoes-clean-sneakers-new-balance-men-s-bb550-in-white-black-leather-60ccc114c4d66b",
+        "bag": "searchapi-quality-bags-carhartt-crossbody-carhartt-crossbody-horizontal-bag-dbf6a9c18adfba"
+      },
+      "stylingNotes": "A navy lambswool sweater under a sleek bomber with crisp suit pants, paired with white‑black leather sneakers and a black crossbody, creates a clean, elevated office look.",
+      "palette": [
+        "black",
+        "white",
+        "navy"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353243",
+      "vibe": "preppy",
+      "frame": "androgynous",
+      "slots": {
+        "top": "generated-44073b6d69513760",
+        "bottom": "generated-d6f6578f74593256",
+        "shoes": "drop-a9fde47f17fdce9e",
+        "bag": "generated-de311e4428b88dcf",
+        "eyewear": "drop-8b49c4dfd62a1e33",
+        "hat": "generated-f5246d54ecc88d0a"
+      },
+      "stylingNotes": "Crisp white Oxford with blue selvedge denim, polished derby shoes, structured black backpack and classic cap for a clean preppy look.",
+      "palette": [
+        "white",
+        "navy",
+        "black"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353354",
+      "vibe": "vacation",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-34f68f6e02ac6786",
+        "top": "drop-ecfec4a6d2dabf10",
+        "bottom": "generated-c92828b35c87e428",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pure-sage-two-strap-sandals-f741859c97ed8f",
+        "jewelry": "drop-95b7c882bae17b8e"
+      },
+      "stylingNotes": "Pair the straw bucket hat with a black MA‑1, white polo, denim jeans, green Birkenstock sandals, and a black crossbody for a sleek, travel‑ready vacation look.",
+      "palette": [
+        "black",
+        "white",
+        "green"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353391",
+      "vibe": "vacation",
+      "frame": "masc",
+      "slots": {
+        "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-men-s-acrylic-watch-hat-c5f71c9c4c9221",
+        "top": "generated-7dd8cd1b5917c88d",
+        "bottom": "generated-a47a20e06a6a38b4",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-madrid-big-buckle-eva-light-rose-one-strap-sandals-8fe07d0db061e4",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-with-prizm-road-jade-lens-799ed14d2fcc3d"
+      },
+      "stylingNotes": "Neutral basics with a pink sandal accent create a relaxed resort-ready look.",
+      "palette": [
+        "black",
+        "tan",
+        "pink"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353465",
+      "vibe": "gym",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-club-cap-black-white-6e8579f61016a1",
+        "top": "generated-93e0163c8dad8654",
+        "bottom": "generated-7074a6ec01ba8a43",
+        "shoes": "drop-b7c655ef9785325e"
+      },
+      "stylingNotes": "Keep it sleek with a black‑white cap, clean tee, black joggers, white trainers, and a minimalist belt bag.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Active Errands",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353650",
+      "vibe": "street",
+      "frame": "fem",
+      "slots": {
+        "top": "drop-ba153cdc0bdadec8",
+        "bottom": "drop-917384b69a31721c",
+        "shoes": "searchapi-quality-shoes-newbalance-9060-new-balance-unisex-9060-in-grey-white-suede-mesh-cc7879cd766def",
+        "jewelry": "drop-4da6d768d3ca963a"
+      },
+      "stylingNotes": "Monochrome techwear pieces create a cohesive street vibe, while the pink ring offers a quiet pop of color.",
+      "palette": [
+        "black",
+        "white",
+        "pink"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353761",
+      "vibe": "clean",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-club-cap-019-l-xl-791e3acf22c041",
+        "outer": "generated-eff9b32d401d04a0",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+        "bottom": "drop-2c1464b6f823004e",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-women-s-gizeh-2ed22566e4dcae"
+      },
+      "stylingNotes": "Pair a black cap with a neutral tank and black skirt, anchored by sleek sandals, a minimalist coat, and a black crossbody for an elevated clean look.",
+      "palette": [
+        "black",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Clean Elevated",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163353798",
+      "vibe": "night",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-b0eaa082a1d64d5c",
+        "top": "generated-ff800081d78419b4",
+        "bottom": "generated-0db5a61113828891",
+        "bag": "generated-e84568147f40668e",
+        "jewelry": "drop-4e972be21810b19c",
+        "shoes": "searchapi-quality-shoes-clean-sneakers-new-balance-men-s-550-aime-leon-dore-leather-sneakers-3752a270d02e8e"
+      },
+      "stylingNotes": "All‑black, high‑formality pieces with a gold accent create a sleek, night‑out vibe.",
+      "palette": [
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354020",
+      "vibe": "date",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "generated-3ae30bb908b91cb8",
+        "top": "generated-97ecfc44d49ca96a",
+        "bottom": "generated-5ae9f7c4f0c71531",
+        "shoes": "drop-42fb5e7c9b25ccb5",
+        "bag": "generated-be52672a9ed5885d",
+        "eyewear": "generated-509ca28e64d3778f",
+        "jewelry": "drop-21e6043cf91a5c75"
+      },
+      "stylingNotes": "Pair the navy Harrington with a crisp white oxford, black tailored trousers, and classic boat shoes, complemented by a leather messenger, luxe Bottega sunglasses, and gold studs for a polished, date‑ready look.",
+      "palette": [
+        "navy",
+        "white",
+        "black",
+        "brown"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354057",
+      "vibe": "date",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-8a59ef977aff2f82",
+        "top": "generated-7cdd30be3dcb2d1f",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117",
+        "shoes": "drop-75b4abc8d934f50a"
+      },
+      "stylingNotes": "A polished date look: black bomber, crisp polo, slim work pants, sleek sneakers, subtle hat, and a clean messenger bag.",
+      "palette": [
+        "black",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354131",
+      "vibe": "edgy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-new-era-yankees-new-era-new-york-yankees-9twenty-washed-cotton-baseball-cap-d8fa96c6b0bd8c",
+        "top": "generated-fc4e0e6ba701488e",
+        "bottom": "generated-3e7299a3d8ed3bef",
+        "shoes": "drop-e4e08db1a6d56b38",
+        "bag": "drop-ae17bc93cc49eb90",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-in-black-171ca5817fbb52"
+      },
+      "stylingNotes": "Pair a sleek black shirt with dark denim and a bold Air Max, anchored by a black cap, bag, and Oakley shades for an edgy street‑ready look.",
+      "palette": [
+        "black",
+        "blue"
+      ],
+      "formulaLabel": "Sneaker-Led Street",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354205",
+      "vibe": "edgy",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-acrylic-knit-hat-cta205-d00624602f3aec",
+        "outer": "searchapi-quality-outer-dickies-eisenhower-dickies-tj15-lined-eisenhower-black-jacket-48f6254f0588b7",
+        "top": "drop-9b0b10d69cd2964d",
+        "bottom": "drop-d9b8c2bf9f7dae12",
+        "shoes": "searchapi-quality-shoes-converse-chuck70-converse-chuck-70-black-high-top-shoes-black-egret-size-m10-w12-5c75ed5101acc9",
+        "bag": "searchapi-quality-bags-baggu-crescent-baggu-priscine-medium-crescent-bag-d312684c0cfc23"
+      },
+      "stylingNotes": "All‑black street vibe anchored by Converse high‑tops, balanced with a sleek Dickies jacket and relaxed nylon pants for edgy, monochrome cool.",
+      "palette": [
+        "black"
+      ],
+      "formulaLabel": "Sneaker-Led Street",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354242",
+      "vibe": "office",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-830080ddfd38687c",
+        "top": "generated-bc06c277623df7af",
+        "bottom": "generated-3853b2c718a1b8f2",
+        "shoes": "drop-aabc4c53e45e487e",
+        "bag": "generated-fd7a28087e6b30fd",
+        "jewelry": "drop-1a0f90e0596fd314"
+      },
+      "stylingNotes": "Navy chinos, merino sweater, and Bi‑Swing blazer paired with a sleek mule and subtle gold ring create a refined old‑money office look.",
+      "palette": [
+        "navy",
+        "grey"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354316",
+      "vibe": "office",
+      "frame": "fem",
+      "slots": {
+        "top": "drop-56938ecfcb1c8abf",
+        "bottom": "drop-5eb057ef0f65bb0b",
+        "shoes": "drop-00cd2debba354113",
+        "bag": "searchapi-quality-bags-baggu-crescent-crescent-nylon-bag-e24d15c39077fb",
+        "eyewear": "searchapi-quality-eyewear-clean-premium-le-specs-outta-love-sunglasses-30f113a959c5d3",
+        "jewelry": "drop-bf1662585100ee4b"
+      },
+      "stylingNotes": "Pair the knit puffer with a sleek hoodie, tan short, classic sneakers and understated accessories for a refined old‑money office look.",
+      "palette": [
+        "tan",
+        "black",
+        "gold"
+      ],
+      "formulaLabel": "Old-Money Knit",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354353",
+      "vibe": "preppy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-511ac772c809e651",
+        "outer": "drop-5300f6d5ddd93126",
+        "top": "generated-35b7019fff4357eb",
+        "bottom": "generated-fdcde6c5f5c7a7f0",
+        "shoes": "drop-b1091e0a18d272a0",
+        "bag": "generated-a08f5cc9b8f11647"
+      },
+      "stylingNotes": "Pair the navy polo and cap with crisp white jacket, dark denim, and tan Birkenstock for a polished preppy office‑smart casual vibe.",
+      "palette": [
+        "navy",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354464",
+      "vibe": "vacation",
+      "frame": "androgynous",
+      "slots": {
+        "top": "generated-b2f4ef84d3ff7a1c",
+        "bottom": "generated-6c25fb5c47e00e5e",
+        "shoes": "drop-8bae1e40c0a8caa3",
+        "bag": "generated-11c4bd6010f3329c",
+        "jewelry": "drop-8d024dab44c76190"
+      },
+      "stylingNotes": "Pair the navy polo with black denim, a black bomber, and taupe Birkenstocks, anchored by a sleek black‑grey backpack and classic Wayfarer shades for an effortless resort‑ready vibe.",
+      "palette": [
+        "navy",
+        "black",
+        "taupe"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354501",
+      "vibe": "vacation",
+      "frame": "masc",
+      "slots": {
+        "hat": "searchapi-quality-hats-adidas-bucket-all-blacks-adidas-bucket-hat-9ada154047e84f",
+        "outer": "generated-10ee1c543f3f0cde",
+        "top": "generated-8298330919a193f3",
+        "bottom": "generated-4516567abfc00dff",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-light-rose-two-strap-sandals-fabce8924526d9",
+        "bag": "searchapi-quality-bags-lululemon-belt-lululemon-everywhere-belt-bag-with-long-strap-1l-00edbcb3bd7b9b"
+      },
+      "stylingNotes": "Mix sleek black basics with a pink accent for a relaxed resort-ready vibe.",
+      "palette": [
+        "black",
+        "pink"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354575",
+      "vibe": "gym",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-0c0ab1bae072e00f",
+        "top": "drop-2a653bf5d2cc277b",
+        "bottom": "generated-12614444ff2dfc1c",
+        "shoes": "ba6bc7345521288d",
+        "bag": "generated-67fb9912eaf8d15e",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-black-sutro-sunglasses-270b2f3fc6a67e"
+      },
+      "stylingNotes": "Pair the beanie and zip‑hoodie with black Dri‑Fit shorts, sleek Gazelle sneakers, a minimal duffle, and sporty Oakley shades for a cohesive, low‑key training look.",
+      "palette": [
+        "black",
+        "grey"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354649",
+      "vibe": "gym",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-new-era-yankees-new-york-yankees-9twenty-adjustable-hat-4315ebac3821a6",
+        "top": "drop-220b0b87f7e7de7f",
+        "bottom": "drop-eecdfad4799a2973",
+        "shoes": "cf644945808d11f8",
+        "bag": "searchapi-quality-bags-baggu-crescent-baggu-nylon-shoulder-bag-10d031efadfbc3"
+      },
+      "stylingNotes": "Pair a sleek bodysuit with a navy short, topped by a lightweight puffer and a sporty cap, finished with breathable sneakers and a handy nylon bag for a functional gym-ready look.",
+      "palette": [
+        "black",
+        "navy",
+        "white"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354686",
+      "vibe": "street",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-324047f016b9a2f5",
+        "top": "drop-ffe43712b3e47d1d",
+        "bottom": "generated-011c0f9cf44b0f42",
+        "shoes": "searchapi-quality-shoes-salomon-xt6-salomon-xt-6-expanse-women-sneakers-black-8e5367ee34aaab",
+        "jewelry": "drop-b5f391c308eddac4"
+      },
+      "stylingNotes": "A sleek black base with olive accent creates a cohesive techwear street look, balancing utility and style.",
+      "palette": [
+        "black",
+        "olive"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354797",
+      "vibe": "clean",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-club-cap-black-white-s-m-2da62083c7bab5",
+        "outer": "generated-69191572e6ba7f3c",
+        "top": "generated-164a50bb8bf5520e",
+        "bottom": "generated-16008bf3bb3a8476",
+        "shoes": "drop-378a837007f6474b",
+        "bag": "generated-5f8af45b14e9df3d"
+      },
+      "stylingNotes": "A crisp white shirt, black MA‑1, tailored pants, and sleek accessories create a refined, airport‑ready clean look.",
+      "palette": [
+        "black",
+        "white",
+        "navy"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354834",
+      "vibe": "clean",
+      "frame": "masc",
+      "slots": {
+        "hat": "searchapi-quality-hats-new-era-yankees-new-era-league-9twenty-new-york-yankees-men-cap-24494c0af8d86b",
+        "outer": "generated-f17faa8440bf22d4",
+        "top": "generated-b1ccefd6f472628c",
+        "bottom": "generated-ff701347a4dc9ded",
+        "shoes": "drop-808b5877d0362d3d",
+        "bag": "searchapi-quality-bags-lululemon-belt-new-york-university-everywhere-belt-bag-black-lululemon-8d832b62885e19",
+        "jewelry": "drop-66fbae2e59b04278"
+      },
+      "stylingNotes": "All‑black basics anchored by a brown high‑top sneaker, with a sleek cap and belt bag for effortless airport utility.",
+      "palette": [
+        "black",
+        "brown",
+        "white"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354871",
+      "vibe": "clean",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-613d1a406d903213",
+        "top": "drop-f62cb71635fbbbec",
+        "bottom": "drop-be18c75456f30cf9",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-women-s-madrid-big-buckle-eva-8e412617398278",
+        "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-rb2132-new-wayfarer-sunglasses-fa190777b9449f"
+      },
+      "stylingNotes": "Mix a white knit top with crisp white shorts, balanced by black accessories for a timeless clean campus‑cozy vibe.",
+      "palette": [
+        "white",
+        "black",
+        "grey"
+      ],
+      "formulaLabel": "Campus Cozy",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354908",
+      "vibe": "night",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "generated-15c40581d8f487cc",
+        "top": "drop-ae2b4dbef5e10a16",
+        "bottom": "generated-6a2f27624f5a5b66",
+        "shoes": "drop-8148277f12771c11",
+        "eyewear": "searchapi-quality-eyewear-lespecs-outta-love-le-specs-heart-throb-round-sunglasses-b05ca0f5937a30",
+        "jewelry": "drop-9dc7da4c55939621"
+      },
+      "stylingNotes": "A sleek stone‑grey napkin top under a black leather jacket, paired with black denim, premium New Balance sneakers, a pearl bag, round sunglasses, and subtle earrings for an edgy after‑dark vibe.",
+      "palette": [
+        "black",
+        "grey",
+        "gold"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163354945",
+      "vibe": "night",
+      "frame": "masc",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-club-featherlight-cap-b6a4ae9ddb9195",
+        "top": "generated-a40b4a1a792a2517",
+        "bottom": "generated-013d9b4c8cf75eeb",
+        "shoes": "searchapi-quality-shoes-converse-chuck70-converse-chuck-70-high-top-men-sneakers-black-f48e6e662a8faa",
+        "bag": "generated-c87b2a7401a14f92"
+      },
+      "stylingNotes": "A sleek black top, dark denim, navy bomber, and classic black sneakers create a refined night‑date look.",
+      "palette": [
+        "black",
+        "navy",
+        "tan"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163355019",
+      "vibe": "cozy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-f8d223bc4cb98659",
+        "top": "generated-2c989447fb08a694",
+        "bottom": "drop-eb391b321a27c5ae",
+        "shoes": "searchapi-quality-shoes-asics-kayano-asics-gel-kayano-14-low-silver-white-us-man8-5-uk7-5-eu42-bdc9de761bef45",
+        "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-ray-ban-folding-wayfarer-sunglasses-5737d8de01363c"
+      },
+      "stylingNotes": "Layer the wool sweater over a beige sweatpant, finish with a beanie, sneakers, belt bag, and wayfarer for a cozy campus‑ready ensemble.",
+      "palette": [
+        "navy",
+        "beige",
+        "white"
+      ],
+      "formulaLabel": "Campus Cozy",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-06-24-163355315",
+      "vibe": "edgy",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-knit-watch-cap-ba96a86d62aa6e",
+        "top": "drop-619da35fecfe4aea",
+        "bottom": "generated-b9a8163156f71f3e",
+        "bag": "searchapi-quality-street-bags-carhartt-sling-bag-db5e77ccc654d0",
+        "eyewear": "searchapi-quality-eyewear-lespecs-outta-love-le-specs-women-s-outta-love-global-fit-sunglasses-e5f9c887b35359",
+        "shoes": "searchapi-quality-shoes-dr-martens-1460-dr-martens-combs-leather-casual-boots-in-black-size-9-547c3dc39bad53"
+      },
+      "stylingNotes": "Mix sleek white asymmetry with utility black accessories for an edgy techwear look.",
+      "palette": [
+        "black",
+        "silver",
+        "white"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-06-24"
+    },
+    {
+      "id": "syli-2026-07-01-163408565",
+      "vibe": "vacation",
+      "frame": "masc",
+      "slots": {
+        "top": "drop-46a43e4c174bdff0",
+        "bottom": "drop-7519bbbe7ac2f837",
+        "shoes": "searchapi-quality-sandals-clean-arizona-birkenstock-6e63f9d60ebdb6",
+        "bag": "generated-8e4ca9cfee9aa03a",
+        "jewelry": "drop-e5bc278631de306e"
+      },
+      "stylingNotes": "Soft, neutral resort look layering preppy essentials—eyelet sweater, wide-leg pants, and Birkenstocks create effortless vacation ease that feels both put-together and completely relaxed.",
+      "palette": [
+        "cream",
+        "tan",
+        "white",
+        "gold"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408602",
+      "vibe": "vacation",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-44c255f7110a28b8",
+        "top": "drop-82715a07b8aa25c5",
+        "bottom": "drop-43f4ffdf3542ab5f",
+        "shoes": "searchapi-quality-sandals-clean-birkenstock-madrid-big-buckle-eva-mauve-one-strap-sandals-e6533b51d9eae2",
+        "bag": "generated-08b249a2fb473b3b"
+      },
+      "stylingNotes": "Neutral, layered resort wear with breathable fabrics and easy silhouettes—the linen bucket hat and Birk sandals ground the look in vacation simplicity while the lightweight puffer adds adaptable coverage for cooler evenings.",
+      "palette": [
+        "cream",
+        "ivory",
+        "taupe",
+        "soft mauve"
+      ],
+      "formulaLabel": "Resort Easy",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408639",
+      "vibe": "gym",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "drop-2f2b0aae5796c4da",
+        "outer": "searchapi-quality-outer-nike-tech-fleece-nike-tech-fleece-full-zip-hoodie-anthracite-black-4b9910374f5e80",
+        "top": "generated-9abc5af484b763c6",
+        "bottom": "generated-95341ea9816f8e21",
+        "shoes": "searchapi-quality-shoes-nike-vomero-nike-zoom-vomero-5-premium-sneakers-in-silver-and-black-d346ab97e83e2f",
+        "bag": "generated-43b27a96f6e58322",
+        "jewelry": "drop-10c7259c03320f7c"
+      },
+      "stylingNotes": "Athletic base in black and grey tech fabrics with performance shoes and a duffel bag creates a cohesive gym-to-errands outfit; the beige trucker hat softens the formality while keeping everything firmly in active wear territory.",
+      "palette": [
+        "black",
+        "grey",
+        "neutral"
+      ],
+      "formulaLabel": "Active Errands",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408676",
+      "vibe": "gym",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-422653ac39d10e4b",
+        "top": "drop-88b05cd4b4c0bac8",
+        "bottom": "generated-a66231a0b1ef7a00",
+        "shoes": "searchapi-quality-shoes-nike-vomero-nike-zoom-vomero-metallic-silver-black-e23b0908fe77ed",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-men-s-sutro-lite-sweep-prizm-sunglasses-e1d5dc905efd6d"
+      },
+      "stylingNotes": "Clean athletic essentials in a neutral monochrome palette—black cap, tee, and shorts with tech-forward silver accents in the shoe and sunglass lens for a focused, performance-ready training-day look.",
+      "palette": [
+        "black",
+        "silver",
+        "grey"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408713",
+      "vibe": "gym",
+      "frame": "fem",
+      "slots": {
+        "top": "drop-9ca97a6f5613875e",
+        "bottom": "drop-4bec95cdd8dbe117",
+        "shoes": "searchapi-quality-shoes-newbalance-9060-new-balance-womens-9060-running-shoes-white-grey-size-07-5-a2c9265d3fc625",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-lite-s-sunglasses-with-prizm-black-lens-55a3553b5b0d77",
+        "jewelry": "drop-b3b7e4c015019231"
+      },
+      "stylingNotes": "Cohesive neutral palette with premium basics and sport-focused accessories—grey hoodie anchors the look while white shorts and grey/white sneakers keep it performance-ready and balanced.",
+      "palette": [
+        "grey",
+        "white",
+        "navy"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408750",
+      "vibe": "street",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-adidas-bucket-adidas-men-s-3-stripes-bucket-hat-da5d23c5aae278",
+        "outer": "generated-b5918a0168385aa7",
+        "top": "generated-014ab665198ab354",
+        "bottom": "generated-ba46dca6022b24a2",
+        "shoes": "searchapi-quality-shoes-salomon-xt6-salomon-xt-6-black-f1ef0fea95e764"
+      },
+      "stylingNotes": "Monochrome techwear utility built on reflective cargo, technical sneakers, and layered structured pieces—street-functional and visually cohesive.",
+      "palette": [
+        "black",
+        "grey",
+        "silver"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408787",
+      "vibe": "street",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-d0dad86fa61690c5",
+        "top": "generated-6cf6ec203e6b07a9",
+        "bottom": "generated-59bbfa0e038bc22d",
+        "shoes": "searchapi-quality-shoes-asics-kayano-asics-gel-kayano-14-sneakers-unisex-other-fibres-4-silver-b627349a5f3852",
+        "jewelry": "561d375c28389500"
+      },
+      "stylingNotes": "All-black techwear utility foundation with silver accents and technical layering—skullcap, cargo, ASICS, and Carhartt throughout anchor a cohesive streetwear-functional look.",
+      "palette": [
+        "black",
+        "silver",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408824",
+      "vibe": "street",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-watch-hat-2025-584b574f54dbbc",
+        "top": "drop-90bc185dd47c19e1",
+        "bottom": "drop-3ae9091e99c3dbfb",
+        "shoes": "searchapi-quality-shoes-salomon-xt6-salomon-xt-6-expanse-black-black-white-m13-w14-200f7e801ba8c2",
+        "bag": "searchapi-quality-street-bags-carhartt-wip-kyle-5-3l-sling-bag-d964c46d902ea5",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-7fad7bfe996831"
+      },
+      "stylingNotes": "Black-white-grey techwear utility fit with ripstop nylon technical pieces, Carhartt workwear essentials, and Salomon trail-inspired sneakers for authentic street-technical edge under budget.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408861",
+      "vibe": "clean",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "generated-b9a09c2a64de8b6f",
+        "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-quick-drying-oversized-t-shirt-e79810c95eb4c5",
+        "bottom": "generated-f08c9caeb03855fc",
+        "shoes": "drop-ac9095f6e93a7998",
+        "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-rb2140-original-wayfarer-sunglasses-6ace58ce1d2270",
+        "jewelry": "7fb598eee85fa4a6"
+      },
+      "stylingNotes": "Streamlined airport utility: structured MA-1 bomber over a clean base, indigo denim, and comfortable Sambas create an effortlessly polished minimal look that reads intentional without trying.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408898",
+      "vibe": "clean",
+      "frame": "masc",
+      "slots": {
+        "hat": "generated-f8ea2186dd502fa9",
+        "top": "generated-a2db4773d8a133c9",
+        "bottom": "generated-ed591a9d0cc12835",
+        "shoes": "searchapi-quality-shoes-clean-sneakers-ald-x-new-balance-men-s-550-36c57e507b377e"
+      },
+      "stylingNotes": "Black, grey, and tan anchors create an understated utility palette—the Carhartt jacket, selvedge denim, and clean sneaker read effortlessly functional for airport travel without sacrificing polish.",
+      "palette": [
+        "black",
+        "grey",
+        "tan"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408935",
+      "vibe": "clean",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-cd0dca641bdd9b86",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-women-s-cotton-rib-high-scoop-tank-eb319fa30f726f",
+        "bottom": "generated-2200367faa791073",
+        "shoes": "drop-eaf33c3edd384e65",
+        "bag": "generated-c1df9317dbaeff46",
+        "jewelry": "drop-614e531117fdec7a"
+      },
+      "stylingNotes": "Neutral, no-fuss layering with structured workwear and clean basics—effortless airport utility that prioritizes comfort and movement without sacrificing polish.",
+      "palette": [
+        "black",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163408972",
+      "vibe": "night",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-5000955c710c0995",
+        "top": "generated-03e2e80cdff4624f",
+        "bottom": "generated-5a45df829d3dabd0",
+        "shoes": "catalog-shoes-nike-af1",
+        "eyewear": "searchapi-quality-eyewear-clean-premium-oakley-men-s-lateralis-sunglasses-95a99001c556dc"
+      },
+      "stylingNotes": "Black silk camp shirt with tailored pleated pants and Air Force 1s strikes the exact balance of polished-yet-cool for a sophisticated date night: elevated formality without trying too hard.",
+      "palette": [
+        "black",
+        "white"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409009",
+      "vibe": "night",
+      "frame": "masc",
+      "slots": {
+        "outer": "generated-56cde4dfc8360295",
+        "top": "generated-a56b1d89195f90f1",
+        "shoes": "generated-76b2ba3dbd4e1ab6",
+        "jewelry": "drop-aa1f3ed5ae3eb698",
+        "bottom": "generated-de7d7fa0912bedd2"
+      },
+      "stylingNotes": "Black leather jacket over tailored black silk reads edgy-polished; white chinos and white bag keep it fresh; gold jewelry ties everything into a cohesive, elevated night look.",
+      "palette": [
+        "black",
+        "white",
+        "gold"
+      ],
+      "formulaLabel": "Date Polished",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409046",
+      "vibe": "night",
+      "frame": "fem",
+      "slots": {
+        "hat": "drop-c94745f295e8a719",
+        "outer": "generated-2c32c1d7ebb73844",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-ribbed-knit-jersey-tank-women-white-tops-xxl-a7552e267ec5c0",
+        "bottom": "generated-2bba290f50bd218c",
+        "shoes": "catalog-shoes-stevemadden-heel",
+        "bag": "searchapi-quality-bags-clean-night-longchamp-le-pliage-n-o-shoulder-bag-a2dbb92a2cdb04"
+      },
+      "stylingNotes": "Black studded leather, pointed heels, and crisp white tank create a polished-yet-edgy night-out look—classic sophistication with attitude.",
+      "palette": [
+        "black",
+        "white"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409083",
+      "vibe": "cozy",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-acrylic-knit-hat-beanie-70f9d2558a5a00",
+        "top": "generated-defab0044c18b0b5",
+        "bottom": "generated-cda931c66bf628cf",
+        "shoes": "searchapi-quality-shoes-newbalance-9060-new-balance-unisex-9060-in-grey-white-suede-mesh-cc7879cd766def",
+        "bag": "generated-cc5a592e65a1f88d",
+        "jewelry": "drop-05793dd760e9ddbc"
+      },
+      "stylingNotes": "Monochromatic neutral base with layered cozy textures—Patagonia fleece, Carhartt beanie, and quality basics create effortless airport utility without looking slouchy.",
+      "palette": [
+        "black",
+        "grey",
+        "white",
+        "tan"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409120",
+      "vibe": "cozy",
+      "frame": "masc",
+      "slots": {
+        "top": "generated-e931f013106c0eae",
+        "bottom": "generated-2e720488d4047c5c",
+        "shoes": "drop-e5b6fc99636c992b",
+        "bag": "generated-1b8f57a90cb445da"
+      },
+      "stylingNotes": "Warm, textured layers and utility-focused pieces create an effortlessly cozy airport look—durable denim and a corduroy shirt jacket feel both protective and approachable, anchored by a classic beanie and sneaker that prioritize comfort with",
+      "palette": [
+        "black",
+        "brown",
+        "grey",
+        "cream"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409157",
+      "vibe": "cozy",
+      "frame": "fem",
+      "slots": {
+        "top": "drop-ba153cdc0bdadec8",
+        "bottom": "drop-9f635555c3ceb319",
+        "shoes": "drop-ebcebdea81be425f",
+        "eyewear": "generated-49007d65beefcd46",
+        "jewelry": "drop-e495da4c65090d8f"
+      },
+      "stylingNotes": "Cozy utility travel fit: puffer jacket + soft layers + leggings + classic sneakers, grounded by neutral palette and practical accessories for easy airport transitions.",
+      "palette": [
+        "cream",
+        "black",
+        "grey"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409194",
+      "vibe": "date",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "generated-3007e5aa1017d6cc",
+        "outer": "generated-c3a2b05d6c28cb65",
+        "top": "generated-ccead1ed25d370d6",
+        "bottom": "generated-84d14b00b0877218",
+        "shoes": "drop-e9fc67357736967e",
+        "bag": "searchapi-quality-bags-clean-night-coach-coachtopia-alter-ego-crescent-shoulder-bag-9ad93e2d05ab63"
+      },
+      "stylingNotes": "A polished but edgy date look: leather biker jacket adds attitude, navy merino stays refined, dark trousers elevate formality, and derby shoes give intentional detail—all grounded in black and neutral tones for cohesion.",
+      "palette": [
+        "black",
+        "navy",
+        "tan"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409268",
+      "vibe": "date",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-7e12d2a44c60a9c4",
+        "top": "drop-852707c24a9d9703",
+        "bottom": "generated-44e1078abf6e65e4",
+        "shoes": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
+        "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-ray-ban-original-wayfarer-black-polarized-84acf90f9537ed"
+      },
+      "stylingNotes": "Cool neutral palette with navy stripe top anchoring a streamlined silhouette—tailored wide-leg base balances the refined mesh, while classic sneakers and clean accessories keep the vibe effortlessly polished for a date night.",
+      "palette": [
+        "black",
+        "navy",
+        "grey",
+        "tan"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409342",
+      "vibe": "edgy",
+      "frame": "masc",
+      "slots": {
+        "hat": "drop-3001f97cdb615164",
+        "outer": "generated-5a523c4878e6b248",
+        "top": "generated-9d0abb6b8a4443f1",
+        "bottom": "generated-94099fe187498caf",
+        "shoes": "drop-22d260d85e98ab1c",
+        "bag": "generated-3d2deffc6ded97df"
+      },
+      "stylingNotes": "Black leather biker over silk camp collar with cargo pants and Air Force 1s creates a refined-meets-street night-out edge—structured enough for venues, bold enough to command a room.",
+      "palette": [
+        "black",
+        "tan"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409379",
+      "vibe": "edgy",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-stussy-cap-st-ssy-logo-embroidered-cap-ba423c2e0b2072",
+        "outer": "generated-d1a240e7aa8b482d",
+        "top": "drop-d244f36551a64b29",
+        "bottom": "generated-12af9bc93c3135ab",
+        "shoes": "searchapi-quality-shoes-converse-chuck70-converse-chuck-70-hi-canvas-sneakers-in-black-8c76c2c8c08a56",
+        "jewelry": "drop-95b7c882bae17b8e"
+      },
+      "stylingNotes": "Monochromatic black with crisp white Telfar bag creates an edgy, graphic silhouette—leather jacket and tailored pants nail formality for night out while Chuck 70s and Stüssy cap keep it cool and streetwear-grounded.",
+      "palette": [
+        "black",
+        "white"
+      ],
+      "formulaLabel": "Night Out",
+      "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-01-163409490",
+      "vibe": "office",
+      "frame": "fem",
+      "slots": {
+        "hat": "generated-f5246d54ecc88d0a",
+        "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-women-s-wilfred-little-cropped-jacket-7ceded7f52a8e3",
+        "top": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-large-c54d2666e66e64",
+        "bottom": "generated-7a29244cfb9d80fb",
+        "shoes": "drop-b2bf4d0c167f95ba",
+        "bag": "searchapi-quality-bags-longchamp-pliage-new-longchamp-le-pliage-tote-bag-m-size3-92407a4330f37e"
+      },
+      "stylingNotes": "A crisp white Oxford under a structured black blazer reads polished-professional; pleated trousers ground the look in tailored elegance, while the premium sneaker and iconic Longchamp tote keep it modern and approachable for office smart-ca",
+      "palette": [
+        "white",
+        "black",
+        "tan"
+      ],
+      "formulaLabel": "Office Smart Casual",
+      "bakedAt": "2026-07-01"
     }
   ]
 }
