@@ -1,6 +1,6 @@
 # Sylistly — Next.js scaffold
 
-Production starter for the Sylistly app (AI-powered outfit builder). Pairs with `SYLISTLY_MASTER_PROMPT.md`.
+Production starter for the Sylistly app (AI-powered outfit builder). Pairs with [`SYLISTLY_BUSINESS_MASTER_PROMPT.md`](./SYLISTLY_BUSINESS_MASTER_PROMPT.md) — the business + execution source of truth (audit, strategy, phased Claude Code prompts).
 
 ## Stack
 
