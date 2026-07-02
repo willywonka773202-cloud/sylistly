@@ -4037,6 +4037,112 @@
       ],
       "formulaLabel": "Office Smart Casual",
       "bakedAt": "2026-07-01"
+    },
+    {
+      "id": "syli-2026-07-02-163416484",
+      "vibe": "vacation",
+      "frame": "fem",
+      "slots": {
+        "outer": "searchapi-quality-outer-patagonia-fleece-patagonia-lw-synch-snap-t-p-o-jacket-deer-brown-f24c76824e8de0",
+        "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+        "bottom": "searchapi-quality-bottoms-dickies-874-dickies-original-874-black-work-pant-bcbbbc3d443117",
+        "shoes": "drop-8bae1e40c0a8caa3",
+        "bag": "drop-dd825db9fdc7c457",
+        "eyewear": "searchapi-quality-eyewear-lespecs-outta-love-le-specs-outta-love-sunglasses-in-black-end-clothing-09e92872d77090",
+        "jewelry": "drop-c578e2b02d484d90"
+      },
+      "stylingNotes": "Grounded neutral palette with functional pieces that balance comfort and effortless style—the Patagonia fleece layers perfectly over the clean tank, while black workwear pants and Birkenstock suede deliver practical ease for airport transit",
+      "palette": [
+        "brown",
+        "tan",
+        "black",
+        "cream"
+      ],
+      "formulaLabel": "Airport Utility",
+      "bakedAt": "2026-07-02"
+    },
+    {
+      "id": "syli-2026-07-02-163416521",
+      "vibe": "gym",
+      "frame": "androgynous",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-club-featherlight-cap-b6a4ae9ddb9195",
+        "top": "generated-8298330919a193f3",
+        "bottom": "generated-4516567abfc00dff",
+        "shoes": "ee1b0c35cccddadc",
+        "bag": "generated-67fb9912eaf8d15e"
+      },
+      "stylingNotes": "Streamlined training-day look: tech-forward layers in black and grey keep you functional, breathable, and ready for the gym while staying cohesively minimal.",
+      "palette": [
+        "black",
+        "grey",
+        "white"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-07-02"
+    },
+    {
+      "id": "syli-2026-07-02-163416558",
+      "vibe": "gym",
+      "frame": "masc",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-club-cap-black-white-6e8579f61016a1",
+        "top": "generated-8050480459a8f235",
+        "bottom": "generated-12614444ff2dfc1c",
+        "shoes": "cf644945808d11f8",
+        "bag": "generated-c87b2a7401a14f92",
+        "jewelry": "drop-564a0356d55782e3"
+      },
+      "stylingNotes": "Clean athletic palette in black, grey, and white keeps the look cohesive—tech fleece layers over tech tee with training shorts and a minimal ring for understated polish on the gym floor.",
+      "palette": [
+        "black",
+        "grey",
+        "white"
+      ],
+      "formulaLabel": "Training Day",
+      "bakedAt": "2026-07-02"
+    },
+    {
+      "id": "syli-2026-07-02-163416595",
+      "vibe": "gym",
+      "frame": "fem",
+      "slots": {
+        "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-adv-club-cap-065f3058f0b1f3",
+        "top": "drop-ecfec4a6d2dabf10",
+        "bottom": "drop-eb391b321a27c5ae",
+        "shoes": "2eb1265214ad2ebf",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-in-black-171ca5817fbb52"
+      },
+      "stylingNotes": "Clean athleisure foundation in neutral tones with performance fabrics keeps you functional through gym sessions and quick errands without looking underdone.\">\n</invoke>",
+      "palette": [
+        "black",
+        "grey",
+        "white"
+      ],
+      "formulaLabel": "Active Errands",
+      "bakedAt": "2026-07-02"
+    },
+    {
+      "id": "syli-2026-07-02-163416632",
+      "vibe": "street",
+      "frame": "androgynous",
+      "slots": {
+        "outer": "generated-7ace3d1a59654950",
+        "top": "generated-7dd8cd1b5917c88d",
+        "bottom": "generated-f4a268b3f192d920",
+        "shoes": "searchapi-quality-shoes-salomon-xt6-salomon-xt-6-low-top-men-sneakers-black-white-blue-curacao-5e0ebcdc609ca0",
+        "bag": "generated-a08f5cc9b8f11647",
+        "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-with-prizm-road-jade-lens-799ed14d2fcc3d",
+        "jewelry": "drop-48eb8ff3131e6e33"
+      },
+      "stylingNotes": "Monochrome techwear built on utility: cargo pants, MA-1, and Salomon XT-6 create function-forward street presence with zero compromise on edge.",
+      "palette": [
+        "black",
+        "white",
+        "grey"
+      ],
+      "formulaLabel": "Techwear Utility",
+      "bakedAt": "2026-07-02"
     }
   ]
 }
