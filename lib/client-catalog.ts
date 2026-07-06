@@ -497,6 +497,16 @@ export const CLIENT_CATALOG_PRODUCTS = ALL_CATALOG_PRODUCTS;
 const PRODUCT_BY_ID = new Map(ALL_CATALOG_PRODUCTS.map((product) => [product.id, product]));
 const PRODUCT_IDS = new Set(PRODUCT_BY_ID.keys());
 
+const FRESHNESS_WINDOW_MS = 35 * 24 * 60 * 60 * 1000;
+
+function freshnessBonus(product: Product): number {
+  const raw = (product.metadata as Record<string, unknown> | undefined)?.discoveredAt;
+  if (typeof raw !== 'string') return 0;
+  const age = Date.now() - Date.parse(raw);
+  if (!Number.isFinite(age) || age < 0 || age > FRESHNESS_WINDOW_MS) return 0;
+  return Math.round(22 * (1 - age / FRESHNESS_WINDOW_MS));
+}
+
 function scoreProduct(product: Product, {
   vibe,
   frame,
@@ -546,6 +556,10 @@ function scoreProduct(product: Product, {
   // link). Modest (tie-breaker) so it never overrides vibe (+36) or coordination.
   if (hasExactProductLink(product)) score += 14;
   if (product.metadata?.featured) score += 8;
+  // New-arrival lift: freshly ingested pieces circulate for ~5 weeks so the
+  // feed visibly changes when inventory lands (retail "new in" behavior).
+  // Sized between featured (+8) and vibe-match (+36) — a nudge, not a takeover.
+  score += freshnessBonus(product);
   if (product.vibes?.includes(vibe) || product.occasions?.includes(vibe)) score += 36;
   if (text.includes(vibe)) score += 18;
   if (hasAnyTerm(text, keywords)) score += 30;
