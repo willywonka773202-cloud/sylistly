@@ -44,7 +44,7 @@ function defaultLayout(pieces: Array<{ slot: Category; product: Product }>): Rec
  * Studio — compose an outfit post: arrange your fit's pieces on a 4:5 canvas by
  * dragging, add a caption, and post it to your profile grid. Local-only (this
  * device) for now; the OutfitPost it writes is backend-ready for a future
- * publish. HONEST: no fake likes/comments — real cross-user social needs accounts.
+ * publish. HONEST: no fabricated engagement counts — real cross-user social needs accounts.
  */
 export function PostComposer({
   open,

@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Lock,
   RotateCcw,
+  Share,
   ShoppingBag,
   SlidersHorizontal,
   Sparkles,
@@ -33,6 +34,7 @@ import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-ima
 import { feedback, isMuted, setMuted } from '@/lib/feedback';
 import { prefersReducedMotion } from '@/lib/visual-capability';
 import { safeStorageSet } from '@/lib/safe-storage';
+import { encodeLookSlug } from '@/lib/share-codes';
 import { lookRarity } from '@/lib/look-rarity';
 import { bumpDaily, consumeLevelUp, type LevelState } from '@/lib/stylist-xp';
 import CelebrationBurst from '@/components/CelebrationBurst';
@@ -531,6 +533,25 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
     setMatchPop(look);
     if (matchTimer.current) window.clearTimeout(matchTimer.current);
     matchTimer.current = window.setTimeout(() => setMatchPop(null), 1500);
+  }
+
+  /** Share — native share sheet with a stable /look/ URL the recipient can
+   *  open, remix, and shop. Clipboard fallback on desktop. */
+  async function onShare(look: ScrollLook) {
+    const slug = encodeLookSlug(look.items);
+    if (!slug) return;
+    const url = `${window.location.origin}/look/${slug}`;
+    track('look_shared', { vibe: look.vibe });
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({ title: 'Sylistly', text: 'Check this fit', url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied — send it to someone');
+      }
+    } catch {
+      // user closed the share sheet — not an error
+    }
   }
 
   /** Pass — lower that vibe (honest down-weight), dim the card. */
@@ -1079,6 +1100,14 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                       }`}
                     >
                       <Heart size={24} fill={saved ? 'currentColor' : 'none'} />
+                    </HapticTap>
+                    <HapticTap
+                      ariaLabel="Share this fit"
+                      onTap={() => onShare(look)}
+                      disabled={false}
+                      className="sy-press grid h-12 w-12 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.55)] text-ink backdrop-blur-md transition"
+                    >
+                      <Share size={18} />
                     </HapticTap>
                   </div>
                 </div>

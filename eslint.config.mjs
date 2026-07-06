@@ -13,6 +13,7 @@ const eslintConfig = [
   {
     ignores: [
       '.next/**',
+      '.claude/**', // agent worktrees live here — never lint another session's checkout
       'node_modules/**',
       'out/**',
       'public/**',

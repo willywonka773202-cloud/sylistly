@@ -34,7 +34,8 @@
     "auto:ship": "node scripts/auto-expand-ship.mjs",
     "bake:ai": "node scripts/bake-ai-looks.mjs",
     "bake:ship": "node scripts/bake-ai-ship.mjs",
-    "test:frame": "node scripts/test-frame-constraint.mjs"
+    "test:frame": "node scripts/test-frame-constraint.mjs",
+    "health:sweep": "node scripts/check-link-health.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
