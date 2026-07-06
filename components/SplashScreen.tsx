@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 /**
  * Cinematic launch build. Rendered as a direct child of <body> in the root
@@ -31,6 +32,9 @@ const PIECES = [
 export function SplashScreen() {
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
+  // Shared-link recipients (/look/*) get the fit instantly — a 2s cinematic
+  // before someone else's outfit reads as friction, not premium.
+  const skip = usePathname()?.startsWith('/look/') ?? false;
 
   useEffect(() => {
     const fade = window.setTimeout(() => setLeaving(true), MIN_VISIBLE_MS);
@@ -41,7 +45,7 @@ export function SplashScreen() {
     };
   }, []);
 
-  if (gone) return null;
+  if (gone || skip) return null;
 
   return (
     <div

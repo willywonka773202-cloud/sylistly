@@ -7,9 +7,17 @@
       "retailer": "Stussy",
       "baseUrl": "https://www.stussy.com",
       "collection": "new-arrivals",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -18,9 +26,19 @@
       "retailer": "Aime Leon Dore",
       "baseUrl": "https://www.aimeleondore.com",
       "collection": "new-arrivals",
-      "vibes": ["preppy", "old money", "streetwear", "clean"],
-      "occasions": ["everyday", "office"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "preppy",
+        "old money",
+        "streetwear",
+        "clean"
+      ],
+      "occasions": [
+        "everyday",
+        "office"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -30,9 +48,20 @@
       "baseUrl": "https://www.aimeleondore.com",
       "collection": "footwear",
       "defaultCategory": "shoes",
-      "vibes": ["preppy", "old money", "streetwear", "clean"],
-      "occasions": ["everyday", "office", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "preppy",
+        "old money",
+        "streetwear",
+        "clean"
+      ],
+      "occasions": [
+        "everyday",
+        "office",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -42,9 +71,19 @@
       "baseUrl": "https://www.aimeleondore.com",
       "collection": "outerwear",
       "defaultCategory": "outer",
-      "vibes": ["preppy", "old money", "streetwear", "clean"],
-      "occasions": ["everyday", "office"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "preppy",
+        "old money",
+        "streetwear",
+        "clean"
+      ],
+      "occasions": [
+        "everyday",
+        "office"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -53,9 +92,19 @@
       "retailer": "Aime Leon Dore",
       "baseUrl": "https://www.aimeleondore.com",
       "collection": "accessories",
-      "vibes": ["preppy", "old money", "streetwear", "clean"],
-      "occasions": ["everyday", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "preppy",
+        "old money",
+        "streetwear",
+        "clean"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -65,9 +114,19 @@
       "baseUrl": "https://kith.com",
       "collection": "mens-footwear",
       "defaultCategory": "shoes",
-      "vibes": ["streetwear", "clean", "premium", "preppy"],
-      "occasions": ["everyday", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "clean",
+        "premium",
+        "preppy"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -77,9 +136,19 @@
       "baseUrl": "https://kith.com",
       "collection": "womens-footwear",
       "defaultCategory": "shoes",
-      "vibes": ["streetwear", "clean", "premium", "preppy"],
-      "occasions": ["everyday", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "clean",
+        "premium",
+        "preppy"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -88,9 +157,18 @@
       "retailer": "Kith",
       "baseUrl": "https://kith.com",
       "collection": "womens-new-arrivals",
-      "vibes": ["streetwear", "clean", "premium"],
-      "occasions": ["everyday", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "clean",
+        "premium"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -100,9 +178,17 @@
       "baseUrl": "https://www.stussy.com",
       "collection": "outerwear",
       "defaultCategory": "outer",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -112,9 +198,17 @@
       "baseUrl": "https://www.stussy.com",
       "collection": "headwear",
       "defaultCategory": "hat",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -123,9 +217,17 @@
       "retailer": "Stussy",
       "baseUrl": "https://www.stussy.com",
       "collection": "accessories",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -134,9 +236,19 @@
       "retailer": "SKIMS",
       "baseUrl": "https://www.skims.com",
       "collection": "new-arrivals",
-      "vibes": ["clean", "minimal", "casual", "gym"],
-      "occasions": ["everyday", "workout"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "clean",
+        "minimal",
+        "casual",
+        "gym"
+      ],
+      "occasions": [
+        "everyday",
+        "workout"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -145,9 +257,19 @@
       "retailer": "Alo Yoga",
       "baseUrl": "https://www.aloyoga.com",
       "collection": "new-arrivals",
-      "vibes": ["gym", "athletic", "clean", "casual"],
-      "occasions": ["workout", "everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "gym",
+        "athletic",
+        "clean",
+        "casual"
+      ],
+      "occasions": [
+        "workout",
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -157,9 +279,17 @@
       "baseUrl": "https://bdgastore.com",
       "collection": "footwear",
       "defaultCategory": "shoes",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -168,9 +298,17 @@
       "retailer": "Bodega",
       "baseUrl": "https://bdgastore.com",
       "collection": "accessories",
-      "vibes": ["streetwear", "street", "casual"],
-      "occasions": ["everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -180,9 +318,18 @@
       "baseUrl": "https://www.everlane.com",
       "collection": "mens-shoes",
       "defaultCategory": "shoes",
-      "vibes": ["clean", "minimal", "casual"],
-      "occasions": ["everyday", "office"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "clean",
+        "minimal",
+        "casual"
+      ],
+      "occasions": [
+        "everyday",
+        "office"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -192,9 +339,19 @@
       "baseUrl": "https://heavenmayhem.com",
       "collection": "earrings",
       "defaultCategory": "jewelry",
-      "vibes": ["clean", "night", "date"],
-      "occasions": ["date", "night out", "everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "clean",
+        "night",
+        "date"
+      ],
+      "occasions": [
+        "date",
+        "night out",
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -204,9 +361,19 @@
       "baseUrl": "https://us.missoma.com",
       "collection": "earrings",
       "defaultCategory": "jewelry",
-      "vibes": ["clean", "night", "date"],
-      "occasions": ["date", "night out", "everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "clean",
+        "night",
+        "date"
+      ],
+      "occasions": [
+        "date",
+        "night out",
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -216,9 +383,19 @@
       "baseUrl": "https://www.localeclectic.com",
       "collection": "rings",
       "defaultCategory": "jewelry",
-      "vibes": ["clean", "night", "date"],
-      "occasions": ["date", "night out", "everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "clean",
+        "night",
+        "date"
+      ],
+      "occasions": [
+        "date",
+        "night out",
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 40
     },
     {
@@ -228,10 +405,334 @@
       "baseUrl": "https://www.telfar.net",
       "collection": "shopping-bags",
       "defaultCategory": "bag",
-      "vibes": ["streetwear", "clean", "night"],
-      "occasions": ["everyday", "night out"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "clean",
+        "night"
+      ],
+      "occasions": [
+        "everyday",
+        "night out"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxProducts": 30
+    },
+    {
+      "id": "princess-polly-tops",
+      "type": "shopifyCollection",
+      "retailer": "Princess Polly",
+      "baseUrl": "https://us.princesspolly.com",
+      "collection": "tops",
+      "defaultCategory": "top",
+      "vibes": [
+        "casual",
+        "clean",
+        "night",
+        "date"
+      ],
+      "occasions": [
+        "everyday",
+        "date",
+        "party"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "princess-polly-bottoms",
+      "type": "shopifyCollection",
+      "retailer": "Princess Polly",
+      "baseUrl": "https://us.princesspolly.com",
+      "collection": "bottoms",
+      "defaultCategory": "bottom",
+      "vibes": [
+        "casual",
+        "clean",
+        "night",
+        "date"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "princess-polly-outerwear",
+      "type": "shopifyCollection",
+      "retailer": "Princess Polly",
+      "baseUrl": "https://us.princesspolly.com",
+      "collection": "outerwear",
+      "defaultCategory": "outer",
+      "vibes": [
+        "casual",
+        "clean",
+        "preppy"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "princess-polly-bags",
+      "type": "shopifyCollection",
+      "retailer": "Princess Polly",
+      "baseUrl": "https://us.princesspolly.com",
+      "collection": "bags",
+      "defaultCategory": "bag",
+      "vibes": [
+        "casual",
+        "clean",
+        "night"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "princess-polly-shoes",
+      "type": "shopifyCollection",
+      "retailer": "Princess Polly",
+      "baseUrl": "https://us.princesspolly.com",
+      "collection": "shoes",
+      "defaultCategory": "shoes",
+      "vibes": [
+        "casual",
+        "clean",
+        "night"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "ohpolly-dresses",
+      "type": "shopifyCollection",
+      "retailer": "Oh Polly",
+      "baseUrl": "https://www.ohpolly.com",
+      "collection": "dresses",
+      "defaultCategory": "top",
+      "vibes": [
+        "night",
+        "date",
+        "clean"
+      ],
+      "occasions": [
+        "date",
+        "party",
+        "night"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "ohpolly-tops",
+      "type": "shopifyCollection",
+      "retailer": "Oh Polly",
+      "baseUrl": "https://www.ohpolly.com",
+      "collection": "tops",
+      "defaultCategory": "top",
+      "vibes": [
+        "night",
+        "date",
+        "clean"
+      ],
+      "occasions": [
+        "date",
+        "party"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "edikted-denim",
+      "type": "shopifyCollection",
+      "retailer": "Edikted",
+      "baseUrl": "https://edikted.com",
+      "collection": "denim",
+      "defaultCategory": "bottom",
+      "vibes": [
+        "casual",
+        "street",
+        "clean"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "edikted-outerwear",
+      "type": "shopifyCollection",
+      "retailer": "Edikted",
+      "baseUrl": "https://edikted.com",
+      "collection": "outerwear",
+      "defaultCategory": "outer",
+      "vibes": [
+        "casual",
+        "street",
+        "clean"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "edikted-tops",
+      "type": "shopifyCollection",
+      "retailer": "Edikted",
+      "baseUrl": "https://edikted.com",
+      "collection": "tops",
+      "defaultCategory": "top",
+      "vibes": [
+        "casual",
+        "street",
+        "night"
+      ],
+      "occasions": [
+        "everyday",
+        "date"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "kith-bags",
+      "type": "shopifyCollection",
+      "retailer": "Kith",
+      "baseUrl": "https://kith.com",
+      "collection": "bags",
+      "defaultCategory": "bag",
+      "vibes": [
+        "streetwear",
+        "clean",
+        "premium"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
+      "maxProducts": 60
+    },
+    {
+      "id": "skims-tops",
+      "type": "shopifyCollection",
+      "retailer": "SKIMS",
+      "baseUrl": "https://www.skims.com",
+      "collection": "tops",
+      "defaultCategory": "top",
+      "vibes": [
+        "clean",
+        "minimal",
+        "casual",
+        "gym"
+      ],
+      "occasions": [
+        "everyday",
+        "workout"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "skims-bottoms",
+      "type": "shopifyCollection",
+      "retailer": "SKIMS",
+      "baseUrl": "https://www.skims.com",
+      "collection": "bottoms",
+      "defaultCategory": "bottom",
+      "vibes": [
+        "clean",
+        "minimal",
+        "casual",
+        "gym"
+      ],
+      "occasions": [
+        "everyday",
+        "workout"
+      ],
+      "gender": [
+        "feminine"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "stussy-tees",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "tees",
+      "defaultCategory": "top",
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
+      "maxProducts": 50
+    },
+    {
+      "id": "stussy-bottoms",
+      "type": "shopifyCollection",
+      "retailer": "Stussy",
+      "baseUrl": "https://www.stussy.com",
+      "collection": "bottoms",
+      "defaultCategory": "bottom",
+      "vibes": [
+        "streetwear",
+        "street",
+        "casual"
+      ],
+      "occasions": [
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
+      "maxProducts": 50
     }
   ],
   "searches": [
@@ -239,18 +740,39 @@
       "id": "new-arrival-loafers",
       "query": "new arrival leather loafers official product page",
       "category": "shoes",
-      "vibes": ["office", "old money", "preppy", "clean"],
-      "occasions": ["office", "date", "everyday"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "office",
+        "old money",
+        "preppy",
+        "clean"
+      ],
+      "occasions": [
+        "office",
+        "date",
+        "everyday"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxResults": 12
     },
     {
       "id": "new-arrival-crossbody-bags",
       "query": "new arrival crossbody bag official product page",
       "category": "bag",
-      "vibes": ["streetwear", "clean", "date"],
-      "occasions": ["everyday", "night out", "date"],
-      "gender": ["androgynous"],
+      "vibes": [
+        "streetwear",
+        "clean",
+        "date"
+      ],
+      "occasions": [
+        "everyday",
+        "night out",
+        "date"
+      ],
+      "gender": [
+        "androgynous"
+      ],
       "maxResults": 12
     }
   ]

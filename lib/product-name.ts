@@ -39,8 +39,13 @@ export function cleanProductName(name: string, brand?: string): string {
  * lowercase brands (adidas, lululemon) and dotted brands (A.P.C.).
  */
 export function cleanBrand(brand: string): string {
-  const b = (brand || '').trim();
+  let b = (brand || '').trim();
   if (!b) return brand;
+  // "Walmart - Ma Croix, Inc" -> "Ma Croix": marketplace prefix and corporate
+  // suffix are seller plumbing, not a brand a shopper recognizes.
+  b = b.replace(/,?\s+(inc|llc|ltd|corp)\.?$/i, '');
+  const dash = b.match(/^(walmart|amazon|target|ebay)\s*-\s*(.+)$/i);
+  if (dash) b = dash[2].trim();
   const m = b.match(/^([a-z0-9][a-z0-9-]*)\.(com|co|net|org|shop|store|us|io)\b.*$/i);
   if (!m) return b;
   const root = m[1];
