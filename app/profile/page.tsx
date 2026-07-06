@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Bookmark, Check, Flame, Gift, Share2, Sparkles } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, Flame, Gift, Plus, Share2, Sparkles, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -17,6 +17,10 @@ import type { Product, Profile } from '@/lib/types';
 import { VIBES } from '@/lib/vibes';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
+import { usePosts, type OutfitPost } from '@/store/posts';
+import { PostComposer } from '@/components/PostComposer';
+import { PostCanvas } from '@/components/PostCanvas';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
 import {
   bestStreak,
   currentStreak,
@@ -67,6 +71,10 @@ export default function ProfilePage() {
   const setBudget = useProfile((state) => state.setBudget);
   const setVibesFromText = useProfile((state) => state.setVibesFromText);
   const fits = useSavedFits((state) => state.fits);
+  const posts = usePosts((state) => state.posts);
+  const removePost = usePosts((state) => state.removePost);
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [viewerPost, setViewerPost] = useState<OutfitPost | null>(null);
   const router = useRouter();
 
   const [hasMounted, setHasMounted] = useState(false);
@@ -296,6 +304,53 @@ export default function ProfilePage() {
         </section>
       ) : null}
 
+      {/* Your posts — the Studio: compose an outfit post (arrange + caption) and
+          it lands in your Instagram-style grid. HONEST v0: local to this device;
+          real cross-user accounts + like/comment/share is the next phase. */}
+      {hasMounted ? (
+        <Section
+          title="Your posts"
+          aside={
+            <button
+              type="button"
+              onClick={() => setComposerOpen(true)}
+              className="sy-press inline-flex items-center gap-1 rounded-full bg-accent-soft px-3 py-1.5 text-[12px] font-bold text-accent"
+            >
+              <Plus size={13} /> Create
+            </button>
+          }
+        >
+          {posts.length ? (
+            <div className="grid grid-cols-3 gap-1.5">
+              {posts.map((post, i) => (
+                <Reveal key={post.id} delay={(i % 3) * 70}>
+                  <button
+                    type="button"
+                    onClick={() => setViewerPost(post)}
+                    aria-label={post.caption ? `Post: ${post.caption}` : 'Outfit post'}
+                    className="sy-press block w-full overflow-hidden rounded-card ring-1 ring-hairline"
+                  >
+                    <PostCanvas post={post} />
+                  </button>
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setComposerOpen(true)}
+              className="sy-press grid w-full place-items-center rounded-card border border-dashed border-hairline-2 bg-surface-1 px-6 py-9 text-center"
+            >
+              <Sparkles size={18} className="text-accent" />
+              <p className="mt-2 text-[13px] font-semibold text-ink">Make your first post</p>
+              <p className="mt-1 max-w-[30ch] text-[12px] text-muted">
+                Arrange a saved fit on a canvas, caption it, and post it to your grid.
+              </p>
+            </button>
+          )}
+        </Section>
+      ) : null}
+
       {/* Frame */}
       <Section title="Frame">
         <div className="grid grid-cols-3 gap-2">
@@ -469,8 +524,71 @@ export default function ProfilePage() {
       </footer>
       </div>
 
+      <PostComposer open={composerOpen} fits={fits} onClose={() => setComposerOpen(false)} />
+      {viewerPost ? (
+        <PostViewer
+          post={viewerPost}
+          onClose={() => setViewerPost(null)}
+          onDelete={() => {
+            removePost(viewerPost.id);
+            setViewerPost(null);
+          }}
+        />
+      ) : null}
+
       <BottomNav />
     </main>
+  );
+}
+
+function PostViewer({
+  post,
+  onClose,
+  onDelete,
+}: {
+  post: OutfitPost;
+  onClose: () => void;
+  onDelete: () => void;
+}) {
+  const ref = useDialogBehavior<HTMLDivElement>(onClose, true);
+  const date = new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return (
+    <div
+      ref={ref}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Outfit post"
+      className="fixed inset-0 z-[120] flex flex-col bg-[rgba(8,7,9,.9)] backdrop-blur-xl sy-fade-in"
+    >
+      <div className="flex items-center justify-between px-4 pb-2 pt-[calc(env(safe-area-inset-top)+12px)]">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted-2"
+        >
+          <X size={17} />
+        </button>
+        <p className="text-eyebrow font-extrabold uppercase text-muted">{date}</p>
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label="Delete post"
+          className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted-2"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto px-5 pb-10">
+        <PostCanvas post={post} className="mx-auto w-full max-w-[360px] rounded-[24px] border border-hairline" />
+        {post.caption ? (
+          <p className="mx-auto mt-4 max-w-[360px] text-[15px] leading-snug text-ink">{post.caption}</p>
+        ) : null}
+        <p className="mx-auto mt-3 max-w-[360px] text-[12px] text-muted">
+          Saved to this device. Posting to friends with their own accounts is on the way.
+        </p>
+      </div>
+    </div>
   );
 }
 

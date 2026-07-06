@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { hydrateItemsFromCatalog } from '@/lib/client-catalog';
 import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { VibeId } from '@/lib/vibes';
@@ -107,8 +106,13 @@ export const useSavedFits = create<SavedFitsState>()(
         return {
           ...state,
           fits: state.fits
+            // ponytail: items persist as full product snapshots, and
+            // transparentItemsOnly already drops broken pieces — re-resolving
+            // from the catalog only refreshed names/prices but dragged the
+            // 898KB catalog into every route's First Load JS. Dropped; re-add an
+            // async post-hydrate refresh if stale prices ever matter.
             .map((fit) => {
-              const items = transparentItemsOnly(hydrateItemsFromCatalog(fit.items));
+              const items = transparentItemsOnly(fit.items);
               const itemCount = Object.keys(items).length;
               return {
                 ...fit,

@@ -19,7 +19,8 @@ const BASE = process.argv[2] || 'http://localhost:3939';
 const TARGET = Number(process.env.AI_BAKE_LOOKS || 22);
 const MAX_USD = Number(process.env.AI_BAKE_MAX_USD || 0.4);
 const EST_COST_PER_CALL = 0.015;
-const MAX_CONSECUTIVE_NON_AI = 4;
+// Tolerate transient timeouts (free Ollama can be slow) before giving up.
+const MAX_CONSECUTIVE_NON_AI = Number(process.env.AI_BAKE_MAX_NONAI || 4);
 const LIBRARY_CAP = 600;
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');

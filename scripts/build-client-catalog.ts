@@ -43,7 +43,7 @@ const CATEGORY_BRAND_CAP_PASSES = [2, 3, 5, Number.POSITIVE_INFINITY];
 // balloons (e.g. outer after a cutout expansion) absorbs the global limit's
 // slack and crowds out REQUIRED-slot categories — brand-concentrated shoes
 // lose picks to brand-diverse outerwear under the brand-cap passes.
-const CATEGORY_MAX: Partial<Record<Category, number>> = { outer: 96, bag: 75 };
+const CATEGORY_MAX: Partial<Record<Category, number>> = { outer: 130, bag: 75 };
 
 function localCutoutExists(product: Product): boolean {
   const url = product.imageTransparentUrl || product.imageCutoutUrl || '';

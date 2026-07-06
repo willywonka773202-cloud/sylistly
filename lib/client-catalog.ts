@@ -595,31 +595,50 @@ function rankedCategoryProducts(category: Category, options: Parameters<typeof s
 }
 
 function pickProduct(category: Category, options: Parameters<typeof scoreProduct>[1]): Product | undefined {
-  const bestDiverseProduct = (ranked: Array<{ product: Product; score: number }>): Product | undefined => {
+  // Pick from a SEEDED weighted band of the top-ranked candidates — NOT just #1.
+  // Taking the single best-scored item every time meant generation recycled the
+  // same ~15 products per category and never touched the deeper pool (94 tops
+  // available, ~17 ever used). The weights are front-loaded so quality still
+  // leads, but the long tail gives lower-ranked-yet-valid pieces a real shot, so
+  // ~50 products get used instead of ~15. Seeded by `options.seed` → deterministic
+  // per seed (the feed stays a pure function of its inputs) yet varied across
+  // seeds (the builder rotates the seed each generate, so fits feel fresh).
+  const pickFrom = (ranked: Array<{ product: Product; score: number }>): Product | undefined => {
     const selectedBrands = new Set((options.selectedProducts || []).map(getBrandOrMerchant).filter(Boolean));
     const heavyRecentBrands = new Set(
       Object.entries(options.recentBrandCounts || {})
         .filter(([, count]) => count >= 3)
         .map(([brand]) => brand),
     );
-    return ranked.find((entry) => {
+    const brandDiverse = ranked.filter((entry) => {
       const brand = getBrandOrMerchant(entry.product);
       return !brand || (!selectedBrands.has(brand) && !heavyRecentBrands.has(brand));
-    })?.product
-      || ranked.find((entry) => {
-        const brand = getBrandOrMerchant(entry.product);
-        return !brand || !selectedBrands.has(brand);
-      })?.product
-      || ranked[0]?.product;
+    });
+    // Quality bar: only positively-scored (vibe/frame-valid) candidates compete.
+    const usable = (brandDiverse.length ? brandDiverse : ranked).filter((entry) => entry.score > 0);
+    if (!usable.length) return ranked[0]?.product;
+
+    // Wide band + gentle power-law decay: #1 stays most likely (quality leads),
+    // but ranks 20–45 get a real, fat-tailed shot so the deep pool actually gets
+    // used (≈60 of 94 reached over a session, not ~17).
+    const band = usable.slice(0, Math.min(45, usable.length));
+    const weights = band.map((_, index) => 1 / Math.pow(index + 1, 0.62));
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    let roll = ((stableHash(`${category}:${options.seed ?? 0}:pick`) % 100_000) / 100_000) * totalWeight;
+    for (let index = 0; index < band.length; index += 1) {
+      roll -= weights[index];
+      if (roll <= 0) return band[index].product;
+    }
+    return band[0].product;
   };
 
-  const primary = bestDiverseProduct(rankedCategoryProducts(category, options));
+  const primary = pickFrom(rankedCategoryProducts(category, options));
   if (primary || !options.avoidIds?.size) return primary;
 
   // Narrow style settings can over-constrain a small reviewed catalog. Keep
   // `usedIds` and scoring penalties, but relax the hard avoid list for this
   // slot so generation returns a usable outfit instead of starving entirely.
-  return bestDiverseProduct(rankedCategoryProducts(category, { ...options, avoidIds: new Set<string>() }));
+  return pickFrom(rankedCategoryProducts(category, { ...options, avoidIds: new Set<string>() }));
 }
 
 function chooseFormula(vibe: VibeId, seed: number, preferredFormulaId?: string): OutfitFormula {
@@ -831,6 +850,7 @@ export function buildCatalogLook({
   recentBrandCounts,
   preferredFormulaId,
   targetSlots,
+  maxTotalCents,
 }: {
   vibe: VibeId;
   frame: GeneratorFrame;
@@ -849,6 +869,9 @@ export function buildCatalogLook({
   diversityStrength?: 'low' | 'medium' | 'high';
   targetSlots?: Category[];
   transparentOnly?: boolean;
+  // TOTAL-outfit budget in cents (the Remix budget panel's "everything" cap).
+  // When set, the assembled look is greedily swapped down to fit — see below.
+  maxTotalCents?: number | null;
 }): {
   products: Partial<Record<Category, Product>>;
   collection: CatalogCollection | null;
@@ -905,6 +928,56 @@ export function buildCatalogLook({
     if (!product) continue;
     products[category] = product;
     usedIds.add(product.id);
+  }
+
+  // Enforce a TOTAL-outfit budget (what the Remix budget panel means by "$100
+  // for everything" — a whole-look cap, NOT a per-item one). Greedily swap the
+  // most expensive UNLOCKED, non-anchor slot down to the cheapest vibe/frame-
+  // valid alternative until the look fits, or until nothing cheaper exists (then
+  // return the closest full look — the UI shows the real total vs the budget).
+  if (typeof maxTotalCents === 'number' && Number.isFinite(maxTotalCents) && maxTotalCents > 0) {
+    const fixedSlots = new Set<string>([
+      ...Object.keys(lockedItems || {}),
+      ...Object.keys(currentItems || {}),
+    ]);
+    const outfitTotal = () =>
+      Object.values(products).reduce((sum, item) => sum + (item?.priceCents || 0), 0);
+    for (let guard = 0; guard < 24 && outfitTotal() > maxTotalCents; guard += 1) {
+      const swappable = (Object.entries(products) as Array<[Category, Product]>)
+        .filter(([category, item]) => item && !fixedSlots.has(category))
+        .sort((left, right) => (right[1].priceCents || 0) - (left[1].priceCents || 0));
+      let swapped = false;
+      for (const [category, current] of swappable) {
+        const cheaper = rankedCategoryProducts(category, {
+          vibe,
+          frame,
+          budget,
+          customMaxCents,
+          seed: seed + category.length * 97,
+          keywords: [vibe, formula.label, formula.structure],
+          usedIds,
+          avoidIds,
+          recentShoeIds: recentShoeSet,
+          recentBrandCounts,
+          formula,
+          selectedProducts: Object.values(products).filter((item): item is Product => Boolean(item)),
+        })
+          .filter((entry) =>
+            entry.score > 0
+            && entry.product.id !== current.id
+            && !usedIds.has(entry.product.id)
+            && (entry.product.priceCents || 0) < (current.priceCents || 0))
+          .sort((left, right) => (left.product.priceCents || 0) - (right.product.priceCents || 0))[0];
+        if (cheaper) {
+          usedIds.delete(current.id);
+          products[category] = cheaper.product;
+          usedIds.add(cheaper.product.id);
+          swapped = true;
+          break;
+        }
+      }
+      if (!swapped) break;
+    }
   }
 
   const missingSlots = categories.filter((category) => !products[category]);

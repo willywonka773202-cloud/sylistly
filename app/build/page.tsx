@@ -87,17 +87,23 @@ const FULL_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
   preppy: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
 };
 
+// Accessory/secondary slots may rely on the google-shopping fallback link (still
+// shoppable) instead of a direct product link — otherwise the exact-link gate
+// halves their already-small pools and leaves grids empty (esp. gym hat/outer/
+// bag, which have no vibe restriction so the link gate is all that starves them).
+// Hero slots (top/bottom/shoes) still require a direct link.
+const LINK_OPTIONAL_SLOTS: ReadonlySet<Category> = new Set<Category>([
+  'hat', 'outer', 'bag', 'eyewear', 'jewelry',
+]);
+
 function isBuildReadyProduct(product?: Product | null): product is Product {
   return Boolean(product && isEditorialCutoutProduct(product) && hasExactProductLink(product));
 }
 
 function isBuildReadySlotProduct(product: Product | null | undefined, slot: Category): product is Product {
-  return Boolean(
-    product
-    && product.category === slot
-    && isBuildReadyProduct(product)
-    && hasHighCategoryConfidence(product, slot),
-  );
+  if (!product || product.category !== slot || !hasHighCategoryConfidence(product, slot)) return false;
+  if (LINK_OPTIONAL_SLOTS.has(slot)) return isEditorialCutoutProduct(product);
+  return isBuildReadyProduct(product);
 }
 
 function slotProductText(product: Product): string {
@@ -465,6 +471,12 @@ function BuilderPageContent({
         ? Number(customBudgetInput)
         : null
       : getBudgetMaxCents(generatorBudget) / 100;
+  // The Remix budget panel is a TOTAL-outfit cap (what "$100 for everything"
+  // means), enforced on the whole-look sum — not the per-item `activePriceMax`.
+  // Reactive off `remixBudget` so it applies the moment a value is typed (no
+  // toggle re-flip needed; the filter defaults on).
+  const maxTotalCents =
+    remixBudgetFilterOn && remixBudget > 0 ? Math.round(remixBudget * 100) : null;
   const refineFocusCategory =
     activeEditSlot ||
     CATEGORY_ORDER.find((category) => renderItems[category]) ||
@@ -836,7 +848,9 @@ function BuilderPageContent({
           generatorBudget === 'any' ? null
             : generatorBudget === 'custom' ? customBudgetCents
             : getBudgetMaxCents(generatorBudget);
-        const libLook = wholeOutfit
+        // A pre-baked library look can't be budget-tuned, so when a TOTAL budget
+        // is set we skip it and use the live composer (which enforces the cap).
+        const libLook = wholeOutfit && !maxTotalCents
           ? getLibraryLook(vibeId, generatorFrame, { seed: lookBody.seed, avoidProductIds, maxItemCents: libMaxItemCents })
           : null;
         lookData = libLook
@@ -858,6 +872,7 @@ function BuilderPageContent({
               lockedItems,
               targetSlots,
               transparentOnly: true,
+              maxTotalCents,
             });
       }
 

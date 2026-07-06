@@ -1,5 +1,3 @@
-import { CLIENT_CATALOG_PRODUCTS } from './client-catalog';
-import type { Product } from './types';
 import type { RarityTier } from './look-rarity';
 
 /**
@@ -154,9 +152,5 @@ export function vaultStats(): VaultStats {
   return { total: vault.length, byTier };
 }
 
-const BY_ID = new Map(CLIENT_CATALOG_PRODUCTS.map((product) => [product.id, product]));
-
-/** Rehydrate a vault entry's products from the catalog (for re-shop/re-view). */
-export function rehydratePull(entry: VaultEntry): Product[] {
-  return entry.productIds.map((id) => BY_ID.get(id)).filter((p): p is Product => Boolean(p));
-}
+// rehydratePull moved to lib/drop-rehydrate so this module (imported by the
+// global BottomNav) stays free of the 898KB catalog.

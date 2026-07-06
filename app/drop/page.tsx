@@ -17,11 +17,11 @@ import {
   getVault,
   MILESTONES,
   nextMilestone,
-  rehydratePull,
   streakFreezes,
   vaultStats,
   type VaultEntry,
 } from '@/lib/drop-vault';
+import { rehydratePull } from '@/lib/drop-rehydrate';
 import { feedback, isMuted, setMuted } from '@/lib/feedback';
 import { lookRarity } from '@/lib/look-rarity';
 import { bumpDaily, getLevel, questStatus } from '@/lib/stylist-xp';

@@ -56,7 +56,7 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'lib/product-links.ts', text: 'wrapAffiliate', label: 'getShoppableUrl wraps affiliate (no commission leak)' },
   { file: "lib/affiliate.ts", text: "startsWith('__')", label: 'affiliate skips placeholder Rakuten ids (no broken links)' },
   { file: 'components/InAppBrowser.tsx', text: 'wrapAffiliate', label: 'in-app browser opens the affiliate-wrapped page (commission-safe)' },
-  { file: 'app/page.tsx', text: 'InAppBrowser', label: 'feed opens retailer links in the in-app browser sheet' },
+  { file: 'components/Feed.tsx', text: 'InAppBrowser', label: 'feed opens retailer links in the in-app browser sheet' },
   { file: 'app/build/page.tsx', text: 'shop_link_clicked', label: 'builder shop CTA tracks the revenue funnel' },
   // FTC compliance — the affiliate disclosure is LEGALLY REQUIRED on every shop
   // surface; a refactor must not silently drop it from any of them.
@@ -70,15 +70,15 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'app/build/page.tsx', text: 'AffiliateDisclosure', label: 'FTC disclosure on the builder shop' },
   // Catalog display hygiene — names cleaned of redundant brand, feed shows the palette.
   { file: 'lib/client-catalog.ts', text: 'cleanProductName', label: 'catalog cleans redundant brand-in-name' },
-  { file: 'app/page.tsx', text: 'lookSwatches', label: 'feed renders palette swatch dots + love-burst colours' },
+  { file: 'components/Feed.tsx', text: 'lookSwatches', label: 'feed renders palette swatch dots + love-burst colours' },
   // The reveal count-up must keep its backstop so a stalled rAF never shows $0.
   { file: 'components/AnimatedNumber.tsx', text: 'setTimeout', label: 'AnimatedNumber keeps the $0-proof backstop' },
   // Load-bearing technical foundations — easy to break in a refactor.
-  // The feed is a Tinder card-deck: swipe right = love (save), left = pass.
-  { file: 'app/page.tsx', text: 'FitDeck', label: 'feed renders the Tinder card-deck' },
-  { file: 'app/page.tsx', text: 'onSwipe', label: 'feed deck wires swipe love/pass' },
-  { file: 'components/FitDeck.tsx', text: "drag={isTop", label: 'deck top card is drag-to-fling (framer)' },
-  { file: 'app/page.tsx', text: 'look_passed', label: 'left-swipe down-weights the vibe (honest personalization)' },
+  // The feed is a vertical scroll: Save keeps a fit, Pass down-weights the vibe.
+  { file: 'components/Feed.tsx', text: 'overflow-y-auto', label: 'feed is a vertical scroll' },
+  { file: 'components/Feed.tsx', text: 'onScroll', label: 'feed tops up on scroll (infinite scroll)' },
+  { file: 'components/Feed.tsx', text: 'look_loved', label: 'feed Save records the loved fit' },
+  { file: 'components/Feed.tsx', text: 'look_passed', label: 'feed Pass down-weights the vibe (honest personalization)' },
   { file: 'lib/visual-capability.ts', text: 'useHeavyVisuals', label: 'SSR-safe heavy-visuals gate present' },
   { file: 'components/three/Crate3D.tsx', text: 'ssr: false', label: '3D crate stays lazy (three.js out of the main bundle)' },
   // Canonical host is consistent (www).

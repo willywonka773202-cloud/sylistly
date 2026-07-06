@@ -5,7 +5,9 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { dropClaimedToday } from '@/components/DailyDrop';
+// Import from the (now catalog-free) lib, NOT the DailyDrop component — pulling
+// it through DailyDrop dragged the 898KB catalog into every route's nav bundle.
+import { dropClaimedToday } from '@/lib/drop-vault';
 import { feedback } from '@/lib/feedback';
 import { useSavedFits } from '@/store/saved-fits';
 

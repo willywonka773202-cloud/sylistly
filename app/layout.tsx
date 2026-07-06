@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Playfair_Display } from 'next/font/google';
 import localFont from 'next/font/local';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
+import { InstallHint } from '@/components/InstallHint';
 import { SplashScreen } from '@/components/SplashScreen';
 import './globals.css';
 
@@ -121,6 +122,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <SplashScreen />
         <AnalyticsProvider />
+        <InstallHint />
         {children}
       </body>
     </html>

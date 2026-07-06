@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { hydrateItemsFromCatalog } from '@/lib/client-catalog';
 import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 
@@ -52,9 +51,12 @@ export const useFit = create<FitState>()(
         const state = persistedState as FitState | undefined;
         if (!state?.items) return state as FitState;
 
+        // ponytail: items persist as full product snapshots; transparentItemsOnly
+        // already drops broken pieces. Catalog re-resolution removed so the 898KB
+        // catalog stays out of First Load JS (see store/saved-fits for the note).
         return {
           ...state,
-          items: transparentItemsOnly(hydrateItemsFromCatalog(state.items)),
+          items: transparentItemsOnly(state.items),
         };
       },
     },
