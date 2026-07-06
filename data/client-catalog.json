@@ -347,8 +347,8 @@
  },
  {
   "id": "drop-d36288d25687c3c1",
-  "brand": "Aim\u00e9 Leon Dore",
-  "name": "Gi\u00f3rgios Sunglasses",
+  "brand": "Aimé Leon Dore",
+  "name": "Giórgios Sunglasses",
   "category": "eyewear",
   "priceCents": 29500,
   "currency": "USD",
@@ -852,8 +852,8 @@
  },
  {
   "id": "drop-8b49c4dfd62a1e33",
-  "brand": "Aim\u00e9 Leon Dore",
-  "name": "On\u00e1sis Sunglasses",
+  "brand": "Aimé Leon Dore",
+  "name": "Onásis Sunglasses",
   "category": "eyewear",
   "priceCents": 29500,
   "currency": "USD",
@@ -1117,7 +1117,7 @@
  },
  {
   "id": "drop-b2bf4d0c167f95ba",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD  / New Balance Made in USA 1300",
   "category": "shoes",
   "priceCents": 22000,
@@ -2453,7 +2453,7 @@
  },
  {
   "id": "drop-df951f5b1a1af0bc",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY TUBE TOP | SIENNA NATURAL LEOPARD",
   "category": "top",
   "priceCents": 4800,
@@ -2906,7 +2906,7 @@
  },
  {
   "id": "drop-619da35fecfe4aea",
-  "brand": "CUPRO JERSEY",
+  "brand": "SKIMS",
   "name": "CUPRO JERSEY ASYMMETRICAL TOP | PEARL",
   "category": "top",
   "priceCents": 11800,
@@ -3196,7 +3196,7 @@
  {
   "id": "drop-e3a4ce83cb05a146",
   "brand": "Radial",
-  "name": "9TWENTY ST\u00dcSSY SPORT CAP",
+  "name": "9TWENTY STÜSSY SPORT CAP",
   "category": "hat",
   "priceCents": 5000,
   "currency": "USD",
@@ -3341,7 +3341,7 @@
  },
  {
   "id": "drop-220b0b87f7e7de7f",
-  "brand": "CUPRO JERSEY",
+  "brand": "SKIMS",
   "name": "CUPRO JERSEY HALTER BODYSUIT | PEARL",
   "category": "top",
   "priceCents": 10800,
@@ -5144,7 +5144,7 @@
  },
  {
   "id": "drop-b4562a152ee38184",
-  "brand": "REFINED KNIT",
+  "brand": "SKIMS",
   "name": "REFINED KNIT TUBE TOP | AMETHYST",
   "category": "top",
   "priceCents": 7800,
@@ -5203,7 +5203,7 @@
  },
  {
   "id": "drop-479155cfaa641534",
-  "brand": "COTTON POPLIN",
+  "brand": "SKIMS",
   "name": "COTTON POPLIN MENS LOGO BAND SLEEP PANT | PLATINUM DOUBLE STRIPE",
   "category": "bottom",
   "priceCents": 6400,
@@ -5373,7 +5373,7 @@
  {
   "id": "searchapi-quality-bags-clean-night-longchamp-le-pliage-n-o-shoulder-bag-a2dbb92a2cdb04",
   "brand": "Longchamp",
-  "name": "Longchamp Le Pliage N\u00e9o Shoulder Bag",
+  "name": "Longchamp Le Pliage Néo Shoulder Bag",
   "category": "bag",
   "priceCents": 22500,
   "currency": "USD",
@@ -5594,7 +5594,7 @@
  },
  {
   "id": "drop-d244f36551a64b29",
-  "brand": "REFINED KNIT",
+  "brand": "SKIMS",
   "name": "REFINED KNIT TUBE TOP | OBSIDIAN",
   "category": "top",
   "priceCents": 7800,
@@ -6031,7 +6031,7 @@
  },
  {
   "id": "drop-ba153cdc0bdadec8",
-  "brand": "SLINKY KNIT",
+  "brand": "SKIMS",
   "name": "SLINKY KNIT CAMI | BUFF",
   "category": "top",
   "priceCents": 7800,
@@ -6461,7 +6461,7 @@
  },
  {
   "id": "drop-f62cb71635fbbbec",
-  "brand": "SLINKY KNIT",
+  "brand": "SKIMS",
   "name": "SLINKY KNIT CARDIGAN | BUFF",
   "category": "top",
   "priceCents": 11800,
@@ -6743,7 +6743,7 @@
  {
   "id": "searchapi-quality-hats-stussy-cap-st-ssy-logo-embroidered-cap-ba423c2e0b2072",
   "brand": "snkrdunk.com/en",
-  "name": "St\u00fcssy Logo-Embroidered Cap",
+  "name": "Stüssy Logo-Embroidered Cap",
   "category": "hat",
   "priceCents": 6900,
   "currency": "USD",
@@ -7934,7 +7934,7 @@
  },
  {
   "id": "drop-2c1464b6f823004e",
-  "brand": "ULTRA FINE LACE",
+  "brand": "SKIMS",
   "name": "ULTRA FINE LACE MIDI SKIRT | OBSIDIAN",
   "category": "bottom",
   "priceCents": 8800,
@@ -8715,7 +8715,7 @@
  {
   "id": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-large-c54d2666e66e64",
   "brand": "J.Crew",
-  "name": "J.Crew Women's \u00c9tienne oversized shirt in lightweight oxford (Size Large)",
+  "name": "J.Crew Women's Étienne oversized shirt in lightweight oxford (Size Large)",
   "category": "top",
   "priceCents": 6250,
   "currency": "USD",
@@ -12402,7 +12402,7 @@
  {
   "id": "generated-35b7019fff4357eb",
   "brand": "Nordstrom Rack",
-  "name": "Nordstrom Cotton Blend Piqu\u00e9 Knit Polo in Blue Bijou at Nordstrom Rack, Size Xx-Large",
+  "name": "Nordstrom Cotton Blend Piqué Knit Polo in Blue Bijou at Nordstrom Rack, Size Xx-Large",
   "category": "top",
   "priceCents": 3497,
   "currency": "USD",
@@ -14683,12 +14683,12 @@
  },
  {
   "id": "generated-fd7a28087e6b30fd",
-  "brand": "B\u00c9IS Travel",
-  "name": "B\u00e9is The Commuter Backpack",
+  "brand": "BÉIS Travel",
+  "name": "Béis The Commuter Backpack",
   "category": "bag",
   "priceCents": 12800,
   "currency": "USD",
-  "retailer": "B\u00c9IS Travel",
+  "retailer": "BÉIS Travel",
   "retailerUrl": "",
   "googleShoppingUrl": "https://www.google.com/search?q=mens+commuter+backpack+minimalist+black+grey+leather&oq=mens+commuter+backpack+minimalist+black+grey+leather&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:3174857315504810472,gid:3844910963733139693,pid:11355242340808516889,oid:9086929636886776036,iid:5925677487438166427&oshop=apv&pvs=0",
   "fallbackUrl": "https://www.google.com/search?q=mens+commuter+backpack+minimalist+black+grey+leather&oq=mens+commuter+backpack+minimalist+black+grey+leather&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:3174857315504810472,gid:3844910963733139693,pid:11355242340808516889,oid:9086929636886776036,iid:5925677487438166427&oshop=apv&pvs=0",
@@ -14983,12 +14983,12 @@
  },
  {
   "id": "generated-1609fe3098ecbd2d",
-  "brand": "B\u00c9IS Travel",
+  "brand": "BÉIS Travel",
   "name": "BEIS The Sport Duffle",
   "category": "bag",
   "priceCents": 9800,
   "currency": "USD",
-  "retailer": "B\u00c9IS Travel",
+  "retailer": "BÉIS Travel",
   "retailerUrl": "",
   "googleShoppingUrl": "https://www.google.com/search?q=mens+gym+cap+duffel+bag+water+resistant+black+training+accessories&oq=mens+gym+cap+duffel+bag+water+resistant+black+training+accessories&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:2632910742694878156,gid:12128903062522040451,pid:14064072374279135632,oid:2592221704608213374,iid:6451677366293896859&oshop=apv&pvs=0",
   "fallbackUrl": "https://www.google.com/search?q=mens+gym+cap+duffel+bag+water+resistant+black+training+accessories&oq=mens+gym+cap+duffel+bag+water+resistant+black+training+accessories&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:2632910742694878156,gid:12128903062522040451,pid:14064072374279135632,oid:2592221704608213374,iid:6451677366293896859&oshop=apv&pvs=0",
@@ -18762,7 +18762,7 @@
  {
   "id": "generated-94099fe187498caf",
   "brand": "Techwearofficial",
-  "name": "\u2019ushoda\u2019 Techwear Cargo Pants",
+  "name": "’ushoda’ Techwear Cargo Pants",
   "category": "bottom",
   "priceCents": 6999,
   "currency": "USD",
@@ -19923,7 +19923,7 @@
  {
   "id": "generated-be52672a9ed5885d",
   "brand": "Denver Leather Craft",
-  "name": "Unisex Leather Laptop Messenger Bag \u00e2\u20ac\u201c Classic Style, Modern Utility - Best Seller",
+  "name": "Unisex Leather Laptop Messenger Bag â€“ Classic Style, Modern Utility - Best Seller",
   "category": "bag",
   "priceCents": 14007,
   "currency": "USD",
@@ -24485,7 +24485,7 @@
  },
  {
   "id": "drop-46a43e4c174bdff0",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Cotton Eyelet Crewneck Sweater",
   "category": "top",
   "priceCents": 35000,
@@ -24920,7 +24920,7 @@
  },
  {
   "id": "drop-745cbb5a4c57a65f",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Dock Hoodie",
   "category": "top",
   "priceCents": 18500,
@@ -24975,7 +24975,7 @@
  },
  {
   "id": "drop-3ae9091e99c3dbfb",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Ripstop Nylon Wave Short",
   "category": "bottom",
   "priceCents": 25000,
@@ -25617,7 +25617,7 @@
  {
   "id": "drop-3001f97cdb615164",
   "brand": "Radial",
-  "name": "BASIC ST\u00dcSSY CAP",
+  "name": "BASIC STÜSSY CAP",
   "category": "hat",
   "priceCents": 4500,
   "currency": "USD",
@@ -26187,7 +26187,7 @@
  },
  {
   "id": "drop-9b0b10d69cd2964d",
-  "brand": "SLINKY KNIT",
+  "brand": "SKIMS",
   "name": "SLINKY KNIT DEEP PLUNGE TOP | BUFF",
   "category": "top",
   "priceCents": 12800,
@@ -26355,12 +26355,12 @@
  },
  {
   "id": "generated-a77829fe214400e5",
-  "brand": "B\u00c9IS Travel",
+  "brand": "BÉIS Travel",
   "name": "BEIS Women's Leather Trim Canvas & Leather Tote",
   "category": "bag",
   "priceCents": 14800,
   "currency": "USD",
-  "retailer": "B\u00c9IS Travel",
+  "retailer": "BÉIS Travel",
   "retailerUrl": "",
   "googleShoppingUrl": "https://www.google.com/search?q=unisex+tote+bag+canvas+leather+black+cream+tan+fashion&oq=unisex+tote+bag+canvas+leather+black+cream+tan+fashion&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:5885299290910600699,gid:7757706353809981465,pid:18169047114097517785,oid:15168037939427039272,iid:3765803341270468333&oshop=apv&pvs=0",
   "fallbackUrl": "https://www.google.com/search?q=unisex+tote+bag+canvas+leather+black+cream+tan+fashion&oq=unisex+tote+bag+canvas+leather+black+cream+tan+fashion&gl=us&hl=en&udm=28&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:5885299290910600699,gid:7757706353809981465,pid:18169047114097517785,oid:15168037939427039272,iid:3765803341270468333&oshop=apv&pvs=0",
@@ -28596,7 +28596,7 @@
  },
  {
   "id": "drop-6074df05039f83f9",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Fassianos \"Rendez - Vous\" Camp Shirt",
   "category": "top",
   "priceCents": 27500,
@@ -28943,7 +28943,7 @@
  },
  {
   "id": "drop-ffe43712b3e47d1d",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Fassianos \"Rendez - Vous\" Crewneck Sweater",
   "category": "top",
   "priceCents": 39500,
@@ -29057,7 +29057,7 @@
  },
  {
   "id": "drop-e0f78dfa2edd568d",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New     Balance       475",
   "category": "shoes",
   "priceCents": 15000,
@@ -29319,7 +29319,7 @@
  },
  {
   "id": "drop-6552e83f3ef3e9b7",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mesh Jungle Shirt",
   "category": "top",
   "priceCents": 29500,
@@ -29462,7 +29462,7 @@
  {
   "id": "drop-2362debaf6671aba",
   "brand": "Everlane",
-  "name": "The Forever Sneaker\u00ae | White",
+  "name": "The Forever Sneaker® | White",
   "category": "shoes",
   "priceCents": 2600,
   "currency": "USD",
@@ -29804,7 +29804,7 @@
  {
   "id": "drop-75b4abc8d934f50a",
   "brand": "Everlane",
-  "name": "The ReLeather\u00ae Court Sneaker | Off White / Black",
+  "name": "The ReLeather® Court Sneaker | Off White / Black",
   "category": "shoes",
   "priceCents": 5200,
   "currency": "USD",
@@ -32133,7 +32133,7 @@
  {
   "id": "searchapi-quality-shoes-asics-kayano-asics-gel-kayano-14-women-s-silver-size-us-5-w-6-5-hbx-ef7cfaabadb11b",
   "brand": "ASICS",
-  "name": "Asics GEL-Kayano 14 Women's Silver/\u94f6\u8272/\u9280\u8272/\uc2e4\ubc84/\u30b7\u30eb\u30d0\u30fc Size US 5 / W 6.5 HBX",
+  "name": "Asics GEL-Kayano 14 Women's Silver/银色/銀色/실버/シルバー Size US 5 / W 6.5 HBX",
   "category": "shoes",
   "priceCents": 14000,
   "currency": "USD",
@@ -32368,7 +32368,7 @@
  },
  {
   "id": "drop-07fd958a07ae21ad",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mesh Knit Polo",
   "category": "top",
   "priceCents": 29500,
@@ -32482,7 +32482,7 @@
  },
  {
   "id": "drop-2ca0f430ab769aec",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New Balance        RC56",
   "category": "shoes",
   "priceCents": 16500,
@@ -32711,7 +32711,7 @@
  },
  {
   "id": "drop-801c170d2ea55154",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mesh Tank Top",
   "category": "top",
   "priceCents": 15000,
@@ -32828,7 +32828,7 @@
  },
  {
   "id": "drop-625b02faeb3320f8",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New Balance    860v2",
   "category": "shoes",
   "priceCents": 15000,
@@ -33096,7 +33096,7 @@
  },
  {
   "id": "drop-45fff17e9bad78c8",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mosaic Button Down Shirt",
   "category": "top",
   "priceCents": 29500,
@@ -33153,7 +33153,7 @@
  },
  {
   "id": "drop-1c6f265a74f6a5e8",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Washed Cotton Windbreaker Pant",
   "category": "bottom",
   "priceCents": 29500,
@@ -33249,7 +33249,7 @@
  },
  {
   "id": "drop-e5b6fc99636c992b",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New Balance 471",
   "category": "shoes",
   "priceCents": 12000,
@@ -33519,7 +33519,7 @@
  },
  {
   "id": "drop-56938ecfcb1c8abf",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Open Mesh Hoodie",
   "category": "top",
   "priceCents": 18500,
@@ -33575,7 +33575,7 @@
  },
  {
   "id": "drop-7519bbbe7ac2f837",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Wide Leg Shore Pant",
   "category": "bottom",
   "priceCents": 29500,
@@ -33673,7 +33673,7 @@
  },
  {
   "id": "drop-093f29efd827e2a5",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New Balance Gator",
   "category": "shoes",
   "priceCents": 13000,
@@ -33896,8 +33896,8 @@
  },
  {
   "id": "drop-f1f3c6969d86c0c6",
-  "brand": "Aim\u00e9 Leon Dore",
-  "name": "Sk\u00e1fos Sweater",
+  "brand": "Aimé Leon Dore",
+  "name": "Skáfos Sweater",
   "category": "top",
   "priceCents": 39500,
   "currency": "USD",
@@ -34009,7 +34009,7 @@
  },
  {
   "id": "drop-e06ef180bad84301",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "ALD / New Balance Made in UK    991",
   "category": "shoes",
   "priceCents": 28000,
@@ -34235,7 +34235,7 @@
  },
  {
   "id": "drop-2e16164e8878c1a7",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Yarn Dyed Striped Shirt",
   "category": "top",
   "priceCents": 25500,
@@ -34342,7 +34342,7 @@
  {
   "id": "drop-7e58b05826c83544",
   "brand": "Everlane",
-  "name": "The ReLeather\u00ae Tennis Shoe  | Orchid",
+  "name": "The ReLeather® Tennis Shoe  | Orchid",
   "category": "shoes",
   "priceCents": 3300,
   "currency": "USD",
@@ -36497,7 +36497,7 @@
   "category": "eyewear",
   "priceCents": 15900,
   "currency": "USD",
-  "retailer": "C\u00e9line Opticien Lunetier",
+  "retailer": "Céline Opticien Lunetier",
   "retailerUrl": "https://www.google.com/search?q=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&oq=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAACE14dBEQAAAABlza1BGAEYFiowUmF5LUJhbiBPYWtsZXkgTGUgU3BlY3MgYmxhY2sgc3VuZ2xhc3NlcyBmYXNoaW9uMiwIBRIKJDUwIC0gJDI1MBgCIhYSFAkAAAAAhNeHQREAAAAAZc2tQRgBKgIYAViJqiBgAg&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:8390787002127382282,gid:6681402563844150000,pid:7572791379405208328,oid:1444934246147291197,iid:2000372413462809020&oshop=apv&pvs=0",
   "googleShoppingUrl": "https://www.google.com/search?q=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&oq=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAACE14dBEQAAAABlza1BGAEYFiowUmF5LUJhbiBPYWtsZXkgTGUgU3BlY3MgYmxhY2sgc3VuZ2xhc3NlcyBmYXNoaW9uMiwIBRIKJDUwIC0gJDI1MBgCIhYSFAkAAAAAhNeHQREAAAAAZc2tQRgBKgIYAViJqiBgAg&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:8390787002127382282,gid:6681402563844150000,pid:7572791379405208328,oid:1444934246147291197,iid:2000372413462809020&oshop=apv&pvs=0",
   "fallbackUrl": "https://www.google.com/search?q=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&oq=Ray-Ban+Oakley+Le+Specs+black+sunglasses+fashion+new+between+50+and+250&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAACE14dBEQAAAABlza1BGAEYFiowUmF5LUJhbiBPYWtsZXkgTGUgU3BlY3MgYmxhY2sgc3VuZ2xhc3NlcyBmYXNoaW9uMiwIBRIKJDUwIC0gJDI1MBgCIhYSFAkAAAAAhNeHQREAAAAAZc2tQRgBKgIYAViJqiBgAg&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=cid:8390787002127382282,gid:6681402563844150000,pid:7572791379405208328,oid:1444934246147291197,iid:2000372413462809020&oshop=apv&pvs=0",
@@ -36778,7 +36778,7 @@
  {
   "id": "drop-d6029c55595ec157",
   "brand": "Heaven Mayhem",
-  "name": "C\u00d4TE EARRINGS",
+  "name": "CÔTE EARRINGS",
   "category": "jewelry",
   "priceCents": 12000,
   "currency": "USD",
@@ -37525,7 +37525,7 @@
  },
  {
   "id": "drop-e9fc67357736967e",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Leather Lug Sole Derby",
   "category": "shoes",
   "priceCents": 39500,
@@ -37741,7 +37741,7 @@
  },
  {
   "id": "drop-7d04ea60c600e43c",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Leather Raffia Loafer",
   "category": "shoes",
   "priceCents": 45000,
@@ -37954,7 +37954,7 @@
  },
  {
   "id": "drop-49549655e1fc7c70",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Leather Raffia Mule",
   "category": "shoes",
   "priceCents": 29500,
@@ -38111,8 +38111,8 @@
  },
  {
   "id": "drop-42fb5e7c9b25ccb5",
-  "brand": "Aim\u00e9 Leon Dore",
-  "name": "P\u00e1pia Boat   Shoe",
+  "brand": "Aimé Leon Dore",
+  "name": "Pápia Boat   Shoe",
   "category": "shoes",
   "priceCents": 39500,
   "currency": "USD",
@@ -38266,7 +38266,7 @@
  },
  {
   "id": "drop-1a6a1daef1f7baf9",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Queens Crest Loafer",
   "category": "shoes",
   "priceCents": 39500,
@@ -38421,7 +38421,7 @@
  },
  {
   "id": "drop-a9fde47f17fdce9e",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Suede Lug Sole Derby",
   "category": "shoes",
   "priceCents": 42500,
@@ -38577,7 +38577,7 @@
  },
  {
   "id": "drop-aabc4c53e45e487e",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Venetian Mule",
   "category": "shoes",
   "priceCents": 39500,
@@ -40881,7 +40881,7 @@
  {
   "id": "drop-668ba7567dd42983",
   "brand": "Missoma",
-  "name": "Lucy Williams Pav\u00e9 Knot Small Hoop Earrings | 18k Gold Plated",
+  "name": "Lucy Williams Pavé Knot Small Hoop Earrings | 18k Gold Plated",
   "category": "jewelry",
   "priceCents": 14000,
   "currency": "USD",
@@ -47637,7 +47637,7 @@
  },
  {
   "id": "drop-6cf9538bff53965f",
-  "brand": "BOYFRIEND",
+  "brand": "SKIMS",
   "name": "BOYFRIEND LOOSE PANT | ONYX",
   "category": "bottom",
   "priceCents": 6800,
@@ -47799,7 +47799,7 @@
  },
  {
   "id": "drop-b37a6f890860c39d",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY FOLDOVER PANT | CHERRY BLOSSOM",
   "category": "bottom",
   "priceCents": 6800,
@@ -47970,7 +47970,7 @@
  },
  {
   "id": "drop-14f1df5b2be13f09",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY FOLDOVER SHORT | CHERRY BLOSSOM",
   "category": "bottom",
   "priceCents": 4800,
@@ -48138,7 +48138,7 @@
  },
  {
   "id": "drop-f612aaa98a9bf6b8",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY LOOSE SHORT | CHERRY BLOSSOM",
   "category": "bottom",
   "priceCents": 4800,
@@ -48307,7 +48307,7 @@
  },
  {
   "id": "drop-0474e736bac99d54",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY LOOSE SHORT | SOOT",
   "category": "bottom",
   "priceCents": 4800,
@@ -48475,7 +48475,7 @@
  },
  {
   "id": "drop-892e91e8f602b827",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY MATERNITY FOLDOVER PANT | LIGHT HEATHER GREY",
   "category": "bottom",
   "priceCents": 7800,
@@ -48642,7 +48642,7 @@
  },
  {
   "id": "drop-fa6ad2e78f4913c9",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY WIDE LEG PANT | LIGHT HEATHER GREY",
   "category": "bottom",
   "priceCents": 7400,
@@ -48811,7 +48811,7 @@
  },
  {
   "id": "drop-6936327a96e90fd6",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB LEGGING | LIGHT HEATHER GREY",
   "category": "bottom",
   "priceCents": 5600,
@@ -48988,7 +48988,7 @@
  },
  {
   "id": "drop-ffae62da406e7495",
-  "brand": "FITS EVERYBODY",
+  "brand": "SKIMS",
   "name": "FITS EVERYBODY MATERNITY HIGH-WAISTED LEGGING | ONYX",
   "category": "bottom",
   "priceCents": 6800,
@@ -49372,7 +49372,7 @@
  },
  {
   "id": "drop-5f14f62f73e99564",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Nylon Track Jacket",
   "category": "outer",
   "priceCents": 39500,
@@ -50506,7 +50506,7 @@
    "tags": [
     "$50 and Up",
     "2022 Winter Formal",
-    "2022\u00caWinter\u00caFormal",
+    "2022ÊWinterÊFormal",
     "2023 GRADUATION NH",
     "2023 HALLOWEEN NH",
     "2023 HOCO",
@@ -55579,7 +55579,7 @@
  },
  {
   "id": "drop-b4eb34563de9b283",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Artiste Pocket Tee",
   "category": "top",
   "priceCents": 9000,
@@ -55715,7 +55715,7 @@
  },
  {
   "id": "drop-f0c909bf62a329cc",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Botanical Crest Pocket Tee",
   "category": "top",
   "priceCents": 9000,
@@ -55860,7 +55860,7 @@
  },
  {
   "id": "drop-656ccfff3e8bd40b",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Coastal Flag Tee",
   "category": "top",
   "priceCents": 8500,
@@ -55996,7 +55996,7 @@
  },
  {
   "id": "drop-a603bb768cece86e",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mesaikos Commuter Tee",
   "category": "top",
   "priceCents": 8500,
@@ -56132,7 +56132,7 @@
  },
  {
   "id": "drop-c387a3e225fd0156",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mesaikos Hoops Tee",
   "category": "top",
   "priceCents": 8500,
@@ -56268,7 +56268,7 @@
  },
  {
   "id": "drop-91146b72eb052fa7",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Mott Street Tee",
   "category": "top",
   "priceCents": 8500,
@@ -56404,7 +56404,7 @@
  },
  {
   "id": "drop-6d263b3a52443d30",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Neighborhood Pocket Tee",
   "category": "top",
   "priceCents": 9000,
@@ -56540,7 +56540,7 @@
  },
  {
   "id": "drop-780be9598b22f465",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Super Cub Tee",
   "category": "top",
   "priceCents": 9000,
@@ -56676,7 +56676,7 @@
  },
  {
   "id": "drop-b0fe4be738569bca",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Taverna Tee",
   "category": "top",
   "priceCents": 9500,
@@ -56809,7 +56809,7 @@
  },
  {
   "id": "drop-19199ede0333b3ff",
-  "brand": "Aim\u00e9 Leon Dore",
+  "brand": "Aimé Leon Dore",
   "name": "Woodblock Dove Tee",
   "category": "top",
   "priceCents": 9000,
@@ -56945,7 +56945,7 @@
  },
  {
   "id": "drop-ce0fec709decb1ec",
-  "brand": "BOYFRIEND",
+  "brand": "SKIMS",
   "name": "BOYFRIEND T-SHIRT | ONYX",
   "category": "top",
   "priceCents": 4800,
@@ -57117,7 +57117,7 @@
  },
  {
   "id": "drop-1fc14919ce05f1dc",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY ASYMMETRICAL TOP | CHERRY BLOSSOM",
   "category": "top",
   "priceCents": 5400,
@@ -57294,7 +57294,7 @@
  },
  {
   "id": "drop-51f4c28b8695aaf9",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY ASYMMETRICAL TOP | SOOT",
   "category": "top",
   "priceCents": 5400,
@@ -57469,7 +57469,7 @@
  },
  {
   "id": "drop-d7a2a857d74a66c9",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY FOLDOVER PANT | SOOT",
   "category": "top",
   "priceCents": 6800,
@@ -57651,7 +57651,7 @@
  },
  {
   "id": "drop-08fd16b0b7136981",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY LONG SLEEVE BOATNECK TOP | SOOT",
   "category": "top",
   "priceCents": 5800,
@@ -57822,7 +57822,7 @@
  },
  {
   "id": "drop-0a412c1e6c091d9d",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY LONG SLEEVE T-SHIRT | CHERRY BLOSSOM",
   "category": "top",
   "priceCents": 5800,
@@ -58006,7 +58006,7 @@
  },
  {
   "id": "drop-d7595b93ac25a224",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY LONG SLEEVE T-SHIRT | SOOT",
   "category": "top",
   "priceCents": 5800,
@@ -58200,7 +58200,7 @@
  },
  {
   "id": "drop-f008bf16694c1cb9",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY MATERNITY T-SHIRT | SOOT",
   "category": "top",
   "priceCents": 5400,
@@ -58370,7 +58370,7 @@
  },
  {
   "id": "drop-b6b2296ff7d0629d",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY OFF THE SHOULDER TOP | LIGHT HEATHER GREY",
   "category": "top",
   "priceCents": 5400,
@@ -58548,7 +58548,7 @@
  },
  {
   "id": "drop-5589828cfe14fc69",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY SCOOP NECK CAMI | CHERRY BLOSSOM",
   "category": "top",
   "priceCents": 4800,
@@ -58733,7 +58733,7 @@
  },
  {
   "id": "drop-e506a158f6f32ab7",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY SCOOP NECK CAMI | SOOT",
   "category": "top",
   "priceCents": 4800,
@@ -58904,7 +58904,7 @@
  },
  {
   "id": "drop-713ff4d498d037d1",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY SCOOP NECK T-SHIRT | LIGHT HEATHER GREY",
   "category": "top",
   "priceCents": 4800,
@@ -59086,7 +59086,7 @@
  },
  {
   "id": "drop-57a87f33bb4ba10e",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY SCOOP NECK T-SHIRT | MARBLE",
   "category": "top",
   "priceCents": 4800,
@@ -59266,7 +59266,7 @@
  },
  {
   "id": "drop-8325a8cb3301bea0",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY STRAIGHT LEG PANT | SOOT",
   "category": "top",
   "priceCents": 6800,
@@ -59444,7 +59444,7 @@
  },
  {
   "id": "drop-a4bd0cffdcdc878e",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY T-SHIRT | KYANITE",
   "category": "top",
   "priceCents": 4800,
@@ -59626,7 +59626,7 @@
  },
  {
   "id": "drop-bcf3ac0adc18a36a",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY T-SHIRT | SOOT",
   "category": "top",
   "priceCents": 4800,
@@ -59823,7 +59823,7 @@
  },
  {
   "id": "drop-12e504c14a05bf91",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY TUBE TOP | CHERRY BLOSSOM",
   "category": "top",
   "priceCents": 4800,
@@ -60004,7 +60004,7 @@
  },
  {
   "id": "drop-cef32d21edd2543e",
-  "brand": "COTTON JERSEY",
+  "brand": "SKIMS",
   "name": "COTTON JERSEY TUBE TOP | MARBLE",
   "category": "top",
   "priceCents": 4800,
@@ -60186,7 +60186,7 @@
  },
  {
   "id": "drop-ebbd98f3e344b813",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB SCOOP NECK TANK | LIGHT HEATHER GREY",
   "category": "top",
   "priceCents": 3800,
@@ -60360,7 +60360,7 @@
  },
  {
   "id": "drop-3d1172c593bf2950",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB T-SHIRT | LIGHT HEATHER GREY",
   "category": "top",
   "priceCents": 4800,
@@ -60544,7 +60544,7 @@
  },
  {
   "id": "drop-e0dc4d9522f4eb5a",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB T-SHIRT | MARBLE",
   "category": "top",
   "priceCents": 4800,
@@ -60726,7 +60726,7 @@
  },
  {
   "id": "drop-2e066b7e9896920b",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB T-SHIRT | OCHRE HORSESHOE PRINT",
   "category": "top",
   "priceCents": 4800,
@@ -60904,7 +60904,7 @@
  },
  {
   "id": "drop-961c99bfe7029afe",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB T-SHIRT | SOOT",
   "category": "top",
   "priceCents": 4800,
@@ -61080,7 +61080,7 @@
  },
  {
   "id": "drop-324ffc7554c6b199",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB TANK | CHERRY BLOSSOM",
   "category": "top",
   "priceCents": 3800,
@@ -61256,7 +61256,7 @@
  },
  {
   "id": "drop-b673589731406b7f",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB TANK | LIGHT HEATHER GREY",
   "category": "top",
   "priceCents": 3800,
@@ -61450,7 +61450,7 @@
  },
  {
   "id": "drop-7606e8d5a8ec9667",
-  "brand": "COTTON RIB",
+  "brand": "SKIMS",
   "name": "COTTON RIB TANK | OCHRE HORSESHOE PRINT",
   "category": "top",
   "priceCents": 3800,
@@ -61626,7 +61626,7 @@
  },
  {
   "id": "drop-2a7898b5bcd2fd64",
-  "brand": "FITS EVERYBODY",
+  "brand": "SKIMS",
   "name": "FITS EVERYBODY CAMI | ONYX",
   "category": "top",
   "priceCents": 4800,
@@ -61800,7 +61800,7 @@
  },
  {
   "id": "drop-9f5ac05408f45520",
-  "brand": "FITS EVERYBODY",
+  "brand": "SKIMS",
   "name": "FITS EVERYBODY T-SHIRT | ONYX",
   "category": "top",
   "priceCents": 4800,
@@ -61990,7 +61990,7 @@
  },
  {
   "id": "drop-cadae3824339c3a0",
-  "brand": "FITS EVERYBODY LACE",
+  "brand": "SKIMS",
   "name": "FITS EVERYBODY LACE PUSH-UP CAMI | BUBBLE GUM TONAL",
   "category": "top",
   "priceCents": 6400,
@@ -62173,7 +62173,7 @@
  },
  {
   "id": "drop-e9cbb780a6789f7c",
-  "brand": "HEAVY POINTELLE",
+  "brand": "SKIMS",
   "name": "HEAVY POINTELLE BOATNECK TEE | MARBLE",
   "category": "top",
   "priceCents": 5800,

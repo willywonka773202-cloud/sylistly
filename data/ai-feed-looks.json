@@ -10,12 +10,8 @@
       "minimal"
     ],
     "likeCount": 40,
-    "caption": "A neutral, highly functional layered look: track jacket over crisp white tee, work pants, and minimal sneaker with utility tote reads as effortless travel-ready polish.",
-    "palette": [
-      "grey",
-      "white",
-      "black"
-    ],
+    "caption": "An AI-styled clean look.",
+    "palette": [],
     "formula": {
       "id": "travel-airport",
       "label": "Airport Utility",
@@ -23,11 +19,11 @@
       "reason": "Travel-friendly pieces keep movement easy while the bag and shoe make it intentional."
     },
     "items": {
-      "outer": "drop-5bd328249a5ff1ff",
-      "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-relaxed-t-shirt-784441e66db8af",
-      "shoes": "drop-0e89c07e484577e3",
-      "bag": "drop-dd825db9fdc7c457",
-      "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-leeway-pants-5ad706d6c78afa"
+      "outer": "drop-dce1bf84f5870bc4",
+      "top": "drop-3d1172c593bf2950",
+      "bottom": "drop-c159f0b21784aaff",
+      "shoes": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
+      "bag": "drop-59478b39bb26346e"
     }
   },
   {
@@ -41,12 +37,8 @@
       "neutral"
     ],
     "likeCount": 57,
-    "caption": "Neutral utility foundation with clean proportions: oversized-fit tee anchors the tapered cargo silhouette, minimal cap and glasses complete the understated airport vibe without fuss.",
-    "palette": [
-      "white",
-      "black",
-      "tan"
-    ],
+    "caption": "An AI-styled clean look.",
+    "palette": [],
     "formula": {
       "id": "travel-airport",
       "label": "Airport Utility",
@@ -54,11 +46,11 @@
       "reason": "Travel-friendly pieces keep movement easy while the bag and shoe make it intentional."
     },
     "items": {
-      "hat": "drop-3001f97cdb615164",
-      "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-t-shirt-with-odor-control-969a2205972c53",
-      "bottom": "searchapi-quality-bottom-denim-casual-levi-s-men-s-xx-taper-cargo-pants-ad6564a54a8b9a",
-      "shoes": "drop-2362debaf6671aba",
-      "eyewear": "d38b67ed2950fc95"
+      "hat": "generated-cbd15d68fbaaed11",
+      "top": "generated-defab0044c18b0b5",
+      "bottom": "generated-d6f6578f74593256",
+      "shoes": "drop-c825757ba2060d79",
+      "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-ray-ban-wayfarer-way-sunglasses-d7f5a36d122272"
     }
   },
   {
@@ -72,13 +64,8 @@
       "layered"
     ],
     "likeCount": 74,
-    "caption": "Denim-on-denim foundation anchored by iconic Air Force 1s creates the ultimate sneaker-street formula—clean, proportional, and grounded in credible culture.",
-    "palette": [
-      "indigo",
-      "black",
-      "white",
-      "gold"
-    ],
+    "caption": "An AI-styled street look.",
+    "palette": [],
     "formula": {
       "id": "streetwear-sneaker-led",
       "label": "Sneaker-Led Street",
@@ -86,12 +73,12 @@
       "reason": "The silhouette starts with volume and lets the shoe carry the streetwear read."
     },
     "items": {
-      "outer": "drop-41744412ea8c26bb",
-      "top": "drop-6eac646d67ac2356",
-      "bottom": "drop-7ca495fbcf9cc9dd",
-      "shoes": "drop-d477ca577d1f346e",
-      "bag": "drop-80290f9ed95e74f4",
-      "jewelry": "drop-05793dd760e9ddbc"
+      "outer": "generated-24e7906dee716915",
+      "top": "generated-014ab665198ab354",
+      "bottom": "generated-f4a268b3f192d920",
+      "shoes": "drop-3fea251ec11c7a63",
+      "bag": "searchapi-quality-bags-carhartt-crossbody-carhartt-crossbody-zip-bag-kotis-design-4d9975e5de5b7a",
+      "jewelry": "drop-48eb8ff3131e6e33"
     }
   },
   {
@@ -105,12 +92,8 @@
       "utility"
     ],
     "likeCount": 91,
-    "caption": "Mono black and neutrals anchored by a clean tee and foundational Dickies + Samba—the ultimate sneaker-led street formula: iconic kicks, utility bottoms, minimal top, statement bag.",
-    "palette": [
-      "black",
-      "grey",
-      "neutral"
-    ],
+    "caption": "An AI-styled street look.",
+    "palette": [],
     "formula": {
       "id": "streetwear-sneaker-led",
       "label": "Sneaker-Led Street",
@@ -118,11 +101,11 @@
       "reason": "The silhouette starts with volume and lets the shoe carry the streetwear read."
     },
     "items": {
-      "hat": "drop-3001f97cdb615164",
-      "top": "drop-88b05cd4b4c0bac8",
-      "bottom": "searchapi-quality-bottoms-dickies-874-dickies-men-s-original-874-work-pants-black-30-771e3db31eaad8",
-      "shoes": "drop-ac9095f6e93a7998",
-      "bag": "drop-da9dfc31d2ee0584"
+      "hat": "generated-7195d240b9fc0f8e",
+      "top": "generated-a2db4773d8a133c9",
+      "bottom": "generated-c75d5b8632505287",
+      "shoes": "searchapi-quality-shoes-nike-vomero-nike-zoom-vomero-5-premium-sneakers-in-silver-and-black-d346ab97e83e2f",
+      "bag": "generated-25b77889fee67693"
     }
   },
   {
@@ -136,12 +119,8 @@
       "tailored"
     ],
     "likeCount": 108,
-    "caption": "A structured black blazer and tailored pants create office polish, grounded by classic black Sambas and a neutral grey Telfar bag for modern, put-together smart casual.",
-    "palette": [
-      "black",
-      "white",
-      "grey"
-    ],
+    "caption": "An AI-styled office look.",
+    "palette": [],
     "formula": {
       "id": "office-smart-casual",
       "label": "Office Smart Casual",
@@ -149,11 +128,11 @@
       "reason": "The formula keeps office polish while avoiding a stiff suit read."
     },
     "items": {
-      "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-wilfred-women-s-etiquette-blazer-aa70d4b478affb",
-      "top": "searchapi-quality-tops-skims-rib-tank-skims-women-s-sheer-rib-tank-top-0a3be70e901ec9",
-      "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-women-s-limitless-pant-dfa23082162e4f",
-      "shoes": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
-      "bag": "drop-80290f9ed95e74f4"
+      "outer": "drop-427d3669d5ad2bd2",
+      "top": "searchapi-quality-tops-jcrew-oxford-j-crew-women-s-tienne-oversized-shirt-in-lightweight-oxford-size-large-c54d2666e66e64",
+      "bottom": "generated-2200367faa791073",
+      "shoes": "drop-e7ac650fdcf43060",
+      "bag": "searchapi-quality-bags-carhartt-crossbody-carhartt-crossbody-snap-bag-b96b3a74996f41"
     }
   },
   {
@@ -167,12 +146,8 @@
       "sharp"
     ],
     "likeCount": 125,
-    "caption": "Polished knit polo paired with dark denim and refined sneakers reads \"office ready\" with understated old-money ease—the cap and frames add heritage touches without breaking formality.",
-    "palette": [
-      "navy",
-      "cream",
-      "black"
-    ],
+    "caption": "An AI-styled office look.",
+    "palette": [],
     "formula": {
       "id": "old-money-knit",
       "label": "Old-Money Knit",
@@ -180,11 +155,11 @@
       "reason": "Classic knitwear and restrained accessories make the look feel refined."
     },
     "items": {
-      "hat": "drop-3001f97cdb615164",
-      "top": "generated-7ca4be6cd09823e8",
-      "bottom": "searchapi-quality-bottoms-levis-501-levi-s-501-original-fit-denim-jeans-6f329aa8d1b9fd",
-      "shoes": "drop-ac9095f6e93a7998",
-      "eyewear": "drop-8663a61076d67ff5"
+      "hat": "generated-99139a4bef83b100",
+      "top": "generated-7fd5d321466f69e2",
+      "bottom": "generated-de7d7fa0912bedd2",
+      "shoes": "generated-76b2ba3dbd4e1ab6",
+      "eyewear": "searchapi-quality-eyewear-rayban-wayfarer-ray-ban-wayfarer-sunglasses-73619fbd2270ca"
     }
   },
   {
@@ -198,12 +173,8 @@
       "evening"
     ],
     "likeCount": 142,
-    "caption": "Tailored neutrals with a statement heel and silver jewelry create an effortlessly chic date-night look that balances polish with modern edge.",
-    "palette": [
-      "tan",
-      "black",
-      "silver"
-    ],
+    "caption": "An AI-styled date look.",
+    "palette": [],
     "formula": {
       "id": "night-out",
       "label": "Night Out",
@@ -211,12 +182,12 @@
       "reason": "Darker anchors, polished footwear, and one shine detail make the fit feel night-ready."
     },
     "items": {
-      "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-women-s-standout-blazer-d5856946f842f6",
-      "top": "searchapi-quality-tops-aritzia-contour-aritzia-women-s-original-contour-float-cami-bodysuit-a81a86a4a8287f",
-      "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-leeway-pants-5ad706d6c78afa",
-      "shoes": "catalog-shoes-stevemadden-heel",
-      "bag": "drop-80290f9ed95e74f4",
-      "jewelry": "5f0c9a42e1eb6cd1"
+      "outer": "generated-10deb348f905c901",
+      "top": "drop-1edb8e0dce32c122",
+      "bottom": "generated-12af9bc93c3135ab",
+      "shoes": "searchapi-quality-shoes-dr-martens-1460-dr-martens-combs-leather-casual-boots-in-black-size-9-547c3dc39bad53",
+      "bag": "drop-1d59f4e1b2cf5c49",
+      "jewelry": "drop-aa1f3ed5ae3eb698"
     }
   },
   {
@@ -230,12 +201,8 @@
       "luxe"
     ],
     "likeCount": 159,
-    "caption": "Monochromatic black palette with streetwear sensibility—tailored basics meet sneaker culture for an androgynous night-out edge that's effortless and modern.",
-    "palette": [
-      "black",
-      "white",
-      "minimal"
-    ],
+    "caption": "An AI-styled night look.",
+    "palette": [],
     "formula": {
       "id": "night-out",
       "label": "Night Out",
@@ -243,11 +210,11 @@
       "reason": "Darker anchors, polished footwear, and one shine detail make the fit feel night-ready."
     },
     "items": {
-      "hat": "drop-3a808e2b40bdb4ed",
-      "top": "searchapi-quality-tops-aritzia-contour-aritzia-women-s-original-contour-float-cami-bodysuit-a81a86a4a8287f",
-      "bottom": "searchapi-quality-bottoms-aritzia-effortless-aritzia-babaton-leeway-pants-5ad706d6c78afa",
-      "shoes": "drop-ac9095f6e93a7998",
-      "bag": "drop-0a48f1226427b537"
+      "hat": "generated-f8ea2186dd502fa9",
+      "top": "generated-9d0abb6b8a4443f1",
+      "bottom": "generated-e4749c729647743f",
+      "shoes": "drop-5bc7b91512545157",
+      "bag": "drop-d63af40ef1382b09"
     }
   },
   {
@@ -261,12 +228,8 @@
       "active"
     ],
     "likeCount": 176,
-    "caption": "Coordinated gym-to-errands look in neutral greys and blacks—premium track jacket adds street polish while functional leggings and recovery sneaker keep you ready for active movement.",
-    "palette": [
-      "grey",
-      "white",
-      "black"
-    ],
+    "caption": "An AI-styled gym look.",
+    "palette": [],
     "formula": {
       "id": "active-errands",
       "label": "Active Errands",
@@ -274,11 +237,11 @@
       "reason": "The look stays active and comfortable, but reads more like a styled off-duty fit than a repeated training set."
     },
     "items": {
-      "outer": "drop-5bd328249a5ff1ff",
-      "top": "drop-17b74f1fcdb75033",
-      "bottom": "searchapi-quality-bottoms-lululemon-align-lululemon-align-leggings-women-s-high-rise-pant-with-pockets-25-b535b459d6efdb",
-      "shoes": "drop-0e89c07e484577e3",
-      "bag": "8db78d56fed8047e"
+      "outer": "generated-4fe83d1d219ad37a",
+      "top": "drop-b673589731406b7f",
+      "bottom": "drop-3ae9091e99c3dbfb",
+      "shoes": "drop-e0f78dfa2edd568d",
+      "bag": "edd04b0f0167fe34"
     }
   },
   {
@@ -301,11 +264,11 @@
       "reason": "The look stays active and comfortable, but reads more like a styled off-duty fit than a repeated training set."
     },
     "items": {
-      "hat": "drop-d0dad86fa61690c5",
-      "top": "drop-2a653bf5d2cc277b",
-      "bottom": "drop-3ae9091e99c3dbfb",
-      "shoes": "drop-bcf8734b21417213",
-      "eyewear": "f70fd86e50d9418c"
+      "hat": "drop-b82ee247d1717def",
+      "top": "drop-6eac646d67ac2356",
+      "bottom": "generated-a66231a0b1ef7a00",
+      "shoes": "searchapi-quality-shoes-nike-vomero-nike-zoom-vomero-metallic-silver-black-e23b0908fe77ed",
+      "eyewear": "searchapi-quality-eyewear-oakley-sutro-oakley-sutro-sunglasses-polished-black-with-prizm-sapphire-lenses-cf6038e072e3f9"
     }
   },
   {
@@ -328,11 +291,11 @@
       "reason": "Comfort pieces are balanced with a cleaner shoe and useful carry piece."
     },
     "items": {
-      "outer": "374edefaf02f85f7",
-      "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-airism-cotton-oversized-striped-t-shirt-0381e6c5ac7853",
-      "bottom": "drop-9f635555c3ceb319",
-      "shoes": "drop-7e58b05826c83544",
-      "bag": "drop-0a48f1226427b537",
+      "outer": "generated-d216a488fcc912c1",
+      "top": "drop-ba153cdc0bdadec8",
+      "bottom": "drop-0f27919a2cb7d4a0",
+      "shoes": "searchapi-quality-shoes-dr-martens-1460-dr-martens-combs-leather-casual-boots-in-black-size-9-547c3dc39bad53",
+      "bag": "generated-961a0d6de5a069ab",
       "jewelry": "drop-05793dd760e9ddbc"
     }
   },
@@ -356,11 +319,11 @@
       "reason": "Light fabrics, easy shoes, and sun-ready accessories keep the outfit seasonal."
     },
     "items": {
-      "hat": "drop-b82ee247d1717def",
-      "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-women-s-airism-cotton-t-shirt-f7722590f3c129",
-      "bottom": "drop-eecdfad4799a2973",
-      "shoes": "drop-2f62f11e699bf8c4",
-      "bag": "drop-dd825db9fdc7c457"
+      "hat": "searchapi-quality-hats-nike-club-cap-nike-dri-fit-club-cap-black-white-6e8579f61016a1",
+      "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank1-f536725869a788",
+      "bottom": "drop-1980b37486652d39",
+      "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+      "bag": "drop-6edf61fa0b2b52f1"
     }
   },
   {
@@ -383,11 +346,11 @@
       "reason": "The formula keeps office polish while avoiding a stiff suit read."
     },
     "items": {
-      "outer": "searchapi-quality-outer-aritzia-blazer-aritzia-women-s-standout-blazer-d5856946f842f6",
-      "top": "searchapi-quality-tops-skims-rib-tank-skims-cotton-rib-tank-top-in-black-size-m-d83c5906df0df4",
-      "bottom": "drop-b378f4efd304982d",
-      "shoes": "searchapi-quality-shoes-adidas-samba-adidas-originals-womens-samba-og-trainer-black-size-3-26bc363536988d",
-      "bag": "drop-7e85e02b50a32ac5"
+      "outer": "drop-427d3669d5ad2bd2",
+      "top": "drop-780be9598b22f465",
+      "bottom": "generated-2bba290f50bd218c",
+      "shoes": "drop-e7ac650fdcf43060",
+      "bag": "searchapi-quality-bags-carhartt-crossbody-carhartt-crossbody-snap-bag-b96b3a74996f41"
     }
   },
   {
@@ -410,11 +373,11 @@
       "reason": "The formula keeps office polish while avoiding a stiff suit read."
     },
     "items": {
-      "hat": "generated-a1a725bebf4d9a53",
+      "hat": "searchapi-quality-hats-carhartt-beanie-carhartt-acrylic-knit-hat-cta205-d00624602f3aec",
       "top": "generated-7fd5d321466f69e2",
-      "bottom": "generated-de7d7fa0912bedd2",
+      "bottom": "generated-ff701347a4dc9ded",
       "shoes": "drop-3fea251ec11c7a63",
-      "eyewear": "f70fd86e50d9418c"
+      "eyewear": "searchapi-quality-eyewear-clean-premium-oakley-men-s-leffingwell-sunglasses-c2f2bad15820c2"
     }
   },
   {
@@ -428,12 +391,8 @@
       "dark"
     ],
     "likeCount": 118,
-    "caption": "Utilitarian techwear built on black workwear basics and a mechanic jacket, grounded by statement Nike Goadome Low and anchored with a gold watch for subtle edge.",
-    "palette": [
-      "black",
-      "grey",
-      "gold"
-    ],
+    "caption": "An AI-styled edgy look.",
+    "palette": [],
     "formula": {
       "id": "techwear-utility",
       "label": "Techwear Utility",
@@ -441,12 +400,12 @@
       "reason": "Black utility pieces and practical accessories make the fit read technical, not random."
     },
     "items": {
-      "outer": "drop-b75b5f66eaa5ec1d",
-      "top": "searchapi-quality-tops-uniqlo-airism-uniqlo-men-s-airism-cotton-oversized-half-sleeve-t-shirt-44604ff3b6c959",
-      "shoes": "drop-a3689647bcd29598",
-      "bag": "drop-dd825db9fdc7c457",
-      "jewelry": "drop-05793dd760e9ddbc",
-      "bottom": "searchapi-quality-bottom-denim-casual-levi-s-women-s-superlow-loose-cargo-jeans-0a74d4c106a941"
+      "outer": "generated-15487f72677b733f",
+      "top": "generated-6cf6ec203e6b07a9",
+      "bottom": "generated-dac37582a37dddc2",
+      "shoes": "drop-6348f55e4d3e0b27",
+      "bag": "generated-124bfb51a0f269e1",
+      "jewelry": "drop-b3b7e4c015019231"
     }
   },
   {
@@ -469,11 +428,11 @@
       "reason": "Travel-friendly pieces keep movement easy while the bag and shoe make it intentional."
     },
     "items": {
-      "hat": "generated-fc3ed530ee15b0e1",
-      "top": "drop-df951f5b1a1af0bc",
-      "bottom": "searchapi-quality-bottoms-lululemon-align-lululemon-capri-leggings-align-high-rise-crop-23-5eba386dee1700",
-      "shoes": "2eb1265214ad2ebf",
-      "bag": "8db78d56fed8047e"
+      "hat": "generated-cbd15d68fbaaed11",
+      "top": "drop-961c99bfe7029afe",
+      "bottom": "drop-d9b8c2bf9f7dae12",
+      "shoes": "drop-6348f55e4d3e0b27",
+      "bag": "2870abdf041d4dae"
     }
   }
 ]

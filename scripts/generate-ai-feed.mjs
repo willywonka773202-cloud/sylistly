@@ -79,6 +79,10 @@ async function main() {
   }
 
   const outPath = path.join(process.cwd(), 'data', 'ai-feed-looks.json');
+  if (looks.length < 8) {
+    console.error(`Only ${looks.length} looks generated — refusing to overwrite the baked deck (need >= 8).`);
+    process.exit(1);
+  }
   writeFileSync(outPath, `${JSON.stringify(looks, null, 2)}\n`, 'utf8');
   const aiCount = looks.filter((l) => l.caption && !l.caption.startsWith('An AI-styled')).length;
   console.log(`\nWrote ${looks.length} looks (${aiCount} AI-styled) to data/ai-feed-looks.json`);
