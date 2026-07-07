@@ -653,8 +653,12 @@ body::before {
 .sy-vitrine-tilt {
   transform-style: preserve-3d;
   transition: transform 120ms linear;
+  /* --sy-srx: scroll parallax — the card rotates like a panel on a wheel as it
+     travels the viewport (set per-article by the feed's scroll handler). The
+     pieces' translateZ depth layers shift against each other under this
+     rotation = true 3D parallax. Snap-scroll settles it back to 0 at rest. */
   transform:
-    rotateX(calc(var(--sy-drag, 0) * -15deg))
+    rotateX(calc(var(--sy-drag, 0) * -15deg + var(--sy-srx, 0deg)))
     rotateY(calc(var(--sy-drag, 0) * 6deg))
     translateY(calc(var(--sy-drag, 0) * -20px));
 }

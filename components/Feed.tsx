@@ -474,8 +474,28 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
       });
   }
 
+  // Scroll parallax: as a card travels the viewport its plate rotates slightly
+  // (±7°) around X, and the pieces' translateZ depth layers shift against each
+  // other — real 3D parallax during the scroll gesture. Snap-scroll returns the
+  // centered card to 0°, so at rest nothing is skewed. rAF-throttled, vars only.
+  const parallaxRaf = useRef<number | null>(null);
+  function applyScrollParallax(el: HTMLDivElement) {
+    if (parallaxRaf.current != null || prefersReducedMotion()) return;
+    parallaxRaf.current = requestAnimationFrame(() => {
+      parallaxRaf.current = null;
+      const mid = el.clientHeight / 2;
+      for (const card of el.querySelectorAll<HTMLElement>('article')) {
+        const r = card.getBoundingClientRect();
+        if (r.bottom < -80 || r.top > el.clientHeight + 80) continue; // offscreen
+        const progress = Math.max(-0.6, Math.min(0.6, (r.top + r.height / 2 - mid) / el.clientHeight));
+        card.style.setProperty('--sy-srx', `${(progress * 7).toFixed(2)}deg`);
+      }
+    });
+  }
+
   function onScroll(e: React.UIEvent<HTMLDivElement>) {
     const el = e.currentTarget;
+    applyScrollParallax(el);
     if (el.scrollHeight - el.scrollTop - el.clientHeight < 900) loadMore();
   }
 
