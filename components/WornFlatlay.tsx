@@ -178,8 +178,9 @@ export function WornFlatlay({
         </>
       ) : null}
       {depth ? <span aria-hidden data-on={active ? 'true' : 'false'} className="sy-plate-rake pointer-events-none absolute inset-0 z-[60]" /> : null}
+      {depth ? <span aria-hidden className="sy-plate-sheen pointer-events-none absolute inset-0 z-[55]" /> : null}
       <div className={depth ? 'sy-vitrine-tilt absolute inset-0' : 'contents'}>
-      <div className={depth ? 'sy-vitrine absolute inset-0' : 'contents'}>
+      <div className={depth ? 'sy-plate-breath sy-vitrine absolute inset-0' : 'contents'}>
       {staggered.map((product, index) => {
         const zone = layout[product.category];
         if (!zone) return null;
@@ -194,6 +195,16 @@ export function WornFlatlay({
             }`}
           />
         );
+        // Depth-layered levitation: foreground pieces (high z) drift furthest,
+        // each on its own period with a negative delay so the plate is mid-
+        // motion on arrival and no two pieces ever bob in sync.
+        const drift = {
+          '--drift-amp': `${(2.2 + Math.min(zone.z, 33) * 0.11).toFixed(1)}px`,
+          '--drift-x': `${(index % 2 === 0 ? 1 : -1) * (1 + (index % 3) * 0.6)}px`,
+          '--drift-rot': `${(0.45 + (index % 3) * 0.35).toFixed(2)}deg`,
+          '--drift-dur': `${(5.6 + ((index * 1.7) % 3.4)).toFixed(1)}s`,
+          '--drift-delay': `${(-(index * 1.9) % 6).toFixed(1)}s`,
+        } as React.CSSProperties;
         return (
           <div
             key={product.id}
@@ -211,6 +222,7 @@ export function WornFlatlay({
               className={active ? 'sy-piece-dress h-full w-full' : 'h-full w-full'}
               style={active ? { animationDelay: `${Math.round(60 + index * index * 9)}ms` } : undefined}
             >
+            <div className="sy-drift h-full w-full" style={drift}>
               {onPieceClick ? (
                 <PlatePieceFloat
                   onActivate={() => onPieceClick(product)}
@@ -227,6 +239,7 @@ export function WornFlatlay({
               ) : (
                 image
               )}
+            </div>
             </div>
           </div>
         );

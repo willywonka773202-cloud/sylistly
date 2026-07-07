@@ -686,6 +686,46 @@ body::before {
   .sy-piece-dress { animation: none; }
 }
 
+/* ── The plate is ALIVE ─────────────────────────────────────────────────────
+   Continuous compositor-driven levitation. The old JS idle-bob only ran while
+   a pointer hovered (phones: never), so at rest every piece froze. These CSS
+   loops run always, cost ~nothing (transform-only, no rAF, no layout), and are
+   layered for depth: foreground pieces drift furthest (--drift-amp), each on
+   its own period + negative delay so nothing ever bobs in sync — the scene is
+   simply already in motion when you arrive. */
+@keyframes sy-drift {
+  0%   { transform: translate3d(0, calc(var(--drift-amp, 4px) * -1), 0) rotate(calc(var(--drift-rot, 0.8deg) * -1)); }
+  100% { transform: translate3d(var(--drift-x, 1.5px), var(--drift-amp, 4px), 0) rotate(var(--drift-rot, 0.8deg)); }
+}
+.sy-drift {
+  animation: sy-drift var(--drift-dur, 6.5s) ease-in-out var(--drift-delay, 0s) infinite alternate;
+}
+
+/* Whole plate breathes — sub-1% scale, felt more than seen. */
+@keyframes sy-plate-breath {
+  from { transform: scale(1); }
+  to   { transform: scale(1.007); }
+}
+.sy-plate-breath { animation: sy-plate-breath 11s ease-in-out infinite alternate; }
+
+/* A soft light band sweeps the vitrine glass every ~9s. */
+@keyframes sy-plate-sheen-sweep {
+  0%   { transform: translateX(-140%) rotate(12deg); opacity: 0; }
+  10%  { opacity: .28; }
+  26%  { transform: translateX(140%) rotate(12deg); opacity: 0; }
+  100% { transform: translateX(140%) rotate(12deg); opacity: 0; }
+}
+.sy-plate-sheen {
+  background: linear-gradient(100deg, transparent 42%, rgba(255, 249, 240, .5) 50%, transparent 58%);
+  mix-blend-mode: soft-light;
+  animation: sy-plate-sheen-sweep 9.5s ease-in-out 2.4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sy-drift, .sy-plate-breath, .sy-plate-sheen { animation: none; }
+  .sy-plate-sheen { opacity: 0; }
+}
+
 /* Rarity in motion — a rare fit stays visibly "alive" the whole time it's on
    screen (rarer = livelier/faster), not just for the 1.5s reveal flash. The
    aura div already exists + is blurred; breathe is just opacity+transform. */
