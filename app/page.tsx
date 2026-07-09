@@ -1,10 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Bookmark, ExternalLink, LoaderCircle, Sparkles, 
-  RefreshCw, ChevronDown, Plus, X, Share2
+import {
+  Bookmark, ExternalLink, LoaderCircle, Sparkles,
+  RefreshCw, ChevronDown, Plus, X, Share2, Zap
 } from 'lucide-react';
 import { Mannequin } from '@/components/Mannequin';
 import { SearchSheet } from '@/components/SearchSheet';
@@ -15,9 +15,9 @@ import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import { hydrateItemsFromCatalog } from '@/lib/catalog';
-import { 
+import {
   OCCASIONS,
-  type OccasionId, 
+  type OccasionId,
   type GeneratorBudget, type GeneratorFrame,
 } from '@/lib/occasions';
 import { DripMeter } from '@/components/DripMeter';

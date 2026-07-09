@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search as SearchIcon, LoaderCircle, Sparkles, Clock, TrendingUp } from 'lucide-react';
+import { X, Search as SearchIcon, LoaderCircle, Sparkles, Clock, TrendingUp, AlertCircle, Database } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import { useFit } from '@/store/fit';
 import type { Category, Product } from '@/lib/types';
@@ -42,6 +42,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [searchProgress, setSearchProgress] = useState<'searching' | 'analyzing' | 'ranking' | null>(null);
   const activeRequest = useRef<AbortController | null>(null);
   const setItem = useFit((s) => s.setItem);
 
@@ -51,6 +53,8 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     setResults([]);
     setError(null);
     setSearched(false);
+    setIsDemoMode(false);
+    setSearchProgress(null);
     const saved = localStorage.getItem('sylistly-search-history');
     if (saved) {
       try { setHistory(JSON.parse(saved).slice(0, 5)); } catch {}
@@ -72,9 +76,11 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
     const controller = new AbortController();
     activeRequest.current = controller;
     const timeout = setTimeout(() => controller.abort(), 12_000);
-    
+
     setLoading(true);
     setError(null);
+    setIsDemoMode(false);
+    setSearchProgress('searching');
 
     if (trimmed && !history.includes(trimmed)) {
       const newHistory = [trimmed, ...history].slice(0, 5);
@@ -94,15 +100,24 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
       if (!response.ok) {
         setResults([]);
         setError(typeof data.error === 'string' ? data.error : 'Search failed');
+        setSearchProgress(null);
         return;
       }
 
+      setIsDemoMode(data.mock || data.mode === 'demo' || false);
+      setSearchProgress('analyzing');
+
+      // Simulate progress through the search pipeline
+      setTimeout(() => setSearchProgress('ranking'), 300);
+
       setResults(Array.isArray(data.products) ? data.products : []);
       setSearched(true);
+      setSearchProgress(null);
     } catch (err) {
       if (controller.signal.aborted) return;
       setResults([]);
       setError(err instanceof Error && err.name === 'AbortError' ? 'Timeout' : 'Network error');
+      setSearchProgress(null);
     } finally {
       clearTimeout(timeout);
       if (activeRequest.current === controller) activeRequest.current = null;
@@ -134,8 +149,15 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
         className="absolute inset-x-0 bottom-0 z-50 max-h-[90%] rounded-t-3xl border-t border-hairline-2 bg-bg flex flex-col"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-hairline">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-muted">{CATEGORY_DESCRIPTIONS[category]}</div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase tracking-widest text-muted">{CATEGORY_DESCRIPTIONS[category]}</span>
+              {isDemoMode && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[9px] font-medium text-amber-400">
+                  <Database size={8} /> Demo
+                </span>
+              )}
+            </div>
             <h2 className="font-serif text-xl font-semibold capitalize mt-0.5">
               {category} <span className="text-accent italic">options</span>
             </h2>
@@ -201,31 +223,66 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
 
         <div className="flex-1 overflow-y-auto px-4 pb-6">
           <AnimatePresence mode="wait">
-            {loading ? (
+            {loading || searchProgress ? (
               <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="space-y-3"
+                className="py-8"
               >
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-24 rounded-xl bg-surface-2 animate-pulse" />
-                ))}
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <div className="relative">
+                    <LoaderCircle className="w-10 h-10 text-accent animate-spin" />
+                    <div className="absolute inset-0 rounded-full border-2 border-accent/20" />
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-ink">
+                      {searchProgress === 'searching' && 'Searching products...'}
+                      {searchProgress === 'analyzing' && 'Analyzing matches...'}
+                      {searchProgress === 'ranking' && 'Ranking best picks...'}
+                    </div>
+                    <div className="text-xs text-muted mt-1">Finding the perfect {category}</div>
+                  </div>
+                </div>
+                <div className="mt-8 space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-24 rounded-xl bg-surface-2 animate-pulse" />
+                  ))}
+                </div>
               </motion.div>
             ) : error ? (
               <motion.div
                 key="error"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="py-10 text-center"
               >
-                <div className="text-red-400 text-sm mb-3">{error}</div>
-                <button
-                  onClick={() => void runSearch()}
-                  className="px-4 py-2 rounded-full bg-surface-2 text-sm"
-                >
-                  Try again
-                </button>
+                <div className="w-12 h-12 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-3">
+                  <AlertCircle className="w-6 h-6 text-red-400" />
+                </div>
+                <div className="text-red-400 text-sm mb-2 font-medium">{error}</div>
+                <p className="text-xs text-muted mb-4 max-w-[260px] mx-auto">
+                  {error.includes('rate-limited') || error.includes('429')
+                    ? 'Live search is temporarily busy. Try demo mode or wait a moment.'
+                    : 'Something went wrong. Let\'s try that again.'}
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => void runSearch()}
+                    className="px-4 py-2 rounded-full bg-accent text-white text-sm font-medium"
+                  >
+                    Try again
+                  </button>
+                  <button
+                    onClick={() => {
+                      setQuery('');
+                      setError(null);
+                    }}
+                    className="px-4 py-2 rounded-full bg-surface-2 text-sm text-muted"
+                  >
+                    Clear
+                  </button>
+                </div>
               </motion.div>
             ) : results.length === 0 && !searched ? (
               <motion.div
@@ -244,8 +301,11 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                 animate={{ opacity: 1 }}
                 className="py-10 text-center"
               >
-                <div className="text-muted text-sm">No results found</div>
-                <div className="text-xs text-muted mt-1">Try different keywords</div>
+                <div className="w-12 h-12 mx-auto rounded-full bg-surface-2 flex items-center justify-center mb-3">
+                  <SearchIcon className="w-5 h-5 text-muted" />
+                </div>
+                <div className="text-muted text-sm mb-1">No results found</div>
+                <div className="text-xs text-muted">Try different keywords or check spelling</div>
               </motion.div>
             ) : (
               <motion.div
@@ -254,7 +314,17 @@ export function SearchSheet({ open, category, initialQuery, onClose }: Props) {
                 animate={{ opacity: 1 }}
                 className="space-y-3"
               >
-                <div className="text-xs text-muted mb-2">{results.length} results</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs text-muted">
+                    {results.length} result{results.length !== 1 ? 's' : ''}
+                    {isDemoMode && <span className="ml-2 text-amber-400">(demo data)</span>}
+                  </div>
+                  {isDemoMode && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[9px] font-medium text-amber-400">
+                      <Database size={8} /> Demo mode
+                    </span>
+                  )}
+                </div>
                 {results.map((p) => (
                   <ProductCard
                     key={p.id}
