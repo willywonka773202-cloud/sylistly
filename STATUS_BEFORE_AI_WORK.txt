@@ -1,0 +1,92 @@
+On branch restore-published-179d720
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .env.example
+	modified:   .gitignore
+	modified:   CATALOG_EXPANSION_PLAN.md
+	modified:   CLAUDE_CODE_HANDOFF.md
+	modified:   README.md
+	modified:   app/api/fit/[id]/route.ts
+	modified:   app/api/fit/route.ts
+	modified:   app/api/image/route.ts
+	modified:   app/api/look/route.ts
+	modified:   app/api/search/route.ts
+	modified:   app/api/shop-all/route.ts
+	modified:   app/build/page.tsx
+	modified:   app/checkout/page.tsx
+	modified:   app/discover/page.tsx
+	modified:   app/feed/page.tsx
+	modified:   app/globals.css
+	modified:   app/layout.tsx
+	modified:   app/page.tsx
+	modified:   app/profile/page.tsx
+	modified:   app/saved/page.tsx
+	modified:   components/CheckoutSheet.tsx
+	modified:   components/DiscoverLookCard.tsx
+	modified:   components/Mannequin.tsx
+	modified:   components/PlaceholderScreen.tsx
+	modified:   components/ProductCard.tsx
+	modified:   components/ProductImage.tsx
+	modified:   components/SearchSheet.tsx
+	modified:   components/SlotList.tsx
+	modified:   data/catalog-tag-overrides.json
+	modified:   data/catalog/cutout-reviewed/cutout-run-report.json
+	modified:   data/catalog/reports/candidate-cutout-review-report.json
+	modified:   data/catalog/reports/catalog-expansion-plan-report.json
+	modified:   data/catalog/reports/searchapi-expansion-plan-report.json
+	modified:   data/discover-look-previews.json
+	modified:   data/discover-look-recipes.json
+	modified:   data/generated-catalog.json
+	modified:   lib/affiliate.ts
+	modified:   lib/brand-catalog.ts
+	modified:   lib/catalog-seeds.ts
+	modified:   lib/catalog-tag-overrides.ts
+	modified:   lib/catalog.ts
+	modified:   lib/checkout.ts
+	modified:   lib/claude.ts
+	modified:   lib/discover-previews.ts
+	modified:   lib/frame-inference.ts
+	modified:   lib/generated-catalog.ts
+	modified:   lib/mock-products.ts
+	modified:   lib/photo-catalog.ts
+	modified:   lib/product-image-quality.ts
+	modified:   lib/product-links.ts
+	modified:   lib/products.ts
+	modified:   lib/search-frame.ts
+	modified:   lib/serpapi.ts
+	modified:   lib/supabase.ts
+	modified:   lib/types.ts
+	modified:   lib/vibes.ts
+	modified:   next-env.d.ts
+	modified:   next.config.js
+	modified:   package-lock.json
+	modified:   package.json
+	modified:   postcss.config.js
+	modified:   public/discover-previews/README.md
+	modified:   scripts/audit-product-images.ts
+	modified:   scripts/build-photo-catalog.mts
+	modified:   scripts/direct-search-smoke.mjs
+	modified:   scripts/enrich-catalog-tags.ts
+	modified:   scripts/expand-catalog.ts
+	modified:   scripts/seed-brand-catalog.mts
+	modified:   scripts/smoke-search.mjs
+	modified:   scripts/test-catalog-search.ts
+	modified:   scripts/test-generator-variety.ts
+	modified:   scripts/validate-catalog.ts
+	modified:   store/checkout.ts
+	modified:   store/fit.ts
+	modified:   store/profile.ts
+	modified:   store/saved-fits.ts
+	modified:   store/social-feed.ts
+	modified:   supabase/migrations/0001_initial.sql
+	modified:   tailwind.config.ts
+	modified:   tsconfig.json
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.codex/
+	STATUS_BEFORE_AI_WORK.txt
+	ruvector.db
+
+no changes added to commit (use "git add" and/or "git commit -a")
