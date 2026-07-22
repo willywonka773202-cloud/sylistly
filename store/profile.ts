@@ -5,12 +5,12 @@ import type { Profile } from '@/lib/types';
 const DEFAULT_PROFILE: Profile = {
   id: 'local-profile',
   skinTone: '#c9a98a',
-  bodyType: 'androgynous',
+  bodyType: 'masc',
   sizes: {},
   stylePrefs: {
-    vibes: ['clean', 'streetwear'],
+    vibes: ['gym', 'athletic', 'casual', 'socal', 'college'],
     budget: 'mid',
-    brands: [],
+    brands: ['Nike', 'Gymshark', 'Vuori', 'Uniqlo', 'Adidas'],
   },
   isCreator: false,
 };
