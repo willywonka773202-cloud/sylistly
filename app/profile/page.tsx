@@ -1,8 +1,9 @@
 'use client';
 
-import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, UserPlus, WandSparkles, X } from 'lucide-react';
+import { Bookmark, Grid3X3, Heart, MessageCircle, Palette, RotateCcw, Ruler, ShoppingBag, Sparkles, UserPlus, WandSparkles, X, Shirt } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { BottomNav } from '@/components/BottomNav';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { ProductImage } from '@/components/ProductImage';
@@ -13,6 +14,7 @@ import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 import { type FeedPost, useSocialFeed } from '@/store/social-feed';
+import { collegeWardrobe, wardrobeSummary } from '@/data/college-wardrobe';
 
 const SKIN_TONES = ['#f5d0b5', '#ddb192', '#c9a98a', '#a47757', '#7d553e', '#4b3025'];
 const BODY_TYPES = ['masc', 'fem', 'androgynous', 'custom'] as const;
@@ -99,7 +101,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h1 className="font-serif text-[28px] font-semibold leading-none text-ink">Style profile</h1>
-                  <p className="mt-1 text-[12px] font-semibold text-muted-2">@you</p>
+                  <p className="mt-1 text-[12px] font-semibold text-muted-2">@you · SDSU</p>
                 </div>
                 <button className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-white shadow-pink-glow">
                   <UserPlus size={12} />
@@ -107,7 +109,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <p className="mt-3 text-[12px] leading-relaxed text-[#cfc0b8]">
-                Building swipeable fits around clean layers, sharp night pieces, and image-backed shopping picks.
+                Gym-bro athletic fits for San Diego State. Clean campus layers, lifting-ready pieces, and SoCal casual.
               </p>
             </div>
           </div>
@@ -128,9 +130,9 @@ export default function ProfilePage() {
 
           <div className="mt-4 flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
             {[
-              ['Clean', Sparkles],
-              ['Streetwear', Grid3X3],
-              ['Night Out', Heart],
+              ['Gym', Sparkles],
+              ['Athletic', Grid3X3],
+              ['Campus', Heart],
               ['Saved', Bookmark],
               ['Remixes', RotateCcw],
             ].map(([label, Icon]) => {
@@ -146,6 +148,27 @@ export default function ProfilePage() {
             })}
           </div>
         </section>
+
+        {/* Personalized College Wardrobe card */}
+        <Link
+          href="/wardrobe"
+          className="mt-5 block rounded-[28px] border border-accent/30 bg-gradient-to-br from-accent/15 to-white/[0.03] p-4 shadow-[0_18px_40px_rgba(0,0,0,.28)] transition hover:border-accent/50"
+        >
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-accent text-white shadow-pink-glow">
+              <Shirt size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[9px] uppercase tracking-[.16em] text-accent">Personalized for you</div>
+              <h2 className="mt-0.5 font-serif text-[20px] font-semibold text-ink">{wardrobeSummary.title}</h2>
+              <p className="mt-1 text-[12px] text-muted-2">{wardrobeSummary.subtitle}</p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center justify-between text-[11px]">
+            <span className="text-muted">{collegeWardrobe.length} starter items · {wardrobeSummary.estimatedTotal}</span>
+            <span className="font-semibold text-accent">Open Closet →</span>
+          </div>
+        </Link>
 
         <section className="mt-5">
           <div className="flex items-end justify-between">
@@ -268,11 +291,11 @@ export default function ProfilePage() {
 
           <label className="mt-4 block text-[11px] text-muted-2">
             Vibes
-            <input value={(profile.stylePrefs.vibes || []).join(', ')} onChange={(event) => setVibesFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="clean girl, streetwear, date night" />
+            <input value={(profile.stylePrefs.vibes || []).join(', ')} onChange={(event) => setVibesFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="gym, athletic, casual, socal" />
           </label>
           <label className="mt-3 block text-[11px] text-muted-2">
             Favorite brands
-            <input value={(profile.stylePrefs.brands || []).join(', ')} onChange={(event) => setBrandsFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="Skims, Nike, Zara" />
+            <input value={(profile.stylePrefs.brands || []).join(', ')} onChange={(event) => setBrandsFromText(event.target.value)} className="mt-1 w-full rounded-2xl border border-hairline bg-surface-2 px-3 py-2 text-sm text-ink outline-none focus:border-accent" placeholder="Nike, Gymshark, Vuori" />
           </label>
         </section>
       </div>
