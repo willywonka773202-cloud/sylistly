@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { collegeWardrobe, wardrobeSummary, type WardrobeItem } from "@/data/college-wardrobe";
-import BottomNav from "@/components/BottomNav";
+import { BottomNav } from "@/components/BottomNav";
 
 const STORAGE_KEY = "sylistly.college-wardrobe.owned.v1";
 
@@ -44,7 +44,7 @@ export default function WardrobePage() {
     <div className="min-h-screen bg-neutral-950 text-white pb-24">
       <header className="sticky top-0 z-10 border-b border-white/10 bg-neutral-950/90 backdrop-blur px-4 py-4">
         <div className="max-w-lg mx-auto">
-          <Link href="/" className="text-xs text-white/50 hover:text-white">
+          <Link href="/build" className="text-xs text-white/50 hover:text-white">
             ← Back to Builder
           </Link>
           <h1 className="mt-2 text-xl font-semibold tracking-tight">{wardrobeSummary.title}</h1>
