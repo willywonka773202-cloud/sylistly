@@ -195,7 +195,7 @@ export default function DropPage() {
   const rewardCrate = crates.find((c) => c.id === 'reward');
 
   return (
-    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
+    <main className="sy-game-screen relative mx-auto flex h-[100svh] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
       <h1 className="sr-only">The Drop — your free daily outfit crate</h1>
       <AmbientField />
       <div aria-hidden className="sy-grain pointer-events-none absolute inset-0 opacity-[.05] mix-blend-overlay" />

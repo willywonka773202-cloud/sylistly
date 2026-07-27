@@ -747,7 +747,7 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
   const lockCount = Object.keys(lockedItems).length;
 
   return (
-    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] flex-col overflow-hidden bg-bg">
+    <main className="sy-game-screen relative mx-auto flex h-[100svh] max-w-[480px] flex-col overflow-hidden bg-bg">
       <h1 className="sr-only">Sylistly Taste Map — explore real clothes, remix a direction, save or shop the complete fit</h1>
       <div aria-hidden className="sy-game-grid pointer-events-none absolute inset-0 z-0 opacity-45" />
 

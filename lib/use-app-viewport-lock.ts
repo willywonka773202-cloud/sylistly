@@ -12,26 +12,22 @@ import { useEffect } from 'react';
  * (the only lock Safari honours — it ignores `overflow: hidden` here) so the
  * toolbar never animates at all.
  *
- * `--app-h` is measured ONCE. We deliberately do not listen for `resize`:
- * re-measuring on every toolbar twitch and keyboard open was the original bug.
- * Orientation is the only change that legitimately alters the height. Shells
- * fall back to `100svh` — the stable small-viewport unit — so a missed or zero
- * reading still yields a correct full-height screen rather than a collapsed one.
+ * There is deliberately NO JavaScript height measurement here. Shells size
+ * themselves in pure CSS with `100svh` — the small-viewport unit, which is
+ * defined as the viewport with the toolbars showing and therefore never changes
+ * as the toolbar animates. A measured height was worse in every way: it needed a
+ * `resize` listener (whose re-measuring mid-gesture was the original snap bug),
+ * and it read wrong on bfcache restore and rotation. `svh` is the same value
+ * when correct and can't drift.
+ *
+ * On the feed this class is ALSO applied by a synchronous inline script in
+ * app/page.tsx, so the document is locked before first paint rather than after
+ * hydration. This hook stays the owner of removal on unmount.
  */
 export function useAppViewportLock(): void {
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add('sy-app-locked');
-    const setHeight = () => {
-      const h = window.visualViewport?.height || window.innerHeight;
-      if (h > 0) root.style.setProperty('--app-h', `${Math.round(h)}px`);
-    };
-    setHeight();
-    window.addEventListener('orientationchange', setHeight);
-    return () => {
-      root.classList.remove('sy-app-locked');
-      root.style.removeProperty('--app-h');
-      window.removeEventListener('orientationchange', setHeight);
-    };
+    return () => root.classList.remove('sy-app-locked');
   }, []);
 }
