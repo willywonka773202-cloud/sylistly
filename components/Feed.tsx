@@ -1,8 +1,10 @@
 'use client';
 
 import {
+  ArrowRight,
   Check,
   ChevronLeft,
+  Compass,
   Heart,
   Layers,
   LayoutGrid,
@@ -14,9 +16,11 @@ import {
   Sparkles,
   Volume2,
   VolumeX,
+  WandSparkles,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import dynamic from 'next/dynamic';
@@ -25,6 +29,7 @@ import { InAppBrowser } from '@/components/InAppBrowser';
 import { PiecePeek } from '@/components/PiecePeek';
 import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
 import { ProductImage } from '@/components/ProductImage';
+import { TasteMapAxis } from '@/components/TasteMapAxis';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { track } from '@/lib/analytics';
 import { fetchAiLook } from '@/lib/ai-look-client';
@@ -45,6 +50,7 @@ import { saveIdentity, type StyleAnswers, type StyleIdentity } from '@/lib/style
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 import { useCheckout } from '@/store/checkout';
+import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
 import { useSavedFits } from '@/store/saved-fits';
 
@@ -85,6 +91,22 @@ const VIBE_HUE: Record<VibeId | 'all', string> = {
   vacation: '#2FA0A8',
   edgy: '#9A3340',
   preppy: '#3F6E55',
+};
+
+// Position each real vibe on the minimal → daring taste axis. This drives the
+// on-card map marker and makes swiping feel like exploring a world, not paging
+// through an undifferentiated catalog.
+const TASTE_POSITION: Record<VibeId, number> = {
+  clean: 24,
+  preppy: 31,
+  office: 37,
+  cozy: 42,
+  vacation: 48,
+  gym: 52,
+  street: 61,
+  date: 67,
+  night: 72,
+  edgy: 84,
 };
 const SEEN_AI_KEY = 'sylistly.seen-ai-looks.v1';
 /** Handoff from /browse: "style this piece" locks it into the scroll. */
@@ -158,7 +180,9 @@ export interface FeedProps {
 }
 
 export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedProps) {
+  const router = useRouter();
   const saveFit = useSavedFits((state) => state.saveFit);
+  const replaceItems = useFit((state) => state.replaceItems);
   const setCheckout = useCheckout((state) => state.setCheckout);
   const profileFrame = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
@@ -696,6 +720,13 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
     setShopSheet({ title, products }); // open the shop-the-look sheet in place (no route change)
   }
 
+  function remixDirection(look: ScrollLook) {
+    replaceItems(look.items);
+    feedback.reveal(1);
+    track('taste_map_remixed', { vibe: look.vibe, pieces: lookProducts(look.items).length });
+    router.push(`/build?vibe=${look.vibe}&frame=${frame}`);
+  }
+
   function toggleSlot(category: Category) {
     setDisabledSlots((prev) => {
       const next = new Set(prev);
@@ -739,8 +770,9 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
   const lockCount = Object.keys(lockedItems).length;
 
   return (
-    <main className="relative mx-auto flex h-[var(--app-h,100dvh)] max-w-[480px] flex-col overflow-hidden bg-bg">
-      <h1 className="sr-only">Sylistly — scroll the fit feed; save a fit you love, pass to see fewer like it</h1>
+    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100dvh)] max-w-[480px] flex-col overflow-hidden bg-bg">
+      <h1 className="sr-only">Sylistly Taste Map — explore real clothes, remix a direction, save or shop the complete fit</h1>
+      <div aria-hidden className="sy-game-grid pointer-events-none absolute inset-0 z-0 opacity-45" />
 
       {/* Screen-reader announcements for the otherwise visual-only celebrations
           (love save, level-up) + toasts — so SR users get the same feedback. */}
@@ -771,8 +803,8 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
         style={{ backgroundColor: VIBE_HUE[vibeFilter] }}
       />
 
-      {/* Top chrome: wordmark + tune, then the vibe story rail */}
-      <header className="relative z-30 shrink-0 pb-3 pt-[calc(env(safe-area-inset-top)+12px)]">
+      {/* Game HUD: compact wordmark, map tools, and real-product style lanes. */}
+      <header className="relative z-30 shrink-0 pb-2 pt-[calc(env(safe-area-inset-top)+10px)]">
         <div className={`flex items-center justify-between px-4${bootCold ? ' sy-boot-1' : ''}`}>
           <div className="flex items-baseline gap-2">
             {vibeFilter !== 'all' ? (
@@ -785,11 +817,11 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                 <ChevronLeft size={15} />
               </button>
             ) : (
-              <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
+              <Compass size={15} className="self-center text-accent" aria-hidden />
             )}
             <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink">
-              Fit <span className="text-accent">scroll</span>
+              Taste <span className="text-accent">map</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -819,47 +851,27 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
           </div>
         </div>
 
-        {/* Story rail — pink gradient rings, real product thumbs */}
-        <div className={`mt-3 flex gap-3 overflow-x-auto px-4 scrollbar-hide${bootCold ? ' sy-boot-2' : ''}`}>
-          <StoryCircle
-            label="For you"
-            active={vibeFilter === 'all'}
-            onClick={() => { setVibeFilter('all'); track('vibe_selected', { vibe: 'all' }); }}
-          >
-            <span className="grid h-full w-full place-items-center rounded-full bg-[radial-gradient(circle_at_32%_26%,#FF7CA0,rgba(255,45,109,.6)_56%,rgba(120,30,52,.8))] text-white">
-              <Sparkles size={19} />
-            </span>
-          </StoryCircle>
-          {VIBES.map((vibe) => {
-            const thumb = vibeThumbs.get(vibe.id);
-            return (
-              <StoryCircle
-                key={vibe.id}
-                label={vibe.label}
-                active={vibeFilter === vibe.id}
-                onClick={() => { setVibeFilter(vibe.id); track('vibe_selected', { vibe: vibe.id }); }}
-              >
-                <span className="relative grid h-full w-full place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_36%_26%,#E0D5C0,#AC9F84)]">
-                  <span aria-hidden className="absolute font-serif text-[19px] italic text-[#6f6045]/75">{vibe.label.charAt(0)}</span>
-                  {thumb ? (
-                    <ProductImage
-                      product={thumb}
-                      transparentOnly
-                      loading="eager"
-                      wrapperClassName="relative h-[78%] w-[78%]"
-                      className="h-full w-full object-contain drop-shadow-[0_2px_5px_rgba(45,30,16,.42)]"
-                    />
-                  ) : null}
-                </span>
-              </StoryCircle>
-            );
-          })}
-        </div>
-
         {/* Tune panel: switch accessory slots off ("never hats") */}
         {tuneOpen ? (
           <div className="mx-4 mt-3 animate-sy-rise rounded-card border border-hairline bg-surface-1/95 p-3 backdrop-blur-xl">
-            <p className="text-eyebrow font-extrabold uppercase text-muted">Generate with</p>
+            <p className="text-eyebrow font-extrabold uppercase text-muted">Style lane</p>
+            <div className="sy-edge-fade-x mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <button type="button" onClick={() => setVibeFilter('all')} aria-pressed={vibeFilter === 'all'} className={`sy-press inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3 text-[11px] font-bold ${vibeFilter === 'all' ? 'border-accent bg-accent text-white' : 'border-hairline-2 bg-surface-2 text-muted-2'}`}>
+                <Sparkles size={13} /> For you
+              </button>
+              {VIBES.map((vibe) => {
+                const thumb = vibeThumbs.get(vibe.id);
+                return (
+                  <button key={vibe.id} type="button" onClick={() => { setVibeFilter(vibe.id); track('vibe_selected', { vibe: vibe.id }); }} aria-pressed={vibeFilter === vibe.id} className={`sy-press inline-flex h-9 shrink-0 items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-[11px] font-bold ${vibeFilter === vibe.id ? 'border-accent/70 bg-accent-soft text-ink' : 'border-hairline bg-surface-2 text-muted-2'}`}>
+                    <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-full bg-[#d9d0c4]">
+                      {thumb ? <ProductImage product={thumb} transparentOnly loading="eager" wrapperClassName="h-[82%] w-[82%]" className="h-full w-full object-contain" /> : null}
+                    </span>
+                    {vibe.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-eyebrow font-extrabold uppercase text-muted">Generate with</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {OPTIONAL_SLOTS.map((slot) => {
                 const enabled = !disabledSlots.has(slot);
@@ -935,9 +947,11 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
         key={vibeFilter}
         className="sy-deck-in relative z-10 min-h-0 flex-1 snap-y snap-mandatory overflow-y-auto overscroll-contain px-4 scrollbar-hide"
       >
-        {looks.map((look) => {
+        {looks.map((look, lookIndex) => {
             const meta = VIBE_META.get(look.vibe);
             const products = lookProducts(look.items);
+            const leftProducts = lookProducts(looks[(lookIndex - 1 + looks.length) % looks.length]?.items || {});
+            const rightProducts = lookProducts(looks[(lookIndex + 1) % looks.length]?.items || {});
             const total = lookTotalCents(look.items);
             const exactCount = products.filter((product) => hasExactProductLink(product)).length;
             const rarity = lookRarity(look.items, look.source);
@@ -992,15 +1006,17 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                         : undefined
                     }
                   >
-                    <WornFlatlay
-                      items={products}
-                      loading="lazy"
-                      plate="spotlight"
-                      depth
-                      bottomReserve={46}
-                      className="h-full w-full"
-                      onPieceClick={(product) => setPeek({ look, product })}
-                    />
+                    <div className="absolute inset-x-0 bottom-0 top-[104px]">
+                      <WornFlatlay
+                        items={products}
+                        loading="lazy"
+                        plate="spotlight"
+                        depth
+                        bottomReserve={38}
+                        className="h-full w-full"
+                        onPieceClick={(product) => setPeek({ look, product })}
+                      />
+                    </div>
 
                     {/* Badges — top-left */}
                     <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
@@ -1026,18 +1042,36 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                       ) : null}
                     </div>
 
+                    <div className="absolute inset-x-3 top-12 z-20 rounded-2xl border border-white/10 bg-[rgba(9,8,10,.58)] px-3 py-2 backdrop-blur-xl">
+                      <TasteMapAxis
+                        position={TASTE_POSITION[look.vibe]}
+                        leftProduct={leftProducts[0]}
+                        rightProduct={rightProducts[0]}
+                        label={meta?.label || 'Your lane'}
+                        compact
+                      />
+                    </div>
+
                     {/* Frosted-glass caption — lifted above the floating bottom nav (full-bleed card) */}
                     <div
                       aria-hidden
                       className="pointer-events-none absolute inset-x-0 bottom-0 h-[280px] bg-[linear-gradient(180deg,transparent,rgba(13,13,15,.72)_92%)]"
                     />
-                    <div className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-10 rounded-2xl bg-[rgba(12,11,13,.5)] p-4 pr-[76px] ring-1 ring-white/10 backdrop-blur-xl">
-                      <div className="flex items-baseline gap-2.5">
+                    <div className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+88px)] z-10 rounded-[22px] bg-[rgba(9,8,10,.68)] p-4 ring-1 ring-white/10 backdrop-blur-2xl">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[9px] font-extrabold uppercase tracking-[.2em] text-accent">Why this fits your taste</p>
+                          <div className="mt-1.5 flex items-baseline gap-2.5">
                         <h2 className="font-serif text-[30px] font-semibold italic leading-[.95] text-ink">
                           {meta?.label || 'The look'}
                         </h2>
                         <span className="rounded-full border border-money/35 bg-money/10 px-2.5 py-1 text-[12px] font-bold text-money">
                           {formatPrice(total)}
+                        </span>
+                          </div>
+                        </div>
+                        <span className="shrink-0 rounded-full border border-champagne/35 bg-champagne-soft px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-champagne">
+                          {exactCount}/{products.length} live
                         </span>
                       </div>
                       {swatches.length >= 2 ? (
@@ -1054,15 +1088,43 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                           ))}
                         </div>
                       ) : null}
-                      <p className="mt-1.5 line-clamp-3 max-w-[42ch] text-[12.5px] leading-snug text-muted-2">
+                      <p className="mt-1.5 line-clamp-2 max-w-[48ch] text-[12.5px] leading-snug text-muted-2">
                         {look.source === 'syli' ? (
                           <span className="font-bold uppercase tracking-[.12em] text-champagne">Syli · </span>
                         ) : null}
                         {look.source === 'syli' && look.note ? tidyNote(look.note) : syliNote(look)}
                       </p>
-                      <p className="mt-1.5 text-[11px] font-semibold text-muted">
-                        {products.length} pieces · {exactCount}/{products.length} shoppable · tap a piece to shop
-                      </p>
+                      <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                        <button
+                          type="button"
+                          onClick={() => remixDirection(look)}
+                          className="sy-press sy-cta-scan inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow"
+                        >
+                          <WandSparkles size={15} />
+                          Remix this direction
+                          <ArrowRight size={14} />
+                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <HapticTap
+                            ariaLabel="Shop the look"
+                            onTap={() => shop(look)}
+                            disabled={false}
+                            className="sy-press grid h-11 w-11 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink"
+                          >
+                            <ShoppingBag size={17} />
+                          </HapticTap>
+                          <HapticTap
+                            ariaLabel={saved ? 'Saved to your looks' : 'Save this fit'}
+                            onTap={() => onLove(look)}
+                            disabled={false}
+                            className={`sy-press grid h-11 w-11 place-items-center rounded-full border ${
+                              saved ? 'border-accent bg-accent text-white shadow-pink-glow' : 'border-accent/60 bg-surface-2/80 text-accent'
+                            }`}
+                          >
+                            <Heart size={18} fill={saved ? 'currentColor' : 'none'} />
+                          </HapticTap>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Love-burst — celebrates a saved fit in its OWN palette */}
@@ -1091,43 +1153,14 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                     ) : null}
                   </div>
 
-                  {/* Per-card action rail — Pass / Shop / Save (TikTok-style right rail) */}
-                  <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+232px)] right-3 z-30 flex flex-col items-center gap-3">
-                    <HapticTap
-                      ariaLabel="Pass — see fewer like this"
-                      onTap={() => onPass(look)}
-                      disabled={passed}
-                      className="sy-press grid h-12 w-12 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.55)] text-muted-2 backdrop-blur-md transition disabled:opacity-40"
-                    >
-                      <X size={20} strokeWidth={2.4} />
+                  {/* Secondary social gestures stay available without covering
+                      the garments. They appear as a compact edge utility. */}
+                  <div className="absolute right-4 top-[156px] z-30 flex flex-col gap-2">
+                    <HapticTap ariaLabel="Pass — see fewer like this" onTap={() => onPass(look)} disabled={passed} className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-muted-2 backdrop-blur-md disabled:opacity-40">
+                      <X size={15} />
                     </HapticTap>
-                    <HapticTap
-                      ariaLabel="Shop the look"
-                      onTap={() => shop(look)}
-                      disabled={false}
-                      className="sy-press grid h-12 w-12 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.55)] text-ink backdrop-blur-md transition"
-                    >
-                      <ShoppingBag size={18} />
-                    </HapticTap>
-                    <HapticTap
-                      ariaLabel={saved ? 'Saved to your looks' : 'Save this fit'}
-                      onTap={() => onLove(look)}
-                      disabled={false}
-                      className={`sy-press grid h-14 w-14 place-items-center rounded-full border backdrop-blur-md transition ${
-                        saved
-                          ? 'border-accent bg-accent text-white shadow-pink-glow'
-                          : 'border-accent/70 bg-[rgba(13,13,15,.55)] text-accent'
-                      }`}
-                    >
-                      <Heart size={24} fill={saved ? 'currentColor' : 'none'} />
-                    </HapticTap>
-                    <HapticTap
-                      ariaLabel="Share this fit"
-                      onTap={() => onShare(look)}
-                      disabled={false}
-                      className="sy-press grid h-12 w-12 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.55)] text-ink backdrop-blur-md transition"
-                    >
-                      <Share size={18} />
+                    <HapticTap ariaLabel="Share this fit" onTap={() => onShare(look)} disabled={false} className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-ink backdrop-blur-md">
+                      <Share size={14} />
                     </HapticTap>
                   </div>
                 </div>
@@ -1237,45 +1270,3 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
     </main>
   );
 }
-
-function StoryCircle({
-  label,
-  active,
-  onClick,
-  children,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`sy-press flex shrink-0 flex-col items-center gap-1 transition-transform duration-300 ease-[cubic-bezier(.34,1.46,.54,1)] ${
-        active ? 'scale-[1.07]' : 'scale-100'
-      }`}
-    >
-      <span className={`relative grid h-[56px] w-[56px] place-items-center rounded-full p-[2.5px] ${active ? 'shadow-pink-glow' : ''}`}>
-        {active ? (
-          <span
-            aria-hidden
-            className="sy-ring-spin absolute inset-0 rounded-full"
-            style={{ background: 'conic-gradient(from 0deg,#FF2D6D,#FF5C8A,#E7C79B,#FF8FB0,#FF2D6D)' }}
-          />
-        ) : (
-          <span aria-hidden className="absolute inset-0 rounded-full bg-hairline-2" />
-        )}
-        <span className="relative grid h-full w-full place-items-center overflow-hidden rounded-full border-2 border-bg">
-          {children}
-        </span>
-      </span>
-      <span className={`max-w-[64px] truncate text-[10px] font-semibold transition-colors ${active ? 'text-ink' : 'text-muted'}`}>
-        {label}
-      </span>
-    </button>
-  );
-}
-

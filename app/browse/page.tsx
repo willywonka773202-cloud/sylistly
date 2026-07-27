@@ -147,7 +147,7 @@ export default function BrowsePage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg pb-[120px]">
+    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg pb-[120px]">
       <h1 className="sr-only">Browse — every piece in the catalog</h1>
       <AmbientField className="opacity-55" />
       <div className="relative z-10">
@@ -164,7 +164,7 @@ export default function BrowsePage() {
           <div className="flex items-baseline gap-2">
             <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink">
-              Browse <span className="text-accent">pieces</span>
+              Live <span className="text-accent">wardrobe</span>
             </span>
           </div>
         </div>

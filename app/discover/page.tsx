@@ -44,7 +44,7 @@ export default function DiscoverPage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg pb-[120px]">
+    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg pb-[120px]">
       <h1 className="sr-only">Discover — curated looks to explore</h1>
       <AmbientField className="opacity-55" />
       <div className="relative z-10">
@@ -66,12 +66,12 @@ export default function DiscoverPage() {
               Pieces
             </Link>
           </div>
-          <div className="mt-4 text-eyebrow font-extrabold uppercase text-champagne">Discover</div>
+          <div className="mt-4 text-eyebrow font-extrabold uppercase text-champagne">Taste paths</div>
           <div className="mt-2 font-serif text-[26px] font-semibold leading-none text-ink">
-            Looks to <em className="italic text-accent">steal</em>
+            Explore the <em className="italic text-accent">map</em>
           </div>
           <p className="mt-2 max-w-[34ch] text-[12px] leading-relaxed text-muted-2">
-            A curated wall of complete fits — tap one to open it in Remix and make it yours.
+            Complete fits arranged by direction — enter one in Remix and make every real piece yours.
           </p>
         </header>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bookmark, GalleryVerticalEnd, Gift, User, WandSparkles } from 'lucide-react';
+import { Bookmark, Compass, Gift, User, WandSparkles } from 'lucide-react';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -94,7 +94,7 @@ export function BottomNav() {
             />
           )
         ) : null}
-        <NavTool href="/" label="Scroll" icon={GalleryVerticalEnd} active={scrollActive} />
+        <NavTool href="/" label="Map" icon={Compass} active={scrollActive} />
         <NavTool href="/build" label="Remix" icon={WandSparkles} active={remixActive} />
         <DropTool active={dropActive} unclaimed={dropUnclaimed} />
         <NavTool href="/saved" label="Saved" icon={Bookmark} active={savedActive} badge={savedCount} />

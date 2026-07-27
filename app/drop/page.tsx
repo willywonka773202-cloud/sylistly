@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, Gift, Volume2, VolumeX } from 'lucide-react';
+import { Archive, Bookmark, Check, ChevronLeft, Flame, Gift, Heart, Snowflake, Trophy, Volume2, VolumeX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AmbientField } from '@/components/AmbientField';
@@ -191,7 +191,7 @@ export default function DropPage() {
   const rewardCrate = crates.find((c) => c.id === 'reward');
 
   return (
-    <main className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
+    <main className="sy-game-screen relative mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
       <h1 className="sr-only">The Drop — your free daily outfit crate</h1>
       <AmbientField />
       <div aria-hidden className="sy-grain pointer-events-none absolute inset-0 opacity-[.05] mix-blend-overlay" />
@@ -424,13 +424,13 @@ function StreakRail() {
   return (
     <div className="mt-5 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <p className="text-[14px] font-bold text-ink">
-          🔥 <span className="text-accent">{streak}-day</span> streak
+        <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-ink">
+          <Flame size={15} className="text-accent" /> <span className="text-accent">{streak}-day</span> streak
           {best > streak ? <span className="font-semibold text-muted"> · best {best}</span> : null}
         </p>
         {freezes > 0 ? (
-          <span className="rounded-full border border-hairline-2 bg-surface-2 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
-            ❄️ {freezes} freeze
+          <span className="inline-flex items-center gap-1 rounded-full border border-hairline-2 bg-surface-2 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
+            <Snowflake size={10} /> {freezes} freeze
           </span>
         ) : null}
       </div>
@@ -457,7 +457,7 @@ function StreakRail() {
             Day {next.day}: <span className="font-semibold text-ink">{next.title}</span> — {next.reward}
           </>
         ) : (
-          '🏆 All milestones reached — legend.'
+          <span className="inline-flex items-center gap-1.5"><Trophy size={12} className="text-champagne" /> All milestones reached — legend.</span>
         )}
       </p>
     </div>
@@ -484,7 +484,7 @@ function LevelRail() {
         />
       </div>
       <p className="mt-2.5 text-[11px] text-muted">
-        {lvl.maxed ? '🏆 Top rank reached.' : <>Next: <span className="font-semibold text-ink">{lvl.nextTitle}</span> — earn XP by swiping, saving & opening drops</>}
+        {lvl.maxed ? <span className="inline-flex items-center gap-1.5"><Trophy size={12} className="text-champagne" /> Top rank reached.</span> : <>Next: <span className="font-semibold text-ink">{lvl.nextTitle}</span> — earn XP by swiping, saving & opening drops</>}
       </p>
     </div>
   );
@@ -510,8 +510,8 @@ function DailyQuests() {
               quest.done ? 'border-emerald-400/30 bg-emerald-400/10' : 'border-hairline bg-surface-2/60'
             }`}
           >
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-bg/60 text-[14px]">
-              {quest.emoji}
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-bg/60 text-accent">
+              {quest.id === 'open-drop' ? <Gift size={14} /> : quest.id === 'save-fit' ? <Bookmark size={14} /> : <Heart size={14} />}
             </span>
             <div className="min-w-0 flex-1">
               <p className={`text-[13px] font-semibold ${quest.done ? 'text-ink line-through opacity-70' : 'text-ink'}`}>
@@ -532,7 +532,7 @@ function DailyQuests() {
               ) : null}
             </div>
             {quest.done ? (
-              <span className="shrink-0 text-[12px] font-bold text-emerald-300">✓ +{quest.xp}</span>
+              <span className="inline-flex shrink-0 items-center gap-1 text-[12px] font-bold text-emerald-300"><Check size={12} /> +{quest.xp}</span>
             ) : (
               <span className="shrink-0 rounded-full border border-hairline-2 px-2 py-0.5 text-[11px] font-semibold text-champagne">
                 +{quest.xp} XP
@@ -589,14 +589,14 @@ function VaultStrip({ onReshop }: { onReshop: (entry: VaultEntry) => void }) {
         {stats.total > 0 ? (
           <p className="text-[11px] text-muted">
             {stats.total} pull{stats.total === 1 ? '' : 's'}
-            {stats.byTier.heat ? ` · ${stats.byTier.heat}🔥` : ''}
+            {stats.byTier.heat ? ` · ${stats.byTier.heat} heat` : ''}
             {stats.byTier.showpiece ? ` · ${stats.byTier.showpiece} showpiece` : ''}
           </p>
         ) : null}
       </div>
       {vault.length === 0 ? (
         <div className="grid place-items-center rounded-[20px] border border-dashed border-hairline-2 bg-surface-1/50 px-6 py-8 text-center">
-          <span className="text-2xl">🗃️</span>
+          <Archive size={24} className="text-champagne" />
           <p className="mt-2 text-[13px] font-semibold text-muted-2">Your collection starts here</p>
           <p className="mt-1 text-[12px] text-muted">Open a crate — every fit you pull lands in your Vault.</p>
         </div>
@@ -640,7 +640,6 @@ function VaultTile({ entry, onReshop }: { entry: VaultEntry; onReshop: (entry: V
         className="absolute left-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[.08em] text-white"
         style={{ background: `${hue}cc` }}
       >
-        {entry.level >= 3 ? '🔥 ' : ''}
         {entry.tier}
       </span>
     </button>

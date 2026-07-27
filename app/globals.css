@@ -163,6 +163,16 @@ p {
   to { opacity: 1; }
 }
 
+@keyframes sy-route-wipe {
+  0% { opacity: .9; transform: scaleX(1); transform-origin: right; }
+  100% { opacity: 0; transform: scaleX(0); transform-origin: right; }
+}
+
+.sy-route-wipe {
+  background: linear-gradient(90deg, transparent, rgba(255,45,109,.15) 38%, rgba(231,199,155,.22) 50%, rgba(255,45,109,.12) 62%, transparent);
+  animation: sy-route-wipe 620ms var(--ease-expo) both;
+}
+
 /* Per-piece reveal as a freshly generated fit lands on the builder board. */
 @keyframes sy-piece-in {
   from { opacity: 0; transform: translateY(9px) scale(.9); }
@@ -875,3 +885,87 @@ html.sy-app-locked body {
 @keyframes sy-bar-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .sy-bar-fill { transform-origin: left center; animation: sy-bar-fill 900ms cubic-bezier(.22,.9,.28,1) both; }
 @media (prefers-reduced-motion: reduce) { .sy-bar-fill { animation: none; transform: none; } }
+
+/* ── Taste Map / style-game layer ───────────────────────────────────────────
+   This is interface motion, not decoration: map markers indicate the current
+   taste position, the CTA scan indicates action readiness, and the live dot
+   communicates that every surface is backed by the current wardrobe/catalog. */
+@keyframes sy-map-enter {
+  0% { opacity: 0; transform: translateY(-8px) scale(.985); filter: blur(5px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes sy-cta-scan {
+  0% { transform: translateX(-150%) skewX(-18deg); }
+  38%, 100% { transform: translateX(310%) skewX(-18deg); }
+}
+
+@keyframes sy-live-pulse {
+  0%, 100% { opacity: .72; box-shadow: 0 0 0 0 rgba(130,224,166,.38); }
+  50% { opacity: 1; box-shadow: 0 0 0 6px rgba(130,224,166,0); }
+}
+
+.sy-game-screen {
+  isolation: isolate;
+  perspective: 1200px;
+}
+
+.sy-game-grid {
+  background-image:
+    linear-gradient(rgba(231,199,155,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(231,199,155,.025) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 72%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 72%);
+}
+
+.sy-stage-header {
+  animation: sy-map-enter 560ms var(--ease-expo) both;
+}
+
+.sy-live-dot {
+  animation: sy-live-pulse 2.2s ease-out infinite;
+}
+
+.sy-taste-axis {
+  animation: sy-map-enter 620ms var(--ease-expo) both;
+}
+
+.sy-taste-axis-compact {
+  transform-origin: top center;
+}
+
+.sy-cta-scan {
+  position: relative;
+  isolation: isolate;
+}
+
+.sy-cta-scan::after {
+  content: '';
+  position: absolute;
+  inset-block: -40%;
+  left: -35%;
+  width: 22%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.42), transparent);
+  animation: sy-cta-scan 4.8s var(--ease-smooth) infinite;
+}
+
+.sy-game-screen [class*='rounded-card'] {
+  transform-style: preserve-3d;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sy-game-screen [class*='rounded-card']:hover {
+    box-shadow: 0 28px 70px rgba(0,0,0,.48), 0 0 0 1px rgba(255,45,109,.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sy-stage-header,
+  .sy-taste-axis,
+  .sy-live-dot,
+  .sy-cta-scan::after {
+    animation: none !important;
+  }
+}

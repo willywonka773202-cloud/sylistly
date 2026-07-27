@@ -164,14 +164,14 @@ export default function ProfilePage() {
     : [];
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg px-5 pb-[140px] pt-[calc(env(safe-area-inset-top)+22px)]">
+    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg px-5 pb-[140px] pt-[calc(env(safe-area-inset-top)+22px)]">
       <AmbientField className="opacity-70" />
       <div className="relative z-10 sy-stagger">
       <header>
-        <p className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly profile</p>
-        <h1 className="mt-2 font-serif text-display font-semibold text-ink">You</h1>
+        <p className="text-eyebrow font-extrabold uppercase sy-sheen">Player profile</p>
+        <h1 className="mt-2 font-serif text-display font-semibold text-ink">Your taste</h1>
         <p className="mt-2 max-w-[36ch] text-[13px] leading-relaxed text-muted">
-          These settings steer every look in your scroll and builder. Stored on this device.
+          Your identity, level, vault, sizing, and budget steer every direction on the map. Stored on this device.
         </p>
       </header>
 

@@ -56,7 +56,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
     .slice(0, 5);
 
   return (
-    <main className="relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg px-4 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]">
+    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg px-4 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]">
       {/* Header */}
       <header className="flex items-center justify-between">
         <Link href="/" className="flex items-baseline gap-2">

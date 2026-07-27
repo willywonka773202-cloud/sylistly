@@ -4,10 +4,14 @@ import { useState } from 'react';
 import { ArrowRight, Copy, ExternalLink } from 'lucide-react';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { ProductImage } from '@/components/ProductImage';
 import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
+import { CLIENT_CATALOG_PRODUCTS } from '@/lib/client-catalog';
 import { buildRetailerGroups, formatCheckoutPrice, isExactProductUrl, openCheckoutUrls } from '@/lib/checkout';
 import { useCheckout } from '@/store/checkout';
+
+const PRODUCT_BY_ID = new Map(CLIENT_CATALOG_PRODUCTS.map((product) => [product.id, product]));
 
 export default function CheckoutPage() {
   const products = useCheckout((state) => state.products);
@@ -55,10 +59,10 @@ export default function CheckoutPage() {
 
   return (
     <PlaceholderScreen
-      eyebrow="Checkout"
+      eyebrow="Live loadout"
       title="Shop the"
-      accent="look"
-      description="Shop every piece in one place — each link opens its real product page at the retailer."
+      accent="real pieces"
+      description="The clothes in your fit, cleanly grouped by retailer — every available link opens the real product page."
     >
       {linkedProducts.length ? (
         <div className="grid gap-3">
@@ -118,13 +122,23 @@ export default function CheckoutPage() {
                 {group.products.map((product) => {
                   const exact = isExactProductUrl(product.url);
                   return (
-                    <div key={product.id} className="rounded-2xl border border-hairline bg-surface-2 p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
+                    <div key={product.id} className="sy-card group rounded-2xl border border-hairline bg-surface-2 p-3">
+                      <div className="flex items-start gap-3">
+                        {PRODUCT_BY_ID.get(product.id) ? (
+                          <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#fff,#eee6dc)] p-1.5">
+                            <ProductImage
+                              product={PRODUCT_BY_ID.get(product.id)!}
+                              transparentOnly
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </span>
+                        ) : null}
+                        <div className="min-w-0 flex-1">
                           <div className="text-[10px] uppercase tracking-[.14em] text-muted-2">{product.brand}</div>
                           <div className="mt-1 text-[13px] leading-tight text-ink">{product.name}</div>
                         </div>
-                        <div className="rounded-full bg-surface-3 px-2.5 py-1 text-[12px] font-semibold text-ink">
+                        <div className="shrink-0 rounded-full bg-surface-3 px-2.5 py-1 text-[12px] font-semibold text-ink">
                           {formatCheckoutPrice(product.priceCents)}
                         </div>
                       </div>

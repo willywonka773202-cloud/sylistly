@@ -230,10 +230,10 @@ export default function SavedPage() {
 
   return (
     <PlaceholderScreen
-      eyebrow="Saved"
-      title="Fits"
-      accent="saved"
-      description="Saved looks live on this device — remix any fit in the builder, shop every piece, or save the pieces you love."
+      eyebrow="Collection vault"
+      title="Your style"
+      accent="inventory"
+      description="Every saved fit and real piece in one place — equip a look in Remix, inspect the clothes, or shop the exact items."
     >
       {confirmation ? (
         <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">

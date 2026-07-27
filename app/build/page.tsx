@@ -1227,7 +1227,7 @@ function BuilderPageContent({
   };
   return (
     <main
-      className="relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
+      className="sy-game-screen relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
     >
       <header className="sy-fade-up relative flex items-center justify-between px-4 pb-2.5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))]">
         <h1 className="sr-only">Remix your outfit</h1>

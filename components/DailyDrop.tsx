@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Gift, RotateCcw, Sparkles } from 'lucide-react';
+import { Flame, Gift, RotateCcw, Sparkles } from 'lucide-react';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { ProductImage } from '@/components/ProductImage';
 import { WornFlatlay } from '@/components/WornFlatlay';
@@ -390,8 +390,8 @@ export function DailyDrop({
           </HapticTap>
 
           {daily && streak > 0 ? (
-            <p className="mt-8 text-[12px] font-semibold text-muted">
-              🔥 <span className="text-ink">{streak}-day</span> streak going
+            <p className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted">
+              <Flame size={14} className="text-accent" /> <span className="text-ink">{streak}-day</span> streak going
             </p>
           ) : null}
         </div>
@@ -449,7 +449,7 @@ export function DailyDrop({
             className="sy-pop-in inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[.24em]"
             style={{ borderColor: hue, color: hue, background: 'rgba(13,13,15,.55)', boxShadow: `0 0 18px ${hue}55` }}
           >
-            {winner.rarity.level >= 3 ? '🔥 ' : ''}
+            {winner.rarity.level >= 3 ? <Flame size={11} /> : null}
             {winner.rarity.label}
           </span>
 
@@ -499,8 +499,8 @@ export function DailyDrop({
           )}
 
           {daily ? (
-            <p className="mt-4 text-[13px] font-semibold text-ink sy-fade-up">
-              🔥 <span className="text-accent">{streak}-day</span> streak
+            <p className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink sy-fade-up">
+              <Flame size={14} className="text-accent" /> <span className="text-accent">{streak}-day</span> streak
               {streak > 1 ? ' — keep it alive tomorrow' : ' — back tomorrow for day 2'}
             </p>
           ) : (

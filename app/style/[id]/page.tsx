@@ -39,7 +39,7 @@ export default async function StyleIdentityPage({ params }: { params: Promise<{ 
   const sampleLook = getLibraryLook(identity.vibes[0], 'androgynous', { seed });
 
   return (
-    <main className="relative mx-auto flex min-h-[100dvh] max-w-[480px] flex-col bg-bg px-6 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+28px)]">
+    <main className="sy-game-screen relative mx-auto flex min-h-[100dvh] max-w-[480px] flex-col bg-bg px-6 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+28px)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_60%_at_50%_-8%,rgba(255,45,109,.2),transparent_46%)]" />
       <div className="relative flex flex-1 flex-col">
         <Link href="/" className="flex items-baseline gap-2">
