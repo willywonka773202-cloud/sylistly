@@ -343,29 +343,33 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // iOS one-swipe-per-card fix. The dynamic Safari toolbar makes `100dvh`
-  // sections taller than the visible area on first load, so a swipe first
-  // collapses the toolbar instead of advancing — the "two swipes per card"
-  // bug. We (a) lock the document so the toolbar stops resizing mid-scroll,
-  // and (b) size the shell to the *measured* visible height so each slide
-  // exactly fills the screen and snaps cleanly.
+  // iOS one-card-per-swipe lock. Two things break snap on Safari: the toolbar
+  // resizes the viewport mid-gesture, and `dvh` tracks that resize — so the
+  // slide height (and every snap point with it) moves while the thumb is down
+  // and the card drifts instead of locking. The CSS shell now uses `svh`, the
+  // STABLE small-viewport unit that ignores the toolbar, and `.sy-app-locked`
+  // pins the body with `position: fixed` so the toolbar never animates at all.
+  //
+  // We still measure once, because svh assumes the toolbar is showing and a
+  // standalone/PWA window is taller — but we deliberately do NOT listen for
+  // `resize`. Re-measuring on resize was the bug: every toolbar twitch and
+  // keyboard open rewrote the height mid-scroll. Orientation is the only change
+  // that legitimately alters the slide height.
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add('sy-app-locked');
     // Guard against a 0 reading (bfcache restore / pre-layout paint can report
     // innerHeight 0 on Safari): leaving --app-h unset falls back to the CSS
-    // 100dvh, never a collapsed 0-height feed.
+    // 100svh, never a collapsed 0-height feed.
     const setHeight = () => {
-      const h = window.innerHeight;
-      if (h > 0) root.style.setProperty('--app-h', `${h}px`);
+      const h = window.visualViewport?.height || window.innerHeight;
+      if (h > 0) root.style.setProperty('--app-h', `${Math.round(h)}px`);
     };
     setHeight();
-    window.addEventListener('resize', setHeight);
     window.addEventListener('orientationchange', setHeight);
     return () => {
       root.classList.remove('sy-app-locked');
       root.style.removeProperty('--app-h');
-      window.removeEventListener('resize', setHeight);
       window.removeEventListener('orientationchange', setHeight);
     };
   }, []);
@@ -770,7 +774,7 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
   const lockCount = Object.keys(lockedItems).length;
 
   return (
-    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100dvh)] max-w-[480px] flex-col overflow-hidden bg-bg">
+    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] flex-col overflow-hidden bg-bg">
       <h1 className="sr-only">Sylistly Taste Map — explore real clothes, remix a direction, save or shop the complete fit</h1>
       <div aria-hidden className="sy-game-grid pointer-events-none absolute inset-0 z-0 opacity-45" />
 
@@ -945,7 +949,14 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
         ref={scrollRef}
         onScroll={onScroll}
         key={vibeFilter}
-        className="sy-deck-in relative z-10 min-h-0 flex-1 snap-y snap-mandatory overflow-y-auto overscroll-contain px-4 scrollbar-hide"
+        // NO transform/filter/animation on this element. `sy-deck-in` lived here
+        // and its `fill: both` left `transform: matrix(1,…)` on the scroller
+        // permanently — Safari then renders the scrolled content through that
+        // transform while scroll math stays in layout px, so the feed never
+        // locks to a card and momentum feels detached. app/template.tsx already
+        // animates the screen in via `sy-route-enter`, one level up and outside
+        // the scroll container, so nothing is lost visually.
+        className="relative z-10 min-h-0 flex-1 snap-y snap-mandatory overflow-y-auto overscroll-contain px-4 scrollbar-hide"
       >
         {looks.map((look, lookIndex) => {
             const meta = VIBE_META.get(look.vibe);

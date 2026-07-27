@@ -835,6 +835,19 @@ html.sy-app-locked body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+/* iOS Safari does NOT honour `overflow: hidden` on the document for the
+   toolbar-collapse / rubber-band gesture — the page still moves, the toolbar
+   still animates, and the resulting viewport resize shifts the snap points
+   mid-swipe, so a card never locks in place. `position: fixed` is the only
+   lock Safari respects. Paired with `svh` sizing on the shell (a stable unit
+   that ignores the toolbar), the snap container keeps one fixed height for the
+   whole gesture. */
+html.sy-app-locked body {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  touch-action: pan-y;
+}
 
 /* Garment depth on the worn plate — stacked, warm-hued, light-from-top-left
    shadows read far more premium than one flat drop shadow (the single biggest
@@ -907,7 +920,11 @@ html.sy-app-locked body {
 
 /* Deck "deals in" when you switch vibes (keyed remount) — night UI pass */
 @keyframes sy-deck-in { from { opacity: 0; transform: scale(0.93) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-.sy-deck-in { animation: sy-deck-in 450ms cubic-bezier(.2, .85, .25, 1) both; }
+/* `backwards`, never `both`: `both` holds the end transform forever, and an
+   element left with a transform can never host a reliable scroll-snap scroller
+   in Safari. Reverting to no transform once the entrance ends keeps this safe
+   wherever it is reused. */
+.sy-deck-in { animation: sy-deck-in 450ms cubic-bezier(.2, .85, .25, 1) backwards; }
 @media (prefers-reduced-motion: reduce) { .sy-deck-in { animation: none; } }
 
 /* Progress/XP bars grow in from the left on mount (night UI pass) */
