@@ -880,6 +880,22 @@ html.sy-app-locked body {
     drop-shadow(9px 18px 30px hsl(35 26% 28% / 0.08));
 }
 
+/* iOS HIG minimum touch target is 44x44. Several round controls are drawn at
+   36px (h-9) because a 44px circle would be visually heavy in the header and on
+   the card's edge rail. This keeps the drawn size and adds an invisible, centred
+   44px hit area, so they stay reliably thumb-tappable without changing the look.
+   ponytail: a pseudo-element, not a wrapper div — no DOM churn, no layout shift. */
+.sy-tap-44 { position: relative; }
+.sy-tap-44::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 /* Dark-plate RIM LIGHT. The halos above are warm-brown, tuned back when pieces
    sat on the light greige plate. On the dark spotlight plate they do nothing:
    the catalog skews black/graphite streetwear (measured across a live feed look,

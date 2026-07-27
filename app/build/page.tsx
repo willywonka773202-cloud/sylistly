@@ -1,5 +1,6 @@
 'use client';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useAppViewportLock } from '@/lib/use-app-viewport-lock';
 import { ArrowLeftRight, Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -396,6 +397,9 @@ function BuilderPageContent({
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
+  // Full-screen route: pin it to the visible viewport so iOS Safari's toolbar
+  // can't resize the shell mid-gesture.
+  useAppViewportLock();
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
   const stylePrefs = useProfile((state) => state.profile.stylePrefs);
@@ -1227,7 +1231,7 @@ function BuilderPageContent({
   };
   return (
     <main
-      className="sy-game-screen relative mx-auto flex h-[100dvh] max-w-[480px] flex-col bg-bg"
+      className="sy-game-screen relative mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] flex-col bg-bg"
     >
       <header className="sy-fade-up relative flex items-center justify-between px-4 pb-2.5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))]">
         <h1 className="sr-only">Remix your outfit</h1>
@@ -2067,7 +2071,7 @@ function BuildOverlay({
 }) {
   const dialogRef = useDialogBehavior<HTMLElement>(onClose);
   return (
-    <div className="fixed inset-0 z-[80] mx-auto flex h-[100dvh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[80] mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
       <button
         type="button"
         aria-label="Close build panel"

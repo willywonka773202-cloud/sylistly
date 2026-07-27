@@ -147,7 +147,12 @@ const LIFTED = new Set<Category>(['top', 'shoes', 'hat', 'eyewear', 'bag', 'jewe
  */
 const PLATE: Record<'greige' | 'spotlight', string> = {
   greige: 'bg-[radial-gradient(135%_115%_at_50%_18%,#F4F0E8_0%,#ECE6DB_56%,#DED4C3_100%)]',
-  spotlight: 'bg-[radial-gradient(115%_85%_at_50%_26%,#46413b_0%,#2a2622_45%,#141211_100%)]',
+  // Neutral charcoal, not brown. The previous stops (#46413b → #2a2622) were
+  // olive-brown, so the largest surface in the app read as mud and pushed a warm
+  // cast onto every cutout. A cool-neutral seamless lets the champagne key light
+  // above do the warming, which is how a real studio sweep works — and neutral
+  // ground makes both black and cream garments separate harder.
+  spotlight: 'bg-[radial-gradient(118%_88%_at_50%_24%,#3c3c41_0%,#26262b_46%,#0f0f12_100%)]',
 };
 
 export function WornFlatlay({

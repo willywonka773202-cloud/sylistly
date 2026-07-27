@@ -31,6 +31,7 @@ import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet'
 import { ProductImage } from '@/components/ProductImage';
 import { TasteMapAxis } from '@/components/TasteMapAxis';
 import { WornFlatlay } from '@/components/WornFlatlay';
+import { useAppViewportLock } from '@/lib/use-app-viewport-lock';
 import { track } from '@/lib/analytics';
 import { fetchAiLook } from '@/lib/ai-look-client';
 import { VIBE_META, lookProducts, type ScrollLook } from '@/lib/look-helpers';
@@ -343,36 +344,8 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // iOS one-card-per-swipe lock. Two things break snap on Safari: the toolbar
-  // resizes the viewport mid-gesture, and `dvh` tracks that resize — so the
-  // slide height (and every snap point with it) moves while the thumb is down
-  // and the card drifts instead of locking. The CSS shell now uses `svh`, the
-  // STABLE small-viewport unit that ignores the toolbar, and `.sy-app-locked`
-  // pins the body with `position: fixed` so the toolbar never animates at all.
-  //
-  // We still measure once, because svh assumes the toolbar is showing and a
-  // standalone/PWA window is taller — but we deliberately do NOT listen for
-  // `resize`. Re-measuring on resize was the bug: every toolbar twitch and
-  // keyboard open rewrote the height mid-scroll. Orientation is the only change
-  // that legitimately alters the slide height.
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.add('sy-app-locked');
-    // Guard against a 0 reading (bfcache restore / pre-layout paint can report
-    // innerHeight 0 on Safari): leaving --app-h unset falls back to the CSS
-    // 100svh, never a collapsed 0-height feed.
-    const setHeight = () => {
-      const h = window.visualViewport?.height || window.innerHeight;
-      if (h > 0) root.style.setProperty('--app-h', `${Math.round(h)}px`);
-    };
-    setHeight();
-    window.addEventListener('orientationchange', setHeight);
-    return () => {
-      root.classList.remove('sy-app-locked');
-      root.style.removeProperty('--app-h');
-      window.removeEventListener('orientationchange', setHeight);
-    };
-  }, []);
+  // iOS one-card-per-swipe lock — see lib/use-app-viewport-lock.ts.
+  useAppViewportLock();
 
   // Re-roll the deck when frame, vibe filter, or slot prefs change (post-mount).
   // The opening deck already IS the androgynous/all baseline, so a fresh visitor
@@ -832,14 +805,14 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
             <Link
               href="/discover"
               aria-label="Discover complete looks"
-              className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+              className="sy-press sy-tap-44 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
             >
               <Layers size={15} />
             </Link>
             <Link
               href="/browse"
               aria-label="Browse every piece"
-              className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+              className="sy-press sy-tap-44 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
             >
               <LayoutGrid size={15} />
             </Link>
@@ -848,7 +821,7 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
               onClick={() => setTuneOpen((open) => !open)}
               aria-expanded={tuneOpen}
               aria-label="Tune what gets generated"
-              className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+              className="sy-press sy-tap-44 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
             >
               {tuneOpen ? <X size={15} /> : <SlidersHorizontal size={15} />}
             </button>
@@ -1174,10 +1147,10 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                   {/* Secondary social gestures stay available without covering
                       the garments. They appear as a compact edge utility. */}
                   <div className="absolute right-4 top-[68px] z-30 flex flex-col gap-2">
-                    <HapticTap ariaLabel="Pass — see fewer like this" onTap={() => onPass(look)} disabled={passed} className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-muted-2 backdrop-blur-md disabled:opacity-40">
+                    <HapticTap ariaLabel="Pass — see fewer like this" onTap={() => onPass(look)} disabled={passed} className="sy-press sy-tap-44 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-muted-2 backdrop-blur-md disabled:opacity-40">
                       <X size={15} />
                     </HapticTap>
-                    <HapticTap ariaLabel="Share this fit" onTap={() => onShare(look)} disabled={false} className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-ink backdrop-blur-md">
+                    <HapticTap ariaLabel="Share this fit" onTap={() => onShare(look)} disabled={false} className="sy-press sy-tap-44 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-ink backdrop-blur-md">
                       <Share size={14} />
                     </HapticTap>
                   </div>

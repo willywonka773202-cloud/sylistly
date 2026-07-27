@@ -1,6 +1,7 @@
 'use client';
 
 import { Archive, Bookmark, Check, ChevronLeft, Flame, Gift, Heart, Snowflake, Trophy, Volume2, VolumeX } from 'lucide-react';
+import { useAppViewportLock } from '@/lib/use-app-viewport-lock';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AmbientField } from '@/components/AmbientField';
@@ -94,6 +95,9 @@ function buildPool(day: number, vibeId: string | null, salt: number): { looks: D
  * honest "& save" pricing. See components/DailyDrop.tsx + [[sylistly-bundle-deals]].
  */
 export default function DropPage() {
+  // Full-screen route: pin it to the visible viewport so iOS Safari's toolbar
+  // can't resize the shell mid-gesture.
+  useAppViewportLock();
   const router = useRouter();
   const setCheckout = useCheckout((state) => state.setCheckout);
   const [muted, setMutedState] = useState(false);
@@ -191,7 +195,7 @@ export default function DropPage() {
   const rewardCrate = crates.find((c) => c.id === 'reward');
 
   return (
-    <main className="sy-game-screen relative mx-auto flex h-[100dvh] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
+    <main className="sy-game-screen relative mx-auto flex h-[var(--app-h,100svh)] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
       <h1 className="sr-only">The Drop — your free daily outfit crate</h1>
       <AmbientField />
       <div aria-hidden className="sy-grain pointer-events-none absolute inset-0 opacity-[.05] mix-blend-overlay" />
