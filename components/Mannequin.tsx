@@ -181,8 +181,14 @@ function FrontCanvas({
     };
     const selectedClassName = locked
       ? 'border-accent shadow-[0_0_0_1px_rgba(255,45,109,.74),0_0_30px_rgba(255,45,109,.36),0_14px_28px_rgba(40,18,22,.14)]'
-      : selected
+      : selected && product
       ? 'border-accent shadow-[0_0_0_1px_rgba(255,45,109,.58),0_0_26px_rgba(255,45,109,.32),0_14px_28px_rgba(40,18,22,.14)]'
+      : selected
+      // Every EMPTY slot starts selected-for-generation, so painting that state
+      // accent turned the opening board into a wall of pink shouting the
+      // default back at you. Champagne states it just as clearly and keeps
+      // pink meaning "you chose this" — a filled selection, a lock, the CTA.
+      ? 'border-champagne/65 shadow-[0_0_0_1px_rgba(231,199,155,.34)]'
       : product
       // Filled pieces float borderless on the board so the outfit reads as one
       // cohesive flat lay; empty/editable slots keep only a faint outline.
@@ -193,7 +199,13 @@ function FrontCanvas({
       : 'bg-[linear-gradient(180deg,#fffefa_0%,#f6eee7_100%)]';
     const wrapperClassName = `relative h-full w-full overflow-visible rounded-[20px] border-2 p-1.5 transition ${filledSlotClassName} ${selectedClassName} ${interactive ? 'cursor-pointer hover:border-accent/80 hover:shadow-[0_0_0_1px_rgba(255,45,109,.42),0_0_24px_rgba(255,45,109,.22),0_14px_28px_rgba(40,18,22,.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.985]' : ''} ${activeEditSlot === category ? 'animate-pulse' : ''} ${highlightCategory === category ? 'ring-1 ring-accent/45' : ''}`;
     const selectionBadge = selected ? (
-      <span className="absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-accent text-white shadow-[0_6px_16px_rgba(255,45,109,.42)]">
+      <span
+        className={`absolute right-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full ${
+          locked || product
+            ? 'bg-accent text-white shadow-[0_6px_16px_rgba(255,45,109,.42)]'
+            : 'bg-champagne/90 text-[#2a2118] shadow-[0_4px_12px_rgba(231,199,155,.3)]'
+        }`}
+      >
         {locked ? <Lock size={12} strokeWidth={3} /> : <Check size={13} strokeWidth={3} />}
       </span>
     ) : null;
@@ -209,11 +221,11 @@ function FrontCanvas({
           aria-label={onOpenSlot ? `Edit ${CATEGORY_LABELS[category]}` : `${generationSelected ? 'Exclude' : 'Include'} ${CATEGORY_LABELS[category]} in next generation`}
         >
           {selectionBadge}
-          <span className={`max-w-full shrink-0 truncate leading-none text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-accent' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
+          <span className={`max-w-full shrink-0 truncate leading-none text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-[#8a7355]' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
           {rawProduct && !hasTransparentProductImage(rawProduct) ? (
             <span className="mt-1 text-[7px] font-bold uppercase tracking-[.12em] text-[#c4aa9a]">Cutout queued</span>
           ) : null}
-          <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-accent' : 'text-[#d0bfb3]'}`}>+</span>
+          <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-[#a08b6a]' : 'text-[#d0bfb3]'}`}>+</span>
         </button>
       );
     }
