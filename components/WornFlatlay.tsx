@@ -16,15 +16,20 @@ import type { Category, Product } from '@/lib/types';
  * stagger when the card is active.
  */
 
-interface Zone {
+interface CollageItem {
+  category: Category;
+  z: number;
+  rot: number;
+}
+
+interface CollageColumn {
   /** left edge, % of plate width */
   left: number;
   /** top edge, % of plate height */
   top: number;
-  w: number;
-  h: number;
-  z: number;
-  rot: number;
+  width: number;
+  height: number;
+  items: CollageItem[];
 }
 
 /** The order a person gets dressed — drives the entrance stagger. */
@@ -49,8 +54,35 @@ const COLLAGE_WEIGHT: Record<Category, number> = {
   eyewear: 0.52,
   jewelry: 0.54,
 };
+
+/**
+ * Roughly how wide each category's cutout is relative to its height. Cells are
+ * sized from THIS rather than from a flat share of the column, because a cell
+ * whose shape does not match its garment's shape wastes the difference as empty
+ * plate: `object-contain` centres the piece and leaves the slack as a gap. A
+ * column of tall trousers and wide sneakers split evenly left the feed's clothes
+ * on 34% of the screen with holes between them.
+ *
+ * ponytail: a static per-category table, not a per-image measurement. Cutouts
+ * within a category are consistent enough, and measuring naturalWidth would mean
+ * loading state and a reflow on every card. If one category ever reads wrong,
+ * tune its number here.
+ */
+const COLLAGE_ASPECT: Record<Category, number> = {
+  top: 1.0,
+  bottom: 0.62,
+  outer: 1.0,
+  bag: 0.84,
+  shoes: 1.45,
+  hat: 1.3,
+  eyewear: 2.5,
+  jewelry: 1.7,
+};
 // Hero garments placed first so the two columns balance around them.
 const COLLAGE_ORDER: Category[] = ['top', 'bottom', 'outer', 'bag', 'shoes', 'hat', 'eyewear', 'jewelry'];
+
+/** A piece's height at unit column width — its natural shape, not a flat share. */
+const naturalHeight = (category: Category): number => 1 / COLLAGE_ASPECT[category];
 
 function computeCollage(
   present: Set<Category>,
@@ -59,52 +91,48 @@ function computeCollage(
    *  above it so the whole outfit stays VISIBLE instead of hiding behind the
    *  caption. 0 = use the full height (Discover/Saved label outside the plate). */
   bottomReserve = 0,
-): Partial<Record<Category, Zone>> {
+): CollageColumn[] {
   const ordered = COLLAGE_ORDER.filter((category) => present.has(category));
   // 4+ pieces → two brick-staggered columns (a packed moodboard). 3 or fewer →
   // a single centred column (a clean stacked trio reads better than a lopsided
-  // 1-vs-2 split). Greedy balance drops each next-biggest piece into the shorter column.
+  // 1-vs-2 split). Balance by NATURAL HEIGHT so the two columns end up the same
+  // length — balancing by weight put both tall trousers in one column and left
+  // the other short, which is where the plate's empty half came from.
   const twoCols = ordered.length >= 4;
   const columns: Category[][] = [[], []];
   if (twoCols) {
-    const weights = [0, 0];
+    const heights = [0, 0];
     for (const category of ordered) {
-      const target = weights[0] <= weights[1] ? 0 : 1;
+      const target = heights[0] <= heights[1] ? 0 : 1;
       columns[target].push(category);
-      weights[target] += COLLAGE_WEIGHT[category];
+      heights[target] += naturalHeight(category);
     }
   } else {
     columns[0] = ordered;
   }
+
   const TOP = 2;
-  const BOTTOM = 98 - Math.max(0, Math.min(60, bottomReserve));
-  const GAP = 1.6;
-  const colWidth = twoCols ? 48 : 76;
-  const colLeft = twoCols ? [2, 50] : [12, 12];
-  const colStagger = twoCols ? [0, 7] : [0, 0];
-  const layout: Partial<Record<Category, Zone>> = {};
-  columns.forEach((column, ci) => {
-    if (!column.length) return;
-    const sum = column.reduce((acc, category) => acc + COLLAGE_WEIGHT[category], 0) || 1;
-    const start = TOP + colStagger[ci];
-    const usable = BOTTOM - start - GAP * Math.max(0, column.length - 1);
-    let cursor = start;
-    column.forEach((category, ri) => {
-      const h = (COLLAGE_WEIGHT[category] / sum) * usable;
-      const swing = (ri + ci) % 2 === 0 ? -1 : 1;
-      layout[category] = {
-        left: colLeft[ci] + swing * 1.5,
-        top: cursor,
-        w: colWidth,
-        h,
-        // small accessories ride above larger garments where they brush past
-        z: 12 + (COLLAGE_WEIGHT[category] < 0.8 ? 20 : 0) + ri,
-        rot: swing * 4,
-      };
-      cursor += h + GAP;
-    });
-  });
-  return layout;
+  const height = 96 - Math.max(0, Math.min(60, bottomReserve));
+  const colWidth = twoCols ? 49 : 74;
+  const colLeft = twoCols ? [1, 50] : [13, 13];
+  const colStagger = twoCols ? [0, 5] : [0, 0];
+
+  return columns
+    .filter((column) => column.length > 0)
+    .map((column, ci) => ({
+      left: colLeft[ci],
+      width: colWidth,
+      top: TOP + colStagger[ci],
+      height,
+      items: column.map((category, ri) => {
+        const swing = (ri + ci) % 2 === 0 ? -1 : 1;
+        return {
+          category,
+          z: 12 + (COLLAGE_WEIGHT[category] < 0.8 ? 20 : 0) + ri,
+          rot: swing * 3.2,
+        };
+      }),
+    }));
 }
 
 /** Pieces that sit ON TOP of others get the deeper, softer shadow tier. */
@@ -158,7 +186,7 @@ export function WornFlatlay({
   const staggered = DRESS_ORDER.map((category) => byCategory.get(category)).filter(
     (product): product is Product => Boolean(product),
   );
-  const layout = computeCollage(new Set(byCategory.keys()), bottomReserve);
+  const columns = computeCollage(new Set(byCategory.keys()), bottomReserve);
 
   return (
     <div
@@ -181,9 +209,31 @@ export function WornFlatlay({
       {depth ? <span aria-hidden className="sy-plate-sheen pointer-events-none absolute inset-0 z-[55]" /> : null}
       <div className={depth ? 'sy-vitrine-tilt absolute inset-0' : 'contents'}>
       <div className={depth ? 'sy-plate-breath sy-vitrine absolute inset-0' : 'contents'}>
-      {staggered.map((product, index) => {
-        const zone = layout[product.category];
-        if (!zone) return null;
+      {columns.map((column, ci) => (
+        <div
+          key={`col-${ci}`}
+          className="absolute flex flex-col items-center justify-center gap-[1.5%]"
+          style={{
+            left: `${column.left}%`,
+            top: `${column.top}%`,
+            width: `${column.width}%`,
+            height: `${column.height}%`,
+          }}
+        >
+          {column.items.map((item) => {
+            const product = byCategory.get(item.category);
+            if (!product) return null;
+            const index = staggered.indexOf(product);
+            return renderPiece(product, item, index);
+          })}
+        </div>
+      ))}
+      </div>
+      </div>
+    </div>
+  );
+
+  function renderPiece(product: Product, item: CollageItem, index: number) {
         const image = (
           <ProductImage
             product={product}
@@ -191,7 +241,11 @@ export function WornFlatlay({
             loading={loading}
             wrapperClassName="h-full w-full"
             className={`h-full w-full object-contain ${
-              LIFTED.has(product.category) ? 'sy-piece-shadow-lifted' : 'sy-piece-shadow'
+              // The dark spotlight plate needs a LIGHT rim to separate dark
+              // garments from it; the light greige plate needs the warm shadow.
+              plate === 'spotlight'
+                ? LIFTED.has(product.category) ? 'sy-piece-rim-lifted' : 'sy-piece-rim'
+                : LIFTED.has(product.category) ? 'sy-piece-shadow-lifted' : 'sy-piece-shadow'
             }`}
           />
         );
@@ -199,7 +253,7 @@ export function WornFlatlay({
         // each on its own period with a negative delay so the plate is mid-
         // motion on arrival and no two pieces ever bob in sync.
         const drift = {
-          '--drift-amp': `${(2.2 + Math.min(zone.z, 33) * 0.11).toFixed(1)}px`,
+          '--drift-amp': `${(2.2 + Math.min(item.z, 33) * 0.11).toFixed(1)}px`,
           '--drift-x': `${(index % 2 === 0 ? 1 : -1) * (1 + (index % 3) * 0.6)}px`,
           '--drift-rot': `${(0.45 + (index % 3) * 0.35).toFixed(2)}deg`,
           '--drift-dur': `${(5.6 + ((index * 1.7) % 3.4)).toFixed(1)}s`,
@@ -208,14 +262,18 @@ export function WornFlatlay({
         return (
           <div
             key={product.id}
-            className="absolute"
+            className="min-h-0 shrink"
             style={{
-              left: `${zone.left}%`,
-              top: `${zone.top}%`,
-              width: `${zone.w}%`,
-              height: `${zone.h}%`,
-              zIndex: zone.z,
-              transform: `rotate(${zone.rot}deg)${depth ? ` translateZ(${Math.max(-45, Math.min(55, (zone.z - 16) * 3.2))}px)` : ''}`,
+              // The cell is the full column width — the largest a piece can be —
+              // and takes its HEIGHT from that width via the garment's own
+              // aspect, so the box is the shape of the piece and `object-contain`
+              // has no slack left to turn into empty plate. Sizing by a share of
+              // the column height instead stretches cells past the garment, and
+              // the resulting gaps are what left the clothes scattered.
+              width: '100%',
+              aspectRatio: `${COLLAGE_ASPECT[item.category]}`,
+              zIndex: item.z,
+              transform: `rotate(${item.rot}deg)${depth ? ` translateZ(${Math.max(-45, Math.min(55, (item.z - 16) * 3.2))}px)` : ''}`,
             }}
           >
             <div
@@ -243,9 +301,5 @@ export function WornFlatlay({
             </div>
           </div>
         );
-      })}
-      </div>
-      </div>
-    </div>
-  );
+  }
 }

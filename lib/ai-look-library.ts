@@ -6,7 +6,7 @@
  */
 import aiData from '@/data/ai-look-library.json';
 import { CLIENT_CATALOG_PRODUCTS } from '@/lib/client-catalog';
-import { isEditorialCutoutProduct } from '@/lib/product-image-quality';
+import { hasExactProductLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorFrame, VibeId } from '@/lib/vibes';
 
@@ -43,6 +43,17 @@ function hydrate(record: BakedLookRecord): AiLook | null {
   }
   const count = Object.keys(products).length;
   if (count < 4 || !products.top || !products.bottom || !products.shoes) return null;
+  // Shoppability bar — the same one generation now holds itself to. These looks
+  // wear the "Styled by Syli" badge, so they are the most premium thing in the
+  // feed; a look whose pieces mostly link to a google-shopping search instead of
+  // a product page is the worst possible thing to put that badge on. Of 197
+  // baked looks only 40 clear this, because the library was baked before the
+  // catalog's dead links were swept. Callers fall back to the engine, which is
+  // now 84% exact-link, so the shortfall costs coverage, not quality.
+  // ponytail: filter, don't re-bake — re-baking spends API budget and is the
+  // owner's call. Re-run scripts/bake-ai-looks.mjs to refill the library.
+  const exact = Object.values(products).filter((product) => hasExactProductLink(product)).length;
+  if (exact * 2 < count) return null;
   return {
     id: record.id,
     vibe: record.vibe as VibeId,

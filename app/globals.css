@@ -847,18 +847,47 @@ html.sy-app-locked body {
 /* The horizontal shadow offsets read --sy-drag so the light appears to rake
    across the plate as you swipe (the var defaults to 0 in :root → fully static
    everywhere it isn't set, e.g. the Drop reel/reveal and under reduced motion). */
+/* The edge halo is TIGHT and dark enough to draw a real contour: cream and white
+   pieces (gym/clean fill a card with them) were dissolving into the greige plate
+   at Discover's card size, which read as an empty card. Two stops — a 1px
+   contour that always separates, then a soft bloom for depth. */
 .sy-piece-shadow {
   filter:
-    drop-shadow(0 0 2.5px hsl(34 24% 34% / 0.24))
-    drop-shadow(calc(1px + var(--sy-drag, 0) * 4px) 2px 3px hsl(35 28% 30% / 0.20))
-    drop-shadow(calc(2px + var(--sy-drag, 0) * 6px) 6px 9px hsl(35 28% 30% / 0.13));
+    drop-shadow(0 0 1px hsl(32 30% 24% / 0.5))
+    drop-shadow(0 0 5px hsl(34 26% 30% / 0.22))
+    drop-shadow(calc(1px + var(--sy-drag, 0) * 4px) 2px 3px hsl(35 28% 30% / 0.22))
+    drop-shadow(calc(2px + var(--sy-drag, 0) * 6px) 6px 9px hsl(35 28% 30% / 0.14));
 }
 .sy-piece-shadow-lifted {
   filter:
-    drop-shadow(0 0 2.5px hsl(34 24% 34% / 0.26))
-    drop-shadow(calc(2px + var(--sy-drag, 0) * 6px) calc(4px - var(--sy-drag, 0) * 4px) 7px hsl(35 28% 30% / 0.18))
-    drop-shadow(calc(4px + var(--sy-drag, 0) * 10px) 10px 16px hsl(35 26% 28% / 0.11))
-    drop-shadow(9px 18px 30px hsl(35 26% 28% / 0.07));
+    drop-shadow(0 0 1px hsl(32 30% 24% / 0.52))
+    drop-shadow(0 0 7px hsl(34 26% 30% / 0.24))
+    drop-shadow(calc(2px + var(--sy-drag, 0) * 6px) calc(4px - var(--sy-drag, 0) * 4px) 7px hsl(35 28% 30% / 0.2))
+    drop-shadow(calc(4px + var(--sy-drag, 0) * 10px) 10px 16px hsl(35 26% 28% / 0.12))
+    drop-shadow(9px 18px 30px hsl(35 26% 28% / 0.08));
+}
+
+/* Dark-plate RIM LIGHT. The halos above are warm-brown, tuned back when pieces
+   sat on the light greige plate. On the dark spotlight plate they do nothing:
+   the catalog skews black/graphite streetwear (measured across a live feed look,
+   3 of 4 cutouts had a mean luminance of ~37/255) and the plate's vignette
+   bottoms out at about the same value — so an unlit dark garment is genuinely
+   invisible, which is what made the outfit plate read as empty.
+   A drop-shadow follows the cutout's ALPHA, so a light one is a true rim light
+   around the real silhouette rather than a box glow behind it. */
+.sy-piece-rim {
+  filter:
+    drop-shadow(0 0 1px hsl(38 58% 90% / 0.5))
+    drop-shadow(0 0 8px hsl(36 44% 76% / 0.2))
+    drop-shadow(calc(1px + var(--sy-drag, 0) * 4px) 3px 7px hsl(0 0% 0% / 0.55))
+    drop-shadow(0 9px 18px hsl(0 0% 0% / 0.38));
+}
+.sy-piece-rim-lifted {
+  filter:
+    drop-shadow(0 0 1.25px hsl(38 58% 92% / 0.58))
+    drop-shadow(0 0 12px hsl(36 46% 78% / 0.26))
+    drop-shadow(calc(2px + var(--sy-drag, 0) * 6px) calc(5px - var(--sy-drag, 0) * 4px) 10px hsl(0 0% 0% / 0.55))
+    drop-shadow(0 16px 30px hsl(0 0% 0% / 0.42));
 }
 
 /* Story-rail active ring — slow champagne/pink spin (night UI pass) */

@@ -1006,43 +1006,25 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                         : undefined
                     }
                   >
-                    <div className="absolute inset-x-0 bottom-0 top-[104px]">
+                    <div className="absolute inset-x-0 bottom-0 top-[58px]">
                       <WornFlatlay
                         items={products}
                         loading="lazy"
                         plate="spotlight"
                         depth
-                        bottomReserve={38}
+                        bottomReserve={33}
                         className="h-full w-full"
                         onPieceClick={(product) => setPeek({ look, product })}
                       />
                     </div>
 
-                    {/* Badges — top-left */}
-                    <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
-                      {look.source === 'syli' ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow">
-                          <Sparkles size={11} />
-                          Styled by Syli
-                        </span>
-                      ) : null}
-                      {rarity.level >= 1 ? (
-                        <span
-                          className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.14em] backdrop-blur-md"
-                          style={{
-                            borderColor: rarity.hue,
-                            color: rarity.hue,
-                            background: 'rgba(13,13,15,.55)',
-                            boxShadow: `0 0 14px ${rarity.hue}66`,
-                          }}
-                        >
-                          {rarity.tier === 'heat' ? '🔥 ' : ''}
-                          {rarity.label}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div className="absolute inset-x-3 top-12 z-20 rounded-2xl border border-white/10 bg-[rgba(9,8,10,.58)] px-3 py-2 backdrop-blur-xl">
+                    {/* Taste axis is the ONLY chrome over the plate. The look's
+                        badges moved down into the caption, where the rest of the
+                        metadata already lives — stacking three bands of chrome
+                        above the garments cost 104px of an 844px screen and left
+                        the clothes, which are the actual product, on a third of
+                        it. */}
+                    <div className="absolute inset-x-3 top-2 z-20 rounded-2xl border border-white/10 bg-[rgba(9,8,10,.58)] px-3 py-1.5 backdrop-blur-xl">
                       <TasteMapAxis
                         position={TASTE_POSITION[look.vibe]}
                         leftProduct={leftProducts[0]}
@@ -1052,16 +1034,41 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                       />
                     </div>
 
-                    {/* Frosted-glass caption — lifted above the floating bottom nav (full-bleed card) */}
+                    {/* Caption sits on a scrim, NOT on a glass slab. A blurred
+                        panel over the plate walled the garments off behind a
+                        second surface; a deep gradient carries the type just as
+                        legibly and lets the outfit run full-bleed underneath, so
+                        the clothes reach the bottom of the screen. */}
                     <div
                       aria-hidden
-                      className="pointer-events-none absolute inset-x-0 bottom-0 h-[280px] bg-[linear-gradient(180deg,transparent,rgba(13,13,15,.72)_92%)]"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-[340px] bg-[linear-gradient(180deg,transparent_0%,rgba(13,13,15,.5)_34%,rgba(13,13,15,.86)_68%,rgba(11,11,13,.97)_100%)]"
                     />
-                    <div className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+88px)] z-10 rounded-[22px] bg-[rgba(9,8,10,.68)] p-4 ring-1 ring-white/10 backdrop-blur-2xl">
+                    <div className="absolute inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-10">
+                      {look.source === 'syli' || rarity.level >= 1 ? (
+                        <div className="pointer-events-none mb-2 flex flex-wrap items-center gap-1.5">
+                          {look.source === 'syli' ? (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-champagne/40 bg-champagne-soft px-2 py-[3px] text-[9px] font-extrabold uppercase tracking-[.16em] text-champagne">
+                              <Sparkles size={10} />
+                              Styled by Syli
+                            </span>
+                          ) : null}
+                          {rarity.level >= 1 ? (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full border px-2 py-[3px] text-[9px] font-extrabold uppercase tracking-[.16em]"
+                              style={{
+                                borderColor: `${rarity.hue}66`,
+                                color: rarity.hue,
+                                background: 'rgba(13,13,15,.45)',
+                              }}
+                            >
+                              {rarity.label}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[9px] font-extrabold uppercase tracking-[.2em] text-accent">Why this fits your taste</p>
-                          <div className="mt-1.5 flex items-baseline gap-2.5">
+                          <div className="flex items-baseline gap-2.5">
                         <h2 className="font-serif text-[30px] font-semibold italic leading-[.95] text-ink">
                           {meta?.label || 'The look'}
                         </h2>
@@ -1101,7 +1108,7 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
                           className="sy-press sy-cta-scan inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white shadow-pink-glow"
                         >
                           <WandSparkles size={15} />
-                          Remix this direction
+                          Remix this
                           <ArrowRight size={14} />
                         </button>
                         <div className="flex items-center gap-1.5">
@@ -1155,7 +1162,7 @@ export function Feed({ initialLooks, initialCursor, initialVibeThumbs }: FeedPro
 
                   {/* Secondary social gestures stay available without covering
                       the garments. They appear as a compact edge utility. */}
-                  <div className="absolute right-4 top-[156px] z-30 flex flex-col gap-2">
+                  <div className="absolute right-4 top-[68px] z-30 flex flex-col gap-2">
                     <HapticTap ariaLabel="Pass — see fewer like this" onTap={() => onPass(look)} disabled={passed} className="sy-press grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-[rgba(13,13,15,.58)] text-muted-2 backdrop-blur-md disabled:opacity-40">
                       <X size={15} />
                     </HapticTap>
