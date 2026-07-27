@@ -28,14 +28,15 @@
     "smoke:routes": "jiti scripts/check-route-smoke.ts",
     "test:units": "jiti scripts/check-lib-units.ts",
     "test:budget": "node scripts/check-budget-cap.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test:units && npm run test:budget && npm run smoke:routes",
+    "verify": "npm run typecheck && npm run lint && npm run test:units && npm run test:budget && npm run test:shoppability && npm run smoke:routes",
     "library:generate": "node scripts/generate-outfit-library.mjs",
     "auto:expand": "node scripts/auto-expand.mjs",
     "auto:ship": "node scripts/auto-expand-ship.mjs",
     "bake:ai": "node scripts/bake-ai-looks.mjs",
     "bake:ship": "node scripts/bake-ai-ship.mjs",
     "test:frame": "node scripts/test-frame-constraint.mjs",
-    "health:sweep": "node scripts/check-link-health.mjs"
+    "health:sweep": "node scripts/check-link-health.mjs",
+    "test:shoppability": "node scripts/check-shoppability.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

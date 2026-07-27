@@ -615,6 +615,10 @@ function rankedCategoryProducts(category: Category, options: Parameters<typeof s
   return cleanRanked.length >= 3 ? cleanRanked : ranked;
 }
 
+/** How many exact-PDP candidates a slot needs before generation restricts itself
+ *  to them. Below this the pool is too shallow to vary and we take the full set. */
+const EXACT_LINK_POOL_FLOOR = 3;
+
 function pickProduct(category: Category, options: Parameters<typeof scoreProduct>[1]): Product | undefined {
   // Pick from a SEEDED weighted band of the top-ranked candidates — NOT just #1.
   // Taking the single best-scored item every time meant generation recycled the
@@ -639,10 +643,24 @@ function pickProduct(category: Category, options: Parameters<typeof scoreProduct
     const usable = (brandDiverse.length ? brandDiverse : ranked).filter((entry) => entry.score > 0);
     if (!usable.length) return ranked[0]?.product;
 
+    // Shoppability gate. A piece without an exact retailer product page links to
+    // a google-shopping search: it earns $0 affiliate AND drops the user on a
+    // search results page instead of the item. Only ~35% of the catalog has an
+    // exact link, so scoreProduct's +14 tie-breaker was drowned out by the
+    // weighted band pick below (a nudge cannot beat a 45-wide random draw) —
+    // feeds shipped looks where 6 of 7 pieces were unbuyable, some 0 of 7.
+    // Restricting the pool preserves score order (quality still leads) and only
+    // falls back to the full pool when the exact subset is too thin to keep
+    // variety, which is the one case a bonus could never have fixed anyway.
+    // ponytail: a flat depth floor, not a per-category one — revisit only if a
+    // category shows visible repetition in the feed.
+    const shoppable = usable.filter((entry) => hasExactProductLink(entry.product));
+    const pool = shoppable.length >= EXACT_LINK_POOL_FLOOR ? shoppable : usable;
+
     // Wide band + gentle power-law decay: #1 stays most likely (quality leads),
     // but ranks 20–45 get a real, fat-tailed shot so the deep pool actually gets
     // used (≈60 of 94 reached over a session, not ~17).
-    const band = usable.slice(0, Math.min(45, usable.length));
+    const band = pool.slice(0, Math.min(45, pool.length));
     const weights = band.map((_, index) => 1 / Math.pow(index + 1, 0.62));
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
     let roll = ((stableHash(`${category}:${options.seed ?? 0}:pick`) % 100_000) / 100_000) * totalWeight;

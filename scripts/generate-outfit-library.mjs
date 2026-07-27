@@ -20,8 +20,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
 const catalog = JSON.parse(readFileSync(join(ROOT, 'data/client-catalog.json'), 'utf8'));
+// Same dead/sold-out gate lib/client-catalog.ts applies at runtime. Without it we
+// bake looks around products the retailer no longer sells, and the runtime gate
+// then strips them back out — leaving stub looks with too few pieces to hydrate.
+const UNAVAILABLE = new Set(
+  JSON.parse(readFileSync(join(ROOT, 'data/catalog-health.json'), 'utf8')).unavailable,
+);
 const PRODUCTS = (Array.isArray(catalog) ? catalog : catalog.products || Object.values(catalog)[0]).filter(
-  (p) => p && p.imageTransparentUrl && p.category,
+  (p) => p && p.imageTransparentUrl && p.category && !UNAVAILABLE.has(p.id),
 );
 
 // ── Shoppability (mirrors lib/product-image-quality hasExactProductLink) ──
