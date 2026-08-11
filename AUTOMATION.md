@@ -186,7 +186,10 @@ with `release=true`, follows this release path:
 Failed and candidate-only runs still preserve their evidence artifact, but the
 commit and deploy steps are unreachable. `SEARCHAPI_KEY` enables discovery;
 `VERCEL_TOKEN` enables the final CLI deployment after a verified release. No
-workflow, push, or deployment was executed as part of the local implementation.
+scheduled workflow was dispatched as part of the implementation. After the same
+verify/build/performance gates passed locally, commit `8922ed5` was pushed and
+manually deployed to the production `www.sylistly.com` alias with explicit user
+authorization.
 
 The repository does not currently contain a CI-safe cutout provider credential
 or configured live worker. New discoveries without an already reviewed transparent

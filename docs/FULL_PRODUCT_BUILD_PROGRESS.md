@@ -84,7 +84,7 @@ The remaining work cannot be represented as complete without external systems, c
 3. **Size inventory:** no retailer-level size/variant inventory feeds were supplied, so Sylistly cannot yet promise availability in a user's specific size.
 4. **Affiliate and analytics proof:** outbound attribution and analytics instrumentation are implemented, but active affiliate identifiers, a live redirect/conversion, revenue attribution, and a production PostHog dashboard have not been verified.
 5. **Legal review:** privacy, terms, and affiliate-disclosure surfaces exist, but launch language and data practices still require qualified counsel review.
-6. **Release authority:** no push, merge, Vercel deployment, workflow dispatch, or production database mutation was authorized or performed.
+6. **Remaining release operations:** commit `8922ed5` is pushed and Vercel production deployment `dpl_2KxDJfuCafvraNmvYjZg9bDA6EPW` is live at `www.sylistly.com`. PR #16 remains a draft against `main`; no scheduled workflow dispatch or production database migration was performed.
 
 ## Honest launch position
 

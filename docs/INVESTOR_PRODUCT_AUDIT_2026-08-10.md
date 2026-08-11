@@ -12,7 +12,7 @@ Investor shorthand: **credible local product, deliberately narrow verified inven
 - Canonical local implementation: `/Users/willlambert/Documents/GitHub/sylistly`.
 - Key local flow: onboarding → For You → save/remix/shop → Browse → Build / Style What I Own → Saved / Checkout → public share → Daily Drop.
 - Local verification: the last recorded `npm run verify` passed, the latest recorded local production-mode build passed, and route bundles passed the repository's performance budgets.
-- Release boundary: **no push, merge, deployment, workflow dispatch, or production database migration was performed.** Any production screenshots and shortcomings documented in the initial audit remain historical evidence of the currently deployed version, not evidence that the local corrections are already live.
+- Release boundary: commit `8922ed5` was pushed and production deployment `dpl_2KxDJfuCafvraNmvYjZg9bDA6EPW` was aliased to `www.sylistly.com` after all local gates passed. PR #16 remains a draft against `main`; no scheduled workflow dispatch or production database migration was performed. The initial production screenshots below remain historical baseline evidence, while the final evidence folder records the shipped interface.
 
 ## What changed in the local release candidate
 
