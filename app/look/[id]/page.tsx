@@ -1,16 +1,17 @@
-import { ExternalLink, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { BottomNav } from '@/components/BottomNav';
 import { ProductImage } from '@/components/ProductImage';
+import { PublicRetailerLink } from '@/components/PublicRetailerLink';
 import { ShareActions } from '@/components/ShareActions';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
-import { wrapAffiliate } from '@/lib/affiliate';
 import { colorSwatch, derivePalette } from '@/lib/color-harmony';
 import { tidyNote } from '@/lib/note-format';
 import { hasExactProductLink } from '@/lib/product-image-quality';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getShoppableUrl } from '@/lib/product-links';
 import { resolveSharedLook, sharedLookProducts, sharedLookTotalCents } from '@/lib/share-look';
 
 function formatPrice(cents: number): string {
@@ -30,10 +31,12 @@ export async function generateMetadata({
   const description =
     (look.note && tidyNote(look.note)) ||
     `${products.length} real pieces, ${total} total — every one shoppable on Sylistly.`;
+  const canonicalPath = `/look/${encodeURIComponent(id)}`;
   return {
     title: `${look.title} · ${total}`,
     description,
-    openGraph: { title: `${look.title} · ${total} · Sylistly`, description },
+    alternates: { canonical: canonicalPath },
+    openGraph: { title: `${look.title} · ${total} · Sylistly`, description, url: canonicalPath },
     twitter: { card: 'summary_large_image', title: `${look.title} · ${total} · Sylistly`, description },
   };
 }
@@ -56,10 +59,15 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
     .slice(0, 5);
 
   return (
-    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] bg-bg px-4 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]">
+    <main className="sy-game-screen relative mx-auto min-h-[100dvh] max-w-[480px] overflow-hidden bg-bg px-4 pb-14 pt-[calc(env(safe-area-inset-top)+18px)] lg:max-w-none lg:px-8 lg:pb-10 lg:pt-8 xl:px-12">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(72%_78%_at_17%_42%,rgba(231,199,155,.10),transparent_72%),radial-gradient(50%_60%_at_84%_18%,rgba(255,45,109,.10),transparent_72%)] lg:block"
+      />
+      <div className="relative mx-auto w-full lg:max-w-[1280px]">
       {/* Header */}
-      <header className="flex items-center justify-between">
-        <Link href="/" className="flex items-baseline gap-2">
+      <header className="flex items-center justify-between lg:border-b lg:border-hairline lg:pb-5">
+        <Link href="/" className="inline-flex min-h-11 items-center gap-2 lg:min-h-0">
           <span className="h-[2px] w-6 self-center rounded-full bg-accent" aria-hidden />
           <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
         </Link>
@@ -75,21 +83,29 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
         )}
       </header>
 
+      <div className="lg:mt-8 lg:grid lg:grid-cols-[minmax(0,1.12fr)_minmax(430px,.88fr)] lg:items-start lg:gap-9 xl:gap-12">
+      <section aria-label="Look preview" className="lg:sticky lg:top-8 lg:w-full lg:max-w-[620px] lg:justify-self-center">
       {/* The plate */}
-      <div className="mt-4 aspect-[3/4] overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card-strong">
+      <div className="mt-4 aspect-[3/4] overflow-hidden rounded-card-lg ring-1 ring-hairline shadow-card-strong lg:mt-0 lg:h-[calc(100dvh-176px)] lg:min-h-[620px] lg:max-h-[760px] lg:aspect-auto lg:rounded-[32px]">
         <WornFlatlay items={products} loading="eager" className="h-full w-full" />
       </div>
+      <p className="mt-3 hidden text-[11px] font-semibold uppercase tracking-[.14em] text-muted lg:block">
+        {products.length}-piece complete look · exact retailer pages
+      </p>
+      </section>
+
+      <aside className="lg:rounded-[32px] lg:border lg:border-hairline lg:bg-surface-1/70 lg:p-6 lg:shadow-card lg:backdrop-blur-xl xl:p-7">
 
       {/* Meta */}
-      <div className="mt-5">
+      <div className="mt-5 lg:mt-0">
         {look.note ? (
           <>
             <p className="text-eyebrow font-extrabold uppercase text-champagne">Syli&apos;s note</p>
             <p className="mt-1 text-[13px] font-medium leading-snug text-muted-2">{tidyNote(look.note)}</p>
           </>
         ) : null}
-        <div className="mt-2 flex items-baseline gap-3">
-          <h1 className="font-serif text-[32px] font-semibold italic leading-[.95] text-ink">{look.title}</h1>
+        <div className="mt-2 flex flex-wrap items-baseline gap-3">
+          <h1 className="font-serif text-[32px] font-semibold italic leading-[.95] text-ink lg:text-[42px]">{look.title}</h1>
           <span className="rounded-full border border-money/35 bg-money/10 px-2.5 py-1 text-[12px] font-bold text-money">
             {formatPrice(total)}
           </span>
@@ -114,13 +130,18 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Pieces — every one a real link */}
-      <div className="mt-5 grid gap-2">
+      <div className="mt-5 grid gap-2 lg:mt-6">
         {products.map((product) => {
-          const url = wrapAffiliate(getProductOutboundUrl(product), product.id); // attribute shared-look conversions
+          const url = getShoppableUrl(product, {
+            lookId: id,
+            surface: 'shared-look',
+            campaign: 'shared',
+            subId: product.id,
+          });
           return (
             <div
               key={product.id}
-              className="flex items-center gap-3 rounded-card border border-hairline bg-surface-1 p-2.5"
+              className="flex items-center gap-3 rounded-card border border-hairline bg-surface-1 p-2.5 lg:bg-surface-2/70 lg:p-3"
             >
               <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[14px] bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)]">
                 <ProductImage
@@ -140,15 +161,12 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
                 {formatPrice(product.priceCents || 0)}
               </span>
               {url ? (
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer sponsored"
-                  className="sy-press inline-flex shrink-0 items-center gap-1 rounded-full border border-accent/40 px-3 py-2 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white"
-                >
-                  Shop
-                  <ExternalLink size={11} />
-                </a>
+                <PublicRetailerLink
+                  initialHref={url}
+                  productId={product.id}
+                  lookId={id}
+                  className="sy-press inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-accent/40 px-3 py-2 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white"
+                />
               ) : null}
             </div>
           );
@@ -159,7 +177,7 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
 
       {/* Pull it into the app */}
       <div className="mt-6">
-        <ShareActions items={look.items} />
+        <ShareActions lookId={id} items={look.items} />
         <p className="mt-4 text-center text-[11px] text-muted">
           Made with{' '}
           <Link href="/" className="font-semibold text-accent">
@@ -167,6 +185,12 @@ export default async function SharedLookPage({ params }: { params: Promise<{ id:
           </Link>{' '}
           — endless outfits from real products.
         </p>
+      </div>
+      </aside>
+      </div>
+      </div>
+      <div className="hidden lg:block">
+        <BottomNav />
       </div>
     </main>
   );

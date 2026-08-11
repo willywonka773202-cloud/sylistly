@@ -1,0 +1,12 @@
+{
+  "kilobyteBytes": 1000,
+  "defaultMaxKb": 450,
+  "routeMaxKb": {
+    "/": 350,
+    "/browse": 400,
+    "/discover": 400,
+    "/build": 400,
+    "/saved": 400
+  },
+  "exceptions": {}
+}

@@ -3,6 +3,7 @@
 import { Check, Lock } from 'lucide-react';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { getTransparentProductImageUrl, hasTransparentProductImage } from '@/lib/product-image-quality';
+import { getStyleOwnedCanvasImageUrl } from '@/lib/style-owned-product';
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorFrame } from '@/lib/vibes';
 
@@ -166,7 +167,8 @@ function FrontCanvas({
 
   const renderZone = (category: Category, prominent = false) => {
     const rawProduct = items[category];
-    const product = hasTransparentProductImage(rawProduct) && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
+    const productImage = getTransparentProductImageUrl(rawProduct) || getStyleOwnedCanvasImageUrl(rawProduct);
+    const product = productImage && rawProduct && !failedImageIds.has(rawProduct.id) ? rawProduct : undefined;
     const generationSelected = selectedGenerationSlots.includes(category);
     const locked = Boolean(product && lockedSlots.includes(category));
     const selected = generationSelected || activeEditSlot === category;
@@ -222,7 +224,7 @@ function FrontCanvas({
         >
           {selectionBadge}
           <span className={`max-w-full shrink-0 truncate leading-none text-[7px] font-black uppercase tracking-[.11em] ${selected ? 'text-[#8a7355]' : 'text-[#b39f91]'}`}>{CATEGORY_LABELS[category]}</span>
-          {rawProduct && !hasTransparentProductImage(rawProduct) ? (
+          {rawProduct && !hasTransparentProductImage(rawProduct) && !getStyleOwnedCanvasImageUrl(rawProduct) ? (
             <span className="mt-1 text-[7px] font-bold uppercase tracking-[.12em] text-[#c4aa9a]">Cutout queued</span>
           ) : null}
           <span className={`mt-1 text-[16px] leading-none ${selected ? 'text-[#a08b6a]' : 'text-[#d0bfb3]'}`}>+</span>
@@ -391,12 +393,15 @@ function PreviewImage({
   blend: boolean;
   onUnavailable?: (product: Product) => void;
 }) {
-  const [imageOk, setImageOk] = useState(hasTransparentProductImage(product));
+  const initialSrc = getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product) || '';
+  const [imageOk, setImageOk] = useState(Boolean(initialSrc));
 
-  const src = imageOk ? getTransparentProductImageUrl(product) || '' : '';
+  const src = imageOk
+    ? getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product) || ''
+    : '';
 
   useEffect(() => {
-    setImageOk(hasTransparentProductImage(product));
+    setImageOk(Boolean(getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product)));
   }, [product]);
 
   if (!src) return null;
@@ -407,7 +412,7 @@ function PreviewImage({
       <img
         src={src}
         alt={`${product.brand} ${product.name}`}
-        data-image-kind="transparent"
+        data-image-kind={hasTransparentProductImage(product) ? 'transparent' : 'verified-owned'}
         data-product-id={product.id}
         data-product-category={product.category}
         className={modeClassName}

@@ -1,6 +1,10 @@
-# Sylistly — Next.js scaffold
+# Sylistly
 
-Production starter for the Sylistly app (AI-powered outfit builder). Pairs with `SYLISTLY_MASTER_PROMPT.md`.
+Sylistly is a local-first fashion discovery and shopping product built around one
+promise: a complete outfit within the shopper's budget, made only from pieces
+with fresh positive availability evidence and exact retailer product pages.
+Every primary look can be saved, remixed, shared, shopped item by item, or have
+one piece replaced without weakening the complete-look or budget invariant.
 
 ## Stack
 
@@ -16,23 +20,27 @@ Production starter for the Sylistly app (AI-powered outfit builder). Pairs with 
 ## Quick start
 
 ```bash
-# 1. install
-pnpm install        # or npm / yarn / bun
+# 1. install from the committed lockfile
+npm ci
 
 # 2. env
 cp .env.example .env.local
 # fill in keys — see §Environment below
 
 # 3. database
-# In Supabase SQL editor, run the migrations in order:
+# In Supabase SQL editor, take a backup, then run migrations in order:
 #   supabase/migrations/0001_initial.sql
 #   supabase/migrations/0002_products_catalog_expansion.sql
+#   supabase/migrations/0003_catalog_link_health.sql
+#   supabase/migrations/0004_click_attribution.sql
+#   supabase/migrations/0005_catalog_lifecycle.sql
+# Read docs/CATALOG_RELIABILITY.md before applying 0005 or enabling a writer.
 #
 # Then seed the current runtime catalog:
 #   npm run seed:catalog
 
 # 4. dev
-pnpm dev
+npm run dev
 # open http://localhost:3000
 ```
 
@@ -42,7 +50,7 @@ One command runs the full gate (also enforced in CI on every push/PR via
 `.github/workflows/verify.yml` — needs no secrets):
 
 ```bash
-npm run verify   # typecheck + lint + unit tests + route/integrity smoke
+npm run verify   # typecheck, lint, unit/integration contracts, data gates, smoke
 ```
 
 Individually:
@@ -50,7 +58,14 @@ Individually:
 ```bash
 npm run typecheck      # tsc --noEmit
 npm run lint           # eslint
-npm run test:units     # pure-logic unit checks: XP levels, bundle pricing, affiliate wrap, rarity tiers
+npm run test:units     # core deterministic product and freshness contracts
+npm run test:catalog-reliability
+npm run test:catalog-flow
+npm run test:catalog-analytics
+npm run test:style-owned
+npm run test:attribution
+npm run test:outfit-library
+npm run test:performance:unit
 npm run smoke:routes   # routes exist + honesty/revenue/foundation invariants
 SMOKE_BASE_URL=https://www.sylistly.com npm run smoke:routes  # + live HTTP check of prod
 ```
@@ -63,16 +78,22 @@ canonical `www` host, no fake-social copy — so they can't silently regress.
 
 Needed for full live functionality. Without paid search keys, `/api/search` still works from the local Sylistly catalog, so the core builder can run without API cost.
 
-## Free Catalog Mode
+The Remix “Style what I own” product-URL path does not need a paid API. It first matches exact links in the published catalog, then may verify structured Product data from an existing catalog retailer. Optional `STYLE_FROM_URL_TIMEOUT_MS` and `STYLE_FROM_URL_MAX_HTML_BYTES` values only tighten or relax the bounded verifier within its documented clamps; see [`docs/STYLE_WHAT_I_OWN.md`](docs/STYLE_WHAT_I_OWN.md). Photo import is intentionally not exposed because the current stack cannot verify image understanding reliably.
 
-The app now defaults to a database-first search path so it can run without paid search calls:
+## Catalog and search modes
 
-- `data/photo-catalog.json` is checked first when you have real product photos imported.
-- If that file is empty, `/api/search` falls back to the starter brand catalog in `lib/brand-catalog.ts`.
-- The selected style frame is sent with every search, so menswear, womenswear, and neutral searches return different query bias.
-- Product buttons open the clean retailer URL directly. Affiliate wrapping can still be layered back in later, but the UI no longer prefers confusing wrapper links.
+The product works without paid search calls. Runtime surfaces resolve through a
+shared strict publishability boundary: exact HTTPS PDP, reviewed imagery,
+explicit trust/stock, and a positive retailer check no older than 24 hours.
+Unresolved, reachable-only, blocked, stale, dead, and sold-out rows remain in
+candidate/review evidence but are not presented as buyable.
 
-Set `SEARCH_MODE=hybrid` only when you intentionally want live SearchAPI fallback. Leave it unset or set `SEARCH_MODE=catalog-only` for the low-cost public version.
+`/api/search` uses the configured Supabase catalog when available and falls back
+to the same strict local artifact. Set `SEARCH_MODE=hybrid` only when intentionally
+enabling SearchAPI discovery; catalog-only is the safe default. All commerce
+buttons use the first-party `/api/out` redirect, which re-resolves the product,
+validates the exact destination, records click attribution, and applies an
+affiliate network wrapper only when a real production identifier is configured.
 
 ## Build a Real Photo Catalog
 
@@ -118,34 +139,16 @@ npx jiti scripts/register-cutouts.ts --apply
 npm run catalog:client
 ```
 
-`/api/catalog-refresh` is protected by `Authorization: Bearer $CATALOG_REFRESH_TOKEN` or `Authorization: Bearer $CRON_SECRET`. `vercel.json` schedules it daily at 10:00 UTC, and it requires `NEXT_PUBLIC_SUPABASE_URL` plus `SUPABASE_SERVICE_ROLE_KEY`. Set `CATALOG_REFRESH_SEARCHAPI=1` and `SEARCHAPI_KEY` only when you want scheduled SearchAPI-backed sources in addition to free brand feeds.
+`/api/catalog-refresh` is a protected, manual Supabase staging endpoint. It requires `Authorization: Bearer $CATALOG_REFRESH_TOKEN` (or `$CRON_SECRET`), `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`. It is deliberately not a Vercel cron: that route stops at `needs-cutout` and cannot publish user-visible inventory. The canonical scheduled path is `.github/workflows/auto-expand.yml`: daily runs execute the complete guarded release loop, while a manual dispatch with `release=false` remains candidate-only. A scheduled run, or a manual dispatch with `release=true`, may commit, push, and deploy only after the strict publishability, repository verification, production build, and performance gates all pass. No workflow, push, or deployment was executed as part of this local implementation. Set `CATALOG_REFRESH_SEARCHAPI=1` and `SEARCHAPI_KEY` only when intentionally running the staging endpoint with SearchAPI-backed sources in addition to free brand feeds.
 
-```
-# Required
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-CRON_SECRET=
-CATALOG_REFRESH_TOKEN=
-ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=claude-sonnet-4-6
-OLLAMA_API_KEY=
-OLLAMA_DEFAULT_MODEL=gpt-oss:120b
-OLLAMA_API_BASE_URL=https://ollama.com/api
-SEARCHAPI_KEY=
-
-# Recommended
-SKIMLINKS_PUBLISHER_ID=
-RAKUTEN_AFFILIATE_ID=
-NEXT_PUBLIC_POSTHOG_KEY=
-
-# Phase 2
-FASHN_API_KEY=
-STRIPE_SECRET_KEY=
-CLOUDFLARE_R2_ACCESS_KEY=
-CLOUDFLARE_R2_SECRET_KEY=
-CLOUDFLARE_R2_BUCKET=
-```
+`.env.example` is the canonical, non-secret environment contract. The core
+strict local experience needs no paid search or AI call. Supabase service-role
+values enable lifecycle/catalog persistence; `CATALOG_OPS_TOKEN` and
+`CATALOG_OPS_SESSION_SECRET` protect the operator surface; affiliate IDs enable
+network wrapping; and the PostHog key/host enable best-effort funnel and pipeline
+analytics. Keep `NEXT_PUBLIC_ENABLE_LIVE_AI_LOOKS=0` until its model/key has been
+verified. Never put service-role, refresh, operator, or affiliate credentials in
+`NEXT_PUBLIC_*` variables.
 
 Get keys:
 
@@ -157,34 +160,39 @@ Get keys:
 
 ## Architecture
 
-The scroll serves **pre-generated, coordinated outfits** from the local catalog
-(no per-view LLM/search call), and every shop link is affiliate-wrapped.
+The For You feed serves **pre-generated, coordinated outfits** from the strict
+published subset (no per-view LLM/search dependency). Optional remote styling
+can enhance a look, but the deterministic engine, budget cap, fresh availability,
+and complete top/bottom/shoes guarantee remain authoritative.
 
 ```
- client catalog (transparent cutouts) ─► outfit library / ai-look library
-                                              │  (coordinated, date-seeded looks)
-                                              ▼
-   SCROLL  ── WornFlatlay collage (vitrine plate)
-       │         │
-       │         └─ lock a piece ─► restyle the rest around it
-       ▼
-   DROP   ── date-seeded crate ─► reveal a look ─► bundle deal (verified-only)
-       │
-       ▼
-   SHOP   ── wrapAffiliate(productUrl)  (Skimlinks / Rakuten) ─► retailer
-                 │
-   engagement ──┴─ real actions ─► XP · levels · quests · streak · vault  (localStorage, honest)
+ discovery/candidates ─► lifecycle + review ─► fresh strict published subset
+                                                    │
+                           outfit library (24k unique validated looks)
+                                      │             │
+                                      ▼             ▼
+                             FOR YOU / REMIX     DAILY DROP
+                                      │             │
+                                      └──────┬──────┘
+                                             ▼
+                    /api/out validation + click ledger + optional affiliate
+                                             │
+                                             ▼
+                                      exact retailer PDP
 ```
 
-The catalog itself is built/refreshed offline (SearchAPI Google Shopping + a
-cutout pipeline → `data/*.json`); `/api/search` powers Browse and falls back to
-the local catalog when no paid key is set. See the catalog sections above.
+Migration `0005_catalog_lifecycle.sql` is the additive durable source-of-truth
+foundation. The repository's static compatibility artifacts remain fail-closed
+while the migration is unapplied or service-role configuration is absent. See
+`docs/CATALOG_RELIABILITY.md`, `docs/CATALOG_FLOW_ACCEPTANCE.md`, and
+`AUTOMATION.md` for serving, worker, retry, review, release, and rollback rules.
 
 ## Directory
 
-The app is a full-screen **outfit scroll** + a **Daily Drop crate**, not a search
-box. The five tabs (BottomNav): Scroll (`/`), Remix (`/build`), Drop (`/drop`,
-centre), Saved (`/saved`), You (`/profile`).
+The primary mobile navigation is For You (`/`), Remix (`/build`), Drop (`/drop`),
+Saved (`/saved`), and You (`/profile`). Browse and Discover provide catalog and
+editorial entry points; wide routes use desktop grids/rails rather than a fixed
+phone shell.
 
 ```
 app/
@@ -227,9 +235,14 @@ scripts/
 - **Vercel** (recommended): `vercel` in the project root. Set env vars in project settings. The Claude + SearchAPI routes run on Node runtime (not Edge — AWS SDK compatibility).
 - **Netlify**: works with `@netlify/plugin-nextjs`.
 
-## Phase plan
+## Product status and evidence
 
-See `SYLISTLY_MASTER_PROMPT.md` §20. This scaffold ships Phase 1: search, build, save. Phase 2 (try-on, creator share) adds `app/api/tryon` and `app/fit/[id]/share`.
+See `docs/FULL_PRODUCT_BUILD_PROGRESS.md` for the current before/after evidence,
+`docs/ANALYTICS_KPI_SPEC.md` for metric definitions, and
+`docs/INVESTOR_PRODUCT_AUDIT_2026-08-10.md` for the product-readiness assessment.
+Virtual try-on, retailer checkout, photo understanding, account sync, and
+affiliate conversion reporting are not claimed unless their external services
+are actually configured and verified.
 
 ## License
 

@@ -22,17 +22,19 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { Reveal } from '@/components/Reveal';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { colorSwatch, derivePalette } from '@/lib/color-harmony';
-import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
-import { encodeLookSlug } from '@/lib/share-codes';
+import { encodeLookSlug } from '@/lib/share-code-encode';
 import { useFit } from '@/store/fit';
 import { useSavedFits, type SavedFitRecord } from '@/store/saved-fits';
 import { ProductImage } from '@/components/ProductImage';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getProductOutboundUrl, getShoppableUrl } from '@/lib/product-links';
 import { hasExactProductLink, hasTransparentProductImage, isHighConfidenceRenderableProduct } from '@/lib/product-image-quality';
+import { getStyleOwnedVerification, isVerifiedStyleOwnedProduct } from '@/lib/style-owned-product';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type VibeId } from '@/lib/vibes';
 import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
+import { useDialogBehavior } from '@/lib/use-dialog-behavior';
+import { isOwnedCheckoutProductId } from '@/lib/checkout';
 
 // Collections ARE the real vibes (one source of truth — no invented "Travel"/
 // "Work"). A fit's collection is the vibe it was generated under; legacy fits
@@ -40,11 +42,16 @@ import { selectWardrobeItems, useWardrobe } from '@/store/wardrobe';
 type Collection = string;
 const VIBE_LABEL = Object.fromEntries(VIBES.map((vibe) => [vibe.id, vibe.label])) as Record<VibeId, string>;
 const VIBE_LABEL_ORDER = VIBES.map((vibe) => vibe.label);
+const REQUIRED_SHOP_CATEGORIES: Category[] = ['top', 'bottom', 'shoes'];
 
 const CheckoutSheet = dynamic(
   () => import('@/components/CheckoutSheet').then((module) => module.CheckoutSheet),
   { ssr: false, loading: () => null },
 );
+
+function isStyleOwnedSavedSnapshot(product?: Product | null): product is Product {
+  return Boolean(product && getStyleOwnedVerification(product));
+}
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
@@ -105,24 +112,96 @@ export default function SavedPage() {
   const [view, setView] = useState<'fits' | 'pieces'>('fits');
   const [checkoutProducts, setCheckoutProducts] = useState<CheckoutProduct[] | null>(null);
   const [checkoutTitle, setCheckoutTitle] = useState<string>('Saved fit');
+  const [checkoutLookId, setCheckoutLookId] = useState<string | undefined>();
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState<Collection>('All');
   const [detailFitId, setDetailFitId] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{ count: number } | null>(null);
+  const [catalogResolution, setCatalogResolution] = useState<Map<string, Product>>(new Map());
+  const [catalogRefreshState, setCatalogRefreshState] = useState<'loading' | 'ready' | 'error'>('loading');
 
-  // Compute renderable view per fit once. Used by the grid, the
-  // collection filter, and the stats card so collection-inference
-  // operates on the same product set the user actually sees.
+  const catalogIds = useMemo(() => Array.from(new Set([
+    ...fits.flatMap((fit) => Object.values(fit.items)
+      .filter((product): product is Product => Boolean(product) && !isVerifiedStyleOwnedProduct(product))
+      .map((product) => product.id)),
+    ...wardrobeItems
+      .filter((item) => !isVerifiedStyleOwnedProduct(item.product))
+      .map((item) => item.productId),
+  ])).sort(), [fits, wardrobeItems]);
+
+  // Saved records intentionally keep their original visual snapshot. Commerce
+  // actions re-resolve IDs through the strict published catalog after every
+  // refresh, so an old price or unavailable item can never masquerade as live.
+  useEffect(() => {
+    const controller = new AbortController();
+    if (!catalogIds.length) {
+      setCatalogResolution(new Map());
+      setCatalogRefreshState('ready');
+      return () => controller.abort();
+    }
+    setCatalogRefreshState('loading');
+    const batches: string[][] = [];
+    for (let index = 0; index < catalogIds.length; index += 64) batches.push(catalogIds.slice(index, index + 64));
+    void Promise.all(batches.map(async (ids) => {
+      const response = await fetch(`/api/catalog?ids=${encodeURIComponent(ids.join(','))}`, {
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error('catalog_refresh_failed');
+      const payload = await response.json() as { products?: Product[] };
+      return Array.isArray(payload.products) ? payload.products : [];
+    })).then((groups) => {
+      if (controller.signal.aborted) return;
+      const products = groups.flat();
+      setCatalogResolution(new Map(products.map((product) => [product.id, product])));
+      setCatalogRefreshState('ready');
+    }).catch(() => {
+      if (controller.signal.aborted) return;
+      setCatalogResolution(new Map());
+      setCatalogRefreshState('error');
+    });
+    return () => controller.abort();
+  }, [catalogIds]);
+
+  // Resolve commerce from every saved slot, independently of whether its
+  // snapshot can currently render. An image failure may change the preview,
+  // but it must never make an incomplete fit appear complete or shoppable.
   const displayFits = useMemo(
     () =>
       fits
         .map((fit) => {
-          const visualEntries = Object.entries(fit.items).filter(
-            (entry): entry is [Category, Product] =>
-              hasTransparentProductImage(entry[1]) && isHighConfidenceRenderableProduct(entry[1]) && !failedImageIds.has(entry[1].id),
+          const intendedEntries = Object.entries(fit.items).filter(
+            (entry): entry is [Category, Product] => Boolean(entry[1]),
           );
+          const intendedProducts = intendedEntries.map(([, product]) => product);
+          const visualEntries = intendedEntries.filter(([, product]) => (
+            (hasTransparentProductImage(product) && isHighConfidenceRenderableProduct(product))
+            || isStyleOwnedSavedSnapshot(product)
+          ) && !failedImageIds.has(product.id));
           const visualItems = Object.fromEntries(visualEntries) as Partial<Record<Category, Product>>;
           const visualProducts = visualEntries.map(([, product]) => product);
+          const currentEntries = intendedEntries.flatMap(([category, snapshot]) => {
+            const current = isVerifiedStyleOwnedProduct(snapshot)
+              ? snapshot
+              : catalogResolution.get(snapshot.id);
+            return current ? [[category, current] as [Category, Product]] : [];
+          });
+          const currentItems = Object.fromEntries(currentEntries) as Partial<Record<Category, Product>>;
+          const currentProducts = currentEntries.map(([, product]) => product);
+          const purchasableProducts = currentProducts.filter((product) => (
+            !isOwnedCheckoutProductId(product.id)
+            && hasExactProductLink(product)
+            && Boolean(getProductOutboundUrl(product))
+          ));
+          const currentTotalCents = purchasableProducts.reduce((sum, product) => sum + product.priceCents, 0);
+          const unavailableCount = Math.max(0, intendedProducts.length - currentProducts.length);
+          const missingCoreCategories = REQUIRED_SHOP_CATEGORIES.filter((category) => !currentItems[category]);
+          const purchasableCount = purchasableProducts.length;
+          const commerceReady = catalogRefreshState === 'ready'
+            && intendedProducts.length > 0
+            && unavailableCount === 0
+            && missingCoreCategories.length === 0
+            && purchasableCount > 0;
           const collection = collectionOf(fit);
           const swatches = derivePalette(
             visualProducts.map((p) => `${p.name} ${(p.colors || []).join(' ')}`).join(' ').toLowerCase(),
@@ -130,10 +209,24 @@ export default function SavedPage() {
             .map((word) => ({ word, hex: colorSwatch(word) }))
             .filter((s): s is { word: string; hex: string } => Boolean(s.hex))
             .slice(0, 4);
-          return { fit, visualItems, visualProducts, collection, swatches };
+          return {
+            fit,
+            intendedProducts,
+            visualItems,
+            visualProducts,
+            currentItems,
+            currentProducts,
+            currentTotalCents,
+            purchasableCount,
+            unavailableCount,
+            missingCoreCategories,
+            commerceReady,
+            collection,
+            swatches,
+          };
         })
-        .filter(({ visualProducts }) => visualProducts.length > 0),
-    [fits, failedImageIds],
+        .filter(({ intendedProducts }) => intendedProducts.length > 0),
+    [fits, failedImageIds, catalogResolution, catalogRefreshState],
   );
 
   const stats = useMemo(() => {
@@ -141,12 +234,13 @@ export default function SavedPage() {
     if (totalFits === 0) {
       return { totalFits: 0, avgPriceCents: 0, topCollection: null as Collection | null, topCategory: null as Category | null };
     }
-    const totalCents = displayFits.reduce((sum, entry) => sum + entry.fit.totalCents, 0);
+    const fullyVerifiedFits = displayFits.filter((entry) => entry.commerceReady);
+    const totalCents = fullyVerifiedFits.reduce((sum, entry) => sum + entry.currentTotalCents, 0);
     const collectionCounts = new Map<Collection, number>();
     const categoryCounts = new Map<Category, number>();
     for (const entry of displayFits) {
       collectionCounts.set(entry.collection, (collectionCounts.get(entry.collection) || 0) + 1);
-      for (const product of entry.visualProducts) {
+      for (const product of entry.intendedProducts) {
         categoryCounts.set(product.category, (categoryCounts.get(product.category) || 0) + 1);
       }
     }
@@ -156,7 +250,7 @@ export default function SavedPage() {
       Array.from(categoryCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
     return {
       totalFits,
-      avgPriceCents: Math.round(totalCents / totalFits),
+      avgPriceCents: fullyVerifiedFits.length ? Math.round(totalCents / fullyVerifiedFits.length) : 0,
       topCollection,
       topCategory,
     };
@@ -185,6 +279,17 @@ export default function SavedPage() {
     [displayFits, activeFilter],
   );
 
+  const currentWardrobeItems = useMemo(() => wardrobeItems.flatMap((item) => {
+    const current = isVerifiedStyleOwnedProduct(item.product)
+      ? item.product
+      : catalogResolution.get(item.productId);
+    return current ? [{ ...item, product: current }] : [];
+  }), [wardrobeItems, catalogResolution]);
+  const withheldReferenceCount = useMemo(() => {
+    const unavailableFitPieces = displayFits.reduce((sum, entry) => sum + entry.unavailableCount, 0);
+    return unavailableFitPieces + Math.max(0, wardrobeItems.length - currentWardrobeItems.length);
+  }, [displayFits, wardrobeItems.length, currentWardrobeItems.length]);
+
   const detail = detailFitId
     ? displayFits.find((entry) => entry.fit.id === detailFitId) ?? null
     : null;
@@ -197,6 +302,7 @@ export default function SavedPage() {
 
   function shopAll(fit: SavedFitRecord, products: Product[]) {
     const items = products
+      .filter((product) => !isOwnedCheckoutProductId(product.id))
       .map((product) => ({
         id: product.id,
         brand: product.brand,
@@ -207,16 +313,25 @@ export default function SavedPage() {
       }))
       .filter((product) => Boolean(product.url));
     setCheckoutTitle(fit.title);
+    setCheckoutLookId(fit.id);
     setCheckoutProducts(items);
   }
 
   function savePieces(products: Product[]) {
     let added = 0;
+    const productIds: string[] = [];
     for (const product of products) {
+      if (isOwnedCheckoutProductId(product.id)) continue;
       addToWishlist(product, 'saved-fit');
       added += 1;
+      productIds.push(product.id);
     }
-    track('pieces_saved', { count: added, from: 'saved-fit' });
+    track('pieces_saved', {
+      count: added,
+      productIds,
+      surface: 'saved',
+      from: 'saved-fit',
+    });
     setConfirmation({ count: added });
   }
 
@@ -230,14 +345,15 @@ export default function SavedPage() {
 
   return (
     <PlaceholderScreen
-      eyebrow="Collection vault"
-      title="Your style"
-      accent="inventory"
-      description="Every saved fit and real piece in one place — equip a look in Remix, inspect the clothes, or shop the exact items."
+      eyebrow="Saved wardrobe"
+      title="Looks worth"
+      accent="keeping"
+      description="Revisit complete outfits, remix the styling, or shop the exact pieces you saved."
+      maxWidthClassName="w-full max-w-none"
     >
       {confirmation ? (
-        <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex max-w-[480px] justify-center px-4">
-          <div className="animate-sy-rise inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,45,109,.55)] backdrop-blur-md">
+        <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+92px)] z-[60] mx-auto flex justify-center px-4 lg:left-[260px]">
+          <div role="status" aria-live="polite" className="animate-sy-rise inline-flex items-center gap-2 rounded-full border border-accent/45 bg-[#1c0f15]/95 px-4 py-2.5 text-[12px] font-semibold text-white shadow-[0_18px_44px_rgba(255,45,109,.55)] backdrop-blur-md">
             <span className="grid h-5 w-5 place-items-center rounded-full bg-accent text-white">
               <Check size={13} strokeWidth={3} />
             </span>
@@ -247,28 +363,42 @@ export default function SavedPage() {
       ) : null}
 
       {/* Fits / Pieces toggle */}
-      <div className="sy-fade-up mb-4 grid grid-cols-2 gap-1 rounded-full border border-hairline bg-surface-1 p-1">
+      <div role="group" aria-label="Saved wardrobe view" className="sy-fade-up mb-4 grid grid-cols-2 gap-1 rounded-full border border-hairline bg-surface-1 p-1 lg:max-w-[360px]">
         {(['fits', 'pieces'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setView(tab)}
             aria-pressed={view === tab}
-            className={`sy-press rounded-full py-2.5 text-[12px] font-bold uppercase tracking-[.12em] transition ${
-              view === tab ? 'bg-accent text-white shadow-pink-glow' : 'text-muted-2'
+            className={`sy-press min-h-11 rounded-full py-2.5 text-[12px] font-bold uppercase tracking-[.12em] transition ${
+              view === tab ? 'bg-accent text-bg shadow-pink-glow' : 'text-muted-2'
             }`}
           >
-            {tab === 'fits' ? `Fits${displayFits.length ? ` (${displayFits.length})` : ''}` : `Pieces${wardrobeItems.length ? ` (${wardrobeItems.length})` : ''}`}
+            {tab === 'fits' ? `Fits${displayFits.length ? ` (${displayFits.length})` : ''}` : `Pieces${currentWardrobeItems.length ? ` (${currentWardrobeItems.length})` : ''}`}
           </button>
         ))}
       </div>
 
+      {catalogRefreshState === 'loading' ? (
+        <p role="status" aria-live="polite" className="mb-4 rounded-card border border-hairline bg-surface-1 px-4 py-3 text-[12px] text-muted-2">
+          Verifying current prices and availability for your saved wardrobe…
+        </p>
+      ) : catalogRefreshState === 'error' ? (
+        <p role="alert" className="mb-4 rounded-card border border-[#dec889]/45 bg-[#dec889]/10 px-4 py-3 text-[12px] text-ink">
+          Current retailer status could not be verified. Your saved references are still here, but shopping actions are withheld until verification succeeds.
+        </p>
+      ) : withheldReferenceCount > 0 ? (
+        <p role="status" className="mb-4 rounded-card border border-[#dec889]/45 bg-[#dec889]/10 px-4 py-3 text-[12px] text-ink">
+          {withheldReferenceCount} saved piece{withheldReferenceCount === 1 ? '' : 's'} no longer has fresh availability evidence. It remains in the saved visual, but is excluded from prices and shopping actions.
+        </p>
+      ) : null}
+
       {view === 'pieces' ? (
-        <PiecesGrid items={wardrobeItems} onRemove={removeWardrobeItem} />
+        <PiecesGrid items={currentWardrobeItems} onRemove={removeWardrobeItem} />
       ) : displayFits.length === 0 ? (
         <SavedEmptyState />
       ) : (
-        <div className="sy-stagger grid gap-4">
+        <div className="sy-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-6">
           <SavedStats stats={stats} />
           <CollectionFilters
             collections={orderedCollections}
@@ -278,43 +408,47 @@ export default function SavedPage() {
           />
           <SavedActionPanel />
           {visibleFits.length === 0 ? (
-            <section className="rounded-[20px] border border-white/10 bg-white/[0.04] p-5 text-center">
+            <section className="rounded-[20px] border border-white/10 bg-white/[0.04] p-5 text-center lg:col-start-1 lg:row-start-2">
               <p className="text-[12px] leading-relaxed text-muted-2">
                 No saved fits match <strong className="text-white">{activeFilter}</strong> yet. Switch back to
                 <button
                   type="button"
                   onClick={() => setActiveFilter('All')}
-                  className="ml-1 text-accent underline decoration-accent decoration-[1.5px] underline-offset-2"
+                  className="ml-1 inline-flex min-h-11 items-center text-accent underline decoration-accent decoration-[1.5px] underline-offset-2"
                 >
                   All
                 </button>{' '}
                 or save more looks from{' '}
-                <Link href="/" className="text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">
-                  the scroll
+                <Link href="/" className="inline-flex min-h-11 items-center text-accent underline decoration-accent decoration-[1.5px] underline-offset-2">
+                  For You
                 </Link>
                 .
               </p>
             </section>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
-              {visibleFits.map(({ fit, visualItems, visualProducts, collection, swatches }, i) => (
+            <div className="grid grid-cols-2 gap-3 lg:col-start-1 lg:row-start-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-4">
+              {visibleFits.map(({ fit, intendedProducts, visualItems, visualProducts, currentProducts, currentTotalCents, purchasableCount, unavailableCount, collection, swatches }, i) => (
                 <Reveal key={fit.id} as="div" delay={(i % 2) * 80}>
                 <button
                   type="button"
                   aria-label={`Open saved fit ${fit.title}`}
                   onClick={() => setDetailFitId(fit.id)}
-                  className="group relative block w-full overflow-hidden rounded-card border border-hairline bg-surface-1 text-left shadow-card transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.28)]"
+                  className="group relative block w-full overflow-hidden rounded-card border border-hairline bg-surface-1 text-left shadow-card transition active:scale-[0.97] motion-safe:transition-all motion-safe:duration-200 motion-safe:hover:-translate-y-1 hover:border-accent/55 hover:shadow-[0_22px_44px_rgba(255,45,109,.28)]"
                 >
                   <div className="relative aspect-[4/5] overflow-hidden">
                     {visualProducts.length >= 3 ? (
                       <WornFlatlay items={visualItems} active={false} loading={i < 2 ? 'eager' : 'lazy'} className="h-full w-full" />
+                    ) : visualProducts.length === 0 ? (
+                      <div className="grid h-full place-items-center bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] px-5 text-center text-[11px] leading-relaxed text-[#6f625a]">
+                        Saved preview temporarily unavailable
+                      </div>
                     ) : (
                       <div className="grid h-full grid-cols-2 gap-1.5 bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-3">
                         {visualProducts.slice(0, 4).map((product) => (
                           <ProductImage
                             key={`${fit.id}-tile-${product.id}`}
                             product={product}
-                            transparentOnly
+                            transparentOnly={!isStyleOwnedSavedSnapshot(product)}
                             loading={i < 2 ? 'eager' : 'lazy'}
                             wrapperClassName="h-full w-full"
                             className="h-full w-full object-contain"
@@ -352,8 +486,8 @@ export default function SavedPage() {
                       </div>
                     ) : null}
                     <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-muted">
-                      <span>{visualProducts.length} pieces</span>
-                      <span className="font-bold text-accent">{formatPrice(fit.totalCents)}</span>
+                      <span>{currentProducts.length}/{intendedProducts.length} verified{unavailableCount ? ` · ${unavailableCount} withheld` : ''}</span>
+                      <span className="font-bold text-accent">{purchasableCount ? `${formatPrice(currentTotalCents)}${unavailableCount ? ' subtotal' : ''}` : 'Owned only'}</span>
                     </div>
                   </div>
                 </button>
@@ -369,11 +503,21 @@ export default function SavedPage() {
           fit={detail.fit}
           visualItems={detail.visualItems}
           visualProducts={detail.visualProducts}
+          intendedCount={detail.intendedProducts.length}
+          currentProducts={detail.currentProducts}
+          currentTotalCents={detail.currentTotalCents}
+          purchasableCount={detail.purchasableCount}
+          unavailableCount={detail.unavailableCount}
+          missingCoreCategories={detail.missingCoreCategories}
+          commerceReady={detail.commerceReady}
+          catalogRefreshState={catalogRefreshState}
           collection={detail.collection}
           onClose={() => setDetailFitId(null)}
-          onLoadInBuilder={() => loadInBuilder(detail.visualItems)}
-          onShop={() => shopAll(detail.fit, detail.visualProducts)}
-          onSavePieces={() => savePieces(detail.visualProducts)}
+          onLoadInBuilder={() => loadInBuilder(detail.currentItems)}
+          onShop={() => {
+            if (detail.commerceReady) shopAll(detail.fit, detail.currentProducts);
+          }}
+          onSavePieces={() => savePieces(detail.currentProducts)}
           onRemove={() => {
             removeFit(detail.fit.id);
             setDetailFitId(null);
@@ -386,8 +530,9 @@ export default function SavedPage() {
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
         title={checkoutTitle}
+        lookId={checkoutLookId}
         products={checkoutProducts || []}
-        onClose={() => setCheckoutProducts(null)}
+        onClose={() => { setCheckoutProducts(null); setCheckoutLookId(undefined); }}
       />
       ) : null}
     </PlaceholderScreen>
@@ -405,13 +550,14 @@ function SavedStats({
   };
 }) {
   return (
-    <section className="grid grid-cols-4 gap-2">
+    <section aria-labelledby="saved-summary-heading" className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:col-start-2 lg:row-start-1 lg:grid-cols-2">
+      <h2 id="saved-summary-heading" className="sr-only">Saved wardrobe summary</h2>
       <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5 motion-safe:animate-[pulse_.6s_ease-out_1]">
         <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Saved</div>
         <div className="mt-0.5 font-serif text-[20px] font-semibold text-ink">{stats.totalFits}</div>
       </div>
       <div className="rounded-[16px] border border-white/10 bg-white/[0.04] p-2.5">
-        <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Avg fit</div>
+        <div className="text-[8px] font-bold uppercase tracking-[.16em] text-muted">Avg verified</div>
         <div className="mt-0.5 whitespace-nowrap font-serif text-[18px] font-semibold leading-none text-ink">
           {formatCompactPrice(stats.avgPriceCents)}
         </div>
@@ -440,7 +586,7 @@ function CollectionFilters({
   counts: Map<Collection, number>;
 }) {
   return (
-    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+    <div role="group" aria-label="Filter saved fits by vibe" className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide lg:col-start-1 lg:row-start-1 lg:self-center">
       {collections.map((label) => {
         const active = activeFilter === label;
         const count = counts.get(label) || 0;
@@ -451,9 +597,10 @@ function CollectionFilters({
             type="button"
             onClick={() => onChange(label)}
             disabled={!hasMatches && label !== 'All'}
-            className={`flex-none rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.95] motion-safe:transition-all motion-safe:duration-200 ${
+            aria-pressed={active}
+            className={`min-h-11 flex-none rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] transition active:scale-[0.95] motion-safe:transition-all motion-safe:duration-200 ${
               active
-                ? 'scale-[1.06] border-accent bg-accent text-white shadow-[0_8px_22px_rgba(255,45,109,.5)] ring-1 ring-white/30'
+                ? 'scale-[1.06] border-accent bg-accent text-bg shadow-[0_8px_22px_rgba(255,45,109,.5)] ring-1 ring-white/30'
                 : hasMatches
                 ? 'border-white/12 bg-white/[0.04] text-white/80 hover:border-accent/55 hover:bg-white/[0.08]'
                 : 'cursor-not-allowed border-white/8 bg-white/[0.02] text-muted opacity-50'
@@ -490,7 +637,7 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
         </p>
         <Link
           href="/browse"
-          className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97]"
+          className="mt-4 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-bg shadow-pink-glow transition active:scale-[0.97]"
         >
           <Sparkles size={11} />
           Browse pieces
@@ -500,10 +647,16 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {items.map(({ product }) => {
-        const url = wrapAffiliate(getProductOutboundUrl(product), product.id); // attribute saved-piece conversions
-        const exact = hasExactProductLink(product);
+        const owned = isOwnedCheckoutProductId(product.id);
+        const url = owned
+          ? ''
+          : getShoppableUrl(product, {
+              surface: 'saved-piece',
+              subId: product.id,
+            });
+        const exact = !owned && hasExactProductLink(product);
         return (
           <div
             key={product.id}
@@ -513,14 +666,14 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
               type="button"
               onClick={() => onRemove(product.id)}
               aria-label={`Remove ${product.brand} ${product.name}`}
-              className="sy-press absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full border border-hairline-2 bg-bg/70 text-muted backdrop-blur-md transition hover:text-ink"
+              className="sy-press absolute right-2 top-2 z-10 grid h-11 w-11 place-items-center rounded-full border border-hairline-2 bg-bg/70 text-muted backdrop-blur-md transition hover:text-ink"
             >
               <X size={13} />
             </button>
             <div className="bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-4">
               <ProductImage
                 product={product}
-                transparentOnly
+                transparentOnly={!isStyleOwnedSavedSnapshot(product)}
                 wrapperClassName="h-[140px] w-full"
                 className="h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(24,12,10,.12)]"
               />
@@ -531,27 +684,34 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
               <div className="mt-2 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5 text-[12px] font-bold text-accent">
                   {formatPrice(product.priceCents || 0)}
-                  {exact ? <span aria-label="Shoppable" className="h-1.5 w-1.5 rounded-full bg-money" /> : null}
+                  {exact ? <><span aria-hidden className="h-1.5 w-1.5 rounded-full bg-money" /><span className="sr-only">Exact product page</span></> : null}
                 </span>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer sponsored"
-                  onClick={() =>
-                    track('shop_link_clicked', {
-                      brand: product.brand,
-                      retailer: product.retailer,
-                      priceCents: product.priceCents,
-                      exact,
-                      wrapped: url !== getProductOutboundUrl(product),
-                      surface: 'saved-pieces',
-                    })
-                  }
-                  className="sy-press inline-flex items-center gap-1 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-bold text-accent transition hover:bg-accent hover:text-white"
-                >
-                  Shop
-                  <ExternalLink size={11} />
-                </a>
+                {owned ? (
+                  <span className="inline-flex min-h-11 items-center rounded-full border border-champagne/30 bg-champagne/10 px-3 py-1.5 text-[10px] font-bold text-champagne">
+                    Owned
+                  </span>
+                ) : (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer sponsored"
+                    onClick={() =>
+                      track('shop_link_clicked', {
+                        brand: product.brand,
+                        productId: product.id,
+                        retailer: product.retailer,
+                        priceCents: product.priceCents,
+                        exact,
+                        attributed: true,
+                        surface: 'saved-pieces',
+                      })
+                    }
+                    className="sy-press inline-flex min-h-11 items-center gap-1 rounded-full border border-accent/40 px-3 py-1.5 text-[10px] font-bold text-accent transition hover:bg-accent hover:text-bg"
+                  >
+                    Shop
+                    <ExternalLink size={11} />
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -563,28 +723,28 @@ function PiecesGrid({ items, onRemove }: { items: WardrobePiece[]; onRemove: (pr
 
 function SavedActionPanel() {
   return (
-    <section className="rounded-[20px] border border-dashed border-white/12 bg-white/[0.025] p-4">
+    <section className="rounded-[20px] border border-dashed border-white/12 bg-white/[0.025] p-4 lg:sticky lg:top-6 lg:col-start-2 lg:row-start-2">
       <div className="flex items-start gap-3">
         <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-accent/12 text-accent">
           <Sparkles size={16} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Saved actions</div>
+          <h2 className="text-[9px] font-black uppercase tracking-[.18em] text-accent">Saved actions</h2>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-2">Open a fit to remix it in the builder or shop every piece in one tap.</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Link
               href="/build"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition active:scale-95"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-bg shadow-pink-glow transition active:scale-95"
             >
               <Wand2 size={11} />
-              Build
+              Remix a look
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.055] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-white/82 transition active:scale-95 hover:border-accent/45"
             >
               <Sparkles size={11} />
-              Scroll
+              For You
             </Link>
           </div>
         </div>
@@ -597,6 +757,14 @@ function SavedDetailSheet({
   fit,
   visualItems,
   visualProducts,
+  intendedCount,
+  currentProducts,
+  currentTotalCents,
+  purchasableCount,
+  unavailableCount,
+  missingCoreCategories,
+  commerceReady,
+  catalogRefreshState,
   collection,
   onClose,
   onLoadInBuilder,
@@ -608,6 +776,14 @@ function SavedDetailSheet({
   fit: SavedFitRecord;
   visualItems: Partial<Record<Category, Product>>;
   visualProducts: Product[];
+  intendedCount: number;
+  currentProducts: Product[];
+  currentTotalCents: number;
+  purchasableCount: number;
+  unavailableCount: number;
+  missingCoreCategories: Category[];
+  commerceReady: boolean;
+  catalogRefreshState: 'loading' | 'ready' | 'error';
   collection: Collection;
   onClose: () => void;
   onLoadInBuilder: () => void;
@@ -619,18 +795,30 @@ function SavedDetailSheet({
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
   const [editingTitle, setEditingTitle] = useState(false);
   const renameFit = useSavedFits((s) => s.renameFit);
+  const dialogRef = useDialogBehavior<HTMLElement>(onClose);
   function commitTitle(value: string) {
     const next = value.trim().slice(0, 40);
     if (next && next !== fit.title) renameFit(fit.id, next);
     setEditingTitle(false);
   }
-  // Encode the fit into a DB-free /look/c-… link; null when <3 catalog pieces.
+  // Encode only an exact recipient-resolvable fit. Device-only owned anchors
+  // intentionally withhold sharing instead of publishing a partial look.
   const shareSlug = encodeLookSlug(visualItems);
+  const shareUnavailableReason = shareSlug
+    ? null
+    : visualProducts.some((product) => product.id.startsWith('owned-'))
+      ? 'Sharing is unavailable because this fit includes a piece saved only on this device.'
+      : 'Sharing needs a complete top, bottom, and shoes.';
   async function handleShare() {
     if (!shareSlug || typeof window === 'undefined') return;
     const url = `${window.location.origin}/look/${shareSlug}`;
     const text = `My ${fit.title} on Sylistly`;
-    track('saved_fit_shared', { pieces: visualProducts.length });
+    track('saved_fit_shared', {
+      lookId: fit.id,
+      pieces: visualProducts.length,
+      productIds: visualProducts.map((product) => product.id),
+      surface: 'saved',
+    });
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Sylistly', text, url });
@@ -644,12 +832,13 @@ function SavedDetailSheet({
     }
   }
   return (
-    <div className="fixed inset-0 z-50 mx-auto flex max-w-[480px] items-end bg-black/65 backdrop-blur-sm">
-      <button className="absolute inset-0" aria-label="Close saved fit" onClick={onClose} />
-      <article className="sy-sheet-enter relative z-10 max-h-[88dvh] w-full overflow-y-auto rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)]">
-        <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20" />
+    <div className="fixed inset-0 z-50 flex items-end bg-black/65 backdrop-blur-sm lg:items-center lg:justify-center lg:p-8 lg:pl-[292px]">
+      <button type="button" className="absolute inset-0" aria-label="Close saved fit" onClick={onClose} />
+      <article ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="saved-fit-dialog-title" tabIndex={-1} className="sy-sheet-enter relative z-10 max-h-[88dvh] w-full overflow-y-auto rounded-t-[30px] border border-white/12 bg-[#11100f] p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-[0_-22px_60px_rgba(0,0,0,.6)] outline-none lg:grid lg:max-w-[980px] lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,.85fr)] lg:gap-x-5 lg:rounded-[30px] lg:p-5">
+        <h2 id="saved-fit-dialog-title" className="sr-only">Saved fit: {fit.title}</h2>
+        <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-white/20 lg:col-span-2" />
 
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-3 lg:col-span-2">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2 text-[8px] font-bold uppercase tracking-[.22em] text-accent">
               <span className="inline-flex items-center gap-1">
@@ -675,43 +864,64 @@ function SavedDetailSheet({
                 type="button"
                 onClick={() => setEditingTitle(true)}
                 aria-label={`Rename fit, currently ${fit.title}`}
-                className="group mt-1 flex items-start gap-1.5 text-left"
+                className="group mt-1 flex min-h-11 items-start gap-1.5 text-left"
               >
-                <h2 className="line-clamp-2 font-serif text-[24px] font-semibold leading-tight text-ink">{fit.title}</h2>
+                <span className="line-clamp-2 font-serif text-[24px] font-semibold leading-tight text-ink">{fit.title}</span>
                 <Pencil size={13} className="mt-2 flex-none text-muted-2 transition group-hover:text-accent" />
               </button>
             )}
             <div className="mt-1 text-[11px] text-muted-2">
-              {visualProducts.length} pieces · <span className="font-semibold text-accent">{formatPrice(fit.totalCents)}</span> · saved {formatDate(fit.createdAt)}
+              {currentProducts.length}/{intendedCount} currently verified · <span className="font-semibold text-accent">{purchasableCount ? `${formatPrice(currentTotalCents)}${unavailableCount ? ' verified shop subtotal' : ' shop total'}` : 'No items to buy'}</span> · saved {formatDate(fit.createdAt)}
             </div>
+            {catalogRefreshState === 'loading' ? (
+              <p role="status" aria-live="polite" className="mt-2 text-[11px] leading-relaxed text-[#dec889]">
+                Checking every saved piece before shopping is enabled…
+              </p>
+            ) : catalogRefreshState === 'error' ? (
+              <p role="alert" className="mt-2 text-[11px] leading-relaxed text-[#dec889]">
+                Shopping is withheld because current retailer status could not be verified.
+              </p>
+            ) : unavailableCount ? (
+              <p role="status" className="mt-2 text-[11px] leading-relaxed text-[#dec889]">
+                {unavailableCount} saved piece{unavailableCount === 1 ? '' : 's'} is shown as a reference but withheld from shopping until it can be freshly verified or replaced.
+              </p>
+            ) : missingCoreCategories.length ? (
+              <p role="status" className="mt-2 text-[11px] leading-relaxed text-[#dec889]">
+                Add a current {missingCoreCategories.join(', ')} {missingCoreCategories.length === 1 ? 'piece' : 'set'} in Remix before shopping this as a complete fit.
+              </p>
+            ) : null}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 flex-none place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
+            className="grid h-11 w-11 flex-none place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white/80 transition active:scale-90 motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
             aria-label="Close"
           >
             <X size={15} />
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <DetailStat label="Pieces" value={visualProducts.length.toString()} />
-          <DetailStat label="Total" value={formatPrice(fit.totalCents)} />
+        <div className="mt-4 grid grid-cols-3 gap-2 lg:col-start-2 lg:row-start-3">
+          <DetailStat label="Pieces" value={`${currentProducts.length}/${intendedCount}`} />
+          <DetailStat label={unavailableCount ? 'Shop subtotal' : 'Shop total'} value={purchasableCount ? formatPrice(currentTotalCents) : 'Owned'} />
           <DetailStat label="Saved" value={formatDate(fit.createdAt).split(',')[0]} />
         </div>
 
         {/* Large preview — same worn plate as the scroll */}
-        <div className="mt-4 overflow-hidden rounded-card-lg ring-1 ring-hairline">
+        <div className="mt-4 overflow-hidden rounded-card-lg ring-1 ring-hairline lg:col-start-1 lg:row-span-6 lg:row-start-3">
           {visualProducts.length >= 3 ? (
             <WornFlatlay items={visualItems} active={false} className="aspect-[4/5] w-full" />
+          ) : visualProducts.length === 0 ? (
+            <div className="grid aspect-[4/5] place-items-center bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] px-8 text-center text-[12px] leading-relaxed text-[#6f625a]">
+              The saved fit is intact, but its preview images are temporarily unavailable.
+            </div>
           ) : (
             <div className="grid aspect-[4/5] grid-cols-2 gap-2 bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] p-4">
               {visualProducts.slice(0, 4).map((product) => (
                 <ProductImage
                   key={`${fit.id}-detail-${product.id}`}
                   product={product}
-                  transparentOnly
+                  transparentOnly={!isStyleOwnedSavedSnapshot(product)}
                   wrapperClassName="h-full w-full"
                   className="h-full w-full object-contain"
                   onUnavailable={onProductFailed}
@@ -722,7 +932,7 @@ function SavedDetailSheet({
         </div>
 
         {/* Key pieces strip */}
-        <div className="mt-4">
+        <div className="mt-4 lg:col-start-2 lg:row-start-4">
           <div className="text-[8px] font-bold uppercase tracking-[.18em] text-muted">Key pieces</div>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {Object.entries(visualItems).map(([category, product]) =>
@@ -732,7 +942,7 @@ function SavedDetailSheet({
                   className="flex h-[64px] w-[180px] flex-none items-center gap-2 rounded-[14px] border border-white/10 bg-white/[0.04] p-1.5"
                 >
                   <div className="h-full w-[60px] flex-none overflow-hidden">
-                    <ProductImage product={product} displayMode="thumbnail" transparentOnly />
+                  <ProductImage product={product} displayMode="thumbnail" transparentOnly={!isStyleOwnedSavedSnapshot(product)} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[8px] font-bold uppercase tracking-[.14em] text-accent">{category}</div>
@@ -746,11 +956,12 @@ function SavedDetailSheet({
         </div>
 
         {/* Primary actions */}
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2 lg:col-start-2 lg:row-start-5">
           <button
             type="button"
             onClick={onLoadInBuilder}
-            className="sy-cta inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white shadow-[0_14px_32px_rgba(255,45,109,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300"
+            disabled={!currentProducts.length}
+            className="sy-cta inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-bg shadow-[0_14px_32px_rgba(255,45,109,.5)] transition hover:bg-right active:scale-[0.97] motion-safe:transition-all motion-safe:duration-300 disabled:cursor-not-allowed disabled:opacity-45"
           >
             <RotateCcw size={13} />
             Open in Remix
@@ -758,18 +969,26 @@ function SavedDetailSheet({
           <button
             type="button"
             onClick={onShop}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white/90 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55 hover:text-white"
+            disabled={!commerceReady}
+            aria-describedby={!commerceReady ? 'saved-shop-readiness' : undefined}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white/90 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55 hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
           >
             <ShoppingBag size={13} />
             Shop fit
           </button>
         </div>
+        <span id="saved-shop-readiness" className="sr-only">
+          {commerceReady
+            ? 'Every intended saved item and the required top, bottom, and shoes are currently verified.'
+            : 'Shop fit is available only after every intended saved item and a top, bottom, and shoes are currently verified.'}
+        </span>
 
         {/* Save the individual pieces to your Pieces tab */}
         <button
           type="button"
           onClick={onSavePieces}
-          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white transition active:scale-[0.97] hover:bg-accent/20"
+          disabled={!currentProducts.length}
+          className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/12 px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white transition active:scale-[0.97] hover:bg-accent/20 disabled:cursor-not-allowed disabled:opacity-45 lg:col-start-2 lg:row-start-6"
         >
           <Heart size={13} className="text-accent" />
           Save these pieces
@@ -780,19 +999,26 @@ function SavedDetailSheet({
           <button
             type="button"
             onClick={handleShare}
-            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white/90 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55 hover:text-white"
+            className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] text-white/90 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-accent/55 hover:text-white lg:col-start-2 lg:row-start-7"
           >
             {shareState === 'copied' ? <Check size={13} className="text-money" /> : <Share2 size={13} />}
             {shareState === 'copied' ? 'Link copied' : 'Share this fit'}
           </button>
+        ) : shareUnavailableReason ? (
+          <p className="mt-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-[11px] leading-relaxed text-muted-2 lg:col-start-2 lg:row-start-7">
+            {shareUnavailableReason}
+          </p>
         ) : null}
+        <span className="sr-only" role="status" aria-live="polite">
+          {shareState === 'copied' ? 'Fit link copied to clipboard.' : ''}
+        </span>
 
         {/* Secondary actions */}
-        <div className="mt-2">
+        <div className="mt-2 lg:col-start-2 lg:row-start-8">
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-red-400/55 hover:text-red-300"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:border-red-400/55 hover:text-red-300"
           >
             <Trash2 size={12} />
             Remove from saved
@@ -825,14 +1051,14 @@ function SavedEmptyState() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Link
           href="/"
-          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-bg shadow-pink-glow transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150"
         >
           <Sparkles size={11} />
-          Open the scroll
+          Open For You
         </Link>
         <Link
           href="/build"
-          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[10px] font-bold uppercase tracking-[.14em] text-white/85 transition active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 hover:bg-white/12"
         >
           <Wand2 size={11} />
           Open Remix

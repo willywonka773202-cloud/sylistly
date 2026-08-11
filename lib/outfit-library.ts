@@ -7,11 +7,19 @@
  * products and serves a fresh, well-coordinated look per vibe × frame.
  */
 import libraryData from '@/data/outfit-library.json';
-import { CLIENT_CATALOG_PRODUCTS } from '@/lib/client-catalog';
+import {
+  CLIENT_CATALOG_PRODUCTS,
+  respectsCatalogGenerationHardPreferences,
+  type CatalogGenerationPreferences,
+} from '@/lib/client-catalog';
 import type { Category, Product } from '@/lib/types';
 import type { GeneratorFrame, VibeId } from '@/lib/vibes';
+import { scoreOutfitForTaste, type TasteRankingSignals } from '@/lib/taste-profile';
 
 interface LibraryFile {
+  schemaVersion: number;
+  verifiedAt: string;
+  maxHealthAgeHours: number;
   slots: Category[];
   ids: string[];
   looks: Record<string, Record<string, number[][]>>;
@@ -37,9 +45,17 @@ function hydrate(row: number[]): Partial<Record<Category, Product>> {
   return out;
 }
 
+function isCompleteHydration(products: Partial<Record<Category, Product>>): products is Partial<Record<Category, Product>> & {
+  top: Product;
+  bottom: Product;
+  shoes: Product;
+} {
+  return Boolean(products.top && products.bottom && products.shoes);
+}
+
 /** Does the pre-generated library cover this vibe (in this or the androgynous frame)? */
 export function hasLibraryCoverage(vibe: VibeId, frame: GeneratorFrame): boolean {
-  return poolFor(vibe, frame).length > 0;
+  return poolFor(vibe, frame).some((row) => isCompleteHydration(hydrate(row)));
 }
 
 /**
@@ -51,13 +67,23 @@ export function hasLibraryCoverage(vibe: VibeId, frame: GeneratorFrame): boolean
 export function getLibraryLook(
   vibe: VibeId,
   frame: GeneratorFrame,
-  opts: { seed?: number; avoidProductIds?: string[]; maxItemCents?: number | null } = {},
+  opts: {
+    seed?: number;
+    avoidProductIds?: string[];
+    maxItemCents?: number | null;
+    /** Hard whole-look ceiling. Filtering the baked pool before repair avoids
+     * collapsing many over-budget rows onto the same cheapest substitutes. */
+    maxTotalCents?: number | null;
+    taste?: TasteRankingSignals;
+    preferences?: CatalogGenerationPreferences;
+  } = {},
 ): { products: Partial<Record<Category, Product>>; formulaId: string } | null {
   const pool = poolFor(vibe, frame);
   if (pool.length === 0) return null;
 
   const avoid = new Set(opts.avoidProductIds || []);
   const maxItemCents = opts.maxItemCents && opts.maxItemCents > 0 ? opts.maxItemCents : null;
+  const maxTotalCents = opts.maxTotalCents && opts.maxTotalCents > 0 ? opts.maxTotalCents : null;
   const seed = opts.seed ?? 0;
   const jitter = (n: number) => {
     const x = Math.sin((seed + n) * 12.9898) * 43758.5453;
@@ -70,21 +96,34 @@ export function getLibraryLook(
     const row = pool[i];
     let overlap = 0;
     let overBudget = false;
+    let unavailable = false;
+    let totalCents = 0;
+    const rowProducts: Product[] = [];
     for (const idx of row) {
       if (idx < 0) continue;
       const id = DATA.ids[idx];
+      const product = BY_ID.get(id);
+      if (!product) { unavailable = true; break; }
+      if (!respectsCatalogGenerationHardPreferences(product, opts.preferences)) {
+        unavailable = true;
+        break;
+      }
+      rowProducts.push(product);
+      totalCents += product.priceCents || 0;
       if (avoid.has(id)) overlap += 1;
       if (maxItemCents) {
-        const product = BY_ID.get(id);
-        if (product && (product.priceCents || 0) > maxItemCents) { overBudget = true; break; }
+        if ((product.priceCents || 0) > maxItemCents) { overBudget = true; break; }
       }
     }
-    if (overBudget) continue; // respect the user's budget cap
+    if (unavailable || overBudget || (maxTotalCents && totalCents > maxTotalCents)) continue;
     // Library rows are sorted best-first (index 0 = highest coordination score).
     // Bias toward the top so users see the BEST fits — with jitter + overlap
     // avoidance keeping it varied and non-repeating.
     const positionBias = (i / pool.length) * 1.7;
-    const freshness = -overlap * 2 + jitter(i) - positionBias;
+    // A bounded on-device taste score can reorder otherwise-coordinated rows,
+    // but the modest scale preserves the library's quality/variety bias.
+    const tasteNudge = scoreOutfitForTaste(rowProducts, opts.taste) / 24;
+    const freshness = -overlap * 2 + jitter(i) - positionBias + tasteNudge;
     if (freshness > bestScore) {
       bestScore = freshness;
       best = row;
@@ -93,6 +132,6 @@ export function getLibraryLook(
   if (!best) return null;
 
   const products = hydrate(best);
-  if (Object.keys(products).length < 3) return null;
+  if (!isCompleteHydration(products)) return null;
   return { products, formulaId: `lib-${vibe}` };
 }

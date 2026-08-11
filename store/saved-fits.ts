@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { isTransparentRenderableProduct } from '@/lib/product-image-quality';
+import { isVerifiedStyleOwnedProduct } from '@/lib/style-owned-product';
 import type { Category, Product } from '@/lib/types';
 import type { VibeId } from '@/lib/vibes';
 
@@ -48,7 +49,7 @@ function createTitle(items: Partial<Record<Category, Product>>, itemCount: numbe
 function transparentItemsOnly(items: Partial<Record<Category, Product>>): Partial<Record<Category, Product>> {
   return Object.fromEntries(
     Object.entries(items).filter((entry): entry is [Category, Product] =>
-      Boolean(entry[1] && isTransparentRenderableProduct(entry[1])),
+      Boolean(entry[1] && (isTransparentRenderableProduct(entry[1]) || isVerifiedStyleOwnedProduct(entry[1]))),
     ),
   ) as Partial<Record<Category, Product>>;
 }

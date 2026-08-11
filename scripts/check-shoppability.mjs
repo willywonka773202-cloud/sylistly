@@ -1,12 +1,10 @@
 /**
- * Money-path check: the looks the FEED actually renders are mostly shoppable.
+ * Primary-feed commerce contract.
  *
- * The feed does not serve the baked outfit library — it calls buildCatalogLook
- * client-side, so shoppability is decided by scoreProduct's exact-link weight,
- * not by the library generator. Only an exact retailer product page can be
- * affiliate-wrapped for commission; a google-shopping search fallback earns $0
- * and drops the user on a search page. This measures the real ratio across a
- * spread of vibe × frame × seed and fails if it regresses.
+ * Exercises the same `generateLooks` path used by SSR and client re-deals. Every
+ * emitted look must be a complete outfit, contain only exact retailer PDP links,
+ * avoid known unavailable stock, and honor the default whole-look ceiling.
+ * Invalid source/locked pieces must be repaired; impossible looks are suppressed.
  *
  *   node scripts/check-shoppability.mjs   (or: npm run test:shoppability)
  */
@@ -25,54 +23,26 @@ Module._resolveFilename = function patchedResolve(request, ...rest) {
 };
 
 const jiti = jitiFactory(here, {});
-const { buildCatalogLook } = jiti('@/lib/client-catalog');
+const {
+  CLIENT_CATALOG_PRODUCTS,
+  buildCatalogLook,
+  isBuyableClientCatalogProduct,
+  validateCompleteBuyableLook,
+} = jiti('@/lib/client-catalog');
+const {
+  DEFAULT_FEED_MAX_TOTAL_CENTS,
+  generateLooks,
+  initialGenState,
+} = jiti('@/lib/compose-look');
 const { hasExactProductLink } = jiti('@/lib/product-image-quality');
 
 const VIBES = ['clean', 'street', 'office', 'date', 'gym', 'cozy', 'vacation', 'preppy', 'night', 'edgy'];
 const FRAMES = ['androgynous', 'fem', 'masc'];
-
-let pieces = 0;
-let exact = 0;
-let looks = 0;
-let looksWithMajority = 0;
-const worst = [];
-const distinct = new Set();
-
-for (const vibe of VIBES) {
-  for (const frame of FRAMES) {
-    for (let seed = 0; seed < 8; seed += 1) {
-      const look = buildCatalogLook({ vibe, frame, budget: 'any', mode: 'full', seed });
-      const products = Object.values(look.products).filter(Boolean);
-      if (!products.length) continue;
-      const hits = products.filter((product) => hasExactProductLink(product)).length;
-      products.forEach((product) => distinct.add(product.id));
-      pieces += products.length;
-      exact += hits;
-      looks += 1;
-      if (hits * 2 >= products.length) looksWithMajority += 1;
-      worst.push({ vibe, frame, seed, ratio: hits / products.length, label: `${hits}/${products.length}` });
-    }
-  }
-}
-
-worst.sort((a, b) => a.ratio - b.ratio);
-const pieceRatio = exact / pieces;
-const majorityRatio = looksWithMajority / looks;
-
-console.log(`looks=${looks}  pieces=${pieces}`);
-console.log(`exact-link pieces: ${(pieceRatio * 100).toFixed(1)}%  (${exact}/${pieces})`);
-console.log(`looks where MOST pieces are shoppable: ${(majorityRatio * 100).toFixed(1)}%`);
-console.log(`worst 5: ${worst.slice(0, 5).map((w) => `${w.vibe}/${w.frame}#${w.seed} ${w.label}`).join(' · ')}`);
-
-console.log(`distinct products used: ${distinct.size}`);
-
-// Floors sit just under the measured values so real regressions fail the build
-// but ordinary catalog churn does not. VARIETY_FLOOR guards the other side of
-// the trade: restricting generation to exact-link pieces must not collapse the
-// feed onto the same handful of products.
-const PIECE_FLOOR = 0.75;
-const MAJORITY_FLOOR = 0.9;
-const VARIETY_FLOOR = 150;
+// One full-feed deal for every vibe × frame cohort keeps this CI check focused
+// while still spanning all 30 recommendation contexts.
+const LOOKS_PER_COHORT = 1;
+const EXPECTED_LOOKS = VIBES.length * FRAMES.length * LOOKS_PER_COHORT;
+const VARIETY_FLOOR = 60;
 
 let failures = 0;
 const check = (label, ok) => {
@@ -80,9 +50,173 @@ const check = (label, ok) => {
   if (!ok) failures += 1;
 };
 
-check(`>=${PIECE_FLOOR * 100}% of generated pieces link to a real product page`, pieceRatio >= PIECE_FLOOR);
-check(`>=${MAJORITY_FLOOR * 100}% of looks are majority-shoppable`, majorityRatio >= MAJORITY_FLOOR);
-check(`generation still reaches >=${VARIETY_FLOOR} distinct products`, distinct.size >= VARIETY_FLOOR);
+let looks = 0;
+let pieces = 0;
+let exactPieces = 0;
+let buyablePieces = 0;
+let completeLooks = 0;
+let budgetCompliantLooks = 0;
+let maxObservedTotal = 0;
+let minObservedTotal = Number.POSITIVE_INFINITY;
+const distinct = new Set();
+const violations = [];
+
+for (let vibeIndex = 0; vibeIndex < VIBES.length; vibeIndex += 1) {
+  const vibe = VIBES[vibeIndex];
+  for (let frameIndex = 0; frameIndex < FRAMES.length; frameIndex += 1) {
+    const frame = FRAMES[frameIndex];
+    const state = { ...initialGenState(), seed: 101 + vibeIndex * 997 + frameIndex * 89 };
+    // No options on purpose: this verifies the backward-compatible default is
+    // the affordable whole-look ceiling, not merely a caller-provided cap.
+    const generated = generateLooks(LOOKS_PER_COHORT, frame, vibe, state);
+    for (const look of generated.looks) {
+      const products = Object.values(look.items).filter(Boolean);
+      const validation = validateCompleteBuyableLook(look.items, DEFAULT_FEED_MAX_TOTAL_CENTS);
+      const exactCount = products.filter((product) => hasExactProductLink(product)).length;
+      const buyableCount = products.filter((product) => isBuyableClientCatalogProduct(product)).length;
+
+      looks += 1;
+      pieces += products.length;
+      exactPieces += exactCount;
+      buyablePieces += buyableCount;
+      if (validation.missingRequiredSlots.length === 0) completeLooks += 1;
+      if (validation.overBudgetCents === 0) budgetCompliantLooks += 1;
+      maxObservedTotal = Math.max(maxObservedTotal, validation.totalCents);
+      minObservedTotal = Math.min(minObservedTotal, validation.totalCents);
+      products.forEach((product) => distinct.add(product.id));
+
+      if (!validation.ok || exactCount !== products.length || buyableCount !== products.length) {
+        violations.push({
+          vibe,
+          frame,
+          key: look.key,
+          totalCents: validation.totalCents,
+          exact: `${exactCount}/${products.length}`,
+          missing: validation.missingRequiredSlots,
+          nonBuyable: validation.nonBuyableSlots,
+        });
+      }
+    }
+  }
+}
+
+const cheapBuyableTop = CLIENT_CATALOG_PRODUCTS
+  .filter((product) => product.category === 'top' && isBuyableClientCatalogProduct(product))
+  .sort((left, right) => left.priceCents - right.priceCents)[0];
+const cheapBuyableBag = CLIENT_CATALOG_PRODUCTS
+  .filter((product) => product.category === 'bag' && isBuyableClientCatalogProduct(product))
+  .sort((left, right) => left.priceCents - right.priceCents)[0];
+
+const validLocked = cheapBuyableTop
+  ? buildCatalogLook({
+      vibe: 'clean',
+      frame: 'androgynous',
+      budget: 'under500',
+      mode: 'full',
+      seed: 417,
+      lockedItems: { top: cheapBuyableTop },
+      targetSlots: ['top', 'bottom', 'shoes'],
+      maxTotalCents: DEFAULT_FEED_MAX_TOTAL_CENTS,
+      requireCompleteBuyable: true,
+    })
+  : null;
+
+const invalidTop = cheapBuyableTop
+  ? { ...cheapBuyableTop, id: '__unavailable-top-fixture__', inStock: false }
+  : null;
+const repairedRequired = invalidTop
+  ? buildCatalogLook({
+      vibe: 'clean',
+      frame: 'androgynous',
+      budget: 'under500',
+      mode: 'full',
+      seed: 719,
+      currentItems: { top: invalidTop },
+      targetSlots: ['top', 'bottom', 'shoes'],
+      maxTotalCents: DEFAULT_FEED_MAX_TOTAL_CENTS,
+      requireCompleteBuyable: true,
+    })
+  : null;
+
+const invalidBag = cheapBuyableBag
+  ? { ...cheapBuyableBag, id: '__unavailable-bag-fixture__', inStock: false }
+  : null;
+const handledOptional = invalidBag
+  ? buildCatalogLook({
+      vibe: 'clean',
+      frame: 'androgynous',
+      budget: 'under500',
+      mode: 'full',
+      seed: 1021,
+      currentItems: { bag: invalidBag },
+      targetSlots: ['top', 'bottom', 'shoes', 'bag'],
+      maxTotalCents: DEFAULT_FEED_MAX_TOTAL_CENTS,
+      requireCompleteBuyable: true,
+    })
+  : null;
+
+const customCap = 35_000;
+const customGenerated = generateLooks(
+  3,
+  'androgynous',
+  'clean',
+  { ...initialGenState(), seed: 2027 },
+  {},
+  new Set(),
+  { budget: 'custom', customMaxCents: customCap, maxTotalCents: customCap },
+);
+const impossible = generateLooks(
+  1,
+  'androgynous',
+  'clean',
+  { ...initialGenState(), seed: 3031 },
+  {},
+  new Set(),
+  { budget: 'custom', customMaxCents: 1, maxTotalCents: 1 },
+);
+
+const pieceRatio = pieces ? exactPieces / pieces : 0;
+const buyableRatio = pieces ? buyablePieces / pieces : 0;
+const completeRatio = looks ? completeLooks / looks : 0;
+const budgetRatio = looks ? budgetCompliantLooks / looks : 0;
+console.log(`looks=${looks}/${EXPECTED_LOOKS}  pieces=${pieces}  distinct=${distinct.size}`);
+console.log(`exact PDP pieces=${(pieceRatio * 100).toFixed(1)}%  buyable=${(buyableRatio * 100).toFixed(1)}%`);
+console.log(`required-slot complete=${(completeRatio * 100).toFixed(1)}%  within $${DEFAULT_FEED_MAX_TOTAL_CENTS / 100}=${(budgetRatio * 100).toFixed(1)}%`);
+console.log(`whole-look totals=$${(minObservedTotal / 100).toFixed(2)}–$${(maxObservedTotal / 100).toFixed(2)}`);
+if (violations.length) console.log('violations:', violations.slice(0, 5));
+
+check('default primary feed emits every requested look', looks === EXPECTED_LOOKS);
+check('100% of emitted pieces have exact retailer PDP links', pieceRatio === 1);
+check('100% of emitted pieces are not known unavailable/inStock=false', buyableRatio === 1);
+check('100% of emitted looks contain top + bottom + shoes', completeRatio === 1);
+check(`100% of default looks total <= $${DEFAULT_FEED_MAX_TOTAL_CENTS / 100}`, budgetRatio === 1);
+check(`generation still reaches >=${VARIETY_FLOOR} distinct buyable products`, distinct.size >= VARIETY_FLOOR);
+check(
+  'a valid locked item is preserved inside a compliant look',
+  Boolean(validLocked?.buyability.ok && validLocked.products.top?.id === cheapBuyableTop?.id),
+);
+check(
+  'an unavailable required piece is replaced by a buyable same-category item',
+  Boolean(
+    repairedRequired?.buyability.ok
+      && repairedRequired.products.top
+      && repairedRequired.products.top.id !== invalidTop?.id
+      && repairedRequired.products.top.category === 'top',
+  ),
+);
+check(
+  'an unavailable optional piece is repaired or safely omitted',
+  Boolean(
+    handledOptional?.buyability.ok
+      && (!handledOptional.products.bag || handledOptional.products.bag.id !== invalidBag?.id),
+  ),
+);
+check(
+  `custom whole-look cap ($${customCap / 100}) propagates`,
+  customGenerated.looks.length > 0
+    && customGenerated.looks.every((look) => validateCompleteBuyableLook(look.items, customCap).ok),
+);
+check('an impossible cap suppresses the look instead of leaking it', impossible.looks.length === 0);
 
 if (failures > 0) {
   console.error(`\n${failures} shoppability check(s) FAILED`);

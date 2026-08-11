@@ -8,13 +8,15 @@
  */
 import { lookProducts, type ScrollLook } from '@/lib/look-helpers';
 import type { Category, Product } from '@/lib/types';
-import type { GeneratorFrame, VibeId } from '@/lib/vibes';
+import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 
 export interface AiLookRequest {
   /** The card key to swap in place, so the AI look replaces the placeholder. */
   key: string;
   vibe: VibeId;
   frame: GeneratorFrame;
+  budget: GeneratorBudget;
+  customMaxCents?: number | null;
   seed: number;
   avoidProductIds?: string[];
 }
@@ -28,7 +30,8 @@ export async function fetchAiLook(req: AiLookRequest, signal?: AbortSignal): Pro
       body: JSON.stringify({
         vibe: req.vibe,
         frame: req.frame,
-        budget: 'any',
+        budget: req.budget,
+        customMaxCents: req.customMaxCents ?? null,
         mode: 'full',
         seed: req.seed,
         diversityStrength: 'high',

@@ -25,6 +25,13 @@ import { colorHarmonyScore, colorTokens, colorSwatch, derivePalette, ACCENT_COLO
 import { tidyNote } from '../lib/note-format';
 import { cleanProductName, cleanBrand } from '../lib/product-name';
 import { formalityLevel, formalityCoherenceScore, fabricCoherenceScore } from '../lib/outfit-coherence';
+import { catalogSizeMatches, productSupportsRequestedSize } from '../lib/catalog-size-availability';
+import { encodeLookSlug, productShareCode } from '../lib/share-code-encode';
+import {
+  VERIFICATION_MAX_FUTURE_SKEW_MS,
+  isVerificationFresh,
+  verificationAgeMs,
+} from '../lib/verification-freshness';
 import { mapCategory, toCents, isHttpUrl } from './ingest/ingest-catalog';
 import type { Category, Product } from '../lib/types';
 
@@ -56,6 +63,38 @@ function check(label: string, condition: boolean): void {
 
 console.log('Lib unit checks');
 console.log('===============');
+
+// ── Verification evidence freshness ────────────────────────────────────────
+const VERIFICATION_NOW = Date.parse('2026-08-10T18:00:00.000Z');
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+check(
+  'verification freshness accepts evidence exactly at the 24-hour boundary',
+  isVerificationFresh(new Date(VERIFICATION_NOW - ONE_DAY_MS).toISOString(), ONE_DAY_MS, VERIFICATION_NOW),
+);
+check(
+  'verification freshness rejects evidence one millisecond beyond the 24-hour boundary',
+  !isVerificationFresh(new Date(VERIFICATION_NOW - ONE_DAY_MS - 1).toISOString(), ONE_DAY_MS, VERIFICATION_NOW),
+);
+check(
+  'verification freshness tolerates five minutes of producer clock skew',
+  verificationAgeMs(
+    new Date(VERIFICATION_NOW + VERIFICATION_MAX_FUTURE_SKEW_MS).toISOString(),
+    VERIFICATION_NOW,
+  ) === 0,
+);
+check(
+  'verification freshness rejects materially future-dated evidence',
+  verificationAgeMs(
+    new Date(VERIFICATION_NOW + VERIFICATION_MAX_FUTURE_SKEW_MS + 1).toISOString(),
+    VERIFICATION_NOW,
+  ) === null,
+);
+check(
+  'verification freshness rejects malformed timestamps and invalid age windows',
+  verificationAgeMs('not-a-date', VERIFICATION_NOW) === null
+    && !isVerificationFresh(new Date(VERIFICATION_NOW).toISOString(), Number.NaN, VERIFICATION_NOW)
+    && !isVerificationFresh(new Date(VERIFICATION_NOW).toISOString(), -1, VERIFICATION_NOW),
+);
 
 // ── XP level math (lib/stylist-xp · levelFor) ────────────────────────────────
 const l0 = levelFor(0);
@@ -213,6 +252,28 @@ check('getProductOutboundUrl: productUrl wins', getProductOutboundUrl(lp({ produ
 check('getProductOutboundUrl: falls back to retailerUrl', getProductOutboundUrl(lp({ retailerUrl: 'https://r.com/x' })) === 'https://r.com/x');
 check('getProductOutboundUrl: invalid productUrl skipped → retailerUrl', getProductOutboundUrl(lp({ productUrl: 'not-a-url', retailerUrl: 'https://r.com/x' })) === 'https://r.com/x');
 check('getProductOutboundUrl: no links → Google Shopping search fallback', getProductOutboundUrl(lp({})).startsWith('https://www.google.com/search'));
+
+// ── Retailer-provided size availability ────────────────────────────────────
+check('catalogSizeMatches: word size aliases normalize', catalogSizeMatches('Medium', 'M'));
+check('catalogSizeMatches: waist token matches W32', catalogSizeMatches('W32 / L30', '32'));
+check('catalogSizeMatches: shoe 10 does not match 10.5', !catalogSizeMatches('US 10.5', '10'));
+check(
+  'size gate: explicit missing requested size is rejected',
+  !productSupportsRequestedSize(qp({ category: 'shoes', availableSizes: ['8', '9', '10.5'] }), { shoes: '10' }),
+);
+check(
+  'size gate: missing retailer size evidence remains eligible without guessing',
+  productSupportsRequestedSize(qp({ category: 'top' }), { top: 'M' }),
+);
+
+// ── Client-safe public look encoding ────────────────────────────────────────
+const shareItems = Object.fromEntries((['top', 'bottom', 'shoes'] as Category[]).map((category, index) => [
+  category,
+  { id: `share-product-${index}`, category } as unknown as Product,
+])) as Partial<Record<Category, Product>>;
+check('share code: product id hash is stable', productShareCode('share-product-0') === productShareCode('share-product-0'));
+check('share code: three pieces create a compact slug', encodeLookSlug(shareItems)?.startsWith('c-') === true);
+check('share code: incomplete looks are not shareable', encodeLookSlug({ top: shareItems.top, shoes: shareItems.shoes }) === null);
 
 // ── Frame correctness (lib/frame-inference · hasFrameMismatch) ───────────────
 // Keeps frame-inappropriate pieces out of a gendered scroll; androgynous = no gate.

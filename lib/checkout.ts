@@ -1,9 +1,17 @@
 import { wrapAffiliate } from '@/lib/affiliate';
+import { buildRetailerClickPath, validateRetailerDestination } from '@/lib/retailer-attribution';
 import type { CheckoutProduct } from '@/components/CheckoutSheet';
 
 export interface RetailerGroup {
   retailer: string;
   products: CheckoutProduct[];
+}
+
+/** `owned-*` rows are transient anchors the user already has, not catalog
+ * inventory resolvable by `/api/out`. They stay visible in the look but must
+ * never be presented as another item to purchase. */
+export function isOwnedCheckoutProductId(productId: unknown): boolean {
+  return typeof productId === 'string' && productId.startsWith('owned-');
 }
 
 export function formatCheckoutPrice(priceCents?: number): string {
@@ -29,7 +37,9 @@ export function buildRetailerGroups(products: CheckoutProduct[]): RetailerGroup[
 
 export function isExactProductUrl(url: string): boolean {
   try {
-    const parsed = new URL(url);
+    const destination = validateRetailerDestination(url);
+    if (!destination.ok || !destination.url) return false;
+    const parsed = new URL(destination.url);
     const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
     const pathname = parsed.pathname.toLowerCase();
     const params = parsed.searchParams;
@@ -58,7 +68,17 @@ export function getCheckoutUrlHost(url: string): string {
   }
 }
 
-export function openCheckoutUrls(urls: string[]): {
+export interface CheckoutOpenTarget {
+  productId?: string;
+  url: string;
+  subId?: string;
+  lookId?: string;
+}
+
+export function openCheckoutUrls(
+  targets: Array<string | CheckoutOpenTarget>,
+  surface = 'checkout-batch',
+): {
   openedCount: number;
   requestedCount: number;
 } {
@@ -66,12 +86,21 @@ export function openCheckoutUrls(urls: string[]): {
     return { openedCount: 0, requestedCount: 0 };
   }
 
-  const uniqueUrls = Array.from(
-    new Set(urls.filter((url) => typeof url === 'string' && url.trim())),
+  const normalizedTargets = targets.flatMap((target): CheckoutOpenTarget[] => {
+    const value = typeof target === 'string' ? target.trim() : target.url?.trim();
+    if (!value) return [];
+    const destination = validateRetailerDestination(value);
+    if (!destination.ok || !destination.url) return [];
+    return typeof target === 'string'
+      ? [{ url: destination.url }]
+      : [{ ...target, url: destination.url }];
+  });
+  const uniqueTargets = Array.from(
+    new Map(normalizedTargets.map((target) => [target.productId || target.url, target])).values(),
   );
   const openedWindows: Window[] = [];
 
-  for (let index = 0; index < uniqueUrls.length; index += 1) {
+  for (let index = 0; index < uniqueTargets.length; index += 1) {
     const popup = window.open('about:blank', `sylistly_checkout_${Date.now()}_${index}`);
     if (!popup) break;
     openedWindows.push(popup);
@@ -79,8 +108,16 @@ export function openCheckoutUrls(urls: string[]): {
 
   openedWindows.forEach((popup, index) => {
     try {
+      const target = uniqueTargets[index];
       popup.opener = null;
-      popup.location.replace(wrapAffiliate(uniqueUrls[index]));
+      popup.location.replace(target.productId
+        ? buildRetailerClickPath({
+          productId: target.productId,
+          lookId: target.lookId,
+          surface,
+          subId: target.subId || target.productId,
+        })
+        : wrapAffiliate(target.url));
     } catch {
       popup.close();
     }
@@ -88,6 +125,6 @@ export function openCheckoutUrls(urls: string[]): {
 
   return {
     openedCount: openedWindows.length,
-    requestedCount: uniqueUrls.length,
+    requestedCount: uniqueTargets.length,
   };
 }

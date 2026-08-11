@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiBudgetAvailableGlobal } from '@/lib/ai-budget';
+import catalogHealthData from '@/data/catalog-health.json';
+import { isProductPublishable, type CatalogHealthSnapshot } from '@/lib/catalog-publishability';
 import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { composeOutfitLook, type StylistProfileInput } from '@/lib/stylist/outfit-composer';
-import { hasProductCommerceLink, isEditorialCutoutProduct } from '@/lib/product-image-quality';
+import { isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import { VIBES, type GeneratorBudget, type GeneratorFrame, type VibeId } from '@/lib/vibes';
 
@@ -30,6 +32,12 @@ interface LookBody {
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
+
+const PUBLISHABILITY_OPTIONS = {
+  health: catalogHealthData as CatalogHealthSnapshot,
+  freshnessPolicy: 'require-fresh' as const,
+};
+const REQUIRED_LOOK_SLOTS: Category[] = ['top', 'bottom', 'shoes'];
 
 function sanitizeProfile(value: unknown): StylistProfileInput | null {
   if (!value || typeof value !== 'object') return null;
@@ -187,16 +195,29 @@ export async function POST(req: NextRequest) {
   });
   const renderableProducts = Object.fromEntries(
     Object.entries(result.products).filter((entry): entry is [Category, Product] =>
-      Boolean(entry[1] && isEditorialCutoutProduct(entry[1]) && hasProductCommerceLink(entry[1])),
+      Boolean(
+        entry[1]
+          && isEditorialCutoutProduct(entry[1])
+          && isProductPublishable(entry[1], PUBLISHABILITY_OPTIONS),
+      ),
     ),
   ) as Partial<Record<Category, Product>>;
+  const rejectedRequiredSlots = REQUIRED_LOOK_SLOTS.filter((slot) => !renderableProducts[slot]);
+  const completeBuyableProducts = rejectedRequiredSlots.length ? {} : renderableProducts;
+  const compositionUnchanged = rejectedRequiredSlots.length === 0
+    && Object.keys(result.products).length === Object.keys(completeBuyableProducts).length;
+  const missingSlots = Array.from(new Set([
+    ...result.missingSlots,
+    ...Object.keys(result.products).filter((slot) => !(slot in renderableProducts)) as Category[],
+    ...rejectedRequiredSlots,
+  ]));
   // Keep only rationales for slots that survived the renderable filter.
   const reasons = result.reasons
-    ? Object.fromEntries(Object.entries(result.reasons).filter(([slot]) => slot in renderableProducts))
+    ? Object.fromEntries(Object.entries(result.reasons).filter(([slot]) => slot in completeBuyableProducts))
     : undefined;
 
   return NextResponse.json({
-    products: renderableProducts,
+    products: completeBuyableProducts,
     collection: result.collection
       ? {
           id: result.collection.id,
@@ -205,20 +226,21 @@ export async function POST(req: NextRequest) {
           frame: result.collection.frame,
         }
       : null,
-    missingSlots: result.missingSlots,
+    missingSlots,
     formula: {
       id: result.formula.id,
       label: result.formula.label,
       structure: result.formula.structure,
       reason: result.formula.reason,
     },
-    source: result.assistantMode === 'ai-styled' ? 'ai'
+    source: result.assistantMode === 'ai-styled' && compositionUnchanged ? 'ai'
       : result.assistantMode === 'budget' ? 'budget'
       : 'catalog',
     assistantMode: result.assistantMode,
     aiBudget: result.assistantMode === 'budget' ? 'capped' : 'ok',
-    stylingNotes: result.stylingNotes,
-    palette: result.palette,
+    stylingNotes: compositionUnchanged ? result.stylingNotes : undefined,
+    palette: compositionUnchanged ? result.palette : undefined,
     reasons,
+    publishability: rejectedRequiredSlots.length ? 'rejected-incomplete' : 'complete-buyable',
   });
 }

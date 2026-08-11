@@ -33,6 +33,7 @@ export interface Product {
   name: string;
   category: Category;
   priceCents: number;
+  originalPriceCents?: number; // only when independently verified; never inferred
   currency: string;            // 'USD'
   retailer: string;
   retailerUrl: string;
@@ -48,6 +49,9 @@ export interface Product {
   imageOriginalUrl?: string;   // debug
   inStock?: boolean;
   trusted?: boolean;
+  availabilityState?: 'available' | 'in_stock' | 'reachable' | 'sold_out' | 'dead' | 'blocked' | 'error' | 'unknown';
+  lastVerifiedAt?: string;     // retailer availability check, not ingestion time
+  availableSizes?: string[];   // only when the source provides variant inventory
   vibes?: string[];
   occasions?: string[];
   colors?: string[];
@@ -88,6 +92,16 @@ export interface Profile {
     vibes?: string[];
     budget?: 'low' | 'mid' | 'high' | 'luxury';
     brands?: string[];
+    retailers?: string[];
+    excludedBrands?: string[];
+    excludedRetailers?: string[];
+    colors?: string[];
+    materials?: string[];
+    occasions?: string[];
+    excludedTerms?: string[];
+    fit?: 'oversized' | 'tailored' | 'relaxed';
+    palette?: 'neutral' | 'dark' | 'earth' | 'bold';
+    priceTolerancePct?: number;
   };
   isCreator: boolean;
 }

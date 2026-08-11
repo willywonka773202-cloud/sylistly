@@ -24,12 +24,12 @@ export default function TermsPage() {
       </header>
 
       <div className="mt-5 rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-[12px] leading-relaxed text-amber-100">
-        ⚠️ <strong>Draft — pending legal review.</strong> Accurate to how the app works today, but not
+        <strong>Draft — pending legal review.</strong> Accurate to how the app works today, but not
         yet reviewed by counsel or in effect.
       </div>
 
       <h1 className="mt-6 font-serif text-[32px] font-semibold leading-tight text-ink">Terms of Service</h1>
-      <p className="mt-1 text-[12px] text-muted">Last updated: 21 June 2026</p>
+      <p className="mt-1 text-[12px] text-muted">Last updated: 10 August 2026</p>
 
       <div className="mt-6 space-y-6 text-[14px] leading-relaxed text-muted-2">
         <section>
@@ -86,15 +86,16 @@ export default function TermsPage() {
         <section>
           <h2 className="font-serif text-[18px] font-semibold text-ink">No warranty &amp; changes</h2>
           <p className="mt-2">
-            The service is provided &ldquo;as is.&rdquo; We may update these terms; continued use means
-            you accept the current version. [Limitation of liability, governing law &amp; dispute terms
-            to be finalised with counsel before launch.]
+            The service is provided &ldquo;as is.&rdquo; We may update these terms. Limitation of liability,
+            governing law, and dispute terms still require counsel and jurisdiction-specific review
+            before this draft can take effect.
           </p>
         </section>
       </div>
 
       <div className="mt-10 flex gap-4 text-[12px] font-semibold text-muted">
         <Link href="/privacy" className="text-accent">Privacy Policy</Link>
+        <Link href="/affiliate-disclosure" className="hover:text-ink">Affiliate disclosure</Link>
         <Link href="/" className="hover:text-ink">Back to Sylistly</Link>
       </div>
     </main>

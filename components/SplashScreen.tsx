@@ -37,6 +37,10 @@ export function SplashScreen() {
   const skip = usePathname()?.startsWith('/look/') ?? false;
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setGone(true);
+      return;
+    }
     const fade = window.setTimeout(() => setLeaving(true), MIN_VISIBLE_MS);
     const remove = window.setTimeout(() => setGone(true), MIN_VISIBLE_MS + FADE_MS);
     return () => {

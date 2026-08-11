@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       // personal utility pages, which render near-empty server-side (their data
       // lives in on-device localStorage) — indexing them would be thin content.
       // Mirrors the sitemap, which lists only the public content surfaces.
-      disallow: ['/api/', '/profile', '/checkout'],
+      disallow: ['/api/', '/profile', '/checkout', '/catalog-ops', '/catalog-lab'],
     },
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,

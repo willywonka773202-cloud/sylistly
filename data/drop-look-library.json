@@ -1,0 +1,4725 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-08-11T01:14:02.468Z",
+ "verifiedAt": "2026-08-10T17:47:46.019Z",
+ "maxHealthAgeHours": 24,
+ "products": [
+  {
+   "id": "drop-d8ba49971161a5a9",
+   "brand": "Agolde",
+   "name": "Agolde Ramona Short - Marshmallow",
+   "category": "bottom",
+   "priceCents": 18800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga9255-1183-mmelo",
+   "productUrl": "https://kith.com/products/aga9255-1183-mmelo",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA9255-1183-MMELO_946ead7f-15f8-4bc0-9d19-247afa98379e.jpg?v=1779896796",
+   "imageTransparentUrl": "/assets/cutouts/drop-d8ba49971161a5a9.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "ramona",
+    "short",
+    "marshmallow",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-ac9095f6e93a7998",
+   "brand": "adidas",
+   "name": "adidas Samba OG - Black",
+   "category": "shoes",
+   "priceCents": 10000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aab75807",
+   "productUrl": "https://kith.com/products/aab75807",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/products/AAB75807AdidasSambaOGBlack_28758.jpg?v=1674508274",
+   "imageTransparentUrl": "/assets/cutouts/drop-ac9095f6e93a7998.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "black"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "adidas",
+    "samba",
+    "og",
+    "black",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-eaf33c3edd384e65",
+   "brand": "adidas",
+   "name": "adidas Samba OG - White",
+   "category": "shoes",
+   "priceCents": 10000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aab75806",
+   "productUrl": "https://kith.com/products/aab75806",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/products/AAB75806AdidasSambaOGWhite_28793.jpg?v=1674508328",
+   "imageTransparentUrl": "/assets/cutouts/drop-eaf33c3edd384e65.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "white"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "adidas",
+    "samba",
+    "og",
+    "white",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith womens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-b2bf4d0c167f95ba",
+   "brand": "Aimé Leon Dore",
+   "name": "ALD  / New Balance Made in USA 1300",
+   "category": "shoes",
+   "priceCents": 22000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/ald-new-balance-1300",
+   "productUrl": "https://www.aimeleondore.com/products/ald-new-balance-1300",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69bd91ee15eb8169bd91ee1609c.1396717069bd91ee1609c.jpg?v=1774037758",
+   "imageTransparentUrl": "/assets/cutouts/drop-b2bf4d0c167f95ba.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "date"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "ald",
+    "new",
+    "balance",
+    "made",
+    "in",
+    "usa",
+    "1300",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "date"
+   ],
+   "sourceQuery": "Aime Leon Dore footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-7e85e02b50a32ac5",
+   "brand": "b.Eautiful",
+   "name": "BAMBI REUSABLE BAG",
+   "category": "bag",
+   "priceCents": 3400,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/bambi-reusable-bag-xl",
+   "productUrl": "https://bdgastore.com/products/bambi-reusable-bag-xl",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/40390202-2026-03-20T102804.843.png?v=1774027758",
+   "imageTransparentUrl": "/assets/cutouts/drop-7e85e02b50a32ac5.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "colors": [
+    "brown"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "bambi",
+    "reusable",
+    "bag",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday",
+    "brown"
+   ],
+   "sourceQuery": "Bodega accessories",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-accessories",
+    "sourceType": "shopifyCollection",
+    "collection": "accessories",
+    "productType": "Bags"
+   }
+  },
+  {
+   "id": "drop-2cd8bbc04807f6c7",
+   "brand": "Kompakt Record Bar",
+   "name": "BASIC LOGO CURVED CAP",
+   "category": "hat",
+   "priceCents": 4500,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/basic-logo-curved-cap-1",
+   "productUrl": "https://bdgastore.com/products/basic-logo-curved-cap-1",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/Untitleddesign-2026-05-07T165756.022.jpg?v=1778198281",
+   "imageTransparentUrl": "/assets/cutouts/drop-2cd8bbc04807f6c7.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "basic",
+    "logo",
+    "curved",
+    "cap",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega accessories",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-accessories",
+    "sourceType": "shopifyCollection",
+    "collection": "accessories",
+    "productType": "Headwear"
+   }
+  },
+  {
+   "id": "drop-852707c24a9d9703",
+   "brand": "Bond Eye",
+   "name": "Bond Eye Lumi Top - Navy Stripe",
+   "category": "top",
+   "priceCents": 18000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/bebound829vsk",
+   "productUrl": "https://kith.com/products/bebound829vsk",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/BEBOUND829VSK-TOP-FRONT_06d9cf81-53a5-4de7-804a-caf7e4ad72b9.jpg?v=1780432963",
+   "imageTransparentUrl": "/assets/cutouts/drop-852707c24a9d9703.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "tan",
+    "navy"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "bond",
+    "eye",
+    "lumi",
+    "top",
+    "navy",
+    "stripe",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "tan"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Tank Tops"
+   }
+  },
+  {
+   "id": "drop-da43d14ed1876847",
+   "brand": "Agolde",
+   "name": "Agolde Arc Jeans - Brink",
+   "category": "bottom",
+   "priceCents": 25800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga290b-1371-bnk",
+   "productUrl": "https://kith.com/products/aga290b-1371-bnk",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA290B-1371-BNK_b30d5a92-f177-4169-886d-02106dd42955.jpg?v=1779896797",
+   "imageTransparentUrl": "/assets/cutouts/drop-da43d14ed1876847.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "arc",
+    "jeans",
+    "brink",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Jeans"
+   }
+  },
+  {
+   "id": "drop-0c19f9538ef0b7be",
+   "brand": "For You, With Love",
+   "name": "Bold Toi Et Moi Pinky Ring",
+   "category": "jewelry",
+   "priceCents": 6900,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/bold-toi-et-moi-pinky-ring",
+   "productUrl": "https://www.localeclectic.com/products/bold-toi-et-moi-pinky-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_3.6.26-40.jpg?v=1776262692",
+   "imageTransparentUrl": "/assets/cutouts/drop-0c19f9538ef0b7be.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "colors": [
+    "pink"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "bold",
+    "toi",
+    "et",
+    "moi",
+    "pinky",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday",
+    "pink"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-f904887ace26ed2b",
+   "brand": "New Balance",
+   "name": "New Balance 992 Made in USA - White / Silver Metalic",
+   "category": "shoes",
+   "priceCents": 20000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/nbu992nc",
+   "productUrl": "https://kith.com/products/nbu992nc",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU992NCNewBalance992White.1jpg.jpg?v=1743712397",
+   "imageTransparentUrl": "/assets/cutouts/drop-f904887ace26ed2b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "white",
+    "silver"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "new",
+    "balance",
+    "992",
+    "made",
+    "in",
+    "usa",
+    "white",
+    "silver",
+    "metalic",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-eecdfad4799a2973",
+   "brand": "Bond Eye",
+   "name": "Bond Eye Mina Short - Navy Stripe",
+   "category": "bottom",
+   "priceCents": 19000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/bebound830vsk",
+   "productUrl": "https://kith.com/products/bebound830vsk",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/BEBOUND830VSK-BOTTOM-FRONT_0dbae0fa-81da-4b95-967e-4146e8b22eb1.jpg?v=1780432964",
+   "imageTransparentUrl": "/assets/cutouts/drop-eecdfad4799a2973.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "navy"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "bond",
+    "eye",
+    "mina",
+    "short",
+    "navy",
+    "stripe",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-f1b2787e50cce0c7",
+   "brand": "New Balance",
+   "name": "New Balance Made in USA 990v4 - Olive Leaf / Permafrost / Light Olive",
+   "category": "shoes",
+   "priceCents": 18500,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/nbu9901mx",
+   "productUrl": "https://kith.com/products/nbu9901mx",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU9901MX-Front.jpg?v=1774633586",
+   "imageTransparentUrl": "/assets/cutouts/drop-f1b2787e50cce0c7.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "olive"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "new",
+    "balance",
+    "made",
+    "in",
+    "usa",
+    "990v4",
+    "olive",
+    "leaf",
+    "permafrost",
+    "light",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-5843b7039be7ff08",
+   "brand": "Kompakt Record Bar",
+   "name": "KRB LIGHT CANVAS TOTE BAG",
+   "category": "bag",
+   "priceCents": 5000,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/krb-light-canvas-tote-bag-3",
+   "productUrl": "https://bdgastore.com/products/krb-light-canvas-tote-bag-3",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/Untitleddesign_95_90c87614-3dd8-40f6-99e9-56bede9c30a9.jpg?v=1778010107",
+   "imageTransparentUrl": "/assets/cutouts/drop-5843b7039be7ff08.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual",
+    "utility"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "colors": [
+    "green"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "krb",
+    "light",
+    "canvas",
+    "tote",
+    "bag",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday",
+    "green",
+    "accessories",
+    "bags",
+    "kompakt",
+    "men",
+    "mens",
+    "new",
+    "arrivals",
+    "size",
+    "us",
+    "os",
+    "totebags",
+    "unisex",
+    "women",
+    "womens",
+    "womenschart",
+    "canvas tote",
+    "tote bag",
+    "carry bag",
+    "streetwear tote"
+   ],
+   "sourceQuery": "Bodega accessories",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-accessories",
+    "sourceType": "shopifyCollection",
+    "collection": "accessories",
+    "productType": "Accessories"
+   }
+  },
+  {
+   "id": "drop-b82ee247d1717def",
+   "brand": "Radial",
+   "name": "CHENILLE S SNAPBACK CAP",
+   "category": "hat",
+   "priceCents": 5000,
+   "currency": "USD",
+   "retailer": "Stussy",
+   "retailerUrl": "https://www.stussy.com/products/1311061-low-profile-chenille-s-snapback-shadow",
+   "productUrl": "https://www.stussy.com/products/1311061-low-profile-chenille-s-snapback-shadow",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1311061_SHAW_1.jpg?v=1769548762",
+   "imageTransparentUrl": "/assets/cutouts/drop-b82ee247d1717def.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "colors": [
+    "blue"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "stussy",
+    "chenille",
+    "snapback",
+    "cap",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday",
+    "blue"
+   ],
+   "sourceQuery": "Stussy headwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "stussy-headwear",
+    "sourceType": "shopifyCollection",
+    "collection": "headwear",
+    "productType": "HEADWEAR"
+   }
+  },
+  {
+   "id": "drop-90bc185dd47c19e1",
+   "brand": "Made Some",
+   "name": "Made Some Italy Sportwear Tee - Off White",
+   "category": "top",
+   "priceCents": 15000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/ms-tee-it",
+   "productUrl": "https://kith.com/products/ms-tee-it",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MS-TEE-IT-FRONT_ae04dddf-5899-472d-86f5-ab8cd3eeb957.jpg?v=1779310472",
+   "imageTransparentUrl": "/assets/cutouts/drop-90bc185dd47c19e1.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "gym",
+    "athletic",
+    "casual"
+   ],
+   "occasions": [
+    "everyday",
+    "date",
+    "gym",
+    "workout"
+   ],
+   "colors": [
+    "white"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "made",
+    "some",
+    "italy",
+    "sportwear",
+    "tee",
+    "off",
+    "white",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "052026",
+    "052026mb",
+    "apparel",
+    "flow",
+    "tagged",
+    "types",
+    "limit",
+    "quantity",
+    "two",
+    "low",
+    "stock",
+    "madesome",
+    "ms",
+    "it",
+    "new",
+    "arrival",
+    "arrivals",
+    "primary",
+    "short",
+    "sleeve",
+    "tees",
+    "sleeves",
+    "tops",
+    "wmns",
+    "sport tee",
+    "sportswear tee",
+    "graphic tee",
+    "training tee",
+    "gym tee",
+    "t-shirt"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Short Sleeve Tees"
+   }
+  },
+  {
+   "id": "drop-d477ca577d1f346e",
+   "brand": "Nike",
+   "name": "AIR FORCE 1 '07 PATENT LEATHER",
+   "category": "shoes",
+   "priceCents": 12500,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/air-force-107-patent-leather",
+   "productUrl": "https://bdgastore.com/products/air-force-107-patent-leather",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IV2857-010_PHSRH000-2000.jpg?v=1778615120",
+   "imageTransparentUrl": "/assets/cutouts/drop-d477ca577d1f346e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "air",
+    "force",
+    "07",
+    "patent",
+    "leather",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-22d260d85e98ab1c",
+   "brand": "Nike",
+   "name": "NIKE AIR FORCE 1 '07 LV8",
+   "category": "shoes",
+   "priceCents": 11500,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/nike-air-force-1-07-lv8-4",
+   "productUrl": "https://bdgastore.com/products/nike-air-force-1-07-lv8-4",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IR5896-030_PHSRH000-2000.jpg?v=1780341408",
+   "imageTransparentUrl": "/assets/cutouts/drop-22d260d85e98ab1c.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "nike",
+    "air",
+    "force",
+    "07",
+    "lv8",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-bcd13a4dcb88faba",
+   "brand": "Peta and Jain",
+   "name": "Gigi Shoulder Bag Chocolate",
+   "category": "bag",
+   "priceCents": 5800,
+   "currency": "USD",
+   "retailer": "Princess Polly",
+   "retailerUrl": "https://us.princesspolly.com/products/gigi-shoulder-bag-chocolate",
+   "productUrl": "https://us.princesspolly.com/products/gigi-shoulder-bag-chocolate",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0061/8627/0804/files/0_e642660d-e7fa-4411-a2d8-6ed5283d9b3c.jpg?v=1728969742",
+   "imageTransparentUrl": "/assets/cutouts/drop-bcd13a4dcb88faba.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "casual",
+    "clean",
+    "night"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "gender": [
+    "feminine"
+   ],
+   "searchTerms": [
+    "princess",
+    "polly",
+    "gigi",
+    "shoulder",
+    "bag",
+    "chocolate",
+    "casual",
+    "clean",
+    "night",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Princess Polly bags",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "princess-polly-bags",
+    "sourceType": "shopifyCollection",
+    "collection": "bags",
+    "productType": "BAGS"
+   }
+  },
+  {
+   "id": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+   "brand": "Birkenstock",
+   "name": "Arizona EVA Birkenstock",
+   "category": "shoes",
+   "priceCents": 4995,
+   "currency": "USD",
+   "retailer": "BIRKENSTOCK",
+   "retailerUrl": "https://www.birkenstock.com/us/arizona-eva/arizonaessentials-tothebeachmetallic-eva-0-eva-u_2095.html",
+   "productUrl": "https://www.birkenstock.com/us/arizona-eva/arizonaessentials-tothebeachmetallic-eva-0-eva-u_2095.html",
+   "googleShoppingUrl": "https://www.google.com/search?q=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&oq=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAADQEoNBEQAAAAAqdaVBGAEYFio3Qmlya2Vuc3RvY2sgc2FuZGFscyBzbGlkZXMgdmFjYXRpb24gc3VtbWVyIGNsZWFuIG91dGZpdDIsCAUSCiQ0MCAtICQxODAYAiIWEhQJAAAAANASg0ERAAAAACp1pUEYASoCGAFYiaogYAI&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=gid:4395942695875510797,pid:5522266860407409379,oid:5522266860407409379,iid:15768703676712230742,rds:UENfNDM5NTk0MjY5NTg3NTUxMDc5N3xQUk9EX1BDXzQzOTU5NDI2OTU4NzU1MTA3OTc=,pvt:hg,pvo:3&oshop=apv&pvs=0",
+   "fallbackUrl": "https://www.google.com/search?q=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&oq=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAADQEoNBEQAAAAAqdaVBGAEYFio3Qmlya2Vuc3RvY2sgc2FuZGFscyBzbGlkZXMgdmFjYXRpb24gc3VtbWVyIGNsZWFuIG91dGZpdDIsCAUSCiQ0MCAtICQxODAYAiIWEhQJAAAAANASg0ERAAAAACp1pUEYASoCGAFYiaogYAI&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=gid:4395942695875510797,pid:5522266860407409379,oid:5522266860407409379,iid:15768703676712230742,rds:UENfNDM5NTk0MjY5NTg3NTUxMDc5N3xQUk9EX1BDXzQzOTU5NDI2OTU4NzU1MTA3OTc=,pvt:hg,pvo:3&oshop=apv&pvs=0",
+   "imageUrl": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTbFC309JA2l0dKxPZG6fbUPd9F3eBzk46hWwmUX1xR7ETqpJV_mDFULYRVkg9_EqIq9y3yQfmXcMgqDV2By4DDuynnQYtGmDZ2JOMyQbup-Gq8kGk5vEj6Dg",
+   "imageTransparentUrl": "/assets/cutouts/searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "summer",
+    "vacation",
+    "clean"
+   ],
+   "occasions": [
+    "summer",
+    "vacation",
+    "clean"
+   ],
+   "colors": [
+    "pink"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "birkenstock",
+    "arizona",
+    "eva",
+    "shoes",
+    "sandals",
+    "slides",
+    "vacation",
+    "summer",
+    "clean",
+    "outfit",
+    "pink"
+   ],
+   "sourceQuery": "Birkenstock sandals slides vacation summer clean outfit",
+   "imageQuality": "good",
+   "popularityScore": 89,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "searchapi_quality_catalog",
+    "sourceId": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+   }
+  },
+  {
+   "id": "drop-10c7259c03320f7c",
+   "brand": "Jurate JLA",
+   "name": "Ease Toe Ring",
+   "category": "jewelry",
+   "priceCents": 5000,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/ease-toe-ring",
+   "productUrl": "https://www.localeclectic.com/products/ease-toe-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_5.19.26-7.jpg?v=1779420926",
+   "imageTransparentUrl": "/assets/cutouts/drop-10c7259c03320f7c.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "ease",
+    "toe",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-4bec95cdd8dbe117",
+   "brand": "Made Some",
+   "name": "Made Some Short Short - White / Navy",
+   "category": "bottom",
+   "priceCents": 22500,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/ms-short-wn",
+   "productUrl": "https://kith.com/products/ms-short-wn",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MS-SHORT-WN-FRONT_405c3491-6a2e-4495-a457-77e36dfd8bd4.jpg?v=1779310475",
+   "imageTransparentUrl": "/assets/cutouts/drop-4bec95cdd8dbe117.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "gym",
+    "athletic",
+    "y2k"
+   ],
+   "occasions": [
+    "everyday",
+    "date",
+    "gym",
+    "workout"
+   ],
+   "colors": [
+    "white",
+    "navy"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "made",
+    "some",
+    "short",
+    "white",
+    "navy",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "052026",
+    "052026mb",
+    "apparel",
+    "bottoms",
+    "flow",
+    "tagged",
+    "types",
+    "limit",
+    "quantity",
+    "two",
+    "madesome",
+    "ms",
+    "wn",
+    "new",
+    "arrival",
+    "arrivals",
+    "primary",
+    "shorts",
+    "wmns",
+    "sport short",
+    "athletic short",
+    "training short",
+    "gym short",
+    "running short"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-9666afe788027e20",
+   "brand": "Air Jordan",
+   "name": "AIR JORDAN 12 RETRO \"BLOODLINE\"",
+   "category": "shoes",
+   "priceCents": 15500,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/air-jordan-12-retro-bloodline",
+   "productUrl": "https://bdgastore.com/products/air-jordan-12-retro-bloodline",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_153265-003_PHSRH000-2000.jpg?v=1779305355",
+   "imageTransparentUrl": "/assets/cutouts/drop-9666afe788027e20.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "air",
+    "jordan",
+    "12",
+    "retro",
+    "bloodline",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-e5bc278631de306e",
+   "brand": "Jurate JLA",
+   "name": "Still Toe Ring",
+   "category": "jewelry",
+   "priceCents": 4500,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/still-toe-ring",
+   "productUrl": "https://www.localeclectic.com/products/still-toe-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_5.19.26-4.jpg?v=1779420905",
+   "imageTransparentUrl": "/assets/cutouts/drop-e5bc278631de306e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "still",
+    "toe",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-09c4fce3422635e4",
+   "brand": "Marine Serre",
+   "name": "Marine Serre Moon Printed Jersey Mini Short - Pink",
+   "category": "bottom",
+   "priceCents": 28500,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/mswsh007acjer0001",
+   "productUrl": "https://kith.com/products/mswsh007acjer0001",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MSWSH007ACJER0001-FRONT_e9616fa4-e5d1-4f9c-bcb4-e1f049fd5613.jpg?v=1780432968",
+   "imageTransparentUrl": "/assets/cutouts/drop-09c4fce3422635e4.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "pink"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "marine",
+    "serre",
+    "moon",
+    "printed",
+    "jersey",
+    "mini",
+    "short",
+    "pink",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-c129055c58918097",
+   "brand": "Air Jordan",
+   "name": "JORDAN TRUNNER O/S SP",
+   "category": "shoes",
+   "priceCents": 13500,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/jordan-trunner-o-s-sp-4",
+   "productUrl": "https://bdgastore.com/products/jordan-trunner-o-s-sp-4",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IV4373-001_PHSRH000-2000.jpg?v=1780346425",
+   "imageTransparentUrl": "/assets/cutouts/drop-c129055c58918097.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "jordan",
+    "trunner",
+    "sp",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-aa24d39683305339",
+   "brand": "La Kaiser",
+   "name": "Gemstone Empress Ring",
+   "category": "jewelry",
+   "priceCents": 10500,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/gemstonel-empress-ring",
+   "productUrl": "https://www.localeclectic.com/products/gemstonel-empress-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/Black_Gret_RG_3.jpg?v=1761344172",
+   "imageTransparentUrl": "/assets/cutouts/drop-aa24d39683305339.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "gemstone",
+    "empress",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-18ba45562b4c791e",
+   "brand": "La Kaiser",
+   "name": "Sky Blue Cats Eye Flow Ring",
+   "category": "jewelry",
+   "priceCents": 9800,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/sky-blue-cats-eye-flow-ring",
+   "productUrl": "https://www.localeclectic.com/products/sky-blue-cats-eye-flow-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_11.4.25-2.jpg?v=1764003614",
+   "imageTransparentUrl": "/assets/cutouts/drop-18ba45562b4c791e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "colors": [
+    "blue"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "sky",
+    "blue",
+    "cats",
+    "eye",
+    "flow",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-9a0580df64006a51",
+   "brand": "Missoma",
+   "name": "Celestial Pave Ear Cuff | 18k Gold Vermeil/Cubic Zirconia",
+   "category": "jewelry",
+   "priceCents": 10900,
+   "currency": "USD",
+   "retailer": "Missoma",
+   "retailerUrl": "https://us.missoma.com/products/celestial-pave-ear-cuff-18ct-gold-plated-vermeil-cubic-zirconia",
+   "productUrl": "https://us.missoma.com/products/celestial-pave-ear-cuff-18ct-gold-plated-vermeil-cubic-zirconia",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0286/4703/0828/files/celestial-pave-ear-cuff-18ct-gold-plated-vermeilcubic-zirconia-earrings-missoma-206299.jpg?v=1707850885",
+   "imageTransparentUrl": "/assets/cutouts/drop-9a0580df64006a51.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "missoma",
+    "celestial",
+    "pave",
+    "ear",
+    "cuff",
+    "18k",
+    "gold",
+    "vermeil",
+    "cubic",
+    "zirconia",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Missoma earrings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "missoma-earrings",
+    "sourceType": "shopifyCollection",
+    "collection": "earrings",
+    "productType": "Earrings"
+   }
+  },
+  {
+   "id": "drop-1d3c8907a84be84b",
+   "brand": "Lemonade",
+   "name": "Buckle Down Boots Black",
+   "category": "shoes",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Princess Polly",
+   "retailerUrl": "https://us.princesspolly.com/products/buckle-down-boots-black",
+   "productUrl": "https://us.princesspolly.com/products/buckle-down-boots-black",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0061/8627/0804/files/1_282f2d72-3449-40e4-8ae9-9df2e1b18dfd.jpg?v=1774589297",
+   "imageTransparentUrl": "/assets/cutouts/drop-1d3c8907a84be84b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "casual",
+    "clean",
+    "night"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "black"
+   ],
+   "gender": [
+    "feminine"
+   ],
+   "searchTerms": [
+    "princess",
+    "polly",
+    "buckle",
+    "down",
+    "boots",
+    "black",
+    "casual",
+    "clean",
+    "night",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Princess Polly shoes",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "princess-polly-shoes",
+    "sourceType": "shopifyCollection",
+    "collection": "shoes",
+    "productType": "BOOTS"
+   }
+  },
+  {
+   "id": "drop-b4eb34563de9b283",
+   "brand": "Aimé Leon Dore",
+   "name": "Artiste Pocket Tee",
+   "category": "top",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/artiste-pocket-tee",
+   "productUrl": "https://www.aimeleondore.com/products/artiste-pocket-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/SS26CT107_SSCERAMIQUETEE_WHITE_2_1x1_c64851c1-d1d4-4213-a1f7-8f3b774fe90e.jpg?v=1782316384",
+   "imageTransparentUrl": "/assets/cutouts/drop-b4eb34563de9b283.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "artiste",
+    "pocket",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-743b276f967a19d3",
+   "brand": "Agolde",
+   "name": "Agolde Indra Short - Journal",
+   "category": "bottom",
+   "priceCents": 18800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga222-1371-jrn",
+   "productUrl": "https://kith.com/products/aga222-1371-jrn",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA222-1371-JRN-FRONT_7e0cd32e-9a5d-4ff9-8db0-2ea6b5babddb.jpg?v=1779896799",
+   "imageTransparentUrl": "/assets/cutouts/drop-743b276f967a19d3.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "indra",
+    "short",
+    "journal",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-f0c909bf62a329cc",
+   "brand": "Aimé Leon Dore",
+   "name": "Botanical Crest Pocket Tee",
+   "category": "top",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/botanical-crest-pocket-tee-1",
+   "productUrl": "https://www.aimeleondore.com/products/botanical-crest-pocket-tee-1",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a39a1abe4ebf36a39a1abe506c.268721666a39a1abe506c.jpg?v=1782161857",
+   "imageTransparentUrl": "/assets/cutouts/drop-f0c909bf62a329cc.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "colors": [
+    "tan"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "botanical",
+    "crest",
+    "pocket",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "tan"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-8148277f12771c11",
+   "brand": "New Balance",
+   "name": "New Balance Made in USA 992 - Olivine / Incense / Raw Cashew",
+   "category": "shoes",
+   "priceCents": 20000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/nbu992720",
+   "productUrl": "https://kith.com/products/nbu992720",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/NBU992720-Front.jpg?v=1774036650",
+   "imageTransparentUrl": "/assets/cutouts/drop-8148277f12771c11.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "new",
+    "balance",
+    "made",
+    "in",
+    "usa",
+    "992",
+    "olivine",
+    "incense",
+    "raw",
+    "cashew",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-95b7c882bae17b8e",
+   "brand": "Harvest Moon",
+   "name": "Witching Hour Crescent Moon Ring",
+   "category": "jewelry",
+   "priceCents": 6500,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/witching-hour-crescent-moon-ring",
+   "productUrl": "https://www.localeclectic.com/products/witching-hour-crescent-moon-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_11.19.25-4.jpg?v=1774893738",
+   "imageTransparentUrl": "/assets/cutouts/drop-95b7c882bae17b8e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "witching",
+    "hour",
+    "crescent",
+    "moon",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-e3d92794a0495195",
+   "brand": "Made Some",
+   "name": "Made Some Short Shorts - Cobalt / White",
+   "category": "bottom",
+   "priceCents": 22500,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/ms-short-cw",
+   "productUrl": "https://kith.com/products/ms-short-cw",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/MS-SHORT-CW-FRONT_2fbdf9c2-af25-4412-904e-9e3ba64bada1.jpg?v=1779310477",
+   "imageTransparentUrl": "/assets/cutouts/drop-e3d92794a0495195.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "gym",
+    "athletic",
+    "y2k"
+   ],
+   "occasions": [
+    "everyday",
+    "date",
+    "gym",
+    "workout"
+   ],
+   "colors": [
+    "white"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "made",
+    "some",
+    "short",
+    "shorts",
+    "cobalt",
+    "white",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "052026",
+    "052026mb",
+    "apparel",
+    "bottoms",
+    "flow",
+    "tagged",
+    "types",
+    "limit",
+    "quantity",
+    "two",
+    "madesome",
+    "ms",
+    "cw",
+    "new",
+    "arrival",
+    "arrivals",
+    "primary",
+    "wmns",
+    "sport short",
+    "athletic short",
+    "training short",
+    "gym short",
+    "running short"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-656ccfff3e8bd40b",
+   "brand": "Aimé Leon Dore",
+   "name": "Coastal Flag Tee",
+   "category": "top",
+   "priceCents": 8500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/coastal-flag-tee",
+   "productUrl": "https://www.aimeleondore.com/products/coastal-flag-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a39969ec275586a39969ec294e.643213686a39969ec294e.jpg?v=1782162110",
+   "imageTransparentUrl": "/assets/cutouts/drop-656ccfff3e8bd40b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "coastal",
+    "flag",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-be18c75456f30cf9",
+   "brand": "Agolde",
+   "name": "Agolde Lydia Short - Chalk White",
+   "category": "bottom",
+   "priceCents": 18800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga9243-1815-clkw",
+   "productUrl": "https://kith.com/products/aga9243-1815-clkw",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA9243-1815-CLKW_63c409a8-d819-40e3-a5ce-9d18ba6ae5f6.jpg?v=1779896796",
+   "imageTransparentUrl": "/assets/cutouts/drop-be18c75456f30cf9.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "white",
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "lydia",
+    "short",
+    "chalk",
+    "white",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-d0dad86fa61690c5",
+   "brand": "Radial",
+   "name": "JERSEY SKULLCAP",
+   "category": "hat",
+   "priceCents": 4500,
+   "currency": "USD",
+   "retailer": "Stussy",
+   "retailerUrl": "https://www.stussy.com/products/1321264-jersey-skullcap-black",
+   "productUrl": "https://www.stussy.com/products/1321264-jersey-skullcap-black",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/1321264_BLAC_1.jpg?v=1778692891",
+   "imageTransparentUrl": "/assets/cutouts/drop-d0dad86fa61690c5.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "stussy",
+    "jersey",
+    "skullcap",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Stussy headwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "stussy-headwear",
+    "sourceType": "shopifyCollection",
+    "collection": "headwear",
+    "productType": "HEADWEAR"
+   }
+  },
+  {
+   "id": "drop-5eb057ef0f65bb0b",
+   "brand": "Agolde",
+   "name": "Agolde Ramona Short - Tangent",
+   "category": "bottom",
+   "priceCents": 18800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga9255-1601-tagt",
+   "productUrl": "https://kith.com/products/aga9255-1601-tagt",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA9255-1601-TAGT_3e0727f4-31cb-4365-83a9-89332d9e2aa3.jpg?v=1779896796",
+   "imageTransparentUrl": "/assets/cutouts/drop-5eb057ef0f65bb0b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "tan",
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "ramona",
+    "short",
+    "tangent",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "tan",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-e0f78dfa2edd568d",
+   "brand": "Aimé Leon Dore",
+   "name": "ALD / New     Balance       475",
+   "category": "shoes",
+   "priceCents": 15000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/ald-new-balance-477",
+   "productUrl": "https://www.aimeleondore.com/products/ald-new-balance-477",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/NB25FS003_NB475_2_1X1_ef440e41-9d99-486a-a1f7-2f9b7217a1e4.jpg?v=1743073897",
+   "imageTransparentUrl": "/assets/cutouts/drop-e0f78dfa2edd568d.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean",
+    "gym",
+    "athletic",
+    "running",
+    "trainer",
+    "sneaker"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "date",
+    "gym",
+    "workout"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "ald",
+    "new",
+    "balance",
+    "475",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "date",
+    "ss25",
+    "drop3",
+    "nbcarryover",
+    "ss26",
+    "algolia",
+    "sneakers",
+    "alttext",
+    "tagged",
+    "dev",
+    "collection",
+    "delivery",
+    "product",
+    "type",
+    "unisex",
+    "season",
+    "size",
+    "range",
+    "49",
+    "style",
+    "number",
+    "nb25fs004",
+    "swatch",
+    "count",
+    "shop",
+    "all",
+    "new balance",
+    "running shoe",
+    "trainer",
+    "athletic sneaker",
+    "workout shoe"
+   ],
+   "sourceQuery": "Aime Leon Dore footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-bf1662585100ee4b",
+   "brand": "For You, With Love",
+   "name": "Pave Bar Pinky Ring",
+   "category": "jewelry",
+   "priceCents": 4900,
+   "currency": "USD",
+   "retailer": "Local Eclectic",
+   "retailerUrl": "https://www.localeclectic.com/products/pave-bar-pinky-ring",
+   "productUrl": "https://www.localeclectic.com/products/pave-bar-pinky-ring",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0764/4005/files/LE_3.6.26-53.jpg?v=1776721874",
+   "imageTransparentUrl": "/assets/cutouts/drop-bf1662585100ee4b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "clean",
+    "night",
+    "date"
+   ],
+   "occasions": [
+    "date",
+    "night out",
+    "everyday"
+   ],
+   "colors": [
+    "pink"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "local",
+    "eclectic",
+    "pave",
+    "bar",
+    "pinky",
+    "ring",
+    "clean",
+    "night",
+    "date",
+    "out",
+    "everyday",
+    "pink"
+   ],
+   "sourceQuery": "Local Eclectic rings",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "local-eclectic-rings",
+    "sourceType": "shopifyCollection",
+    "collection": "rings",
+    "productType": "rings"
+   }
+  },
+  {
+   "id": "drop-e4e08db1a6d56b38",
+   "brand": "Nike",
+   "name": "NIKE AIR MAX 95 BIG BUBBLE",
+   "category": "shoes",
+   "priceCents": 20000,
+   "currency": "USD",
+   "retailer": "Bodega",
+   "retailerUrl": "https://bdgastore.com/products/nike-air-max-95-big-bubble-7",
+   "productUrl": "https://bdgastore.com/products/nike-air-max-95-big-bubble-7",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0049/9112/files/AURORA_IB6830-001_PHSRH000-2000.jpg?v=1779399139",
+   "imageTransparentUrl": "/assets/cutouts/drop-e4e08db1a6d56b38.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual"
+   ],
+   "occasions": [
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "bodega",
+    "nike",
+    "air",
+    "max",
+    "95",
+    "big",
+    "bubble",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday"
+   ],
+   "sourceQuery": "Bodega footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "bodega-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-2a653bf5d2cc277b",
+   "brand": "Radial",
+   "name": "CURSIVE APPLIQUE ZIP HOODIE",
+   "category": "top",
+   "priceCents": 15000,
+   "currency": "USD",
+   "retailer": "Stussy",
+   "retailerUrl": "https://www.stussy.com/products/118617-cursive-applique-zip-hoodie-lime",
+   "productUrl": "https://www.stussy.com/products/118617-cursive-applique-zip-hoodie-lime",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0087/6193/3920/files/118617_LIME_1.jpg?v=1778692711",
+   "imageTransparentUrl": "/assets/cutouts/drop-2a653bf5d2cc277b.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "street",
+    "casual",
+    "gym",
+    "athletic"
+   ],
+   "occasions": [
+    "everyday",
+    "gym",
+    "workout"
+   ],
+   "gender": [
+    "androgynous",
+    "masc"
+   ],
+   "searchTerms": [
+    "stussy",
+    "cursive",
+    "applique",
+    "zip",
+    "hoodie",
+    "streetwear",
+    "street",
+    "casual",
+    "everyday",
+    "bis",
+    "active",
+    "colorswatches",
+    "mens",
+    "newcollection",
+    "product",
+    "family",
+    "118617",
+    "su26",
+    "delivery",
+    "sweatscollection",
+    "zip hoodie",
+    "sweatshirt",
+    "training hoodie",
+    "gym hoodie"
+   ],
+   "sourceQuery": "Stussy new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "stussy-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "FLEECE"
+   }
+  },
+  {
+   "id": "drop-bcf8734b21417213",
+   "brand": "Nike",
+   "name": "Nike Air Max 95 Big Bubble - Metallic Silver / Black",
+   "category": "shoes",
+   "priceCents": 20000,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/nkib6830-002",
+   "productUrl": "https://kith.com/products/nkib6830-002",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_IB6830-002_PHSRH000-2000.jpg?v=1774543664",
+   "imageTransparentUrl": "/assets/cutouts/drop-bcf8734b21417213.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "black",
+    "silver"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "nike",
+    "air",
+    "max",
+    "95",
+    "big",
+    "bubble",
+    "metallic",
+    "silver",
+    "black",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-a61ec92ecb9f5b4a",
+   "brand": "Lemonade",
+   "name": "Wrecked Western Boots Black",
+   "category": "shoes",
+   "priceCents": 8900,
+   "currency": "USD",
+   "retailer": "Princess Polly",
+   "retailerUrl": "https://us.princesspolly.com/products/wrecked-western-boots-black",
+   "productUrl": "https://us.princesspolly.com/products/wrecked-western-boots-black",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0061/8627/0804/files/1_65a74718-2dc7-4d1c-a5f4-a31becc480d8.jpg?v=1770341753",
+   "imageTransparentUrl": "/assets/cutouts/drop-a61ec92ecb9f5b4a.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "casual",
+    "clean",
+    "night"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "black"
+   ],
+   "gender": [
+    "feminine"
+   ],
+   "searchTerms": [
+    "princess",
+    "polly",
+    "wrecked",
+    "western",
+    "boots",
+    "black",
+    "casual",
+    "clean",
+    "night",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Princess Polly shoes",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "princess-polly-shoes",
+    "sourceType": "shopifyCollection",
+    "collection": "shoes",
+    "productType": "BOOTS"
+   }
+  },
+  {
+   "id": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9",
+   "brand": "Birkenstock",
+   "name": "Birkenstock Arizona Stealth Buckle Two-Strap Sandals",
+   "category": "shoes",
+   "priceCents": 5495,
+   "currency": "USD",
+   "retailer": "BIRKENSTOCK",
+   "retailerUrl": "https://www.birkenstock.com/us/arizona-stealth-buckle-eva/arizonaeva-eva-eva-272681-eva-u_1929.html",
+   "productUrl": "https://www.birkenstock.com/us/arizona-stealth-buckle-eva/arizonaeva-eva-eva-272681-eva-u_1929.html",
+   "googleShoppingUrl": "https://www.google.com/search?q=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&oq=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAADQEoNBEQAAAAAqdaVBGAEYFio3Qmlya2Vuc3RvY2sgc2FuZGFscyBzbGlkZXMgdmFjYXRpb24gc3VtbWVyIGNsZWFuIG91dGZpdDIsCAUSCiQ0MCAtICQxODAYAiIWEhQJAAAAANASg0ERAAAAACp1pUEYASoCGAFYiaogYAI&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=gid:14518830093525003191,pid:16576649562659007398,oid:16576649562659007398,iid:6644081825687186683,rds:UENfMTQ1MTg4MzAwOTM1MjUwMDMxOTF8UFJPRF9QQ18xNDUxODgzMDA5MzUyNTAwMzE5MQ==,pvt:hg,pvo:3&oshop=apv&pvs=0",
+   "fallbackUrl": "https://www.google.com/search?q=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&oq=Birkenstock+sandals+slides+vacation+summer+clean+outfit+new+between+40+and+180&gl=us&hl=en&udm=28&shoprs=CAESFhIUCQAAAADQEoNBEQAAAAAqdaVBGAEYFio3Qmlya2Vuc3RvY2sgc2FuZGFscyBzbGlkZXMgdmFjYXRpb24gc3VtbWVyIGNsZWFuIG91dGZpdDIsCAUSCiQ0MCAtICQxODAYAiIWEhQJAAAAANASg0ERAAAAACp1pUEYASoCGAFYiaogYAI&start=0&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw#oshopproduct=gid:14518830093525003191,pid:16576649562659007398,oid:16576649562659007398,iid:6644081825687186683,rds:UENfMTQ1MTg4MzAwOTM1MjUwMDMxOTF8UFJPRF9QQ18xNDUxODgzMDA5MzUyNTAwMzE5MQ==,pvt:hg,pvo:3&oshop=apv&pvs=0",
+   "imageUrl": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTpEvgJZcg6XXrg7lL6SoOfvOx1nx5XhlhbXzshghzW5EHpQXoqLNBDmoPwhPTWxLxm5XIekm22Ddi6RF0LvIprq4dgAO4_24dWizFt2HfyuxuXTi_T1Jl8tQ",
+   "imageTransparentUrl": "/assets/cutouts/searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "summer",
+    "vacation",
+    "clean"
+   ],
+   "occasions": [
+    "summer",
+    "vacation",
+    "clean"
+   ],
+   "colors": [
+    "blue"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "birkenstock",
+    "arizona",
+    "stealth",
+    "buckle",
+    "two",
+    "strap",
+    "sandals",
+    "shoes",
+    "slides",
+    "vacation",
+    "summer",
+    "clean",
+    "outfit",
+    "blue"
+   ],
+   "sourceQuery": "Birkenstock sandals slides vacation summer clean outfit",
+   "imageQuality": "good",
+   "popularityScore": 89,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "searchapi_quality_catalog",
+    "sourceId": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+   }
+  },
+  {
+   "id": "drop-186f1a82b7d7f58f",
+   "brand": "Agolde",
+   "name": "Agolde Rounded Baggy Jeans - Expression",
+   "category": "bottom",
+   "priceCents": 26800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga333-1972-exss",
+   "productUrl": "https://kith.com/products/aga333-1972-exss",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA333-1972-EXSS_feff0184-442e-421e-9b81-0e319cbdccec.jpg?v=1779896797",
+   "imageTransparentUrl": "/assets/cutouts/drop-186f1a82b7d7f58f.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "rounded",
+    "baggy",
+    "jeans",
+    "expression",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Jeans"
+   }
+  },
+  {
+   "id": "drop-2ca0f430ab769aec",
+   "brand": "Aimé Leon Dore",
+   "name": "ALD / New Balance        RC56",
+   "category": "shoes",
+   "priceCents": 16500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/ald-new-balance-rc56-7",
+   "productUrl": "https://www.aimeleondore.com/products/ald-new-balance-rc56-7",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore698e1c0e2d6748698e1c0e2d82b.94854480698e1c0e2d82b.jpg?v=1771002302",
+   "imageTransparentUrl": "/assets/cutouts/drop-2ca0f430ab769aec.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "date"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "ald",
+    "new",
+    "balance",
+    "rc56",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "date"
+   ],
+   "sourceQuery": "Aime Leon Dore footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "footwear",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-3ae9091e99c3dbfb",
+   "brand": "Aimé Leon Dore",
+   "name": "Ripstop Nylon Wave Short",
+   "category": "bottom",
+   "priceCents": 25000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/ripstop-nylon-wave-short",
+   "productUrl": "https://www.aimeleondore.com/products/ripstop-nylon-wave-short",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fb9fcbb2c5a469fb9fcbb2f01.5426975169fb9fcbb2f01.jpg?v=1778253017",
+   "imageTransparentUrl": "/assets/cutouts/drop-3ae9091e99c3dbfb.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean",
+    "gym",
+    "athletic",
+    "vacation",
+    "coastal"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "gym",
+    "workout",
+    "vacation"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "ripstop",
+    "nylon",
+    "wave",
+    "short",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "ss26",
+    "drop5",
+    "alttext",
+    "tagged",
+    "best",
+    "seller",
+    "dev",
+    "alt",
+    "style",
+    "number",
+    "collection",
+    "delivery",
+    "season",
+    "size",
+    "range",
+    "ss26wr014",
+    "swatch",
+    "count",
+    "highsummer",
+    "newarrivals",
+    "shop",
+    "all",
+    "nylon short",
+    "ripstop short",
+    "vacation short",
+    "coastal short",
+    "athletic short",
+    "training short",
+    "gym short"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Shorts"
+   }
+  },
+  {
+   "id": "drop-093f29efd827e2a5",
+   "brand": "Aimé Leon Dore",
+   "name": "ALD / New Balance Gator",
+   "category": "shoes",
+   "priceCents": 13000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/ald-new-balance-gator",
+   "productUrl": "https://www.aimeleondore.com/products/ald-new-balance-gator",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fb89961b1e5769fb89961b35b.9512303269fb89961b35b.jpg?v=1778255068",
+   "imageTransparentUrl": "/assets/cutouts/drop-093f29efd827e2a5.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "ald",
+    "new",
+    "balance",
+    "gator",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Footwear"
+   }
+  },
+  {
+   "id": "drop-a603bb768cece86e",
+   "brand": "Aimé Leon Dore",
+   "name": "Mesaikos Commuter Tee",
+   "category": "top",
+   "priceCents": 8500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/mesaikos-commuter-tee",
+   "productUrl": "https://www.aimeleondore.com/products/mesaikos-commuter-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a399554399b116a39955439b55.167140376a39955439b55.jpg?v=1782162054",
+   "imageTransparentUrl": "/assets/cutouts/drop-a603bb768cece86e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "mesaikos",
+    "commuter",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-1c6f265a74f6a5e8",
+   "brand": "Aimé Leon Dore",
+   "name": "Washed Cotton Windbreaker Pant",
+   "category": "bottom",
+   "priceCents": 29500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/washed-cotton-windbreaker-pant",
+   "productUrl": "https://www.aimeleondore.com/products/washed-cotton-windbreaker-pant",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fcc2b046225369fcc2b046565.4891133769fcc2b046565.jpg?v=1778252866",
+   "imageTransparentUrl": "/assets/cutouts/drop-1c6f265a74f6a5e8.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean",
+    "gym",
+    "athletic",
+    "casual",
+    "vacation",
+    "coastal"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "gym",
+    "workout",
+    "travel",
+    "vacation"
+   ],
+   "gender": [
+    "androgynous",
+    "masc"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "washed",
+    "cotton",
+    "windbreaker",
+    "pant",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "ss26",
+    "drop5",
+    "alttext",
+    "tagged",
+    "best",
+    "seller",
+    "dev",
+    "alt",
+    "style",
+    "number",
+    "collection",
+    "delivery",
+    "season",
+    "size",
+    "range",
+    "ss26wp012",
+    "swatch",
+    "count",
+    "newarrivals",
+    "shop",
+    "all",
+    "aime leon dore",
+    "windbreaker pant",
+    "nylon pant",
+    "lightweight vacation pant",
+    "coastal easy pant",
+    "warm up pant",
+    "training pant",
+    "athletic pant"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Pants"
+   }
+  },
+  {
+   "id": "drop-c387a3e225fd0156",
+   "brand": "Aimé Leon Dore",
+   "name": "Mesaikos Hoops Tee",
+   "category": "top",
+   "priceCents": 8500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/mesaikos-hoops-tee",
+   "productUrl": "https://www.aimeleondore.com/products/mesaikos-hoops-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a399569ef25d06a399569ef4be.880665176a399569ef4be.jpg?v=1782162073",
+   "imageTransparentUrl": "/assets/cutouts/drop-c387a3e225fd0156.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "mesaikos",
+    "hoops",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-7519bbbe7ac2f837",
+   "brand": "Aimé Leon Dore",
+   "name": "Wide Leg Shore Pant",
+   "category": "bottom",
+   "priceCents": 29500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/wide-leg-shore-pant",
+   "productUrl": "https://www.aimeleondore.com/products/wide-leg-shore-pant",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fb9efb93ad8069fb9efb93caa.2804788269fb9efb93caa.jpg?v=1778252534",
+   "imageTransparentUrl": "/assets/cutouts/drop-7519bbbe7ac2f837.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean",
+    "gym",
+    "athletic",
+    "casual",
+    "vacation",
+    "coastal"
+   ],
+   "occasions": [
+    "everyday",
+    "office",
+    "gym",
+    "workout",
+    "travel",
+    "vacation"
+   ],
+   "gender": [
+    "androgynous",
+    "masc"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "wide",
+    "leg",
+    "shore",
+    "pant",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "ss26",
+    "drop5",
+    "alttext",
+    "tagged",
+    "best",
+    "seller",
+    "dev",
+    "alt",
+    "style",
+    "number",
+    "collection",
+    "delivery",
+    "season",
+    "size",
+    "range",
+    "ss26wp011",
+    "swatch",
+    "count",
+    "highsummer",
+    "newarrivals",
+    "shop",
+    "all",
+    "aime leon dore",
+    "shore pant",
+    "wide leg pant",
+    "relaxed pant",
+    "coastal pant",
+    "vacation easy pant",
+    "warm up pant",
+    "casual athletic pant",
+    "active errands pant"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Pants"
+   }
+  },
+  {
+   "id": "drop-a3689647bcd29598",
+   "brand": "Nike",
+   "name": "Nike Air Max Goadome Low - Black",
+   "category": "shoes",
+   "priceCents": 17500,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/nkiq0641-001",
+   "productUrl": "https://kith.com/products/nkiq0641-001",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AURORA_IQ0641-001_PHSRH000-2000.jpg?v=1770678251",
+   "imageTransparentUrl": "/assets/cutouts/drop-a3689647bcd29598.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "black"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "nike",
+    "air",
+    "max",
+    "goadome",
+    "low",
+    "black",
+    "streetwear",
+    "clean",
+    "premium",
+    "preppy",
+    "everyday",
+    "date"
+   ],
+   "sourceQuery": "Kith mens-footwear",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-mens-footwear",
+    "sourceType": "shopifyCollection",
+    "collection": "mens-footwear",
+    "productType": "Low Top Sneakers"
+   }
+  },
+  {
+   "id": "drop-1f5729c48cd4796e",
+   "brand": "Agolde",
+   "name": "Agolde Vintage Loose Jeans - Outbreak",
+   "category": "bottom",
+   "priceCents": 25800,
+   "currency": "USD",
+   "retailer": "Kith",
+   "retailerUrl": "https://kith.com/products/aga328-1885-obrk",
+   "productUrl": "https://kith.com/products/aga328-1885-obrk",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0094/2252/files/AGA328-1885-OBRK_80218e7d-d6c2-48a0-b910-dee36eb3d6a2.jpg?v=1779896797",
+   "imageTransparentUrl": "/assets/cutouts/drop-1f5729c48cd4796e.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "streetwear",
+    "clean",
+    "premium"
+   ],
+   "occasions": [
+    "everyday",
+    "date"
+   ],
+   "colors": [
+    "gold"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "kith",
+    "agolde",
+    "vintage",
+    "loose",
+    "jeans",
+    "outbreak",
+    "streetwear",
+    "clean",
+    "premium",
+    "everyday",
+    "date",
+    "gold"
+   ],
+   "sourceQuery": "Kith womens-new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "kith-womens-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "womens-new-arrivals",
+    "productType": "Jeans"
+   }
+  },
+  {
+   "id": "drop-801c170d2ea55154",
+   "brand": "Aimé Leon Dore",
+   "name": "Mesh Tank Top",
+   "category": "top",
+   "priceCents": 15000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/mesh-tank-top-3",
+   "productUrl": "https://www.aimeleondore.com/products/mesh-tank-top-3",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fb9553d9c16969fb9553d9e3f.0825447869fb9553d9e3f.jpg?v=1778253072",
+   "imageTransparentUrl": "/assets/cutouts/drop-801c170d2ea55154.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "colors": [
+    "tan"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "mesh",
+    "tank",
+    "top",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office",
+    "tan"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tops"
+   }
+  },
+  {
+   "id": "drop-91146b72eb052fa7",
+   "brand": "Aimé Leon Dore",
+   "name": "Mott Street Tee",
+   "category": "top",
+   "priceCents": 8500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/mott-street-tee",
+   "productUrl": "https://www.aimeleondore.com/products/mott-street-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a399647661d836a39964766465.307820216a39964766465.jpg?v=1782162092",
+   "imageTransparentUrl": "/assets/cutouts/drop-91146b72eb052fa7.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "mott",
+    "street",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-6d263b3a52443d30",
+   "brand": "Aimé Leon Dore",
+   "name": "Neighborhood Pocket Tee",
+   "category": "top",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/neighborhood-pocket-tee-2",
+   "productUrl": "https://www.aimeleondore.com/products/neighborhood-pocket-tee-2",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a399493cc3a496a399493cc535.846639996a399493cc535.jpg?v=1782161966",
+   "imageTransparentUrl": "/assets/cutouts/drop-6d263b3a52443d30.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "neighborhood",
+    "pocket",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-56938ecfcb1c8abf",
+   "brand": "Aimé Leon Dore",
+   "name": "Open Mesh Hoodie",
+   "category": "top",
+   "priceCents": 18500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/open-mesh-hoodie",
+   "productUrl": "https://www.aimeleondore.com/products/open-mesh-hoodie",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fb94434b1c7969fb94434b3ff.4124253369fb94434b3ff.jpg?v=1778253241",
+   "imageTransparentUrl": "/assets/cutouts/drop-56938ecfcb1c8abf.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "open",
+    "mesh",
+    "hoodie",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Hoodies"
+   }
+  },
+  {
+   "id": "drop-780be9598b22f465",
+   "brand": "Aimé Leon Dore",
+   "name": "Super Cub Tee",
+   "category": "top",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/super-cub-tee",
+   "productUrl": "https://www.aimeleondore.com/products/super-cub-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a3994c302b4c06a3994c302d60.932807676a3994c302d60.jpg?v=1782162008",
+   "imageTransparentUrl": "/assets/cutouts/drop-780be9598b22f465.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "super",
+    "cub",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-19199ede0333b3ff",
+   "brand": "Aimé Leon Dore",
+   "name": "Woodblock Dove Tee",
+   "category": "top",
+   "priceCents": 9000,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/woodblock-dove-tee",
+   "productUrl": "https://www.aimeleondore.com/products/woodblock-dove-tee",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore6a399428a56b456a399428a5858.278322096a399428a5858.jpg?v=1782161920",
+   "imageTransparentUrl": "/assets/cutouts/drop-19199ede0333b3ff.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "woodblock",
+    "dove",
+    "tee",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Tees"
+   }
+  },
+  {
+   "id": "drop-2e16164e8878c1a7",
+   "brand": "Aimé Leon Dore",
+   "name": "Yarn Dyed Striped Shirt",
+   "category": "top",
+   "priceCents": 25500,
+   "currency": "USD",
+   "retailer": "Aime Leon Dore",
+   "retailerUrl": "https://www.aimeleondore.com/products/yarn-dyed-striped-shirt",
+   "productUrl": "https://www.aimeleondore.com/products/yarn-dyed-striped-shirt",
+   "imageUrl": "https://cdn.shopify.com/s/files/1/0302/7829/files/AimeLeonDore69fba14a8ad57569fba14a8afa1.6335066169fba14a8afa1.jpg?v=1778252634",
+   "imageTransparentUrl": "/assets/cutouts/drop-2e16164e8878c1a7.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "inStock": true,
+   "trusted": true,
+   "vibes": [
+    "preppy",
+    "old money",
+    "streetwear",
+    "clean"
+   ],
+   "occasions": [
+    "everyday",
+    "office"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "aime",
+    "leon",
+    "dore",
+    "yarn",
+    "dyed",
+    "striped",
+    "shirt",
+    "preppy",
+    "old",
+    "money",
+    "streetwear",
+    "clean",
+    "everyday",
+    "office"
+   ],
+   "sourceQuery": "Aime Leon Dore new-arrivals",
+   "imageQuality": "good",
+   "popularityScore": 0,
+   "metadata": {
+    "clientCatalog": true,
+    "source": "drop_catalog",
+    "sourceId": "aime-leon-dore-new-arrivals",
+    "sourceType": "shopifyCollection",
+    "collection": "new-arrivals",
+    "productType": "Woven Shirts"
+   }
+  },
+  {
+   "id": "2eb1265214ad2ebf",
+   "brand": "Adidas",
+   "name": "Samba Indoor Soccer Shoes Black M 5.5 / W 6.5",
+   "category": "shoes",
+   "priceCents": 9500,
+   "currency": "USD",
+   "retailer": "adidas",
+   "retailerUrl": "https://coliseumsports.com/products/adidas-samba-black",
+   "productUrl": "https://coliseumsports.com/products/adidas-samba-black",
+   "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR0He9fmObR4yK6kqSPuBubFP_p1lmNfRO37_7M0M2NzbkiWjWVE_gf6XT8MENlbHc4i2Ti3nLNcLss7t5H0G7A3JEJHbhhd8_kbV6EAOlyx0aHmAvNVf6kBg",
+   "imageTransparentUrl": "/assets/cutouts/2eb1265214ad2ebf.png",
+   "imageSource": "transparent-pipeline",
+   "imageStatus": "cutout-ready",
+   "trusted": true,
+   "vibes": [
+    "gym",
+    "athletic",
+    "clean",
+    "minimal"
+   ],
+   "occasions": [
+    "workout",
+    "everyday"
+   ],
+   "gender": [
+    "androgynous"
+   ],
+   "searchTerms": [
+    "gym",
+    "athletic",
+    "training",
+    "workout",
+    "clean",
+    "minimal",
+    "neutral"
+   ],
+   "metadata": {
+    "clientCatalog": true,
+    "source": "photo_catalog"
+   }
+  }
+ ],
+ "looks": {
+  "clean": [
+   {
+    "id": "drop-clean-a86f2748ee66d7",
+    "slots": {
+     "top": "drop-56938ecfcb1c8abf",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "bag": "drop-7e85e02b50a32ac5"
+    }
+   },
+   {
+    "id": "drop-clean-8c93594c7c3ee8",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   },
+   {
+    "id": "drop-clean-8b2f247850b705",
+    "slots": {
+     "top": "drop-801c170d2ea55154",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-clean-e44ecb02232240",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-clean-85eaa50c2b41ff",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "2eb1265214ad2ebf"
+    }
+   },
+   {
+    "id": "drop-clean-70b75fff9daaa4",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-clean-ab238a6d00d8c5",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-clean-7c644de920b9d7",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-a61ec92ecb9f5b4a"
+    }
+   },
+   {
+    "id": "drop-clean-1b20ad87e9ddfa",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-clean-2b1bdc22712067",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "2eb1265214ad2ebf"
+    }
+   }
+  ],
+  "street": [
+   {
+    "id": "drop-street-42fb5d5b7d31c0",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-street-c4ef7a4950d827",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-093f29efd827e2a5"
+    }
+   },
+   {
+    "id": "drop-street-26208e738b0807",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-2ca0f430ab769aec"
+    }
+   },
+   {
+    "id": "drop-street-8e182937085aff",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-186f1a82b7d7f58f",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   },
+   {
+    "id": "drop-street-1fc8349ac37d0a",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "drop-9666afe788027e20"
+    }
+   },
+   {
+    "id": "drop-street-639d7d3a4b3cd6",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-bcf8734b21417213"
+    }
+   },
+   {
+    "id": "drop-street-4d84a8baeeb385",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-d477ca577d1f346e",
+     "hat": "drop-d0dad86fa61690c5"
+    }
+   },
+   {
+    "id": "drop-street-18639619a6cfa0",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-9666afe788027e20",
+     "hat": "drop-b82ee247d1717def"
+    }
+   },
+   {
+    "id": "drop-street-61cd242c6f16f2",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-f1b2787e50cce0c7"
+    }
+   },
+   {
+    "id": "drop-street-ae4a57d2f58b98",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-2ca0f430ab769aec"
+    }
+   }
+  ],
+  "office": [
+   {
+    "id": "drop-office-a7755d17cda12c",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "drop-a61ec92ecb9f5b4a"
+    }
+   },
+   {
+    "id": "drop-office-bc4a14c08dfd61",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-1d3c8907a84be84b",
+     "bag": "drop-bcd13a4dcb88faba"
+    }
+   },
+   {
+    "id": "drop-office-0fa325d3c0716e",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "2eb1265214ad2ebf"
+    }
+   },
+   {
+    "id": "drop-office-b20c13370e51dd",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-office-608f7a2ecf8b79",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-office-d33cbc958b7e34",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   },
+   {
+    "id": "drop-office-7423a7aebef053",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-office-5865547a6b2c90",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-a61ec92ecb9f5b4a"
+    }
+   },
+   {
+    "id": "drop-office-4e8e5d1920bc4a",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-office-310cdaae8954ee",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   }
+  ],
+  "date": [
+   {
+    "id": "drop-date-bb29fb07f49310",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "2eb1265214ad2ebf",
+     "jewelry": "drop-95b7c882bae17b8e"
+    }
+   },
+   {
+    "id": "drop-date-255ce8f9645caa",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-date-af529e22ba511c",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-9a0580df64006a51"
+    }
+   },
+   {
+    "id": "drop-date-9f0212fd0867b8",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-date-026419ba1cf037",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   },
+   {
+    "id": "drop-date-49626977361e1b",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "2eb1265214ad2ebf",
+     "jewelry": "drop-bf1662585100ee4b"
+    }
+   },
+   {
+    "id": "drop-date-12fa4805b7dcc3",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "drop-eaf33c3edd384e65",
+     "jewelry": "drop-e5bc278631de306e"
+    }
+   },
+   {
+    "id": "drop-date-77eadcceaf8764",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-18ba45562b4c791e"
+    }
+   },
+   {
+    "id": "drop-date-1f7f1ea67e4ef4",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-date-899f694f92220b",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "2eb1265214ad2ebf",
+     "jewelry": "drop-0c19f9538ef0b7be"
+    }
+   }
+  ],
+  "gym": [
+   {
+    "id": "drop-gym-45965fd1447ed5",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-gym-a6f359c48bdae2",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-d477ca577d1f346e"
+    }
+   },
+   {
+    "id": "drop-gym-f5c629c1ee1f07",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-gym-511eab893cf5bf",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-d477ca577d1f346e"
+    }
+   },
+   {
+    "id": "drop-gym-b58e27ae532230",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-gym-f4d77a14565313",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-d477ca577d1f346e"
+    }
+   },
+   {
+    "id": "drop-gym-a924aaba598596",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-gym-d592dbec9f3fc0",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "2eb1265214ad2ebf"
+    }
+   },
+   {
+    "id": "drop-gym-3c1d4e1c9c1403",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-d477ca577d1f346e"
+    }
+   },
+   {
+    "id": "drop-gym-7623298b7e5b4c",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "2eb1265214ad2ebf"
+    }
+   }
+  ],
+  "cozy": [
+   {
+    "id": "drop-cozy-53d6e3c039b1be",
+    "slots": {
+     "top": "drop-2e16164e8878c1a7",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   },
+   {
+    "id": "drop-cozy-bcbaa06f4ce0c3",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-09c4fce3422635e4",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-cozy-c501ef51ec3a2b",
+    "slots": {
+     "top": "drop-852707c24a9d9703",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-cozy-ecc14993ca97df",
+    "slots": {
+     "top": "drop-801c170d2ea55154",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-093f29efd827e2a5"
+    }
+   },
+   {
+    "id": "drop-cozy-bf813d29bb558c",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   },
+   {
+    "id": "drop-cozy-696f32c8b90ad5",
+    "slots": {
+     "top": "drop-56938ecfcb1c8abf",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-cozy-aacc021eaae02e",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-b2bf4d0c167f95ba"
+    }
+   },
+   {
+    "id": "drop-cozy-16ea739fb9a475",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-f1b2787e50cce0c7"
+    }
+   },
+   {
+    "id": "drop-cozy-29e0ed31cc21cf",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-f904887ace26ed2b"
+    }
+   },
+   {
+    "id": "drop-cozy-05dee02422ac8a",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-8148277f12771c11"
+    }
+   }
+  ],
+  "vacation": [
+   {
+    "id": "drop-vacation-67f6fd9080d92c",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   },
+   {
+    "id": "drop-vacation-83eb25c39e54fb",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   },
+   {
+    "id": "drop-vacation-d586325c223a88",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-vacation-89f91a53a01dfb",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   },
+   {
+    "id": "drop-vacation-446b55d14151b6",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-vacation-1d2f31438b5310",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-3ae9091e99c3dbfb",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+     "bag": "drop-5843b7039be7ff08"
+    }
+   },
+   {
+    "id": "drop-vacation-86b0b3cad09bd3",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-vacation-66ae83f3eab4e0",
+    "slots": {
+     "top": "drop-2a653bf5d2cc277b",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4",
+     "hat": "drop-2cd8bbc04807f6c7"
+    }
+   },
+   {
+    "id": "drop-vacation-49f36399e477d6",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-1c6f265a74f6a5e8",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-stealth-buckle-eva-dusty-blue-two-strap-sandals-36aa5f3576bab9"
+    }
+   },
+   {
+    "id": "drop-vacation-28cb49f3f07858",
+    "slots": {
+     "top": "drop-90bc185dd47c19e1",
+     "bottom": "drop-7519bbbe7ac2f837",
+     "shoes": "searchapi-quality-sandals-clean-birkenstock-arizona-essentials-eva-pink-clay-two-strap-sandals-d1ee71b6c2ffc4"
+    }
+   }
+  ],
+  "preppy": [
+   {
+    "id": "drop-preppy-89020988418795",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   },
+   {
+    "id": "drop-preppy-5a5d6ea0f8aa59",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-preppy-193ec055b59c78",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-preppy-624f76a6960577",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-preppy-074fa15e582013",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-preppy-a6974869974e94",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-preppy-b19d911061a74c",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-eaf33c3edd384e65"
+    }
+   },
+   {
+    "id": "drop-preppy-fcb0d1b2898471",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-e0f78dfa2edd568d"
+    }
+   },
+   {
+    "id": "drop-preppy-2952429819f0ab",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-a61ec92ecb9f5b4a"
+    }
+   },
+   {
+    "id": "drop-preppy-adc585ede15cc8",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-ac9095f6e93a7998"
+    }
+   }
+  ],
+  "night": [
+   {
+    "id": "drop-night-4d556f48285b99",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-night-6f10f0cb3e4c28",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-aa24d39683305339"
+    }
+   },
+   {
+    "id": "drop-night-9738f98c9e2a9f",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-night-1f3f111adf7149",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-1f5729c48cd4796e",
+     "shoes": "drop-a61ec92ecb9f5b4a"
+    }
+   },
+   {
+    "id": "drop-night-39f32843cd99e4",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-night-2a7dffb4eba9bc",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-10c7259c03320f7c"
+    }
+   },
+   {
+    "id": "drop-night-c04a239b9f2aec",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-be18c75456f30cf9",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-night-29ce62ca9e832b",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-da43d14ed1876847",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-bf1662585100ee4b"
+    }
+   },
+   {
+    "id": "drop-night-3865373a41f0f2",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-e3d92794a0495195",
+     "shoes": "drop-1d3c8907a84be84b"
+    }
+   },
+   {
+    "id": "drop-night-841dc0c346f014",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-4bec95cdd8dbe117",
+     "shoes": "drop-a61ec92ecb9f5b4a",
+     "jewelry": "drop-e5bc278631de306e"
+    }
+   }
+  ],
+  "edgy": [
+   {
+    "id": "drop-edgy-84f79d9e88da7a",
+    "slots": {
+     "top": "drop-780be9598b22f465",
+     "bottom": "drop-186f1a82b7d7f58f",
+     "shoes": "drop-c129055c58918097"
+    }
+   },
+   {
+    "id": "drop-edgy-45d2febe3e671f",
+    "slots": {
+     "top": "drop-91146b72eb052fa7",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-093f29efd827e2a5"
+    }
+   },
+   {
+    "id": "drop-edgy-bfdc4db83287e4",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-186f1a82b7d7f58f",
+     "shoes": "drop-22d260d85e98ab1c"
+    }
+   },
+   {
+    "id": "drop-edgy-c4246d98005224",
+    "slots": {
+     "top": "drop-b4eb34563de9b283",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-c129055c58918097"
+    }
+   },
+   {
+    "id": "drop-edgy-694c8a0d67a2f5",
+    "slots": {
+     "top": "drop-c387a3e225fd0156",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-a3689647bcd29598"
+    }
+   },
+   {
+    "id": "drop-edgy-e3f66d567ee9e6",
+    "slots": {
+     "top": "drop-a603bb768cece86e",
+     "bottom": "drop-5eb057ef0f65bb0b",
+     "shoes": "drop-e4e08db1a6d56b38"
+    }
+   },
+   {
+    "id": "drop-edgy-06037cf4338885",
+    "slots": {
+     "top": "drop-656ccfff3e8bd40b",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-a3689647bcd29598"
+    }
+   },
+   {
+    "id": "drop-edgy-48191769560e7e",
+    "slots": {
+     "top": "drop-19199ede0333b3ff",
+     "bottom": "drop-d8ba49971161a5a9",
+     "shoes": "drop-8148277f12771c11"
+    }
+   },
+   {
+    "id": "drop-edgy-ee29ed621258a4",
+    "slots": {
+     "top": "drop-f0c909bf62a329cc",
+     "bottom": "drop-eecdfad4799a2973",
+     "shoes": "drop-c129055c58918097"
+    }
+   },
+   {
+    "id": "drop-edgy-3f79bd8e2b8b9a",
+    "slots": {
+     "top": "drop-6d263b3a52443d30",
+     "bottom": "drop-743b276f967a19d3",
+     "shoes": "drop-bcf8734b21417213"
+    }
+   }
+  ]
+ }
+}

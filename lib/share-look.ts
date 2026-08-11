@@ -18,11 +18,21 @@ export interface SharedLook {
   isSyli: boolean;
 }
 
+function isCompletePublicComposition(items: Partial<Record<Category, Product>>): boolean {
+  return Boolean(items.top && items.bottom && items.shoes)
+    && Object.values(items).every((product) => !product || !product.id.startsWith('owned-'));
+}
+
 export function resolveSharedLook(rawId: string): SharedLook | null {
-  const id = decodeURIComponent(rawId);
+  let id: string;
+  try {
+    id = decodeURIComponent(rawId);
+  } catch {
+    return null;
+  }
   if (id.startsWith('syli-')) {
     const look = getAiLookById(id);
-    if (!look) return null;
+    if (!look || !isCompletePublicComposition(look.products)) return null;
     const label = VIBES.find((vibe) => vibe.id === look.vibe)?.label || 'Styled';
     return {
       items: look.products,
@@ -33,7 +43,7 @@ export function resolveSharedLook(rawId: string): SharedLook | null {
     };
   }
   const items = decodeLookSlug(id);
-  if (!items) return null;
+  if (!items || !isCompletePublicComposition(items)) return null;
   return { items, title: 'Styled fit', isSyli: false };
 }
 

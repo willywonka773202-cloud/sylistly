@@ -44,18 +44,20 @@ const requiredText: Array<{ file: string; text: string; label: string }> = [
   { file: 'components/BottomNav.tsx', text: 'href="/profile"', label: 'BottomNav: You tab' },
   // Drop shop wires the crate, vault, and quests.
   { file: 'app/drop/page.tsx', text: 'DailyDrop', label: 'Drop mounts the crate component' },
-  { file: 'app/drop/page.tsx', text: 'Your Vault', label: 'Drop surfaces the collection Vault' },
+  { file: 'app/drop/page.tsx', text: 'Saved drops', label: 'Drop surfaces saved drop items' },
   { file: 'app/drop/page.tsx', text: 'Daily quests', label: 'Drop surfaces daily quests' },
   { file: 'components/DailyDrop.tsx', text: 'recordPull', label: 'Reveals are recorded to the Vault' },
   { file: 'components/DailyDrop.tsx', text: 'computeBundleDeal', label: 'Drop reveal shows bundle pricing' },
   // Honesty invariants — load-bearing for the brand.
   { file: 'lib/bundle-deals.ts', text: 'verified', label: 'Bundle deals gated on verified codes (no fake discounts)' },
   { file: 'lib/stylist-xp.ts', text: 'real actions', label: 'XP is from real actions only' },
-  // Revenue integrity — every shop path must wrap affiliate, and the affiliate
-  // wrapper must skip placeholder Rakuten ids (no broken/foreign links).
-  { file: 'lib/product-links.ts', text: 'wrapAffiliate', label: 'getShoppableUrl wraps affiliate (no commission leak)' },
+  // Revenue integrity — shop paths use the validated first-party redirect,
+  // which then applies affiliate wrapping without exposing server credentials.
+  { file: 'lib/product-links.ts', text: 'buildRetailerClickPath', label: 'getShoppableUrl uses attributed server redirect' },
   { file: "lib/affiliate.ts", text: "startsWith('__')", label: 'affiliate skips placeholder Rakuten ids (no broken links)' },
-  { file: 'components/InAppBrowser.tsx', text: 'wrapAffiliate', label: 'in-app browser opens the affiliate-wrapped page (commission-safe)' },
+  { file: 'components/InAppBrowser.tsx', text: 'getShoppableUrl', label: 'in-app browser opens the attributed redirect (commission-safe)' },
+  { file: 'app/api/out/route.ts', text: 'validateRetailerDestination', label: 'retailer redirect validates the outbound destination' },
+  { file: 'app/api/out/route.ts', text: 'recordRetailerClick', label: 'retailer redirect records server-side attribution' },
   { file: 'components/Feed.tsx', text: 'InAppBrowser', label: 'feed opens retailer links in the in-app browser sheet' },
   { file: 'app/build/page.tsx', text: 'shop_link_clicked', label: 'builder shop CTA tracks the revenue funnel' },
   // FTC compliance — the affiliate disclosure is LEGALLY REQUIRED on every shop
@@ -124,6 +126,30 @@ async function run() {
     console.log(`PASS ${check.label}`);
   }
 
+  // The product goal requires the daily job to complete the same guarded
+  // publish loop as an explicitly authorized manual release. Both preliminary
+  // and final decisions must recognize the schedule; can_publish remains the
+  // sole commit/deploy boundary.
+  {
+    const workflow = source('.github/workflows/auto-expand.yml');
+    const scheduledReleaseChecks = workflow.match(/github\.event_name\s*==\s*['"]schedule['"]/g) || [];
+    if (scheduledReleaseChecks.length < 2) {
+      fail('catalog workflow does not run both guarded release decisions on schedule');
+    }
+    const manualReleaseChecks = workflow.match(/github\.event_name\s*==\s*['"]workflow_dispatch['"]\s*&&\s*inputs\.release\s*==\s*true/g) || [];
+    if (manualReleaseChecks.length < 2) {
+      fail('catalog workflow release gates are not both tied to manual dispatch');
+    }
+    if (!workflow.includes("if: steps.final.outputs.can_publish == 'true'")) {
+      fail('catalog workflow can cross the publish boundary without can_publish');
+    }
+    if (!workflow.includes('npm run build') || !workflow.includes('npm run test:performance')) {
+      fail('catalog release workflow does not gate on production build and route budgets');
+    }
+    console.log('PASS scheduled and authorized manual runs share the guarded release path');
+    console.log('PASS catalog release is gated on production build and route budgets');
+  }
+
   // Bundle-deal URL integrity — a VERIFIED deal must link to its OWN retailer's
   // host. Catches the copy-paste cross-retailer URL bug class (e.g. a Merchology
   // deal whose url pointed at nike.com), which would misdirect users dishonestly.
@@ -162,7 +188,17 @@ async function run() {
     { pattern: /selling fast|almost gone|only \d+ left/i, label: 'fake scarcity language' },
   ];
   for (const relativeRoot of ['app', 'components', 'store', 'lib']) {
-    const files = gitOutput(['ls-files', relativeRoot])
+    // Scan committed sources and non-ignored new sources. `git ls-files`
+    // without `--others` misses pre-commit violations in newly created files;
+    // `--exclude-standard` keeps generated/ignored artifacts out of the scan.
+    const files = gitOutput([
+      'ls-files',
+      '--cached',
+      '--others',
+      '--exclude-standard',
+      '--',
+      relativeRoot,
+    ])
       .split(/\r?\n/)
       .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'));
     for (const file of files) {

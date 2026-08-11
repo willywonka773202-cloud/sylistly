@@ -11,11 +11,24 @@
  * the exact same function, so SSR HTML and post-hydration generation agree.
  */
 import { getAiLook } from '@/lib/ai-look-library';
-import { buildCatalogLook } from '@/lib/client-catalog';
+import {
+  buildCatalogLook,
+  COMPLETE_BUYABLE_REQUIRED_SLOTS,
+  isBuyableClientCatalogProduct,
+  respectsCatalogGenerationHardPreferences,
+  validateCompleteBuyableLook,
+  type CatalogGenerationPreferences,
+} from '@/lib/client-catalog';
 import { getLibraryLook } from '@/lib/outfit-library';
 import { isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
-import { VIBES, type GeneratorFrame, type VibeId } from '@/lib/vibes';
+import {
+  getBudgetMaxCents,
+  VIBES,
+  type GeneratorBudget,
+  type GeneratorFrame,
+  type VibeId,
+} from '@/lib/vibes';
 import {
   isCategorySane,
   lookProducts,
@@ -37,6 +50,157 @@ export interface GenState {
   seenAiIds: string[];
 }
 
+export const DEFAULT_FEED_BUDGET: GeneratorBudget = 'under500';
+export const DEFAULT_FEED_MAX_TOTAL_CENTS = 50_000;
+
+/** Optional whole-look controls. Keeping this final argument optional preserves
+ * every existing `generateLooks` caller while making the default affordable. */
+export interface FeedGenerationOptions {
+  budget?: GeneratorBudget;
+  customMaxCents?: number | null;
+  /** Hard cap for the complete outfit. `null` explicitly opts out. */
+  maxTotalCents?: number | null;
+  preferences?: CatalogGenerationPreferences;
+}
+
+interface ResolvedFeedGenerationOptions {
+  budget: GeneratorBudget;
+  customMaxCents: number | null;
+  maxTotalCents: number | null;
+  preferences?: CatalogGenerationPreferences;
+}
+
+function cleanPreferenceList(value: string[] | undefined): string[] | undefined {
+  const cleaned = Array.from(new Set((value || []).map((entry) => entry.trim()).filter(Boolean))).slice(0, 40);
+  return cleaned.length ? cleaned : undefined;
+}
+
+function resolveFeedGenerationOptions(options: FeedGenerationOptions): ResolvedFeedGenerationOptions {
+  const validCustomMax = typeof options.customMaxCents === 'number'
+    && Number.isFinite(options.customMaxCents)
+    && options.customMaxCents > 0
+    ? options.customMaxCents
+    : null;
+  const requestedBudget = options.budget ?? DEFAULT_FEED_BUDGET;
+  const budget = requestedBudget === 'custom' && validCustomMax == null
+    ? DEFAULT_FEED_BUDGET
+    : requestedBudget;
+  const hasExplicitTotalCap = Object.prototype.hasOwnProperty.call(options, 'maxTotalCents');
+  const explicitTotalCap = typeof options.maxTotalCents === 'number'
+    && Number.isFinite(options.maxTotalCents)
+    && options.maxTotalCents > 0
+    ? options.maxTotalCents
+    : null;
+  const budgetMax = getBudgetMaxCents(budget, validCustomMax);
+  const derivedTotalCap = Number.isFinite(budgetMax) && budgetMax > 0 ? budgetMax : null;
+  return {
+    budget,
+    customMaxCents: validCustomMax,
+    maxTotalCents: hasExplicitTotalCap ? explicitTotalCap : derivedTotalCap,
+    preferences: options.preferences ? {
+      preferredBrands: cleanPreferenceList(options.preferences.preferredBrands),
+      preferredRetailers: cleanPreferenceList(options.preferences.preferredRetailers),
+      preferredColors: cleanPreferenceList(options.preferences.preferredColors),
+      preferredTerms: cleanPreferenceList(options.preferences.preferredTerms),
+      excludedBrands: cleanPreferenceList(options.preferences.excludedBrands),
+      excludedRetailers: cleanPreferenceList(options.preferences.excludedRetailers),
+      excludedTerms: cleanPreferenceList(options.preferences.excludedTerms),
+      preferredSizes: options.preferences.preferredSizes,
+      priceTolerancePct: options.preferences.priceTolerancePct,
+      taste: options.preferences.taste,
+    } : undefined,
+  };
+}
+
+function sanitizeLockedItems(
+  lockedItems: Partial<Record<Category, Product>>,
+): Partial<Record<Category, Product>> {
+  const sanitized: Partial<Record<Category, Product>> = {};
+  for (const [category, product] of Object.entries(lockedItems) as Array<[Category, Product | undefined]>) {
+    if (
+      product
+      && product.category === category
+      && isCategorySane(product)
+      && isBuyableClientCatalogProduct(product)
+    ) {
+      sanitized[category] = product;
+    }
+  }
+  return sanitized;
+}
+
+function repairCompleteFeedLook({
+  candidateItems,
+  vibe,
+  frame,
+  seed,
+  avoidProductIds,
+  lockedItems,
+  disabledSlots,
+  generation,
+}: {
+  candidateItems?: Partial<Record<Category, Product>>;
+  vibe: VibeId;
+  frame: GeneratorFrame;
+  seed: number;
+  avoidProductIds: string[];
+  lockedItems: Partial<Record<Category, Product>>;
+  disabledSlots: Set<Category>;
+  generation: ResolvedFeedGenerationOptions;
+}): Partial<Record<Category, Product>> | null {
+  const requiredSlots = new Set<Category>(COMPLETE_BUYABLE_REQUIRED_SLOTS);
+  const preferredItems: Partial<Record<Category, Product>> = {};
+  for (const [category, product] of Object.entries(candidateItems || {}) as Array<[Category, Product | undefined]>) {
+    if (product && product.category === category && isCategorySane(product)) preferredItems[category] = product;
+  }
+
+  const vibeSlots = VIBE_META.get(vibe)?.slots || [];
+  const candidateSlots = Object.keys(candidateItems || {}) as Category[];
+  const lockedSlots = Object.keys(lockedItems) as Category[];
+  const targetSlots = Array.from(new Set<Category>([
+    ...COMPLETE_BUYABLE_REQUIRED_SLOTS,
+    ...vibeSlots,
+    ...candidateSlots,
+    ...lockedSlots,
+  ])).filter((slot) => requiredSlots.has(slot) || !disabledSlots.has(slot) || Boolean(lockedItems[slot]));
+
+  const built = buildCatalogLook({
+    vibe,
+    frame,
+    budget: generation.budget,
+    customMaxCents: generation.customMaxCents,
+    mode: 'full',
+    seed,
+    avoidProductIds,
+    currentItems: preferredItems,
+    lockedItems: Object.keys(lockedItems).length ? lockedItems : undefined,
+    targetSlots,
+    transparentOnly: true,
+    maxTotalCents: generation.maxTotalCents,
+    requireCompleteBuyable: true,
+    preferences: generation.preferences,
+  });
+
+  const products: Partial<Record<Category, Product>> = {};
+  for (const [category, product] of Object.entries(built.products) as Array<[Category, Product | undefined]>) {
+    const disabledOptional = disabledSlots.has(category)
+      && !requiredSlots.has(category)
+      && !lockedItems[category];
+    if (
+      product
+      && !disabledOptional
+      && product.category === category
+      && isCategorySane(product)
+      && isEditorialCutoutProduct(product)
+      && isBuyableClientCatalogProduct(product)
+    ) {
+      products[category] = product;
+    }
+  }
+
+  return validateCompleteBuyableLook(products, generation.maxTotalCents).ok ? products : null;
+}
+
 /** Matches the feed's original ref defaults (seedRef 101, indexRef 0, …). */
 export function initialGenState(): GenState {
   return { seed: 101, index: 0, recentIds: [], vibeLikes: {}, vibePasses: {}, seenAiIds: [] };
@@ -54,47 +218,42 @@ function composeScrollLook(
   avoidProductIds: string[],
   lockedItems: Partial<Record<Category, Product>>,
   disabledSlots: Set<Category>,
+  generation: ResolvedFeedGenerationOptions,
 ): Partial<Record<Category, Product>> | null {
   const hasLocks = Object.keys(lockedItems).length > 0;
   const hasSlotPrefs = disabledSlots.size > 0;
   if (!hasLocks && !hasSlotPrefs) {
-    const library = getLibraryLook(vibe, frame, { seed, avoidProductIds });
+    const library = getLibraryLook(vibe, frame, {
+      seed,
+      avoidProductIds,
+      maxTotalCents: generation.maxTotalCents,
+      taste: generation.preferences?.taste,
+      preferences: generation.preferences,
+    });
     if (library) {
-      const sane: Partial<Record<Category, Product>> = {};
-      for (const [category, product] of Object.entries(library.products)) {
-        if (product && isCategorySane(product) && isEditorialCutoutProduct(product)) {
-          sane[category as Category] = product;
-        }
-      }
-      if (lookProducts(sane).length >= 3) return sane;
+      const repaired = repairCompleteFeedLook({
+        candidateItems: library.products,
+        vibe,
+        frame,
+        seed,
+        avoidProductIds,
+        lockedItems,
+        disabledSlots,
+        generation,
+      });
+      if (repaired) return repaired;
     }
   }
-  const vibeSlots = VIBE_META.get(vibe)?.slots || [];
-  const targetSlots = vibeSlots.filter((slot) => !disabledSlots.has(slot));
-  const built = buildCatalogLook({
+
+  return repairCompleteFeedLook({
     vibe,
     frame,
-    budget: 'any',
-    mode: 'full',
     seed,
     avoidProductIds,
-    lockedItems: hasLocks ? lockedItems : undefined,
-    currentItems: hasLocks ? lockedItems : undefined,
-    targetSlots: targetSlots.length >= 3 ? targetSlots : undefined,
-    transparentOnly: true,
+    lockedItems,
+    disabledSlots,
+    generation,
   });
-  const products: Partial<Record<Category, Product>> = {};
-  for (const [category, product] of Object.entries(built.products)) {
-    if (
-      product
-      && !disabledSlots.has(category as Category)
-      && isCategorySane(product)
-      && isEditorialCutoutProduct(product)
-    ) {
-      products[category as Category] = product;
-    }
-  }
-  return lookProducts(products).length >= 3 ? products : null;
 }
 
 /**
@@ -110,10 +269,13 @@ export function generateLooks(
   state: GenState,
   locks: Partial<Record<Category, Product>> = {},
   disabledSlots: Set<Category> = new Set(),
+  generationOptions: FeedGenerationOptions = {},
 ): { looks: ScrollLook[]; state: GenState } {
   let { seed, index } = state;
   let recentIds = state.recentIds;
   const { vibeLikes, vibePasses, seenAiIds } = state;
+  const generation = resolveFeedGenerationOptions(generationOptions);
+  const buyableLocks = sanitizeLockedItems(locks);
 
   const fresh: ScrollLook[] = [];
   // Batch-local picks: dedupes within this deal WITHOUT mutating the persistent
@@ -132,7 +294,7 @@ export function generateLooks(
     .filter(([, n]) => n > 0)
     .sort((a, b) => b[1] - a[1])[0] || [])[0] as VibeId | undefined;
 
-  while (fresh.length < count && attempts < count * 4) {
+  while (fresh.length < count && attempts < count * 8) {
     attempts += 1;
     let vibe: VibeId;
     if (filter !== 'all') {
@@ -150,7 +312,7 @@ export function generateLooks(
     index += 1;
     seed += 17;
     const lockedIds = new Set(
-      Object.values(locks).map((product) => product?.id).filter(Boolean),
+      Object.values(buyableLocks).map((product) => product?.id).filter(Boolean),
     );
     const avoid = recentIds.filter((id) => !lockedIds.has(id));
 
@@ -164,23 +326,37 @@ export function generateLooks(
       });
       if (aiLook) {
         batchPicked.add(aiLook.id);
-        const ids = lookProducts(aiLook.products).map((product) => product.id);
-        recentIds = [...recentIds, ...ids].slice(-80);
-        fresh.push({
-          key: `look-${seed}`,
-          vibe: aiLook.vibe,
-          items: aiLook.products,
-          gen: 0,
-          source: 'syli',
-          note: aiLook.note,
-          aiId: aiLook.id,
-          palette: aiLook.palette,
-        });
-        continue;
+        const aiProducts = lookProducts(aiLook.products);
+        const aiIsEligible = validateCompleteBuyableLook(
+          aiLook.products,
+          generation.maxTotalCents,
+        ).ok && aiProducts.every((product) => (
+          isCategorySane(product)
+          && isEditorialCutoutProduct(product)
+          && respectsCatalogGenerationHardPreferences(product, generation.preferences)
+        ));
+        // An altered AI record is no longer the authored look. Accept only a
+        // fully valid, unchanged record; otherwise use the budget-aware baked
+        // pool instead of repeatedly composing the same cheap repairs.
+        if (aiIsEligible) {
+          const ids = aiProducts.map((product) => product.id);
+          recentIds = [...recentIds, ...ids].slice(-80);
+          fresh.push({
+            key: `look-${seed}`,
+            vibe: aiLook.vibe,
+            items: aiLook.products,
+            gen: 0,
+            source: 'syli',
+            note: aiLook.note,
+            aiId: aiLook.id,
+            palette: aiLook.palette,
+          });
+          continue;
+        }
       }
     }
 
-    const items = composeScrollLook(vibe, frame, seed, avoid, locks, disabledSlots);
+    const items = composeScrollLook(vibe, frame, seed, avoid, buyableLocks, disabledSlots, generation);
     if (!items) continue;
     const ids = lookProducts(items).map((product) => product.id);
     recentIds = [...recentIds, ...ids].slice(-80);
@@ -192,8 +368,19 @@ export function generateLooks(
 
 /** The deterministic opening deck (default frame, no filter, no personalization)
  *  — server-rendered so the feed paints instantly without shipping the catalog. */
-export function composeInitialLooks(count = 4): { looks: ScrollLook[]; cursor: GenState } {
-  const { looks, state } = generateLooks(count, 'androgynous', 'all', initialGenState());
+export function composeInitialLooks(
+  count = 4,
+  generationOptions: FeedGenerationOptions = {},
+): { looks: ScrollLook[]; cursor: GenState } {
+  const { looks, state } = generateLooks(
+    count,
+    'androgynous',
+    'all',
+    initialGenState(),
+    {},
+    new Set(),
+    generationOptions,
+  );
   return { looks, cursor: state };
 }
 

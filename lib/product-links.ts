@@ -1,4 +1,5 @@
 import { wrapAffiliate } from './affiliate';
+import { buildRetailerClickPath, type RetailerAttribution } from './retailer-attribution';
 import type { Product } from './types';
 
 function isValidHttpUrl(value?: string): value is string {
@@ -32,13 +33,29 @@ export function getProductOutboundUrl(product: Product): string {
 }
 
 /**
- * The URL to actually NAVIGATE to when a user shops a product — the raw outbound
- * URL wrapped with affiliate tracking. Use this for hrefs / window.open / the
- * checkout flow. Use getProductOutboundUrl (raw) for display + link-quality
- * checks (host, isExactProductUrl), which must see the real retailer URL.
+ * The URL to navigate to when a user shops a product. It points at Sylistly's
+ * validated server redirect, which records attribution and then applies the
+ * configured affiliate wrapper. Use getProductOutboundUrl (raw) for display +
+ * link-quality checks, which must see the real retailer URL.
  */
-export function getShoppableUrl(product: Product): string {
-  // Pass the product id as the affiliate sub-id → per-product conversion
-  // attribution once the keys are live (which products actually sell).
-  return wrapAffiliate(getProductOutboundUrl(product), product.id);
+export type ProductClickAttribution = Omit<RetailerAttribution, 'productId'>;
+
+export function getShoppableUrl(product: Product, attribution: ProductClickAttribution = {}): string {
+  // Style What I Own anchors are device-local references the user already has.
+  // They are intentionally absent from server catalog resolution, so routing
+  // an `owned-*` id through /api/out would produce a broken 404 purchase CTA.
+  if (product.id.startsWith('owned-')) return '';
+  // Route through the server so every supported surface gets the same validated
+  // destination, click ledger, and affiliate sub-id. The redirect still works
+  // from the bundled static catalog when Supabase is not configured.
+  return buildRetailerClickPath({
+    ...attribution,
+    productId: product.id,
+    surface: attribution.surface || 'product-link',
+  });
+}
+
+/** Raw affiliate URL for server jobs/tests that intentionally bypass click logging. */
+export function getDirectAffiliateUrl(product: Product, subId = product.id): string {
+  return wrapAffiliate(getProductOutboundUrl(product), subId);
 }

@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 1,
+  "sourceHealthGeneratedAt": "2026-08-10T17:47:46.019Z",
+  "maxHealthAgeHours": 24,
+  "baseline": {
+    "rows": 12000,
+    "uniqueSignatures": 11810,
+    "duplicateSignatures": 190,
+    "duplicateRatePct": 1.5833,
+    "compactArtifactBytes": 356360
+  },
+  "acceptance": {
+    "baselineRows": 12000,
+    "targetUniqueSignatures": 24000,
+    "totalRows": 24000,
+    "uniqueSignatures": 24000,
+    "duplicateSignatures": 0,
+    "duplicateRatePct": 0,
+    "meetsTarget": true
+  },
+  "inventory": {
+    "catalogProducts": 328,
+    "freshPositiveExactProducts": 239,
+    "usedProducts": 226,
+    "byCategory": {
+      "bag": 17,
+      "bottom": 22,
+      "eyewear": 13,
+      "hat": 10,
+      "jewelry": 66,
+      "outer": 8,
+      "shoes": 63,
+      "top": 40
+    }
+  },
+  "compactArtifactBytes": 412646,
+  "coordination": {
+    "qualityBar": 0.64,
+    "averageScore": 0.748
+  },
+  "wholeLookTotals": {
+    "minCents": 13695,
+    "medianCents": 92700,
+    "p90Cents": 166000,
+    "maxCents": 1204500,
+    "averageCents": 111513
+  },
+  "budgetBands": {
+    "lte250": 283,
+    "gt250_lte500": 2498,
+    "gt500_lte1000": 10778,
+    "gt1000": 10441
+  },
+  "combinations": [
+    {
+      "vibe": "clean",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 806,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 16,
+        "outer": 4,
+        "bag": 16
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 38,
+        "gt500_lte1000": 346,
+        "gt1000": 416
+      }
+    },
+    {
+      "vibe": "clean",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 809,
+      "pools": {
+        "top": 40,
+        "bottom": 22,
+        "shoes": 25,
+        "outer": 7,
+        "bag": 17
+      },
+      "budgetBands": {
+        "lte250": 9,
+        "gt250_lte500": 136,
+        "gt500_lte1000": 360,
+        "gt1000": 295
+      }
+    },
+    {
+      "vibe": "clean",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 822,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 16,
+        "outer": 5,
+        "bag": 16
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 47,
+        "gt500_lte1000": 325,
+        "gt1000": 428
+      }
+    },
+    {
+      "vibe": "street",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 837,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 26,
+        "outer": 4,
+        "bag": 16,
+        "hat": 9
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 31,
+        "gt500_lte1000": 422,
+        "gt1000": 347
+      }
+    },
+    {
+      "vibe": "street",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 884,
+      "pools": {
+        "top": 40,
+        "bottom": 22,
+        "shoes": 35,
+        "outer": 7,
+        "bag": 17,
+        "hat": 10
+      },
+      "budgetBands": {
+        "lte250": 4,
+        "gt250_lte500": 123,
+        "gt500_lte1000": 421,
+        "gt1000": 252
+      }
+    },
+    {
+      "vibe": "street",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 849,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 26,
+        "outer": 5,
+        "bag": 16,
+        "hat": 9
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 30,
+        "gt500_lte1000": 416,
+        "gt1000": 354
+      }
+    },
+    {
+      "vibe": "office",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 913,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 2,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 52,
+        "gt500_lte1000": 264,
+        "gt1000": 484
+      }
+    },
+    {
+      "vibe": "office",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1043,
+      "pools": {
+        "top": 20,
+        "bottom": 15,
+        "shoes": 34,
+        "outer": 5,
+        "bag": 14
+      },
+      "budgetBands": {
+        "lte250": 6,
+        "gt250_lte500": 161,
+        "gt500_lte1000": 340,
+        "gt1000": 293
+      }
+    },
+    {
+      "vibe": "office",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 938,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 3,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 57,
+        "gt500_lte1000": 257,
+        "gt1000": 486
+      }
+    },
+    {
+      "vibe": "date",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 868,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 2,
+        "jewelry": 15,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 25,
+        "gt500_lte1000": 188,
+        "gt1000": 587
+      }
+    },
+    {
+      "vibe": "date",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 938,
+      "pools": {
+        "top": 23,
+        "bottom": 15,
+        "shoes": 34,
+        "outer": 5,
+        "jewelry": 66,
+        "bag": 14
+      },
+      "budgetBands": {
+        "lte250": 7,
+        "gt250_lte500": 77,
+        "gt500_lte1000": 309,
+        "gt1000": 407
+      }
+    },
+    {
+      "vibe": "date",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 874,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 3,
+        "jewelry": 15,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 25,
+        "gt500_lte1000": 204,
+        "gt1000": 571
+      }
+    },
+    {
+      "vibe": "gym",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1496,
+      "pools": {
+        "top": 2,
+        "bottom": 3,
+        "shoes": 7,
+        "bag": 15,
+        "hat": 9
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 17,
+        "gt500_lte1000": 608,
+        "gt1000": 175
+      }
+    },
+    {
+      "vibe": "gym",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 892,
+      "pools": {
+        "top": 12,
+        "bottom": 5,
+        "shoes": 8,
+        "bag": 15,
+        "hat": 10
+      },
+      "budgetBands": {
+        "lte250": 25,
+        "gt250_lte500": 413,
+        "gt500_lte1000": 311,
+        "gt1000": 51
+      }
+    },
+    {
+      "vibe": "gym",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 2658,
+      "pools": {
+        "top": 2,
+        "bottom": 3,
+        "shoes": 7,
+        "bag": 15,
+        "hat": 9
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 1,
+        "gt500_lte1000": 530,
+        "gt1000": 269
+      }
+    },
+    {
+      "vibe": "cozy",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 976,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 22,
+        "outer": 4
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 84,
+        "gt500_lte1000": 526,
+        "gt1000": 190
+      }
+    },
+    {
+      "vibe": "cozy",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 982,
+      "pools": {
+        "top": 40,
+        "bottom": 22,
+        "shoes": 37,
+        "outer": 7
+      },
+      "budgetBands": {
+        "lte250": 21,
+        "gt250_lte500": 227,
+        "gt500_lte1000": 388,
+        "gt1000": 164
+      }
+    },
+    {
+      "vibe": "cozy",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1000,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 22,
+        "outer": 5
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 75,
+        "gt500_lte1000": 500,
+        "gt1000": 225
+      }
+    },
+    {
+      "vibe": "vacation",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1515,
+      "pools": {
+        "top": 3,
+        "bottom": 5,
+        "shoes": 4,
+        "hat": 9,
+        "eyewear": 0,
+        "bag": 16
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 88,
+        "gt500_lte1000": 469,
+        "gt1000": 243
+      }
+    },
+    {
+      "vibe": "vacation",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 914,
+      "pools": {
+        "top": 19,
+        "bottom": 8,
+        "shoes": 9,
+        "hat": 10,
+        "eyewear": 0,
+        "bag": 17
+      },
+      "budgetBands": {
+        "lte250": 201,
+        "gt250_lte500": 342,
+        "gt500_lte1000": 219,
+        "gt1000": 38
+      }
+    },
+    {
+      "vibe": "vacation",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 2329,
+      "pools": {
+        "top": 3,
+        "bottom": 5,
+        "shoes": 4,
+        "hat": 9,
+        "eyewear": 0,
+        "bag": 16
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 36,
+        "gt500_lte1000": 438,
+        "gt1000": 326
+      }
+    },
+    {
+      "vibe": "preppy",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 953,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 4,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 35,
+        "gt500_lte1000": 320,
+        "gt1000": 445
+      }
+    },
+    {
+      "vibe": "preppy",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 912,
+      "pools": {
+        "top": 20,
+        "bottom": 15,
+        "shoes": 25,
+        "outer": 7,
+        "bag": 14
+      },
+      "budgetBands": {
+        "lte250": 8,
+        "gt250_lte500": 101,
+        "gt500_lte1000": 379,
+        "gt1000": 312
+      }
+    },
+    {
+      "vibe": "preppy",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 984,
+      "pools": {
+        "top": 13,
+        "bottom": 12,
+        "shoes": 16,
+        "outer": 5,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 28,
+        "gt500_lte1000": 314,
+        "gt1000": 458
+      }
+    },
+    {
+      "vibe": "night",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1219,
+      "pools": {
+        "top": 13,
+        "bottom": 9,
+        "shoes": 7,
+        "outer": 2,
+        "jewelry": 15,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 28,
+        "gt500_lte1000": 229,
+        "gt1000": 543
+      }
+    },
+    {
+      "vibe": "night",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 836,
+      "pools": {
+        "top": 16,
+        "bottom": 12,
+        "shoes": 18,
+        "outer": 2,
+        "jewelry": 66,
+        "bag": 14
+      },
+      "budgetBands": {
+        "lte250": 2,
+        "gt250_lte500": 74,
+        "gt500_lte1000": 295,
+        "gt1000": 429
+      }
+    },
+    {
+      "vibe": "night",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1294,
+      "pools": {
+        "top": 13,
+        "bottom": 9,
+        "shoes": 7,
+        "outer": 2,
+        "jewelry": 15,
+        "bag": 13
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 21,
+        "gt500_lte1000": 251,
+        "gt1000": 528
+      }
+    },
+    {
+      "vibe": "edgy",
+      "frame": "androgynous",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 976,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 24,
+        "outer": 4,
+        "bag": 15
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 41,
+        "gt500_lte1000": 412,
+        "gt1000": 347
+      }
+    },
+    {
+      "vibe": "edgy",
+      "frame": "fem",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 1117,
+      "pools": {
+        "top": 24,
+        "bottom": 17,
+        "shoes": 28,
+        "outer": 7,
+        "bag": 15
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 44,
+        "gt500_lte1000": 349,
+        "gt1000": 407
+      }
+    },
+    {
+      "vibe": "edgy",
+      "frame": "masc",
+      "kept": 800,
+      "target": 800,
+      "shortfall": 0,
+      "attempts": 998,
+      "pools": {
+        "top": 21,
+        "bottom": 15,
+        "shoes": 24,
+        "outer": 5,
+        "bag": 15
+      },
+      "budgetBands": {
+        "lte250": 0,
+        "gt250_lte500": 41,
+        "gt500_lte1000": 388,
+        "gt1000": 371
+      }
+    }
+  ]
+}

@@ -116,6 +116,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${satoshi.variable} ${playfair.variable}`}>
       <body className="bg-bg text-ink">
+        <a
+          href="#main-content"
+          className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:not-sr-only focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-full focus:bg-ink focus:px-4 focus:text-[13px] focus:font-bold focus:text-bg focus:shadow-float"
+        >
+          Skip to main content
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }}
@@ -123,30 +129,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SplashScreen />
         <AnalyticsProvider />
         <InstallHint />
-        {/* Desktop vitrine — frames the 480px app column as an intentional
-            object on wide screens (every page centers at the same width).
-            Pure chrome: aria-hidden, no pointer events, invisible below lg. */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-[60] hidden lg:block">
-          {/* hairline edges + ambient wall glow around the column */}
-          <div className="absolute inset-y-0 left-1/2 w-[480px] -translate-x-1/2 shadow-[0_0_120px_rgba(255,45,109,.07)] ring-1 ring-white/[.07]" />
-          {/* left gallery rail — xl only: below that the gutter is too narrow */}
-          <div className="absolute left-[max(2.5rem,calc(50%-240px-21rem))] top-1/2 hidden w-64 -translate-y-1/2 xl:block">
-            <span className="block h-[2px] w-8 bg-accent" />
-            <p className="mt-5 font-serif text-[30px] italic leading-none text-ink">Sylistly</p>
-            <p className="mt-3 text-[13px] leading-relaxed text-muted-2">
-              An endless scroll of complete outfits, built from real pieces you can buy right now.
-            </p>
-            <div className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-2">
-              <p className="border-t border-hairline-2 py-3">Scroll complete fits</p>
-              <p className="border-t border-hairline-2 py-3">Lock a piece · remix the rest</p>
-              <p className="border-y border-hairline-2 py-3">Shop every look</p>
-            </div>
-            <p className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted">
-              Best on your phone — <span className="text-ink">sylistly.com</span>
-            </p>
-          </div>
+        <div id="main-content" tabIndex={-1} className="lg:pl-[260px]">
+          {children}
         </div>
-        {children}
       </body>
     </html>
   );

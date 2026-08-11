@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import { getLibraryLook } from '@/lib/outfit-library';
-import { IDENTITIES } from '@/lib/style-identity';
+import { getStyleIdentityById } from '@/lib/style-identity';
 import type { Category } from '@/lib/types';
 import { VIBES } from '@/lib/vibes';
 
@@ -54,7 +54,7 @@ async function toDataUri(relativeUrl: string): Promise<string | null> {
 
 export default async function StyleOgImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const identity = IDENTITIES[id];
+  const identity = getStyleIdentityById(id);
 
   const name = identity?.name || 'Sylistly';
   const tagline = identity?.tagline || 'Endless outfits from real products.';

@@ -405,7 +405,7 @@ export function SearchSheet({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Search pieces"
+        aria-labelledby="search-sheet-title"
         tabIndex={-1}
         className="fixed inset-x-0 z-[80] mx-auto flex min-h-0 max-w-[480px] translate-y-0 flex-col overscroll-contain rounded-t-3xl border-t border-white/10 bg-[#11100f] pb-1 shadow-[0_-22px_70px_rgba(0,0,0,.55)] outline-none"
         style={{
@@ -415,10 +415,10 @@ export function SearchSheet({
       >
             <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2.5" />
             <div className="flex items-center justify-between px-5 pb-1.5 pt-1">
-              <div className="font-serif font-semibold text-lg">
+              <h2 id="search-sheet-title" className="font-serif font-semibold text-lg">
                 Add <em className="italic text-accent">{CATEGORY_LABELS[currentCategory]}</em>
-              </div>
-              <button onClick={onClose} aria-label="Close" className="w-7 h-7 rounded-full bg-surface-3 grid place-items-center">
+              </h2>
+              <button type="button" onClick={onClose} aria-label="Close" className="grid h-11 w-11 place-items-center rounded-full bg-surface-3">
                 <X size={14} className="text-muted-2" />
               </button>
             </div>
@@ -436,6 +436,7 @@ export function SearchSheet({
                         key={slot}
                         type="button"
                         onClick={() => chooseCategory(slot)}
+                        aria-pressed={active}
                         className={`relative flex w-[96px] flex-none flex-col rounded-[16px] border p-1.5 text-left transition ${
                           active
                             ? 'border-accent/65 bg-[linear-gradient(180deg,rgba(255,45,109,.12),rgba(255,255,255,.04))] shadow-pink-glow'
@@ -502,7 +503,7 @@ export function SearchSheet({
                   <button
                     type="button"
                     onClick={() => void runSearch('', currentCategory)}
-                    className="rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
+                    className="min-h-11 rounded-full border border-hairline-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-muted-2 hover:border-accent hover:text-ink"
                   >
                     Browse
                   </button>
@@ -520,6 +521,7 @@ export function SearchSheet({
             >
               <SearchIcon size={16} className="absolute left-7 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
               <input
+                data-dialog-initial-focus
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -532,13 +534,13 @@ export function SearchSheet({
               <button
                 type="submit"
                 disabled={loading}
-                className="absolute right-5 top-1/2 -translate-y-1/2 rounded-full bg-accent px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-50"
+                className="absolute right-5 top-1/2 min-h-11 -translate-y-1/2 rounded-full bg-accent px-3 py-1.5 text-[11px] font-semibold text-bg disabled:opacity-50"
               >
                 Search
               </button>
             </form>
 
-            <div className="flex flex-wrap gap-1.5 px-4 pb-2">
+            <div role="group" aria-label="Maximum item price" className="flex flex-wrap gap-1.5 px-4 pb-2">
               {[
                 { label: 'Any', value: null },
                 { label: '< $100', value: 100 },
@@ -552,9 +554,10 @@ export function SearchSheet({
                     setSearchPriceMax(option.value);
                     if (option.value !== null) setCustomPriceInput('');
                   }}
-                  className={`flex-none whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-semibold ${
+                  aria-pressed={searchPriceMax === option.value && !customPriceInput}
+                  className={`min-h-11 flex-none whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-semibold ${
                     searchPriceMax === option.value
-                      ? 'bg-accent text-white shadow-pink-glow'
+                      ? 'bg-accent text-bg shadow-pink-glow'
                       : 'border border-hairline bg-surface-2 text-muted-2 hover:text-ink'
                   }`}
                 >
@@ -572,7 +575,7 @@ export function SearchSheet({
                 }}
                 aria-label="Custom maximum price"
                 placeholder="Custom $"
-                className="min-w-[96px] rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
+                className="min-h-11 min-w-[96px] rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[16px] text-ink outline-none focus:border-accent"
               />
             </div>
 
@@ -588,7 +591,7 @@ export function SearchSheet({
                       recordRecent(term);
                       void runSearch(term, currentCategory);
                     }}
-                    className="flex-none whitespace-nowrap rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[11.5px] text-ink hover:border-accent/55"
+                    className="min-h-11 flex-none whitespace-nowrap rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[11.5px] text-ink hover:border-accent/55"
                   >
                     {term}
                   </button>
@@ -597,7 +600,7 @@ export function SearchSheet({
                   type="button"
                   onClick={clearRecents}
                   aria-label="Clear recent searches"
-                  className="flex-none rounded-full border border-hairline bg-surface-2 p-1.5 text-muted-2 transition hover:text-ink"
+                  className="grid h-11 w-11 flex-none place-items-center rounded-full border border-hairline bg-surface-2 text-muted-2 transition hover:text-ink"
                 >
                   <X size={12} />
                 </button>
@@ -612,7 +615,7 @@ export function SearchSheet({
                     setQuery(c);
                     void runSearch(c, currentCategory);
                   }}
-                  className="flex-none whitespace-nowrap rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11.5px] text-muted-2 hover:text-ink"
+                  className="min-h-11 flex-none whitespace-nowrap rounded-full border border-hairline bg-surface-2 px-3 py-1.5 text-[11.5px] text-muted-2 hover:text-ink"
                 >
                   {c}
                 </button>
@@ -647,9 +650,9 @@ export function SearchSheet({
             <div className="min-h-0 flex-1 overflow-hidden px-4 pb-3">
               {loading
                 ? (
-                    <div className="grid min-h-[260px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
+                    <div role="status" className="grid min-h-[260px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
                       <div>
-                        <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+                        <div aria-hidden className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
                         <div className="mt-4 font-serif text-lg text-ink">Finding image-backed pieces...</div>
                         <div className="mt-1 text-sm text-muted">Only real product photos will be shown.</div>
                       </div>
@@ -684,7 +687,7 @@ export function SearchSheet({
                               setFailedImageIds(new Set());
                               setReadyImageIds(new Set());
                             }}
-                            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
+                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
                           >
                             <RotateCcw size={14} />
                             Reset options
@@ -692,7 +695,7 @@ export function SearchSheet({
                           <button
                             type="button"
                             onClick={() => void runSearch(query, currentCategory)}
-                            className="rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-white shadow-pink-glow"
+                            className="min-h-11 rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-bg shadow-pink-glow"
                           >
                             Search again
                           </button>
@@ -726,21 +729,21 @@ export function SearchSheet({
                       ) : null}
 
                       {!activeCandidate || !activeImageReady ? (
-                        <div className="grid min-h-[260px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
+                        <div role="status" className="grid min-h-[260px] place-items-center rounded-[28px] border border-white/10 bg-white/[0.03] text-center">
                           <div>
-                            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+                            <div aria-hidden className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
                             <div className="mt-4 font-serif text-lg text-ink">Preparing option...</div>
                             <div className="mt-1 text-sm text-muted">Checking the product photo before it appears.</div>
                           </div>
                         </div>
                       ) : (
-                        <article className="overflow-hidden rounded-[30px] border border-white/10 bg-[#171514] shadow-[0_24px_70px_rgba(0,0,0,.34)]">
+                        <article aria-labelledby="search-active-product" className="overflow-hidden rounded-[30px] border border-white/10 bg-[#171514] shadow-[0_24px_70px_rgba(0,0,0,.34)]">
                           <div className="relative m-2.5 overflow-hidden rounded-[22px] bg-[linear-gradient(180deg,#fffaf0_0%,#f0e4d6_100%)] ring-1 ring-[#efe4da]">
                             <div className="absolute left-3 top-3 z-10 rounded-full bg-[#181513]/80 px-3 py-1 text-[9px] font-bold uppercase tracking-[.16em] text-white">
                               {CATEGORY_LABELS[activeCandidate.category]}
                             </div>
                             {selectedItem?.id === activeCandidate.id ? (
-                              <div className="absolute right-3 top-3 z-10 rounded-full bg-accent px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-white">
+                              <div className="absolute right-3 top-3 z-10 rounded-full bg-accent px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-bg">
                                 Selected
                               </div>
                             ) : null}
@@ -769,9 +772,9 @@ export function SearchSheet({
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="text-[10px] font-bold uppercase tracking-[.18em] text-[#a9998f]">{cleanBrand(activeCandidate.brand)}</div>
-                                <div className="mt-1 line-clamp-2 font-serif text-[18px] font-semibold leading-[1.08] text-ink">
+                                <h3 id="search-active-product" className="mt-1 line-clamp-2 font-serif text-[18px] font-semibold leading-[1.08] text-ink">
                                   {cleanProductName(activeCandidate.name, activeCandidate.brand)}
-                                </div>
+                                </h3>
                                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted">
                                   <span className="rounded-full border border-white/10 px-2.5 py-1">{formatPrice(activeCandidate.priceCents)}</span>
                                   <span className="rounded-full border border-white/10 px-2.5 py-1">{getHost(getProductOutboundUrl(activeCandidate))}</span>
@@ -786,14 +789,14 @@ export function SearchSheet({
                               <button
                                 type="button"
                                 onClick={goToNextResult}
-                                className="rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
+                                className="min-h-11 rounded-full border border-white/15 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-ink"
                               >
                                 Skip
                               </button>
                               <button
                                 type="button"
                                 onClick={chooseActiveCandidate}
-                                className="rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-white shadow-pink-glow"
+                                className="min-h-11 rounded-full bg-accent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-bg shadow-pink-glow"
                               >
                                 {selectedItem ? 'Swap' : 'Use this'}
                               </button>
@@ -804,7 +807,7 @@ export function SearchSheet({
                                 type="button"
                                 onClick={goToPreviousResult}
                                 disabled={activeResultIndex <= 0}
-                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
+                                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
                               >
                                 <ChevronLeft size={14} />
                                 Prev
@@ -812,7 +815,7 @@ export function SearchSheet({
                               <button
                                 type="button"
                                 onClick={shopActiveCandidate}
-                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2"
+                                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2"
                               >
                                 Shop
                                 <ExternalLink size={13} />
@@ -821,7 +824,7 @@ export function SearchSheet({
                                 type="button"
                                 onClick={goToNextResult}
                                 disabled={activeResultIndex >= candidateResults.length}
-                                className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
+                                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full bg-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-2 disabled:opacity-35"
                               >
                                 Next
                                 <ChevronRight size={14} />

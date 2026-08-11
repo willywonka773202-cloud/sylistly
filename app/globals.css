@@ -8,6 +8,7 @@
      renders dark instead of mismatched-light on the dark surfaces. */
   color-scheme: dark;
   --accent: #FF2D6D;
+  --bg: #0D0D0F;
   --accent-hot: #FF5C8A;
   --accent-deep: #C5174F;
   --champagne: #e7c79b;
@@ -95,6 +96,12 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* The skip link moves focus here; the visible cue stays on the destination's
+   content rather than drawing a viewport-sized ring around the app shell. */
+#main-content:focus {
+  outline: none;
 }
 
 /* Typographic line-breaking polish (progressive enhancement — ignored where
@@ -452,7 +459,9 @@ p {
     border-radius: 9999px;
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hot) 56%, var(--accent) 100%);
     background-size: 200% 100%;
-    color: white;
+    /* #FF2D6D is 3.59:1 against white, so small CTA copy uses the existing
+       dark canvas token as its contrast color (5.41:1). */
+    color: var(--bg, #0D0D0F);
     font-weight: 700;
     box-shadow: 0 16px 34px rgba(255, 59, 99, .42);
     transition: transform 150ms ease, background-position 240ms ease, box-shadow 240ms ease;
@@ -484,7 +493,7 @@ p {
   .sy-chip-active {
     border-color: transparent;
     background: var(--accent);
-    color: white;
+    color: var(--bg, #0D0D0F);
     box-shadow: 0 10px 28px rgba(255, 59, 99, .4);
   }
 
@@ -510,6 +519,14 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-pulse,
+  .animate-sy-rise,
+  .sy-motion-optional {
+    animation: none !important;
+    transition: none !important;
+  }
+
   .sy-route-enter,
   .sy-piece-in,
   .sy-grid-piece-in,

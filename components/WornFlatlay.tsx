@@ -195,8 +195,10 @@ export function WornFlatlay({
 
   return (
     <div
-      role="img"
-      aria-label={`Outfit of ${products.length} pieces arranged as a collage`}
+      role={onPieceClick ? 'group' : 'img'}
+      aria-label={onPieceClick
+        ? `Outfit of ${products.length} pieces. Choose a piece for shopping and replacement options.`
+        : `Outfit of ${products.length} pieces arranged as a collage`}
       className={`relative overflow-hidden ${PLATE[plate]} ${className}`}
       style={depth ? { perspective: '1100px' } : undefined}
     >
@@ -289,7 +291,7 @@ export function WornFlatlay({
               {onPieceClick ? (
                 <PlatePieceFloat
                   onActivate={() => onPieceClick(product)}
-                  label={`Shop the ${product.brand} ${product.category}`}
+                  label={`Open options for the ${product.brand} ${product.category}`}
                   disabled={!active}
                   idleFloat={LIFTED.has(product.category) ? 3 : 0}
                   maxTilt={10}

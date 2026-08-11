@@ -1,14 +1,14 @@
 'use client';
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { useAppViewportLock } from '@/lib/use-app-viewport-lock';
-import { ArrowLeftRight, Bookmark, ChevronLeft, ExternalLink, Layers, LoaderCircle, Lock, Plus, RotateCcw, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import { ArrowLeftRight, BadgeCheck, Bookmark, ChevronLeft, CircleAlert, ExternalLink, Layers, Link2, LoaderCircle, Lock, Plus, RotateCcw, ShoppingBag, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { Mannequin } from '@/components/Mannequin';
-import { SearchSheet } from '@/components/SearchSheet';
 import { BottomNav } from '@/components/BottomNav';
-import { CheckoutSheet, type CheckoutProduct } from '@/components/CheckoutSheet';
+import type { CheckoutProduct } from '@/components/CheckoutSheet';
 import { BudgetPanel } from '@/components/BudgetPanel';
 import { useFit } from '@/store/fit';
 import { useProfile } from '@/store/profile';
@@ -19,20 +19,18 @@ import {
 } from '@/lib/remix-budget-storage';
 import { CATEGORY_ORDER, CATEGORY_LABELS, type Category, type Product } from '@/lib/types';
 import {
-  buildCatalogLook,
   collectOutfitProductIds,
-  getClientCatalogProducts,
   getBrandOrMerchant,
   getOutfitBrandCounts,
   getShoeId,
-  hydrateItemsFromCatalog,
+  isBuyableOutfitProduct,
   outfitFullSignature,
   outfitRequiredSignature,
-} from '@/lib/client-catalog';
+  validateCompleteBuyableLook,
+} from '@/lib/build-commerce';
 import { track } from '@/lib/analytics';
 import { useBodyScrollLock } from '@/lib/use-body-scroll-lock';
 import { useDialogBehavior } from '@/lib/use-dialog-behavior';
-import { getLibraryLook } from '@/lib/outfit-library';
 import { getProductOutboundUrl, getShoppableUrl } from '@/lib/product-links';
 import { hasFrameMismatch } from '@/lib/frame-inference';
 import { isVibeAppropriate } from '@/lib/vibe-fit';
@@ -46,6 +44,7 @@ import {
   productImageQualityScore,
   sortTransparentFeedRenderableProducts,
 } from '@/lib/product-image-quality';
+import { getStyleOwnedCanvasImageUrl, isVerifiedStyleOwnedProduct } from '@/lib/style-owned-product';
 import {
   VIBES,
   getBudgetMaxCents,
@@ -54,6 +53,16 @@ import {
   type VibeId,
   vibeSearchQuery,
 } from '@/lib/vibes';
+import {
+  buildTasteRankingSignals,
+  emptyTasteRankingSignals,
+  loadTasteProfile,
+  recordTasteSignal,
+  scoreProductForTaste,
+  type TasteRankingSignals,
+  type TasteSignalInput,
+  type TasteStorage,
+} from '@/lib/taste-profile';
 
 const EDITORIAL_LOADING_LINES = [
   'Balancing silhouette...',
@@ -61,6 +70,32 @@ const EDITORIAL_LOADING_LINES = [
   'Placing accessories...',
   'Polishing the board...',
 ];
+
+const BUILDER_TASTE_STORAGE: TasteStorage = {
+  getItem: safeStorageGet,
+  setItem: safeStorageSet,
+};
+
+// Search and shop sheets are opened on demand; defer their larger interaction
+// code so the remix canvas itself becomes usable first.
+const SearchSheet = dynamic(
+  () => import('@/components/SearchSheet').then((module) => module.SearchSheet),
+  { ssr: false, loading: () => null },
+);
+const CheckoutSheet = dynamic(
+  () => import('@/components/CheckoutSheet').then((module) => module.CheckoutSheet),
+  { ssr: false, loading: () => null },
+);
+
+// The catalog and pre-generated outfit library are generated JSON-backed and
+// together dominate this route's bundle. The render shell needs neither: saved
+// snapshots are validated by lightweight helpers above, then the current rows
+// hydrate after mount; generation/search await this chunk on first use.
+type BuildCatalogEngine = typeof import('@/lib/build-catalog-engine');
+let buildCatalogEnginePromise: Promise<BuildCatalogEngine> | null = null;
+function loadBuildCatalogEngine(): Promise<BuildCatalogEngine> {
+  return (buildCatalogEnginePromise ??= import('@/lib/build-catalog-engine'));
+}
 
 const MISSING_GENERATOR_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'eyewear', 'jewelry', 'hat'];
 const STARTER_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
@@ -88,23 +123,49 @@ const FULL_GENERATOR_SLOTS: Record<VibeId, Category[]> = {
   preppy: ['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear'],
 };
 
-// Accessory/secondary slots may rely on the google-shopping fallback link (still
-// shoppable) instead of a direct product link — otherwise the exact-link gate
-// halves their already-small pools and leaves grids empty (esp. gym hat/outer/
-// bag, which have no vibe restriction so the link gate is all that starves them).
-// Hero slots (top/bottom/shoes) still require a direct link.
-const LINK_OPTIONAL_SLOTS: ReadonlySet<Category> = new Set<Category>([
-  'hat', 'outer', 'bag', 'eyewear', 'jewelry',
-]);
+const REQUIRED_COMMERCE_SLOTS: Category[] = ['top', 'bottom', 'shoes'];
 
 function isBuildReadyProduct(product?: Product | null): product is Product {
-  return Boolean(product && isEditorialCutoutProduct(product) && hasExactProductLink(product));
+  return Boolean(
+    product
+      && product.inStock !== false
+      && (isEditorialCutoutProduct(product) || isVerifiedStyleOwnedProduct(product))
+      && hasExactProductLink(product)
+      && isBuyableOutfitProduct(product),
+  );
 }
 
 function isBuildReadySlotProduct(product: Product | null | undefined, slot: Category): product is Product {
-  if (!product || product.category !== slot || !hasHighCategoryConfidence(product, slot)) return false;
-  if (LINK_OPTIONAL_SLOTS.has(slot)) return isEditorialCutoutProduct(product);
+  if (!product || product.category !== slot) return false;
+  if (!isVerifiedStyleOwnedProduct(product) && !hasHighCategoryConfidence(product, slot)) return false;
   return isBuildReadyProduct(product);
+}
+
+function formatCommerceConflict(
+  items: Partial<Record<Category, Product>>,
+  maxTotalCents: number | null,
+  lockedSlots: Category[] = [],
+): string | null {
+  const validation = validateCompleteBuyableLook(items, maxTotalCents);
+  if (validation.ok) return null;
+
+  const reasons: string[] = [];
+  if (validation.missingRequiredSlots.length) {
+    reasons.push(`add ${validation.missingRequiredSlots.map((slot) => CATEGORY_LABELS[slot].toLowerCase()).join(', ')}`);
+  }
+  if (validation.nonBuyableSlots.length) {
+    reasons.push(`replace ${validation.nonBuyableSlots.map((slot) => CATEGORY_LABELS[slot].toLowerCase()).join(', ')} with exact, available items`);
+  }
+  if (validation.overBudgetCents > 0) {
+    reasons.push(`reduce the total by $${(validation.overBudgetCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}`);
+  }
+  const lockedConflict = lockedSlots.filter((slot) =>
+    validation.nonBuyableSlots.includes(slot) || Boolean(validation.overBudgetCents && items[slot]),
+  );
+  const lockNote = lockedConflict.length
+    ? ` Unlock ${lockedConflict.map((slot) => CATEGORY_LABELS[slot].toLowerCase()).join(', ')} if you want Syli to repair it.`
+    : '';
+  return `Shop items is withheld until you ${reasons.join('; ')}.${lockNote}`;
 }
 
 function slotProductText(product: Product): string {
@@ -154,8 +215,11 @@ function buildSlotCandidateRankScore(
   query: string,
   recentBrandCounts: Record<string, number> = {},
   draftItems: Partial<Record<Category, Product>> = {},
+  taste?: TasteRankingSignals,
 ): number {
-  return slotCandidateScore(product, query) - brandConcentrationPenalty(product, recentBrandCounts, draftItems);
+  return slotCandidateScore(product, query)
+    + scoreProductForTaste(product, taste)
+    - brandConcentrationPenalty(product, recentBrandCounts, draftItems);
 }
 
 function pickBuildSlotCandidate(
@@ -165,13 +229,14 @@ function pickBuildSlotCandidate(
   avoidIds: string[] = [],
   recentBrandCounts: Record<string, number> = {},
   draftItems: Partial<Record<Category, Product>> = {},
+  taste?: TasteRankingSignals,
 ): Product | null {
   const avoidSet = new Set(avoidIds);
   const slotReady = products
     .filter((product) => isBuildReadySlotProduct(product, slot))
     .sort((left, right) =>
-      buildSlotCandidateRankScore(right, query, recentBrandCounts, draftItems)
-      - buildSlotCandidateRankScore(left, query, recentBrandCounts, draftItems),
+      buildSlotCandidateRankScore(right, query, recentBrandCounts, draftItems, taste)
+      - buildSlotCandidateRankScore(left, query, recentBrandCounts, draftItems, taste),
     );
 
   const fresh = slotReady.filter((product) => !avoidSet.has(product.id));
@@ -179,11 +244,11 @@ function pickBuildSlotCandidate(
   const shortList = pool.slice(0, Math.min(8, pool.length));
   if (!shortList.length) return null;
 
-  const totalWeight = shortList.reduce((sum, product, index) => sum + Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems) / 25)), 0);
+  const totalWeight = shortList.reduce((sum, product, index) => sum + Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems, taste) / 25)), 0);
   let roll = Math.random() * totalWeight;
   for (let index = 0; index < shortList.length; index += 1) {
     const product = shortList[index];
-    roll -= Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems) / 25));
+    roll -= Math.max(1, 14 - index * 2 + Math.max(0, buildSlotCandidateRankScore(product, query, recentBrandCounts, draftItems, taste) / 25));
     if (roll <= 0) return product;
   }
   return shortList[0];
@@ -214,40 +279,39 @@ function defaultGenerationSlotsForVibe(vibe: VibeId): Category[] {
   return FULL_GENERATOR_SLOTS[vibe] || STARTER_GENERATOR_SLOTS[vibe] || ['top', 'bottom', 'shoes', 'bag'];
 }
 
-type BuilderPreferenceKind = 'save' | 'pass';
-
-interface BuilderPreferenceHistory {
-  events: Array<{
-    kind: BuilderPreferenceKind;
-    vibe: VibeId;
-    productIds: string[];
-    categories: Category[];
-    createdAt: number;
-  }>;
-  vibes: Partial<Record<VibeId, { saved: number; passed: number }>>;
-  categories: Partial<Record<Category, { saved: number; passed: number }>>;
-  products: Record<string, { saved: number; passed: number }>;
-}
-
 const CATEGORY_PRIORITY: Category[] = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'eyewear', 'jewelry'];
 const NEUTRAL_COLORS = new Set(['black', 'white', 'cream', 'ivory', 'beige', 'stone', 'grey', 'gray', 'charcoal', 'tan', 'brown', 'navy']);
 const SWIPE_HINT_STORAGE_KEY = 'sylistly-builder-swipe-hint-v2';
-const BUILDER_PREFERENCES_STORAGE_KEY = 'sylistly-builder-preferences-v1';
 
 /**
- * Stable signature for an outfit-items map, keyed by category + product id.
+ * Stable commerce signature for an outfit-items map.
  *
  * Used to decide whether two `Partial<Record<Category, Product>>` values
- * represent the same outfit even when their object references differ — e.g.
- * after `hydrateItemsFromCatalog` spreads fresh `{ ...product, ...catalogProduct }`
- * shells on every call. Comparing signatures prevents an effect that calls
- * `replaceItems(hydrated)` from looping forever on referentially-new but
- * semantically-identical results.
+ * Product ids alone are insufficient: a saved board may keep the same id while
+ * price, stock, verification, image, or destination changes. Comparing the
+ * fields that drive display and shopping refreshes those snapshots without an
+ * effect loop when the current catalog record is already installed.
  */
 function itemSignature(items: Partial<Record<Category, Product>>): string {
   return Object.entries(items)
     .sort(([leftCat], [rightCat]) => leftCat.localeCompare(rightCat))
-    .map(([cat, product]) => `${cat}:${product?.id ?? ''}`)
+    .map(([cat, product]) => [
+      cat,
+      product?.id ?? '',
+      product?.brand ?? '',
+      product?.name ?? '',
+      product?.priceCents ?? '',
+      product?.originalPriceCents ?? '',
+      product?.currency ?? '',
+      product?.productUrl ?? '',
+      product?.retailerUrl ?? '',
+      product?.imageUrl ?? '',
+      product?.imageTransparentUrl ?? '',
+      product?.inStock ?? '',
+      product?.trusted ?? '',
+      product?.availabilityState ?? '',
+      product?.lastVerifiedAt ?? '',
+    ].join(':'))
     .join('|');
 }
 
@@ -261,50 +325,6 @@ const BUILD_SECTION_LABELS: Record<BuildSectionTab, string> = {
 };
 
 const BUILD_OVERLAY_TABS = ['settings', 'refine', 'details'] as const;
-
-function recordBuilderPreferenceEvent(
-  kind: BuilderPreferenceKind,
-  productsBySlot: Partial<Record<Category, Product>>,
-  vibe: VibeId,
-) {
-  if (typeof window === 'undefined') return;
-  const entries = Object.entries(productsBySlot).filter((entry): entry is [Category, Product] => Boolean(entry[1]));
-  if (!entries.length) return;
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(BUILDER_PREFERENCES_STORAGE_KEY) || '{}') as Partial<BuilderPreferenceHistory>;
-    const history: BuilderPreferenceHistory = {
-      events: Array.isArray(parsed.events) ? parsed.events : [],
-      vibes: parsed.vibes || {},
-      categories: parsed.categories || {},
-      products: parsed.products || {},
-    };
-    const counterKey = kind === 'save' ? 'saved' : 'passed';
-
-    history.events.unshift({
-      kind,
-      vibe,
-      productIds: entries.map(([, product]) => product.id),
-      categories: entries.map(([category]) => category),
-      createdAt: Date.now(),
-    });
-    history.events = history.events.slice(0, 120);
-
-    history.vibes[vibe] = history.vibes[vibe] || { saved: 0, passed: 0 };
-    history.vibes[vibe]![counterKey] += 1;
-
-    for (const [category, product] of entries) {
-      history.categories[category] = history.categories[category] || { saved: 0, passed: 0 };
-      history.categories[category]![counterKey] += 1;
-      history.products[product.id] = history.products[product.id] || { saved: 0, passed: 0 };
-      history.products[product.id][counterKey] += 1;
-    }
-
-    window.localStorage.setItem(BUILDER_PREFERENCES_STORAGE_KEY, JSON.stringify(history));
-  } catch {
-    // Local preference tracking should never block save/pass/generation flows.
-  }
-}
 
 interface OutfitAnalysis {
   score: number;
@@ -386,6 +406,7 @@ function BuilderPageContent({
   quickSlots,
   quickLock,
   quickSource,
+  quickBudget,
 }: {
   quickSlot: string | null;
   quickQuery: string | null;
@@ -394,6 +415,7 @@ function BuilderPageContent({
   quickSlots: string | null;
   quickLock: string | null;
   quickSource: string | null;
+  quickBudget: string | null;
 }) {
   const { items, totalCents, count, clear, replaceItems } = useFit();
   const skinTone = useProfile((state) => state.profile.skinTone);
@@ -402,6 +424,7 @@ function BuilderPageContent({
   useAppViewportLock();
   const bodyType = useProfile((state) => state.profile.bodyType);
   const setBodyType = useProfile((state) => state.setBodyType);
+  const profileSizes = useProfile((state) => state.profile.sizes);
   const stylePrefs = useProfile((state) => state.profile.stylePrefs);
   const saveLocalFit = useSavedFits((state) => state.saveFit);
   const [searchFor, setSearchFor] = useState<Category | null>(null);
@@ -434,6 +457,7 @@ function BuilderPageContent({
   const recentShoeIdsRef = useRef<string[]>([]);
   const recentBrandCountsRef = useRef<Record<string, number>>({});
   const recentFormulaIdsRef = useRef<string[]>([]);
+  const tasteSignalsRef = useRef(emptyTasteRankingSignals());
   const [boardDragging, setBoardDragging] = useState(false);
   const [activeEditSlot, setActiveEditSlot] = useState<Category | null>(null);
   const [swipeFeedback, setSwipeFeedback] = useState<'save' | 'pass' | null>(null);
@@ -443,6 +467,7 @@ function BuilderPageContent({
   const [swipeHintRunCount, setSwipeHintRunCount] = useState(0);
   const [saveBurst, setSaveBurst] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isDesktopCanvas, setIsDesktopCanvas] = useState(false);
   const [activeBuildOverlay, setActiveBuildOverlay] = useState<Exclude<BuildSectionTab, 'build'> | null>(null);
   const [lockedSlots, setLockedSlots] = useState<Category[]>([]);
   // Tracks which slots were updated in the most recent successful generate.
@@ -454,6 +479,27 @@ function BuilderPageContent({
   const quickSourceProcessedRef = useRef(false);
   const boardControls = useAnimation();
   const router = useRouter();
+  const generationPreferences = useMemo(() => ({
+    preferredBrands: stylePrefs?.brands,
+    preferredRetailers: stylePrefs?.retailers,
+    preferredColors: stylePrefs?.colors,
+    preferredTerms: [
+      ...(stylePrefs?.materials || []),
+      ...(stylePrefs?.occasions || []),
+      stylePrefs?.fit,
+      stylePrefs?.palette,
+    ].filter((value): value is string => Boolean(value)),
+    excludedBrands: stylePrefs?.excludedBrands,
+    excludedRetailers: stylePrefs?.excludedRetailers,
+    excludedTerms: stylePrefs?.excludedTerms,
+    preferredSizes: {
+      top: profileSizes.top,
+      outer: profileSizes.top,
+      bottom: profileSizes.bottom?.waist ? String(profileSizes.bottom.waist) : undefined,
+      shoes: profileSizes.shoe,
+    },
+    priceTolerancePct: stylePrefs?.priceTolerancePct,
+  }), [profileSizes, stylePrefs]);
   const total = totalCents();
   const n = count();
   const renderItems = useMemo<Partial<Record<Category, Product>>>(() => (hasMounted ? items : {}), [hasMounted, items]);
@@ -481,6 +527,21 @@ function BuilderPageContent({
   // toggle re-flip needed; the filter defaults on).
   const maxTotalCents =
     remixBudgetFilterOn && remixBudget > 0 ? Math.round(remixBudget * 100) : null;
+  const selectedCommerceCapCents = maxTotalCents ?? (
+    generatorBudget === 'any'
+      ? null
+      : generatorBudget === 'custom'
+      ? customBudgetCents
+      : getBudgetMaxCents(generatorBudget)
+  );
+  const commerceValidation = useMemo(
+    () => validateCompleteBuyableLook(renderItems, selectedCommerceCapCents),
+    [renderItems, selectedCommerceCapCents],
+  );
+  const commerceConflict = useMemo(
+    () => formatCommerceConflict(renderItems, selectedCommerceCapCents, lockedSlots),
+    [renderItems, selectedCommerceCapCents, lockedSlots],
+  );
   const refineFocusCategory =
     activeEditSlot ||
     CATEGORY_ORDER.find((category) => renderItems[category]) ||
@@ -488,8 +549,14 @@ function BuilderPageContent({
     'top';
   const lockedSlotSet = useMemo(() => new Set(lockedSlots), [lockedSlots]);
 
+  function recordBuilderTaste(input: TasteSignalInput) {
+    if (typeof window === 'undefined') return;
+    const { profile } = recordTasteSignal(BUILDER_TASTE_STORAGE, input);
+    tasteSignalsRef.current = buildTasteRankingSignals(profile);
+  }
+
   const playSwipeHint = useCallback(async () => {
-    if (generatorLoading || boardDragging || searchFor) return;
+    if (isDesktopCanvas || generatorLoading || boardDragging || searchFor) return;
     if (safeStorageGet(SWIPE_HINT_STORAGE_KEY) === '1') {
       setSwipeHintDismissed(true);
       return;
@@ -514,7 +581,7 @@ function BuilderPageContent({
       transition: { type: 'spring', stiffness: 220, damping: 20 },
     });
     setSwipeCoachLabel(null);
-  }, [boardControls, boardDragging, generatorLoading, searchFor]);
+  }, [boardControls, boardDragging, generatorLoading, isDesktopCanvas, searchFor]);
 
   useBodyScrollLock(Boolean(activeBuildOverlay || checkoutProducts));
 
@@ -526,13 +593,34 @@ function BuilderPageContent({
 
   useEffect(() => {
     setHasMounted(true);
+    tasteSignalsRef.current = buildTasteRankingSignals(loadTasteProfile(BUILDER_TASTE_STORAGE));
+  }, []);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+    const syncDesktopState = () => setIsDesktopCanvas(desktopQuery.matches);
+    syncDesktopState();
+    desktopQuery.addEventListener('change', syncDesktopState);
+    return () => desktopQuery.removeEventListener('change', syncDesktopState);
   }, []);
 
   // Hydrate persisted budget on mount; persist whenever it changes after that.
   // Mirrors the saved-fits + budget pattern (local-only, no backend).
   useEffect(() => {
-    setRemixBudget(loadRemixBudgetFromStorage());
-  }, []);
+    const parsedHandoffBudget = quickBudget === 'any' ? 0 : Number(quickBudget);
+    const hasHandoffBudget = quickBudget === 'any' || (
+      Number.isFinite(parsedHandoffBudget)
+      && parsedHandoffBudget > 0
+      && parsedHandoffBudget <= 99_999
+    );
+    const resolvedBudget = hasHandoffBudget
+      ? Math.round(parsedHandoffBudget)
+      : loadRemixBudgetFromStorage();
+    setRemixBudget(resolvedBudget);
+    setRemixBudgetFilterOn(resolvedBudget > 0);
+    setGeneratorBudget(resolvedBudget > 0 ? 'custom' : 'any');
+    setCustomBudgetInput(resolvedBudget > 0 ? String(resolvedBudget) : '');
+  }, [quickBudget]);
 
   useEffect(() => {
     if (!hasMounted) return;
@@ -577,16 +665,26 @@ function BuilderPageContent({
   }, [generatorLoading]);
 
   useEffect(() => {
-    const hydrated = hydrateItemsFromCatalog(items);
-    // hydrateItemsFromCatalog returns a fresh `{ ...product, ...catalogProduct }`
-    // object for every slot every call, so a referential `!==` check is
-    // always true and `replaceItems(hydrated)` would loop forever
-    // (re-runs effect → fresh refs → replaceItems → re-runs → …). Compare
-    // stable category:id signatures instead so the effect only writes when
-    // the underlying outfit actually changed.
-    if (itemSignature(items) === itemSignature(hydrated)) return;
-    replaceItems(hydrated);
-  }, [items, replaceItems]);
+    if (!hasMounted || !Object.values(items).some(Boolean)) return;
+    let active = true;
+    const currentSignature = itemSignature(items);
+
+    void loadBuildCatalogEngine()
+      .then(({ hydrateItemsFromCatalog }) => {
+        if (!active) return;
+        const hydrated = hydrateItemsFromCatalog(items);
+        // Compare the commerce fingerprint rather than only category:id: a
+        // current row can keep its id while price, stock, image or URL changes.
+        if (currentSignature === itemSignature(hydrated)) return;
+        replaceItems(hydrated);
+      })
+      .catch(() => {
+        // Fail closed without erasing the persisted board. Lightweight commerce
+        // validation keeps Shop disabled until a current row can be hydrated.
+      });
+
+    return () => { active = false; };
+  }, [hasMounted, items, replaceItems]);
 
   useEffect(() => {
     setLockedSlots((current) => {
@@ -676,7 +774,18 @@ function BuilderPageContent({
     avoidIds: string[] = [],
     draftItems: Partial<Record<Category, Product>> = items,
   ): Promise<Product | null> {
-    const catalogFallbackProducts = filterBuildContextProducts(getClientCatalogProducts(80, category), generatorFrame, activePriceMax);
+    let catalogFallbackProducts: Product[] = [];
+    try {
+      const { getClientCatalogProducts } = await loadBuildCatalogEngine();
+      catalogFallbackProducts = filterBuildContextProducts(
+        getClientCatalogProducts(80, category),
+        generatorFrame,
+        activePriceMax,
+      );
+    } catch {
+      // The API search below remains a strict fresh-positive fallback if the
+      // interaction chunk cannot be loaded (for example, after a stale deploy).
+    }
     const catalogCandidate = pickBuildSlotCandidate(
       catalogFallbackProducts,
       category,
@@ -684,6 +793,7 @@ function BuilderPageContent({
       avoidIds,
       recentBrandCountsRef.current,
       draftItems,
+      tasteSignalsRef.current,
     );
     if (catalogCandidate) return catalogCandidate;
 
@@ -714,12 +824,13 @@ function BuilderPageContent({
       avoidIds,
       recentBrandCountsRef.current,
       draftItems,
+      tasteSignalsRef.current,
     );
   }
 
   async function generateLook(
     mode: 'starter' | 'missing' | 'full' | 'refresh',
-    options?: { vibeId?: VibeId; sourceLabel?: string; useAi?: boolean },
+    options?: { vibeId?: VibeId; sourceLabel?: string; useAi?: boolean; tasteAction?: 'remix' },
   ) {
     const useAi = options?.useAi === true;
     if (generatorLoading || aiRefining) return;
@@ -739,13 +850,33 @@ function BuilderPageContent({
         .filter((slot) => lockedSlotSet.has(slot) && items[slot])
         .map((slot) => [slot, items[slot]]),
     ) as Partial<Record<Category, Product>>;
+    const invalidLockedSlots = (Object.entries(lockedItems) as Array<[Category, Product]>)
+      .filter(([slot, product]) => !isBuildReadySlotProduct(product, slot))
+      .map(([slot]) => slot);
+
+    if (invalidLockedSlots.length) {
+      setStatusMessage(
+        `Unlock ${invalidLockedSlots.map((slot) => CATEGORY_LABELS[slot].toLowerCase()).join(', ')}: `
+        + 'the current item is unavailable or does not have an exact retailer page.',
+      );
+      return;
+    }
+    const lockedTotalCents = Object.values(lockedItems)
+      .reduce((sum, product) => sum + (product?.priceCents || 0), 0);
+    if (selectedCommerceCapCents && lockedTotalCents > selectedCommerceCapCents) {
+      setStatusMessage(
+        `Locked pieces already total $${(lockedTotalCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}, `
+        + `above the $${(selectedCommerceCapCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })} outfit cap. Unlock one or raise the budget.`,
+      );
+      return;
+    }
 
     if (!generationSlots.length) {
       setStatusMessage('Select at least one preview slot before generating.');
       return;
     }
 
-    const targetSlots = (
+    const requestedTargetSlots = (
       mode === 'full' || mode === 'refresh' || mode === 'starter'
         ? generationSlots
         : mode === 'missing'
@@ -755,7 +886,12 @@ function BuilderPageContent({
             ...workingVibe.slots.filter((slot) => generationSlots.includes(slot)),
           ]))
         : generationSlots
-    ).filter((slot) => !lockedSlotSet.has(slot) && (mode !== 'missing' || !items[slot]));
+    );
+    const targetSlots = CATEGORY_ORDER.filter((slot) =>
+      (requestedTargetSlots.includes(slot) || REQUIRED_COMMERCE_SLOTS.includes(slot))
+      && !lockedSlotSet.has(slot)
+      && (mode !== 'missing' || !items[slot] || !isBuildReadySlotProduct(items[slot], slot)),
+    );
     if (!targetSlots.length) {
       setStatusMessage(
         Object.keys(lockedItems).length
@@ -772,7 +908,13 @@ function BuilderPageContent({
     setStatusMessage(null);
 
     try {
-      const nextItems: Partial<Record<Category, Product>> = mode === 'missing' ? { ...items } : { ...lockedItems };
+      const retainedReadyItems = Object.fromEntries(
+        (Object.entries(items) as Array<[Category, Product]>)
+          .filter(([slot, product]) => isBuildReadySlotProduct(product, slot)),
+      ) as Partial<Record<Category, Product>>;
+      const nextItems: Partial<Record<Category, Product>> = mode === 'missing'
+        ? { ...retainedReadyItems, ...lockedItems }
+        : { ...lockedItems };
       let addedCount = 0;
       let collectionLabel: string | null = null;
       let assistantLabel: string | null = null;
@@ -841,6 +983,7 @@ function BuilderPageContent({
         });
         lookData = lookResponse.ok ? await lookResponse.json() : null;
       } else {
+        const { buildCatalogLook, getLibraryLook } = await loadBuildCatalogEngine();
         // Prefer a pre-generated, coordination-scored library look for fresh
         // whole-outfit generation (Build / swipe / vibe-select). For fill-
         // around-existing ("missing") or when slots are locked, use the
@@ -854,8 +997,17 @@ function BuilderPageContent({
             : getBudgetMaxCents(generatorBudget);
         // A pre-baked library look can't be budget-tuned, so when a TOTAL budget
         // is set we skip it and use the live composer (which enforces the cap).
-        const libLook = wholeOutfit && !maxTotalCents
-          ? getLibraryLook(vibeId, generatorFrame, { seed: lookBody.seed, avoidProductIds, maxItemCents: libMaxItemCents })
+        const libLook = wholeOutfit && !selectedCommerceCapCents
+          ? getLibraryLook(vibeId, generatorFrame, {
+              seed: lookBody.seed,
+              avoidProductIds,
+              maxItemCents: libMaxItemCents,
+              taste: tasteSignalsRef.current,
+              preferences: {
+                ...generationPreferences,
+                taste: tasteSignalsRef.current,
+              },
+            })
           : null;
         lookData = libLook
           ? { products: libLook.products, formula: { id: libLook.formulaId } }
@@ -876,7 +1028,12 @@ function BuilderPageContent({
               lockedItems,
               targetSlots,
               transparentOnly: true,
-              maxTotalCents,
+              maxTotalCents: selectedCommerceCapCents,
+              requireCompleteBuyable: true,
+              preferences: {
+                ...generationPreferences,
+                taste: tasteSignalsRef.current,
+              },
             });
       }
 
@@ -951,19 +1108,29 @@ function BuilderPageContent({
         return;
       }
 
-      // Don't commit a stub: a single search-fallback slot can satisfy
-      // `addedCount` yet leave a 1–2 piece "outfit". Keep the prior board and
-      // ask for a retry unless the merged look has ≥3 renderable pieces (what
-      // the grid actually draws).
-      const renderableCount = Object.values(nextItems).filter(
-        (product): product is Product => Boolean(product) && hasTransparentProductImage(product),
-      ).length;
-      if (renderableCount < 3) {
-        setStatusMessage("Couldn't assemble a full look — try another vibe or loosen the budget.");
+      // Commerce promise gate: never replace the board with a fit that looks
+      // ready to shop but is missing a required piece, points at a search page,
+      // contains a known unavailable item, or exceeds the selected full-look cap.
+      const nextValidation = validateCompleteBuyableLook(nextItems, selectedCommerceCapCents);
+      if (!nextValidation.ok) {
+        setStatusMessage(
+          formatCommerceConflict(nextItems, selectedCommerceCapCents, lockedSlots)
+            || "Couldn't assemble a complete, buyable look. Try another vibe or adjust the budget.",
+        );
         return;
       }
 
       replaceItems(nextItems);
+      if (options?.tasteAction === 'remix' && Object.values(items).some(Boolean)) {
+        recordBuilderTaste({
+          action: 'remix',
+          vibe: vibeId,
+          // Remix means interest in the previous look/vibe, not certainty that
+          // every newly generated product is liked before it has been judged.
+          products: Object.values(items).filter((product): product is Product => Boolean(product)),
+          contextId: `builder:${outfitFullSignature(items)}`,
+        });
+      }
       // Surface which slots actually moved so the slot pills can play a
       // brief glow. Capture diff vs the `items` snapshot we read at the
       // top of generateLook (closure value, not post-replace).
@@ -1025,7 +1192,9 @@ function BuilderPageContent({
 
   async function generateFromSettings(mode: 'starter' | 'missing' | 'full' | 'refresh') {
     setActiveBuildOverlay(null);
-    await generateLook(mode);
+    await generateLook(mode, {
+      tasteAction: n > 0 && (mode === 'refresh' || mode === 'full') ? 'remix' : undefined,
+    });
   }
 
   function toggleGenerationSlot(category: Category) {
@@ -1036,8 +1205,111 @@ function BuilderPageContent({
     );
   }
 
+  function setWholeLookBudget(value: number) {
+    const normalized = Number.isFinite(value) && value > 0 ? Math.round(value) : 0;
+    setRemixBudget(normalized);
+    setRemixBudgetFilterOn(normalized > 0);
+    setGeneratorBudget(normalized > 0 ? 'custom' : 'any');
+    setCustomBudgetInput(normalized > 0 ? String(normalized) : '');
+  }
+
+  async function styleOwnedFromUrl(url: string): Promise<boolean> {
+    if (generatorLoading || aiRefining) return false;
+    setGeneratorLoading(true);
+    setStatusMessage(null);
+    try {
+      const response = await fetch('/api/style-from-url', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const data = await response.json().catch(() => ({})) as {
+        ok?: boolean;
+        error?: string;
+        source?: 'catalog' | 'structured-product';
+        product?: Product;
+      };
+      if (!response.ok || !data.ok || !data.product) {
+        throw new Error(data.error || 'That product could not be verified. Try another exact retailer product link.');
+      }
+
+      const anchor = data.product;
+      const category = anchor.category;
+      if (!CATEGORY_ORDER.includes(category) || !isBuildReadySlotProduct(anchor, category)) {
+        throw new Error('That page did not provide a verified, supported clothing item.');
+      }
+      const anchorItems = { [category]: anchor } as Partial<Record<Category, Product>>;
+      const { buildCatalogLook } = await loadBuildCatalogEngine();
+      const built = buildCatalogLook({
+        vibe: selectedVibe,
+        frame: generatorFrame,
+        budget: generatorBudget,
+        customMaxCents: customBudgetCents,
+        mode: 'full',
+        seed: Date.now(),
+        currentItems: anchorItems,
+        lockedItems: anchorItems,
+        targetSlots: Array.from(new Set([...defaultGenerationSlotsForVibe(selectedVibe), category])),
+        transparentOnly: true,
+        maxTotalCents: selectedCommerceCapCents,
+        requireCompleteBuyable: true,
+        preferences: {
+          ...generationPreferences,
+          taste: tasteSignalsRef.current,
+        },
+      });
+      const nextItems = { ...built.products, [category]: anchor };
+      const validation = validateCompleteBuyableLook(nextItems, selectedCommerceCapCents);
+      if (!validation.ok) {
+        const budgetHint = validation.overBudgetCents > 0 && selectedCommerceCapCents
+          ? ` Raise the whole-look budget above $${(selectedCommerceCapCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })} and try again.`
+          : '';
+        throw new Error(
+          `${formatCommerceConflict(nextItems, selectedCommerceCapCents, [category]) || 'A complete set of verified complements could not be assembled.'}${budgetHint}`,
+        );
+      }
+
+      replaceItems(nextItems);
+      setLockedSlots([category]);
+      setActiveEditSlot(category);
+      setSelectedGenerationSlots(CATEGORY_ORDER.filter((slot) =>
+        slot === category || defaultGenerationSlotsForVibe(selectedVibe).includes(slot),
+      ));
+      const savedFit = saveLocalFit(nextItems, selectedVibe);
+      recordBuilderTaste({
+        action: 'save',
+        vibe: selectedVibe,
+        products: Object.values(nextItems).filter((product): product is Product => Boolean(product)),
+        contextId: `builder-style-owned:${outfitFullSignature(nextItems)}`,
+      });
+      track('look_remixed', {
+        lookId: savedFit?.id || outfitFullSignature(nextItems),
+        surface: 'builder-style-owned-url',
+        productId: anchor.id,
+        productIds: collectOutfitProductIds(nextItems),
+        totalCents: validation.totalCents,
+        maxTotalCents: selectedCommerceCapCents,
+        source: data.source,
+        owned_category: category,
+      });
+      setStatusMessage(
+        `${data.source === 'catalog' ? 'Matched' : 'Verified'} ${anchor.brand} ${anchor.name}, locked it as your ${CATEGORY_LABELS[category].toLowerCase()}, and saved ${savedFit ? `“${savedFit.title}”` : 'the look'} on this device. Added verified complements within your whole-look budget.`,
+      );
+      return true;
+    } catch (cause) {
+      setStatusMessage(cause instanceof Error ? cause.message : 'That product could not be styled right now.');
+      return false;
+    } finally {
+      setGeneratorLoading(false);
+    }
+  }
+
   function toggleLockedSlot(category: Category) {
     if (!items[category]) return;
+    if (!isBuildReadySlotProduct(items[category], category)) {
+      setStatusMessage(`Replace ${CATEGORY_LABELS[category].toLowerCase()} before locking it; its exact retailer page is not available.`);
+      return;
+    }
     setLockedSlots((current) =>
       current.includes(category)
         ? current.filter((slot) => slot !== category)
@@ -1063,17 +1335,67 @@ function BuilderPageContent({
     if (!n) return;
     // Saves are local-only today (no account system) — say exactly that.
     const localFit = saveLocalFit(items, selectedVibe);
-    recordBuilderPreferenceEvent('save', items, selectedVibe);
+    recordBuilderTaste({
+      action: 'save',
+      vibe: selectedVibe,
+      products: Object.values(items).filter((product): product is Product => Boolean(product)),
+      contextId: `builder:${outfitFullSignature(items)}`,
+    });
     setStatusMessage(
       localFit
-        ? `Saved "${localFit.title}" to your looks on this device.`
+        ? `${commerceValidation.ok ? 'Saved look' : 'Saved draft'} "${localFit.title}" on this device.${commerceConflict ? ` ${commerceConflict}` : ''}`
         : 'Could not save this fit — add a few pieces first.',
+    );
+  }
+
+  function selectReplacement(category: Category, product: Product) {
+    if (!isBuildReadySlotProduct(product, category)) {
+      setStatusMessage(
+        `${CATEGORY_LABELS[category]} was not replaced: that item is unavailable or does not have an exact retailer page.`,
+      );
+      return;
+    }
+
+    const mergedItems = { ...items, [category]: product };
+    const mergedValidation = validateCompleteBuyableLook(mergedItems, selectedCommerceCapCents);
+    if (mergedValidation.overBudgetCents > 0) {
+      setStatusMessage(
+        `${CATEGORY_LABELS[category]} was not replaced: the full look would be $${(mergedValidation.overBudgetCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })} over budget. Raise the cap or choose a lower-priced piece.`,
+      );
+      return;
+    }
+
+    const previousProduct = items[category];
+    replaceItems(mergedItems);
+    if (previousProduct?.id !== product.id) {
+      recordBuilderTaste({
+        action: 'replacement',
+        vibe: selectedVibe,
+        products: [product],
+        rejectedProducts: previousProduct ? [previousProduct] : [],
+        contextId: `builder:${category}:${product.id}`,
+      });
+    }
+    setStatusMessage(
+      mergedValidation.ok
+        ? `${CATEGORY_LABELS[category]} replaced. The complete look is ready to shop item by item.`
+        : `Replaced ${CATEGORY_LABELS[category].toLowerCase()}. ${formatCommerceConflict(mergedItems, selectedCommerceCapCents, lockedSlots) || ''}`,
     );
   }
 
   async function shopAll() {
     if (!n) return;
-    const selectedProducts = Object.values(items).filter((product): product is Product => Boolean(product));
+    const validation = validateCompleteBuyableLook(items, selectedCommerceCapCents);
+    if (!validation.ok) {
+      setStatusMessage(
+        formatCommerceConflict(items, selectedCommerceCapCents, lockedSlots)
+          || 'Shop items is unavailable until this look is complete and buyable.',
+      );
+      return;
+    }
+    const selectedProducts = Object.values(items).filter((product): product is Product =>
+      Boolean(product) && !isVerifiedStyleOwnedProduct(product),
+    );
     const links = selectedProducts
       .map((product) => ({
         id: product.id,
@@ -1091,6 +1413,19 @@ function BuilderPageContent({
     }
 
     setStatusMessage(null);
+    recordBuilderTaste({
+      action: 'shop',
+      vibe: selectedVibe,
+      products: selectedProducts,
+      contextId: `builder:${outfitFullSignature(items)}`,
+    });
+    track('look_shopped', {
+      lookId: outfitFullSignature(items),
+      surface: 'builder',
+      productIds: links.map((product) => product.id),
+      pieces: links.length,
+      totalCents: links.reduce((sum, product) => sum + (product.priceCents || 0), 0),
+    });
     setCheckoutProducts(links);
   }
 
@@ -1104,17 +1439,38 @@ function BuilderPageContent({
     setSearchFor(category);
   }
 
+  function recordFocusedProductShop(product: Product) {
+    recordBuilderTaste({
+      action: 'shop',
+      vibe: selectedVibe,
+      products: [product],
+      contextId: `builder-item:${product.id}`,
+    });
+  }
+
   async function generateNextSwipeFit(direction: 'left' | 'right') {
     if (generatorLoading || aiRefining) return;
     const hasCurrentFit = n > 0;
     if (direction === 'right' && hasCurrentFit) {
       const saved = saveLocalFit(items, selectedVibe);
-      recordBuilderPreferenceEvent('save', items, selectedVibe);
+      recordBuilderTaste({
+        action: 'save',
+        vibe: selectedVibe,
+        products: Object.values(items).filter((product): product is Product => Boolean(product)),
+        contextId: `builder:${outfitFullSignature(items)}`,
+      });
       setSaveBurst(true);
       window.setTimeout(() => setSaveBurst(false), 850);
       setStatusMessage(saved ? `Saved "${saved.title}". Loading the next ${activeVibe.label.toLowerCase()} look.` : 'Saved this look. Loading the next variation.');
     } else if (direction === 'left') {
-      if (hasCurrentFit) recordBuilderPreferenceEvent('pass', items, selectedVibe);
+      if (hasCurrentFit) {
+        recordBuilderTaste({
+          action: 'pass',
+          vibe: selectedVibe,
+          products: Object.values(items).filter((product): product is Product => Boolean(product)),
+          contextId: `builder:${outfitFullSignature(items)}`,
+        });
+      }
       setStatusMessage(`Passed. Loading another ${activeVibe.label.toLowerCase()} look.`);
     }
 
@@ -1193,7 +1549,12 @@ function BuilderPageContent({
     if (boardDragging || generatorLoading || aiRefining || n === 0) return;
     dismissSwipeHint(true);
     const saved = saveLocalFit(items, selectedVibe);
-    recordBuilderPreferenceEvent('save', items, selectedVibe);
+    recordBuilderTaste({
+      action: 'save',
+      vibe: selectedVibe,
+      products: Object.values(items).filter((product): product is Product => Boolean(product)),
+      contextId: `builder:${outfitFullSignature(items)}`,
+    });
     setSaveBurst(true);
     window.setTimeout(() => setSaveBurst(false), 850);
     setStatusMessage(saved ? `Saved "${saved.title}".` : 'Saved this fit.');
@@ -1231,9 +1592,9 @@ function BuilderPageContent({
   };
   return (
     <main
-      className="sy-game-screen relative mx-auto flex h-[100svh] max-w-[480px] flex-col bg-bg"
+      className="sy-game-screen relative mx-auto flex h-[100svh] max-w-[480px] flex-col bg-bg lg:mx-0 lg:max-w-none lg:overflow-hidden lg:bg-[#0b0908]"
     >
-      <header className="sy-fade-up relative flex items-center justify-between px-4 pb-2.5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))]">
+      <header className="sy-fade-up relative flex items-center justify-between px-4 pb-2.5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))] lg:h-[76px] lg:flex-none lg:border-b lg:border-white/8 lg:px-6 lg:py-0">
         <h1 className="sr-only">Remix your outfit</h1>
         <button
           type="button"
@@ -1248,7 +1609,7 @@ function BuilderPageContent({
         >
           <ChevronLeft size={17} />
         </button>
-        <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[170px] -translate-x-1/2 text-center min-[380px]:w-[200px]">
+        <div className="pointer-events-none absolute left-1/2 top-10 z-0 w-[170px] -translate-x-1/2 text-center min-[380px]:w-[200px] lg:top-1/2 lg:w-auto lg:-translate-y-1/2">
           <div className="flex items-baseline justify-center gap-2">
             <span className="text-eyebrow font-extrabold uppercase sy-sheen">Sylistly</span>
             <span className="font-serif text-[17px] font-semibold italic leading-none text-ink min-[380px]:text-[18px]">
@@ -1277,16 +1638,17 @@ function BuilderPageContent({
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-2">
-          <section className="flex flex-col gap-3">
+      <div className="min-h-0 flex-1 overflow-y-auto lg:overflow-hidden">
+        <div className="flex flex-col gap-4 px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-2 lg:grid lg:h-full lg:grid-cols-[minmax(520px,1fr)_minmax(340px,400px)] lg:gap-5 lg:px-6 lg:pb-5 lg:pt-5">
+          <section className="flex flex-col gap-3 lg:min-h-0 lg:overflow-y-auto lg:rounded-[34px] lg:border lg:border-white/10 lg:bg-white/[0.025] lg:p-4 lg:shadow-[0_26px_70px_rgba(0,0,0,.3)]">
             <div className="relative">
               {saveBurst ? (
                 <div className="pointer-events-none absolute -inset-4 z-0 rounded-[38px] bg-accent/25 blur-2xl" />
               ) : null}
-              {/* Swipe cues at the card edges — light up as you drag. */}
+              {/* Mobile keeps the quick swipe gesture; desktop reserves the
+                  canvas for precise piece selection, replacement, and locking. */}
               <div
-                className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                className={`pointer-events-none absolute left-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition lg:hidden ${
                   activeSwipeCue === 'pass'
                     ? 'border-white/25 bg-black/78 text-white shadow-[0_12px_30px_rgba(0,0,0,.32)]'
                     : 'border-white/10 bg-black/28 text-white/42 opacity-0'
@@ -1295,7 +1657,7 @@ function BuilderPageContent({
                 Pass
               </div>
               <div
-                className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition ${
+                className={`pointer-events-none absolute right-1 top-1/2 z-20 -translate-y-1/2 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.16em] transition lg:hidden ${
                   activeSwipeCue === 'save'
                     ? 'border-accent bg-accent text-white shadow-pink-glow'
                     : 'border-accent/20 bg-accent/10 text-white/48 opacity-0'
@@ -1306,8 +1668,8 @@ function BuilderPageContent({
               <motion.div
                 animate={boardControls}
                 className="relative z-10 touch-pan-y"
-                drag="x"
-                dragListener={!aiRefining && !generatorLoading}
+                drag={isDesktopCanvas ? false : 'x'}
+                dragListener={!isDesktopCanvas && !aiRefining && !generatorLoading}
                 dragConstraints={{ left: -220, right: 220 }}
                 dragElastic={0.12}
                 dragTransition={{ bounceStiffness: 260, bounceDamping: 22 }}
@@ -1320,7 +1682,9 @@ function BuilderPageContent({
                   setDragIntent(info.offset.x > 22 ? 'save' : info.offset.x < -22 ? 'pass' : null);
                 }}
                 onDragEnd={(event, info) => void handleBoardDragEnd(event, info)}
-                onDoubleClick={handleBoardDoubleTap}
+                onDoubleClick={() => {
+                  if (!isDesktopCanvas) handleBoardDoubleTap();
+                }}
                 whileDrag={{ rotate: 2, scale: 0.985 }}
               >
                 {swipeFeedback ? (
@@ -1385,9 +1749,9 @@ function BuilderPageContent({
                 />
               </motion.div>
             </div>
-            <div className="border-t border-hairline px-1 pt-4">
+            <div className="border-t border-hairline px-1 pt-4 lg:border-white/8 lg:px-1 lg:pb-1">
               {renderN ? (
-                <div className="mb-3 flex items-center justify-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(255,45,109,.18)]">
+                <div className="mb-3 flex items-center justify-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-2 text-center text-[10px] font-black uppercase tracking-[.13em] text-white shadow-[0_10px_28px_rgba(255,45,109,.18)] lg:hidden">
                   <ArrowLeftRight size={12} className="text-accent" />
                   Swipe the fit · ← pass · save →
                 </div>
@@ -1399,7 +1763,7 @@ function BuilderPageContent({
                     {activeVibe.label} · {selectedGenerationSlots.length} slots · {renderN ? totalDisplay : 'ready'}
                   </div>
                   <div className="mt-1 text-[11px] leading-relaxed text-muted">
-                    Swipe the card to pass or save, tap a slot to swap, lock to keep.
+                    <span className="lg:hidden">Swipe the card to pass or save. </span>Tap a slot to replace it; lock favorites before remixing.
                     {lockedSlots.length ? ` ${lockedSlots.length} locked.` : ''}
                   </div>
                 </div>
@@ -1412,49 +1776,88 @@ function BuilderPageContent({
                   Settings
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={() => void generateLook('full', { sourceLabel: 'Selected slots.' })}
-                disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
-                className="sy-cta mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D_0%,#FF5C8A_60%,#FF2D6D_100%)] bg-[length:200%_100%] bg-left px-4 py-3.5 text-[12px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.42)] transition hover:bg-right active:scale-[0.98] motion-safe:transition-all motion-safe:duration-300 disabled:opacity-60 disabled:active:scale-100"
-              >
-                {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                {renderN ? 'New look' : 'Generate look'}
-              </button>
-              <button
-                type="button"
-                onClick={() => void generateLook('refresh', { useAi: true, sourceLabel: 'AI-refined.' })}
-                disabled={generatorLoading || aiRefining || renderN === 0}
-                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-2.5 text-[11px] font-black uppercase tracking-[.14em] text-accent transition hover:border-accent/60 active:scale-[0.98] disabled:opacity-50"
-              >
-                {aiRefining ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                {aiRefining ? 'Styling your fit…' : 'Refine with AI'}
-              </button>
+              <div className="lg:grid lg:grid-cols-2 lg:gap-2">
+                <button
+                  type="button"
+                  onClick={() => void generateLook('full', {
+                    sourceLabel: 'Selected slots.',
+                    tasteAction: renderN ? 'remix' : undefined,
+                  })}
+                  disabled={generatorLoading || aiRefining || selectedGenerationSlots.length === 0}
+                  className="sy-cta mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-3.5 text-[12px] font-black uppercase tracking-[.14em] text-white shadow-[0_12px_30px_rgba(255,45,109,.32)] transition hover:bg-accent-hot active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100"
+                >
+                  {generatorLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  {renderN ? 'New look' : 'Generate look'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateLook('refresh', {
+                    useAi: true,
+                    sourceLabel: 'AI-refined.',
+                    tasteAction: 'remix',
+                  })}
+                  disabled={generatorLoading || aiRefining || renderN === 0}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-2.5 text-[11px] font-black uppercase tracking-[.14em] text-accent transition hover:border-accent/60 active:scale-[0.98] disabled:opacity-50 lg:mt-3"
+                >
+                  {aiRefining ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                  {aiRefining ? 'Styling your fit…' : 'Refine with AI'}
+                </button>
+              </div>
+              <StyleOwnedUrlForm
+                disabled={generatorLoading || aiRefining}
+                onSubmit={styleOwnedFromUrl}
+              />
             </div>
           </section>
 
-          <BudgetPanel
-            totalCents={total}
-            budget={remixBudget}
-            onBudgetChange={setRemixBudget}
-            filterOn={remixBudgetFilterOn}
-            onToggleFilter={(value) => {
-              setRemixBudgetFilterOn(value);
-              if (value && remixBudget > 0) {
-                // Wire the budget cap into the existing per-item price gate so
-                // the next generate / search filters to picks that fit.
-                setGeneratorBudget('custom');
-                setCustomBudgetInput(String(remixBudget));
-              }
-            }}
+          <DesktopBuilderRail
             items={renderItems}
-            onJumpSlot={openBoardSlot}
-            itemCount={renderN}
+            lockedSlots={lockedSlots}
+            vibeLabel={activeVibe.label}
+            totalDisplay={totalDisplay}
+            budgetCapCents={selectedCommerceCapCents}
+            commerceReady={commerceValidation.ok}
+            commerceConflict={commerceConflict}
             loading={generatorLoading || aiRefining}
+            statusMessage={statusMessage}
+            onSetBudget={setWholeLookBudget}
+            onReplace={openBoardSlot}
+            onToggleLock={toggleLockedSlot}
+            onOpenSettings={() => setActiveBuildOverlay('settings')}
+            onRemix={() => void generateLook('refresh', {
+              sourceLabel: 'Remixed around your locks.',
+              tasteAction: 'remix',
+            })}
+            onSave={saveFit}
+            onShop={shopAll}
           />
 
+          <div className="lg:hidden">
+            <BudgetPanel
+              totalCents={total}
+              budget={selectedCommerceCapCents ? Math.round(selectedCommerceCapCents / 100) : 0}
+              onBudgetChange={setWholeLookBudget}
+              filterOn={Boolean(selectedCommerceCapCents)}
+              onToggleFilter={(value) => {
+                if (!value) setWholeLookBudget(0);
+                else if (selectedCommerceCapCents) setWholeLookBudget(Math.round(selectedCommerceCapCents / 100));
+              }}
+              items={renderItems}
+              onJumpSlot={openBoardSlot}
+              itemCount={renderN}
+              loading={generatorLoading || aiRefining}
+            />
+          </div>
 
-          <section className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))] p-3 shadow-[0_18px_42px_rgba(40,20,24,.16)]">
+          {renderN > 0 && commerceConflict ? (
+            <div className="flex items-start gap-2.5 rounded-[20px] border border-amber-300/20 bg-amber-300/10 px-3.5 py-3 text-[11px] leading-relaxed text-amber-100 lg:hidden">
+              <CircleAlert size={15} className="mt-0.5 flex-none" />
+              <span>{commerceConflict}</span>
+            </div>
+          ) : null}
+
+
+          <section className="rounded-[28px] border border-hairline bg-[linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))] p-3 shadow-[0_18px_42px_rgba(40,20,24,.16)] lg:hidden">
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
@@ -1473,16 +1876,16 @@ function BuilderPageContent({
               <button
                 type="button"
                 onClick={shopAll}
-                disabled={renderN === 0}
+                disabled={!commerceValidation.ok}
                 className="rounded-full bg-accent px-3 py-4 text-[10px] font-black uppercase tracking-[.14em] text-white shadow-pink-glow transition hover:bg-accent-hot active:scale-[0.97] motion-safe:transition-transform motion-safe:duration-150 disabled:bg-white/[0.04] disabled:text-muted disabled:shadow-none disabled:active:scale-100"
               >
-                Shop
+                Shop items
               </button>
             </div>
           </section>
 
           {stylingNote && (stylingNote.notes || stylingNote.palette?.length) ? (
-            <div className="sy-enter overflow-hidden rounded-card border border-accent/25 bg-[radial-gradient(120%_80%_at_12%_-10%,rgba(255,45,109,.16),transparent_46%),linear-gradient(180deg,rgba(251,247,242,.06),rgba(251,247,242,.02))] p-4">
+            <div className="sy-enter overflow-hidden rounded-card border border-accent/25 bg-[radial-gradient(120%_80%_at_12%_-10%,rgba(255,45,109,.16),transparent_46%),linear-gradient(180deg,rgba(251,247,242,.06),rgba(251,247,242,.02))] p-4 lg:hidden">
               <div className="flex items-center gap-2">
                 <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">
                   <Sparkles size={13} />
@@ -1510,7 +1913,7 @@ function BuilderPageContent({
               type="button"
               onClick={makeEditorial}
               disabled={editorialLoading}
-              className="sy-press inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-3 text-[12px] font-bold uppercase tracking-[.12em] text-accent transition hover:border-accent/60 disabled:opacity-60"
+              className="sy-press inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-soft px-4 py-3 text-[12px] font-bold uppercase tracking-[.12em] text-accent transition hover:border-accent/60 disabled:opacity-60 lg:hidden"
             >
               <Sparkles size={14} />
               {editorialLoading ? 'Creating editorial photo…' : 'Make it editorial'}
@@ -1518,11 +1921,11 @@ function BuilderPageContent({
           ) : null}
 
           {editorialError ? (
-            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">{editorialError}</div>
+            <div className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2 lg:hidden">{editorialError}</div>
           ) : null}
 
           {statusMessage ? (
-            <div role="status" aria-live="polite" className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2">
+            <div role="status" aria-live="polite" className="rounded-[20px] border border-hairline bg-surface-2 px-4 py-3 text-[12px] leading-relaxed text-muted-2 lg:hidden">
               {statusMessage}
             </div>
           ) : null}
@@ -1673,7 +2076,22 @@ function BuilderPageContent({
                       <button
                         key={option.value}
                         type="button"
-                        onClick={() => setGeneratorBudget(option.value as GeneratorBudget)}
+                        onClick={() => {
+                          const nextBudget = option.value as GeneratorBudget;
+                          if (nextBudget === 'any') {
+                            setWholeLookBudget(0);
+                            return;
+                          }
+                          if (nextBudget === 'custom') {
+                            setGeneratorBudget('custom');
+                            return;
+                          }
+                          const capDollars = Math.round(getBudgetMaxCents(nextBudget) / 100);
+                          setRemixBudget(capDollars);
+                          setRemixBudgetFilterOn(true);
+                          setGeneratorBudget(nextBudget);
+                          setCustomBudgetInput('');
+                        }}
                         className={`rounded-full px-3 py-1.5 text-[10px] font-medium transition active:scale-95 ${
                           generatorBudget === option.value
                             ? 'bg-white text-black'
@@ -1693,8 +2111,11 @@ function BuilderPageContent({
                       <input
                         value={customBudgetInput}
                         onChange={(event) => {
+                          const next = event.target.value.replace(/[^\d]/g, '').slice(0, 4);
                           setGeneratorBudget('custom');
-                          setCustomBudgetInput(event.target.value.replace(/[^\d]/g, '').slice(0, 4));
+                          setCustomBudgetInput(next);
+                          setRemixBudget(next ? Number(next) : 0);
+                          setRemixBudgetFilterOn(Boolean(next));
                         }}
                         inputMode="numeric"
                         placeholder="180"
@@ -1780,6 +2201,7 @@ function BuilderPageContent({
                 onFocusCategory={focusRefineCategory}
                 onToggleLock={toggleLockedSlot}
                 onOpenSearch={openFocusedSearch}
+                onShopProduct={recordFocusedProductShop}
               />
             </div>
           ) : (
@@ -1799,7 +2221,11 @@ function BuilderPageContent({
                     <div className="text-[10px] uppercase tracking-[.18em] text-muted">Shopping summary</div>
                     <div className="mt-1 font-serif text-[21px] font-semibold text-ink">{totalDisplay}</div>
                     <div className="mt-1 text-[11px] leading-relaxed text-muted-2">
-                      {renderN > 0 ? `${renderN} image-backed piece${renderN !== 1 ? 's' : ''} ready to shop.` : 'Build a fit first, then shop the full look.'}
+                      {renderN === 0
+                        ? 'Build a complete fit first, then open each exact retailer item.'
+                        : commerceValidation.ok
+                        ? `${renderN} exact, available piece${renderN !== 1 ? 's' : ''} ready to shop item by item.`
+                        : commerceConflict}
                     </div>
                   </div>
                   <div className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-accent">
@@ -1809,10 +2235,10 @@ function BuilderPageContent({
                 <div className="mt-4 grid grid-cols-1 gap-2">
                   <button
                     onClick={shopAll}
-                    disabled={renderN === 0}
+                    disabled={!commerceValidation.ok}
                     className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-accent py-3.5 text-sm font-semibold text-white shadow-pink-glow transition hover:bg-accent-hot disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted disabled:shadow-none"
                   >
-                    Shop full look {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
+                    Shop items {renderN > 0 && <span className="opacity-75 font-medium">- {renderN}</span>}
                     <ExternalLink size={14} />
                   </button>
                   <button onClick={clearFit} className="w-full rounded-xl py-2 text-xs text-muted transition hover:text-ink">
@@ -1833,12 +2259,15 @@ function BuilderPageContent({
         initialQuery={searchFor ? quickQuery : null}
         frame={generatorFrame}
         priceMax={activePriceMax}
+        itemsOverride={renderItems}
+        onSelectProduct={selectReplacement}
         onClose={closeSearchSheet}
       />
 
       <CheckoutSheet
         open={Boolean(checkoutProducts)}
         title="Your fit"
+        lookId={outfitFullSignature(renderItems)}
         products={checkoutProducts || []}
         onClose={() => setCheckoutProducts(null)}
       />
@@ -1873,6 +2302,349 @@ function BuilderPageContent({
   );
 }
 
+function StyleOwnedUrlForm({
+  disabled,
+  onSubmit,
+}: {
+  disabled: boolean;
+  onSubmit: (url: string) => Promise<boolean>;
+}) {
+  const [url, setUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalized = url.trim();
+    if (!normalized || submitting || disabled) return;
+    setSubmitting(true);
+    try {
+      const succeeded = await onSubmit(normalized);
+      if (succeeded) setUrl('');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <section
+      aria-labelledby="style-owned-url-title"
+      className="mt-3 rounded-[22px] border border-champagne/25 bg-[linear-gradient(135deg,rgba(231,199,155,.11),rgba(255,255,255,.025))] p-3.5"
+    >
+      <div className="flex items-start gap-2.5">
+        <span className="grid h-9 w-9 flex-none place-items-center rounded-full border border-champagne/30 bg-champagne/10 text-champagne">
+          <Link2 size={15} />
+        </span>
+        <div className="min-w-0">
+          <h2 id="style-owned-url-title" className="font-serif text-[17px] font-semibold leading-tight text-ink">
+            Style what I own
+          </h2>
+          <p className="mt-1 text-[10.5px] leading-relaxed text-muted-2">
+            Paste an exact retailer product page. We’ll verify the item, lock it on your canvas, and add buyable complements within your whole-look budget.
+          </p>
+        </div>
+      </div>
+      <form onSubmit={submit} className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <label className="sr-only" htmlFor="style-owned-product-url">Exact retailer product URL</label>
+        <input
+          id="style-owned-product-url"
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          required
+          value={url}
+          onChange={(event) => setUrl(event.target.value)}
+          placeholder="https://retailer.com/products/..."
+          disabled={disabled || submitting}
+          className="min-h-11 min-w-0 rounded-full border border-white/12 bg-black/20 px-4 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/25 disabled:opacity-55"
+        />
+        <button
+          type="submit"
+          disabled={disabled || submitting || !url.trim()}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-4 text-[10px] font-black uppercase tracking-[.12em] text-black transition hover:bg-champagne disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-muted"
+        >
+          {submitting ? <LoaderCircle size={13} className="animate-spin" /> : <Sparkles size={13} />}
+          {submitting ? 'Verifying' : 'Style it'}
+        </button>
+      </form>
+      <p className="mt-2 text-[9px] leading-relaxed text-muted">
+        Product URLs only. Photo import is not enabled because this version cannot verify image understanding reliably.
+      </p>
+    </section>
+  );
+}
+
+function DesktopBuilderRail({
+  items,
+  lockedSlots,
+  vibeLabel,
+  totalDisplay,
+  budgetCapCents,
+  commerceReady,
+  commerceConflict,
+  loading,
+  statusMessage,
+  onSetBudget,
+  onReplace,
+  onToggleLock,
+  onOpenSettings,
+  onRemix,
+  onSave,
+  onShop,
+}: {
+  items: Partial<Record<Category, Product>>;
+  lockedSlots: Category[];
+  vibeLabel: string;
+  totalDisplay: string;
+  budgetCapCents: number | null;
+  commerceReady: boolean;
+  commerceConflict: string | null;
+  loading: boolean;
+  statusMessage: string | null;
+  onSetBudget: (value: number) => void;
+  onReplace: (category: Category) => void;
+  onToggleLock: (category: Category) => void;
+  onOpenSettings: () => void;
+  onRemix: () => void;
+  onSave: () => void;
+  onShop: () => void | Promise<void>;
+}) {
+  const itemCount = Object.values(items).filter(Boolean).length;
+  const budgetDollars = budgetCapCents ? Math.round(budgetCapCents / 100) : 0;
+  const [budgetInput, setBudgetInput] = useState(budgetDollars ? String(budgetDollars) : '');
+
+  useEffect(() => {
+    setBudgetInput(budgetDollars ? String(budgetDollars) : '');
+  }, [budgetDollars]);
+
+  function openProduct(product: Product) {
+    if (!isBuildReadyProduct(product) || isVerifiedStyleOwnedProduct(product)) return;
+    const lookId = outfitFullSignature(items);
+    const url = getShoppableUrl(product, {
+      lookId,
+      surface: 'builder-desktop-rail',
+      subId: product.id,
+    });
+    if (!url || url === '#') return;
+    track('shop_link_clicked', {
+      surface: 'builder-desktop-rail',
+      lookId,
+      productId: product.id,
+      category: product.category,
+      brand: product.brand,
+      priceCents: product.priceCents,
+      exact: true,
+    });
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  return (
+    <aside className="hidden min-h-0 flex-col overflow-hidden rounded-[34px] border border-white/10 bg-[#11100f] shadow-[0_26px_70px_rgba(0,0,0,.34)] lg:flex">
+      <div className="border-b border-white/8 px-5 pb-4 pt-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.2em] text-accent">Your canvas</div>
+            <h2 className="mt-1 font-serif text-[26px] font-semibold leading-tight text-ink">
+              {vibeLabel} <em className="italic text-accent">look</em>
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-2 transition hover:border-accent hover:text-ink"
+            aria-label="Open look settings"
+          >
+            <SlidersHorizontal size={15} />
+          </button>
+        </div>
+
+        <div className="mt-4 rounded-[22px] border border-white/10 bg-white/[0.035] p-3.5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[9px] font-black uppercase tracking-[.18em] text-muted">Whole-look budget</div>
+              <div className="mt-1 text-[12px] text-muted-2">
+                {budgetDollars ? `Keep every item under $${budgetDollars} total` : 'No total cap selected'}
+              </div>
+            </div>
+            <label className="flex items-center gap-1 rounded-full border border-white/12 bg-black/20 px-3 py-2 text-[12px] text-ink">
+              <span className="text-muted">$</span>
+              <input
+                value={budgetInput}
+                inputMode="numeric"
+                aria-label="Whole-look budget in dollars"
+                placeholder="Any"
+                onChange={(event) => {
+                  const next = event.target.value.replace(/[^\d]/g, '').slice(0, 5);
+                  setBudgetInput(next);
+                  onSetBudget(next ? Number(next) : 0);
+                }}
+                className="w-14 bg-transparent text-right font-semibold outline-none placeholder:text-muted"
+              />
+            </label>
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-1.5">
+            {[250, 500, 1000, 0].map((value) => {
+              const active = value === budgetDollars || (value === 0 && budgetDollars === 0);
+              return (
+                <button
+                  key={value || 'any'}
+                  type="button"
+                  onClick={() => onSetBudget(value)}
+                  className={`rounded-full px-2 py-2 text-[9px] font-black uppercase tracking-[.1em] transition ${
+                    active
+                      ? 'bg-accent text-white shadow-pink-glow'
+                      : 'border border-white/10 bg-white/[0.035] text-muted-2 hover:border-accent/50 hover:text-ink'
+                  }`}
+                >
+                  {value ? `$${value}` : 'Any'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="font-serif text-[24px] font-semibold text-ink">{totalDisplay}</div>
+            <div className="mt-0.5 text-[10px] uppercase tracking-[.14em] text-muted">{itemCount} pieces</div>
+          </div>
+          <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-[.12em] ${
+            commerceReady
+              ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100'
+              : 'border-amber-300/20 bg-amber-300/10 text-amber-100'
+          }`}>
+            {commerceReady ? <BadgeCheck size={12} /> : <CircleAlert size={12} />}
+            {commerceReady ? 'Complete & available' : 'Needs attention'}
+          </div>
+        </div>
+        {!commerceReady && commerceConflict ? (
+          <div className="mt-3 flex items-start gap-2 rounded-[16px] border border-amber-300/20 bg-amber-300/10 px-3 py-2.5 text-[10.5px] leading-relaxed text-amber-100">
+            <CircleAlert size={14} className="mt-0.5 flex-none" />
+            <span>{commerceConflict}</span>
+          </div>
+        ) : null}
+        {statusMessage ? (
+          <div role="status" aria-live="polite" className="mt-3 rounded-[16px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-[10.5px] leading-relaxed text-muted-2">
+            {statusMessage}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <div className="mb-2 flex items-center justify-between px-1">
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-muted">Pieces</div>
+          <div className="text-[9px] text-muted-2">Replace or lock any slot</div>
+        </div>
+        <div className="space-y-2">
+          {CATEGORY_ORDER.map((category) => {
+            const product = items[category];
+            const locked = lockedSlots.includes(category);
+            const buyable = isBuildReadySlotProduct(product, category);
+            return (
+              <div key={category} className="flex items-center gap-3 rounded-[18px] border border-white/8 bg-white/[0.03] p-2.5">
+                <button
+                  type="button"
+                  onClick={() => onReplace(category)}
+                  className="grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-[14px] bg-[#f5eee8] transition hover:ring-2 hover:ring-accent/50"
+                  aria-label={`${product ? 'Replace' : 'Add'} ${CATEGORY_LABELS[category]}`}
+                >
+                  {product ? (
+                    <PanelPreviewImage
+                      product={product}
+                      wrapperClassName="h-full w-full"
+                      modeClassName="h-full w-full object-contain p-1.5"
+                    />
+                  ) : (
+                    <Plus size={17} className="text-[#8c786c]" />
+                  )}
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] font-black uppercase tracking-[.14em] text-accent">{CATEGORY_LABELS[category]}</span>
+                    {product && !buyable ? (
+                      <span className="rounded-full bg-amber-300/10 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-[.1em] text-amber-100">refresh</span>
+                    ) : null}
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] font-semibold text-ink">{product ? product.name : 'Add a piece'}</div>
+                  <div className="mt-0.5 truncate text-[9px] text-muted">
+                    {product ? `${product.brand} · $${(product.priceCents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'Required for a complete look when top, bottom, or shoes'}
+                  </div>
+                </div>
+                <div className="flex flex-none items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onReplace(category)}
+                    className="rounded-full border border-white/10 px-2.5 py-1.5 text-[8px] font-black uppercase tracking-[.1em] text-muted-2 transition hover:border-accent hover:text-ink"
+                  >
+                    {product ? 'Replace' : 'Add'}
+                  </button>
+                  {product ? (
+                    <button
+                      type="button"
+                      onClick={() => onToggleLock(category)}
+                      disabled={!buyable}
+                      className={`grid h-7 w-7 place-items-center rounded-full border transition disabled:opacity-35 ${
+                        locked
+                          ? 'border-accent bg-accent text-white shadow-pink-glow'
+                          : 'border-white/10 bg-white/[0.035] text-muted-2 hover:border-accent hover:text-ink'
+                      }`}
+                      aria-label={`${locked ? 'Unlock' : 'Lock'} ${CATEGORY_LABELS[category]}`}
+                    >
+                      <Lock size={11} />
+                    </button>
+                  ) : null}
+                  {product && buyable && !isVerifiedStyleOwnedProduct(product) ? (
+                    <button
+                      type="button"
+                      onClick={() => openProduct(product)}
+                      className="grid h-7 w-7 place-items-center rounded-full border border-white/10 bg-white/[0.035] text-muted-2 transition hover:border-accent hover:text-ink"
+                      aria-label={`Shop ${product.name}`}
+                    >
+                      <ExternalLink size={11} />
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="border-t border-white/8 bg-black/15 p-4">
+        <div className="grid grid-cols-[1fr_auto] gap-2">
+          <button
+            type="button"
+            onClick={onShop}
+            disabled={!commerceReady || loading}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-[11px] font-black uppercase tracking-[.12em] text-white shadow-pink-glow transition hover:bg-accent-hot disabled:bg-white/[0.05] disabled:text-muted disabled:shadow-none"
+          >
+            <ShoppingBag size={13} />
+            Shop items
+          </button>
+          <button
+            type="button"
+            onClick={onRemix}
+            disabled={loading || itemCount === 0}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[.12em] text-ink transition hover:border-accent disabled:opacity-40"
+          >
+            <Sparkles size={12} />
+            Remix
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={itemCount === 0}
+          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-muted-2 transition hover:border-accent hover:text-ink disabled:opacity-40"
+        >
+          <Bookmark size={12} />
+          Save {commerceReady ? 'look' : 'draft'}
+        </button>
+        <AffiliateDisclosure className="mt-2.5 text-center" />
+      </div>
+    </aside>
+  );
+}
+
 function FocusedRefinePanel({
   items,
   activeCategory,
@@ -1881,6 +2653,7 @@ function FocusedRefinePanel({
   onFocusCategory,
   onToggleLock,
   onOpenSearch,
+  onShopProduct,
 }: {
   items: Partial<Record<Category, Product>>;
   activeCategory: Category;
@@ -1889,20 +2662,32 @@ function FocusedRefinePanel({
   onFocusCategory: (category: Category) => void;
   onToggleLock: (category: Category) => void;
   onOpenSearch: (category: Category) => void;
+  onShopProduct: (product: Product) => void;
 }) {
   const activeProduct = items[activeCategory];
   const activeLocked = Boolean(activeProduct && lockedSlots.includes(activeCategory));
   const activeIndex = CATEGORY_ORDER.indexOf(activeCategory);
   const previousCategory = CATEGORY_ORDER[(activeIndex - 1 + CATEGORY_ORDER.length) % CATEGORY_ORDER.length];
   const nextCategory = CATEGORY_ORDER[(activeIndex + 1) % CATEGORY_ORDER.length];
-  const shopUrl = activeProduct ? getShoppableUrl(activeProduct) : '';
+  const lookId = outfitFullSignature(items);
+  const shopUrl = isBuildReadySlotProduct(activeProduct, activeCategory)
+    && !isVerifiedStyleOwnedProduct(activeProduct)
+    ? getShoppableUrl(activeProduct, {
+        lookId,
+        surface: 'builder',
+        subId: activeProduct.id,
+      })
+    : '';
 
   function openShop() {
     if (!shopUrl || shopUrl === '#') return;
+    if (activeProduct) onShopProduct(activeProduct);
     // Track the builder shop-through so the revenue funnel is measured here too
     // (it was the one shop CTA not firing shop_link_clicked).
     track('shop_link_clicked', {
       surface: 'builder',
+      lookId,
+      productId: activeProduct?.id,
       category: activeProduct?.category,
       brand: activeProduct?.brand,
     });
@@ -2047,7 +2832,7 @@ function FocusedRefinePanel({
               disabled={!activeProduct || !shopUrl || shopUrl === '#'}
               className="inline-flex items-center justify-center gap-1 rounded-full bg-white/[0.06] px-3 py-3 text-[10px] font-bold uppercase tracking-[.14em] text-muted-2 transition hover:bg-white/[0.1] disabled:opacity-35"
             >
-              Shop
+              Shop item
               <ExternalLink size={12} />
             </button>
           </div>
@@ -2071,7 +2856,7 @@ function BuildOverlay({
 }) {
   const dialogRef = useDialogBehavior<HTMLElement>(onClose);
   return (
-    <div className="fixed inset-0 z-[80] mx-auto flex h-[100svh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[80] mx-auto flex h-[100svh] max-w-[480px] items-end bg-black/46 backdrop-blur-[2px] lg:mx-0 lg:max-w-none lg:items-stretch lg:justify-end lg:p-6 lg:pl-[286px]">
       <button
         type="button"
         aria-label="Close build panel"
@@ -2088,7 +2873,7 @@ function BuildOverlay({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 38, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)] outline-none"
+        className="relative z-10 flex max-h-[calc(100dvh-56px)] min-h-0 w-full flex-col overflow-hidden rounded-t-[34px] border border-white/12 bg-[#0f0d0c] pb-[env(safe-area-inset-bottom)] shadow-[0_-22px_60px_rgba(0,0,0,.46)] outline-none lg:h-full lg:max-h-none lg:max-w-[720px] lg:rounded-[34px] lg:pb-0 lg:shadow-[0_28px_80px_rgba(0,0,0,.5)]"
       >
         <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))] px-4 pb-3 pt-3">
           <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-white/18" />
@@ -2232,12 +3017,15 @@ function PanelPreviewImage({
   wrapperClassName: string;
   modeClassName: string;
 }) {
-  const [imageOk, setImageOk] = useState(hasTransparentProductImage(product));
+  const initialSrc = getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product) || '';
+  const [imageOk, setImageOk] = useState(Boolean(initialSrc));
 
-  const src = imageOk ? getTransparentProductImageUrl(product) || '' : '';
+  const src = imageOk
+    ? getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product) || ''
+    : '';
 
   useEffect(() => {
-    setImageOk(hasTransparentProductImage(product));
+    setImageOk(Boolean(getTransparentProductImageUrl(product) || getStyleOwnedCanvasImageUrl(product)));
   }, [product]);
 
   if (!src) return null;
@@ -2449,13 +3237,14 @@ function BuilderPageWithSearchParams() {
       quickSlots={searchParams?.get('slots') ?? null}
       quickLock={searchParams?.get('lock') ?? null}
       quickSource={searchParams?.get('source') ?? null}
+      quickBudget={searchParams?.get('budget') ?? null}
     />
   );
 }
 
 export default function BuilderPage() {
   return (
-    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} quickSource={null} />}>
+    <Suspense fallback={<BuilderPageContent quickSlot={null} quickQuery={null} quickVibe={null} quickFrame={null} quickSlots={null} quickLock={null} quickSource={null} quickBudget={null} />}>
       <BuilderPageWithSearchParams />
     </Suspense>
   );

@@ -45,7 +45,11 @@ if (has('SEARCHAPI_KEY')) {
       MAX_SEARCHES: process.env.MAX_SEARCHES || '40',
     });
   } catch (error) {
-    console.warn(`catalog:expand failed — continuing with the existing catalog. (${error.message})`);
+    if (process.env.CATALOG_ALLOW_GROWTH_FAILURE === '1') {
+      console.warn(`catalog:expand failed — explicitly allowed to continue with existing catalog. (${error.message})`);
+    } else {
+      throw new Error(`catalog:expand failed; candidate generation aborted. (${error.message})`);
+    }
   }
 } else {
   console.log('\nNo SEARCHAPI_KEY → skipping live catalog growth (will still regenerate from the existing catalog).');

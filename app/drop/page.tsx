@@ -3,14 +3,14 @@
 import { Archive, Bookmark, Check, ChevronLeft, Flame, Gift, Heart, Snowflake, Trophy, Volume2, VolumeX } from 'lucide-react';
 import { useAppViewportLock } from '@/lib/use-app-viewport-lock';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AmbientField } from '@/components/AmbientField';
 import { BottomNav } from '@/components/BottomNav';
 import { DailyDrop, type DropLook } from '@/components/DailyDrop';
 import { ProductImage } from '@/components/ProductImage';
-import { getAiLook } from '@/lib/ai-look-library';
 import { track } from '@/lib/analytics';
 import { computeBundleDeal } from '@/lib/bundle-deals';
+import { getVerifiedDropLooks, resolveVerifiedDropProducts } from '@/lib/drop-look-library';
 import {
   bestStreak,
   currentStreak,
@@ -22,17 +22,15 @@ import {
   vaultStats,
   type VaultEntry,
 } from '@/lib/drop-vault';
-import { rehydratePull } from '@/lib/drop-rehydrate';
 import { feedback, isMuted, setMuted } from '@/lib/feedback';
 import { lookRarity } from '@/lib/look-rarity';
 import { bumpDaily, getLevel, questStatus } from '@/lib/stylist-xp';
 import { getProductOutboundUrl } from '@/lib/product-links';
 import { isEditorialCutoutProduct } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
-import { VIBES } from '@/lib/vibes';
+import { VIBES, type VibeId } from '@/lib/vibes';
 import { useCheckout } from '@/store/checkout';
 
-const VIBE_LABEL = new Map(VIBES.map((vibe) => [vibe.id, vibe.label]));
 const DAY_MS = 86_400_000;
 
 function fmt(cents: number): string {
@@ -45,10 +43,17 @@ const TIER_HUE: Record<string, string> = {
   showpiece: '#FF2D6D',
   heat: '#FFC24B',
 };
+const TIER_LABEL: Record<string, string> = {
+  everyday: 'Everyday',
+  standout: 'Standout',
+  showpiece: 'Statement',
+  heat: 'Signature',
+};
 const HERO_ORDER = ['outer', 'top', 'bottom', 'shoes', 'bag', 'hat', 'eyewear', 'jewelry'];
 
 function vaultHero(entry: VaultEntry): Product | null {
-  const products = rehydratePull(entry).filter((p) => isEditorialCutoutProduct(p));
+  const products = resolveVerifiedDropProducts(entry.productIds)
+    .filter((p) => isEditorialCutoutProduct(p));
   for (const cat of HERO_ORDER) {
     const found = products.find((p) => p.category === cat);
     if (found) return found;
@@ -64,27 +69,10 @@ interface Crate {
   winnerKey?: string;
 }
 
-/** A date-seeded pool of Claude-composed looks (mixed when vibeId is null, or a
- *  single vibe for a themed crate). Stable all day, rotates daily. */
-function buildPool(day: number, vibeId: string | null, salt: number): { looks: DropLook[]; winnerKey?: string } {
-  const vibes = VIBES.map((vibe) => vibe.id);
-  const seen = new Set<string>();
-  const out: DropLook[] = [];
-  for (let i = 0; i < 18 && out.length < 10; i += 1) {
-    const vibe = vibeId ?? vibes[(day + i) % vibes.length];
-    const ai = getAiLook(vibe as never, 'androgynous', {
-      seed: day * 131 + i * 29 + salt * 7,
-      seenLookIds: seen,
-    });
-    if (!ai) continue;
-    seen.add(ai.id);
-    out.push({
-      key: ai.id,
-      items: ai.products,
-      source: 'syli',
-      label: `${VIBE_LABEL.get(ai.vibe) || 'Sylistly'} fit`,
-    });
-  }
+/** A date-seeded pool of complete catalog-verified looks (mixed when vibeId is
+ *  null, or a single vibe for a themed crate). Stable all day, rotates daily. */
+function buildPool(day: number, vibeId: VibeId | null, salt: number): { looks: DropLook[]; winnerKey?: string } {
+  const out = getVerifiedDropLooks(vibeId, day * 131 + salt * 7, 10);
   return { looks: out, winnerKey: out.length ? out[day % out.length].key : undefined };
 }
 
@@ -103,11 +91,35 @@ export default function DropPage() {
   const [muted, setMutedState] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+  const returnFocusIdRef = useRef<string | null>(null);
+
+  function showCrate(id: string) {
+    returnFocusIdRef.current = id;
+    setOpenId(id);
+  }
+
+  function closeCrate() {
+    const triggerId = returnFocusIdRef.current;
+    setOpenId(null);
+    window.requestAnimationFrame(() => {
+      if (!triggerId) return;
+      document
+        .querySelector<HTMLElement>(`[data-crate-trigger="${triggerId}"]`)
+        ?.focus({ preventScroll: true });
+    });
+  }
+
+  useEffect(() => {
+    if (!openId) return;
+    const frame = window.requestAnimationFrame(() => backButtonRef.current?.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [openId]);
 
   useEffect(() => {
     setMutedState(isMuted());
     setMounted(true);
-    track('drop_opened', {});
+    track('daily_drop_viewed', { surface: 'daily-drop' });
   }, []);
 
   const crates = useMemo<Crate[]>(() => {
@@ -166,14 +178,22 @@ export default function DropPage() {
         priceCents: product.priceCents,
       }))
       .filter((product) => Boolean(product.url));
-    track('drop_shopped', { pieces: products.length, look: look.key });
+    track('daily_drop_shopped', {
+      lookId: look.key,
+      productIds: products.map((product) => product.id),
+      pieces: products.length,
+      totalCents: products.reduce((sum, product) => sum + (product.priceCents || 0), 0),
+      source: look.source,
+      surface: 'daily-drop',
+      crate_id: openId || 'unknown',
+    });
     bumpDaily('bundlesShopped');
-    setCheckout({ title: `${look.label} bundle`, products });
+    setCheckout({ title: `${look.label} bundle`, lookId: look.key, products });
     router.push('/checkout');
   }
 
   function reshopVault(entry: VaultEntry) {
-    const products = rehydratePull(entry)
+    const products = resolveVerifiedDropProducts(entry.productIds)
       .map((product) => ({
         id: product.id,
         brand: product.brand,
@@ -184,9 +204,16 @@ export default function DropPage() {
       }))
       .filter((product) => Boolean(product.url));
     if (!products.length) return;
-    track('vault_reshopped', { look: entry.key });
+    track('daily_drop_shopped', {
+      lookId: entry.key,
+      productIds: products.map((product) => product.id),
+      pieces: products.length,
+      totalCents: products.reduce((sum, product) => sum + (product.priceCents || 0), 0),
+      source: 'vault',
+      surface: 'daily-drop-vault',
+    });
     bumpDaily('bundlesShopped');
-    setCheckout({ title: `${entry.label} bundle`, products });
+    setCheckout({ title: `${entry.label} bundle`, lookId: entry.key, products });
     router.push('/checkout');
   }
 
@@ -195,29 +222,29 @@ export default function DropPage() {
   const rewardCrate = crates.find((c) => c.id === 'reward');
 
   return (
-    <main className="sy-game-screen relative mx-auto flex h-[100svh] max-w-[480px] flex-col overflow-hidden bg-bg text-ink">
-      <h1 className="sr-only">The Drop — your free daily outfit crate</h1>
+    <main className="sy-game-screen relative flex h-[100svh] w-full flex-col overflow-hidden bg-bg text-ink">
       <AmbientField />
       <div aria-hidden className="sy-grain pointer-events-none absolute inset-0 opacity-[.05] mix-blend-overlay" />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top)+16px)]">
+      <header className="relative z-10 flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top)+16px)] lg:px-8 lg:pt-7">
         <div className="flex items-center gap-2">
           {openCrate ? (
             <button
+              ref={backButtonRef}
               type="button"
-              onClick={() => setOpenId(null)}
+              onClick={closeCrate}
               aria-label="Back to all drops"
-              className="sy-press -ml-1 grid h-9 w-9 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
+              className="sy-press -ml-1 grid h-11 w-11 place-items-center rounded-full border border-hairline-2 bg-surface-2/80 text-ink backdrop-blur-md"
             >
               <ChevronLeft size={17} />
             </button>
           ) : null}
           <div className="flex flex-col">
             <span className="text-eyebrow font-extrabold uppercase tracking-[.3em] text-champagne">
-              {openCrate && !openCrate.daily ? 'Bundle' : 'Daily'}
+              {openCrate && !openCrate.daily ? 'Style edit' : 'Daily edit'}
             </span>
-            <span className="font-serif text-[26px] font-semibold italic leading-none text-ink">
+            <h1 className="font-serif text-[26px] font-semibold italic leading-none text-ink">
               {openCrate && !openCrate.daily ? (
                 <>
                   {openCrate.label} <span className="text-accent">drop</span>
@@ -227,7 +254,7 @@ export default function DropPage() {
                   The <span className="text-accent">Drop</span>
                 </>
               )}
-            </span>
+            </h1>
           </div>
         </div>
         <button
@@ -238,9 +265,9 @@ export default function DropPage() {
             setMutedState(next);
             if (!next) feedback.tick();
           }}
-          aria-pressed={muted}
-          aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
-          className={`sy-press grid h-9 w-9 place-items-center rounded-full border backdrop-blur-md ${
+          aria-pressed={!muted}
+          aria-label="Sound and haptics"
+          className={`sy-press grid h-11 w-11 place-items-center rounded-full border backdrop-blur-md ${
             muted ? 'border-hairline-2 bg-surface-2/80 text-muted' : 'border-accent/50 bg-accent-soft text-accent'
           }`}
         >
@@ -250,7 +277,7 @@ export default function DropPage() {
 
       {/* Open crate → the reveal experience. Otherwise → the shop grid. */}
       {openCrate ? (
-        <div className="relative z-10 flex flex-1 flex-col overflow-hidden pb-[calc(env(safe-area-inset-bottom)+96px)]">
+        <div className="relative z-10 mx-auto flex w-full flex-1 flex-col overflow-hidden pb-[calc(env(safe-area-inset-bottom)+96px)] lg:max-w-[1000px] lg:pb-8">
           <DailyDrop
             key={openCrate.id}
             looks={openCrate.looks}
@@ -260,40 +287,60 @@ export default function DropPage() {
           />
         </div>
       ) : (
-        <div className="sy-stagger relative z-10 flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+108px)] pt-5 scrollbar-hide">
+        <div className="sy-stagger relative z-10 flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+108px)] pt-5 scrollbar-hide lg:grid lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,.55fr)] lg:items-start lg:gap-x-6 lg:px-8 lg:pb-10 lg:pt-7">
           {mounted && dailyCrate ? (
-            <FeaturedCrate
-              crate={dailyCrate}
-              preview={previewOf(dailyCrate)}
-              claimed={dropClaimedToday()}
-              onOpen={() => {
-                feedback.tick();
-                setOpenId(dailyCrate.id);
-              }}
-            />
+            <div className="lg:col-start-1 lg:row-start-1">
+              <FeaturedCrate
+                crate={dailyCrate}
+                preview={previewOf(dailyCrate)}
+                claimed={dropClaimedToday()}
+                onOpen={() => {
+                  feedback.tick();
+                  track('daily_drop_opened', {
+                    lookId: dailyCrate.winnerKey,
+                    crateId: dailyCrate.id,
+                    reward: false,
+                    surface: 'daily-drop',
+                  });
+                  showCrate(dailyCrate.id);
+                }}
+              />
+            </div>
           ) : null}
 
-          {mounted ? <StreakRail /> : null}
-          {mounted ? <LevelRail /> : null}
-          {mounted ? <DailyQuests /> : null}
+          {mounted ? (
+            <aside aria-labelledby="drop-activity-heading" className="lg:sticky lg:top-0 lg:col-start-2 lg:row-span-3 lg:row-start-1">
+              <h2 id="drop-activity-heading" className="sr-only lg:not-sr-only lg:mb-3 lg:block lg:text-eyebrow lg:font-extrabold lg:uppercase lg:tracking-[.24em] lg:text-champagne">
+                Your activity
+              </h2>
+              <StreakRail />
+              <LevelRail />
+              <DailyQuests />
 
-          {mounted && rewardCrate && currentStreak() >= MILESTONES[0].day ? (
-            <RewardCrateCard
-              crate={rewardCrate}
-              onOpen={() => {
-                feedback.tick();
-                track('crate_opened', { crate: 'reward' });
-                setOpenId('reward');
-              }}
-            />
+              {rewardCrate && currentStreak() >= MILESTONES[0].day ? (
+                <RewardCrateCard
+                  crate={rewardCrate}
+                  onOpen={() => {
+                    feedback.tick();
+                    track('reward_opened', {
+                      lookId: rewardCrate.winnerKey,
+                      crateId: 'reward',
+                      streak: currentStreak(),
+                      surface: 'daily-drop',
+                    });
+                    showCrate('reward');
+                  }}
+                />
+              ) : null}
+            </aside>
           ) : null}
 
           {mounted && crates.length > 1 ? (
-            <>
-              <p className="mb-3 mt-7 text-eyebrow font-extrabold uppercase tracking-[.28em] text-muted">
-                More bundles
-              </p>
-              <div className="grid grid-cols-2 gap-3">
+            <section className="lg:col-start-1 lg:row-start-2">
+              <h2 className="mb-3 mt-7 text-eyebrow font-extrabold uppercase tracking-[.28em] text-muted">
+                Shop by style
+              </h2>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                 {crates
                   .filter((c) => !c.daily && c.id !== 'reward')
                   .map((crate, i) => {
@@ -306,17 +353,26 @@ export default function DropPage() {
                         delay={(i % 2) * 70}
                         onOpen={() => {
                           feedback.tick();
-                          track('crate_opened', { crate: crate.id });
-                          setOpenId(crate.id);
+                          track('daily_drop_opened', {
+                            lookId: crate.winnerKey,
+                            crateId: crate.id,
+                            reward: false,
+                            surface: 'daily-drop',
+                          });
+                          showCrate(crate.id);
                         }}
                       />
                     );
                   })}
               </div>
-            </>
+            </section>
           ) : null}
 
-          {mounted ? <VaultStrip onReshop={reshopVault} /> : null}
+          {mounted ? (
+            <div className="lg:col-start-1 lg:row-start-3">
+              <VaultStrip onReshop={reshopVault} />
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -326,6 +382,7 @@ export default function DropPage() {
 }
 
 function FeaturedCrate({
+  crate,
   preview,
   claimed,
   onOpen,
@@ -337,6 +394,7 @@ function FeaturedCrate({
 }) {
   return (
     <button
+      data-crate-trigger={crate.id}
       type="button"
       onClick={onOpen}
       className="sy-press relative block w-full overflow-hidden rounded-[28px] border border-accent/30 bg-[linear-gradient(150deg,#1b1b20,#141417)] p-6 text-left shadow-[0_24px_60px_-26px_rgba(255,45,109,.6)]"
@@ -352,12 +410,12 @@ function FeaturedCrate({
           <Gift size={30} strokeWidth={1.8} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-eyebrow font-extrabold uppercase tracking-[.24em] text-champagne">Today&rsquo;s Drop</p>
+          <p className="text-eyebrow font-extrabold uppercase tracking-[.24em] text-champagne">Today&rsquo;s complete look</p>
           <p className="mt-0.5 font-serif text-[20px] font-semibold italic leading-tight text-ink">
-            {claimed ? 'See your fit' : 'Open to reveal'}
+            {claimed ? 'View your look' : 'Reveal today’s edit'}
           </p>
           <p className="mt-1 text-[12px] text-muted">
-            {preview.pieces} pieces{preview.pct > 0 ? ` · save up to ${preview.pct}%` : ''} · free daily
+            {preview.pieces} pieces{preview.pct > 0 ? ` · save up to ${preview.pct}%` : ''} · new each day
           </p>
         </div>
         <ChevronLeft size={18} className="shrink-0 rotate-180 text-muted" />
@@ -379,6 +437,7 @@ function ThemedCrate({
 }) {
   return (
     <button
+      data-crate-trigger={crate.id}
       type="button"
       onClick={onOpen}
       style={{ animationDelay: `${delay}ms` }}
@@ -426,19 +485,19 @@ function StreakRail() {
   const maxDay = MILESTONES[MILESTONES.length - 1].day;
   const fillPct = Math.min(100, (streak / maxDay) * 100);
   return (
-    <div className="mt-5 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
+    <section aria-labelledby="streak-heading" className="mt-5 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <p className="inline-flex items-center gap-1.5 text-[14px] font-bold text-ink">
+        <h3 id="streak-heading" className="inline-flex items-center gap-1.5 text-[14px] font-bold text-ink">
           <Flame size={15} className="text-accent" /> <span className="text-accent">{streak}-day</span> streak
           {best > streak ? <span className="font-semibold text-muted"> · best {best}</span> : null}
-        </p>
+        </h3>
         {freezes > 0 ? (
           <span className="inline-flex items-center gap-1 rounded-full border border-hairline-2 bg-surface-2 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
             <Snowflake size={10} /> {freezes} freeze
           </span>
         ) : null}
       </div>
-      <div className="relative mt-4 h-1.5 rounded-full bg-hairline-2">
+      <div role="progressbar" aria-label={`Streak progress toward day ${maxDay}`} aria-valuemin={0} aria-valuemax={maxDay} aria-valuenow={Math.min(streak, maxDay)} className="relative mt-4 h-1.5 rounded-full bg-hairline-2">
         <div className="sy-bar-fill absolute inset-y-0 left-0 rounded-full bg-accent transition-all duration-500" style={{ width: `${fillPct}%` }} />
         {MILESTONES.map((m) => {
           const reached = streak >= m.day;
@@ -446,7 +505,7 @@ function StreakRail() {
             <span
               key={m.day}
               className={`absolute -top-1 grid h-3.5 w-3.5 -translate-x-1/2 place-items-center rounded-full border text-[7px] font-black ${
-                reached ? 'border-accent bg-accent text-white' : 'border-hairline-2 bg-bg text-muted'
+                reached ? 'border-accent bg-accent text-bg' : 'border-hairline-2 bg-bg text-muted'
               }`}
               style={{ left: `${(m.day / maxDay) * 100}%` }}
             >
@@ -464,7 +523,7 @@ function StreakRail() {
           <span className="inline-flex items-center gap-1.5"><Trophy size={12} className="text-champagne" /> All milestones reached — legend.</span>
         )}
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -472,25 +531,30 @@ function StreakRail() {
 function LevelRail() {
   const lvl = getLevel();
   return (
-    <div className="mt-3 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
+    <section aria-labelledby="style-level-heading" className="mt-3 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
       <div className="flex items-baseline justify-between">
-        <p className="text-[14px] font-bold text-ink">
-          <span className="text-champagne">Lv {lvl.level}</span> · {lvl.title}
-        </p>
+        <h3 id="style-level-heading" className="text-[14px] font-bold text-ink">
+          <span className="text-champagne">Style level {lvl.level}</span> · {lvl.title}
+        </h3>
         <p className="text-[11px] text-muted">
-          {lvl.maxed ? `${lvl.xp} XP · max rank` : `${lvl.intoLevel}/${lvl.span} XP`}
+          {lvl.maxed ? `${lvl.xp} points · top level` : `${lvl.intoLevel}/${lvl.span} activity points`}
         </p>
       </div>
       <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-hairline-2">
         <div
+          role="progressbar"
+          aria-label="Style level progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(lvl.pct)}
           className="sy-bar-fill absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(90deg,#FF2D6D,#E7C79B)] transition-all duration-500"
           style={{ width: `${lvl.pct}%` }}
         />
       </div>
       <p className="mt-2.5 text-[11px] text-muted">
-        {lvl.maxed ? <span className="inline-flex items-center gap-1.5"><Trophy size={12} className="text-champagne" /> Top rank reached.</span> : <>Next: <span className="font-semibold text-ink">{lvl.nextTitle}</span> — earn XP by swiping, saving & opening drops</>}
+        {lvl.maxed ? <span className="inline-flex items-center gap-1.5"><Trophy size={12} className="text-champagne" /> Top style level reached.</span> : <>Next: <span className="font-semibold text-ink">{lvl.nextTitle}</span> — make picks, save looks, and view drops</>}
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -499,9 +563,9 @@ function DailyQuests() {
   const quests = questStatus();
   const doneCount = quests.filter((q) => q.done).length;
   return (
-    <div className="mt-3 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
+    <section aria-labelledby="daily-goals-heading" className="mt-3 rounded-[22px] border border-hairline-2 bg-surface-1/70 p-4 backdrop-blur-md">
       <div className="mb-3 flex items-baseline justify-between">
-        <p className="text-eyebrow font-extrabold uppercase tracking-[.24em] text-muted">Daily quests</p>
+        <h3 id="daily-goals-heading" className="text-eyebrow font-extrabold uppercase tracking-[.24em] text-muted">Daily styling goals</h3>
         <p className="text-[11px] text-muted">
           {doneCount}/{quests.length} · resets at midnight
         </p>
@@ -523,7 +587,7 @@ function DailyQuests() {
               </p>
               {quest.target > 1 && !quest.done ? (
                 <div className="mt-1 flex items-center gap-2">
-                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-hairline-2">
+                  <div role="progressbar" aria-label={quest.label} aria-valuemin={0} aria-valuemax={quest.target} aria-valuenow={quest.progress} className="h-1 flex-1 overflow-hidden rounded-full bg-hairline-2">
                     <div
                       className="sy-bar-fill h-full rounded-full bg-accent transition-all duration-500"
                       style={{ width: `${Math.min(100, (quest.progress / quest.target) * 100)}%` }}
@@ -539,13 +603,13 @@ function DailyQuests() {
               <span className="inline-flex shrink-0 items-center gap-1 text-[12px] font-bold text-emerald-300"><Check size={12} /> +{quest.xp}</span>
             ) : (
               <span className="shrink-0 rounded-full border border-hairline-2 px-2 py-0.5 text-[11px] font-semibold text-champagne">
-                +{quest.xp} XP
+                +{quest.xp} pts
               </span>
             )}
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -553,6 +617,7 @@ function DailyQuests() {
 function RewardCrateCard({ crate, onOpen }: { crate: Crate; onOpen: () => void }) {
   return (
     <button
+      data-crate-trigger={crate.id}
       type="button"
       onClick={onOpen}
       aria-label={`Open your streak reward — ${crate.label}`}
@@ -571,10 +636,10 @@ function RewardCrateCard({ crate, onOpen }: { crate: Crate; onOpen: () => void }
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-eyebrow font-extrabold uppercase tracking-[.24em]" style={{ color: '#FFC24B' }}>
-            Streak Reward · unlocked
+            Loyalty edit · unlocked
           </p>
-          <p className="mt-0.5 font-serif text-[18px] font-semibold italic leading-tight text-ink">Open your reward</p>
-          <p className="mt-0.5 text-[11px] text-muted">Today&rsquo;s top-rarity fit, earned by your streak</p>
+          <p className="mt-0.5 font-serif text-[18px] font-semibold italic leading-tight text-ink">View your reward look</p>
+          <p className="mt-0.5 text-[11px] text-muted">A standout edit earned by your return streak</p>
         </div>
         <ChevronLeft size={18} className="shrink-0 rotate-180" style={{ color: '#FFC24B' }} />
       </div>
@@ -587,14 +652,14 @@ function VaultStrip({ onReshop }: { onReshop: (entry: VaultEntry) => void }) {
   const vault = getVault();
   const stats = vaultStats();
   return (
-    <div className="mt-7">
+    <section aria-labelledby="saved-drops-heading" className="mt-7">
       <div className="mb-3 flex items-baseline justify-between">
-        <p className="text-eyebrow font-extrabold uppercase tracking-[.28em] text-muted">Your Vault</p>
+        <h2 id="saved-drops-heading" className="text-eyebrow font-extrabold uppercase tracking-[.28em] text-muted">Saved drops</h2>
         {stats.total > 0 ? (
           <p className="text-[11px] text-muted">
-            {stats.total} pull{stats.total === 1 ? '' : 's'}
-            {stats.byTier.heat ? ` · ${stats.byTier.heat} heat` : ''}
-            {stats.byTier.showpiece ? ` · ${stats.byTier.showpiece} showpiece` : ''}
+            {stats.total} look{stats.total === 1 ? '' : 's'}
+            {stats.byTier.heat ? ` · ${stats.byTier.heat} signature` : ''}
+            {stats.byTier.showpiece ? ` · ${stats.byTier.showpiece} statement` : ''}
           </p>
         ) : null}
       </div>
@@ -602,7 +667,7 @@ function VaultStrip({ onReshop }: { onReshop: (entry: VaultEntry) => void }) {
         <div className="grid place-items-center rounded-[20px] border border-dashed border-hairline-2 bg-surface-1/50 px-6 py-8 text-center">
           <Archive size={24} className="text-champagne" />
           <p className="mt-2 text-[13px] font-semibold text-muted-2">Your collection starts here</p>
-          <p className="mt-1 text-[12px] text-muted">Open a crate — every fit you pull lands in your Vault.</p>
+          <p className="mt-1 text-[12px] text-muted">Reveal a daily edit and the complete look will stay here.</p>
         </div>
       ) : (
         <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 scrollbar-hide">
@@ -611,7 +676,7 @@ function VaultStrip({ onReshop }: { onReshop: (entry: VaultEntry) => void }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -644,7 +709,7 @@ function VaultTile({ entry, onReshop }: { entry: VaultEntry; onReshop: (entry: V
         className="absolute left-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[.08em] text-white"
         style={{ background: `${hue}cc` }}
       >
-        {entry.tier}
+        {TIER_LABEL[entry.tier] || entry.tier}
       </span>
     </button>
   );

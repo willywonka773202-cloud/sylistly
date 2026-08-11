@@ -37,7 +37,6 @@ export function rowForProduct(product: Product) {
     fallback_url: product.fallbackUrl ?? null,
     image_quality: product.imageQuality ?? null,
     popularity_score: product.popularityScore ?? null,
-    last_checked_at: new Date().toISOString(),
     metadata: product.metadata ?? {},
   };
 }

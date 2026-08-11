@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 /**
- * Live-retailer link health sweep. Checks every direct-link catalog product
- * (Shopify stores via the free /products/X.js JSON, everything else via GET)
- * and rewrites data/catalog-health.json, whose `unavailable` ids are gated out
- * of every surface by isCleanClientCatalogProduct (lib/client-catalog.ts).
- * Also patches priceCents in data/client-catalog.json when the live Shopify
- * price drifted more than 2% / $1.
+ * Live-retailer link health sweep.
  *
- * Run: npm run health:sweep   (network; ~3 min; safe to re-run anytime)
- * ponytail: sequential-ish sweep w/ 10 workers, no retries — good enough nightly;
- * add retry/backoff if `blocked` counts climb.
+ * Backward compatibility: data/catalog-health.json still exposes generatedAt,
+ * checked, and unavailable. Schema v2 additionally records a typed, timestamped
+ * outcome per product plus explicit coverage metrics for the 24-hour SLA.
+ *
+ * Run: npm run health:sweep (network; safe to re-run anytime)
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
@@ -21,80 +18,315 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG_PATH = path.join(ROOT, 'data', 'client-catalog.json');
 const HEALTH_PATH = path.join(ROOT, 'data', 'catalog-health.json');
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+const FRESH_WINDOW_MS = 24 * 60 * 60 * 1000;
+const MAX_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
-const catalog = JSON.parse(readFileSync(CATALOG_PATH, 'utf8'));
+function validHttpUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 
-const isValid = (u) => { try { return new URL(u).protocol.startsWith('http'); } catch { return false; } };
-const isDirect = (p) => isValid(p.productUrl) && !new URL(p.productUrl).host.includes('google.');
-const items = catalog.filter(isDirect).map((p) => ({ id: p.id, url: p.productUrl.replace(/\?.*$/, ''), price: p.priceCents }));
+export function isExactPdpUrl(value) {
+  if (!validHttpUrl(value)) return false;
+  const parsed = new URL(value);
+  const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+  const pathname = parsed.pathname.toLowerCase();
+  const isNordstromProductPath =
+    (hostname === 'nordstrom.com' || hostname === 'nordstromrack.com')
+    && /^\/s\/[^/]+\/\d+/.test(pathname);
 
-function fetchUrl(u, depth = 0) {
+  if (!pathname || pathname === '/') return false;
+  if (hostname.includes('google.')) return false;
+  if (parsed.hash.toLowerCase().includes('oshopproduct')) return false;
+  if (pathname.includes('/search') || (pathname.includes('/s/') && !isNordstromProductPath) || pathname.includes('search-result')) return false;
+  return !['q', 'query', 'search', 'searchTerm', 'text', 'keyword']
+    .some((key) => parsed.searchParams.has(key));
+}
+
+function directProductUrl(product) {
+  const value = [product.productUrl, product.retailerUrl].find(validHttpUrl);
+  if (!validHttpUrl(value)) return null;
+  const parsed = new URL(value);
+  if (parsed.hostname.toLowerCase().includes('google.')) return null;
+  parsed.hash = '';
+  // Remove tracking without deleting functional PDP keys such as pid/style/sku.
+  for (const key of [...parsed.searchParams.keys()]) {
+    if (
+      key.toLowerCase().startsWith('utm_')
+      || ['affid', 'affiliate', 'clickid', 'fbclid', 'gclid', 'irclickid', 'ref', 'referrer'].includes(key.toLowerCase())
+    ) {
+      parsed.searchParams.delete(key);
+    }
+  }
+  return parsed.toString();
+}
+
+export function buildHealthSnapshot(catalog, items, results, startedAt, generatedAt = new Date().toISOString()) {
+  const checkedIds = new Set(results.map((result) => result.id));
+  const publishableCandidates = items.filter((item) => item.exactPdp && item.trusted !== false && item.inStock !== false);
+  const publishableCandidateIds = new Set(publishableCandidates.map((item) => item.id));
+  const generatedMs = Date.parse(generatedAt);
+  const freshPublishableChecks = results.filter((result) => {
+    if (!publishableCandidateIds.has(result.id)) return false;
+    const checkedMs = Date.parse(result.checkedAt);
+    return Number.isFinite(checkedMs)
+      && Number.isFinite(generatedMs)
+      && generatedMs - checkedMs >= -MAX_FUTURE_SKEW_MS
+      && generatedMs - checkedMs <= FRESH_WINDOW_MS;
+  });
+  const freshAvailablePublishableChecks = freshPublishableChecks
+    .filter((result) => result.outcome === 'available');
+  const checkedPublishable = publishableCandidates.filter((item) => checkedIds.has(item.id)).length;
+  const pct = (numerator, denominator) => denominator ? Number(((numerator / denominator) * 100).toFixed(1)) : 0;
+  const statusCounts = {};
+  for (const result of results) statusCounts[result.outcome] = (statusCounts[result.outcome] || 0) + 1;
+  const unavailable = results
+    .filter((result) => result.outcome === 'dead' || result.outcome === 'sold_out')
+    .map((result) => result.id)
+    .sort();
+  const products = Object.fromEntries(
+    [...results]
+      .sort((left, right) => left.id.localeCompare(right.id))
+      .map((result) => [result.id, result]),
+  );
+  // Candidate-review coverage is intentionally broader than the serving set:
+  // it shows how much structurally plausible inventory has current positive
+  // evidence. The served/published set is the fresh-positive subset, so its
+  // own 24-hour coverage is 100% by construction (or 0% when empty). A generic
+  // 200, bot block, or error remains review work and is never served.
+  const candidateReviewCoveragePct = pct(
+    freshAvailablePublishableChecks.length,
+    publishableCandidates.length,
+  );
+  const servedPublishedProducts = freshAvailablePublishableChecks.length;
+  const servedFreshCoveragePct = servedPublishedProducts > 0 ? 100 : 0;
+
+  return {
+    schemaVersion: 2,
+    generatedAt,
+    startedAt,
+    checked: results.length,
+    eligible: items.length,
+    note: 'regenerate with: npm run health:sweep',
+    coverage: {
+      targetFreshCoveragePct: 95,
+      catalogProducts: catalog.length,
+      directLinkProducts: items.length,
+      exactPdpProducts: items.filter((item) => item.exactPdp).length,
+      candidateProducts: catalog.length,
+      reviewCandidates: publishableCandidates.length,
+      candidateFreshAvailable: freshAvailablePublishableChecks.length,
+      candidateReviewCoveragePct,
+      targetCandidateReviewCoveragePct: 95,
+      meetsCandidateReviewCoverageTarget: candidateReviewCoveragePct >= 95,
+      servedPublishedProducts,
+      servedFreshCoveragePct,
+      targetServedFreshCoveragePct: 95,
+      meetsServedFreshCoverageTarget: servedPublishedProducts > 0 && servedFreshCoveragePct >= 95,
+      withheldCandidateProducts: Math.max(0, catalog.length - servedPublishedProducts),
+      retiredProducts: unavailable.length,
+      // Backward-compatible aliases. These describe candidate review coverage,
+      // not the strict served/published set; new consumers must use the explicit
+      // fields above.
+      publishableCandidates: publishableCandidates.length,
+      checkedProducts: results.length,
+      checkedDirectPct: pct(results.length, items.length),
+      checkedPublishableCandidates: checkedPublishable,
+      freshCheckedPublishableCandidates: freshPublishableChecks.length,
+      freshAvailablePublishableCandidates: freshAvailablePublishableChecks.length,
+      freshCoveragePct: candidateReviewCoveragePct,
+      meetsFreshCoverageTarget: candidateReviewCoveragePct >= 95,
+      statusCounts,
+    },
+    unavailable,
+    products,
+  };
+}
+
+function fetchUrl(url, depth = 0) {
   return new Promise((resolve) => {
-    if (depth > 4) return resolve({ code: 599 });
-    const mod = u.startsWith('https') ? https : http;
-    const req = mod.get(u, { headers: { 'user-agent': UA, accept: '*/*' }, timeout: 20000 }, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        res.resume();
-        return resolve(fetchUrl(new URL(res.headers.location, u).toString(), depth + 1));
-      }
-      let body = '';
-      res.on('data', (d) => { if (body.length < 400000) body += d; });
-      res.on('end', () => resolve({ code: res.statusCode, body }));
-    }).on('error', () => resolve({ code: 0 }));
-    req.on('timeout', () => { req.destroy(); resolve({ code: 0 }); });
+    if (depth > 4) {
+      resolve({ code: 0, body: '', error: 'redirect_limit', finalUrl: url });
+      return;
+    }
+    const requestModule = url.startsWith('https') ? https : http;
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const request = requestModule.get(
+      url,
+      { headers: { 'user-agent': UA, accept: '*/*' }, timeout: 20_000 },
+      (response) => {
+        const code = response.statusCode || 0;
+        if (code >= 300 && code < 400 && response.headers.location) {
+          response.resume();
+          const redirectUrl = new URL(response.headers.location, url).toString();
+          fetchUrl(redirectUrl, depth + 1).then(finish);
+          return;
+        }
+        let body = '';
+        response.on('data', (chunk) => {
+          if (body.length < 400_000) body += chunk;
+        });
+        response.on('end', () => finish({ code, body, finalUrl: url }));
+      },
+    );
+    request.on('error', (error) => finish({ code: 0, body: '', error: error.code || 'network', finalUrl: url }));
+    request.on('timeout', () => {
+      request.destroy();
+      finish({ code: 0, body: '', error: 'timeout', finalUrl: url });
+    });
   });
 }
 
 async function check(item) {
-  if (/\/products\//.test(item.url)) { // Shopify: free structured price + availability
-    const r = await fetchUrl(item.url + '.js');
-    if (r.code === 200 && r.body) {
+  const base = {
+    id: item.id,
+    checkedAt: new Date().toISOString(),
+    url: item.url,
+    exactPdp: item.exactPdp,
+    catalogPriceCents: item.price,
+  };
+
+  if (/\/products\//.test(item.url)) {
+    const shopifyUrl = item.url.endsWith('.js') ? item.url : `${item.url.replace(/\/$/, '')}.js`;
+    const response = await fetchUrl(shopifyUrl);
+    if (response.code === 200 && response.body) {
       try {
-        const j = JSON.parse(r.body);
-        return { id: item.id, status: j.available ? 'ok' : 'soldout', livePrice: j.price, catPrice: item.price };
-      } catch { /* fall through to HTML check */ }
+        const payload = JSON.parse(response.body);
+        // Only a real boolean is product-level stock evidence. Some non-Shopify
+        // endpoints also return JSON from `.js`; absence of `available` must not
+        // be misclassified as sold out.
+        if (typeof payload.available === 'boolean') {
+          const livePriceCents = Number(payload.price);
+          return {
+            ...base,
+            outcome: payload.available ? 'available' : 'sold_out',
+            httpStatus: 200,
+            ...(Number.isFinite(livePriceCents) ? { livePriceCents } : {}),
+            detail: 'shopify_product_json',
+          };
+        }
+      } catch {
+        // A non-Shopify retailer may also use /products/. Verify its HTML below.
+      }
     }
-    if (r.code === 404) return { id: item.id, status: 'dead' };
-    if (r.code === 403 || r.code === 429) return { id: item.id, status: 'blocked' };
   }
-  const r = await fetchUrl(item.url);
-  if (r.code === 404 || r.code === 410) return { id: item.id, status: 'dead' };
-  if (r.code === 403 || r.code === 429) return { id: item.id, status: 'blocked' };
-  if (r.code !== 200) return { id: item.id, status: `error${r.code}` };
-  if (/OutOfStock|sold[ -]?out|"available":\s*false/i.test(r.body || '')) return { id: item.id, status: 'soldout' };
-  return { id: item.id, status: 'ok' };
+
+  const response = await fetchUrl(item.url);
+  if (response.code === 404 || response.code === 410) {
+    return { ...base, outcome: 'dead', httpStatus: response.code };
+  }
+  if (response.code === 403 || response.code === 429) {
+    return { ...base, outcome: 'blocked', httpStatus: response.code, detail: `http_${response.code}` };
+  }
+  if (response.code !== 200) {
+    return {
+      ...base,
+      outcome: 'error',
+      httpStatus: response.code || null,
+      detail: response.error || `http_${response.code}`,
+    };
+  }
+  const htmlOutcome = classifyHtmlOutcome(response.body || '');
+  return {
+    ...base,
+    outcome: htmlOutcome,
+    httpStatus: 200,
+    detail: htmlOutcome === 'reachable' ? 'http_200_stock_unknown' : 'structured_html_stock_signal',
+  };
 }
 
-const results = [];
-let cursor = 0;
-async function worker() {
-  while (cursor < items.length) {
-    const item = items[cursor++];
-    results.push(await check(item));
-    if (results.length % 50 === 0) console.error(`  ${results.length}/${items.length}`);
+/** Classify only strong product-level stock evidence. Generic HTTP 200 means the
+ * URL is reachable, not that the product can be bought. */
+export function classifyHtmlOutcome(body) {
+  const html = String(body || '');
+  const soldOutSignal = [
+    /"availability"\s*:\s*"https?:\/\/schema\.org\/(?:OutOfStock|SoldOut|Discontinued)"/i,
+    /(?:content|href)=["']https?:\/\/schema\.org\/(?:OutOfStock|SoldOut|Discontinued)["']/i,
+    /property=["']product:availability["'][^>]*content=["'](?:out of stock|sold out|unavailable)["']/i,
+    /content=["'](?:out of stock|sold out|unavailable)["'][^>]*property=["']product:availability["']/i,
+  ].some((pattern) => pattern.test(html));
+  if (soldOutSignal) return 'sold_out';
+
+  const inStockSignal = [
+    /"availability"\s*:\s*"https?:\/\/schema\.org\/InStock"/i,
+    /(?:content|href)=["']https?:\/\/schema\.org\/InStock["']/i,
+    /property=["']product:availability["'][^>]*content=["']in stock["']/i,
+    /content=["']in stock["'][^>]*property=["']product:availability["']/i,
+  ].some((pattern) => pattern.test(html));
+  return inStockSignal ? 'available' : 'reachable';
+}
+
+async function main() {
+  const catalog = JSON.parse(readFileSync(CATALOG_PATH, 'utf8'));
+  const items = catalog
+    .map((product) => {
+      const url = directProductUrl(product);
+      return url ? {
+        id: product.id,
+        url,
+        price: product.priceCents,
+        exactPdp: isExactPdpUrl([product.productUrl, product.retailerUrl].find(validHttpUrl)),
+        trusted: product.trusted,
+        inStock: product.inStock,
+      } : null;
+    })
+    .filter(Boolean);
+  const startedAt = new Date().toISOString();
+  const results = [];
+  let cursor = 0;
+
+  async function worker() {
+    while (cursor < items.length) {
+      const item = items[cursor++];
+      results.push(await check(item));
+      if (results.length % 50 === 0) console.error(`  ${results.length}/${items.length}`);
+    }
+  }
+
+  await Promise.all(Array.from({ length: 10 }, worker));
+
+  const snapshot = buildHealthSnapshot(catalog, items, results, startedAt);
+  console.log('sweep:', JSON.stringify(snapshot.coverage.statusCounts));
+  writeFileSync(HEALTH_PATH, `${JSON.stringify(snapshot, null, 1)}\n`);
+  console.log(`gated ${snapshot.unavailable.length} dead/sold-out ids -> data/catalog-health.json`);
+  console.log(
+    `candidate review coverage ${snapshot.coverage.candidateReviewCoveragePct}% `
+    + `(${snapshot.coverage.candidateFreshAvailable}/${snapshot.coverage.reviewCandidates} fresh available); `
+    + `served freshness ${snapshot.coverage.servedFreshCoveragePct}% `
+    + `(${snapshot.coverage.servedPublishedProducts} strict products)`,
+  );
+
+  const drifted = new Map(results
+    .filter((result) => (
+      result.outcome === 'available'
+      && result.livePriceCents
+      && result.catalogPriceCents
+      && Math.abs(result.livePriceCents - result.catalogPriceCents) > Math.max(100, result.catalogPriceCents * 0.02)
+    ))
+    .map((result) => [result.id, result.livePriceCents]));
+  if (drifted.size) {
+    for (const product of catalog) {
+      if (drifted.has(product.id)) product.priceCents = drifted.get(product.id);
+    }
+    writeFileSync(CATALOG_PATH, `${JSON.stringify(catalog, null, 1)}\n`);
+    console.log(`patched ${drifted.size} drifted prices -> data/client-catalog.json`);
   }
 }
-await Promise.all(Array.from({ length: 10 }, worker));
 
-const tally = {};
-for (const r of results) tally[r.status] = (tally[r.status] || 0) + 1;
-console.log('sweep:', JSON.stringify(tally));
-
-// blocked/error are UNKNOWN, not unavailable — never gate on them.
-const unavailable = results.filter((r) => r.status === 'dead' || r.status === 'soldout').map((r) => r.id).sort();
-writeFileSync(HEALTH_PATH, JSON.stringify({
-  generatedAt: new Date().toISOString(),
-  checked: results.length,
-  note: 'regenerate with: npm run health:sweep',
-  unavailable,
-}, null, 1) + '\n');
-console.log(`gated ${unavailable.length} dead/sold-out ids -> data/catalog-health.json`);
-
-const drifted = new Map(results
-  .filter((r) => r.status === 'ok' && r.livePrice && r.catPrice && Math.abs(r.livePrice - r.catPrice) > Math.max(100, r.catPrice * 0.02))
-  .map((r) => [r.id, r.livePrice]));
-if (drifted.size) {
-  for (const p of catalog) if (drifted.has(p.id)) p.priceCents = drifted.get(p.id);
-  writeFileSync(CATALOG_PATH, JSON.stringify(catalog, null, 1) + '\n');
-  console.log(`patched ${drifted.size} drifted prices -> data/client-catalog.json`);
+const invokedDirectly = process.argv[1]
+  && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+if (invokedDirectly) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 }

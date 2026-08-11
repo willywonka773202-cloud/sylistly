@@ -37,7 +37,6 @@ export async function cacheProducts(products: Product[]) {
       fallback_url: p.fallbackUrl,
       image_quality: p.imageQuality,
       popularity_score: p.popularityScore,
-      last_checked_at: new Date().toISOString(),
       metadata: p.metadata ?? {},
     })),
     { onConflict: 'id' },

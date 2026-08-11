@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useBodyScrollLock } from '@/lib/use-body-scroll-lock';
 
 const FOCUSABLE =
-  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, [contenteditable="true"], [tabindex]:not([tabindex="-1"])';
 
 /**
  * Modal-dialog behavior for the slide-up sheets (PiecePeek, CheckoutSheet,
@@ -28,11 +28,13 @@ export function useDialogBehavior<T extends HTMLElement>(onClose: () => void, op
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const panel = ref.current;
     if (panel) {
+      const preferredFocus = panel.querySelector<HTMLElement>('[data-dialog-initial-focus]');
       const firstFocusable = panel.querySelector<HTMLElement>(FOCUSABLE);
-      (firstFocusable ?? panel).focus({ preventScroll: true });
+      (preferredFocus ?? firstFocusable ?? panel).focus({ preventScroll: true });
     }
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         onCloseRef.current();
         return;
       }

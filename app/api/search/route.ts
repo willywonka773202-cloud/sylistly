@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import catalogHealthData from '@/data/catalog-health.json';
 import { aiBudgetAvailableGlobal } from '@/lib/ai-budget';
+import { isProductPublishable, type CatalogHealthSnapshot } from '@/lib/catalog-publishability';
 import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import { parseSearchIntent, parseSearchIntentHeuristic, rerankProducts } from '@/lib/claude';
 import { hydrateRetailerUrls, searchShopping } from '@/lib/serpapi';
@@ -13,7 +15,7 @@ import { searchPhotoCatalog } from '@/lib/photo-catalog';
 import { searchDropCatalog } from '@/lib/drop-catalog';
 import { searchSearchApiQualityCatalog } from '@/lib/searchapi-quality-catalog';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
-import { hasExactProductLink, hasUsableImageUrl, sortRealCommerceFeedProducts, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
+import { hasUsableImageUrl, sortRealCommerceFeedProducts, sortTransparentFeedRenderableProducts } from '@/lib/product-image-quality';
 import type { Category, Product } from '@/lib/types';
 import {
   applyFrameToIntent,
@@ -41,6 +43,10 @@ type CatalogKind = 'database' | 'drops' | 'searchapi-quality' | 'photo' | 'blend
 
 const RESPONSE_CACHE_TTL_MS = 10 * 60 * 1000;
 const SEARCH_RESULT_LIMIT = 10;
+const PUBLISHABILITY_OPTIONS = {
+  health: catalogHealthData as CatalogHealthSnapshot,
+  freshnessPolicy: 'require-fresh' as const,
+};
 const searchResponseCache = new Map<
   string,
   { expiresAt: number; products: Product[]; source: SearchSource }
@@ -194,7 +200,11 @@ function getSearchMode(): SearchMode {
 
 function realCommerceProducts(products: Product[], transparentOnly = false, exactOnly = transparentOnly): Product[] {
   const sortedProducts = transparentOnly ? sortTransparentFeedRenderableProducts(products) : sortRealCommerceFeedProducts(products);
-  return exactOnly ? sortedProducts.filter(hasExactProductLink) : sortedProducts;
+  // Public search is a shopping surface, so explicit `exactOnly: false` no
+  // longer bypasses stock/trust/PDP checks. Keep the argument for request/cache
+  // compatibility while applying one publishability boundary to every source.
+  void exactOnly;
+  return sortedProducts.filter((product) => isProductPublishable(product, PUBLISHABILITY_OPTIONS));
 }
 
 function catalogKindFor({

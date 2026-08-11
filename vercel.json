@@ -1,9 +1,3 @@
 {
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/catalog-refresh",
-      "schedule": "0 10 * * *"
-    }
-  ]
+  "framework": "nextjs"
 }

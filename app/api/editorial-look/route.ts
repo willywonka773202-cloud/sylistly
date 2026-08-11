@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import catalogHealthData from '@/data/catalog-health.json';
+import { isProductPublishable, type CatalogHealthSnapshot } from '@/lib/catalog-publishability';
 import { generateEditorialLookImage, isEditorialImageConfigured } from '@/lib/editorial-image';
 import { allowAiCall, clientKeyFromRequest } from '@/lib/rate-limit';
 import type { Category, Product } from '@/lib/types';
@@ -7,11 +9,16 @@ export const runtime = 'nodejs';
 export const maxDuration = 40;
 
 const CATEGORIES = new Set<Category>(['hat', 'outer', 'top', 'bottom', 'shoes', 'bag', 'eyewear', 'jewelry']);
+const PUBLISHABILITY_OPTIONS = {
+  health: catalogHealthData as CatalogHealthSnapshot,
+  freshnessPolicy: 'require-fresh' as const,
+};
 
 function sanitizeProducts(value: unknown): Product[] {
   if (!Array.isArray(value)) return [];
   return value
     .filter((p): p is Product => Boolean(p && typeof p === 'object' && CATEGORIES.has((p as Product).category)))
+    .filter((product) => isProductPublishable(product, PUBLISHABILITY_OPTIONS))
     .slice(0, 8);
 }
 

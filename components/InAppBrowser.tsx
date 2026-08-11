@@ -5,10 +5,9 @@ import { ArrowUpRight, Globe, Lock, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AffiliateDisclosure } from '@/components/AffiliateDisclosure';
 import { ProductImage } from '@/components/ProductImage';
-import { wrapAffiliate } from '@/lib/affiliate';
 import { track } from '@/lib/analytics';
 import { hasExactProductLink } from '@/lib/product-image-quality';
-import { getProductOutboundUrl } from '@/lib/product-links';
+import { getProductOutboundUrl, getShoppableUrl } from '@/lib/product-links';
 import { hasDirectRetailerUrl } from '@/lib/retailer-url';
 import type { Product } from '@/lib/types';
 import { useDialogBehavior } from '@/lib/use-dialog-behavior';
@@ -49,7 +48,7 @@ function formatPrice(cents: number): string {
 export function InAppBrowser({ product, onClose }: { product: Product; onClose: () => void }) {
   const reduce = useReducedMotion();
   const rawUrl = getProductOutboundUrl(product);
-  const shopUrl = wrapAffiliate(rawUrl); // commission-safe outbound for "Open full page"
+  const shopUrl = getShoppableUrl(product, { surface: 'in-app-browser', subId: product.id });
   const retailer = merchantName(product);
   const exact = hasExactProductLink(product);
   // Only attempt to embed a REAL retailer page. A Google-Shopping fallback (no
@@ -60,7 +59,13 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
-    track('shop_preview_opened', { brand: product.brand, retailer: product.retailer, direct, surface: 'in-app-browser' });
+    track('shop_preview_opened', {
+      productId: product.id,
+      brand: product.brand,
+      retailer: product.retailer,
+      direct,
+      surface: 'in-app-browser',
+    });
     if (!direct) return;
     // No load event within the window → assume the retailer refuses framing.
     timer.current = window.setTimeout(() => {
@@ -78,14 +83,15 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
 
   const onOutbound = useCallback(() => {
     track('shop_link_clicked', {
+      productId: product.id,
       brand: product.brand,
       retailer: product.retailer,
       priceCents: product.priceCents,
       exact,
-      wrapped: shopUrl !== rawUrl,
+      attributed: true,
       surface: 'in-app-browser',
     });
-  }, [product, exact, shopUrl, rawUrl]);
+  }, [product, exact]);
 
   const onDragEnd = useCallback(
     (_e: unknown, info: PanInfo) => {
@@ -99,7 +105,7 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
 
   return (
     <div className="fixed inset-0 z-[90] mx-auto flex max-w-[480px] flex-col justify-end">
-      <button className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-label="Close" onClick={onClose} />
+      <button type="button" className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-label="Close" onClick={onClose} />
 
       <motion.div
         ref={dialogRef}
@@ -133,7 +139,7 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
               target="_blank"
               rel="noreferrer sponsored"
               onClick={onOutbound}
-              className="sy-press inline-flex shrink-0 items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-3 py-2 text-[12px] font-bold text-white shadow-pink-glow"
+              className="sy-press inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-3 py-2 text-[12px] font-bold text-bg shadow-pink-glow"
             >
               Open
               <ArrowUpRight size={14} />
@@ -142,7 +148,7 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="sy-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted"
+              className="sy-press grid h-11 w-11 shrink-0 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted"
             >
               <X size={15} />
             </button>
@@ -166,9 +172,9 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
 
           {/* Loading veil */}
           {!noLink && phase === 'loading' ? (
-            <div className="absolute inset-0 grid place-items-center bg-surface-1">
+            <div role="status" aria-live="polite" className="absolute inset-0 grid place-items-center bg-surface-1">
               <div className="flex flex-col items-center gap-3">
-                <span className="h-9 w-9 animate-spin rounded-full border-2 border-hairline-2 border-t-accent" />
+                <span aria-hidden className="h-9 w-9 animate-spin rounded-full border-2 border-hairline-2 border-t-accent" />
                 <p className="text-[12px] font-semibold text-muted">Loading {retailer}…</p>
               </div>
             </div>
@@ -204,7 +210,7 @@ export function InAppBrowser({ product, onClose }: { product: Product; onClose: 
                     target="_blank"
                     rel="noreferrer sponsored"
                     onClick={onOutbound}
-                    className="sy-press mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-5 py-3.5 text-[14px] font-bold text-white shadow-pink-glow"
+                    className="sy-press mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-5 py-3.5 text-[14px] font-bold text-bg shadow-pink-glow"
                   >
                     {direct ? `Open full page at ${retailer}` : 'Open search'}
                     <ArrowUpRight size={15} />

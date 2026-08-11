@@ -10,17 +10,17 @@ import {
 import { CATEGORY_ORDER, type Category, type Product } from '@/lib/types';
 import type { GeneratorBudget, GeneratorFrame, VibeId } from '@/lib/vibes';
 import { aiBudgetAvailable, recordAiUsage } from '@/lib/ai-budget';
-import { ollamaBudgetAvailable, recordOllamaUsage } from '@/lib/ollama-budget';
 
 type GeneratorMode = 'starter' | 'missing' | 'full' | 'refresh';
 type DiversityStrength = 'low' | 'medium' | 'high';
 
-// Sonnet 4.6 for genuinely good, cohesive styling. The UI shows an instant
-// deterministic fit first and swaps in this AI-styled look when it lands, so
-// Sonnet's ~15s runs in the BACKGROUND and never blocks the user. Override with
-// OUTFIT_COMPOSER_MODEL=claude-haiku-4-5 for ~10s if you'd rather skip the wait.
-const DEFAULT_MODEL = 'claude-sonnet-4-6';
-const COMPOSE_TIMEOUT_MS = 25_000; // backgrounded — give Sonnet room before deterministic fallback (route maxDuration is 30)
+// Haiku is the safe default for an optional styling enhancement. The core
+// shopping experience is catalog-backed and deterministic, so a provider
+// outage must never hold up a complete, buyable outfit.
+const DEFAULT_MODEL = 'claude-haiku-4-5';
+const DEFAULT_COMPOSE_TIMEOUT_MS = 10_000;
+const PROVIDER_LONG_BREAK_MS = 30 * 60_000;
+const PROVIDER_SHORT_BREAK_MS = 60_000;
 const PER_SLOT_LIMIT = 10; // deterministic shortlist (fallback base only)
 const FULL_INVENTORY_PER_SLOT = 24; // how much of the real catalog the model reads per slot
 const COMPOSE_MAX_TOKENS = 900;
@@ -146,14 +146,50 @@ function getClient(): Anthropic | null {
   return apiKey ? new Anthropic({ apiKey }) : null;
 }
 
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string, onTimeout?: () => void): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(label)), ms);
+    const timer = setTimeout(() => {
+      onTimeout?.();
+      reject(new Error(label));
+    }, ms);
     promise.then(
       (value) => { clearTimeout(timer); resolve(value); },
       (error) => { clearTimeout(timer); reject(error); },
     );
   });
+}
+
+interface ProviderCircuit {
+  until: number;
+  reason: string;
+}
+
+let providerCircuit: ProviderCircuit = { until: 0, reason: '' };
+
+function composeTimeoutMs(): number {
+  const configured = Number(process.env.OUTFIT_COMPOSER_TIMEOUT_MS);
+  if (!Number.isFinite(configured)) return DEFAULT_COMPOSE_TIMEOUT_MS;
+  return Math.max(3_000, Math.min(25_000, Math.round(configured)));
+}
+
+function providerCircuitOpen(): boolean {
+  return providerCircuit.until > Date.now();
+}
+
+function errorStatus(error: unknown): number | undefined {
+  if (!error || typeof error !== 'object' || !('status' in error)) return undefined;
+  const status = (error as { status?: unknown }).status;
+  return typeof status === 'number' ? status : undefined;
+}
+
+function tripProviderCircuit(error: unknown): void {
+  const status = errorStatus(error);
+  const longFailure = status === 401 || status === 403 || status === 404;
+  const duration = longFailure ? PROVIDER_LONG_BREAK_MS : PROVIDER_SHORT_BREAK_MS;
+  providerCircuit = {
+    until: Date.now() + duration,
+    reason: status ? `http-${status}` : error instanceof Error ? error.name : 'provider-error',
+  };
 }
 
 const STYLIST_RUBRIC = [
@@ -357,7 +393,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
   const client = getClient();
   // Cost governor: skip the paid call (use the free engine) when rate-limited,
   // the kill switch is on, or the daily spend cap is reached.
-  const aiPermitted = params.allowAi !== false && aiBudgetAvailable();
+  const aiPermitted = params.allowAi !== false && aiBudgetAvailable() && !providerCircuitOpen();
   if (!client || !aiPermitted) {
     // Deterministic path (incl. the optimistic `fast` preview) — skip the
     // expensive full-inventory build entirely so it returns quickly.
@@ -394,6 +430,8 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
 
   try {
     const model = process.env.OUTFIT_COMPOSER_MODEL?.trim() || DEFAULT_MODEL;
+    const timeoutMs = composeTimeoutMs();
+    const controller = new AbortController();
     const message = await withTimeout(
       client.messages.create({
         model,
@@ -402,9 +440,10 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
         tools: [COMPOSE_TOOL],
         tool_choice: { type: 'tool', name: 'compose_outfit' },
         messages: [{ role: 'user', content: JSON.stringify(buildUserPayload(inventory, shortlists, params)) }],
-      }),
-      COMPOSE_TIMEOUT_MS,
+      }, { signal: controller.signal, maxRetries: 0, timeout: timeoutMs }),
+      timeoutMs,
       'Outfit composer timed out',
+      () => controller.abort(),
     );
     recordAiUsage(model, message.usage);
 
@@ -417,6 +456,7 @@ export async function composeOutfitLook(params: ComposeOutfitParams): Promise<Co
     const hasRequired = REQUIRED_OUTFIT_SLOTS.every((slot) => composed.products[slot]);
     return hasRequired ? composed : assembleFallback(shortlists, params);
   } catch (error) {
+    tripProviderCircuit(error);
     console.warn('[outfit-composer] falling back to deterministic: %s', error instanceof Error ? error.message : String(error));
     return assembleFallback(shortlists, params);
   }

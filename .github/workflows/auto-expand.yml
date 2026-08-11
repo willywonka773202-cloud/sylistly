@@ -1,16 +1,25 @@
-name: Auto-expand catalog & outfit library
+name: Catalog publish and health pipeline
 
-# Grows the clothing catalog (when SEARCHAPI_KEY is configured) and always
-# regenerates the pre-made, coordinated outfit library from it — then verifies
-# and deploys only if the build is green. Runs weekly, or on demand.
-#
-# NOTE: scheduled runs only fire when this file is on the repository's DEFAULT
-# branch. Manual runs (workflow_dispatch) work from any branch. See AUTOMATION.md.
+# Daily schedules run the complete guarded publish loop. A manual dispatch may
+# opt into that same release path with `release=true`; `release=false` remains a
+# candidate-only dry run. Every release still has to pass the strict serving,
+# shrink, source, repository-verification, and performance gates before the
+# commit/push/deploy boundary becomes reachable.
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Authorize commit/push/deploy only after every gate passes'
+        required: true
+        default: false
+        type: boolean
   schedule:
-    - cron: '17 9 * * 1' # Mondays 09:17 UTC
+    - cron: '17 9 * * *' # Daily 09:17 UTC; complete guarded release loop
+
+concurrency:
+  group: sylistly-catalog-pipeline
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -18,9 +27,10 @@ permissions:
 env:
   VERCEL_ORG_ID: team_Jr5ljSGJQA9YHH5jkvgoOk5j
   VERCEL_PROJECT_ID: prj_Th1hzGmRh5rbqr1QVYOC2tKwCCcN
+  CLIENT_CATALOG_LIMIT: '1200'
 
 jobs:
-  expand:
+  candidate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,38 +45,148 @@ jobs:
 
       - run: npm ci
 
-      - name: Grow catalog + regenerate outfit library
+      - name: Capture immutable baseline
+        id: baseline
+        run: |
+          COUNT=$(node -e "const c=require('./data/client-catalog.json'); process.stdout.write(String(Array.isArray(c)?c.length:(c.products||[]).length))")
+          npx jiti scripts/catalog-ops-pipeline.ts --candidate-only --json > "$RUNNER_TEMP/catalog-baseline.json"
+          CURRENT_SERVED=$(jq -r '.evidence.servedPublishedProducts // 0' "$RUNNER_TEMP/catalog-baseline.json")
+          PRIOR_SERVED=$(jq -r '.evidence.servedPublishedProducts // empty' data/catalog/reports/catalog-ops-run.json 2>/dev/null || true)
+          SERVED_COUNT="${PRIOR_SERVED:-$CURRENT_SERVED}"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "served_count=$SERVED_COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Generate workspace candidate
+        id: expand
         env:
           SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
         run: node scripts/auto-expand.mjs
 
-      - name: Verify (typecheck + production build)
-        run: |
-          npx tsc --noEmit
-          npm run build
+      - name: Build typed link-health candidate
+        id: health
+        run: npm run health:sweep
 
-      - name: Commit regenerated data
+      - name: Repair recommendation indexes from fresh health
+        id: repair
+        run: |
+          npm run library:generate
+          npm run drop:library
+
+      - name: Evaluate candidate gates
+        id: guard
+        env:
+          RELEASE_REQUESTED: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.release == true)) && '1' || '0' }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+        run: |
+          MODE="--candidate-only"
+          if [ "$RELEASE_REQUESTED" = "1" ]; then MODE="--release"; fi
+          npx jiti scripts/catalog-ops-pipeline.ts \
+            --baseline-count=${{ steps.baseline.outputs.count }} \
+            --baseline-served-count=${{ steps.baseline.outputs.served_count }} \
+            "$MODE" \
+            --write-report=data/catalog/reports/catalog-ops-run.json \
+            --github-output="$GITHUB_OUTPUT"
+
+      - name: Verify and build candidate
+        id: verify
+        if: steps.guard.outputs.eligible == 'true'
+        run: |
+          npm run verify
+          npm run build
+          npm run test:performance
+
+      - name: Record verification failure
+        if: always() && steps.verify.outcome == 'failure'
+        env:
+          CATALOG_PIPELINE_STAGE: verify
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+        run: npx jiti scripts/emit-catalog-verification-failure.ts
+
+      - name: Record pre-verification workflow failure
+        if: always() && (steps.expand.outcome == 'failure' || steps.health.outcome == 'failure' || steps.repair.outcome == 'failure')
+        env:
+          CATALOG_PIPELINE_STAGE: ${{ steps.expand.outcome == 'failure' && 'candidate' || steps.health.outcome == 'failure' && 'health' || 'repair' }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+        run: npx jiti scripts/emit-catalog-verification-failure.ts
+
+      - name: Finalize publish decision
+        id: final
+        if: steps.verify.outcome == 'success'
+        env:
+          RELEASE_REQUESTED: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.release == true)) && '1' || '0' }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+        run: |
+          MODE="--candidate-only"
+          if [ "$RELEASE_REQUESTED" = "1" ]; then MODE="--release"; fi
+          npx jiti scripts/catalog-ops-pipeline.ts \
+            --baseline-count=${{ steps.baseline.outputs.count }} \
+            --baseline-served-count=${{ steps.baseline.outputs.served_count }} \
+            "$MODE" \
+            --verification-passed \
+            --write-report=data/catalog/reports/catalog-ops-run.json \
+            --github-output="$GITHUB_OUTPUT"
+
+      - name: Preserve candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-candidate-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            data/client-catalog.json
+            data/outfit-library.json
+            data/outfit-library-report.json
+            data/drop-look-library.json
+            data/catalog-health.json
+            data/catalog/reports/catalog-ops-run.json
+            data/catalog/reports/client-catalog-build-report.json
+
+      - name: Commit verified release candidate
         id: commit
+        if: steps.final.outputs.can_publish == 'true'
         run: |
           git config user.name "sylistly-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/client-catalog.json data/outfit-library.json data/generated-catalog.json data/photo-catalog.json
+          git add \
+            data/client-catalog.json \
+            data/outfit-library.json \
+            data/outfit-library-report.json \
+            data/drop-look-library.json \
+            data/generated-catalog.json \
+            data/photo-catalog.json \
+            data/catalog-health.json \
+            data/catalog/reports/catalog-ops-run.json \
+            data/catalog/reports/client-catalog-build-report.json
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No catalog/outfit changes this run."
+            echo "No verified catalog changes to publish."
           else
-            git commit -m "auto-expand: refresh catalog + outfit library [skip ci]"
+            git commit -m "catalog: publish verified automated refresh [skip ci]"
             git push origin "${{ github.ref_name }}"
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Deploy to Vercel (production)
-        if: steps.commit.outputs.changed == 'true'
+      - name: Deploy verified release
+        id: deploy
+        if: steps.final.outputs.can_publish == 'true' && steps.commit.outputs.changed == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "No VERCEL_TOKEN secret set — skipping CLI deploy. (Add it to deploy automatically, or rely on Vercel Git integration.)"
+            echo "VERCEL_TOKEN is not configured; verified commit was pushed but CLI deploy is skipped."
             exit 0
           fi
           npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+
+      - name: Record release boundary failure
+        if: always() && (steps.commit.outcome == 'failure' || steps.deploy.outcome == 'failure')
+        env:
+          CATALOG_PIPELINE_STAGE: publish
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+        run: npx jiti scripts/emit-catalog-verification-failure.ts

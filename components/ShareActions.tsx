@@ -9,7 +9,13 @@ import { useFit } from '@/store/fit';
 const PENDING_LOCK_KEY = 'sylistly.pending-lock.v1';
 
 /** CTA pair on shared-fit pages: pull the look into the app. */
-export function ShareActions({ items }: { items: Partial<Record<Category, Product>> }) {
+export function ShareActions({
+  lookId,
+  items,
+}: {
+  lookId: string;
+  items: Partial<Record<Category, Product>>;
+}) {
   const router = useRouter();
   const replaceItems = useFit((state) => state.replaceItems);
 
@@ -21,7 +27,13 @@ export function ShareActions({ items }: { items: Partial<Record<Category, Produc
 
   function remixHere() {
     replaceItems(items);
-    track('share_page_remix', { pieces: products.length });
+    track('look_remixed', {
+      lookId,
+      productIds: products.map((product) => product.id),
+      pieces: products.length,
+      source: 'shared',
+      surface: 'shared-look',
+    });
     router.push('/build');
   }
 
@@ -36,7 +48,14 @@ export function ShareActions({ items }: { items: Partial<Record<Category, Produc
       } catch {
         /* storage blocked — navigate anyway, no pre-lock */
       }
-      track('share_page_lock', { category: hero.category, brand: hero.brand });
+      track('piece_lock_toggled', {
+        lookId,
+        productId: hero.id,
+        category: hero.category,
+        brand: hero.brand,
+        locked: true,
+        surface: 'shared-look',
+      });
     }
     router.push('/');
   }

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Flame, Gift, RotateCcw, Sparkles } from 'lucide-react';
-import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { ProductImage } from '@/components/ProductImage';
 import { WornFlatlay } from '@/components/WornFlatlay';
 import { feedback, haptic } from '@/lib/feedback';
@@ -110,6 +109,19 @@ export function DailyDrop({
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
+  const spinningHeadingRef = useRef<HTMLParagraphElement | null>(null);
+  const revealedHeadingRef = useRef<HTMLHeadingElement | null>(null);
+
+  // Opening and replaying replace the focused control. Move focus to the new
+  // phase heading so keyboard and screen-reader users stay in the reveal flow.
+  useEffect(() => {
+    if (phase === 'intro') return;
+    const frame = window.requestAnimationFrame(() => {
+      (phase === 'spinning' ? spinningHeadingRef.current : revealedHeadingRef.current)
+        ?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [phase]);
 
   // Build the reel + place today's winner under the marker. Winner is the
   // date-seeded key when provided (stable all day); otherwise the standout
@@ -325,7 +337,7 @@ export function DailyDrop({
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
         <Gift size={32} className="text-muted" />
-        <p className="mt-3 text-[14px] font-semibold text-ink">Your drop is warming up</p>
+        <h2 className="mt-3 text-[14px] font-semibold text-ink">Your drop is warming up</h2>
         <p className="mt-1 text-[12px] text-muted">Come back in a moment for today&rsquo;s fit.</p>
       </div>
     );
@@ -340,7 +352,7 @@ export function DailyDrop({
   const deal = computeBundleDeal(bundleProducts);
 
   return (
-    <div className="relative flex flex-1 flex-col items-center justify-center px-6">
+    <div aria-busy={phase === 'spinning'} className="relative flex flex-1 flex-col items-center justify-center px-6">
       {/* Ambient rarity glow that intensifies on reveal. */}
       <div
         aria-hidden
@@ -352,7 +364,9 @@ export function DailyDrop({
       />
 
       {!ready ? (
-        <div className="h-40 w-40 animate-pulse rounded-[34px] bg-surface-2/60" />
+        <div role="status" className="grid h-40 w-40 place-items-center animate-pulse rounded-[34px] bg-surface-2/60">
+          <span className="sr-only">Preparing the drop</span>
+        </div>
       ) : null}
 
       {/* ── INTRO: the closed crate ─────────────────────────────────────── */}
@@ -400,7 +414,7 @@ export function DailyDrop({
       {/* ── SPINNING: the CS:GO reel ────────────────────────────────────── */}
       {ready && phase === 'spinning' ? (
         <div className="w-full">
-          <p className="mb-6 text-center text-[11px] font-black uppercase tracking-[.34em] text-muted">
+          <p ref={spinningHeadingRef} tabIndex={-1} className="mb-6 text-center text-[11px] font-black uppercase tracking-[.34em] text-muted outline-none">
             Revealing…
           </p>
           <div ref={viewportRef} className="relative h-[180px] w-full overflow-hidden">
@@ -464,18 +478,14 @@ export function DailyDrop({
             )}
           </div>
 
-          <h2 className="mt-5 text-center font-display text-[28px] leading-[1.05] text-ink sy-fade-up">
+          <h2 ref={revealedHeadingRef} tabIndex={-1} className="mt-5 text-center font-display text-[28px] leading-[1.05] text-ink outline-none sy-fade-up">
             {winner.look.label}
           </h2>
           {deal.hasDeal ? (
             <div className="mt-2 flex flex-col items-center gap-1 sy-fade-up">
               <div className="flex items-center gap-2 text-[14px]">
                 <span className="text-muted line-through">{formatPrice(deal.retailCents)}</span>
-                <AnimatedNumber
-                  value={deal.dealCents / 100}
-                  format={(n) => `$${Math.round(n).toLocaleString()}`}
-                  className="font-bold text-emerald-300"
-                />
+                <span className="font-bold text-emerald-300">{formatPrice(deal.dealCents)}</span>
                 <span
                   className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-[.12em] text-white"
                   style={{ background: hue }}
@@ -489,11 +499,9 @@ export function DailyDrop({
             </div>
           ) : (
             <p className="mt-1.5 flex items-center gap-2 text-[13px] text-muted sy-fade-up">
-              <AnimatedNumber
-                value={deal.retailCents / 100}
-                format={(n) => `$${Math.round(n).toLocaleString()}`}
-                className="rounded-full bg-surface-2 px-2.5 py-0.5 font-semibold text-emerald-300"
-              />
+              <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-semibold text-emerald-300">
+                {formatPrice(deal.retailCents)}
+              </span>
               <span>{winnerPieces.length} pieces · shoppable</span>
             </p>
           )}
@@ -513,7 +521,7 @@ export function DailyDrop({
                 feedback.save();
                 onWear(winner.look);
               }}
-              className="sy-press sy-cta relative grid h-12 place-items-center overflow-hidden rounded-full bg-accent text-[14px] font-bold text-white shadow-pink-glow"
+              className="sy-press sy-cta relative grid h-12 place-items-center overflow-hidden rounded-full bg-accent text-[14px] font-bold text-bg shadow-pink-glow"
             >
               <span className="inline-flex items-center gap-2">
                 <Sparkles size={15} /> {deal.hasDeal ? `Shop the bundle · save up to ${formatPrice(deal.savingsCents)}` : 'Shop the bundle'}
@@ -534,7 +542,7 @@ export function DailyDrop({
             <button
               type="button"
               onClick={replay}
-              className="sy-press mx-auto mt-1 inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted-2 hover:text-ink"
+              className="sy-press mx-auto mt-1 inline-flex min-h-11 items-center gap-1.5 px-3 text-[12px] font-semibold text-muted-2 hover:text-ink"
             >
               <RotateCcw size={13} /> Replay the reveal
             </button>

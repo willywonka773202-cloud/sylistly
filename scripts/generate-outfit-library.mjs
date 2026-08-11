@@ -20,15 +20,31 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
 const catalog = JSON.parse(readFileSync(join(ROOT, 'data/client-catalog.json'), 'utf8'));
-// Same dead/sold-out gate lib/client-catalog.ts applies at runtime. Without it we
-// bake looks around products the retailer no longer sells, and the runtime gate
-// then strips them back out — leaving stub looks with too few pieces to hydrate.
-const UNAVAILABLE = new Set(
-  JSON.parse(readFileSync(join(ROOT, 'data/catalog-health.json'), 'utf8')).unavailable,
-);
-const PRODUCTS = (Array.isArray(catalog) ? catalog : catalog.products || Object.values(catalog)[0]).filter(
-  (p) => p && p.imageTransparentUrl && p.category && !UNAVAILABLE.has(p.id),
-);
+const health = JSON.parse(readFileSync(join(ROOT, 'data/catalog-health.json'), 'utf8'));
+const CATALOG_PRODUCTS = Array.isArray(catalog) ? catalog : catalog.products || Object.values(catalog)[0];
+const MAX_HEALTH_AGE_MS = 24 * 60 * 60 * 1000;
+const MAX_FUTURE_SKEW_MS = 5 * 60 * 1000;
+const BASELINE_ROWS = 12_000;
+const BASELINE_METRICS = Object.freeze({
+  rows: BASELINE_ROWS,
+  uniqueSignatures: 11_810,
+  duplicateSignatures: 190,
+  duplicateRatePct: 1.5833,
+  compactArtifactBytes: 356_360,
+});
+const TARGET_UNIQUE_SIGNATURES = BASELINE_ROWS * 2;
+const TARGET_PER_COMBO = TARGET_UNIQUE_SIGNATURES / (10 * 3);
+
+if (health.schemaVersion < 2 || !health.products || !health.generatedAt) {
+  throw new Error('A schema-v2 catalog-health.json is required. Run npm run health:sweep first.');
+}
+const generatedMs = Date.parse(health.generatedAt);
+const generatedAgeMs = Date.now() - generatedMs;
+if (!Number.isFinite(generatedMs)
+  || generatedAgeMs < -MAX_FUTURE_SKEW_MS
+  || generatedAgeMs > MAX_HEALTH_AGE_MS) {
+  throw new Error('Catalog health evidence must be current (<=24 hours old). Run npm run health:sweep first.');
+}
 
 // ── Shoppability (mirrors lib/product-image-quality hasExactProductLink) ──
 // A piece is "exact" when productUrl/retailerUrl points at a real merchant
@@ -55,18 +71,40 @@ function isSearchOrAggregatorUrl(url) {
 }
 
 function hasExactLink(p) {
-  for (const field of ['productUrl', 'retailerUrl']) {
-    const u = (p[field] || '').trim();
-    if (!u) continue;
-    try {
-      const pathname = new URL(u).pathname;
-      if (!pathname || pathname === '/') continue;
-    } catch { continue; }
-    if (!isSearchOrAggregatorUrl(u)) return true;
-  }
-  return false;
+  const url = [p?.productUrl, p?.retailerUrl]
+    .find((value) => typeof value === 'string' && value.trim());
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+    if (!parsed.pathname || parsed.pathname === '/') return false;
+  } catch { return false; }
+  return !isSearchOrAggregatorUrl(url);
 }
 
+function hasFreshPositiveEvidence(p) {
+  const record = health.products[p.id];
+  const checkedMs = Date.parse(record?.checkedAt || '');
+  const ageMs = Date.now() - checkedMs;
+  return p
+    && p.imageTransparentUrl
+    && p.category
+    && p.trusted !== false
+    && p.inStock !== false
+    && Number.isFinite(p.priceCents)
+    && p.priceCents > 0
+    && record?.outcome === 'available'
+    && record.exactPdp === true
+    && Number.isFinite(checkedMs)
+    && ageMs >= -MAX_FUTURE_SKEW_MS
+    && ageMs <= MAX_HEALTH_AGE_MS
+    && hasExactLink(p);
+}
+
+// This is deliberately a positive-evidence allowlist, not a dead-link denylist.
+// A retailer block, a merely reachable page, or missing/stale evidence excludes
+// the product. Runtime hydration applies the same fail-closed policy.
+const PRODUCTS = CATALOG_PRODUCTS.filter(hasFreshPositiveEvidence);
 const EXACT_LINK_IDS = new Set(PRODUCTS.filter(hasExactLink).map((p) => p.id));
 
 // ── Color taxonomy ────────────────────────────────────────────────
@@ -301,25 +339,35 @@ function buildPools(vibe, cfg, frame) {
   return pools;
 }
 
-// Probability that a slot draw comes from the exact-link subset (when it has
-// any). Lifts monetizable pieces without starving variety — the full pool
-// still supplies ~1/3 of draws and the coherence scorer does the rest.
-const EXACT_DRAW_PROB = 0.65;
-
 // ── Generate library ──────────────────────────────────────────────
 const QUALITY_BAR = 0.64;
-const CAP_PER_COMBO = 400;   // fewer, higher-quality per gender × style (rotation biases to the best)
-const SAMPLES_PER_COMBO = 60000;
+const CAP_PER_COMBO = TARGET_PER_COMBO;
+const SAMPLES_PER_COMBO = 180_000;
 
 const library = [];
 const stats = [];
+// A signature describes the actual slot→product composition. Vibe/frame labels
+// are intentionally excluded: relabeling the same outfit is not new diversity.
+const globalSignatures = new Set();
 
 for (const vibe of Object.keys(VIBE_CONFIG)) {
   const cfg = VIBE_CONFIG[vibe];
   for (const frame of FRAMES) {
     const pools = buildPools(vibe, cfg, frame);
     const reqMissing = REQUIRED.filter((s) => !pools[s] || pools[s].length === 0);
-    if (reqMissing.length) { stats.push({ vibe, frame, kept: 0, note: `missing ${reqMissing.join(',')}` }); continue; }
+    if (reqMissing.length) {
+      stats.push({
+        vibe,
+        frame,
+        kept: 0,
+        target: CAP_PER_COMBO,
+        shortfall: CAP_PER_COMBO,
+        attempts: 0,
+        pools: Object.fromEntries(cfg.slots.map((slot) => [slot, pools[slot].length])),
+        note: `missing ${reqMissing.join(',')}`,
+      });
+      continue;
+    }
 
     const rand = mulberry32(hashStr(`${vibe}:${frame}`));
     const seen = new Set();
@@ -339,16 +387,18 @@ for (const vibe of Object.keys(VIBE_CONFIG)) {
           const skipProb = slot === 'bag' || slot === 'eyewear' ? 0.62 : 0.42;
           if (rand() < skipProb) continue;
         }
-        const exactPool = pools[`${slot}:exact`];
-        const drawPool = exactPool && exactPool.length && rand() < EXACT_DRAW_PROB ? exactPool : pool;
-        pieces.push(drawPool[Math.floor(rand() * drawPool.length)]);
+        pieces.push(pool[Math.floor(rand() * pool.length)]);
       }
       if (!REQUIRED.every((s) => pieces.some((p) => p.category === s))) continue;
-      const sig = pieces.map((p) => p.id).sort().join('|');
-      if (seen.has(sig)) continue;
+      const sig = pieces
+        .map((p) => `${p.category}:${p.id}`)
+        .sort()
+        .join('|');
+      if (seen.has(sig) || globalSignatures.has(sig)) continue;
       const sc = scoreOutfit(pieces, vibe, cfg);
       if (sc.total < QUALITY_BAR) continue;
       seen.add(sig);
+      globalSignatures.add(sig);
       const items = {};
       for (const p of pieces) items[p.category] = p.id;
       kept.push({
@@ -360,7 +410,15 @@ for (const vibe of Object.keys(VIBE_CONFIG)) {
     kept.sort((a, b) => b.score - a.score);
     kept.forEach((o, i) => { o.id = `lib-${vibe}-${frame}-${i}`; });
     library.push(...kept);
-    stats.push({ vibe, frame, kept: kept.length, pools: Object.fromEntries(cfg.slots.map((s) => [s, pools[s].length])) });
+    stats.push({
+      vibe,
+      frame,
+      kept: kept.length,
+      target: CAP_PER_COMBO,
+      shortfall: Math.max(0, CAP_PER_COMBO - kept.length),
+      attempts,
+      pools: Object.fromEntries(cfg.slots.map((s) => [s, pools[s].length])),
+    });
   }
 }
 
@@ -371,6 +429,70 @@ function dominantPalette(pieces) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([c]) => c);
 }
 
+// ── Validate and measure before writing ───────────────────────────
+const PRODUCT_BY_ID = new Map(PRODUCTS.map((product) => [product.id, product]));
+const BUDGET_BAND_IDS = ['lte250', 'gt250_lte500', 'gt500_lte1000', 'gt1000'];
+const budgetBand = (totalCents) => {
+  if (totalCents <= 25_000) return BUDGET_BAND_IDS[0];
+  if (totalCents <= 50_000) return BUDGET_BAND_IDS[1];
+  if (totalCents <= 100_000) return BUDGET_BAND_IDS[2];
+  return BUDGET_BAND_IDS[3];
+};
+const emptyBudgetBands = () => Object.fromEntries(BUDGET_BAND_IDS.map((id) => [id, 0]));
+const signatureForItems = (items) => Object.entries(items)
+  .map(([slot, id]) => `${slot}:${id}`)
+  .sort()
+  .join('|');
+const measuredSignatures = new Set();
+const duplicateSignatures = [];
+const invariantErrors = [];
+const totals = [];
+const budgetBands = emptyBudgetBands();
+const comboBudgetBands = new Map();
+const usedProductIds = new Set();
+
+for (const outfit of library) {
+  const missing = REQUIRED.filter((slot) => !outfit.items[slot]);
+  if (missing.length) invariantErrors.push(`${outfit.vibe}/${outfit.frame}: missing ${missing.join(',')}`);
+  const signature = signatureForItems(outfit.items);
+  if (measuredSignatures.has(signature)) duplicateSignatures.push(signature);
+  measuredSignatures.add(signature);
+  let totalCents = 0;
+  for (const id of Object.values(outfit.items)) {
+    const product = PRODUCT_BY_ID.get(id);
+    if (!product || !hasFreshPositiveEvidence(product)) {
+      invariantErrors.push(`${outfit.vibe}/${outfit.frame}: unverified product ${id}`);
+      continue;
+    }
+    usedProductIds.add(id);
+    totalCents += product.priceCents;
+  }
+  totals.push(totalCents);
+  const band = budgetBand(totalCents);
+  budgetBands[band] += 1;
+  const key = `${outfit.vibe}:${outfit.frame}`;
+  const comboBands = comboBudgetBands.get(key) || emptyBudgetBands();
+  comboBands[band] += 1;
+  comboBudgetBands.set(key, comboBands);
+}
+
+if (invariantErrors.length) {
+  throw new Error(`Refusing to write an invalid outfit library:\n${invariantErrors.slice(0, 20).join('\n')}`);
+}
+
+const sortedTotals = [...totals].sort((a, b) => a - b);
+const percentile = (ratio) => sortedTotals[Math.min(
+  sortedTotals.length - 1,
+  Math.max(0, Math.floor((sortedTotals.length - 1) * ratio)),
+)] || 0;
+const totalStats = {
+  minCents: sortedTotals[0] || 0,
+  medianCents: percentile(0.5),
+  p90Cents: percentile(0.9),
+  maxCents: sortedTotals.at(-1) || 0,
+  averageCents: Math.round(totals.reduce((sum, total) => sum + total, 0) / (totals.length || 1)),
+};
+
 // ── Compact, interned output (product ids → indices, fixed slot order) ──
 const SLOT_ORDER = ['top', 'bottom', 'shoes', 'outer', 'bag', 'hat', 'jewelry', 'eyewear'];
 const idList = [];
@@ -380,33 +502,82 @@ const intern = (id) => {
   return idIndex.get(id);
 };
 const looksByKey = {};
-for (const o of library) {
-  const row = SLOT_ORDER.map((slot) => (o.items[slot] != null ? intern(o.items[slot]) : -1));
-  (looksByKey[o.vibe] ||= {})[o.frame] ||= [];
-  looksByKey[o.vibe][o.frame].push(row);
+for (const outfit of library) {
+  const row = SLOT_ORDER.map((slot) => (outfit.items[slot] != null ? intern(outfit.items[slot]) : -1));
+  // Undefined trailing slots hydrate exactly like -1, so trimming them keeps a
+  // 24k-row client artifact materially smaller without changing the schema.
+  while (row.at(-1) === -1) row.pop();
+  (looksByKey[outfit.vibe] ||= {})[outfit.frame] ||= [];
+  looksByKey[outfit.vibe][outfit.frame].push(row);
 }
-const out = { slots: SLOT_ORDER, ids: idList, looks: looksByKey };
-writeFileSync(join(ROOT, 'data/outfit-library.json'), `${JSON.stringify(out)}\n`, 'utf8');
+const out = {
+  schemaVersion: 2,
+  verifiedAt: health.generatedAt,
+  maxHealthAgeHours: 24,
+  slots: SLOT_ORDER,
+  ids: idList,
+  looks: looksByKey,
+};
+const serializedOut = `${JSON.stringify(out)}\n`;
+writeFileSync(join(ROOT, 'data/outfit-library.json'), serializedOut, 'utf8');
 
-// ── Report ────────────────────────────────────────────────────────
-console.log(`\nWrote ${library.length} coordinated outfits to data/outfit-library.json\n`);
-console.log('vibe        frame         kept   pools');
-for (const s of stats) {
+const duplicateCount = duplicateSignatures.length;
+const report = {
+  schemaVersion: 1,
+  sourceHealthGeneratedAt: health.generatedAt,
+  maxHealthAgeHours: 24,
+  baseline: BASELINE_METRICS,
+  acceptance: {
+    baselineRows: BASELINE_ROWS,
+    targetUniqueSignatures: TARGET_UNIQUE_SIGNATURES,
+    totalRows: library.length,
+    uniqueSignatures: measuredSignatures.size,
+    duplicateSignatures: duplicateCount,
+    duplicateRatePct: Number(((duplicateCount / (library.length || 1)) * 100).toFixed(4)),
+    meetsTarget: measuredSignatures.size >= TARGET_UNIQUE_SIGNATURES && duplicateCount === 0,
+  },
+  inventory: {
+    catalogProducts: CATALOG_PRODUCTS.length,
+    freshPositiveExactProducts: PRODUCTS.length,
+    usedProducts: usedProductIds.size,
+    byCategory: Object.fromEntries(
+      [...new Set(PRODUCTS.map((product) => product.category))]
+        .sort()
+        .map((category) => [category, PRODUCTS.filter((product) => product.category === category).length]),
+    ),
+  },
+  compactArtifactBytes: Buffer.byteLength(serializedOut),
+  coordination: {
+    qualityBar: QUALITY_BAR,
+    averageScore: Number((library.reduce((sum, outfit) => sum + outfit.score, 0) / (library.length || 1)).toFixed(3)),
+  },
+  wholeLookTotals: totalStats,
+  budgetBands,
+  combinations: stats.map((stat) => ({
+    ...stat,
+    budgetBands: comboBudgetBands.get(`${stat.vibe}:${stat.frame}`) || emptyBudgetBands(),
+  })),
+};
+writeFileSync(join(ROOT, 'data/outfit-library-report.json'), `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+
+// ── Human-readable report ────────────────────────────────────────
+console.log(`\nWrote ${library.length} coordinated outfits to data/outfit-library.json`);
+console.log('Wrote validation metrics to data/outfit-library-report.json\n');
+console.log('vibe        frame         kept   shortfall   pools');
+for (const stat of stats) {
   console.log(
-    `${s.vibe.padEnd(10)} ${String(s.frame).padEnd(12)} ${String(s.kept).padStart(4)}   ${s.note || JSON.stringify(s.pools)}`,
+    `${stat.vibe.padEnd(10)} ${String(stat.frame).padEnd(12)} ${String(stat.kept).padStart(4)}   ${String(stat.shortfall).padStart(9)}   ${stat.note || JSON.stringify(stat.pools)}`,
   );
 }
-const byVibe = {};
-for (const o of library) byVibe[o.vibe] = (byVibe[o.vibe] || 0) + 1;
-console.log('\nper-vibe totals:', JSON.stringify(byVibe));
-const avgScore = library.reduce((s, o) => s + o.score, 0) / (library.length || 1);
-console.log('avg coordination score:', Math.round(avgScore * 1000) / 1000);
+console.log(`\nunique signatures: ${measuredSignatures.size}/${TARGET_UNIQUE_SIGNATURES} target`);
+console.log(`duplicates: ${duplicateCount} (${report.acceptance.duplicateRatePct.toFixed(4)}%)`);
+console.log(`strict inventory: ${PRODUCTS.length}/${CATALOG_PRODUCTS.length} products · ${usedProductIds.size} used`);
+console.log(`budget bands: ${JSON.stringify(budgetBands)}`);
+console.log(`whole-look totals (cents): ${JSON.stringify(totalStats)}`);
+console.log(`compact artifact: ${report.compactArtifactBytes.toLocaleString()} bytes`);
+console.log(`avg coordination score: ${report.coordination.averageScore}`);
 
-let shopPieces = 0, shopExact = 0, shopFloor = 0;
-for (const o of library) {
-  const ids = Object.values(o.items);
-  const exact = ids.filter((id) => EXACT_LINK_IDS.has(id)).length;
-  shopPieces += ids.length; shopExact += exact;
-  if (exact >= 3) shopFloor += 1;
+if (!report.acceptance.meetsTarget) {
+  console.error('\nOutfit diversity target was not met; see exact per-combination shortfalls in data/outfit-library-report.json.');
+  process.exitCode = 2;
 }
-console.log(`shoppability: ${(shopExact / shopPieces * 100).toFixed(1)}% of pieces exact-link · ${(shopFloor / library.length * 100).toFixed(1)}% of looks have >=3 exact pieces (catalog: ${EXACT_LINK_IDS.size}/${PRODUCTS.length} exact)`);

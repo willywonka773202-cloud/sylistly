@@ -62,18 +62,19 @@ export function InstallHint() {
   return (
     <div
       role="dialog"
-      aria-label="Add Sylistly to your Home Screen"
+      aria-modal="false"
+      aria-labelledby="install-hint-title"
       className="pointer-events-none fixed inset-x-0 bottom-0 z-[130] px-3 pb-[calc(env(safe-area-inset-bottom)+96px)]"
     >
       <div
-        className={`pointer-events-auto mx-auto flex max-w-[440px] items-start gap-3 rounded-[22px] border border-[rgba(231,199,155,.22)] bg-[rgba(18,17,20,.975)] p-3.5 shadow-[0_26px_64px_-18px_rgba(0,0,0,.78)] backdrop-blur-2xl transition-all duration-300 ease-out ${
+        className={`pointer-events-auto mx-auto flex max-w-[440px] items-start gap-3 rounded-[22px] border border-[rgba(231,199,155,.22)] bg-[rgba(18,17,20,.975)] p-3.5 shadow-[0_26px_64px_-18px_rgba(0,0,0,.78)] backdrop-blur-2xl transition-all duration-300 ease-out motion-reduce:transform-none motion-reduce:transition-none ${
           shown ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon-192.png" alt="" width={44} height={44} className="mt-0.5 h-11 w-11 shrink-0 rounded-[12px] ring-1 ring-[rgba(231,199,155,.25)]" />
         <div className="min-w-0 flex-1">
-          <p className="text-[14.5px] font-bold leading-tight text-ink">Add Sylistly to your Home Screen</p>
+          <h2 id="install-hint-title" className="text-[14.5px] font-bold leading-tight text-ink">Add Sylistly to your Home Screen</h2>
           <p className="mt-1 text-[12.5px] leading-snug text-muted">
             Launches full-screen — one tap to today&apos;s drop and your saved fits, like a real app.
           </p>
@@ -87,7 +88,7 @@ export function InstallHint() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss"
-          className="sy-press -mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted-2 transition hover:text-ink"
+          className="sy-press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted-2 transition hover:text-ink"
         >
           <X size={17} />
         </button>

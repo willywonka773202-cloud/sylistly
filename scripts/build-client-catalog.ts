@@ -1,6 +1,12 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import catalogHealthData from '../data/catalog-health.json';
 import { ALL_CATALOG_PRODUCTS } from '../lib/catalog';
+import {
+  evaluateProductPublishability,
+  isProductPublishable,
+  type CatalogHealthSnapshot,
+} from '../lib/catalog-publishability';
 import {
   getProductImageQualityScore,
   hasProductCommerceLink,
@@ -25,6 +31,7 @@ interface ClientCatalogReport {
     failedEditorialGate: number;
     blockedStatusOrFlags: number;
     noCommerceLink: number;
+    failedPublishabilityGate: number;
     syntheticStudio: number;
     missingLocalCutoutFile: number;
   };
@@ -44,6 +51,10 @@ const CATEGORY_BRAND_CAP_PASSES = [2, 3, 5, Number.POSITIVE_INFINITY];
 // slack and crowds out REQUIRED-slot categories — brand-concentrated shoes
 // lose picks to brand-diverse outerwear under the brand-cap passes.
 const CATEGORY_MAX: Partial<Record<Category, number>> = { outer: 130, bag: 75 };
+const PUBLISHABILITY_OPTIONS = {
+  health: catalogHealthData as CatalogHealthSnapshot,
+  freshnessPolicy: 'allow-unknown' as const,
+};
 
 function localCutoutExists(product: Product): boolean {
   const url = product.imageTransparentUrl || product.imageCutoutUrl || '';
@@ -62,7 +73,7 @@ function hasBlockedCutoutStatusOrFlags(product: Product): boolean {
 
 function isClientCatalogProduct(product: Product): boolean {
   return isEditorialCutoutProduct(product)
-    && hasProductCommerceLink(product)
+    && isProductPublishable(product, PUBLISHABILITY_OPTIONS)
     && !isSyntheticStudioProduct(product)
     && localCutoutExists(product);
 }
@@ -300,6 +311,7 @@ async function build(): Promise<{ products: Product[]; report: ClientCatalogRepo
     failedEditorialGate: 0,
     blockedStatusOrFlags: 0,
     noCommerceLink: 0,
+    failedPublishabilityGate: 0,
     syntheticStudio: 0,
     missingLocalCutoutFile: 0,
   };
@@ -319,6 +331,10 @@ async function build(): Promise<{ products: Product[]; report: ClientCatalogRepo
     }
     if (!hasProductCommerceLink(product)) {
       rejected.noCommerceLink += 1;
+      continue;
+    }
+    if (!evaluateProductPublishability(product, PUBLISHABILITY_OPTIONS).publishable) {
+      rejected.failedPublishabilityGate += 1;
       continue;
     }
     if (isSyntheticStudioProduct(product)) {
@@ -354,7 +370,8 @@ async function build(): Promise<{ products: Product[]; report: ClientCatalogRepo
       outputFile: 'data/client-catalog.json',
       notes: [
         'Client catalog is generated from reviewed transparent runtime products only.',
-        'Products must pass the feed editorial transparent-cutout gate, have a real commerce/search outbound link, avoid failed/quarantined/bad cutout flags, and reference an existing local cutout file.',
+        'Products must pass the shared publishability gate (exact PDP, acceptable trust/stock, not known dead or sold out), the editorial transparent-cutout gate, and reference an existing local cutout file.',
+        'Missing or stale health evidence remains backward-compatible during catalog builds; set strict freshness in release gating only after the 24-hour coverage target is met.',
         'The export intentionally shares the same visual quality floor as the feed and generator so noisy marketplace, costume, set, and category-mismatched items do not re-enter the UI.',
         'The emitted order is category- and brand-balanced so the first client slices do not collapse into one brand or two outfit formulas.',
         'Near-duplicate scrape listings (same brand+colour+model) are collapsed to one product per group, keeping the cleanest cutout (lowest body-model score) so duplicates and worn-on-a-model twins do not re-enter the feed.',

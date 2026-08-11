@@ -47,39 +47,40 @@ export function PiecePeek({
   const dialogRef = useDialogBehavior<HTMLDivElement>(onClose);
 
   return (
-    <div className="fixed inset-0 z-[80] mx-auto flex max-w-[480px] items-end">
-      <button className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-label="Close" onClick={onClose} />
+    <div className="fixed inset-0 z-[80] mx-auto flex max-w-[480px] items-end lg:max-w-none lg:items-center lg:justify-center lg:p-8">
+      <button type="button" className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-label="Close" onClick={onClose} />
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label={`${product.brand} ${product.name}`}
+        aria-labelledby="piece-peek-title"
         tabIndex={-1}
-        className="sy-sheet-enter relative z-10 w-full rounded-t-sheet border border-hairline-2 bg-surface-1 p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-float outline-none"
+        className="sy-sheet-enter relative z-10 w-full rounded-t-sheet border border-hairline-2 bg-surface-1 p-4 pb-[calc(env(safe-area-inset-bottom)+18px)] shadow-float outline-none lg:max-w-[760px] lg:rounded-[32px] lg:p-7 lg:pb-7"
       >
-        <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-hairline-2" />
+        <div className="mx-auto mb-3 h-1 w-11 rounded-full bg-hairline-2 lg:hidden" />
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="sy-press absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted"
+          className="sy-press absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full border border-hairline-2 bg-surface-2 text-muted lg:right-5 lg:top-5"
         >
           <X size={15} />
         </button>
 
-        <div className="flex items-center gap-3.5">
-          <span className="grid h-[88px] w-[88px] shrink-0 place-items-center overflow-hidden rounded-card bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)]">
+        <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-center lg:gap-x-7">
+        <div className="flex items-center gap-3.5 lg:contents">
+          <span className="grid h-[88px] w-[88px] shrink-0 place-items-center overflow-hidden rounded-card bg-[linear-gradient(180deg,#FFFFFF,#FAF5EF)] lg:row-span-2 lg:h-[248px] lg:w-full lg:rounded-[24px]">
             <ProductImage
               product={product}
               transparentOnly
-              wrapperClassName="h-[72px] w-[72px]"
-              className="h-[72px] w-[72px] object-contain"
+              wrapperClassName="h-[72px] w-[72px] lg:h-[210px] lg:w-[210px]"
+              className="h-[72px] w-[72px] object-contain lg:h-[210px] lg:w-[210px]"
             />
           </span>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 lg:self-end lg:pr-11">
             <p className="text-eyebrow font-extrabold uppercase text-champagne">{product.brand}</p>
-            <p className="mt-1 line-clamp-2 text-[14px] font-semibold leading-tight text-ink">{product.name}</p>
-            <p className="mt-1.5 flex items-center gap-2 text-[15px] font-bold text-accent">
+            <h2 id="piece-peek-title" className="mt-1 line-clamp-2 text-[14px] font-semibold leading-tight text-ink lg:mt-2 lg:text-[22px] lg:leading-[1.08]">{product.name}</h2>
+            <p className="mt-1.5 flex flex-wrap items-center gap-2 text-[15px] font-bold text-accent lg:mt-3 lg:text-[18px]">
               {formatPrice(product.priceCents || 0)}
               {exact ? (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.1em] text-money">
@@ -91,10 +92,11 @@ export function PiecePeek({
           </div>
         </div>
 
+        <div className="lg:col-start-2 lg:self-start">
         <button
           type="button"
           onClick={onShop}
-          className="sy-press mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-3.5 text-[14px] font-bold text-white shadow-pink-glow"
+          className="sy-press mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#FF2D6D,#FF5C8A)] px-4 py-3.5 text-[14px] font-bold text-bg shadow-pink-glow"
         >
           Shop at {merchantName(product)}
           <ExternalLink size={15} />
@@ -105,7 +107,7 @@ export function PiecePeek({
           <button
             type="button"
             onClick={onSwap}
-            className="sy-press inline-flex items-center justify-center gap-2 rounded-full border border-hairline-2 bg-surface-2 px-4 py-3 text-[13px] font-semibold text-ink"
+            className="sy-press inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-hairline-2 bg-surface-2 px-4 py-3 text-[13px] font-semibold text-ink"
           >
             <RefreshCw size={14} className="text-accent" />
             Swap piece
@@ -114,7 +116,7 @@ export function PiecePeek({
             type="button"
             onClick={onLock}
             aria-pressed={locked}
-            className={`sy-press inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-[13px] font-semibold transition ${
+            className={`sy-press inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 py-3 text-[13px] font-semibold transition ${
               locked
                 ? 'border-accent bg-accent-soft text-ink'
                 : 'border-hairline-2 bg-surface-2 text-ink'
@@ -123,6 +125,8 @@ export function PiecePeek({
             <Lock size={14} className="text-accent" />
             {locked ? 'Locked' : 'Lock it'}
           </button>
+        </div>
+        </div>
         </div>
       </div>
     </div>

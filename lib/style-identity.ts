@@ -79,6 +79,12 @@ export const IDENTITIES: Record<string, StyleIdentity> = {
   },
 };
 
+/** Own-property lookup prevents crafted route ids such as `toString` or
+ * `__proto__` from resolving through Object.prototype. */
+export function getStyleIdentityById(id: string): StyleIdentity | null {
+  return Object.prototype.hasOwnProperty.call(IDENTITIES, id) ? IDENTITIES[id] : null;
+}
+
 /** Deterministic mapping from answers → persona. Every combo resolves. */
 export function deriveIdentity(answers: StyleAnswers): StyleIdentity {
   const { lane, palette } = answers;
@@ -100,7 +106,7 @@ export function deriveIdentity(answers: StyleAnswers): StyleIdentity {
     else id = 'soft-romantic';
   }
 
-  return IDENTITIES[id] || IDENTITIES['editorial-clean'];
+  return getStyleIdentityById(id) || IDENTITIES['editorial-clean'];
 }
 
 const IDENTITY_KEY = 'sylistly.style-identity.v1';

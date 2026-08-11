@@ -47,6 +47,10 @@ const contentSecurityPolicy = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // A parent-level package-lock.json exists on the development machine. Pin
+  // tracing to this repository so Next never infers the workspace root from
+  // that unrelated lockfile (and production bundle evidence stays stable).
+  outputFileTracingRoot: __dirname,
   async headers() {
     return [
       {

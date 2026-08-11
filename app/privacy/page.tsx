@@ -25,12 +25,12 @@ export default function PrivacyPage() {
       </header>
 
       <div className="mt-5 rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-[12px] leading-relaxed text-amber-100">
-        ⚠️ <strong>Draft — pending legal review.</strong> This describes how the app works today but
+        <strong>Draft — pending legal review.</strong> This describes how the app works today but
         has not been reviewed by counsel and is not yet a final, effective policy.
       </div>
 
       <h1 className="mt-6 font-serif text-[32px] font-semibold leading-tight text-ink">Privacy Policy</h1>
-      <p className="mt-1 text-[12px] text-muted">Last updated: 21 June 2026</p>
+      <p className="mt-1 text-[12px] text-muted">Last updated: 10 August 2026</p>
 
       <div className="mt-6 space-y-6 text-[14px] leading-relaxed text-muted-2">
         <section>
@@ -47,18 +47,25 @@ export default function PrivacyPage() {
           <p className="mt-2">
             Your saved fits, your style-quiz answers and persona, your frame and preference settings,
             and your streak/collection progress are kept in your browser&rsquo;s local storage. They
-            don&rsquo;t leave your device and we can&rsquo;t see them. Clearing your browser data
-            removes them.
+            are not uploaded as a Sylistly account profile. Clearing local data from Profile or your
+            browser removes them. If you deliberately paste a retailer URL into &ldquo;Style what I
+            own,&rdquo; that URL is sent to the Sylistly server only so the page can be validated; the
+            feature code does not add the URL to a server-side wardrobe.
           </p>
         </section>
 
         <section>
           <h2 className="font-serif text-[18px] font-semibold text-ink">Analytics</h2>
           <p className="mt-2">
-            When enabled, we use a product-analytics tool (PostHog) to understand aggregate usage —
-            which screens are viewed, fits swiped, and links tapped — so we can improve the app. This
-            is behavioural, not personally-identifying, and is only active when an analytics key is
-            configured. We do not sell your data.
+            When enabled, we use a product-analytics tool (PostHog) to understand usage — which
+            screens are viewed, fits swiped, preferences changed, links tapped, and how pages perform —
+            so we can improve the app. These are pseudonymous event records, not anonymous aggregate
+            statistics at collection time. They use random browser and session identifiers stored in
+            first-party browser storage and a first-party analytics cookie. We disable automatic click
+            capture, heatmaps, and session recording, and send only the product events described here.
+            Sylistly does not attach a name or email unless a real account feature is introduced and you
+            choose to use it. PostHog collection is active only when an analytics key is configured. We
+            do not sell this data.
           </p>
         </section>
 
@@ -68,7 +75,21 @@ export default function PrivacyPage() {
             When you tap to shop a piece, you&rsquo;re sent to the retailer through an affiliate link
             (e.g. Skimlinks, Rakuten). These partners may set cookies on the retailer&rsquo;s side to
             credit Sylistly a commission if you buy — at no extra cost to you. Once you&rsquo;re on a
-            retailer&rsquo;s site, their privacy policy governs that visit.
+            retailer&rsquo;s site, their privacy policy governs that visit. When the click ledger is
+            configured, Sylistly records the product/look reference, originating surface, campaign,
+            anonymous browser/session references, destination host, affiliate network, redirect result,
+            and time. It does not record your retailer checkout or payment details.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-serif text-[18px] font-semibold text-ink">Requests and service logs</h2>
+          <p className="mt-2">
+            Search, catalog, link-validation, and retailer-redirect requests are processed by our hosting
+            and database providers. The application stores only the catalog and click fields described
+            above, but infrastructure providers may keep ordinary security and request logs under their
+            own retention settings. Final retention periods and region-specific rights must be set and
+            reviewed before this draft becomes effective.
           </p>
         </section>
 
@@ -76,9 +97,9 @@ export default function PrivacyPage() {
           <h2 className="font-serif text-[18px] font-semibold text-ink">Who we share with</h2>
           <p className="mt-2">
             We don&rsquo;t sell personal data. The only third parties involved are the analytics
-            provider (aggregate usage, when enabled), the affiliate networks (for commission
-            attribution), and the retailers you choose to visit. We don&rsquo;t process payments —
-            purchases happen on the retailer&rsquo;s own checkout.
+            provider (pseudonymous product-usage events, when enabled), the affiliate networks (for commission
+            attribution), our hosting/database providers, and the retailers you choose to visit. We
+            don&rsquo;t process payments — purchases happen on the retailer&rsquo;s own checkout.
           </p>
         </section>
 
@@ -90,22 +111,26 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-serif text-[18px] font-semibold text-ink">Your choices</h2>
           <p className="mt-2">
-            You can clear all on-device data any time through your browser settings. Because we
-            don&rsquo;t hold an account for you, there&rsquo;s no server-side profile to delete.
+            You can clear Sylistly&rsquo;s on-device saved data from Profile or through your browser
+            settings. That reset also rotates the anonymous analytics identity on the next visit.
+            Because the current product does not create an account, there is no server-side account
+            profile to delete. A public request/opt-out contact and jurisdiction-specific rights process
+            must be added before this draft takes effect.
           </p>
         </section>
 
         <section>
           <h2 className="font-serif text-[18px] font-semibold text-ink">Changes &amp; contact</h2>
           <p className="mt-2">
-            We&rsquo;ll update this page if our practices change. Questions: [contact email — to be
-            added before launch].
+            We&rsquo;ll update this page if our practices change. A public privacy contact channel will
+            be added before this draft takes effect.
           </p>
         </section>
       </div>
 
       <div className="mt-10 flex gap-4 text-[12px] font-semibold text-muted">
         <Link href="/terms" className="text-accent">Terms of Service</Link>
+        <Link href="/affiliate-disclosure" className="hover:text-ink">Affiliate disclosure</Link>
         <Link href="/" className="hover:text-ink">Back to Sylistly</Link>
       </div>
     </main>
