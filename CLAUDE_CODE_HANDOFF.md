@@ -6,11 +6,11 @@ This file is the clean handoff for continuing Sylistly in Claude Code.
 
 Use this folder as the only source of truth:
 
-- `/Users/willlambert/Documents/Codex/2026-04-21-files-mentioned-by-the-user-faac6441/sylistly-nextjs`
+- `<LOCAL_PROJECT_PATH>`
 
 Do not merge or reuse the divergent earlier prototype:
 
-- `/Users/willlambert/Documents/Sylistly`
+- `<LOCAL_PROJECT_PATH>`
 
 That older folder has drift we do not want to carry forward.
 
@@ -19,15 +19,15 @@ That older folder has drift we do not want to carry forward.
 Upload these files and folders:
 
 1. The full project folder:
-   - `/Users/willlambert/Documents/Codex/2026-04-21-files-mentioned-by-the-user-faac6441/sylistly-nextjs`
+   - `<LOCAL_PROJECT_PATH>`
 2. The prior Codex handoff:
-   - `/Users/willlambert/Library/Application Support/Claude/local-agent-mode-sessions/37eb60af-411a-4a7c-8d4a-1cdd659b2a7d/44c00edc-a395-4cfa-871f-ec6f250d651f/local_2f503246-b73b-410f-98cb-2e0964a2056c/outputs/CODEX_HANDOFF.md`
+   - `<LOCAL_PROJECT_PATH>`
 3. The original master product/design prompt:
-   - `/Users/willlambert/Library/Application Support/Claude/local-agent-mode-sessions/37eb60af-411a-4a7c-8d4a-1cdd659b2a7d/44c00edc-a395-4cfa-871f-ec6f250d651f/local_2f503246-b73b-410f-98cb-2e0964a2056c/outputs/SYLISTLY_MASTER_PROMPT.md`
+   - `<LOCAL_PROJECT_PATH>`
 4. The visual HTML prototype:
-   - `/Users/willlambert/Library/Application Support/Claude/local-agent-mode-sessions/37eb60af-411a-4a7c-8d4a-1cdd659b2a7d/44c00edc-a395-4cfa-871f-ec6f250d651f/local_2f503246-b73b-410f-98cb-2e0964a2056c/outputs/sylistly.html`
+   - `<LOCAL_PROJECT_PATH>`
 5. Optional but useful visual reference video:
-   - `/Users/willlambert/Downloads/FAAC6441-6A69-43A9-8AFB-F1825E896B10.mov`
+   - `<LOCAL_PROJECT_PATH>`
 
 Do not upload `.env.local` if you do not want secrets copied around. Just tell Claude Code the env vars exist locally or will be added locally.
 
@@ -134,10 +134,10 @@ These are the main issues Claude Code should treat as real product gaps, not jus
 ## Exact Prompt To Paste Into Claude Code
 
 ```text
-Use /Users/willlambert/Documents/Codex/2026-04-21-files-mentioned-by-the-user-faac6441/sylistly-nextjs as the only source of truth.
+Use <LOCAL_PROJECT_PATH>
 
 Important constraints:
-- Do not merge anything from /Users/willlambert/Documents/Sylistly. That folder is a divergent early prototype and should be ignored.
+- Do not merge anything from <LOCAL_PROJECT_PATH>
 - Use the uploaded CODEX_HANDOFF.md, SYLISTLY_MASTER_PROMPT.md, sylistly.html, and optional video as product/design context.
 - Keep the app aligned with the visual feel and interaction quality of sylistly.html and the video.
 - Do not commit secrets or ask me to paste secrets into chat. Assume env vars are set locally.
@@ -215,7 +215,7 @@ Please start by:
 ## Shorter Prompt Option
 
 ```text
-Finish the Sylistly app in /Users/willlambert/Documents/Codex/2026-04-21-files-mentioned-by-the-user-faac6441/sylistly-nextjs using the uploaded handoff docs, sylistly.html, and video as reference. Do not use /Users/willlambert/Documents/Sylistly. Focus on the builder/search/shop flow, polish mobile UX, keep demo mode explicit for rate-limited live search, and implement fixes directly instead of just planning.
+Finish the Sylistly app in <LOCAL_PROJECT_PATH>
 ```
 
 ## Important Things To Tell Claude Code
