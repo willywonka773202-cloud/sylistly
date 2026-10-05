@@ -1,3 +1,13 @@
+# Sylistly — fashion discovery prototype
+
+A personal AI-assisted product experiment in outfit discovery and shopping interfaces. Public source and preview availability do not mean every recommendation, retailer stock check, or provider integration is production-ready. [Read the scope and contribution](https://will-lambert-portfolio.vercel.app/projects/sylistly.html). Existing licensing remains unchanged.
+
+[Personal portfolio](https://will-lambert-portfolio.vercel.app) · [Project updates](https://will-lambert-portfolio.vercel.app/updates.html)
+
+---
+
+## Existing technical documentation
+
 # Sylistly — AI Outfit Builder
 
 AI-powered outfit builder (search, mannequin, feed, discover, saved, profile) with real product shopping.
